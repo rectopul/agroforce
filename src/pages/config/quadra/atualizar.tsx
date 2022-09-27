@@ -67,7 +67,7 @@ interface IData {
   quadra: any;
 }
 
-const generatesPropsDividers = [
+const generatePropsDividers = [
   // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
   { name: "CamposGerenciados[]", title: "Divisor", value: "divisor" },
   { name: "CamposGerenciados[]", title: "Sem metro", value: "sem_metros" },
@@ -94,22 +94,47 @@ const generatePropsParcels = [
   // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
   {
     name: "CamposGerenciados[]",
-    title: "Experimento Planejado",
+    title: "Experimento",
     value: "experimentName",
   },
-  { name: "CamposGerenciados[]", title: "Lugar de Cultura", value: "local" },
+  { name: "CamposGerenciados[]", title: "Nome do Genótipo", value: "genotipo" },
   {
     name: "CamposGerenciados[]",
-    title: "Delineamento",
-    value: "delineamento",
+    title: "Status T",
+    value: "status_t",
   },
-  { name: "CamposGerenciados[]", title: "Rep.", value: "repetitionsNumber" },
-  { name: "CamposGerenciados[]", title: "NLP", value: "nlp" },
-  { name: "CamposGerenciados[]", title: "CLP", value: "clp" },
-  { name: "CamposGerenciados[]", title: "EEL", value: "eel" },
-  { name: "CamposGerenciados[]", title: "Densidade", value: "density" },
-  { name: "CamposGerenciados[]", title: "Status EXP.", value: "status" },
+  { name: "CamposGerenciados[]", title: "Fase", value: "fase" },
+  { name: "CamposGerenciados[]", title: "Tecnologia", value: "tecnologia" },
+  { name: "CamposGerenciados[]", title: "SC", value: "sc" },
+  { name: "CamposGerenciados[]", title: "NPE", value: "npe" },
+  { name: "CamposGerenciados[]", title: "NC", value: "nc" },
+  { name: "CamposGerenciados[]", title: "R", value: "rep" },
+  { name: "CamposGerenciados[]", title: "Plantio", value: "plantio" },
 ];
+
+const generatePropsPlanting = [
+  // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+  {
+    name: "CamposGerenciados[]",
+    title: "T4",
+    value: "t4",
+  },
+  { name: "CamposGerenciados[]", title: "Tratorista", value: "tratorista" },
+  {
+    name: "CamposGerenciados[]",
+    title: "Disparador A",
+    value: "disp_a",
+  },
+  { name: "CamposGerenciados[]", title: "Disparador B", value: "disp_b" },
+  { name: "CamposGerenciados[]", title: "Olheiro", value: "olheiro" },
+  { name: "CamposGerenciados[]", title: "Responsável", value: "responsible" },
+];
+
+const dividersCampos = "id,divisor,sem_metros,t4_i,t4_f,di,df";
+const experimentsCampos = "seq,experimentName,npe_i,npe_f,parcelas";
+const parcelsCampos =
+  "experimentName,genotipo,status_t,fase,tecnologia,sc,npe,nc,rep,plantio";
+const plantingCampos = "t4,tratorista,disp_a,disp_b,olheiro,responsible";
 
 export default function AtualizarQuadra({
   allDividers,
@@ -177,23 +202,20 @@ export default function AtualizarQuadra({
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
-  const preferences = userLogado.preferences.dividers || {
-    id: 0,
-    table_preferences: "id,divisor,sem_metros,t4_i,t4_f,di,df",
-  };
+  const [preferences, setPreferences] = useState<any>(
+    userLogado.preferences.dividers || {
+      id: 0,
+      table_preferences: dividersCampos,
+    }
+  );
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences
   );
-  const [experimentsCamposGerenciados, setExperimentsCamposGerenciados] =
-    useState<any>("seq,experimentName,npe_i,npe_f,parcelas");
-  const [parcelasCamposGerenciados, setParcelasCamposGerenciados] =
-    useState<any>(
-      "experimentName,genotipo,status_t,fase,tecnologia,sc,npe,nc,rep,plantio"
-    );
-  const [plantingCamposGerenciados, setHarvestCamposGerenciados] =
-    useState<any>("t4,tratorista,disp_a,disp_b,olheiro,responsavel");
-
-  console.log({ allDividers });
+  const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(
+    generatePropsDividers
+  );
+  const [table, setTable] = useState<string>("dividers");
+  const [columns, setColumns] = useState([]);
 
   const [data, setData] = useState<any[]>(allDividers);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -201,51 +223,6 @@ export default function AtualizarQuadra({
   const [orderList, setOrder] = useState<number>(1);
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: "CamposGerenciados[]", title: "Divisor", value: "divisor" },
-    { name: "CamposGerenciados[]", title: "Sem metro", value: "sem_metros" },
-    { name: "CamposGerenciados[]", title: "T4I", value: "t4_i" },
-    { name: "CamposGerenciados[]", title: "T4F", value: "t4_f" },
-    { name: "CamposGerenciados[]", title: "DI", value: "di" },
-    { name: "CamposGerenciados[]", title: "DF", value: "df" },
-  ]);
-  const [generatesPropsExperiments, setGeneratesPropsExperiments] = useState<
-    IGenerateProps[]
-  >(() => [
-    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: "CamposGerenciados[]", title: "Seq", value: "seq" },
-    {
-      name: "CamposGerenciados[]",
-      title: "Nome do experimento",
-      value: "experimentName",
-    },
-    { name: "CamposGerenciados[]", title: "NPEI", value: "npe_i" },
-    { name: "CamposGerenciados[]", title: "NPEF.", value: "npe_f" },
-    { name: "CamposGerenciados[]", title: "Nº Parcelas", value: "parcelas" },
-  ]);
-  const [generatesPropsParcelas, setGeneratesPropsParcelas] = useState<
-    IGenerateProps[]
-  >(() => [
-    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    {
-      name: "CamposGerenciados[]",
-      title: "Experimento Planejado",
-      value: "experimentName",
-    },
-    { name: "CamposGerenciados[]", title: "Lugar de Cultura", value: "local" },
-    {
-      name: "CamposGerenciados[]",
-      title: "Delineamento",
-      value: "delineamento",
-    },
-    { name: "CamposGerenciados[]", title: "Rep.", value: "repetitionsNumber" },
-    { name: "CamposGerenciados[]", title: "NLP", value: "nlp" },
-    { name: "CamposGerenciados[]", title: "CLP", value: "clp" },
-    { name: "CamposGerenciados[]", title: "EEL", value: "eel" },
-    { name: "CamposGerenciados[]", title: "Densidade", value: "density" },
-    { name: "CamposGerenciados[]", title: "Status EXP.", value: "status" },
-  ]);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>("");
   const [orderBy, setOrderBy] = useState<string>("");
@@ -253,95 +230,6 @@ export default function AtualizarQuadra({
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-  const [table, setTable] = useState<string>("dividers");
-
-  const [columns, setColumns] = useState([]);
-
-  async function handleOrder(
-    column: string,
-    order: string | any
-  ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = "asc";
-    } else if (order === 2) {
-      typeOrder = "desc";
-    } else {
-      typeOrder = "";
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== "undefined") {
-      if (typeOrder !== "") {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== "") {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_quadra=${idQuadra}`;
-    } else {
-      parametersFilter = filter;
-    }
-
-    switch (table) {
-      case "dividers": {
-        await dividersService
-          .getAll(`${parametersFilter}&skip=0&take=${take}`)
-          .then((response) => {
-            if (response.status === 200) {
-              setData(response.response);
-            }
-          });
-        break;
-      }
-      case "experiments": {
-        await experimentService
-          .getAll(`${parametersFilter}&skip=0&take=${take}`)
-          .then((response) => {
-            if (response.status === 200) {
-              setData(response.response);
-            }
-          });
-        break;
-      }
-      case "parcelas": {
-        await experimentGenotipeService
-          .getAll(`${parametersFilter}&skip=0&take=${take}`)
-          .then((response) => {
-            if (response.status === 200) {
-              setData(response.response);
-            }
-          });
-        break;
-      }
-      case "colheita": {
-        setData([]);
-        break;
-      }
-      default: {
-        await dividersService
-          .getAll(`${parametersFilter}&skip=0&take=${take}`)
-          .then((response) => {
-            if (response.status === 200) {
-              setData(response.response);
-            }
-          });
-      }
-    }
-
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder("");
-      }
-    }
-  }
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -394,6 +282,110 @@ export default function AtualizarQuadra({
           </div>
         ),
     };
+  }
+
+  function updateFieldFactory(title: string, name: string) {
+    return (
+      <div className="w-2/4 h-7">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
+          {name}
+        </label>
+        <Input
+          style={{ background: "#e5e7eb" }}
+          disabled
+          required
+          id={title}
+          name={title}
+          value={formik.values[title]}
+        />
+      </div>
+    );
+  }
+
+  async function handleOrder(
+    column: string,
+    order: string | any
+  ): Promise<void> {
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = "asc";
+    } else if (order === 2) {
+      typeOrder = "desc";
+    } else {
+      typeOrder = "";
+    }
+    setOrderBy(column);
+    setOrderType(typeOrder);
+    if (filter && typeof filter !== "undefined") {
+      if (typeOrder !== "") {
+        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+      } else {
+        parametersFilter = filter;
+      }
+    } else if (typeOrder !== "") {
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_quadra=${idQuadra}`;
+    } else {
+      parametersFilter = filter;
+    }
+
+    switch (table) {
+      case "dividers": {
+        await dividersService
+          .getAll(`${parametersFilter}&skip=0&take=${take}`)
+          .then((response) => {
+            if (response.status === 200) {
+              setData(response.response);
+            }
+          });
+        break;
+      }
+      case "experiments": {
+        await experimentService
+          .getAll(`${parametersFilter}&skip=0&take=${take}`)
+          .then((response) => {
+            if (response.status === 200) {
+              setData(response.response);
+            }
+          });
+        break;
+      }
+      case "parcels": {
+        await experimentGenotipeService
+          .getAll(`${parametersFilter}&skip=0&take=${take}`)
+          .then((response) => {
+            if (response.status === 200) {
+              setData(response.response);
+            }
+          });
+        break;
+      }
+      case "planting": {
+        setData([]);
+        break;
+      }
+      default: {
+        await dividersService
+          .getAll(`${parametersFilter}&skip=0&take=${take}`)
+          .then((response) => {
+            if (response.status === 200) {
+              setData(response.response);
+            }
+          });
+      }
+    }
+
+    if (orderList === 2) {
+      setOrder(0);
+      setArrowOrder(<AiOutlineArrowDown />);
+    } else {
+      setOrder(orderList + 1);
+      if (orderList === 1) {
+        setArrowOrder(<AiOutlineArrowUp />);
+      } else {
+        setArrowOrder("");
+      }
+    }
   }
 
   function dividersColumnsOrder(columnsCampos: string) {
@@ -511,8 +503,8 @@ export default function AtualizarQuadra({
       if (columnOrder[index] === "olheiro") {
         tableFields.push(headerTableFactory("Olheiro", "olheiro"));
       }
-      if (columnOrder[index] === "responsavel") {
-        tableFields.push(headerTableFactory("Responsável", "responsavel"));
+      if (columnOrder[index] === "responsible") {
+        tableFields.push(headerTableFactory("Responsável", "responsible"));
       }
     });
     return tableFields;
@@ -524,13 +516,13 @@ export default function AtualizarQuadra({
         return dividersColumnsOrder(camposGerenciados);
       }
       case "experiments": {
-        return experimentsColumnsOrder(experimentsCamposGerenciados);
+        return experimentsColumnsOrder(camposGerenciados);
       }
       case "parcels": {
-        return parcelsColumnsOrder(parcelasCamposGerenciados);
+        return parcelsColumnsOrder(camposGerenciados);
       }
       case "planting": {
-        return plantingColumnsOrder(plantingCamposGerenciados);
+        return plantingColumnsOrder(camposGerenciados);
       }
       default: {
         return dividersColumnsOrder(camposGerenciados);
@@ -538,11 +530,67 @@ export default function AtualizarQuadra({
     }
   }
 
-  useEffect(() => {
-    setColumns(generateColumns());
-  }, [table]);
+  function generateProps() {
+    switch (table) {
+      case "dividers": {
+        return setGeneratesProps(generatePropsDividers);
+      }
+      case "experiments": {
+        return setGeneratesProps(generatePropsExperiments);
+      }
+      case "parcels": {
+        return setGeneratesProps(generatePropsParcels);
+      }
+      case "planting": {
+        return setGeneratesProps(generatePropsPlanting);
+      }
+      default: {
+        return setGeneratesProps(generatePropsDividers);
+      }
+    }
+  }
 
-  console.log({ columns });
+  function onChangeTable(table: string) {
+    const preferencesDividers = userLogado.preferences.dividers || {
+      id: 0,
+      table_preferences: dividersCampos,
+    };
+    const preferencesExperiments = userLogado.preferences.experiments || {
+      id: 0,
+      table_preferences: experimentsCampos,
+    };
+    const preferencesParcels = userLogado.preferences.parcels || {
+      id: 0,
+      table_preferences: parcelsCampos,
+    };
+    const preferencesPlanting = userLogado.preferences.planting || {
+      id: 0,
+      table_preferences: plantingCampos,
+    };
+
+    switch (table) {
+      case "dividers":
+        setPreferences(preferencesDividers);
+        setCamposGerenciados(preferencesDividers.table_preferences);
+        break;
+      case "experiments":
+        setPreferences(preferencesExperiments);
+        setCamposGerenciados(preferencesExperiments.table_preferences);
+        break;
+      case "parcels":
+        setPreferences(preferencesParcels);
+        setCamposGerenciados(preferencesParcels.table_preferences);
+        break;
+      case "planting":
+        setPreferences(preferencesPlanting);
+        setCamposGerenciados(preferencesPlanting.table_preferences);
+        break;
+      default:
+        break;
+    }
+
+    setTable(table);
+  }
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
@@ -554,34 +602,82 @@ export default function AtualizarQuadra({
     }
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
+
+    let module_id: any = null;
+    switch (table) {
+      case "dividers":
+        module_id = 18;
+        break;
+      case "experiments":
+        module_id = 18;
+        break;
+      case "parcels":
+        module_id = 18;
+        break;
+      case "planting":
+        module_id = 18;
+        break;
+      default:
+        break;
+    }
+
+    //envia campos para api
+    //salvar o preferences no localstorage
+    //salva no estado preferences
+    //set os campos gerenciados
+
     if (preferences.id === 0) {
       await userPreferencesService
         .create({
           table_preferences: campos,
           userId: userLogado.id,
-          module_id: 18,
+          module_id,
         })
         .then((response) => {
-          userLogado.preferences.dividers = {
+          userLogado.preferences[table] = {
             id: response.response.id,
             userId: preferences.userId,
             table_preferences: campos,
           };
-          preferences.id = response.response.id;
+
+          //preferences.id = response.response.id;
+          setPreferences({
+            id: response.response.id,
+            table_preferences: campos,
+          });
         });
       localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.dividers = {
+      setPreferences({ ...preferences, table_preferences: campos });
+
+      userLogado.preferences[table] = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
       };
+
       await userPreferencesService.update({
         table_preferences: campos,
         id: preferences.id,
       });
+
       localStorage.setItem("user", JSON.stringify(userLogado));
     }
+
+    //setPreferences({ ...preferences, table_preferences: campos });
+    // localStorage.setItem(
+    //   "user",
+    //   JSON.stringify({
+    //     ...userLogado,
+    //     preferences: {
+    //       ...userLogado.preferences,
+    //       [table]: {
+    //         ...preferences,
+    //         table_preferences: campos,
+    //       },
+    //     },
+    //   })
+    // );
 
     setStatusAccordion(false);
     setCamposGerenciados(campos);
@@ -600,42 +696,96 @@ export default function AtualizarQuadra({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await dividersService
-      .getAll(filterApplication)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          const newData = response.map((row: any) => {
-            if (row.status === 0) {
-              row.status = "Inativo";
-            } else {
-              row.status = "Ativo";
-            }
+    switch (table) {
+      case "dividers": {
+        const { response } = await dividersService.getAll(filterApplication);
+        const newData = response.map((row: any) => {
+          delete row.id;
+          delete row.quadra;
 
-            delete row.id;
-            delete row.quadra;
+          return {
+            ...row,
+            status: row.status === 0 ? "Inativo" : "Ativo",
+          };
+        });
 
-            return row;
-          });
+        console.log({ response });
 
-          const workSheet = XLSX.utils.json_to_sheet(newData);
-          const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, "dividers");
+        return generateSpreadSheet(newData);
+      }
+      case "experiments": {
+        return generateSpreadSheet([]);
+      }
+      case "parcels": {
+        return generateSpreadSheet([]);
+      }
+      case "planting": {
+        return generateSpreadSheet([]);
+      }
+      default: {
+        return;
+      }
+    }
 
-          // Buffer
-          XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "buffer",
-          });
-          // Binary
-          XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "binary",
-          });
-          // Download
-          XLSX.writeFile(workBook, "divisores.xlsx");
-        }
-      });
+    // await dividersService
+    //   .getAll(filterApplication)
+    //   .then(({ status, response }) => {
+    //     if (status === 200) {
+    //       const newData = response.map((row: any) => {
+    //         if (row.status === 0) {
+    //           row.status = "Inativo";
+    //         } else {
+    //           row.status = "Ativo";
+    //         }
+
+    //         delete row.id;
+    //         delete row.quadra;
+
+    //         return row;
+    //       });
+
+    //       const workSheet = XLSX.utils.json_to_sheet(newData);
+    //       const workBook = XLSX.utils.book_new();
+    //       XLSX.utils.book_append_sheet(workBook, workSheet, "dividers");
+
+    //       // Buffer
+    //       XLSX.write(workBook, {
+    //         bookType: "xlsx", // xlsx
+    //         type: "buffer",
+    //       });
+    //       // Binary
+    //       XLSX.write(workBook, {
+    //         bookType: "xlsx", // xlsx
+    //         type: "binary",
+    //       });
+    //       // Download
+    //       XLSX.writeFile(workBook, "divisores.xlsx");
+    //     }
+    //   });
   };
+
+  function generateSpreadSheet(data: any) {
+    if (data?.length > 0) {
+      const workSheet = XLSX.utils.json_to_sheet(data);
+      const workBook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workBook, workSheet, table);
+
+      // Buffer
+      XLSX.write(workBook, {
+        bookType: "xlsx", // xlsx
+        type: "buffer",
+      });
+      // Binary
+      XLSX.write(workBook, {
+        bookType: "xlsx", // xlsx
+        type: "binary",
+      });
+      // Download
+      XLSX.writeFile(workBook, `${table}.xlsx`);
+    } else {
+      Swal.fire("Não existe nenhum registro para gerar a planilha.");
+    }
+  }
 
   function handleTotalPages(): void {
     if (currentPage < 0) {
@@ -675,7 +825,7 @@ export default function AtualizarQuadra({
         });
         break;
       }
-      case "parcelas": {
+      case "parcels": {
         await experimentGenotipeService
           .getAll(parametersFilter)
           .then((response) => {
@@ -685,7 +835,7 @@ export default function AtualizarQuadra({
           });
         break;
       }
-      case "colheita": {
+      case "planting": {
         setData([]);
         break;
       }
@@ -700,27 +850,18 @@ export default function AtualizarQuadra({
   }
 
   useEffect(() => {
+    setColumns(generateColumns());
+    generateProps();
+  }, [table, camposGerenciados]);
+
+  useEffect(() => {
+    handlePagination();
+  }, [table]);
+
+  useEffect(() => {
     handlePagination();
     handleTotalPages();
   }, [currentPage]);
-
-  function updateFieldFactory(title: string, name: string) {
-    return (
-      <div className="w-2/4 h-7">
-        <label className="block text-gray-900 text-sm font-bold mb-1">
-          {name}
-        </label>
-        <Input
-          style={{ background: "#e5e7eb" }}
-          disabled
-          required
-          id={title}
-          name={title}
-          value={formik.values[title]}
-        />
-      </div>
-    );
-  }
 
   return (
     <>
@@ -841,7 +982,7 @@ export default function AtualizarQuadra({
                             table === "dividers" ? "bg-blue-600" : "bg-gray-600"
                           }
                           textColor="white"
-                          onClick={() => setTable("dividers")}
+                          onClick={() => onChangeTable("dividers")}
                           // icon={<FaSortAmountUpAlt size={20} />}
                         />
                       </div>
@@ -856,7 +997,7 @@ export default function AtualizarQuadra({
                               : "bg-gray-600"
                           }
                           textColor="white"
-                          onClick={() => setTable("experiments")}
+                          onClick={() => onChangeTable("experiments")}
                           // icon={<FaSortAmountUpAlt size={20} />}
                         />
                       </div>
@@ -869,7 +1010,7 @@ export default function AtualizarQuadra({
                             table === "parcels" ? "bg-blue-600" : "bg-gray-600"
                           }
                           textColor="white"
-                          onClick={() => setTable("parcels")}
+                          onClick={() => onChangeTable("parcels")}
                           // icon={<FaSortAmountUpAlt size={20} />}
                         />
                       </div>
@@ -882,7 +1023,7 @@ export default function AtualizarQuadra({
                             table === "planting" ? "bg-blue-600" : "bg-gray-600"
                           }
                           textColor="white"
-                          onClick={() => setTable("planting")}
+                          onClick={() => onChangeTable("planting")}
                           // icon={<FaSortAmountUpAlt size={20} />}
                         />
                       </div>
