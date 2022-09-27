@@ -814,6 +814,7 @@ export default function AtualizarQuadra({
           if (response.status === 200) {
             setData(response.response);
           }
+          setTotalItems(response.total);
         });
         break;
       }
@@ -822,6 +823,7 @@ export default function AtualizarQuadra({
           if (response.status === 200) {
             setData(response.response);
           }
+          setTotalItems(response.total);
         });
         break;
       }
@@ -832,11 +834,13 @@ export default function AtualizarQuadra({
             if (response.status === 200) {
               setData(response.response);
             }
+            setTotalItems(response.total);
           });
         break;
       }
       case "planting": {
         setData([]);
+        //setTotalItems(response.total);
         break;
       }
       default: {
