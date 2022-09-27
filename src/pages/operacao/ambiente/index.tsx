@@ -79,12 +79,12 @@ interface IData {
   totalItems: number;
   filter: string | any;
   itensPerPage: number | any;
-  filterBeforeEdit :object |any;
+  filterBeforeEdit: object | any;
   filterApplication: object | any;
-  id_safra :number |any,
-  cultureId :number | any,
-  orderByserver :string |any, 
-  typeOrderServer: string |any, 
+  id_safra: number | any,
+  cultureId: number | any,
+  orderByserver: string | any,
+  typeOrderServer: string | any,
 }
 
 export default function Listagem({
@@ -95,8 +95,8 @@ export default function Listagem({
       filterBeforeEdit,
       id_safra,
       cultureId,
-      orderByserver, 
-      typeOrderServer, 
+      orderByserver,
+      typeOrderServer,
     }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
@@ -183,9 +183,9 @@ export default function Listagem({
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-  const [orderBy,setOrderBy]=useState<string>(orderByserver); 
-  const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); 
-  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; 
+  const [orderBy, setOrderBy] = useState<string>(orderByserver);
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
 
   const filters = [
@@ -231,7 +231,7 @@ export default function Listagem({
       filterNpeFinalFrom,
     }) => {
       // &filterSafra=${filterSafra}
-      const parametersFilter = `filterStatus=${filterStatus}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&id_culture=${cultureId}&id_safra=${id_safra}`;
+      const parametersFilter = `filterStatus=${filterStatus}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&safraId=${id_safra}`;
       // await npeService
       //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
       //   .then((response) => {
@@ -249,28 +249,28 @@ export default function Listagem({
 
 
   //Calling common API 
-  async function callingApi(parametersFilter : any ){
+  async function callingApi(parametersFilter: any) {
 
     setCookies("filterBeforeEdit", parametersFilter);
     setCookies("filterBeforeEditTypeOrder", typeOrder);
-    setCookies("filterBeforeEditOrderBy", orderBy);  
+    setCookies("filterBeforeEditOrderBy", orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
     await npeService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400 ) {
+      if (response.status === 200 || response.status === 400) {
         setNPE(response.response);
         setTotalItems(response.total);
       }
     });
-  } 
+  }
 
   //Call that function when change type order value.
   useEffect(() => {
     callingApi(filter);
   }, [typeOrder]);
-  
+
 
 
   function headerTableFactory(name: any, title: string) {
@@ -373,13 +373,13 @@ export default function Listagem({
     //   }
     // }
 
-      //Gobal manage orders
-      const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order , orderList);
+    //Gobal manage orders
+    const { typeOrderG, columnG, orderByG, arrowOrder } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-      setTypeOrder(typeOrderG);
-      setOrderBy(columnG);
-      setOrder(orderByG);
-      setArrowOrder(arrowOrder);
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
   }
 
   async function getValuesColumns(): Promise<void> {
@@ -564,10 +564,10 @@ export default function Listagem({
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = tableGlobalFunctions.getValuesForFilter(value , filtersParams);
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
     return parameter;
   }
-  
+
   function filterFieldFactory(title: any, name: any) {
     return (
       <div className="h-7 w-1/2 ml-4">
@@ -908,7 +908,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages-1)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600 testing"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -936,8 +936,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const { cultureId } = req.cookies;
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
-  ? req.cookies.filterBeforeEdit
-  : `filterStatus=2&id_culture=${cultureId}&id_safra=${id_safra}`;
+    ? req.cookies.filterBeforeEdit
+    : `filterStatus=2&safraId=${id_safra}`;
 
 
   // removeCookies('filterBeforeEdit', { req, res });
@@ -946,37 +946,37 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
 
-  const filterApplication = `filterStatus=2&id_culture=${cultureId}&id_safra=${id_safra}`;
+  const filterApplication = `filterStatus=2&safraId=${id_safra}`;
 
   //Last page
   const lastPageServer = req.cookies.lastPage
-  ? req.cookies.lastPage
-  : "No";
+    ? req.cookies.lastPage
+    : "No";
 
-  if(lastPageServer == undefined || lastPageServer == "No"){
+  if (lastPageServer == undefined || lastPageServer == "No") {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies("filterBeforeEditTypeOrder", { req, res });
     removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });  
+    removeCookies("lastPage", { req, res });
   }
 
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
-  ? req.cookies.filterBeforeEditTypeOrder
-  : "desc";
-        
+    ? req.cookies.filterBeforeEditTypeOrder
+    : "desc";
+
 
   const orderByserver = req.cookies.filterBeforeEditOrderBy
-  ? req.cookies.filterBeforeEditOrderBy
-  : "local.name_local_culture";
-  
+    ? req.cookies.filterBeforeEditOrderBy
+    : "local.name_local_culture";
+
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
   removeCookies("filterBeforeEditTypeOrder", { req, res });
   removeCookies("filterBeforeEditOrderBy", { req, res });
-  removeCookies("lastPage", { req, res });  
+  removeCookies("lastPage", { req, res });
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=2&id_culture=${cultureId}&id_safra=${id_safra}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=2&safraId=${id_safra}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -999,8 +999,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
       filterApplication,
       id_safra,
       cultureId,
-      orderByserver, 
-      typeOrderServer, 
+      orderByserver,
+      typeOrderServer,
     },
   };
 };
