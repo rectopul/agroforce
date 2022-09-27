@@ -526,6 +526,7 @@ model genotype_treatment {
   treatments_number Int
   comments          String?
   status            String
+  status_experiment String     @default("IMPORTADO")
   created_by        Int
   assay_list        assay_list @relation(fields: [id_assay_list], references: [id])
   genotipo          genotipo   @relation(fields: [id_genotipo], references: [id])
