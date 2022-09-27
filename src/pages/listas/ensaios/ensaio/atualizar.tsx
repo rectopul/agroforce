@@ -95,7 +95,7 @@ export default function AtualizarTipoEnsaio({
     { name: 'CamposGerenciados[]', title: 'NCA', value: 'nca' },
     { name: 'CamposGerenciados[]', title: 'Cód. lote', value: 'cod_lote' },
     { name: 'CamposGerenciados[]', title: 'OBS', value: 'comments' },
-    { name: 'CamposGerenciados[]', title: 'Status Exp.', value: 'status_experiment' },
+    { name: 'CamposGerenciados[]', title: 'Status Trat.', value: 'status_experiment' },
   ]);
   const [
     generatesPropsExperiments,
@@ -332,7 +332,7 @@ export default function AtualizarTipoEnsaio({
         tableFields.push(headerTableFactory('OBS', 'comments'));
       }
       if (columnOrder[index] === 'status_experiment') {
-        tableFields.push(headerTableFactory('Status Exp.', 'status_experiment'));
+        tableFields.push(headerTableFactory('Status Trat.', 'status_experiment'));
       }
     });
     return tableFields;
