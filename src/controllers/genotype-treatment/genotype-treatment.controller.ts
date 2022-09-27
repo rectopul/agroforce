@@ -98,6 +98,7 @@ export class GenotypeTreatmentController {
         },
         treatments_number: true,
         status: true,
+        status_experiment: true,
         lote: {
           select: {
             ncc: true,
@@ -152,7 +153,7 @@ export class GenotypeTreatmentController {
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
       if (options.orderBy) {
-        console.log("orderBy   ",options.orderBy);
+        console.log('orderBy   ', options.orderBy);
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }

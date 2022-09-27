@@ -142,10 +142,12 @@ export default function NovoLocal({
                   Swal.fire(response.message);
                 }
               });
+            } else {
+              Swal.fire('Unable to update prox npe, prox npe entered is already consumed by experiment genotipe.')
             }
           });
         } else {
-          Swal.fire('Unable to update prox npe');
+          Swal.fire('Unable to update prox npe, prox npe entered is already consumed by another npe.')
         }
       });
     },

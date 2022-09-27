@@ -2,41 +2,41 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import React, { useRef } from "react";
-import { removeCookies, setCookies } from "cookies-next";
-import { useFormik } from "formik";
-import MaterialTable from "material-table";
-import { GetServerSideProps } from "next";
-import getConfig from "next/config";
-import { RequestInit } from "next/dist/server/web/spec-extension/request";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import React, { useRef } from 'react';
+import { removeCookies, setCookies } from 'cookies-next';
+import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
+import { GetServerSideProps } from 'next';
+import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from "react-beautiful-dnd";
-import { BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { BsDownload } from "react-icons/bs";
+} from 'react-beautiful-dnd';
+import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import { BsDownload } from 'react-icons/bs';
 import {
   RiArrowUpDownLine,
   RiCloseCircleFill,
   RiFileExcel2Line,
-} from "react-icons/ri";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import Modal from "react-modal";
-import * as XLSX from "xlsx";
-import Swal from "sweetalert2";
-import readXlsxFile from "read-excel-file";
+} from 'react-icons/ri';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import Modal from 'react-modal';
+import * as XLSX from 'xlsx';
+import Swal from 'sweetalert2';
+import readXlsxFile from 'read-excel-file';
 import {
   ITreatment,
   ITreatmentFilter,
   ITreatmentGrid,
-} from "../../../../interfaces/listas/ensaio/genotype-treatment.interface";
-import { IGenerateProps } from "../../../../interfaces/shared/generate-props.interface";
+} from '../../../../interfaces/listas/ensaio/genotype-treatment.interface';
+import { IGenerateProps } from '../../../../interfaces/shared/generate-props.interface';
 
 import {
   AccordionFilter,
@@ -46,14 +46,14 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
-} from "../../../../components";
-import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
+} from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   genotypeTreatmentService,
   importService,
   userPreferencesService,
-} from "../../../../services";
-import * as ITabs from "../../../../shared/utils/dropdown";
+} from '../../../../services';
+import * as ITabs from '../../../../shared/utils/dropdown';
 
 export default function Listagem({
   assaySelect,
@@ -68,21 +68,19 @@ export default function Listagem({
 
   const tableRef = useRef<any>(null);
 
-  const tabsDropDowns = TabsDropDowns("listas");
+  const tabsDropDowns = TabsDropDowns('listas');
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "ENSAIO" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.genotypeTreatment || {
     id: 0,
     table_preferences:
-      "id,foco,type_assay,tecnologia,gli,bgm,treatments_number,status,statusAssay,genotipoName,nca",
+      'id,foco,type_assay,tecnologia,gli,bgm,treatments_number,status,statusAssay,genotipoName,nca',
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences
+    preferences.table_preferences,
   );
   const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
   const [tableMessage, setMessage] = useState<boolean>(false);
@@ -93,89 +91,83 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number>(0);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    // {
-    //   name: 'CamposGerenciados[]',
-    //   title: 'CheckBox ',
-    //   value: 'id',
-    //   defaultChecked: () => camposGerenciados.includes('id'),
-    // },
     {
-      name: "CamposGerenciados[]",
-      title: "Foco",
-      value: "foco",
-      defaultChecked: () => camposGerenciados.includes("foco"),
+      name: 'CamposGerenciados[]',
+      title: 'Foco',
+      value: 'foco',
+      defaultChecked: () => camposGerenciados.includes('foco'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Ensaio",
-      value: "type_assay",
-      defaultChecked: () => camposGerenciados.includes("type_assay"),
+      name: 'CamposGerenciados[]',
+      title: 'Ensaio',
+      value: 'type_assay',
+      defaultChecked: () => camposGerenciados.includes('type_assay'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Nome da tecnologia",
-      value: "tecnologia",
-      defaultChecked: () => camposGerenciados.includes("tecnologia"),
+      name: 'CamposGerenciados[]',
+      title: 'Nome da tecnologia',
+      value: 'tecnologia',
+      defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "GLI",
-      value: "gli",
-      defaultChecked: () => camposGerenciados.includes("gli"),
+      name: 'CamposGerenciados[]',
+      title: 'GLI',
+      value: 'gli',
+      defaultChecked: () => camposGerenciados.includes('gli'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "BGM",
-      value: "bgm",
-      defaultChecked: () => camposGerenciados.includes("bgm"),
+      name: 'CamposGerenciados[]',
+      title: 'BGM',
+      value: 'bgm',
+      defaultChecked: () => camposGerenciados.includes('bgm'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "NT",
-      value: "treatments_number",
-      defaultChecked: () => camposGerenciados.includes("treatments_number"),
+      name: 'CamposGerenciados[]',
+      title: 'NT',
+      value: 'treatments_number',
+      defaultChecked: () => camposGerenciados.includes('treatments_number'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Status T",
-      value: "status",
-      defaultChecked: () => camposGerenciados.includes("status"),
+      name: 'CamposGerenciados[]',
+      title: 'Status T',
+      value: 'status',
+      defaultChecked: () => camposGerenciados.includes('status'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Status do Ensaio",
-      value: "statusAssay",
-      defaultChecked: () => camposGerenciados.includes("statusAssay"),
+      name: 'CamposGerenciados[]',
+      title: 'Status do Ensaio',
+      value: 'statusAssay',
+      defaultChecked: () => camposGerenciados.includes('statusAssay'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Nome do genótipo",
-      value: "genotipoName",
-      defaultChecked: () => camposGerenciados.includes("genotipoName"),
+      name: 'CamposGerenciados[]',
+      title: 'Nome do genótipo',
+      value: 'genotipoName',
+      defaultChecked: () => camposGerenciados.includes('genotipoName'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "NCA",
-      value: "nca",
-      defaultChecked: () => camposGerenciados.includes("nca"),
+      name: 'CamposGerenciados[]',
+      title: 'NCA',
+      value: 'nca',
+      defaultChecked: () => camposGerenciados.includes('nca'),
     },
   ]);
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
     {
-      name: "StatusCheckbox",
-      title: "IMPORTADO ",
-      value: "importado",
-      defaultChecked: () => camposGerenciados.includes("importado"),
+      name: 'StatusCheckbox',
+      title: 'IMPORTADO ',
+      value: 'importado',
+      defaultChecked: () => camposGerenciados.includes('importado'),
     },
     {
-      name: "StatusCheckbox",
-      title: "SORTEADO",
-      value: "sorteado",
-      defaultChecked: () => camposGerenciados.includes("sorteado"),
+      name: 'StatusCheckbox',
+      title: 'SORTEADO',
+      value: 'sorteado',
+      defaultChecked: () => camposGerenciados.includes('sorteado'),
     },
   ]);
-  const [orderBy, setOrderBy] = useState<string>("");
-  const [orderType, setOrderType] = useState<string>("");
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   // const take: number = itensPerPage;
@@ -188,24 +180,24 @@ export default function Listagem({
 
   const formik = useFormik<ITreatmentFilter>({
     initialValues: {
-      filterFoco: "",
-      filterTypeAssay: "",
-      filterTechnology: "",
-      filterGli: "",
-      filterBgm: "",
-      filterTreatmentsNumber: "",
-      filterStatus: "",
-      filterCodTec: "",
-      filterStatusAssay: "",
-      filterGenotypeName: "",
-      filterNca: "",
-      orderBy: "",
-      typeOrder: "",
-      filterBgmTo: "",
-      filterBgmFrom: "",
-      filterNtTo: "",
-      filterNtFrom: "",
-      filterStatusT: "",
+      filterFoco: '',
+      filterTypeAssay: '',
+      filterTechnology: '',
+      filterGli: '',
+      filterBgm: '',
+      filterTreatmentsNumber: '',
+      filterStatus: '',
+      filterCodTec: '',
+      filterStatusAssay: '',
+      filterGenotypeName: '',
+      filterNca: '',
+      orderBy: '',
+      typeOrder: '',
+      filterBgmTo: '',
+      filterBgmFrom: '',
+      filterNtTo: '',
+      filterNtFrom: '',
+      filterStatusT: '',
     },
     onSubmit: async ({
       filterFoco,
@@ -225,9 +217,9 @@ export default function Listagem({
       filterCodTec,
     }) => {
       const allCheckBox: any = document.querySelectorAll(
-        "input[name='StatusCheckbox']"
+        "input[name='StatusCheckbox']",
       );
-      let selecionados = "";
+      let selecionados = '';
       for (let i = 0; i < allCheckBox.length; i += 1) {
         if (allCheckBox[i].checked) {
           selecionados += `${allCheckBox[i].value},`;
@@ -237,7 +229,7 @@ export default function Listagem({
       const filterStatus = selecionados.substr(0, selecionados.length - 1);
       const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}`;
       setFiltersParams(parametersFilter);
-      setCookies("filterBeforeEdit", filtersParams);
+      setCookies('filterBeforeEdit', filtersParams);
       await genotypeTreatmentService
         .getAll(`${parametersFilter}`)
         .then(({ response, total: allTotal }) => {
@@ -248,7 +240,7 @@ export default function Listagem({
           setCurrentPage(0);
           setMessage(true);
           tableRef.current.dataManager.changePageSize(
-            allTotal >= take ? take : allTotal
+            allTotal >= take ? take : allTotal,
           );
         });
     },
@@ -258,21 +250,21 @@ export default function Listagem({
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = "asc";
+      typeOrder = 'asc';
     } else if (order === 2) {
-      typeOrder = "desc";
+      typeOrder = 'desc';
     } else {
-      typeOrder = "";
+      typeOrder = '';
     }
     setOrderBy(column);
     setOrderType(typeOrder);
-    if (filter && typeof filter !== "undefined") {
-      if (typeOrder !== "") {
+    if (filter && typeof filter !== 'undefined') {
+      if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== "") {
+    } else if (typeOrder !== '') {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
     } else {
       parametersFilter = filter;
@@ -296,7 +288,7 @@ export default function Listagem({
   function headerTableFactory(
     name: string,
     title: string,
-    style: boolean = false
+    style: boolean = false,
   ) {
     return {
       title: (
@@ -312,7 +304,7 @@ export default function Listagem({
       ),
       field: title,
       sorting: true,
-      cellStyle: style ? { color: "#039be5", fontWeight: "bold" } : {},
+      cellStyle: style ? { color: '#039be5', fontWeight: 'bold' } : {},
     };
   }
 
@@ -329,7 +321,7 @@ export default function Listagem({
           </button>
         </div>
       ),
-      field: "tecnologia",
+      field: 'tecnologia',
       width: 0,
       sorting: true,
       render: (rowData: any) => (
@@ -343,44 +335,44 @@ export default function Listagem({
   }
 
   function orderColumns(columnsOrder: string): Array<object> {
-    const columnOrder: any = columnsOrder.split(",");
+    const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
-      if (columnOrder[item] === "foco") {
-        tableFields.push(headerTableFactory("Foco", "assay_list.foco.name"));
+      if (columnOrder[item] === 'foco') {
+        tableFields.push(headerTableFactory('Foco', 'assay_list.foco.name'));
       }
-      if (columnOrder[item] === "type_assay") {
+      if (columnOrder[item] === 'type_assay') {
         tableFields.push(
-          headerTableFactory("Ensaio", "assay_list.type_assay.name")
+          headerTableFactory('Ensaio', 'assay_list.type_assay.name'),
         );
       }
-      if (columnOrder[item] === "tecnologia") {
-        tableFields.push(tecnologiaHeaderFactory("Tecnologia", "tecnologia"));
+      if (columnOrder[item] === 'tecnologia') {
+        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
       }
-      if (columnOrder[item] === "gli") {
-        tableFields.push(headerTableFactory("GLI", "assay_list.gli"));
+      if (columnOrder[item] === 'gli') {
+        tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
       }
-      if (columnOrder[item] === "bgm") {
-        tableFields.push(headerTableFactory("BGM", "assay_list.bgm"));
+      if (columnOrder[item] === 'bgm') {
+        tableFields.push(headerTableFactory('BGM', 'assay_list.bgm'));
       }
-      if (columnOrder[item] === "treatments_number") {
-        tableFields.push(headerTableFactory("NT", "treatments_number"));
+      if (columnOrder[item] === 'treatments_number') {
+        tableFields.push(headerTableFactory('NT', 'treatments_number'));
       }
-      if (columnOrder[item] === "status") {
-        tableFields.push(headerTableFactory("Status T", "status"));
+      if (columnOrder[item] === 'status') {
+        tableFields.push(headerTableFactory('Status T', 'status'));
       }
-      if (columnOrder[item] === "statusAssay") {
+      if (columnOrder[item] === 'statusAssay') {
         tableFields.push(
-          headerTableFactory("Status do ensaio", "assay_list.status")
+          headerTableFactory('Status do ensaio', 'assay_list.status'),
         );
       }
-      if (columnOrder[item] === "genotipoName") {
+      if (columnOrder[item] === 'genotipoName') {
         tableFields.push(
-          headerTableFactory("Nome do genótipo", "genotipo.name_genotipo", true)
+          headerTableFactory('Nome do genótipo', 'genotipo.name_genotipo', true),
         );
       }
-      if (columnOrder[item] === "nca") {
-        tableFields.push(headerTableFactory("NCA", "lote.ncc", true));
+      if (columnOrder[item] === 'nca') {
+        tableFields.push(headerTableFactory('NCA', 'lote.ncc', true));
       }
     });
     return tableFields;
@@ -390,7 +382,7 @@ export default function Listagem({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = "";
+    let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -413,7 +405,7 @@ export default function Listagem({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
       userLogado.preferences.genotypeTreatment = {
         id: preferences.id,
@@ -424,7 +416,7 @@ export default function Listagem({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -465,20 +457,20 @@ export default function Listagem({
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, "Tratamentos");
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
 
           // Buffer
           XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "buffer",
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
           });
           // Binary
           XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "binary",
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, "Tratamentos-genótipo.xlsx");
+          XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
         }
       });
   };
@@ -500,27 +492,27 @@ export default function Listagem({
             newItem.status_t = item.status;
             newItem.genotipo = item.genotipo.name_genotipo;
             newItem.nca = item.lote?.ncc;
-            newItem.novo_genotipo = "";
-            newItem.novo_status = "";
-            newItem.novo_nca = "";
+            newItem.novo_genotipo = '';
+            newItem.novo_status = '';
+            newItem.novo_nca = '';
             return newItem;
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, "Tratamentos");
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
 
           // Buffer
           XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "buffer",
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
           });
           // Binary
           XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "binary",
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, "Substituição-genótipos.xlsx");
+          XLSX.writeFile(workBook, 'Substituição-genótipos.xlsx');
         }
       });
   };
@@ -578,7 +570,7 @@ export default function Listagem({
     readXlsxFile(value[0]).then((rows) => {
       importService
         .validate({
-          table: "REPLACEMENT_GENOTYPE ",
+          table: 'REPLACEMENT_GENOTYPE ',
           spreadSheet: rows,
           moduleId: 27,
           idSafra: userLogado.safras.safra_selecionada,
@@ -587,7 +579,7 @@ export default function Listagem({
         .then(({ message }: any) => {
           Swal.fire({
             html: message,
-            width: "800",
+            width: '800',
           });
         });
     });
@@ -595,10 +587,10 @@ export default function Listagem({
 
   async function handleSubmit(event: any) {
     const genotypeButton = document.querySelector(
-      "input[id='genotipo']:checked"
+      "input[id='genotipo']:checked",
     );
     const ncaButton = document.querySelector("input[id='nca']:checked");
-    const inputFile: any = document.getElementById("import");
+    const inputFile: any = document.getElementById('import');
     event.preventDefault();
     if (genotypeButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => ({
@@ -608,14 +600,14 @@ export default function Listagem({
       }));
 
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
-      localStorage.setItem("checkedTreatments", checkedTreatmentsLocal);
+      localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
       localStorage.setItem(
-        "treatmentsOptionSelected",
-        JSON.stringify("genotipo")
+        'treatmentsOptionSelected',
+        JSON.stringify('genotipo'),
       );
 
       router.push(
-        "/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios"
+        '/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios',
       );
     } else if (ncaButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => ({
@@ -624,16 +616,16 @@ export default function Listagem({
         idLote: item.id_lote,
       }));
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
-      localStorage.setItem("checkedTreatments", checkedTreatmentsLocal);
-      localStorage.setItem("treatmentsOptionSelected", JSON.stringify("nca"));
+      localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
+      localStorage.setItem('treatmentsOptionSelected', JSON.stringify('nca'));
 
       router.push(
-        "/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios"
+        '/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios',
       );
     } else if (inputFile?.files.length !== 0) {
       readExcel(inputFile.files);
     } else {
-      Swal.fire("Selecione alguma opção ou import");
+      Swal.fire('Selecione alguma opção ou import');
     }
   }
 
@@ -739,7 +731,11 @@ export default function Listagem({
             </header>
             <div>
               <div className="mb-2 text-blue-600 text-xl mt-2 font-medium">
-                <h2>Total selecionados: {rowsSelected?.length}</h2>
+                <h2>
+                  Total selecionados:
+                  {' '}
+                  {rowsSelected?.length}
+                </h2>
               </div>
 
               <div className="border-l-8 border-l-blue-600">
@@ -808,8 +804,8 @@ export default function Listagem({
                   pb-8
                 "
                 >
-                  {filterFieldFactory("filterFoco", "Foco")}
-                  {filterFieldFactory("filterTypeAssay", "Ensaio")}
+                  {filterFieldFactory('filterFoco', 'Foco')}
+                  {filterFieldFactory('filterTypeAssay', 'Ensaio')}
 
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -826,7 +822,7 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory("filterTechnology", "Nome da tecnologia")}
+                  {filterFieldFactory('filterTechnology', 'Nome da tecnologia')}
                   <div className="h-7 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       GLI
@@ -956,7 +952,7 @@ export default function Listagem({
                     </label>
                     <Select
                       values={[
-                        { id: "", name: "Selecione" },
+                        { id: '', name: 'Selecione' },
                         ...genotypeSelect,
                       ]}
                       id="filterGenotypeName"
@@ -967,7 +963,7 @@ export default function Listagem({
                   </div>
 
                   {/* {filterFieldFactory('filterGenotypeName', 'Nome genótipo')} */}
-                  {filterFieldFactory("filterNca", "NCA")}
+                  {filterFieldFactory('filterNca', 'NCA')}
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
@@ -991,18 +987,17 @@ export default function Listagem({
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
               tableRef={tableRef}
-              style={{ background: "#f9fafb" }}
+              style={{ background: '#f9fafb' }}
               columns={columns}
               data={afterFilter ? treatments : []}
               options={{
                 selection: true,
-                selectionProps: (rowData: any) =>
-                  isOpenModal && { disabled: rowData },
+                selectionProps: (rowData: any) => isOpenModal && { disabled: rowData },
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
                 },
-                rowStyle: { background: "#f9fafb", height: 35 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 // pageSize: itensPerPage,
@@ -1011,8 +1006,8 @@ export default function Listagem({
               localization={{
                 body: {
                   emptyDataSourceMessage: tableMessage
-                    ? "Nenhum Trat. Genótipo encontrado!"
-                    : "ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.",
+                    ? 'Nenhum Trat. Genótipo encontrado!'
+                    : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
                 },
               }}
               onChangeRowsPerPage={(e: any) => {}}
@@ -1047,7 +1042,9 @@ export default function Listagem({
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado: {itemsTotal}
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
                     </strong>
 
                     <div
@@ -1094,7 +1091,7 @@ export default function Listagem({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value
+                                                generate.value,
                                               )}
                                             />
                                           </li>
@@ -1134,59 +1131,58 @@ export default function Listagem({
                     </div>
                   </div>
                 ),
-                Pagination: (props) =>
-                  (
-                    <div
-                      className="flex
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(0)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage < 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill("")
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setCurrentPage(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(pages)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(0)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage < 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(pages)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
                   ) as any,
               }}
             />
@@ -1211,7 +1207,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : "";
+    : '';
   const { token } = req.cookies;
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
@@ -1220,12 +1216,11 @@ export const getServerSideProps: GetServerSideProps = async ({
   const baseUrlTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
   const baseUrlAssay = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
-  const filterApplication =
-    req.cookies.filterBeforeEdit ||
-    `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const filterApplication = req.cookies.filterBeforeEdit
+    || `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
-  removeCookies("filterBeforeEdit", { req, res });
-  removeCookies("pageBeforeEdit", { req, res });
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const param = `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
@@ -1233,19 +1228,19 @@ export const getServerSideProps: GetServerSideProps = async ({
   const urlParametersTreatment: any = new URL(baseUrlTreatment);
   urlParametersTreatment.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
   const { response: allTreatments, total: totalItems } = await fetch(
     urlParametersTreatment.toString(),
-    requestOptions
+    requestOptions,
   ).then((response) => response.json());
 
   const { response: allAssay } = await fetch(
     `${urlParametersAssay.toString()}/?id_culture=${idCulture}&id_safra=${idSafra}`,
-    requestOptions
+    requestOptions,
   ).then((response) => response.json());
 
   const assaySelect = allAssay.map((item: any) => {
@@ -1256,8 +1251,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   });
 
   const teste: any = {};
-  teste.id = "";
-  teste.name = "Selecione";
+  teste.id = '';
+  teste.name = 'Selecione';
   assaySelect.unshift(teste);
 
   const genotypeSelect = allTreatments?.map((item: any) => {
@@ -1266,6 +1261,9 @@ export const getServerSideProps: GetServerSideProps = async ({
     newItem.name = item.genotipo.name_genotipo;
     return newItem;
   });
+
+  console.log('allTreatments');
+  console.log(allTreatments);
 
   return {
     props: {

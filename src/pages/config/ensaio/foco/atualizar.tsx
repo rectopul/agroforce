@@ -384,17 +384,25 @@ export default function Atualizar({
         if (status === 200) {
           const newData = response.map((row: any) => {
             const newRow = row;
+
+            newRow.SAFRA = row.safra.safraName;
+            newRow.GRUPO = Number(row.group);
+            newRow.FOCO = row.foco.name;
+
             delete newRow.npe;
-            newRow.group = Number(row.group);
+            delete newRow.safra;
+            delete newRow.foco;
+            delete newRow.id_foco;
+            delete newRow.group;
             delete newRow.id;
             return newRow;
           });
 
-          newData.map((item: any) => {
-            item.foco = item.foco?.name;
-            item.safra = item.safra?.safraName;
-            return item;
-          });
+          // newData.map((item: any) => {
+          //   item.foco = item.foco?.name;
+          //   item.safra = item.safra?.safraName;
+          //   return item;
+          // });
 
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();

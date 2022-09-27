@@ -391,6 +391,9 @@ export default function Listagem({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
+
+    console.log('filter');
+    console.log(filter);
     await experimentService
       .getAll(parametersFilter)
       .then(({ status, response, total: newTotal }: any) => {
@@ -719,14 +722,13 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? req.cookies.filterBeforeEdit
     : '';
   const { token } = req.cookies;
-  const { cultureId } = req.cookies;
   const { safraId } = req.cookies;
   const experimentGroupId = query.id;
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrlExperiments = `${publicRuntimeConfig.apiUrl}/experiment`;
 
-  const filterApplication = req.cookies.filterBeforeEdit
+  const filterApplication = `${req.cookies.filterBeforeEdit}&experimentGroupId=${experimentGroupId}`
     || `&experimentGroupId=${experimentGroupId}&safraId=${safraId}`;
 
   removeCookies('filterBeforeEdit', { req, res });
@@ -752,7 +754,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     `${baseUrlShow}/${experimentGroupId}`,
     requestOptions,
   ).then((response) => response.json());
-
   return {
     props: {
       allExperiments,
@@ -761,7 +762,6 @@ export const getServerSideProps: GetServerSideProps = async ({
       totalItems,
       itensPerPage,
       filterApplication,
-      cultureId,
       safraId,
       pageBeforeEdit,
       filterBeforeEdit,

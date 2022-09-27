@@ -28,8 +28,10 @@ import { FaRegThumbsDown, FaRegThumbsUp, FaSearchPlus } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
+import handleStatusGlobal from 'src/shared/utils/handleStatusGlobal';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
+import { number } from 'yup';
 import {
   AccordionFilter,
   Button,
@@ -198,13 +200,15 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleStatus(idFoco: number, data: any): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&id_culture=${cultureId}&filterSearch=${data.name}`;
-    if (data.status === 0) {
-      data.status = 1;
-    } else {
-      data.status = 0;
+  async function handleStatus(id: number, data: any) {
+    const params = `filterStatus=${1}&id_culture=${cultureId}&filterSearch=${data.name}`;
+    const index: any = await handleStatusGlobal({
+      id, status: data.status, service: focoService, params, table: 'foco', data: focos,
+    });
+    if (!index || index === -1) {
+      return;
     }
+<<<<<<< Updated upstream
     await focoService.getAll(parametersFilter).then(async ({ status }) => {
       if (status === 200 && data.status === 1) {
         Swal.fire('Já existe um registro ativo com esse nome na tabela foco. \n Favor inativar o registro antes de executar a ação.');
@@ -222,6 +226,12 @@ export default function Listagem({
         copy[index].status = data.status;
         return copy;
       });
+=======
+    setFocos((oldFocos) => {
+      const copy = [...oldFocos];
+      copy[index].status = data.status;
+      return copy;
+>>>>>>> Stashed changes
     });
   }
 

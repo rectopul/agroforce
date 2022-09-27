@@ -36,7 +36,7 @@ import { BsTrashFill } from 'react-icons/bs';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { experimentGenotipeService } from 'src/services/experiment_genotipe.service';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import { npeService, userPreferencesService } from '../../../../services';
+import { genotypeTreatmentService, npeService, userPreferencesService } from '../../../../services';
 import { experimentService } from '../../../../services/experiment.service';
 import {
   AccordionFilter,
@@ -619,7 +619,7 @@ export default function Listagem({
     }
   }
 
-  async function createExperimentGenotipe({ data, total_consumed }: any) {
+  async function createExperimentGenotipe({ data, total_consumed, genotipo_treatment }: any) {
     const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
     const experimentObj: any[] = [];
     experimentos.map((item: any) => {
@@ -628,20 +628,15 @@ export default function Listagem({
       data.status = 'SORTEADO';
       experimentObj.push(data);
     });
-    if (
-      NPESelectedRow?.npeQT == 'N/A'
-        ? true
-        : NPESelectedRow?.npeQT - total_consumed > 0
-          && lastNpe < NPESelectedRow?.nextNPE.npei_i
-    ) {
-      await experimentGenotipeService
-        .create(data)
-        .then(async ({ status, response }: any) => {
-          if (status === 200) {
-            experimentObj.map(async (x: any) => {
-              await experimentService
-                .update(x)
-                .then(({ status, response }: any) => {});
+    if (NPESelectedRow?.npeQT == 'N/A' ? true : (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE.npei_i)) {
+      await experimentGenotipeService.create(data).then(async ({ status, response }: any) => {
+        if (status === 200) {
+          genotipo_treatment.map(async (gt: any) => {
+            genotypeTreatmentService.update(gt).then(({ status, message }: any) => {
+            });
+          });
+          experimentObj.map(async (x: any) => {
+            await experimentService.update(x).then(({ status, response }: any) => {
             });
 
             await npeService.update({
@@ -659,6 +654,7 @@ export default function Listagem({
   function validateConsumedData() {
     if (!SortearDisable) {
       const experiment_genotipo: any[] = [];
+      const genotipo_treatment: any[] = [];
       let npei = Number(NPESelectedRow?.npei_i);
       let total_consumed = 0;
 
@@ -666,6 +662,8 @@ export default function Listagem({
         total_consumed += item.npeQT;
         item.assay_list.genotype_treatment.map((gt: any) => {
           const data: any = {};
+          const gt_new: any = gt;
+          gt_new.status_experiment = "SORTEADO";
           data.idSafra = gt.id_safra;
           data.idFoco = item.assay_list.foco.id;
           data.idTypeAssay = item.assay_list.type_assay.id;
@@ -679,10 +677,11 @@ export default function Listagem({
           data.idGenotipo = gt.genotipo.id; // Added new field
           data.nca = '';
           experiment_genotipo.push(data);
+          genotipo_treatment.push(gt_new);
           npei++;
         });
       });
-      createExperimentGenotipe({ data: experiment_genotipo, total_consumed });
+      createExperimentGenotipe({ data: experiment_genotipo, total_consumed, genotipo_treatment });
     } else {
       const temp = NPESelectedRow;
       Swal.fire({
