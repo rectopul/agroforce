@@ -28,7 +28,10 @@ import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiOrganizationChart } from 'react-icons/ri';
+<<<<<<< HEAD
 import handleStatusGlobal from 'src/shared/utils/handleStatusGlobal';
+=======
+>>>>>>> bd0cf8edac5d356b065dba0071eaa705058fcc45
 import * as XLSX from 'xlsx';
 import {
   AccordionFilter,
@@ -37,11 +40,18 @@ import {
   Content,
   Input,
   Select,
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 } from "../../../../components";
 import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
 import { typeAssayService, userPreferencesService } from "../../../../services";
 import * as ITabs from "../../../../shared/utils/dropdown";
+=======
+} from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { typeAssayService, userPreferencesService } from '../../../../services';
+import * as ITabs from '../../../../shared/utils/dropdown';
+>>>>>>> bd0cf8edac5d356b065dba0071eaa705058fcc45
 import { tableGlobalFunctions } from '../../../../helpers';
 =======
 } from '../../../../components';
@@ -82,8 +92,8 @@ interface IData {
   idSafra: string;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string;
-  typeOrderServer :any| string, //RR
-  orderByserver : any |string //RR
+  typeOrderServer :any| string, // RR
+  orderByserver : any |string // RR
 }
 
 export default function TipoEnsaio({
@@ -95,8 +105,8 @@ export default function TipoEnsaio({
   idSafra,
   pageBeforeEdit,
   filterBeforeEdit,
-  typeOrderServer, //RR
-  orderByserver //RR
+  typeOrderServer, // RR
+  orderByserver, // RR
 }: IData) {
   const { TabsDropDowns } = ITabs.default;
 
@@ -157,6 +167,7 @@ export default function TipoEnsaio({
     },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+<<<<<<< HEAD
 <<<<<<< Updated upstream
   const [colorStar, setColorStar] = useState<string>("");
   // const [orderBy, setOrderBy] = useState<string>("");
@@ -166,30 +177,34 @@ export default function TipoEnsaio({
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
 >>>>>>> Stashed changes
+=======
+  const [colorStar, setColorStar] = useState<string>('');
+  // const [orderBy, setOrderBy] = useState<string>("");
+  const [orderType, setOrderType] = useState<string>('');
+>>>>>>> bd0cf8edac5d356b065dba0071eaa705058fcc45
   const router = useRouter();
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
-  const [orderBy,setOrderBy]=useState<string>(orderByserver); //RR
-  const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); //RR
-  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;  //RR
-
-
+  const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const filters = [
-    { id: 2, name: "Todos" },
-    { id: 1, name: "Ativos" },
-    { id: 0, name: "Inativos" },
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatusBeforeEdit = filterBeforeEdit.split("");
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
   const formik = useFormik<IFilter>({
     initialValues: {
 <<<<<<< Updated upstream
       filterStatus: filterStatusBeforeEdit[13],
       filterName: checkValue('filterName'),
+<<<<<<< HEAD
       filterProtocolName:  checkValue('filterProtocolName'),
       filterSeedsTo:  checkValue('filterSeedsTo'),
       filterSeedsFrom:  checkValue('filterSeedsFrom'),
@@ -204,6 +219,13 @@ export default function TipoEnsaio({
       orderBy: '',
       typeOrder: '',
 >>>>>>> Stashed changes
+=======
+      filterProtocolName: checkValue('filterProtocolName'),
+      filterSeedsTo: checkValue('filterSeedsTo'),
+      filterSeedsFrom: checkValue('filterSeedsFrom'),
+      orderBy: '',
+      typeOrder: '',
+>>>>>>> bd0cf8edac5d356b065dba0071eaa705058fcc45
     },
     onSubmit: async ({
       filterStatus,
@@ -216,12 +238,16 @@ export default function TipoEnsaio({
         filterStatus || 1
       }&filterName=${filterName}&filterProtocolName=${filterProtocolName}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&id_culture=${idCulture}`;
       setFiltersParams(parametersFilter);
+<<<<<<< HEAD
 <<<<<<< Updated upstream
       setCookies("filterBeforeEdit", filtersParams);
+=======
+      setCookies('filterBeforeEdit', filtersParams);
+>>>>>>> bd0cf8edac5d356b065dba0071eaa705058fcc45
 
       setFilter(parametersFilter);
       setCurrentPage(0);
-      await callingApi(parametersFilter); 
+      await callingApi(parametersFilter);
 
       // await typeAssayService
       //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
@@ -234,30 +260,29 @@ export default function TipoEnsaio({
     },
   });
 
-
-  //Calling common API 
-  async function callingApi(parametersFilter : any ){
-
-    setCookies("filterBeforeEdit", parametersFilter);
-    setCookies("filterBeforeEditTypeOrder", typeOrder);
-    setCookies("filterBeforeEditOrderBy", orderBy);  
+  // Calling common API
+  async function callingApi(parametersFilter : any) {
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies("filtersParams", parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
     await typeAssayService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400 ) {
+      if (response.status === 200 || response.status === 400) {
         setTypeAssay(response.response);
         setTotalItems(response.total);
       }
     });
-  } 
+  }
 
-  //Call that function when change type order value.
+  // Call that function when change type order value.
   useEffect(() => {
     callingApi(filter);
   }, [typeOrder]);
 
+<<<<<<< HEAD
 =======
       setCookies('filterBeforeEdit', filtersParams);
       await typeAssayService
@@ -295,6 +320,8 @@ export default function TipoEnsaio({
   }
 >>>>>>> Stashed changes
 
+=======
+>>>>>>> bd0cf8edac5d356b065dba0071eaa705058fcc45
   async function handleOrder(
     column: string,
     order: string | any,
@@ -367,14 +394,12 @@ export default function TipoEnsaio({
     //   }
     // }
 
-      //Gobal manage orders
-      const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order , orderList);
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-      setTypeOrder(typeOrderG);
-      setOrderBy(columnG);
-      setOrder(orderByG);
-      setArrowOrder(arrowOrder);
-
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
     if (orderList === 2) {
@@ -389,6 +414,12 @@ export default function TipoEnsaio({
       }
     }
 >>>>>>> Stashed changes
+=======
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
+>>>>>>> bd0cf8edac5d356b065dba0071eaa705058fcc45
   }
 
   async function handleStatus(id: number, status: any): Promise<void> {
@@ -473,6 +504,7 @@ export default function TipoEnsaio({
       field: 'status',
       sorting: false,
       searchable: false,
+<<<<<<< HEAD
 <<<<<<< Updated upstream
       filterPlaceholder: "Filtrar por status",
       render: (rowData: ITypeAssayProps) =>
@@ -508,6 +540,8 @@ export default function TipoEnsaio({
               />
             </div>
 =======
+=======
+>>>>>>> bd0cf8edac5d356b065dba0071eaa705058fcc45
       filterPlaceholder: 'Filtrar por status',
       render: (rowData: ITypeAssayProps) => (rowData.status ? (
         <div className="h-7 flex">
@@ -517,7 +551,15 @@ export default function TipoEnsaio({
               title={`Atualizar ${rowData.name}`}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
+<<<<<<< HEAD
                 setCookies('filterBeforeEdit', filtersParams);
+=======
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('lastPage', 'atualizar');
+>>>>>>> bd0cf8edac5d356b065dba0071eaa705058fcc45
                 router.push(
                   `/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`,
                 );
@@ -525,7 +567,10 @@ export default function TipoEnsaio({
               bgColor="bg-blue-600"
               textColor="white"
             />
+<<<<<<< HEAD
 >>>>>>> Stashed changes
+=======
+>>>>>>> bd0cf8edac5d356b065dba0071eaa705058fcc45
           </div>
           <div style={{ width: 5 }} />
           <div>
@@ -695,8 +740,8 @@ export default function TipoEnsaio({
       });
   };
 
-   //manage total pages
-   async function handleTotalPages() {
+  // manage total pages
+  async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
     }
@@ -721,15 +766,15 @@ export default function TipoEnsaio({
     //       setTypeAssay(response);
     //     }
     //   });
-    await callingApi(filter); //handle pagination globly
+    await callingApi(filter); // handle pagination globly
   }
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = tableGlobalFunctions.getValuesForFilter(value , filtersParams);
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
     return parameter;
   }
-  
+
   function filterFieldFactorySeeds(name: any) {
     return (
       <div className="h-6 w-1/2 ml-4">
@@ -991,6 +1036,7 @@ export default function TipoEnsaio({
                       py-5
                       bg-gray-50
                     "
+<<<<<<< HEAD
 <<<<<<< Updated upstream
                       {...props}
                     >
@@ -1036,6 +1082,8 @@ export default function TipoEnsaio({
                       />
                     </div>
 =======
+=======
+>>>>>>> bd0cf8edac5d356b065dba0071eaa705058fcc45
                     {...props}
                   >
                     <Button
@@ -1072,14 +1120,21 @@ export default function TipoEnsaio({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
+<<<<<<< HEAD
                       onClick={() => setCurrentPage(pages)}
+=======
+                      onClick={() => setCurrentPage(pages - 1)}
+>>>>>>> bd0cf8edac5d356b065dba0071eaa705058fcc45
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
+<<<<<<< HEAD
 >>>>>>> Stashed changes
+=======
+>>>>>>> bd0cf8edac5d356b065dba0071eaa705058fcc45
                   ) as any,
               }}
             />
@@ -1112,35 +1167,37 @@ export const getServerSideProps: GetServerSideProps = async ({
 <<<<<<< Updated upstream
     : `filterStatus=1&id_culture=${idCulture}`;
 
-  //Last page
+  // Last page
   const lastPageServer = req.cookies.lastPage
-  ? req.cookies.lastPage
-  : "No";
+    ? req.cookies.lastPage
+    : 'No';
 
-  if(lastPageServer == undefined || lastPageServer == "No"){
+  if (lastPageServer == undefined || lastPageServer == 'No') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });  
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
   }
 
-  //RR
+  // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
-  ? req.cookies.filterBeforeEditTypeOrder
-  : "desc";
-       
-  //RR
-  const orderByserver = req.cookies.filterBeforeEditOrderBy
-  ? req.cookies.filterBeforeEditOrderBy
-  : "name";
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'desc';
 
+<<<<<<< HEAD
 =======
     : 'filterStatus=1';
   const { token } = req.cookies;
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
 >>>>>>> Stashed changes
+=======
+  // RR
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : 'name';
+>>>>>>> bd0cf8edac5d356b065dba0071eaa705058fcc45
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/type-assay`;
@@ -1149,6 +1206,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? `${req.cookies.filterBeforeEdit}`
     : `filterStatus=1&id_culture=${idCulture}`;
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
@@ -1161,6 +1219,15 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 >>>>>>> Stashed changes
+=======
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+
+  // RR
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
+>>>>>>> bd0cf8edac5d356b065dba0071eaa705058fcc45
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}`;
 
@@ -1187,8 +1254,8 @@ export const getServerSideProps: GetServerSideProps = async ({
       idSafra,
       pageBeforeEdit,
       filterBeforeEdit,
-      orderByserver, 
-      typeOrderServer,  
+      orderByserver,
+      typeOrderServer,
     },
   };
 };
