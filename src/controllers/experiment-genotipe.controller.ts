@@ -19,6 +19,8 @@ export class ExperimentGenotipeController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
+      console.log('options');
+      console.log(options);
       if (options.filterFoco) {
         parameters.foco = JSON.parse(
           `{ "name": { "contains": "${options.filterFoco}" } }`,
@@ -271,8 +273,8 @@ export class ExperimentGenotipeController {
         );
       }
 
-      if (options.idSafra) {
-        parameters.idSafra = Number(options.idSafra);
+      if (options.id_safra) {
+        parameters.idSafra = Number(options.id_safra);
       }
 
       if (options.idFoco) {

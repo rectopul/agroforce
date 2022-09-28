@@ -20,6 +20,8 @@ export class ExperimentController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
+      console.log('options');
+      console.log(options);
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
         if (options.filterRepetitionFrom && options.filterRepetitionTo) {
           parameters.repetitionsNumber = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);
@@ -130,6 +132,10 @@ export class ExperimentController {
 
       if (options.idSafra) {
         parameters.idSafra = Number(options.idSafra);
+      }
+
+      if (options.id_safra) {
+        parameters.idSafra = Number(options.id_safra);
       }
 
       if (options.id) {
