@@ -810,32 +810,23 @@ export default function AtualizarQuadra({
 
     switch (table) {
       case "dividers": {
-        await dividersService.getAll(parametersFilter).then((response) => {
-          if (response.status === 200) {
-            setData(response.response);
-          }
-          setTotalItems(response.total);
-        });
+        const response = await dividersService.getAll(parametersFilter);
+        setData(response.response);
+        setTotalItems(response.total);
         break;
       }
       case "experiments": {
-        await experimentService.getAll(parametersFilter).then((response) => {
-          if (response.status === 200) {
-            setData(response.response);
-          }
-          setTotalItems(response.total);
-        });
+        const response = await experimentService.getAll(parametersFilter);
+        setData(response.response);
+        setTotalItems(response.total);
         break;
       }
       case "parcels": {
-        await experimentGenotipeService
-          .getAll(parametersFilter)
-          .then((response) => {
-            if (response.status === 200) {
-              setData(response.response);
-            }
-            setTotalItems(response.total);
-          });
+        const response = await experimentGenotipeService.getAll(
+          parametersFilter
+        );
+        setData(response.response);
+        setTotalItems(response.total);
         break;
       }
       case "planting": {
@@ -844,11 +835,9 @@ export default function AtualizarQuadra({
         break;
       }
       default: {
-        await dividersService.getAll(parametersFilter).then((response) => {
-          if (response.status === 200) {
-            setData(response.response);
-          }
-        });
+        const response = await dividersService.getAll(parametersFilter);
+        setData(response.response);
+        setTotalItems(response.total);
       }
     }
   }
