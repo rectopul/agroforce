@@ -157,6 +157,7 @@ export class NpeController {
           type_assay: { select: { name: true, id: true } },
           group: true,
           npei: true,
+          npei_i: true,
           npef: true,
           status: true,
           edited: true,
