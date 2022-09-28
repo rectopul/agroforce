@@ -62,6 +62,7 @@ export class QuadraController {
           safra: { select: { safraName: true } },
           allocation: true,
           status: true,
+          AllocatedExperiment: true,
         };
       }
 
