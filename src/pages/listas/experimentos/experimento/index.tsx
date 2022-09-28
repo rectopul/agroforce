@@ -203,7 +203,6 @@ export default function Listagem({
     initialValues: {
       filterFoco: checkValue('filterFoco'),
       filterTypeAssay: checkValue('filterTypeAssay'),
-      filterProtocol: checkValue('filterProtocol'),
       filterGli: checkValue('filterGli'),
       filterExperimentName: checkValue('filterExperimentName'),
       filterTecnologia: checkValue('filterTecnologia'),
@@ -219,7 +218,6 @@ export default function Listagem({
     onSubmit: async ({
       filterFoco,
       filterTypeAssay,
-      filterProtocol,
       filterGli,
       filterExperimentName,
       filterTecnologia,
@@ -272,8 +270,7 @@ export default function Listagem({
       //     });
       // },
 
-      console.log('cultureId   ', cultureId);
-      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterProtocol=${filterProtocol}&filterCod=${filterCod}&filterStatus=${filterStatus}&id_culture=${cultureId}`;
+      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterCod=${filterCod}&filterStatus=${filterStatus}&id_culture=${cultureId}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -292,7 +289,6 @@ export default function Listagem({
 
     await experimentService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
-        console.log('response   ', response);
         setExperimento(response.response);
         setTotalItems(response.total);
       }
@@ -750,7 +746,6 @@ export default function Listagem({
                                         pb-8
                                         "
                 >
-                  {filterFieldFactory('filterProtocol', 'Protocolo')}
                   {filterFieldFactory('filterFoco', 'Foco')}
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
                   {filterFieldFactory('filterGli', 'GLI')}
@@ -1088,11 +1083,11 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : 'desc';
+    : 'asc';
 
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : 'assay_list.protocol_name';
+    : '';
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });

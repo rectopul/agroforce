@@ -261,7 +261,7 @@ export default function Listagem({
       //     });
       // },
 
-      const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&id_culture=${idCulture}`;
+      const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&filterLotsTo=${filterLotsTo}&filterLotsFrom=${filterLotsFrom}&id_culture=${idCulture}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -277,7 +277,6 @@ export default function Listagem({
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
-    console.log('---sdfdsf   ', parametersFilter);
 
     await genotipoService.getAll(parametersFilter).then((response) => {
       if (response.status === 200 || response.status === 400) {

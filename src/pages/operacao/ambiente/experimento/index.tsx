@@ -34,7 +34,7 @@ import * as XLSX from 'xlsx';
 import Modal from 'react-modal';
 import { BsTrashFill } from 'react-icons/bs';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { experimentGenotipeService } from 'src/services/experiment_genotipe.service';
+import { experimentGenotipeService } from 'src/services/experiment-genotipe.service';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import { genotypeTreatmentService, npeService, userPreferencesService } from '../../../../services';
 import { experimentService } from '../../../../services/experiment.service';
@@ -588,7 +588,6 @@ export default function Listagem({
         if (status === 200) {
           let i = 0;
           response.length > 0 ? i = NPESelectedRow.prox_npe : i = NPESelectedRow.npef;
-          console.log('i', i);
           response.map((item: any) => {
             item.npei = i;
             item.npef = i + item.npeQT - 1;
@@ -621,7 +620,6 @@ export default function Listagem({
 
   async function createExperimentGenotipe({ data, total_consumed, genotipo_treatment }: any) {
     if (data.length > 0) {
-      console.log('create exp');
       const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
       const experimentObj: any[] = [];
       experimentos.map((item: any) => {
@@ -630,12 +628,8 @@ export default function Listagem({
         data.status = 'SORTEADO';
         experimentObj.push(data);
       });
-      console.log('NPEQT', NPESelectedRow?.npeQT);
-      console.log('lastNNPE', lastNpe);
-      console.log('npei_i', NPESelectedRow?.nextNPE.npei_i);
 
       if (NPESelectedRow?.npeQT == 'N/A' ? true : (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE.npei_i)) {
-        console.log('test');
         await experimentGenotipeService.create(data).then(async ({ status, response }: any) => {
           if (status === 200) {
             genotipo_treatment.map(async (gt: any) => {
@@ -663,7 +657,6 @@ export default function Listagem({
   }
 
   function validateConsumedData() {
-    console.log(SortearDisable);
     if (!SortearDisable) {
       const experiment_genotipo: any[] = [];
       const genotipo_treatment: any[] = [];

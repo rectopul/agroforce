@@ -31,7 +31,7 @@ import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import readXlsxFile from 'read-excel-file';
-import { experimentGenotipeService } from 'src/services/experiment_genotipe.service';
+import { experimentGenotipeService } from 'src/services/experiment-genotipe.service';
 import {
   ITreatment,
   ITreatmentFilter,
@@ -57,7 +57,7 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
 
 export default function Listagem({
-  assaySelect,
+  // assaySelect,
   genotypeSelect,
   itensPerPage,
   filterApplication,
@@ -216,10 +216,9 @@ export default function Listagem({
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-  const [orderBy,setOrderBy]=useState<string>(orderByserver); //RR
-  const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); //RR
-  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy=='tecnologia'?'genotipo.tecnologia.cod_tec':orderBy}&typeOrder=${typeOrder}`;  //RR
-
+  const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == 'tecnologia' ? 'genotipo.tecnologia.cod_tec' : orderBy}&typeOrder=${typeOrder}`; // RR
 
   const [nccIsValid, setNccIsValid] = useState<boolean>(false);
   const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
@@ -315,7 +314,7 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await genotypeTreatmentService.getAll(parametersFilter).then((response) => {
+    await experimentGenotipeService.getAll(parametersFilter).then((response) => {
       if (response.status === 200 || response.status === 400) {
         setTreatments(response.response);
         setTotalItems(response.total);
@@ -415,7 +414,7 @@ export default function Listagem({
       render: (rowData: any) => (
         <div className="h-10 flex">
           <div>
-            {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
+            {`${rowData.experiment.assay_list.tecnologia.cod_tec} ${rowData.experiment.assay_list.tecnologia.name}`}
           </div>
         </div>
       ),
@@ -427,16 +426,16 @@ export default function Listagem({
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
       if (columnOrder[item] === 'foco') {
-        tableFields.push(headerTableFactory('Foco', 'foco.name'));
+        tableFields.push(headerTableFactory('Foco', 'experiment.assay_list.foco.name'));
       }
       if (columnOrder[item] === 'type_assay') {
-        tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
+        tableFields.push(headerTableFactory('Ensaio', 'experiment.assay_list.type_assay.name'));
       }
       if (columnOrder[item] === 'tecnologia') {
         tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
       }
       if (columnOrder[item] === 'gli') {
-        tableFields.push(headerTableFactory('GLI', 'gli'));
+        tableFields.push(headerTableFactory('GLI', 'experiment.assay_list.gli'));
       }
       if (columnOrder[item] === 'experiment') {
         tableFields.push(
@@ -748,7 +747,6 @@ export default function Listagem({
       );
     } else if (inputFile?.files.length !== 0) {
       const value = await readExcel(inputFile.files);
-      console.log('calling me....', value);
     } else {
       Swal.fire('Selecione alguma opção ou import');
     }
@@ -1345,8 +1343,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   const idSafra = req.cookies.safraId;
 
   const { publicRuntimeConfig } = getConfig();
-  const baseUrlTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
-  const baseUrlAssay = `${publicRuntimeConfig.apiUrl}/assay-list`;
+  const baseUrlTreatment = `${publicRuntimeConfig.apiUrl}/experiment-genotipe`;
+  const baseUrlAssay = `${publicRuntimeConfig.apiUrl}/experiment`;
 
   const filterApplication = req.cookies.filterBeforeEdit
     || `&id_culture=${idCulture}&id_safra=${idSafra}`;
@@ -1401,17 +1399,17 @@ export const getServerSideProps: GetServerSideProps = async ({
     requestOptions,
   ).then((response) => response.json());
 
-  const assaySelect = allAssay.map((item: any) => {
-    const newItem: any = {};
-    newItem.id = item.gli;
-    newItem.name = item.gli;
-    return newItem;
-  });
+  // const assaySelect = allAssay.map((item: any) => {
+  //   const newItem: any = {};
+  //   newItem.id = item.gli;
+  //   newItem.name = item.gli;
+  //   return newItem;
+  // });
 
-  const teste: any = {};
-  teste.id = '';
-  teste.name = 'Selecione';
-  assaySelect.unshift(teste);
+  // const teste: any = {};
+  // teste.id = '';
+  // teste.name = 'Selecione';
+  // assaySelect.unshift(teste);
 
   const genotypeSelect = allExpTreatments?.map((item: any) => {
     const newItem: any = {};
@@ -1419,10 +1417,12 @@ export const getServerSideProps: GetServerSideProps = async ({
     newItem.name = item.genotipo.name_genotipo;
     return newItem;
   });
+  console.log('allExpTreatments');
+  console.log(allExpTreatments);
   return {
     props: {
       allExpTreatments,
-      assaySelect,
+      // assaySelect,
       genotypeSelect,
       totalItems,
       itensPerPage,

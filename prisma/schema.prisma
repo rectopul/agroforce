@@ -223,10 +223,10 @@ model quadra {
   cod_quadra    String
   id_culture    Int
   local_plantio String?
-  larg_q        Int
-  comp_p        Int
+  larg_q        Decimal  @db.Decimal(4, 2)
+  comp_p        Decimal  @db.Decimal(4, 2)
   linha_p       Int
-  comp_c        Decimal  @db.Decimal(2, 1)
+  comp_c        Decimal  @db.Decimal(4, 2)
   esquema       String?
   tiro_fixo     Int?
   disparo_fixo  Int?

@@ -1084,9 +1084,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     : 'safra.safraName';
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
-  ? req.cookies.filterBeforeEdit
-  : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
-
+    ? req.cookies.filterBeforeEdit
+    : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;

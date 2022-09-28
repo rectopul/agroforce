@@ -392,8 +392,6 @@ export default function Listagem({
       parametersFilter = `${parametersFilter}&${filter}`;
     }
 
-    console.log('filter');
-    console.log(filter);
     await experimentService
       .getAll(parametersFilter)
       .then(({ status, response, total: newTotal }: any) => {

@@ -1378,7 +1378,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { id: experimentGroupId } = query;
 
   const { publicRuntimeConfig } = getConfig();
-  const baseUrlParcelas = `${publicRuntimeConfig.apiUrl}/experiment_genotipe`;
+  const baseUrlParcelas = `${publicRuntimeConfig.apiUrl}/experiment-genotipe`;
 
   const filterApplication = req.cookies.filterBeforeEdit
     || `&id_culture=${idCulture}&id_safra=${idSafra}`;

@@ -41,6 +41,7 @@ import {
 } from '../../../components';
 import * as ITabs from '../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../helpers';
+
 interface IDelineamentoProps {
   id: number | any;
   name: string | any;
@@ -76,8 +77,8 @@ interface Idata {
   cultureId: number;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
-  typeOrderServer :any| string, //RR
-  orderByserver : any |string //RR
+  typeOrderServer :any| string, // RR
+  orderByserver : any |string // RR
 }
 
 export default function Listagem({
@@ -88,8 +89,8 @@ export default function Listagem({
   cultureId,
   pageBeforeEdit,
   filterBeforeEdit,
-  typeOrderServer, //RR
-  orderByserver //RR
+  typeOrderServer, // RR
+  orderByserver, // RR
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
@@ -166,9 +167,9 @@ export default function Listagem({
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
-  const [orderBy,setOrderBy]=useState<string>(orderByserver); //RR
-  const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); //RR
-  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;  //RR
+  const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const columns = colums(camposGerenciados);
   const filters = [
@@ -179,17 +180,16 @@ export default function Listagem({
 
   const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
-
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterRepetitionTo       : checkValue('filterRepetitionTo'),
-      filterRepetitionFrom     : checkValue('filterRepetitionFrom'),
-      filterTratRepetitionTo   : checkValue('filterTratRepetitionTo'),
-      filterTratRepetitionFrom : checkValue('filterTratRepetitionFrom'),
-      filterStatus             : filterStatusBeforeEdit[13],
-      filterName               : checkValue('filterName'),
-      filterRepeat             : checkValue('filterRepeat'),
-      filterTreatment          : checkValue('filterTreatment'),
+      filterRepetitionTo: checkValue('filterRepetitionTo'),
+      filterRepetitionFrom: checkValue('filterRepetitionFrom'),
+      filterTratRepetitionTo: checkValue('filterTratRepetitionTo'),
+      filterTratRepetitionFrom: checkValue('filterTratRepetitionFrom'),
+      filterStatus: filterStatusBeforeEdit[13],
+      filterName: checkValue('filterName'),
+      filterRepeat: checkValue('filterRepeat'),
+      filterTreatment: checkValue('filterTreatment'),
       orderBy: '',
       typeOrder: '',
     },
@@ -218,35 +218,31 @@ export default function Listagem({
 
       setFilter(parametersFilter);
       setCurrentPage(0);
-      await callingApi(parametersFilter); 
+      await callingApi(parametersFilter);
     },
   });
 
-
-  //Calling common API 
-  async function callingApi(parametersFilter : any ){
-
-    setCookies("filterBeforeEdit", parametersFilter);
-    setCookies("filterBeforeEditTypeOrder", typeOrder);
-    setCookies("filterBeforeEditOrderBy", orderBy);  
+  // Calling common API
+  async function callingApi(parametersFilter : any) {
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies("filtersParams", parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
     await delineamentoService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400 ) {
+      if (response.status === 200 || response.status === 400) {
         setDelineamento(response.response);
         setTotalItems(response.total);
       }
     });
-  } 
+  }
 
-  //Call that function when change type order value.
+  // Call that function when change type order value.
   useEffect(() => {
     callingApi(filter);
   }, [typeOrder]);
-
-
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -376,12 +372,12 @@ export default function Listagem({
                 <Button
                   icon={<AiOutlineTable size={14} />}
                   onClick={() => {
-                    setCookies("pageBeforeEdit", currentPage?.toString());
-                    setCookies("filterBeforeEdit", filter);
-                    setCookies("filterBeforeEditTypeOrder", typeOrder);
-                    setCookies("filterBeforeEditOrderBy", orderBy);
-                    setCookies("filtersParams", filtersParams);
-                    setCookies("lastPage", "sequencia-delineamento");
+                    setCookies('pageBeforeEdit', currentPage?.toString());
+                    setCookies('filterBeforeEdit', filter);
+                    setCookies('filterBeforeEditTypeOrder', typeOrder);
+                    setCookies('filterBeforeEditOrderBy', orderBy);
+                    setCookies('filtersParams', filtersParams);
+                    setCookies('lastPage', 'sequencia-delineamento');
                     router.push(
                       `delineamento/sequencia-delineamento?id_delineamento=${rowData.id}`,
                     );
@@ -446,13 +442,15 @@ export default function Listagem({
     //   }
     // }
 
-     //Gobal manage orders
-     const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order , orderList);
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-     setTypeOrder(typeOrderG);
-     setOrderBy(columnG);
-     setOrder(orderByG);
-     setArrowOrder(arrowOrder);
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
   }
 
   async function getValuesColumns(): Promise<void> {
@@ -502,7 +500,7 @@ export default function Listagem({
     idDelineamento: number,
     data: IDelineamentoProps,
   ): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&name=${data.name}`;
+    const parametersFilter = `filterStatus=${1}&id_culture=${cultureId}&name=${data.name}`;
 
     if (data.status === 0) {
       await delineamentoService.getAll(parametersFilter).then((response) => {
@@ -642,10 +640,10 @@ export default function Listagem({
     //   }
     // });
 
-    await callingApi(filter); //handle pagination globly
+    await callingApi(filter); // handle pagination globly
   }
 
-  //manage total pages
+  // manage total pages
   async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
@@ -654,10 +652,9 @@ export default function Listagem({
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = tableGlobalFunctions.getValuesForFilter(value , filtersParams);
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
     return parameter;
   }
-
 
   useEffect(() => {
     handlePagination();
@@ -703,7 +700,7 @@ export default function Listagem({
                       name="filterStatus"
                       onChange={formik.handleChange}
                       // defaultValue={filterStatusBeforeEdit[13]}
-                      defaultValue={ checkValue('filterStatus')}                     
+                      defaultValue={checkValue('filterStatus')}
                       values={filters.map((id) => id)}
                       selected="1"
                     />
@@ -719,7 +716,7 @@ export default function Listagem({
                       id="filterName"
                       name="filterName"
                       onChange={formik.handleChange}
-                      defaultValue={ checkValue('filterName')}  
+                      defaultValue={checkValue('filterName')}
                     />
                   </div>
                   <div className="h-6 w-1/2 ml-4">
@@ -731,7 +728,7 @@ export default function Listagem({
                         placeholder="De"
                         id="filterRepetitionFrom"
                         name="filterRepetitionFrom"
-                        defaultValue={ checkValue('filterRepetitionFrom')}  
+                        defaultValue={checkValue('filterRepetitionFrom')}
                         onChange={formik.handleChange}
                       />
                       <Input
@@ -739,7 +736,7 @@ export default function Listagem({
                         placeholder="Até"
                         id="filterRepetitionTo"
                         name="filterRepetitionTo"
-                        defaultValue={ checkValue('filterRepetitionTo')}  
+                        defaultValue={checkValue('filterRepetitionTo')}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -753,7 +750,7 @@ export default function Listagem({
                         placeholder="De"
                         id="filterTratRepetitionFrom"
                         name="filterTratRepetitionFrom"
-                        defaultValue={ checkValue('filterTratRepetitionFrom')}  
+                        defaultValue={checkValue('filterTratRepetitionFrom')}
                         onChange={formik.handleChange}
                       />
                       <Input
@@ -761,7 +758,7 @@ export default function Listagem({
                         placeholder="Até"
                         id="filterTratRepetitionTo"
                         name="filterTratRepetitionTo"
-                        defaultValue={ checkValue('filterTratRepetitionTo')}  
+                        defaultValue={checkValue('filterTratRepetitionTo')}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -972,7 +969,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages-1)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -1003,28 +1000,28 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     ? req.cookies.filterBeforeEdit
     : `filterStatus=1&id_culture=${cultureId}`;
 
-  //Last page
+  // Last page
   const lastPageServer = req.cookies.lastPage
-  ? req.cookies.lastPage
-  : "No";
+    ? req.cookies.lastPage
+    : 'No';
 
-  if(lastPageServer == undefined || lastPageServer == "No"){
+  if (lastPageServer == undefined || lastPageServer == 'No') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });  
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
   }
 
-  //RR
+  // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
-  ? req.cookies.filterBeforeEditTypeOrder
-  : "desc";
-       
-  //RR
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'desc';
+
+  // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
-  ? req.cookies.filterBeforeEditOrderBy
-  : "name";
+    ? req.cookies.filterBeforeEditOrderBy
+    : 'name';
 
   const { token } = req.cookies;
   // const { cultureId } = req.cookies;
@@ -1033,14 +1030,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     ? `${req.cookies.filterBeforeEdit}`
     : `filterStatus=1&id_culture=${cultureId}`;
 
-
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
-  //RR
-  removeCookies("filterBeforeEditTypeOrder", { req, res });
-  removeCookies("filterBeforeEditOrderBy", { req, res });
-  removeCookies("lastPage", { req, res });
+  // RR
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/delineamento`;
@@ -1066,8 +1062,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
       cultureId,
       pageBeforeEdit,
       filterBeforeEdit,
-      orderByserver, 
-      typeOrderServer,  
+      orderByserver,
+      typeOrderServer,
     },
   };
 };

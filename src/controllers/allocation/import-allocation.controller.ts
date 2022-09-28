@@ -14,7 +14,7 @@ import { LocalController } from '../local/local.controller';
 import { ExperimentController } from '../experiment/experiment.controller';
 import { LogImportController } from '../log-import.controller';
 import { QuadraController } from '../block/quadra.controller';
-import { ExperimentGenotipeController } from '../experiment_genotipe.controller';
+import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
 import { LayoutQuadraController } from '../block-layout/layout-quadra.controller';
 import { LayoutChildrenController } from '../layout-children.controller';
 import { AllocatedExperimentController } from './allocated-experimento.controller';

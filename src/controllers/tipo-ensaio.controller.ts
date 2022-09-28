@@ -20,11 +20,7 @@ export class TypeAssayController {
 
       if (options.filterName) {
         parameters.name = JSON.parse(`{"contains":"${options.filterName}"}`);
-      }
-
-      if (options.filterProtocolName) {
-        parameters.protocol_name = JSON.parse(`{"contains":"${options.filterProtocolName}"}`);
-      }
+      }   
 
       if (options.filterSeedsFrom || options.filterSeedsTo) {
         if (options.filterSeedsFrom && options.filterSeedsTo) {

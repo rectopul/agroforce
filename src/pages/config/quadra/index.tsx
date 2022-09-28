@@ -588,7 +588,6 @@ export default function Listagem({
   const downloadExcelSintetico = async (): Promise<void> => {
     await quadraService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
-        console.log(response);
         const newData = response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo' as any;

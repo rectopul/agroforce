@@ -61,7 +61,6 @@ import { IExperiments } from '../../../interfaces/listas/experimento/experimento
 
 interface IFilter {
   filterFoco: string;
-  filterProtocol: string;
   filterTypeAssay: string;
   filterGli: string;
   filterExperimentName: string;
@@ -149,7 +148,6 @@ export default function Listagem({
     initialValues: {
       filterFoco: '',
       filterTypeAssay: '',
-      filterProtocol: '',
       filterGli: '',
       filterExperimentName: '',
       filterTecnologia: '',
@@ -165,7 +163,6 @@ export default function Listagem({
     onSubmit: async ({
       filterFoco,
       filterTypeAssay,
-      filterProtocol,
       filterGli,
       filterExperimentName,
       filterTecnologia,
@@ -190,7 +187,6 @@ export default function Listagem({
         'experimento',
         filterFoco,
         filterTypeAssay,
-        filterProtocol,
         filterGli,
         filterExperimentName,
         filterTecnologia,
@@ -577,7 +573,6 @@ export default function Listagem({
                                         pb-8
                                         "
                 >
-                  {filterFieldFactory('filterProtocol', 'Protocolo')}
                   {filterFieldFactory('filterFoco', 'Foco')}
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
                   {filterFieldFactory('filterGli', 'GLI')}

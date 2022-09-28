@@ -6,7 +6,7 @@ import { AssayListController } from '../assay-list/assay-list.controller';
 import { functionsUtils } from '../../shared/utils/functionsUtils';
 import { IReturnObject } from '../../interfaces/shared/Import.interface';
 import { ExperimentGroupController } from '../experiment-group/experiment-group.controller';
-import { ExperimentGenotipeController } from '../experiment_genotipe.controller';
+import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -179,7 +179,6 @@ export class ExperimentController {
         orderBy,
       );
 
-      // console.log("response  ",response)
       response.map((item: any) => {
         const newItem = item;
         newItem.countNT = functionsUtils
