@@ -674,8 +674,7 @@ export default function Listagem({
         total_consumed += item.npeQT;
         item.assay_list.genotype_treatment.map((gt: any) => {
           const data: any = {};
-          const gt_new: any = gt;
-          gt_new.status_experiment = "SORTEADO";
+          const gt_new: any = {};
           data.idSafra = gt.id_safra;
           data.idFoco = item.assay_list.foco.id;
           data.idTypeAssay = item.assay_list.type_assay.id;
@@ -688,6 +687,8 @@ export default function Listagem({
           // data.name_genotipo = gt.genotipo.name_genotipo;
           data.idGenotipo = gt.genotipo.id; // Added new field
           data.nca = '';
+          gt_new.id = gt.id;
+          gt_new.status_experiment = "SORTEADO";
           experiment_genotipo.push(data);
           genotipo_treatment.push(gt_new);
           npei++;
