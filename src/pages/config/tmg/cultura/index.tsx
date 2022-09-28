@@ -193,11 +193,6 @@ export default function Listagem({
     });
   }
 
-  //Call that function when change type order value.
-  useEffect(() => {
-    console.log("value   -------")
-    // callingApi(filter);
-  }, []);
 
   //Call that function when change type order value.
   useEffect(() => {
