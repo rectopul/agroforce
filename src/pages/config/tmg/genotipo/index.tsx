@@ -271,12 +271,12 @@ export default function Listagem({
 
   // Calling common API
   async function callingApi(parametersFilter : any) {
-    setCookie('filterBeforeEdit', parametersFilter);
-    setCookie('filterBeforeEditTypeOrder', typeOrder);
-    setCookie('filterBeforeEditOrderBy', orderBy);
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookie('filtersParams', parametersFilter);
+    setCookies('filtersParams', parametersFilter);
     console.log('---sdfdsf   ', parametersFilter);
 
     await genotipoService.getAll(parametersFilter).then((response) => {
