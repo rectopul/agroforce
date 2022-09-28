@@ -322,14 +322,43 @@ export default function Atualizarquadra({
           } else {
             row.status = 'Ativo';
           }
+
+          row.ESQUEMA = row.Layout.esquema;
+          row.PLANTADEIRA = row.Layout.plantadeira;
+          row.SL = row.sl;
+          row.SC = row.sc;
+          row.S_ALOC = row.s_aloc;
+          row.TIRO = row.tiro;
+          row.DISPARO = row.disparo;
+          row.DIST = row.dist;
+          row.ST = row.st;
+          row.CJ = row.cj;
+          row.SPC = row.spc;
+          row.S_COLHEITA = row.scolheita;
+          row.TIPO_PARCELA = row.tipo_parcela;
+
+          delete row.Layout;
           delete row.id;
+          delete row.sl;
+          delete row.sc;
+          delete row.s_aloc;
+          delete row.tiro;
+          delete row.disparo;
+          delete row.dist;
+          delete row.st;
+          delete row.cj;
+          delete row.spc;
+          delete row.scolheita;
+          delete row.tipo_parcela;
+          delete row.status;
           delete row.id_layout;
+
           return row;
         });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'disparos');
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'Esquema');
 
         // Buffer
         const buf = XLSX.write(workBook, {
@@ -342,7 +371,7 @@ export default function Atualizarquadra({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'Disparos.xlsx');
+        XLSX.writeFile(workBook, 'Esquema.xlsx');
       }
     });
   };

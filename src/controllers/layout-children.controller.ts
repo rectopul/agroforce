@@ -24,6 +24,7 @@ export class LayoutChildrenController {
         spc: true,
         scolheita: true,
         tipo_parcela: true,
+        Layout: true,
       };
 
       if (options.id_culture) {

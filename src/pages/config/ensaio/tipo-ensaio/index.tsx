@@ -249,18 +249,6 @@ export default function TipoEnsaio({
 
       name: 'CamposGerenciados[]',
 
-      title: 'Nome do Protocolo',
-
-      value: 'protocol_name',
-
-      defaultChecked: () => camposGerenciados.includes('protocol_name'),
-
-    },
-
-    {
-
-      name: 'CamposGerenciados[]',
-
       title: 'Quant. de sementes por envelope',
 
       value: 'envelope',
@@ -778,14 +766,6 @@ export default function TipoEnsaio({
         tableFields.push(headerTableFactory('Nome', 'name'));
       }
 
-      if (columnOrder[item] === 'protocol_name') {
-        tableFields.push(
-
-          headerTableFactory('Nome do Protocolo', 'protocol_name'),
-
-        );
-      }
-
       if (columnOrder[item] === 'envelope') {
         tableFields.push(
 
@@ -1193,33 +1173,6 @@ export default function TipoEnsaio({
 
                   </div>
 
-                  <div className="h-6 w-1/2 ml-4">
-
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-
-                      Nome do Protocolo
-
-                    </label>
-
-                    <Input
-
-                      type="text"
-
-                      placeholder="Nome do Protocolo"
-
-                      max="40"
-
-                      id="filterProtocolName"
-
-                      name="filterProtocolName"
-
-                      defaultValue={checkValue('filterProtocolName')}
-
-                      onChange={formik.handleChange}
-                    />
-
-                  </div>
-
                   {filterFieldFactorySeeds('Quant. de sementes por envelope')}
 
                   <div style={{ width: 40 }} />
@@ -1314,20 +1267,20 @@ export default function TipoEnsaio({
 
                       <Button
 
-                      title="Cadastrar Tipo Ensaio"
+                        title="Cadastrar Tipo Ensaio"
 
-                      value="Cadastrar Tipo Ensaio"
+                        value="Cadastrar Tipo Ensaio"
 
-                      bgColor="bg-blue-600"
+                        bgColor="bg-blue-600"
 
-                      textColor="white"
+                        textColor="white"
 
-                      onClick={() => {}}
+                        onClick={() => {}}
 
-                      href="/config/ensaio/tipo-ensaio/cadastro"
+                        href="/config/ensaio/tipo-ensaio/cadastro"
 
-                      icon={<RiOrganizationChart size={20} />}
-                    />
+                        icon={<RiOrganizationChart size={20} />}
+                      />
 
                     </div>
 
@@ -1350,126 +1303,126 @@ export default function TipoEnsaio({
 
                       <div className="border-solid border-2 border-blue-600 rounded">
 
-                      <div className="w-64">
+                        <div className="w-64">
 
-                      <AccordionFilter
+                          <AccordionFilter
 
-                      title="Gerenciar Campos"
+                            title="Gerenciar Campos"
 
-                      grid={statusAccordion}
-                    >
+                            grid={statusAccordion}
+                          >
 
-                      <DragDropContext onDragEnd={handleOnDragEnd}>
+                            <DragDropContext onDragEnd={handleOnDragEnd}>
 
-                      <Droppable droppableId="characters">
+                              <Droppable droppableId="characters">
 
-                      {(provided) => (
+                                {(provided) => (
 
-                      <ul
+                                  <ul
 
-                    className="w-full h-full characters"
+                                    className="w-full h-full characters"
 
-                    {...provided.droppableProps}
+                                    {...provided.droppableProps}
 
-                    ref={provided.innerRef}
-                  >
+                                    ref={provided.innerRef}
+                                  >
 
-                    <div className="h-8 mb-3">
+                                    <div className="h-8 mb-3">
 
-                      <Button
+                                      <Button
 
-                      value="Atualizar"
+                                        value="Atualizar"
 
-                      bgColor="bg-blue-600"
+                                        bgColor="bg-blue-600"
 
-                      textColor="white"
+                                        textColor="white"
 
-                      onClick={getValuesColumns}
+                                        onClick={getValuesColumns}
 
-                      icon={<IoReloadSharp size={20} />}
-                    />
+                                        icon={<IoReloadSharp size={20} />}
+                                      />
 
-                    </div>
+                                    </div>
 
-                    {generatesProps.map((generate, index) => (
+                                    {generatesProps.map((generate, index) => (
 
-                      <Draggable
+                                      <Draggable
 
-                      key={index}
+                                        key={index}
 
-                      draggableId={String(generate.title)}
+                                        draggableId={String(generate.title)}
 
-                      index={index}
-                    >
+                                        index={index}
+                                      >
 
-                      {(providers) => (
+                                        {(providers) => (
 
-                      <li
+                                          <li
 
-                      ref={providers.innerRef}
+                                            ref={providers.innerRef}
 
-                      {...providers.draggableProps}
+                                            {...providers.draggableProps}
 
-                      {...providers.dragHandleProps}
-                    >
+                                            {...providers.dragHandleProps}
+                                          >
 
-                      <CheckBox
+                                            <CheckBox
 
-                      name={generate.name}
+                                              name={generate.name}
 
-                      title={generate.title?.toString()}
+                                              title={generate.title?.toString()}
 
-                      value={generate.value}
+                                              value={generate.value}
 
-                      defaultChecked={camposGerenciados.includes(
+                                              defaultChecked={camposGerenciados.includes(
 
-                      generate.value,
+                                                generate.value,
 
-                    )}
-                    />
+                                              )}
+                                            />
 
-                    </li>
+                                          </li>
 
-                    )}
+                                        )}
 
-                    </Draggable>
+                                      </Draggable>
 
-                    ))}
+                                    ))}
 
-                    {provided.placeholder}
+                                    {provided.placeholder}
 
-                  </ul>
+                                  </ul>
 
-                    )}
+                                )}
 
-                    </Droppable>
+                              </Droppable>
 
-                    </DragDropContext>
+                            </DragDropContext>
 
-                    </AccordionFilter>
+                          </AccordionFilter>
 
-                    </div>
+                        </div>
 
-                    </div>
+                      </div>
 
                       <div className="h-12 flex items-center justify-center w-full">
 
-                      <Button
+                        <Button
 
-                      title="Exportar planilha de ensaios"
+                          title="Exportar planilha de ensaios"
 
-                      icon={<RiFileExcel2Line size={20} />}
+                          icon={<RiFileExcel2Line size={20} />}
 
-                      bgColor="bg-blue-600"
+                          bgColor="bg-blue-600"
 
-                      textColor="white"
+                          textColor="white"
 
-                      onClick={() => {
-                      downloadExcel();
-                    }}
-                    />
+                          onClick={() => {
+                            downloadExcel();
+                          }}
+                        />
 
-                    </div>
+                      </div>
 
                     </div>
 
@@ -1530,20 +1483,20 @@ export default function TipoEnsaio({
 
                       .map((value, index) => (
 
-                      <Button
+                        <Button
 
-                      key={index}
+                          key={index}
 
-                      onClick={() => setCurrentPage(index)}
+                          onClick={() => setCurrentPage(index)}
 
-                      value={`${currentPage + 1}`}
+                          value={`${currentPage + 1}`}
 
-                      bgColor="bg-blue-600"
+                          bgColor="bg-blue-600"
 
-                      textColor="white"
+                          textColor="white"
 
-                      disabled
-                    />
+                          disabled
+                        />
 
                       ))}
 

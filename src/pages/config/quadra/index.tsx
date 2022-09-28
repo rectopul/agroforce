@@ -82,7 +82,7 @@ interface IData {
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
   typeOrderServer :any| string;
-  orderByserver : any |string 
+  orderByserver : any |string
 }
 
 export default function Listagem({
@@ -94,7 +94,7 @@ export default function Listagem({
   pageBeforeEdit,
   filterBeforeEdit,
   typeOrderServer,
-  orderByserver 
+  orderByserver,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
@@ -155,9 +155,9 @@ export default function Listagem({
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
-  const [orderBy,setOrderBy]=useState<string>(orderByserver); //RR
-  const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); //RR
-  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;  //RR
+  const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -191,34 +191,31 @@ export default function Listagem({
 
       setFilter(parametersFilter);
       setCurrentPage(0);
-      await callingApi(parametersFilter); 
-
+      await callingApi(parametersFilter);
     },
   });
 
-  //Calling common API 
-  async function callingApi(parametersFilter : any ){
-
-    setCookies("filterBeforeEdit", parametersFilter);
-    setCookies("filterBeforeEditTypeOrder", typeOrder);
-    setCookies("filterBeforeEditOrderBy", orderBy);  
+  // Calling common API
+  async function callingApi(parametersFilter : any) {
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies("filtersParams", parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
     await quadraService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400 ) {
+      if (response.status === 200 || response.status === 400) {
         setQuadra(response.response);
         setTotalItems(response.total);
       }
     });
-  } 
+  }
 
-  //Call that function when change type order value.
+  // Call that function when change type order value.
   useEffect(() => {
     callingApi(filter);
   }, [typeOrder]);
-  
 
   async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
     const parametersFilter = `filterStatus=${1}&cod_quadra=${
@@ -303,13 +300,15 @@ export default function Listagem({
     //   }
     // }
 
-      //Gobal manage orders
-      const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order , orderList);
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-      setTypeOrder(typeOrderG);
-      setOrderBy(columnG);
-      setOrder(orderByG);
-      setArrowOrder(arrowOrder);
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
   }
 
   function headerTableFactory(name: any, title: string) {
@@ -380,12 +379,12 @@ export default function Listagem({
               textColor="white"
               title={`Editar ${rowData.cod_quadra}`}
               onClick={() => {
-                setCookies("pageBeforeEdit", currentPage?.toString());
-                setCookies("filterBeforeEdit", filter);
-                setCookies("filterBeforeEditTypeOrder", typeOrder);
-                setCookies("filterBeforeEditOrderBy", orderBy);
-                setCookies("filtersParams", filtersParams);
-                setCookies("lastPage", "atualizar");
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('lastPage', 'atualizar');
                 router.push(`/config/quadra/atualizar?id=${rowData.id}`);
               }}
             />
@@ -586,7 +585,71 @@ export default function Listagem({
     });
   };
 
-  //manage total pages
+  const downloadExcelSintetico = async (): Promise<void> => {
+    await quadraService.getAll(filter).then(({ status, response }) => {
+      if (status === 200) {
+        console.log(response);
+        const newData = response.map((row: any) => {
+          if (row.status === 0) {
+            row.status = 'Inativo' as any;
+          } else {
+            row.status = 'Ativo' as any;
+          }
+          row.ALOCAÇÃO = row.AllocatedExperiment;
+          row.COD_QUADRA = row.cod_quadra;
+          row.LOCAL = row.local?.name_local_culture;
+          row.ESQUEMA = row.esquema;
+          row.LARG_Q = row.larg_q;
+          row.COMP_P = row.comp_p;
+          row.LINHA_P = row.linha_p;
+          row.COMP_C = row.comp_c;
+          row.TIRO_FIXO = row.tiro_fixo;
+          row.DISPARO_FIXO = row.disparo_fixo;
+          row.STATUS_ALOCADO = row.allocation;
+          row.STATUS = row.status;
+
+          delete row.cod_quadra;
+          delete row.local;
+          delete row.esquema;
+          delete row.larg_q;
+          delete row.comp_p;
+          delete row.linha_p;
+          delete row.q;
+          delete row.comp_c;
+          delete row.tiro_fixo;
+          delete row.disparo_fixo;
+          delete row.status;
+          delete row.id;
+          delete row.safra;
+          delete row.tableData;
+          delete row.local_plantio;
+          delete row.allocation;
+          return row;
+        });
+
+        const workSheet = XLSX.utils.json_to_sheet(newData);
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'quadra');
+
+        // Buffer
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
+        });
+        // Binary
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
+        });
+        // Download
+        XLSX.writeFile(workBook, 'Sintética.xlsx');
+      } else {
+        Swal.fire(response);
+      }
+    });
+  };
+
+  // manage total pages
   async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
@@ -610,13 +673,12 @@ export default function Listagem({
     //     setQuadra(response.response);
     //   }
     // });
-    await callingApi(filter); //handle pagination globly
+    await callingApi(filter); // handle pagination globly
   }
-
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = tableGlobalFunctions.getValuesForFilter(value , filtersParams);
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
     return parameter;
   }
 
@@ -857,6 +919,17 @@ export default function Listagem({
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
+                          title="Exportação Sintética"
+                          icon={<RiFileExcel2Line size={20} />}
+                          bgColor="bg-red-600"
+                          textColor="white"
+                          onClick={() => {
+                            downloadExcelSintetico();
+                          }}
+                        />
+                      </div>
+                      <div className="h-12 flex items-center justify-center w-full">
+                        <Button
                           title="Configurar Importação de Planilha"
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
@@ -913,7 +986,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages-1)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -946,39 +1019,39 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : `filterStatus=2`;
+    : 'filterStatus=2';
 
-  //Last page
+  // Last page
   const lastPageServer = req.cookies.lastPage
-  ? req.cookies.lastPage
-  : "No";
+    ? req.cookies.lastPage
+    : 'No';
 
-  if(lastPageServer == undefined || lastPageServer == "No"){
+  if (lastPageServer == undefined || lastPageServer == 'No') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });  
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
   }
 
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
-  ? req.cookies.filterBeforeEditTypeOrder
-  : "desc";
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'desc';
 
   const orderByserver = req.cookies.filterBeforeEditOrderBy
-  ? req.cookies.filterBeforeEditOrderBy
-  : "local.name_local_culture";
+    ? req.cookies.filterBeforeEditOrderBy
+    : 'local.name_local_culture';
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}`
-    : `filterStatus=2`;
+    : 'filterStatus=2';
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
-  removeCookies("filterBeforeEditTypeOrder", { req, res });
-  removeCookies("filterBeforeEditOrderBy", { req, res });
-  removeCookies("lastPage", { req, res });
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/quadra`;
@@ -1008,8 +1081,8 @@ export const getServerSideProps: GetServerSideProps = async ({
       cultureId,
       pageBeforeEdit,
       filterBeforeEdit,
-      orderByserver, 
-      typeOrderServer,  
+      orderByserver,
+      typeOrderServer,
     },
   };
 };
