@@ -66,6 +66,10 @@ export class NpeController {
         parameters.safraId = Number(options.id_safra);
       }
 
+      if (options.safraId) {
+        parameters.safraId = Number(options.safraId);
+      }
+
       if (options.filterSafra) {
         parameters.safra = JSON.parse(`{ "safraName": { "contains": "${options.filterSafra}" } }`);
       }
