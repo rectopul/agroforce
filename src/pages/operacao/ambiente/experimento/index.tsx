@@ -108,12 +108,12 @@ interface IData {
 }
 
 export default function Listagem({
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs;
 
   const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
@@ -639,19 +639,19 @@ export default function Listagem({
           experimentObj.map(async (x: any) => {
             await experimentService.update(x).then(({ status, response }: any) => {
             });
+          })
 
-            await npeService.update({
-              id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == 'N/A' ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
-            }).then(({ status, resposne }: any) => {
-              if (status === 200) {
-                router.push('/operacao/ambiente');
-              }
-            });
-          }),        
-        });
-    
+          await npeService.update({
+            id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == 'N/A' ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
+          }).then(({ status, resposne }: any) => {
+            if (status === 200) {
+              router.push('/operacao/ambiente');
+            }
+          });
+        }
+      });
+    }
   }
-}
 
   function validateConsumedData() {
     if (!SortearDisable) {
@@ -716,8 +716,8 @@ export default function Listagem({
     let count = 0;
     experimentos.map((item: any) => {
       item.npei <= NPESelectedRow?.nextNPE.npei_i
-      && item.npef >= NPESelectedRow?.nextNPE.npei_i
-      && NPESelectedRow?.nextNPE != 0
+        && item.npef >= NPESelectedRow?.nextNPE.npei_i
+        && NPESelectedRow?.nextNPE != 0
         ? count++
         : '';
     });
@@ -740,9 +740,8 @@ export default function Listagem({
                         "
         >
           <div
-            className={`w-full ${
-              selectedNPE?.length > 3 && 'max-h-40 overflow-y-scroll'
-            } mb-4`}
+            className={`w-full ${selectedNPE?.length > 3 && 'max-h-40 overflow-y-scroll'
+              } mb-4`}
           >
             <MaterialTable
               style={{
@@ -868,21 +867,21 @@ export default function Listagem({
                                             index={index}
                                           >
                                             {(provider) => (
-                                            <li
-                                              ref={provider.innerRef}
-                                              {...provider.draggableProps}
-                                              {...provider.dragHandleProps}
-                                            >
-                                              <CheckBox
-                                                name={generate.name}
-                                                title={generate.title?.toString()}
-                                                value={generate.value}
-                                                defaultChecked={camposGerenciados.includes(
-                                                  String(generate.value),
-                                                )}
-                                              />
-                                            </li>
-                                          )}
+                                              <li
+                                                ref={provider.innerRef}
+                                                {...provider.draggableProps}
+                                                {...provider.dragHandleProps}
+                                              >
+                                                <CheckBox
+                                                  name={generate.name}
+                                                  title={generate.title?.toString()}
+                                                  value={generate.value}
+                                                  defaultChecked={camposGerenciados.includes(
+                                                    String(generate.value),
+                                                  )}
+                                                />
+                                              </li>
+                                            )}
                                           </Draggable>
                                         ))}
                                         {provided.placeholder}
@@ -899,8 +898,8 @@ export default function Listagem({
                               title="Sortear"
                               value="Sortear"
                               bgColor={
-                              SortearDisable ? 'bg-gray-400' : 'bg-blue-600'
-                            }
+                                SortearDisable ? 'bg-gray-400' : 'bg-blue-600'
+                              }
                               textColor="white"
                               onClick={validateConsumedData}
                             />
