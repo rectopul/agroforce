@@ -91,8 +91,8 @@ export default function Listagem({
   filterApplication,
   pageBeforeEdit,
   filterBeforeEdit,
-  typeOrderServer, 
-  orderByserver 
+  typeOrderServer,
+  orderByserver,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
@@ -137,9 +137,9 @@ export default function Listagem({
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-  const [orderBy,setOrderBy]=useState<string>(orderByserver); //RR
-  const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); //RR
-  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;  //RR
+  const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
@@ -149,8 +149,8 @@ export default function Listagem({
       filterSearch: checkValue('filterSearch'),
       orderBy: '',
       typeOrder: '',
-      filterGroupTo:  checkValue('filterGroupTo'),
-      filterGroupFrom:  checkValue('filterGroupFrom'),
+      filterGroupTo: checkValue('filterGroupTo'),
+      filterGroupFrom: checkValue('filterGroupFrom'),
     },
     onSubmit: async ({
       filterStatus, filterSearch, filterGroupTo, filterGroupFrom,
@@ -169,69 +169,47 @@ export default function Listagem({
       //   });
 
       const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterSearch=${filterSearch}&filterGroupTo=${filterGroupTo}&filterGroupFrom=${filterGroupFrom}&id_culture=${cultureId}`;
+      }&filterSearch=${filterSearch}&filterGroupTo=${filterGroupTo}&filterGroupFrom=${filterGroupFrom}&id_culture=${cultureId}&id_safra=${safraId}`;
       setFilter(parametersFilter);
       setCurrentPage(0);
-      await callingApi(parametersFilter); 
+      await callingApi(parametersFilter);
     },
   });
 
-
-  //Calling common API 
-  async function callingApi(parametersFilter : any ){
-
-    setCookies("filterBeforeEdit", parametersFilter);
-    setCookies("filterBeforeEditTypeOrder", typeOrder);
-    setCookies("filterBeforeEditOrderBy", orderBy);  
+  // Calling common API
+  async function callingApi(parametersFilter : any) {
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies("filtersParams", parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
     await focoService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400 ) {
+      if (response.status === 200 || response.status === 400) {
         setFocos(response.response);
         setTotalItems(response.total);
       }
     });
-  } 
+  }
 
-  //Call that function when change type order value.
+  // Call that function when change type order value.
   useEffect(() => {
     callingApi(filter);
   }, [typeOrder]);
 
   async function handleStatus(id: number, data: any) {
-    const params = `filterStatus=${1}&id_culture=${cultureId}&filterSearch=${data.name}`;
+    const params = `filterStatus=${1}&id_culture=${cultureId}&id_safra=${safraId}&filterSearch=${data.name}`;
     const index: any = await handleStatusGlobal({
       id, status: data.status, service: focoService, params, table: 'foco', data: focos,
     });
     if (!index || index === -1) {
       return;
     }
-<<<<<<< Updated upstream
-    await focoService.getAll(parametersFilter).then(async ({ status }) => {
-      if (status === 200 && data.status === 1) {
-        Swal.fire('Já existe um registro ativo com esse nome na tabela foco. \n Favor inativar o registro antes de executar a ação.');
-        return;
-      }
-      await focoService.update({ id: idFoco, status: data.status });
-      const index = focos.findIndex((foco) => foco.id === idFoco);
-
-      if (!index || index === -1) {
-        return;
-      }
-
-      setFocos((oldFocos) => {
-        const copy = [...oldFocos];
-        copy[index].status = data.status;
-        return copy;
-      });
-=======
     setFocos((oldFocos) => {
       const copy = [...oldFocos];
       copy[index].status = data.status;
       return copy;
->>>>>>> Stashed changes
     });
   }
 
@@ -281,14 +259,15 @@ export default function Listagem({
     //   }
     // }
 
-      //Gobal manage orders
-      const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order , orderList);
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-      setTypeOrder(typeOrderG);
-      setOrderBy(columnG);
-      setOrder(orderByG);
-      setArrowOrder(arrowOrder);
-
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
   }
 
   function headerTableFactory(name: any, title: string) {
@@ -361,12 +340,12 @@ export default function Listagem({
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
               onClick={() => {
-                setCookies("pageBeforeEdit", currentPage?.toString());
-                setCookies("filterBeforeEdit", filter);
-                setCookies("filterBeforeEditTypeOrder", typeOrder);
-                setCookies("filterBeforeEditOrderBy", orderBy);
-                setCookies("filtersParams", filtersParams);
-                setCookies("lastPage", "atualizar");
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('lastPage', 'atualizar');
                 router.push(
                   `/config/ensaio/foco/atualizar?id=${rowData.id}`,
                 );
@@ -550,7 +529,7 @@ export default function Listagem({
     });
   };
 
-  //manage total pages
+  // manage total pages
   async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
@@ -576,13 +555,12 @@ export default function Listagem({
     //   }
     // });
 
-    await callingApi(filter); //handle pagination globly
+    await callingApi(filter); // handle pagination globly
   }
-
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = tableGlobalFunctions.getValuesForFilter(value , filtersParams);
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
     return parameter;
   }
 
@@ -865,7 +843,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages-1)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -893,28 +871,25 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const { safraId } = req.cookies;
   const { cultureId } = req.cookies;
 
-  //Last page
+  // Last page
   const lastPageServer = req.cookies.lastPage
-  ? req.cookies.lastPage
-  : "No";
+    ? req.cookies.lastPage
+    : 'No';
 
-  if(lastPageServer == undefined || lastPageServer == "No"){
+  if (lastPageServer == undefined || lastPageServer == 'No') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });  
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
   }
 
-  
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    :`filterStatus=1&id_culture=${cultureId}`;
-
-
+    : `filterStatus=1&id_culture=${cultureId}&id_safra=${safraId}`;
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/foco`;
@@ -922,24 +897,23 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}`
-    : `filterStatus=1&id_culture=${cultureId}`;
+    : `filterStatus=1&id_culture=${cultureId}&id_safra=${safraId}`;
 
-  //RR
+  // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
-  ? req.cookies.filterBeforeEditTypeOrder
-  : "desc";
-       
-  //RR
-  const orderByserver = req.cookies.filterBeforeEditOrderBy
-  ? req.cookies.filterBeforeEditOrderBy
-  : "name";
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'desc';
 
+  // RR
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : 'name';
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
-  removeCookies("filterBeforeEditTypeOrder", { req, res });
-  removeCookies("filterBeforeEditOrderBy", { req, res });
-  removeCookies("lastPage", { req, res });  
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
@@ -953,7 +927,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     urlParameters.toString(),
     requestOptions,
   ).then((response) => response.json());
-
   return {
     props: {
       allFocos,
@@ -964,8 +937,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
       filterApplication,
       pageBeforeEdit,
       filterBeforeEdit,
-      orderByserver, 
-      typeOrderServer,  
+      orderByserver,
+      typeOrderServer,
     },
   };
 };

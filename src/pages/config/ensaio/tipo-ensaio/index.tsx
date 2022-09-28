@@ -140,7 +140,7 @@ interface IData {
 
   idCulture: number;
 
-  idSafra: string;
+  safraId: string;
 
   pageBeforeEdit: string | any;
 
@@ -164,7 +164,7 @@ export default function TipoEnsaio({
 
   idCulture,
 
-  idSafra,
+  safraId,
 
   pageBeforeEdit,
 
@@ -342,7 +342,7 @@ export default function TipoEnsaio({
 
         filterStatus || 1
 
-      }&filterName=${filterName}&filterProtocolName=${filterProtocolName}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&id_culture=${idCulture}`;
+      }&filterName=${filterName}&filterProtocolName=${filterProtocolName}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&id_culture=${idCulture}&id_safra=${safraId}`;
 
       setFiltersParams(parametersFilter);
 
@@ -1565,7 +1565,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const idCulture = req.cookies.cultureId;
 
-  const idSafra = req.cookies.safraId;
+  const { safraId } = req.cookies;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
 
@@ -1577,7 +1577,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
     ? req.cookies.filterBeforeEdit
 
-    : `filterStatus=1&id_culture=${idCulture}`;
+    : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
 
   // Last page
 
@@ -1623,7 +1623,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
     ? `${req.cookies.filterBeforeEdit}`
 
-    : `filterStatus=1&id_culture=${idCulture}`;
+    : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
 
   removeCookies('filterBeforeEdit', { req, res });
 
@@ -1637,7 +1637,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   removeCookies('lastPage', { req, res });
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
 
   const urlParameters: any = new URL(baseUrl);
 
@@ -1675,7 +1675,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
       idCulture,
 
-      idSafra,
+      safraId,
 
       pageBeforeEdit,
 

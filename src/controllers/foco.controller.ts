@@ -61,8 +61,8 @@ export class FocoController {
       );
 
       if (response.total > 0) {
-        response.map((item: any) => {
-          item.group.map((group: any) => {
+        response?.map((item: any) => {
+          item.group?.map((group: any) => {
             if (group.id_safra === Number(options.id_safra)) {
               if (group.group.toString().length === 1) {
                 group.group = `0${group.group.toString()}`;
@@ -74,6 +74,9 @@ export class FocoController {
           });
         });
       }
+
+      // console.log('response');
+      // console.log(response[3]);
 
       if (!response || response.total <= 0) {
         return { status: 404, response: [], total: 0 };
