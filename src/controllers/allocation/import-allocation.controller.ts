@@ -427,6 +427,7 @@ export class ImportAllocationController {
                 experimentName: spreadSheet[row][2],
                 npei: Number(spreadSheet[row][3]),
                 npef: Number(spreadSheet[row][4]),
+                blockId: quadra[0]?.id,
                 parcelas: Number(spreadSheet[row][5]),
                 createdBy,
               });

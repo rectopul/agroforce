@@ -628,6 +628,7 @@ export default function Listagem({
       data.status = 'SORTEADO';
       experimentObj.push(data);
     });
+
     if (NPESelectedRow?.npeQT == 'N/A' ? true : (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE.npei_i)) {
       await experimentGenotipeService.create(data).then(async ({ status, response }: any) => {
         if (status === 200) {
@@ -638,16 +639,17 @@ export default function Listagem({
           experimentObj.map(async (x: any) => {
             await experimentService.update(x).then(({ status, response }: any) => {
             });
+          });
 
-            await npeService.update({
-              id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == 'N/A' ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
-            }).then(({ status, resposne }: any) => {
-              if (status === 200) {
-                router.push('/operacao/ambiente');
-              }
-            });
-          }
-        });
+          await npeService.update({
+            id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == 'N/A' ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
+          }).then(({ status, resposne }: any) => {
+            if (status === 200) {
+              router.push('/operacao/ambiente');
+            }
+          });
+        }
+      });
     }
   }
 
@@ -663,7 +665,7 @@ export default function Listagem({
         item.assay_list.genotype_treatment.map((gt: any) => {
           const data: any = {};
           const gt_new: any = gt;
-          gt_new.status_experiment = "SORTEADO";
+          gt_new.status_experiment = 'SORTEADO';
           data.idSafra = gt.id_safra;
           data.idFoco = item.assay_list.foco.id;
           data.idTypeAssay = item.assay_list.type_assay.id;
@@ -714,8 +716,8 @@ export default function Listagem({
     let count = 0;
     experimentos.map((item: any) => {
       item.npei <= NPESelectedRow?.nextNPE.npei_i
-      && item.npef >= NPESelectedRow?.nextNPE.npei_i
-      && NPESelectedRow?.nextNPE != 0
+        && item.npef >= NPESelectedRow?.nextNPE.npei_i
+        && NPESelectedRow?.nextNPE != 0
         ? count++
         : '';
     });
@@ -738,8 +740,7 @@ export default function Listagem({
                         "
         >
           <div
-            className={`w-full ${
-              selectedNPE?.length > 3 && 'max-h-40 overflow-y-scroll'
+            className={`w-full ${selectedNPE?.length > 3 && 'max-h-40 overflow-y-scroll'
             } mb-4`}
           >
             <MaterialTable
@@ -866,21 +867,21 @@ export default function Listagem({
                                             index={index}
                                           >
                                             {(provider) => (
-                                            <li
-                                              ref={provider.innerRef}
-                                              {...provider.draggableProps}
-                                              {...provider.dragHandleProps}
-                                            >
-                                              <CheckBox
-                                                name={generate.name}
-                                                title={generate.title?.toString()}
-                                                value={generate.value}
-                                                defaultChecked={camposGerenciados.includes(
-                                                  String(generate.value),
-                                                )}
-                                              />
-                                            </li>
-                                          )}
+                                              <li
+                                                ref={provider.innerRef}
+                                                {...provider.draggableProps}
+                                                {...provider.dragHandleProps}
+                                              >
+                                                <CheckBox
+                                                  name={generate.name}
+                                                  title={generate.title?.toString()}
+                                                  value={generate.value}
+                                                  defaultChecked={camposGerenciados.includes(
+                                                    String(generate.value),
+                                                  )}
+                                                />
+                                              </li>
+                                            )}
                                           </Draggable>
                                         ))}
                                         {provided.placeholder}
@@ -897,8 +898,8 @@ export default function Listagem({
                               title="Sortear"
                               value="Sortear"
                               bgColor={
-                              SortearDisable ? 'bg-gray-400' : 'bg-blue-600'
-                            }
+                                SortearDisable ? 'bg-gray-400' : 'bg-blue-600'
+                              }
                               textColor="white"
                               onClick={validateConsumedData}
                             />

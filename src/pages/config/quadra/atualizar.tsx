@@ -698,8 +698,31 @@ export default function AtualizarQuadra({
   const downloadExcel = async (): Promise<void> => {
     switch (table) {
       case "dividers": {
-        const { response } = await dividersService.getAll(filterApplication);
+        const { response } = await dividersService.getAll(filter);
         const newData = response.map((row: any) => {
+          if (row.status === 0) {
+            row.status = 'Inativo';
+          } else {
+            row.status = 'Ativo';
+          }
+
+          row.COD_QUADRA = row.quadra.cod_quadra;
+          row.LOCAL_PREPARO = row.quadra.local?.name_local_culture;
+          row.ESQUEMA = row.quadra.esquema;
+          row.DIVISOR = row.divisor;
+          row.SEM_METROS = row.sem_metros;
+          row.T4_I = row.t4_i;
+          row.T4_F = row.t4_f;
+          row.DI = row.di;
+          row.DF = row.df;
+
+          delete row.divisor;
+          delete row.sem_metros;
+          delete row.t4_i;
+          delete row.t4_f;
+          delete row.di;
+          delete row.df;
+          delete row.status;
           delete row.id;
           delete row.quadra;
 
@@ -711,7 +734,22 @@ export default function AtualizarQuadra({
 
         console.log({ response });
 
-        return generateSpreadSheet(newData);
+        const workSheet = XLSX.utils.json_to_sheet(newData);
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'dividers');
+
+        // Buffer
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
+        });
+        // Binary
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
+        });
+        // Download
+        XLSX.writeFile(workBook, 'Divisores.xlsx');
       }
       case "experiments": {
         return generateSpreadSheet([]);
@@ -1094,6 +1132,7 @@ export default function AtualizarQuadra({
                           }}
                         />
                       </div>
+
                     </div>
                   </div>
                 ),

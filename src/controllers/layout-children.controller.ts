@@ -24,6 +24,7 @@ export class LayoutChildrenController {
         spc: true,
         scolheita: true,
         tipo_parcela: true,
+        Layout: true,
       };
 
       if (options.id_culture) {
@@ -46,6 +47,9 @@ export class LayoutChildrenController {
         skip,
         orderBy,
       );
+
+      console.log('response');
+      console.log(response);
 
       if (!response && response.total <= 0) {
         return {

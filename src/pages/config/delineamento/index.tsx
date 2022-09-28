@@ -1001,7 +1001,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : `filterStatus=2&id_culture=${cultureId}`;
+    : `filterStatus=1&id_culture=${cultureId}`;
 
   //Last page
   const lastPageServer = req.cookies.lastPage

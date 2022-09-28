@@ -196,7 +196,9 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}`;
+
 
   const filters = [
     { id: 2, name: 'Todos' },
@@ -1052,7 +1054,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : `filterStatus=2&safraId=${id_safra}`;
+    : `filterStatus=1&safraId=${id_safra}`;
 
   // removeCookies('filterBeforeEdit', { req, res });
   // removeCookies('pageBeforeEdit', { req, res });
@@ -1060,7 +1062,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
 
-  const filterApplication = `filterStatus=2&safraId=${id_safra}`;
+  const filterApplication = `filterStatus=1&safraId=${id_safra}`;
 
   // Last page
   const lastPageServer = req.cookies.lastPage
@@ -1081,7 +1083,8 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : 'local.name_local_culture';
+    : "";
+    // local.name_local_culture
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
@@ -1089,7 +1092,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('filterBeforeEditOrderBy', { req, res });
   removeCookies('lastPage', { req, res });
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=2&safraId=${id_safra}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&safraId=${id_safra}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {

@@ -19,7 +19,13 @@ export class DividersController {
         t4_f: true,
         di: true,
         df: true,
-        quadra: { select: { esquema: true } },
+        quadra: {
+          select: {
+            esquema: true,
+            cod_quadra: true,
+            local: true,
+          },
+        },
       };
 
       if (options.id_culture) {

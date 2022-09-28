@@ -60,6 +60,7 @@ export class UnidadeCulturaController {
       const select = {
         id: true,
         id_safra: true,
+        safra: true,
         id_unity_culture: true,
         id_local: true,
         name_unity_culture: true,

@@ -282,7 +282,6 @@ export class UserController {
   async update(data: object | any) {
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-
       if (data !== null && data !== undefined) {
         const parameters: object | any = {};
 

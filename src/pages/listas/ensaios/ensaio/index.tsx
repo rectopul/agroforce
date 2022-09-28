@@ -103,9 +103,9 @@ export default function TipoEnsaio({
 
   const [orderBy,setOrderBy]=useState<string>(orderByserver); 
   const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); 
-  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; 
+  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy=='tecnologia'?'tecnologia.cod_tec':orderBy}&typeOrder=${typeOrder}`; 
 
-  console.log("filterApplication  ",filterApplication)
+  // console.log("filterApplication  ",filterApplication)
   const formik = useFormik<IAssayListFilter>({
     initialValues: {
       filterTratFrom:  checkValue('filterTratFrom'),
@@ -339,8 +339,12 @@ useEffect(() => {
                 icon={<BiEdit size={14} />}
                 title={`Atualizar ${rowData.gli}`}
                 onClick={() => {
-                  setCookies('pageBeforeEdit', currentPage?.toString());
-                  setCookies('filterBeforeEdit', filtersParams);
+                  setCookies("pageBeforeEdit", currentPage?.toString());
+                  setCookies("filterBeforeEdit", filter);
+                  setCookies("filterBeforeEditTypeOrder", typeOrder);
+                  setCookies("filterBeforeEditOrderBy", orderBy);
+                  setCookies("filtersParams", filtersParams);
+                  setCookies("lastPage", "atualizar");
                   router.push(`/listas/ensaios/ensaio/atualizar?id=${rowData.id}`);
                 }}
                 bgColor="bg-blue-600"
@@ -895,7 +899,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
    : "protocol_name";
 
   const filterApplication = req.cookies.filterBeforeEdit
-    ? `${filterBeforeEdit}`
+    ? filterBeforeEdit
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
   // removeCookies('filterBeforeEdit', { req, res });
   // removeCookies('pageBeforeEdit', { req, res });
