@@ -360,8 +360,13 @@ export default function AtualizarTipoEnsaio({
       .then(({ status, response }) => {
         if (status === 200) {
           const newData = response.map((row: any) => {
-            row.tipo_ensaio = row.type_assay?.name;
-            row.safra = row.safra?.safraName;
+            row.TIPO_ENSAIO = row.type_assay?.name;
+            row.SAFRA = row.safra?.safraName;
+            row.QUANT_SEMENTES_ENVELOPE = row.seeds;
+
+            delete row.seeds;
+            delete row.safra;
+            delete row.id_safra;
             delete row.id;
             delete row.type_assay;
             return row;

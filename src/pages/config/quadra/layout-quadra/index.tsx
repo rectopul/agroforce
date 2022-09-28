@@ -1097,7 +1097,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : `filterStatus=2`;
+    : `filterStatus=1`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
@@ -1109,11 +1109,11 @@ export const getServerSideProps: GetServerSideProps = async ({
   const baseUrl = `${publicRuntimeConfig.apiUrl}/layout-quadra`;
   const urlParameters: any = new URL(baseUrl);
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=2`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   // const filterApplication = `filterStatus=1&id_culture=${cultureId}`;
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}`
-    : `filterStatus=2`;
+    : `filterStatus=1`;
 
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {

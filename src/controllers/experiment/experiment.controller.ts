@@ -155,8 +155,8 @@ export class ExperimentController {
       if (options.Epoca) {
         parameters.period = Number(options.Epoca);
       }
-      if (options.Status) {
-        parameters.status = options.Status;
+      if (options.status) {
+        parameters.status = options.status;
       }
       if (options.gli) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.gli}" } } }`));
@@ -179,6 +179,7 @@ export class ExperimentController {
         orderBy,
       );
 
+      // console.log("response  ",response)
       response.map((item: any) => {
         const newItem = item;
         newItem.countNT = functionsUtils

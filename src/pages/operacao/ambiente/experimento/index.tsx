@@ -36,7 +36,7 @@ import { BsTrashFill } from 'react-icons/bs';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { experimentGenotipeService } from 'src/services/experiment_genotipe.service';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import { npeService, userPreferencesService } from '../../../../services';
+import { genotypeTreatmentService, npeService, userPreferencesService } from '../../../../services';
 import { experimentService } from '../../../../services/experiment.service';
 import {
   AccordionFilter,
@@ -619,7 +619,7 @@ export default function Listagem({
     }
   }
 
-  async function createExperimentGenotipe({ data, total_consumed }: any) {
+  async function createExperimentGenotipe({ data, total_consumed, genotipo_treatment }: any) {
     const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
     const experimentObj: any[] = [];
     experimentos.map((item: any) => {
@@ -628,37 +628,35 @@ export default function Listagem({
       data.status = 'SORTEADO';
       experimentObj.push(data);
     });
-    if (
-      NPESelectedRow?.npeQT == 'N/A'
-        ? true
-        : NPESelectedRow?.npeQT - total_consumed > 0
-          && lastNpe < NPESelectedRow?.nextNPE.npei_i
-    ) {
-      await experimentGenotipeService
-        .create(data)
-        .then(async ({ status, response }: any) => {
-          if (status === 200) {
-            experimentObj.map(async (x: any) => {
-              await experimentService
-                .update(x)
-                .then(({ status, response }: any) => {});
-            });
 
-            await npeService.update({
-              id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == 'N/A' ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
-            }).then(({ status, resposne }: any) => {
-              if (status === 200) {
-                router.push('/operacao/ambiente');
-              }
+    if (NPESelectedRow?.npeQT == 'N/A' ? true : (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE.npei_i)) {
+      await experimentGenotipeService.create(data).then(async ({ status, response }: any) => {
+        if (status === 200) {
+          genotipo_treatment.map(async (gt: any) => {
+            genotypeTreatmentService.update(gt).then(({ status, message }: any) => {
             });
-          }
-        });
+          });
+          experimentObj.map(async (x: any) => {
+            await experimentService.update(x).then(({ status, response }: any) => {
+            });
+          });
+
+          await npeService.update({
+            id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == 'N/A' ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
+          }).then(({ status, resposne }: any) => {
+            if (status === 200) {
+              router.push('/operacao/ambiente');
+            }
+          });
+        }
+      });
     }
   }
 
   function validateConsumedData() {
     if (!SortearDisable) {
       const experiment_genotipo: any[] = [];
+      const genotipo_treatment: any[] = [];
       let npei = Number(NPESelectedRow?.npei_i);
       let total_consumed = 0;
 
@@ -666,6 +664,8 @@ export default function Listagem({
         total_consumed += item.npeQT;
         item.assay_list.genotype_treatment.map((gt: any) => {
           const data: any = {};
+          const gt_new: any = gt;
+          gt_new.status_experiment = 'SORTEADO';
           data.idSafra = gt.id_safra;
           data.idFoco = item.assay_list.foco.id;
           data.idTypeAssay = item.assay_list.type_assay.id;
@@ -679,10 +679,11 @@ export default function Listagem({
           data.idGenotipo = gt.genotipo.id; // Added new field
           data.nca = '';
           experiment_genotipo.push(data);
+          genotipo_treatment.push(gt_new);
           npei++;
         });
       });
-      createExperimentGenotipe({ data: experiment_genotipo, total_consumed });
+      createExperimentGenotipe({ data: experiment_genotipo, total_consumed, genotipo_treatment });
     } else {
       const temp = NPESelectedRow;
       Swal.fire({
@@ -715,8 +716,8 @@ export default function Listagem({
     let count = 0;
     experimentos.map((item: any) => {
       item.npei <= NPESelectedRow?.nextNPE.npei_i
-      && item.npef >= NPESelectedRow?.nextNPE.npei_i
-      && NPESelectedRow?.nextNPE != 0
+        && item.npef >= NPESelectedRow?.nextNPE.npei_i
+        && NPESelectedRow?.nextNPE != 0
         ? count++
         : '';
     });
@@ -739,8 +740,7 @@ export default function Listagem({
                         "
         >
           <div
-            className={`w-full ${
-              selectedNPE?.length > 3 && 'max-h-40 overflow-y-scroll'
+            className={`w-full ${selectedNPE?.length > 3 && 'max-h-40 overflow-y-scroll'
             } mb-4`}
           >
             <MaterialTable
@@ -867,21 +867,21 @@ export default function Listagem({
                                             index={index}
                                           >
                                             {(provider) => (
-                                            <li
-                                              ref={provider.innerRef}
-                                              {...provider.draggableProps}
-                                              {...provider.dragHandleProps}
-                                            >
-                                              <CheckBox
-                                                name={generate.name}
-                                                title={generate.title?.toString()}
-                                                value={generate.value}
-                                                defaultChecked={camposGerenciados.includes(
-                                                  String(generate.value),
-                                                )}
-                                              />
-                                            </li>
-                                          )}
+                                              <li
+                                                ref={provider.innerRef}
+                                                {...provider.draggableProps}
+                                                {...provider.dragHandleProps}
+                                              >
+                                                <CheckBox
+                                                  name={generate.name}
+                                                  title={generate.title?.toString()}
+                                                  value={generate.value}
+                                                  defaultChecked={camposGerenciados.includes(
+                                                    String(generate.value),
+                                                  )}
+                                                />
+                                              </li>
+                                            )}
                                           </Draggable>
                                         ))}
                                         {provided.placeholder}
@@ -898,8 +898,8 @@ export default function Listagem({
                               title="Sortear"
                               value="Sortear"
                               bgColor={
-                              SortearDisable ? 'bg-gray-400' : 'bg-blue-600'
-                            }
+                                SortearDisable ? 'bg-gray-400' : 'bg-blue-600'
+                              }
                               textColor="white"
                               onClick={validateConsumedData}
                             />

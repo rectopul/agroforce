@@ -72,6 +72,9 @@ export class GenotypeTreatmentController {
       if (options.filterStatusAssay) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
       }
+      if (options.status_experiment) {
+        parameters.status_experiment = JSON.parse(`{"contains": "${options.status_experiment}" }`);
+      }
       const select = {
         id: true,
         id_lote: true,
@@ -98,6 +101,7 @@ export class GenotypeTreatmentController {
         },
         treatments_number: true,
         status: true,
+        status_experiment: true,
         lote: {
           select: {
             ncc: true,
@@ -152,7 +156,7 @@ export class GenotypeTreatmentController {
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
       if (options.orderBy) {
-        console.log("orderBy   ",options.orderBy);
+        console.log('orderBy   ', options.orderBy);
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }

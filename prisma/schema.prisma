@@ -236,13 +236,14 @@ model quadra {
   created_at    DateTime @default(now())
   id_safra      Int
   id_local      Int
-  allocation    String?
+  allocation    String?  @default("IMPORTADO")
 
-  culture    culture      @relation(fields: [id_culture], references: [id])
-  local      local        @relation(fields: [id_local], references: [id])
-  safra      safra        @relation(fields: [id_safra], references: [id])
-  dividers   dividers[]
-  experiment experiment[]
+  culture             culture               @relation(fields: [id_culture], references: [id])
+  local               local                 @relation(fields: [id_local], references: [id])
+  safra               safra                 @relation(fields: [id_safra], references: [id])
+  dividers            dividers[]
+  experiment          experiment[]
+  AllocatedExperiment AllocatedExperiment[]
 }
 
 model dividers {
@@ -524,6 +525,7 @@ model genotype_treatment {
   treatments_number Int
   comments          String?
   status            String
+  status_experiment String     @default("IMPORTADO")
   created_by        Int
   assay_list        assay_list @relation(fields: [id_assay_list], references: [id])
   genotipo          genotipo   @relation(fields: [id_genotipo], references: [id])
@@ -622,6 +624,9 @@ model AllocatedExperiment {
   npei           Int
   npef           Int
   parcelas       Int
+  blockId        Int
   createdBy      Int
   createdAt      DateTime @default(now())
+
+  quadra quadra @relation(fields: [blockId], references: [id])
 }

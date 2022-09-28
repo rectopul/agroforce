@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { removeCookies, setCookie, setCookies } from 'cookies-next';
+import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -203,7 +203,7 @@ export default function Listagem({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == 'Tecnologia' ? 'tecnologia.cod_tec' : orderBy}&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -271,12 +271,12 @@ export default function Listagem({
 
   // Calling common API
   async function callingApi(parametersFilter : any) {
-    setCookie('filterBeforeEdit', parametersFilter);
-    setCookie('filterBeforeEditTypeOrder', typeOrder);
-    setCookie('filterBeforeEditOrderBy', orderBy);
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookie('filtersParams', parametersFilter);
+    setCookies('filtersParams', parametersFilter);
     console.log('---sdfdsf   ', parametersFilter);
 
     await genotipoService.getAll(parametersFilter).then((response) => {
@@ -326,8 +326,10 @@ export default function Listagem({
     //   }
     // }
 
-    //Gobal manage orders
-    const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order , orderList);
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
@@ -723,7 +725,7 @@ export default function Listagem({
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = tableGlobalFunctions.getValuesForFilter(value , filtersParams);
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
     return parameter;
   }
 

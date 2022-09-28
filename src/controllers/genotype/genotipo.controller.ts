@@ -80,7 +80,14 @@ export class GenotipoController {
           name_experiment: true,
           name_alter: true,
           elit_name: true,
-          tecnologia: true,
+          // tecnologia: true,
+          tecnologia: {
+            select: {
+              name: true,
+              id: true,
+              cod_tec :true,
+            },
+          },
           numberLotes: true,
           type: true,
           gmr: true,

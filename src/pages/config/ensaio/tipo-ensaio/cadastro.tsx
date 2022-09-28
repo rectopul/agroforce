@@ -106,18 +106,6 @@ export default function NovoTipoEnsaio() {
                 value={formik.values.name}
               />
             </div>
-
-            <div className="w-4/12 h-6">
-              <label className="block text-gray-900 text-sm font-bold mb-1">
-                Protocolo
-              </label>
-              <Select
-                name="protocolName"
-                onChange={formik.handleChange}
-                selected={protocols[0]}
-                values={protocols.map((name) => name)}
-              />
-            </div>
           </div>
 
           <div
