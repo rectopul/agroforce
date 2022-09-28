@@ -29,12 +29,12 @@ export class ExperimentController {
           parameters.repetitionsNumber = JSON.parse(`{"lte": ${Number(options.filterRepetitionTo)} }`);
         }
       }
-      if (options.filterStatus) {
-        parameters.OR = [];
-        const statusParams = options.filterStatus.split(',');
-        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
-        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
-      }
+      // if (options.filterStatus) {
+      //   parameters.OR = [];
+      //   const statusParams = options.filterStatus.split(',');
+      //   parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
+      //   parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
+      // }
 
       if (options.filterExperimentName) {
         parameters.experimentName = JSON.parse(`{ "contains":"${options.filterExperimentName}" }`);
@@ -155,8 +155,8 @@ export class ExperimentController {
       if (options.Epoca) {
         parameters.period = Number(options.Epoca);
       }
-      if (options.status) {
-        parameters.status = options.status;
+      if (options.Status) {
+        parameters.status = options.Status;
       }
       if (options.gli) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.gli}" } } }`));

@@ -281,6 +281,7 @@ export class ImportNpeController {
                     this.aux.npei = spreadSheet[row][column];
                     this.aux.npef = spreadSheet[row][column];
                     this.aux.prox_npe = spreadSheet[row][column];
+                    this.aux.npei_i = spreadSheet[row][column];
                   }
                 } else {
                   responseIfError[Number(column)]
@@ -371,6 +372,7 @@ export class ImportNpeController {
                   this.aux.npei = spreadSheet[row][column];
                   this.aux.npef = spreadSheet[row][column];
                   this.aux.prox_npe = spreadSheet[row][column];
+                  this.aux.npei_i = spreadSheet[row][column];
                 }
 
                 if (spreadSheet[row].length === (Number(column) + 1)) {
