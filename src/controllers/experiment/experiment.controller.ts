@@ -170,7 +170,8 @@ export class ExperimentController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
-
+      console.log('parameters');
+      console.log(parameters);
       const response: object | any = await this.experimentRepository.findAll(
         parameters,
         select,

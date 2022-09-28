@@ -87,6 +87,8 @@ export class QuadraController {
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
+      console.log('parameters');
+      console.log(parameters);
       const response: object | any = await this.quadraRepository.findAll(
         parameters,
         select,

@@ -45,7 +45,6 @@ interface IFilter {
   filterGmrTo: string | any;
   filterBgmFrom: string | any;
   filterBgmTo: string | any;
-  filterYear: string;
   filterCodLote: string;
   filterNcc: string;
   filterFase: string;

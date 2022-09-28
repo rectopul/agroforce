@@ -176,8 +176,9 @@ export default function Listagem({
       filterSchema,
       filterPTo,
       filterPFrom,
+      filterPreparation,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus}&filterSearch=${filterSearch}&filterSchema=${filterSchema}&filterPTo=${filterPTo}&filterPFrom=${filterPFrom}`;
+      const parametersFilter = `filterStatus=${filterStatus}&filterPreparation=${filterPreparation}&filterSearch=${filterSearch}&filterSchema=${filterSchema}&filterPTo=${filterPTo}&filterPFrom=${filterPFrom}`;
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEdit', filtersParams);
       // await quadraService
@@ -1018,7 +1019,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : `filterStatus=1`;
+    : 'filterStatus=1';
 
   // Last page
   const lastPageServer = req.cookies.lastPage
@@ -1043,7 +1044,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}`
-    : `filterStatus=1`;
+    : 'filterStatus=1';
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });

@@ -45,7 +45,6 @@ import { tableGlobalFunctions } from '../../../../helpers';
 
 interface IFilter {
   filterFoco: string;
-  filterProtocol: string;
   filterTypeAssay: string;
   filterGli: string;
   filterExperimentName: string;
@@ -270,7 +269,7 @@ export default function Listagem({
       //     });
       // },
 
-      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterCod=${filterCod}&filterStatus=${filterStatus}&id_culture=${cultureId}`;
+      const parametersFilter = `filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterCod=${filterCod}&filterStatus=${filterStatus}&id_culture=${cultureId}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);

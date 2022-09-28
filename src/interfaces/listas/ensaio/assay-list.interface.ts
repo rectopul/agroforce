@@ -55,7 +55,6 @@ export interface IAssayListFilter {
   filterTratFrom: string | any
   filterTratTo: string | any
   filterFoco: string
-  filterProtocol: string
   filterTypeAssay: string
   filterGli: string
   filterTechnology: string
