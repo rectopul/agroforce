@@ -628,6 +628,7 @@ export default function Listagem({
       data.status = 'SORTEADO';
       experimentObj.push(data);
     });
+
     if (NPESelectedRow?.npeQT == 'N/A' ? true : (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE.npei_i)) {
       await experimentGenotipeService.create(data).then(async ({ status, response }: any) => {
         if (status === 200) {
@@ -646,10 +647,11 @@ export default function Listagem({
                 router.push('/operacao/ambiente');
               }
             });
-          }
+          }),        
         });
-    }
+    
   }
+}
 
   function validateConsumedData() {
     if (!SortearDisable) {
