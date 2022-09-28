@@ -96,8 +96,6 @@ interface IData {
 }
 
 export default function Listagem({
-  allExperiments,
-  totalItems,
   itensPerPage,
   filterApplication,
   idSafra,
@@ -568,7 +566,8 @@ export default function Listagem({
       data.status = 'SORTEADO';
       experimentObj.push(data);
     });
-    if (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE) {
+
+    if (NPESelectedRow?.npeQT == 'N/A' ? true : (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE.npei_i)) {
       await experimentGenotipeService.create(data).then(async ({ status, response }: any) => {
         if (status === 200) {
           experimentObj.map(async (x: any) => {
@@ -577,7 +576,9 @@ export default function Listagem({
             });
           });
 
-          await npeService.update({ id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT - total_consumed }).then(({ status, resposne }: any) => {
+          await npeService.update({
+            id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == 'N/A' ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
+          }).then(({ status, resposne }: any) => {
             if (status === 200) {
               router.push('/operacao/ambiente');
             }
@@ -618,6 +619,18 @@ export default function Listagem({
     getExperiments();
   }, [NPESelectedRow]);
 
+  useEffect(() => {
+    let count = 0;
+    experimentos.map((item: any) => {
+      item.npei <= NPESelectedRow?.nextNPE.npei_i
+        && item.npef >= NPESelectedRow?.nextNPE.npei_i
+        && NPESelectedRow?.nextNPE != 0
+        ? count++
+        : '';
+    });
+    count > 0 ? setSortearDisable(true) : setSortearDisable(false);
+  }, [experimentos]);
+
   return (
     <>
       <Head><title>Listagem de experimentos</title></Head>
@@ -629,7 +642,10 @@ export default function Listagem({
                         gap-0
                         "
         >
-          <div className="w-full">
+          <div
+            className={`w-full ${selectedNPE?.length > 3 && 'max-h-40 overflow-y-scroll'
+            } mb-4`}
+          >
             <MaterialTable
               style={{ background: '#f9fafb', marginBottom: '15px', paddingBottom: '10px' }}
               columns={columnNPE}
@@ -721,47 +737,48 @@ export default function Listagem({
                               <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
                                 <DragDropContext onDragEnd={handleOnDragEnd}>
                                   <Droppable droppableId="characters">
-                                    {
-                                      (provided) => (
-                                        <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-                                          <div className="h-8 mb-3">
-                                            <Button
-                                              value="Atualizar"
-                                              bgColor="bg-blue-600"
-                                              textColor="white"
-                                              onClick={getValuesColumns}
-                                              icon={<IoReloadSharp size={20} />}
-                                            />
-                                          </div>
-                                          {
-                                            generatesProps.map((generate, index) => (
-                                              <Draggable
-                                                key={index}
-                                                draggableId={String(generate.title)}
-                                                index={index}
+                                    {(provided) => (
+                                      <ul
+                                        className="w-full h-full characters"
+                                        {...provided.droppableProps}
+                                        ref={provided.innerRef}
+                                      >
+                                        <div className="h-8 mb-3">
+                                          <Button
+                                            value="Atualizar"
+                                            bgColor="bg-blue-600"
+                                            textColor="white"
+                                            onClick={getValuesColumns}
+                                            icon={<IoReloadSharp size={20} />}
+                                          />
+                                        </div>
+                                        {generatesProps.map((generate, index) => (
+                                          <Draggable
+                                            key={index}
+                                            draggableId={String(generate.title)}
+                                            index={index}
+                                          >
+                                            {(provider) => (
+                                              <li
+                                                ref={provider.innerRef}
+                                                {...provider.draggableProps}
+                                                {...provider.dragHandleProps}
                                               >
-                                                {(provider) => (
-                                                  <li
-                                                    ref={provider.innerRef}
-                                                    {...provider.draggableProps}
-                                                    {...provider.dragHandleProps}
-                                                  >
-                                                    <CheckBox
-                                                      name={generate.name}
-                                                      title={generate.title?.toString()}
-                                                      value={generate.value}
-                                                      defaultChecked={camposGerenciados
-                                                        .includes(String(generate.value))}
-                                                    />
-                                                  </li>
-                                                )}
-                                              </Draggable>
-                                            ))
-                                          }
-                                          {provided.placeholder}
-                                        </ul>
-                                      )
-                                    }
+                                                <CheckBox
+                                                  name={generate.name}
+                                                  title={generate.title?.toString()}
+                                                  value={generate.value}
+                                                  defaultChecked={camposGerenciados.includes(
+                                                    String(generate.value),
+                                                  )}
+                                                />
+                                              </li>
+                                            )}
+                                          </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                      </ul>
+                                    )}
                                   </Droppable>
                                 </DragDropContext>
                               </AccordionFilter>
@@ -772,7 +789,9 @@ export default function Listagem({
                             <Button
                               title="Sortear"
                               value="Sortear"
-                              bgColor="bg-blue-600"
+                              bgColor={
+                                SortearDisable ? 'bg-gray-400' : 'bg-blue-600'
+                              }
                               textColor="white"
                               onClick={validateConsumedData}
                             />
