@@ -620,40 +620,50 @@ export default function Listagem({
   }
 
   async function createExperimentGenotipe({ data, total_consumed, genotipo_treatment }: any) {
-    const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
-    const experimentObj: any[] = [];
-    experimentos.map((item: any) => {
-      const data: any = {};
-      data.id = Number(item.id);
-      data.status = 'SORTEADO';
-      experimentObj.push(data);
-    });
-
-    if (NPESelectedRow?.npeQT == 'N/A' ? true : (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE.npei_i)) {
-      await experimentGenotipeService.create(data).then(async ({ status, response }: any) => {
-        if (status === 200) {
-          genotipo_treatment.map(async (gt: any) => {
-            genotypeTreatmentService.update(gt).then(({ status, message }: any) => {
-            });
-          });
-          experimentObj.map(async (x: any) => {
-            await experimentService.update(x).then(({ status, response }: any) => {
-            });
-          })
-
-          await npeService.update({
-            id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == 'N/A' ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
-          }).then(({ status, resposne }: any) => {
-            if (status === 200) {
-              router.push('/operacao/ambiente');
-            }
-          });
-        }
+    if (data.length > 0) {
+      console.log('create exp');
+      const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
+      const experimentObj: any[] = [];
+      experimentos.map((item: any) => {
+        const data: any = {};
+        data.id = Number(item.id);
+        data.status = 'SORTEADO';
+        experimentObj.push(data);
       });
+      console.log('NPEQT', NPESelectedRow?.npeQT);
+      console.log('lastNNPE', lastNpe);
+      console.log('npei_i', NPESelectedRow?.nextNPE.npei_i);
+
+      if (NPESelectedRow?.npeQT == 'N/A' ? true : (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE.npei_i)) {
+        console.log('test')
+        await experimentGenotipeService.create(data).then(async ({ status, response }: any) => {
+          if (status === 200) {
+            genotipo_treatment.map(async (gt: any) => {
+              genotypeTreatmentService.update(gt).then(({ status, message }: any) => {
+              });
+            });
+            experimentObj.map(async (x: any) => {
+              await experimentService.update(x).then(({ status, response }: any) => {
+              });
+            })
+
+            await npeService.update({
+              id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == 'N/A' ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
+            }).then(({ status, resposne }: any) => {
+              if (status === 200) {
+                router.push('/operacao/ambiente');
+              }
+            });
+          }
+        });
+      }
+    } else {
+      Swal.fire("Nenhum experimento para desenhar");
     }
   }
 
   function validateConsumedData() {
+    console.log(SortearDisable);
     if (!SortearDisable) {
       const experiment_genotipo: any[] = [];
       const genotipo_treatment: any[] = [];
