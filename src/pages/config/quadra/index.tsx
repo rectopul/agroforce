@@ -1044,11 +1044,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}`
-<<<<<<< Updated upstream
-    : 'filterStatus=2';
-=======
     : `filterStatus=1`;
->>>>>>> Stashed changes
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
