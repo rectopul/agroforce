@@ -29,6 +29,21 @@
   border: solid 1px #d1d5db;
 }
 
+.MuiAutocomplete-inputRoot {
+  /* max-height: 28px; */
+  /* font-size: 10px; */
+}
+
+.MuiAutocomplete-input {
+}
+
+.MuiAutocomplete-inputFocused {
+}
+
+/* .MuiFilledInput-root {
+  font-size: 9px;
+} */
+
 .MuiAccordion-root {
   /* max-height: 30px; */
   /* z-index: 999; */
