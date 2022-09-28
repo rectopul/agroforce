@@ -483,7 +483,6 @@ export default function Listagem({
             } else {
               row.status = 'Ativo' as any;
             }
-            console.log(row);
             row.NOME = row.delineamento?.name;
             row.REPETICAO = row.repeticao;
             row.SORTEIO = row.sorteio;

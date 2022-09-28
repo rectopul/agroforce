@@ -181,7 +181,7 @@ export default function Atualizar({
         parametersFilter = filter;
       }
     } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_safra=${idSafra}&id_foco${idFoco}`;
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_foco${idFoco}`;
     } else {
       parametersFilter = filter;
     }
@@ -745,14 +745,14 @@ export const getServerSideProps: GetServerSideProps = async ({
   };
 
   const idFoco = Number(query.id);
-  const filterApplication = `&id_safra=${idSafra}&id_foco=${idFoco}`;
+  const filterApplication = `&id_foco=${idFoco}`;
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrlGrupo = `${publicRuntimeConfig.apiUrl}/grupo`;
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/foco`;
 
   const { response: allItens, total: totalItems } = await fetch(
-    `${baseUrlGrupo}?id_foco=${idFoco}&id_safra=${idSafra}`,
+    `${baseUrlGrupo}?id_foco=${idFoco}`,
     requestOptions,
   ).then((response) => response.json());
 

@@ -165,12 +165,11 @@ export default function Listagem({
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
-  const [orderBy,setOrderBy]=useState<string>(orderByserver); 
-  const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); 
-  // const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; 
+  const [orderBy, setOrderBy] = useState<string>(orderByserver);
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  // const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
-  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}`; 
-
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}`;
 
   const formik = useFormik<IExperimentGroupFilter>({
     initialValues: {
@@ -180,20 +179,20 @@ export default function Listagem({
       // filterTagsPrinted: checkValue('filterTagsPrinted'),
       // filterTotalTags: checkValue('filterTotalTags'),
       // filterStatus: checkValue('filterStatus'),
-      filterExperimentGroup:  checkValue('filterExperimentGroup'),
-      filterQuantityExperiment:  checkValue('filterQuantityExperiment'),
-      filterTagsToPrint:  checkValue('filterTagsToPrint'),
-      filterTagsPrinted:  checkValue('filterTagsPrinted'),
-      filterTotalTags:  checkValue('filterTotalTags'),
-      filterStatus:  checkValue('filterStatus'),
-      filterQtdExpFrom:  checkValue('filterQtdExpFrom'),
-      filterQtdExpTo:  checkValue('filterQtdExpTo'),
-      filterTotalEtiqImprimirFrom:  checkValue('filterTotalEtiqImprimirFrom'),
-      filterTotalEtiqImprimirTo:  checkValue('filterTotalEtiqImprimirTo'),
-      filterTotalEtiqImpressasFrom:  checkValue('filterTotalEtiqImpressasFrom'),
-      filterTotalEtiqImpressasTo:  checkValue('filterTotalEtiqImpressasTo'),
-      filterTotalEtiqFrom:  checkValue('filterTotalEtiqFrom'),
-      filterTotalEtiqTo:  checkValue('filterTotalEtiqTo'),
+      filterExperimentGroup: checkValue('filterExperimentGroup'),
+      filterQuantityExperiment: checkValue('filterQuantityExperiment'),
+      filterTagsToPrint: checkValue('filterTagsToPrint'),
+      filterTagsPrinted: checkValue('filterTagsPrinted'),
+      filterTotalTags: checkValue('filterTotalTags'),
+      filterStatus: checkValue('filterStatus'),
+      filterQtdExpFrom: checkValue('filterQtdExpFrom'),
+      filterQtdExpTo: checkValue('filterQtdExpTo'),
+      filterTotalEtiqImprimirFrom: checkValue('filterTotalEtiqImprimirFrom'),
+      filterTotalEtiqImprimirTo: checkValue('filterTotalEtiqImprimirTo'),
+      filterTotalEtiqImpressasFrom: checkValue('filterTotalEtiqImpressasFrom'),
+      filterTotalEtiqImpressasTo: checkValue('filterTotalEtiqImpressasTo'),
+      filterTotalEtiqFrom: checkValue('filterTotalEtiqFrom'),
+      filterTotalEtiqTo: checkValue('filterTotalEtiqTo'),
     },
     onSubmit: async ({
       filterExperimentGroup,
@@ -259,8 +258,6 @@ export default function Listagem({
   }, [typeOrder]);
 
   useEffect(() => {
-    console.log('filtersParams -- ', filterBeforeEdit);
-    console.log('filtersParams2 -- ', filtersParams);
     setCookies('filtersParams-test-rr', filtersParams);
   }, [filtersParams]);
 
@@ -1192,10 +1189,9 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 'desc';
 
   const orderByserver = req.cookies.filterBeforeEditOrderBy
-  ? req.cookies.filterBeforeEditOrderBy
-  : "";
+    ? req.cookies.filterBeforeEditOrderBy
+    : '';
 
-  // assay_list.protocol_name
   // removeCookies('filterBeforeEdit', { req, res });
   // removeCookies('pageBeforeEdit', { req, res });
   // removeCookies("filterBeforeEditTypeOrder", { req, res });

@@ -20,6 +20,8 @@ export class NpeController {
     let orderBy: object | any;
     let select: any = [];
     try {
+      console.log('options');
+      console.log(options);
       if (options.filterStatus) {
         if (options.filterStatus !== '2') {
           if (options.filterStatus == '1') {
@@ -60,8 +62,8 @@ export class NpeController {
         parameters.npei = Number(options.filterNPE);
       }
 
-      if (options.safraId) {
-        parameters.safraId = Number(options.safraId);
+      if (options.id_safra) {
+        parameters.safraId = Number(options.id_safra);
       }
 
       if (options.filterSafra) {
@@ -171,8 +173,6 @@ export class NpeController {
         skip,
         orderBy,
       );
-
-      // console.log("filter response ",response)
 
       if (response.length > 0) {
         const next_available_npe = response[response.length - 1].prox_npe;

@@ -45,7 +45,6 @@ interface IFilter {
   filterGmrTo: string | any;
   filterBgmFrom: string | any;
   filterBgmTo: string | any;
-  filterYear: string;
   filterCodLote: string;
   filterNcc: string;
   filterFase: string;
@@ -172,7 +171,6 @@ export default function Listagem({
       filterGmrTo: '',
       filterBgmTo: '',
       filterBgmFrom: '',
-      filterYear: '',
       filterCodLote: '',
       filterNcc: '',
       filterFase: '',
@@ -198,7 +196,6 @@ export default function Listagem({
       filterGmrTo,
       filterBgmTo,
       filterBgmFrom,
-      filterYear,
       filterCodLote,
       filterNcc,
       filterFase,
@@ -222,7 +219,7 @@ export default function Listagem({
       //   setCurrentPage(0);
       // });
 
-      const parametersFilter = `&filterGmrFrom=${filterGmrFrom}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmrTo=${filterGmrTo}&id_culture=${idCulture}&id_safra=${idSafra}`;
+      const parametersFilter = `&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterWeightTo=${filterWeightTo}&filterWeightFrom=${filterWeightFrom}&filterSeedTo=${filterSeedTo}&filterSeedFrom=${filterSeedFrom}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterGmrFrom=${filterGmrFrom}&filterGmrTo=${filterGmrTo}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&id_culture=${idCulture}&id_safra=${idSafra}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -472,6 +469,7 @@ export default function Listagem({
           delete newItem.id;
           delete newItem.id_genotipo;
           delete newItem.genotipo;
+          delete newItem.safra;
 
           return newItem;
         });

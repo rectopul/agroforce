@@ -150,14 +150,13 @@ export class ImportBlockController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
                 if (typeof spreadSheet[row][column] !== 'number'
-                || Number(spreadSheet[row][column]) <= 0
-                || !Number.isInteger(Number(spreadSheet[row][column]))) {
+                || Number(spreadSheet[row][column]) <= 0) {
                   responseIfError[Number(column)]
                         += responseGenericFactory(
                       (Number(column) + 1),
                       row,
                       spreadSheet[0][column],
-                      'precisa ser um numero inteiro e positivo',
+                      'precisa ser um numero e positivo',
                     );
                 }
                 if (larg_q !== '') {
@@ -187,14 +186,13 @@ export class ImportBlockController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
                 if (typeof spreadSheet[row][column] !== 'number'
-                || Number(spreadSheet[row][column]) <= 0
-                || !Number.isInteger(Number(spreadSheet[row][column]))) {
+                || Number(spreadSheet[row][column]) <= 0) {
                   responseIfError[Number(column)]
                         += responseGenericFactory(
                       (Number(column) + 1),
                       row,
                       spreadSheet[0][column],
-                      'precisa ser um numero inteiro e positivo',
+                      'precisa ser um numero e positivo',
                     );
                 }
                 if (cod_quadra === cod_quadra_anterior) {
@@ -234,12 +232,13 @@ export class ImportBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (!validateInteger(spreadSheet[row][column])) {
+              } else if (typeof spreadSheet[row][column] !== 'number'
+                || Number(spreadSheet[row][column]) <= 0) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   (Number(column) + 1),
                   row,
                   spreadSheet[0][column],
-                  'precisa ser um numero inteiro e positivo',
+                  'precisa ser um numero e positivo',
                 );
               }
             }

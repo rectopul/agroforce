@@ -36,19 +36,19 @@ import {
   Input,
 } from '../../../../components';
 
-type IAssayListUpdate = Omit<IAssayList, 'id_safra' | 'period' | 'protocol_name'>;
+type IAssayListUpdate = Omit<IAssayList, 'id_safra' | 'period' >;
 
 export default function AtualizarTipoEnsaio({
-      allGenotypeTreatment,
-      assayList,
-      totalItens,
-      idAssayList,
-      idSafra,
-      itensPerPage,
-      filterApplication,
-      allExperiments,
-      totalExperiments,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allGenotypeTreatment,
+  assayList,
+  totalItens,
+  idAssayList,
+  idSafra,
+  itensPerPage,
+  filterApplication,
+  allExperiments,
+  totalExperiments,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');

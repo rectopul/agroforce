@@ -1,4 +1,4 @@
-import { ExperimentGenotipeRepository } from 'src/repository/experiment_genotipe.repository';
+import { ExperimentGenotipeRepository } from 'src/repository/experiment-genotipe.repository';
 import { IReturnObject } from '../interfaces/shared/Import.interface';
 import handleError from '../shared/utils/handleError';
 import { ExperimentGroupController } from './experiment-group/experiment-group.controller';
@@ -185,7 +185,8 @@ export class ExperimentGenotipeController {
       // if (options.npe) {
       //   parameters.npe = Number(options.npe);
       // }
-
+      console.log('options');
+      console.log(options);
       const select = {
         id: true,
         safra: { select: { safraName: true } },
@@ -201,6 +202,38 @@ export class ExperimentGenotipeController {
             delineamento: true,
             local: {
               select: { name_local_culture: true },
+            },
+            assay_list: {
+              select: {
+                gli: true,
+                bgm: true,
+                status: true,
+                genotype_treatment: { include: { genotipo: true } },
+                tecnologia: {
+                  select: {
+                    name: true,
+                    id: true,
+                    cod_tec: true,
+                  },
+                },
+                foco: {
+                  select: {
+                    name: true,
+                    id: true,
+                  },
+                },
+                type_assay: {
+                  select: {
+                    name: true,
+                    id: true,
+                  },
+                },
+                safra: {
+                  select: {
+                    safraName: true,
+                  },
+                },
+              },
             },
           },
         },

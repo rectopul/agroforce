@@ -11,6 +11,8 @@ export class GenotipoController {
     let orderBy: object | any;
     let select: any = [];
     try {
+      console.log('options');
+      console.log(options);
       if (options.filterGenotipo) {
         parameters.name_genotipo = JSON.parse(`{"contains":"${options.filterGenotipo}"}`);
       }
@@ -85,7 +87,7 @@ export class GenotipoController {
             select: {
               name: true,
               id: true,
-              cod_tec :true,
+              cod_tec: true,
             },
           },
           numberLotes: true,
@@ -168,10 +170,8 @@ export class GenotipoController {
     }
   }
 
-
   async getOneByName(name: any) {
     try {
-     
       const response = await this.genotipoRepository.findOneByName(name);
 
       if (!response) throw new Error('Item não encontrado');

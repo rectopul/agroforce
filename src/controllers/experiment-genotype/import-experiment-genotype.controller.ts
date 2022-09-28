@@ -11,7 +11,7 @@ import {
 } from '../../shared/utils/responseErrorFactory';
 import { AssayListController } from '../assay-list/assay-list.controller';
 import { ExperimentController } from '../experiment/experiment.controller';
-import { ExperimentGenotipeController } from '../experiment_genotipe.controller';
+import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
 import { GenotipoController } from '../genotype/genotipo.controller';
 import { LogImportController } from '../log-import.controller';
 import { LoteController } from '../lote.controller';

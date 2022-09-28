@@ -494,7 +494,6 @@ export default function Listagem({
           } else {
             row.status = 'Ativo' as any;
           }
-          console.log(row);
           row.NOME = row?.name;
           row.GRUPO = row?.group.group;
           row.STATUS = row?.status;

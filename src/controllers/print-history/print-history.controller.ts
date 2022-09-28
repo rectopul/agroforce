@@ -2,7 +2,7 @@ import handleError from '../../shared/utils/handleError';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { PrintHistoryRepository } from '../../repository/print-history.repository';
 import { IReturnObject } from '../../interfaces/shared/Import.interface';
-import { ExperimentGenotipeController } from '../experiment_genotipe.controller';
+import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
 
 export class PrintHistoryController {
   printHistoryRepository = new PrintHistoryRepository();

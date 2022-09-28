@@ -20,7 +20,7 @@ import { RiFileExcel2Line, RiOrganizationChart } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { experimentGenotipeService } from 'src/services/experiment_genotipe.service';
+import { experimentGenotipeService } from 'src/services/experiment-genotipe.service';
 import { ITreatment } from 'src/interfaces/listas/ensaio/genotype-treatment.interface';
 import { experimentService, userPreferencesService } from '../../../../services';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
