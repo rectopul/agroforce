@@ -243,7 +243,7 @@ export default function Listagem({
 
   async function handleStatus(
     idItem: number,
-    data: IUsers,
+    data: any,
   ): Promise<void> {
     if (data.status === 1) {
       data.status = 0;
@@ -675,8 +675,8 @@ export default function Listagem({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      // defaultValue={filterStatusBeforeEdit[13]}
-                      defaultValue={checkValue('filterStatus')}
+                      defaultValue={filterStatusBeforeEdit[13]}
+                      // defaultValue={checkValue('filterStatus')}
                       values={filters.map((id) => id)}
                       selected="1"
                     />
