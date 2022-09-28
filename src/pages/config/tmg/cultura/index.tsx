@@ -193,6 +193,11 @@ export default function Listagem({
     });
   }
 
+  //Call that function when change type order value.
+  useEffect(() => {
+    console.log("value   -------")
+    // callingApi(filter);
+  }, []);
 
   //Call that function when change type order value.
   useEffect(() => {
@@ -815,11 +820,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : 'filterStatus=2';
+    : 'filterStatus=1';
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : 'filterStatus=2';
+    : 'filterStatus=1';
 
   //Last page
   const lastPageServer = req.cookies.lastPage
@@ -831,6 +836,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies("filterBeforeEditTypeOrder", { req, res });
     removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("filtersParams", { req, res });
     removeCookies("lastPage", { req, res });
   }
 
@@ -851,10 +857,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   removeCookies("filterBeforeEditTypeOrder", { req, res });
   removeCookies("filterBeforeEditOrderBy", { req, res });
   removeCookies("lastPage", { req, res });
+  removeCookies("filtersParams", { req, res });
+
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
-  const param = `skip=0&take=${itensPerPage}&filterStatus=2`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {

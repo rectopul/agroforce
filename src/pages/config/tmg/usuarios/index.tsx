@@ -898,10 +898,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : 'filterStatus=1';
+    : 'filterStatus=2';
   const filterApplication = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : 'filterStatus=1';
+    : 'filterStatus=2';
 
   // Last page
   const lastPageServer = req.cookies.lastPage
@@ -910,9 +910,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   if (lastPageServer == undefined || lastPageServer == 'No') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
-    removeCookies('filterBeforeEditTypeOrder', { req, res });
-    removeCookies('filterBeforeEditOrderBy', { req, res });
-    removeCookies('lastPage', { req, res });
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("lastPage", { req, res });  
+    removeCookies("filtersParams", { req, res });
   }
 
   // RR
@@ -927,11 +928,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
-  removeCookies('lastPage', { req, res });
-
+  removeCookies("filterBeforeEditTypeOrder", { req, res });
+  removeCookies("filterBeforeEditOrderBy", { req, res });
+  removeCookies("lastPage", { req, res });  
+  removeCookies("filtersParams", { req, res });
+  
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=2`;
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();

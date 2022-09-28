@@ -216,9 +216,10 @@ export default function Listagem({
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-  const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
-  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const [orderBy,setOrderBy]=useState<string>(orderByserver); //RR
+  const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); //RR
+  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy=='tecnologia'?'genotipo.tecnologia.cod_tec':orderBy}&typeOrder=${typeOrder}`;  //RR
+
 
   const [nccIsValid, setNccIsValid] = useState<boolean>(false);
   const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
