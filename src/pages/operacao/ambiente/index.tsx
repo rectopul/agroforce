@@ -23,7 +23,7 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
-import { removeCookies, setCookies } from 'cookies-next';
+import { removeCookies } from 'cookies-next';
 import { npeService, userPreferencesService } from '../../../services';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
@@ -35,7 +35,6 @@ import {
   Select,
 } from '../../../components';
 import * as ITabs from '../../../shared/utils/dropdown';
-import { tableGlobalFunctions } from '../../../helpers';
 
 interface INpeProps {
   id: number | any;
@@ -60,15 +59,8 @@ interface IFilter {
   filterFoco: string | any;
   filterEnsaio: string | any;
   filterTecnologia: string | any;
-  filterCodTecnologia: string | any;
   filterEpoca: string | any;
   filterNPE: string | any;
-  filterNpeTo: string | any;
-  filterNpeFrom: string | any;
-  filterNpeFinalTo: string | any;
-  filterNpeFinalFrom: string | any;
-  filterGrpTo: string | any;
-  filterGrpFrom: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -82,12 +74,7 @@ interface IData {
   totalItems: number;
   filter: string | any;
   itensPerPage: number | any;
-  filterBeforeEdit: object | any;
   filterApplication: object | any;
-  id_safra: number | any,
-  cultureId: number | any,
-  orderByserver: string | any,
-  typeOrderServer: string | any,
 }
 
 export default function Listagem({
@@ -95,17 +82,10 @@ export default function Listagem({
   itensPerPage,
   filterApplication,
   totalItems,
-  filterBeforeEdit,
-  id_safra,
-  cultureId,
-  orderByserver,
-  typeOrderServer,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
-  const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE'
-    ? { ...i, statusTab: true }
-    : { ...i, statubsTab: false }));
+  const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
 
   const router = useRouter();
 
@@ -113,13 +93,12 @@ export default function Listagem({
   const preferences = userLogado.preferences.npe || {
     id: 0,
     table_preferences:
-      'id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef,grp',
+      'id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef',
   };
-
+  preferences.table_preferences = 'id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef';
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
-  const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
   const [npe, setNPE] = useState(allNpe);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(1);
@@ -137,7 +116,7 @@ export default function Listagem({
     // },
     {
       name: 'CamposGerenciados[]',
-      title: 'Lugar de cultura',
+      title: 'Local ',
       value: 'local',
       defaultChecked: () => camposGerenciados.includes('local'),
     },
@@ -167,7 +146,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Época',
+      title: 'Epoca ',
       value: 'epoca',
       defaultChecked: () => camposGerenciados.includes('epoca'),
     },
@@ -175,7 +154,7 @@ export default function Listagem({
       name: 'CamposGerenciados[]',
       title: 'NPE Inicial ',
       value: 'npei',
-      defaultChecked: () => camposGerenciados.includes('npei_i'),
+      defaultChecked: () => camposGerenciados.includes('npei'),
     },
     {
       name: 'CamposGerenciados[]',
@@ -183,46 +162,24 @@ export default function Listagem({
       value: 'npef',
       defaultChecked: () => camposGerenciados.includes('npef'),
     },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'GRP',
-      value: 'grp',
-      defaultChecked: () => camposGerenciados.includes('grp'),
-    },
   ]);
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-  const [orderBy, setOrderBy] = useState<string>(orderByserver);
-  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
-  const filters = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
-    { id: 3, name: 'Sorteado' },
-  ];
-
-  const filterStatus = filterApplication.split('');
-
-  const formik = useFormik<any>({
+  const formik = useFormik<IFilter>({
     initialValues: {
-      filterStatus: filterStatus[13],
-      filterLocal: checkValue('filterLocal'),
-      filterSafra: checkValue('filterSafra'),
-      filterFoco: checkValue('filterFoco'),
-      filterEnsaio: checkValue('filterEnsaio'),
-      filterTecnologia: checkValue('filterTecnologia'),
-      filterEpoca: checkValue('filterEpoca'),
-      filterNPE: checkValue('filterNPE'),
+      filterStatus: '',
+      filterLocal: '',
+      filterSafra: '',
+      filterFoco: '',
+      filterEnsaio: '',
+      filterTecnologia: '',
+      filterEpoca: '',
+      filterNPE: '',
       orderBy: '',
       typeOrder: '',
-      filterNpeTo: checkValue('filterNpeTo'),
-      filterNpeFrom: checkValue('filterNpeFrom'),
-      filterNpeFinalTo: checkValue('filterNpeFinalTo'),
-      filterNpeFinalFrom: checkValue('filterNpeFinalFrom'),
     },
     onSubmit: async ({
       filterStatus,
@@ -231,101 +188,30 @@ export default function Listagem({
       filterFoco,
       filterEnsaio,
       filterTecnologia,
-      filterCodTecnologia,
       filterEpoca,
       filterNPE,
-      filterNpeTo,
-      filterNpeFrom,
-      filterNpeFinalTo,
-      filterNpeFinalFrom,
-      filterGrpTo,
-      filterGrpFrom,
     }) => {
-      // &filterSafra=${filterSafra}
-      const parametersFilter = `filterStatus=${filterStatus}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&safraId=${id_safra}`;
-      // await npeService
-      //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
-      //   .then((response) => {
-      //     setFilter(parametersFilter);
-      //     setNPE(response.response);
-      //     setTotalItems(response.total);
-      //     setCurrentPage(0);
-      //   });
-
-      setFilter(parametersFilter);
-      setCurrentPage(0);
-      await callingApi(parametersFilter);
+      const parametersFilter = `filterStatus=${filterStatus || 1
+      }&filterLocal=${filterLocal}&filterSafra=${filterSafra}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_safra=${userLogado.safras.safra_selecionada
+      }`;
+      await npeService
+        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+        .then((response) => {
+          setFilter(parametersFilter);
+          setNPE(response.response);
+          setTotalItems(response.total);
+          setCurrentPage(0);
+        });
     },
   });
 
-  // Calling common API
-  async function callingApi(parametersFilter: any) {
-    setCookies('filterBeforeEdit', parametersFilter);
-    setCookies('filterBeforeEditTypeOrder', typeOrder);
-    setCookies('filterBeforeEditOrderBy', orderBy);
-    parametersFilter = `${parametersFilter}&${pathExtra}`;
-    setFiltersParams(parametersFilter);
-    setCookies('filtersParams', parametersFilter);
+  const filters = [
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
+  ];
 
-    await npeService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400) {
-        setNPE(response.response);
-        setTotalItems(response.total);
-      }
-    });
-  }
-
-  // Call that function when change type order value.
-  useEffect(() => {
-    callingApi(filter);
-  }, [typeOrder]);
-
-  // async function handleOrder(
-  //   column: string,
-  //   order: string | any,
-  // ): Promise<void> {
-  //   let typeOrder: any;
-  //   let parametersFilter: any;
-  //   if (order === 1) {
-  //     typeOrder = 'asc';
-  //   } else if (order === 2) {
-  //     typeOrder = 'desc';
-  //   } else {
-  //     typeOrder = '';
-  //   }
-
-  //   if (filter && typeof filter !== 'undefined') {
-  //     if (typeOrder !== '') {
-  //       parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-  //     } else {
-  //       parametersFilter = filter;
-  //     }
-  //   } else if (typeOrder !== '') {
-  //     parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-  //   } else {
-  //     parametersFilter = filter;
-  //   }
-
-  //   await npeService
-  //     .getAll(`${parametersFilter}&skip=0&take=${take}`)
-  //     .then((response) => {
-  //       if (response.status === 200) {
-  //         setNPE(response.response);
-  //       }
-  //     });
-
-  //   if (orderList === 2) {
-  //     setOrder(0);
-  //     setArrowOrder(<AiOutlineArrowDown />);
-  //   } else {
-  //     setOrder(orderList + 1);
-  //     if (orderList === 1) {
-  //       setArrowOrder(<AiOutlineArrowUp />);
-  //     } else {
-  //       setArrowOrder('');
-  //     }
-  //   }
-  // }
+  const filterStatus = filterApplication.split('');
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -341,33 +227,7 @@ export default function Listagem({
         </div>
       ),
       field: title,
-      sorting: true,
-    };
-  }
-
-  function tecnologiaHeaderFactory(title: string, name: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {title}
-          </button>
-        </div>
-      ),
-      field: 'tecnologia',
-      width: 0,
-      sorting: true,
-      render: (rowData: any) => (
-        <div className="h-10 flex">
-          <div>
-            {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
-          </div>
-        </div>
-      ),
+      sorting: false,
     };
   }
 
@@ -377,7 +237,7 @@ export default function Listagem({
     Object.keys(columnCampos).forEach((item) => {
       if (columnCampos[item] === 'local') {
         tableFields.push(
-          headerTableFactory('Lugar de cultura', 'local.name_local_culture'),
+          headerTableFactory('Local', 'local.name_local_culture'),
         );
       }
       if (columnCampos[item] === 'safra') {
@@ -390,19 +250,16 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
       }
       if (columnCampos[item] === 'tecnologia') {
-        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
+        tableFields.push(headerTableFactory('Tecnologia', 'tecnologia.name'));
       }
       if (columnCampos[item] === 'epoca') {
-        tableFields.push(headerTableFactory('Época', 'epoca'));
+        tableFields.push(headerTableFactory('Epoca', 'epoca'));
       }
       if (columnCampos[item] === 'npei') {
-        tableFields.push(headerTableFactory('NPE Inicial', 'npei_i'));
+        tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
       }
       if (columnCampos[item] === 'npef') {
         tableFields.push(headerTableFactory('NPE Final', 'npef'));
-      }
-      if (columnCampos[item] === 'grp') {
-        tableFields.push(headerTableFactory('GRP', 'group.group'));
       }
     });
     return tableFields;
@@ -414,57 +271,47 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
-    // let typeOrder: any;
-    // let parametersFilter: any;
-    // if (order === 1) {
-    //   typeOrder = 'asc';
-    // } else if (order === 2) {
-    //   typeOrder = 'desc';
-    // } else {
-    //   typeOrder = '';
-    // }
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
 
-    // if (filter && typeof filter !== 'undefined') {
-    //   if (typeOrder !== '') {
-    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-    //   } else {
-    //     parametersFilter = filter;
-    //   }
-    // } else if (typeOrder !== '') {
-    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    // } else {
-    //   parametersFilter = filter;
-    // }
+    if (filter && typeof filter !== 'undefined') {
+      if (typeOrder !== '') {
+        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+      } else {
+        parametersFilter = filter;
+      }
+    } else if (typeOrder !== '') {
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    } else {
+      parametersFilter = filter;
+    }
 
-    // await npeService
-    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
-    //   .then((response) => {
-    //     if (response.status === 200) {
-    //       setNPE(response.response);
-    //     }
-    //   });
+    await npeService
+      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .then((response) => {
+        if (response.status === 200) {
+          setNPE(response.response);
+        }
+      });
 
-    // if (orderList === 2) {
-    //   setOrder(0);
-    //   setArrowOrder(<AiOutlineArrowDown />);
-    // } else {
-    //   setOrder(orderList + 1);
-    //   if (orderList === 1) {
-    //     setArrowOrder(<AiOutlineArrowUp />);
-    //   } else {
-    //     setArrowOrder('');
-    //   }
-    // }
-
-    // Gobal manage orders
-    const {
-      typeOrderG, columnG, orderByG, arrowOrder,
-    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
-
-    setTypeOrder(typeOrderG);
-    setOrderBy(columnG);
-    setOrder(orderByG);
-    setArrowOrder(arrowOrder);
+    if (orderList === 2) {
+      setOrder(0);
+      setArrowOrder(<AiOutlineArrowDown />);
+    } else {
+      setOrder(orderList + 1);
+      if (orderList === 1) {
+        setArrowOrder(<AiOutlineArrowUp />);
+      } else {
+        setArrowOrder('');
+      }
+    }
   }
 
   async function getValuesColumns(): Promise<void> {
@@ -562,41 +409,27 @@ export default function Listagem({
       filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
-    await npeService.getAll(filter).then((response) => {
+    await npeService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = response.response.map((row: any) => {
-          if (row.status === 0) {
-            row.status = 'Inativo';
-          } else {
-            row.status = 'Ativo';
-          }
-          row.LOCAL = row.local.name_local_culture;
-          row.SAFRA = row.safra.safraName;
-          row.FOCO = row.foco.name;
-          row.TIPO_ENSAIO = row.type_assay.name;
-          row.TECNOLOGIA = row.tecnologia.name;
-          row.ÉPOCA = row.epoca;
-          row.NPEI = row.npei;
-          row.NPEF = row.npef;
-          row.NPEQT = row.npeQT;
-          row.NEXT_NPE = row.nextNPE;
-          row.STATUS = row.status;
+        const newData = response.response.map(
+          (row: { avatar: any; status: any }) => {
+            delete row.avatar;
+            if (row.status === 0) {
+              row.status = 'Inativo';
+            } else {
+              row.status = 'Ativo';
+            }
 
-          delete row.local;
-          delete row.safra;
-          delete row.foco;
-          delete row.type_assay;
-          delete row.tecnologia;
-          delete row.epoca;
-          delete row.npei;
-          delete row.npef;
-          delete row.npeQT;
-          delete row.nextNPE;
-          delete row.status;
-          delete row.avatar;
-          delete row.id;
+            return row;
+          },
+        );
 
-          return row;
+        newData.map((item: any) => {
+          item.foco = item.foco?.name;
+          item.local = item.local?.name_local_culture;
+          item.safra = item.safra?.safraName;
+          item.tecnologia = item.tecnologia?.name;
+          item.type_assay = item.type_assay?.name;
         });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
@@ -621,37 +454,31 @@ export default function Listagem({
     });
   };
 
-  // manage total pages
-  async function handleTotalPages() {
+  function handleTotalPages(): void {
     if (currentPage < 0) {
       setCurrentPage(0);
+    } else if (currentPage >= pages) {
+      setCurrentPage(pages - 1);
     }
   }
 
   async function handlePagination(): Promise<void> {
-    // const skip = currentPage * Number(take);
-    // let parametersFilter = `skip=${skip}&take=${take}`;
-    // if (filter) {
-    //   parametersFilter = `${parametersFilter}&${filter}`;
-    // }
-    // await npeService.getAll(parametersFilter).then((response) => {
-    //   if (response.status === 200) {
-    //     setNPE(response.response);
-    //   }
-    // });
+    const skip = currentPage * Number(take);
+    let parametersFilter = `skip=${skip}&take=${take}`;
 
-    await callingApi(filter); // handle pagination globly
-  }
-
-  // Checking defualt values
-  function checkValue(value: any) {
-    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
-    return parameter;
+    if (filter) {
+      parametersFilter = `${parametersFilter}&${filter}`;
+    }
+    await npeService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200) {
+        setNPE(response.response);
+      }
+    });
   }
 
   function filterFieldFactory(title: any, name: any) {
     return (
-      <div className="h-7 w-1/2 ml-2">
+      <div className="h-7 w-1/2 ml-4">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -661,7 +488,6 @@ export default function Listagem({
           max="40"
           id={title}
           name={title}
-          defaultValue={checkValue(title)}
           onChange={formik.handleChange}
         />
       </div>
@@ -669,10 +495,8 @@ export default function Listagem({
   }
 
   function handleSelectionRow(data: any) {
-    const selectedRow = data?.map((e: any) => ({
-      ...e,
-      tableData: { id: e.tableData.id, checked: false },
-    }));
+    const selectedRow = data?.map((e: any) => (
+      { ...e, tableData: { id: e.tableData.id, checked: false } }));
     setSelectedNPE(selectedRow);
   }
 
@@ -696,7 +520,7 @@ export default function Listagem({
       <Head>
         <title>Listagem dos NPEs</title>
       </Head>
-      <Content contentHeader={tabsOperationMenu} moduloActive="operacao">
+      <Content contentHeader={tabsOperationMenu} moduloActive="operation">
         <main
           className="h-full w-full
           flex flex-col
@@ -704,7 +528,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar ambientes">
+          <AccordionFilter title="Filtrar npe's">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -722,7 +546,7 @@ export default function Listagem({
                   pb-0
                 "
                 >
-                  {/* <div className="h-6 w-1/3 ml-1">
+                  <div className="h-6 w-1/2 ml-1">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status
                     </label>
@@ -733,9 +557,9 @@ export default function Listagem({
                       values={filters.map((id) => id)}
                       selected="1"
                     />
-                  </div> */}
+                  </div>
 
-                  {filterFieldFactory('filterLocal', 'Lugar de cultura')}
+                  {filterFieldFactory('filterLocal', 'Local')}
 
                   {filterFieldFactory('filterSafra', 'Safra')}
 
@@ -743,78 +567,15 @@ export default function Listagem({
 
                   {filterFieldFactory('filterEnsaio', 'Ensaio')}
 
-                  {filterFieldFactory('filterCodTecnologia', 'Cód. Tecnologia')}
-
                   {filterFieldFactory('filterTecnologia', 'Tecnologia')}
 
-                  {filterFieldFactory('filterEpoca', 'Época')}
+                  {filterFieldFactory('filterEpoca', 'Epoca')}
 
-                  <div className="h-6 w-1/3 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      NPE Inicial
-                    </label>
-                    <div className="flex">
-                      <Input
-                        placeholder="De"
-                        id="filterNpeFrom"
-                        name="filterNpeFrom"
-                        onChange={formik.handleChange}
-                      />
-                      <Input
-                        style={{ marginLeft: 8 }}
-                        placeholder="Até"
-                        id="filterNpeTo"
-                        name="filterNpeTo"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="h-6 w-1/3 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      NPE Final
-                    </label>
-                    <div className="flex">
-                      <Input
-                        placeholder="De"
-                        id="filterNpeFinalFrom"
-                        name="filterNpeFinalFrom"
-                        onChange={formik.handleChange}
-                      />
-                      <Input
-                        style={{ marginLeft: 8 }}
-                        placeholder="Até"
-                        id="filterNpeFinalTo"
-                        name="filterNpeFinalTo"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="h-6 w-1/3 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      GRP
-                    </label>
-                    <div className="flex">
-                      <Input
-                        placeholder="De"
-                        id="filterGrpFrom"
-                        name="filterGrpFrom"
-                        onChange={formik.handleChange}
-                      />
-                      <Input
-                        style={{ marginLeft: 8 }}
-                        placeholder="Até"
-                        id="filterGrpTo"
-                        name="filterGrpTo"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
+                  {filterFieldFactory('filterNPE', 'NPE Inicial')}
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 15 }}>
                     <Button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -822,6 +583,7 @@ export default function Listagem({
                     />
                   </div>
                 </div>
+
               </form>
             </div>
           </AccordionFilter>
@@ -868,19 +630,12 @@ export default function Listagem({
                       <Button
                         title="Gerar sorteio"
                         value="Gerar sorteio"
-                        bgColor={
-                          selectedNPE?.length <= 0
-                            ? 'bg-gray-400'
-                            : 'bg-blue-600'
-                        }
+                        bgColor={selectedNPE?.length <= 0 ? 'bg-gray-400' : 'bg-blue-600'}
                         textColor="white"
                         disabled={selectedNPE.length <= 0}
                         onClick={() => {
                           selectedNPE.sort((a, b) => a.npei - b.npei);
-                          localStorage.setItem(
-                            'selectedNPE',
-                            JSON.stringify(selectedNPE),
-                          );
+                          localStorage.setItem('selectedNPE', JSON.stringify(selectedNPE));
                           router.push({
                             pathname: '/operacao/ambiente/experimento',
                           });
@@ -1020,14 +775,14 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages - 1)}
+                      onClick={() => setCurrentPage(currentPage + 10)}
                       bgColor="bg-blue-600 testing"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>
@@ -1037,10 +792,7 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({
-  req,
-  res,
-}: any) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (
     await PreferencesControllers.getConfigGerais()
@@ -1048,48 +800,16 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const { token } = req.cookies;
   const id_safra: any = req.cookies.safraId;
-  const { cultureId } = req.cookies;
 
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : `filterStatus=2&safraId=${id_safra}`;
-
-  // removeCookies('filterBeforeEdit', { req, res });
-  // removeCookies('pageBeforeEdit', { req, res });
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
 
-  const filterApplication = `filterStatus=2&safraId=${id_safra}`;
+  const filterApplication = `filterStatus=1&safraId=${id_safra}`;
 
-  // Last page
-  const lastPageServer = req.cookies.lastPage
-    ? req.cookies.lastPage
-    : 'No';
-
-  if (lastPageServer == undefined || lastPageServer == 'No') {
-    removeCookies('filterBeforeEdit', { req, res });
-    removeCookies('pageBeforeEdit', { req, res });
-    removeCookies('filterBeforeEditTypeOrder', { req, res });
-    removeCookies('filterBeforeEditOrderBy', { req, res });
-    removeCookies('lastPage', { req, res });
-  }
-
-  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
-    ? req.cookies.filterBeforeEditTypeOrder
-    : 'desc';
-
-  const orderByserver = req.cookies.filterBeforeEditOrderBy
-    ? req.cookies.filterBeforeEditOrderBy
-    : 'local.name_local_culture';
-
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-  removeCookies('filterBeforeEditTypeOrder', { req, res });
-  removeCookies('filterBeforeEditOrderBy', { req, res });
-  removeCookies('lastPage', { req, res });
-
-  const param = `skip=0&take=${itensPerPage}&filterStatus=2&safraId=${id_safra}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&safraId=${id_safra}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -1098,22 +818,17 @@ export const getServerSideProps: GetServerSideProps = async ({
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allNpe = [], total: totalItems = 0 } = await fetch(
-    urlParameters.toString(),
-    requestOptions,
-  ).then((response) => response.json());
+  const {
+    response: allNpe = [],
+    total: totalItems = 0,
+  } = await fetch(urlParameters.toString(), requestOptions).then((response) => (response.json()));
 
   return {
     props: {
       allNpe,
       totalItems,
       itensPerPage,
-      filterBeforeEdit,
       filterApplication,
-      id_safra,
-      cultureId,
-      orderByserver,
-      typeOrderServer,
     },
   };
 };
