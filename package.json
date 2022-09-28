@@ -8,8 +8,8 @@
     "lint": "eslint --fix --ext .ts,.tsx ."
   },
   "dependencies": {
-    "@emotion/react": "^11.8.2",
-    "@emotion/styled": "^11.8.1",
+    "@emotion/react": "^11.10.4",
+    "@emotion/styled": "^11.10.4",
     "@faker-js/faker": "^7.4.0",
     "@headlessui/react": "^1.5.0",
     "@heroicons/react": "^1.0.5",
@@ -17,7 +17,7 @@
     "@material-ui/core": "^4.12.3",
     "@material-ui/icons": "^4.11.2",
     "@mui/icons-material": "^5.5.0",
-    "@mui/material": "^5.5.0",
+    "@mui/material": "^5.10.7",
     "@mui/styled-engine-sc": "^5.4.2",
     "@nestjs/platform-express": "^8.3.0",
     "@nestjs/swagger": "^5.2.0",
@@ -47,6 +47,8 @@
     "jspdf-autotable": "^3.5.23",
     "material-table": "^1.63.0",
     "next": "^12.1.0",
+    "next-barcode": "1.4.0",
+    "next-qrcode": "2.2.0",
     "next-swagger-doc": "^0.2.0",
     "nookies": "^2.5.2",
     "nprogress": "^0.2.0",
@@ -76,9 +78,7 @@
     "util": "^0.12.4",
     "uuid": "^8.3.2",
     "xlsx": "^0.18.3",
-    "yup": "^0.32.11",
-    "next-barcode": "1.4.0",
-    "next-qrcode": "2.2.0"
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@types/cookie": "^0.4.1",

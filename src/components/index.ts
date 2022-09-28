@@ -18,3 +18,7 @@ export { ToolTip } from "./ToolTip";
 export { ModalComponent } from "./ModalComponent";
 export { ModalConfirmation } from "./ModalConfirmation";
 export { FieldItemsPerPage } from "./FieldItemsPerPage";
+export { SelectAutoComplete } from "./SelectAutoComplete";
+export { SelectAutoCompleteMaterial } from "./SelectAutoCompleteMaterial";
+export { SelectMultiple } from "./SelectMultiple";
+export { SelectMultipleMaterial } from "./SelectMultipleMaterial";
