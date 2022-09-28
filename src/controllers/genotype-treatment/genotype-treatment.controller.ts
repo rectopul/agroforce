@@ -72,6 +72,9 @@ export class GenotypeTreatmentController {
       if (options.filterStatusAssay) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
       }
+      if (options.status_experiment) {
+        parameters.status_experiment = JSON.parse(`{"contains": "${options.status_experiment}" }`);
+      }
       const select = {
         id: true,
         id_lote: true,

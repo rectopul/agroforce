@@ -238,11 +238,12 @@ model quadra {
   id_local      Int
   allocation    String?  @default("IMPORTADO")
 
-  culture    culture      @relation(fields: [id_culture], references: [id])
-  local      local        @relation(fields: [id_local], references: [id])
-  safra      safra        @relation(fields: [id_safra], references: [id])
-  dividers   dividers[]
-  experiment experiment[]
+  culture             culture               @relation(fields: [id_culture], references: [id])
+  local               local                 @relation(fields: [id_local], references: [id])
+  safra               safra                 @relation(fields: [id_safra], references: [id])
+  dividers            dividers[]
+  experiment          experiment[]
+  AllocatedExperiment AllocatedExperiment[]
 }
 
 model dividers {
@@ -623,6 +624,9 @@ model AllocatedExperiment {
   npei           Int
   npef           Int
   parcelas       Int
+  blockId        Int
   createdBy      Int
   createdAt      DateTime @default(now())
+
+  quadra quadra @relation(fields: [blockId], references: [id])
 }
