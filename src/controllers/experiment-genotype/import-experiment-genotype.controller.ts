@@ -15,8 +15,8 @@ import { ExperimentGenotipeController } from '../experiment_genotipe.controller'
 import { GenotipoController } from '../genotype/genotipo.controller';
 import { LogImportController } from '../log-import.controller';
 import { LoteController } from '../lote.controller';
-import { GenotypeTreatmentController } from './genotype-treatment.controller';
-import { HistoryGenotypeTreatmentController } from './history-genotype-treatment.controller';
+import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';
+import { HistoryGenotypeTreatmentController } from '../genotype-treatment/history-genotype-treatment.controller';
 
 export class ImportExperimentGenotypeController {
   static async validate(
@@ -35,11 +35,11 @@ export class ImportExperimentGenotypeController {
     const responseIfError: Array<string> = [];
 
     try {
-      const value_hold : any = {};
+      const value_hold: any = {};
 
       if (spreadSheet.length == 0) {
         responseIfError[0]
-        += '<li style="text-align:left"> Não há registros por favor verifique. </li> <br>';
+          += '<li style="text-align:left"> Não há registros por favor verifique. </li> <br>';
       }
 
       for (const row in spreadSheet) {
@@ -48,19 +48,19 @@ export class ImportExperimentGenotypeController {
         if (row !== '0') {
           // experiments
           if (spreadSheet[row][5] != null) {
-            const experiments : any = await experimentController.getFromExpName(spreadSheet[row][5]);
+            const experiments: any = await experimentController.getFromExpName(spreadSheet[row][5]);
 
             if (experiments.status == 200 && experiments.response.length > 0) {
               value_hold.idExperiment = experiments.response[0]?.id;
 
               if (experiments.response[0]?.local.name_local_culture != spreadSheet[row][6]) {
                 responseIfError[0]
-                += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a Lugar de plantio e diferente da cadastrada no experimento. </li> <br>`;
+                  += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a Lugar de plantio e diferente da cadastrada no experimento. </li> <br>`;
               }
 
               if (experiments.response[0]?.delineamento.name != spreadSheet[row][7]) {
                 responseIfError[0]
-                += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a delineamento e diferente da cadastrada no experimento. </li> <br>`;
+                  += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a delineamento e diferente da cadastrada no experimento. </li> <br>`;
               }
             } else {
               responseIfError[0]
@@ -68,7 +68,7 @@ export class ImportExperimentGenotypeController {
             }
           } else {
             responseIfError[0]
-            += `<li style="text-align:left"> A ${row}ª linha está vazia para para o experimento </li> <br>`;
+              += `<li style="text-align:left"> A ${row}ª linha está vazia para para o experimento </li> <br>`;
           }
 
           for (const column in spreadSheet[row]) {

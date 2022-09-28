@@ -929,7 +929,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : `filterStatus=2&id_culture=${cultureId}`;
+    : `filterStatus=1&id_culture=${cultureId}`;
 
   //Last page
   const lastPageServer = req.cookies.lastPage
@@ -959,11 +959,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/safra`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=2&id_culture=${cultureId}`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}`
-    : `filterStatus=2&id_culture=${cultureId}`;
+    : `filterStatus=1&id_culture=${cultureId}`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });

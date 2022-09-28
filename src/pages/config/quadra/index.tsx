@@ -1019,7 +1019,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : 'filterStatus=2';
+    : `filterStatus=1`;
 
   // Last page
   const lastPageServer = req.cookies.lastPage
@@ -1044,7 +1044,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}`
-    : 'filterStatus=2';
+    : `filterStatus=1`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
@@ -1056,7 +1056,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/quadra`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=2`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
 

@@ -698,7 +698,7 @@ export default function AtualizarQuadra({
   const downloadExcel = async (): Promise<void> => {
     switch (table) {
       case "dividers": {
-        const { response } = await dividersService.getAll(filterApplication);
+        const { response } = await dividersService.getAll(filter);
         const newData = response.map((row: any) => {
           if (row.status === 0) {
             row.status = 'Inativo';
@@ -733,6 +733,10 @@ export default function AtualizarQuadra({
         });
 
         console.log({ response });
+
+        const workSheet = XLSX.utils.json_to_sheet(newData);
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'dividers');
 
         // Buffer
         XLSX.write(workBook, {
