@@ -11,8 +11,6 @@ export class GenotipoController {
     let orderBy: object | any;
     let select: any = [];
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterGenotipo) {
         parameters.name_genotipo = JSON.parse(`{"contains":"${options.filterGenotipo}"}`);
       }

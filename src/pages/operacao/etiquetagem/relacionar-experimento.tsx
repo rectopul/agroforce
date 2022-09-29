@@ -520,7 +520,6 @@ export default function Listagem({
     const { status }: IReturnObject = await experimentService.update({
       idList: experimentsSelected,
       experimentGroupId: Number(experimentGroupId),
-      status: 'IMP. N INICI.',
     });
     if (status !== 200) {
       Swal.fire('Erro ao associar experimentos');
