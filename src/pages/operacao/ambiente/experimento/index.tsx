@@ -108,12 +108,12 @@ interface IData {
 }
 
 export default function Listagem({
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs;
 
   const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
@@ -585,7 +585,7 @@ export default function Listagem({
       const temp = [...selectedNPE];
 
       await experimentService.getAll(parametersFilter).then(({ status, response, total }: any) => {
-        if (status === 200) {
+        if (status === 200 || status === 400) {
           let i = 0;
           response.length > 0 ? i = NPESelectedRow.prox_npe : i = NPESelectedRow.npef;
           response.map((item: any) => {
@@ -602,7 +602,7 @@ export default function Listagem({
       });
       parametersFilter = `skip=${skip}&take=${take}&${parametersFilter}`;
       await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
-        if (status === 200) {
+        if (status === 200 || status === 400) {
           let i = NPESelectedRow.prox_npe;
           response.map((item: any) => {
             item.npei = i;
@@ -745,7 +745,7 @@ export default function Listagem({
         >
           <div
             className={`w-full ${selectedNPE?.length > 3 && 'max-h-40 overflow-y-scroll'
-            } mb-4`}
+              } mb-4`}
           >
             <MaterialTable
               style={{

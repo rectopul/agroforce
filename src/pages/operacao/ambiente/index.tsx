@@ -91,16 +91,16 @@ interface IData {
 }
 
 export default function Listagem({
-  allNpe,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  filterBeforeEdit,
-  id_safra,
-  cultureId,
-  orderByserver,
-  typeOrderServer,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allNpe,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      filterBeforeEdit,
+      id_safra,
+      cultureId,
+      orderByserver,
+      typeOrderServer,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
   const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE'
@@ -514,8 +514,8 @@ export default function Listagem({
 
   async function handleStatus(idNPE: number, data: any): Promise<void> {
     const parametersFilter = `filterStatus=${1}&id_safra=${data.id_safra
-    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
-    }&epoca=${String(data.epoca)}`;
+      }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
+      }&epoca=${String(data.epoca)}`;
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {
         if (response.total > 0) {
@@ -816,7 +816,7 @@ export default function Listagem({
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 15 }}>
                     <Button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -878,7 +878,7 @@ export default function Listagem({
                         textColor="white"
                         disabled={selectedNPE.length <= 0}
                         onClick={() => {
-                          selectedNPE.sort((a, b) => a.npei - b.npei);
+                          selectedNPE.sort((a, b) => a.prox_npe - b.prox_npe);
                           localStorage.setItem(
                             'selectedNPE',
                             JSON.stringify(selectedNPE),
@@ -1029,7 +1029,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>
@@ -1084,7 +1084,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
     : "";
-    // local.name_local_culture
+  // local.name_local_culture
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
