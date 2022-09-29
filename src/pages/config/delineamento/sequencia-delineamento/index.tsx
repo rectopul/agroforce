@@ -171,7 +171,7 @@ export default function Listagem({
       // eslint-disable-next-line max-len
       filterSearch, filterRepetitionTo, filterRepetitionFrom, filterOrderTo, filterOrderFrom, filterNtTo, filterNtFrom, filterBlockTo, filterBlockFrom,
     }) => {
-      const parametersFilter = `&filterSearch=${filterSearch}&filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterOrderTo=${filterOrderTo}&filterOrderFrom=${filterOrderFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterBlockTo=${filterBlockTo}&filterBlockFrom=${filterBlockFrom}`;
+      const parametersFilter = `&filterSearch=${filterSearch}&filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterOrderTo=${filterOrderTo}&filterOrderFrom=${filterOrderFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterBlockTo=${filterBlockTo}&filterBlockFrom=${filterBlockFrom}&id_delineamento=${idDelineamento}`;
       // await sequenciaDelineamentoService
       //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
       //   .then(({ response, total: newTotal }: IReturnObject) => {
@@ -191,9 +191,9 @@ export default function Listagem({
   //Calling common API 
   async function callingApi(parametersFilter : any ){
 
-    setCookies("filterBeforeEdit", parametersFilter);
-    setCookies("filterBeforeEditTypeOrder", typeOrder);
-    setCookies("filterBeforeEditOrderBy", orderBy);  
+    setCookies("filterBeforeEditSquence", parametersFilter);
+    setCookies("filterBeforeEditTypeOrderSquence", typeOrder);
+    setCookies("filterBeforeEditOrderBySquence", orderBy);  
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
@@ -910,48 +910,47 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query}:
   const baseUrl = `${publicRuntimeConfig.apiUrl}/sequencia-delineamento`;
 
    //Last page
-   const lastPageServer = req.cookies.lastPage
-   ? req.cookies.lastPage
+   const lastPageServer = req.cookies.lastPageSquence
+   ? req.cookies.lastPageSquence
    : "No";
  
    if(lastPageServer == undefined || lastPageServer == "No"){
-      removeCookies('filterBeforeEdit',  {req, res} );
-      removeCookies('pageBeforeEdit',{req,res} );
-      removeCookies("filterBeforeEditTypeOrder",{req, res});
-      removeCookies("filterBeforeEditOrderBy",{req, res});
-      removeCookies("lastPage", {req,res});
+      removeCookies('filterBeforeEditSquence',  {req, res} );
+      removeCookies('pageBeforeEditSquence',{req,res} );
+      removeCookies("filterBeforeEditTypeOrderSquence",{req, res});
+      removeCookies("filterBeforeEditOrderBySquence",{req, res});
+      removeCookies("lastPageSquence", {req,res});
    }
 
- const filterBeforeEdit = req.cookies.filterBeforeEdit
-   ? req.cookies.filterBeforeEdit
+ const filterBeforeEdit = req.cookies.filterBeforeEditSquence
+   ? req.cookies.filterBeforeEditSquence
    : `filterStatus=1&id_delineamento=${idDelineamento}`;
 
 
    //RR
-   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
-   ? req.cookies.filterBeforeEditTypeOrder
+   const typeOrderServer = req.cookies.filterBeforeEditTypeOrderSquence
+   ? req.cookies.filterBeforeEditTypeOrderSquence
    : "desc";
         
    //RR
-   const orderByserver = req.cookies.filterBeforeEditOrderBy
-   ? req.cookies.filterBeforeEditOrderBy
+   const orderByserver = req.cookies.filterBeforeEditOrderBySquence
+   ? req.cookies.filterBeforeEditOrderBySquence
    : "repeticao";
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_delineamento=${idDelineamento}`;
   // const filterApplication = 'filterStatus=1';
 
-  const filterApplication = req.cookies.filterBeforeEdit
-  ? req.cookies.filterBeforeEdit
+  const filterApplication = req.cookies.filterBeforeEditSquence
+  ? req.cookies.filterBeforeEditSquence
   : `filterStatus=1&id_delineamento=${idDelineamento}`;
 
+  removeCookies('filterBeforeEditSquence',  {req, res} );
+  removeCookies('pageBeforeEditSquence',{req,res} );
+  removeCookies("filterBeforeEditTypeOrderSquence",{req, res});
+  removeCookies("filterBeforeEditOrderBySquence",{req, res});
+  removeCookies("lastPageSquence", {req,res});
 
-
-  removeCookies('filterBeforeEdit',  {req, res} );
-  removeCookies('pageBeforeEdit',{req,res} );
-  removeCookies("filterBeforeEditTypeOrder",{req, res});
-  removeCookies("filterBeforeEditOrderBy",{req, res});
-  removeCookies("lastPage", {req,res});
-
+  // console.log("Squence  --------------------- ",filterApplication)
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
 

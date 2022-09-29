@@ -896,25 +896,26 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : 'filterStatus=2';
-  const filterApplication = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : 'filterStatus=2';
 
-  // Last page
-  const lastPageServer = req.cookies.lastPage
+    // Last page
+    const lastPageServer = req.cookies.lastPage
     ? req.cookies.lastPage
     : 'No';
-  if (lastPageServer == undefined || lastPageServer == 'No') {
+    if (lastPageServer == undefined || lastPageServer == 'No') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies("filterBeforeEditTypeOrder", { req, res });
     removeCookies("filterBeforeEditOrderBy", { req, res });
     removeCookies("lastPage", { req, res });  
     removeCookies("filtersParams", { req, res });
-  }
+    }
+
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : 'filterStatus=1';
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : 'filterStatus=1';
 
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
@@ -935,7 +936,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
-  const param = `skip=0&take=${itensPerPage}&filterStatus=2`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();

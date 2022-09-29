@@ -769,8 +769,8 @@ export default function Listagem({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      // defaultValue={filterStatusBeforeEdit[13]}
-                      defaultValue={checkValue('filterStatus')}
+                      defaultValue={filterStatusBeforeEdit[13]}
+                      // defaultValue={checkValue('filterStatus')}
                       values={filters.map((id) => id)}
                       selected="1"
                     />

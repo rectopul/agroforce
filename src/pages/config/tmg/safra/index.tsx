@@ -924,25 +924,28 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   )?.response[0]?.itens_per_page;
 
   const { cultureId } = req.cookies;
+
+
+  // Last page
+  const lastPageServer = req.cookies.lastPage
+  ? req.cookies.lastPage
+  : 'No';
+
+if (lastPageServer == undefined || lastPageServer == 'No') {
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
+}
+
+
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : `filterStatus=1&id_culture=${cultureId}`;
-
-  //Last page
-  const lastPageServer = req.cookies.lastPage
-  ? req.cookies.lastPage
-  : "No";
-
-  if(lastPageServer == undefined || lastPageServer == "No"){
-    removeCookies('filterBeforeEdit', { req, res });
-    removeCookies('pageBeforeEdit', { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });  
-  }
 
   //RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
