@@ -141,7 +141,7 @@ export class SequenciaDelineamentoController {
       }
 
       if (options.nt) {
-        parameters.nt = options.nt;
+        parameters.nt = Number(options.nt);
       }
 
       if (options.ntCount) {
