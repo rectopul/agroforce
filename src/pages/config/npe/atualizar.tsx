@@ -71,10 +71,10 @@ interface IData {
 }
 
 export default function NovoLocal({
-  local,
-  layoultEdit,
-  npe,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      local,
+      layoultEdit,
+      npe,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -132,6 +132,7 @@ export default function NovoLocal({
               await npeService.update({
                 id: values.id,
                 prox_npe: values.prox_npe,
+                npef: npe.status == 3 ? npe.npef : values.prox_npe,
                 npei_i: values.prox_npe,
                 edited: 1,
               }).then((response) => {

@@ -34,11 +34,20 @@ import { RequestInit } from "next/dist/server/web/spec-extension/request";
 import { experimentGenotipeService } from "src/services/experiment-genotipe.service";
 import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
 import {
-  genotypeTreatmentService,
-  npeService,
-  userPreferencesService,
-} from "../../../../services";
-import { experimentService } from "../../../../services/experiment.service";
+  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+} from 'react-icons/bi';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
+import Swal from 'sweetalert2';
+import * as XLSX from 'xlsx';
+import Modal from 'react-modal';
+import { BsTrashFill } from 'react-icons/bs';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { experimentGenotipeService } from 'src/services/experiment-genotipe.service';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { genotypeTreatmentService, npeService, sequenciaDelineamentoService, userPreferencesService } from '../../../../services';
+import { experimentService } from '../../../../services/experiment.service';
 import {
   AccordionFilter,
   Button,
@@ -109,12 +118,12 @@ interface IData {
 }
 
 export default function Listagem({
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs;
 
   const tabsOperationMenu = tabsOperation.map((i) =>
@@ -611,55 +620,68 @@ export default function Listagem({
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
       }
-      const temp = [...selectedNPE];
-
-      await experimentService
-        .getAll(parametersFilter)
-        .then(({ status, response, total }: any) => {
-          if (status === 200) {
-            let i = 0;
-            response.length > 0
-              ? (i = NPESelectedRow.prox_npe)
-              : (i = NPESelectedRow.npef);
-            response.map((item: any) => {
-              item.npei = i;
-              item.npef = i + item.npeQT - 1;
-              i = item.npef + 1;
-              i >= NPESelectedRow.nextNPE.npei_i && npeUsedFrom == 0
-                ? setNpeUsedFrom(NPESelectedRow.nextNPE.npei_i)
-                : "";
-            });
-
-            setExperimento(response);
-            setTotalItems(total);
-            temp.filter((x): any => x == NPESelectedRow)[0].npef = i - 1;
-          }
-        });
-      parametersFilter = `skip=${skip}&take=${take}&${parametersFilter}`;
-      await experimentService
-        .getAll(parametersFilter)
-        .then(({ status, response }: any) => {
-          if (status === 200) {
-            let i = NPESelectedRow.prox_npe;
-            response.map((item: any) => {
-              item.npei = i;
-              item.npef = i + item.npeQT - 1;
-              i = item.npef + 1;
-            });
-            setLastExperimentNPE(i);
-            setExperimentoNew(response);
-          }
-        });
-
+      await experimentService.getAll(`skip=${skip}&take=${take}&${parametersFilter}`).then(({ status, response }: any) => {
+        if (status === 200 || status === 400) {
+          let i = NPESelectedRow.prox_npe;
+          response.map(async (item: any) => {
+            await sequenciaDelineamentoService.getAll(`id_delineamento=${item.delineamento.id}&nt=${item.countNT}`).then(async ({ status, response, total }: any) => {
+              if (status === 200 || status === 400) {
+                item.seq_delineamento = response;
+                item.npei = i;
+                item.npef = i + item.npeQT * (item.seq_delineamento.length) - 1;
+                i = item.npef + 1;
+              }
+            })
+          });
+          setLastExperimentNPE(i);
+          setExperimentoNew(response);
+        }
+      });
+      getAllExperiments();
       setLoading(false);
     }
   }
 
-  async function createExperimentGenotipe({
-    data,
-    total_consumed,
-    genotipo_treatment,
-  }: any) {
+  async function getAllExperiments(): Promise<void> {
+    if (NPESelectedRow) {
+      const skip = currentPage * Number(take);
+      let parametersFilter = `idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}&Status=IMPORTADO`;
+
+      if (filter) {
+        parametersFilter = `${parametersFilter}&${filter}`;
+      }
+
+      const temp = [...selectedNPE];
+
+      await experimentService.getAll(parametersFilter).then(({ status, response, total }: any) => {
+        if (status === 200 || status === 400) {
+          let i = 0;
+          response.length > 0 ? i = NPESelectedRow.prox_npe : i = NPESelectedRow.npef;
+          response.map(async (item: any) => {
+            sequenciaDelineamentoService.getAll(`id_delineamento=${item.delineamento.id}&nt=${item.countNT}`).then(async ({ status, response, total }: any) => {
+              if (status === 200 || status === 400) {
+                item.seq_delineamento = response;
+              }
+            })
+            item.npei = i;
+            item.npef = i + item.npeQT - 1;
+            i = item.npef + 1;
+            i >= NPESelectedRow.nextNPE.npei_i && npeUsedFrom == 0 ? setNpeUsedFrom(NPESelectedRow.nextNPE.npei_i) : '';
+          });
+          // temp.filter((x): any => x == NPESelectedRow)[0].npef = response[response.length - 1].npef;
+          setExperimento(response);
+          console.log('Experimentos : ', response[response.length - 1]);
+          setTotalItems(total);
+        }
+      });
+      setLoading(false);
+    }
+  }
+
+  async function createExperimentGenotipe({ data, total_consumed, genotipo_treatment }: any) {
+    console.log('data : ', data);
+    console.log('total_consumed : ', total_consumed);
+    console.log('genotype treatment : ', genotipo_treatment);
     if (data.length > 0) {
       const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
       const experimentObj: any[] = [];
@@ -720,37 +742,35 @@ export default function Listagem({
       const experiment_genotipo: any[] = [];
       const genotipo_treatment: any[] = [];
       let npei = Number(NPESelectedRow?.npei_i);
-      let total_consumed = 0;
 
       experimentos?.map((item: any) => {
-        total_consumed += item.npeQT;
+
         item.assay_list.genotype_treatment.map((gt: any) => {
-          const data: any = {};
+          item.seq_delineamento.map((sd: any) => {
+            const data: any = {};
+            data.idSafra = gt.id_safra;
+            data.idFoco = item.assay_list.foco.id;
+            data.idTypeAssay = item.assay_list.type_assay.id;
+            data.idTecnologia = item.assay_list.tecnologia.id;
+            data.gli = item.assay_list.gli;
+            data.idExperiment = item.id;
+            data.rep = item.delineamento.repeticao;
+            data.nt = gt.treatments_number;
+            data.npe = npei;
+            // data.name_genotipo = gt.genotipo.name_genotipo;
+            data.idGenotipo = gt.genotipo.id; // Added new field
+            data.id_seq_delineamento = sd.id;
+            data.nca = '';
+            experiment_genotipo.push(data);
+            npei++;
+          })
           const gt_new: any = {};
-          data.idSafra = gt.id_safra;
-          data.idFoco = item.assay_list.foco.id;
-          data.idTypeAssay = item.assay_list.type_assay.id;
-          data.idTecnologia = item.assay_list.tecnologia.id;
-          data.gli = item.assay_list.gli;
-          data.idExperiment = item.id;
-          data.rep = item.delineamento.repeticao;
-          data.nt = gt.treatments_number;
-          data.npe = npei;
-          // data.name_genotipo = gt.genotipo.name_genotipo;
-          data.idGenotipo = gt.genotipo.id; // Added new field
-          data.nca = "";
           gt_new.id = gt.id;
-          gt_new.status_experiment = "SORTEADO";
-          experiment_genotipo.push(data);
+          gt_new.status_experiment = 'SORTEADO';
           genotipo_treatment.push(gt_new);
-          npei++;
         });
       });
-      createExperimentGenotipe({
-        data: experiment_genotipo,
-        total_consumed,
-        genotipo_treatment,
-      });
+      createExperimentGenotipe({ data: experiment_genotipo, total_consumed: experiment_genotipo.length, genotipo_treatment });
     } else {
       const temp = NPESelectedRow;
       Swal.fire({
@@ -807,9 +827,8 @@ export default function Listagem({
                         "
         >
           <div
-            className={`w-full ${
-              selectedNPE?.length > 3 && "max-h-40 overflow-y-scroll"
-            } mb-4`}
+            className={`w-full ${selectedNPE?.length > 3 && 'max-h-40 overflow-y-scroll'
+              } mb-4`}
           >
             <MaterialTable
               style={{

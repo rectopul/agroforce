@@ -243,6 +243,7 @@ export class ExperimentGenotipeController {
         nca: true,
         idLote: true,
         status_t: true,
+        sequencia_delineamento: true
       };
 
       if (options.experimentGroupId) {

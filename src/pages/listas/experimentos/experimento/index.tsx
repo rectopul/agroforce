@@ -287,7 +287,7 @@ export default function Listagem({
     setCookies('filtersParams', parametersFilter);
 
     await experimentService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
+      if (response.status === 200 || (response.status === 400 && response.total == 0)) {
         setExperimento(response.response);
         setTotalItems(response.total);
       }

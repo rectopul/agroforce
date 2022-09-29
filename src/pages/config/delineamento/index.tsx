@@ -699,8 +699,8 @@ export default function Listagem({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      // defaultValue={filterStatusBeforeEdit[13]}
-                      defaultValue={checkValue('filterStatus')}
+                      defaultValue={filterStatusBeforeEdit[13]}
+                      // defaultValue={checkValue('filterStatus')}
                       values={filters.map((id) => id)}
                       selected="1"
                     />
@@ -993,15 +993,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   )?.response[0]?.itens_per_page) ?? 15;
 
   const { cultureId } = req.cookies;
-  const pageBeforeEdit = req.cookies.pageBeforeEdit
-    ? req.cookies.pageBeforeEdit
-    : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : `filterStatus=1&id_culture=${cultureId}`;
 
-  // Last page
-  const lastPageServer = req.cookies.lastPage
+    // Last page
+    const lastPageServer = req.cookies.lastPage
     ? req.cookies.lastPage
     : 'No';
 
@@ -1013,6 +1007,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     removeCookies('lastPage', { req, res });
   }
 
+  const pageBeforeEdit = req.cookies.pageBeforeEdit
+    ? req.cookies.pageBeforeEdit
+    : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : `filterStatus=1&id_culture=${cultureId}`;
+
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
@@ -1021,7 +1022,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : 'name';
+    : 'repeticao';
 
   const { token } = req.cookies;
   // const { cultureId } = req.cookies;

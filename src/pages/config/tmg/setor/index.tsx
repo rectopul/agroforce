@@ -783,12 +783,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
-  const filterApplication = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : 'filterStatus=1';
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : 'filterStatus=1';
+
 
   //Last page
   const lastPageServer = req.cookies.lastPage
@@ -802,6 +797,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     removeCookies("filterBeforeEditOrderBy", { req, res });
     removeCookies("lastPage", { req, res });  
   }
+  
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : 'filterStatus=1';
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : 'filterStatus=1';
 
   //RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
