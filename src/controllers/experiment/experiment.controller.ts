@@ -71,6 +71,7 @@ export class ExperimentController {
         id: true,
         idSafra: true,
         density: true,
+        safra: true,
         repetitionsNumber: true,
         experimentGroupId: true,
         period: true,
