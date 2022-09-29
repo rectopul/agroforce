@@ -493,10 +493,10 @@ export default function Listagem({
         .create({
           table_preferences: campos,
           userId: userLogado.id,
-          module_id: 27,
+          module_id: 30,
         })
         .then((response) => {
-          userLogado.preferences.genotypeTreatment = {
+          userLogado.preferences.parcelas = {
             id: response.response.id,
             userId: preferences.userId,
             table_preferences: campos,
@@ -505,7 +505,7 @@ export default function Listagem({
         });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.genotypeTreatment = {
+      userLogado.preferences.parcelas = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,

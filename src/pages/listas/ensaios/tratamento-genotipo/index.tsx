@@ -242,7 +242,7 @@ export default function Listagem({
       }
 
       const filterStatus = selecionados.substr(0, selecionados.length - 1);
-      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}`;
+      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}&status_experiment=${'IMPORTADO'}`;
 
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEdit', filtersParams);
@@ -1397,7 +1397,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const baseUrlAssay = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
   const filterApplication = req.cookies.filterBeforeEdit
-    || `&id_culture=${idCulture}&id_safra=${idSafra}`;
+    || `&id_culture=${idCulture}&id_safra=${idSafra}&status_experiment=${'IMPORTADO'}`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });

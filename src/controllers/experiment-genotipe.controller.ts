@@ -19,8 +19,6 @@ export class ExperimentGenotipeController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterFoco) {
         parameters.foco = JSON.parse(
           `{ "name": { "contains": "${options.filterFoco}" } }`,
@@ -187,8 +185,6 @@ export class ExperimentGenotipeController {
       // if (options.npe) {
       //   parameters.npe = Number(options.npe);
       // }
-      console.log('options');
-      console.log(options);
       const select = {
         id: true,
         safra: { select: { safraName: true } },

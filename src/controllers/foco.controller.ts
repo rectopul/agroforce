@@ -12,8 +12,6 @@ export class FocoController {
   async getAll(options: any) {
     const parameters: object | any = {};
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
@@ -62,9 +60,6 @@ export class FocoController {
         orderBy,
       );
 
-      console.log('response');
-      console.log(response);
-
       if (response.total > 0) {
         response?.map((item: any) => {
           item.group?.map((group: any) => {
@@ -79,9 +74,6 @@ export class FocoController {
           });
         });
       }
-
-      // console.log('response');
-      // console.log(response[3]);
 
       if (!response || response.total <= 0) {
         return { status: 404, response: [], total: 0 };

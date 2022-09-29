@@ -199,10 +199,9 @@ export class ReplaceTreatmentController {
       if (options.checkedTreatments) {
         // const checkedParams = options.checkedTreatments.split(',');
         // parameters.OR = checkedParams.map((item: any) => (item ? (JSON.parse(`{ "genotipo": {"name_genotipo":  {"contains": "${item}" }  } }`)) : undefined));
-
-        parameters.id_genotipo = Number(options.checkedTreatments[0]);
+        const id = options.checkedTreatments.split(',');
+        parameters.id_genotipo = Number(id[0]);
       }
-
       const take = (options.take) ? Number(options.take) : undefined;
 
       const skip = (options.skip) ? Number(options.skip) : undefined;

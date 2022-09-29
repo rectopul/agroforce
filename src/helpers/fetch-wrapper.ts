@@ -45,8 +45,6 @@ async function get(url: any, params: any) {
     credentials: 'include',
     headers: authHeader(url),
   };
-  console.log('urlParameters');
-  console.log(urlParameters);
   const response = await fetch(urlParameters, requestOptions);
   return handleResponse(response);
 }
