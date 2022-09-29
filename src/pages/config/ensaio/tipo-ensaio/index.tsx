@@ -1137,7 +1137,7 @@ export default function TipoEnsaio({
 
                       // defaultValue={filterStatusBeforeEdit[13]}
 
-                      defaultValue={checkValue('filterStatus')}
+                      defaultValue={filterStatusBeforeEdit[13]}
 
                       values={filters.map((id) => id)}
 
@@ -1240,27 +1240,7 @@ export default function TipoEnsaio({
 
                   <div
 
-                    className="w-full max-h-96
-
-                    flex
-
-                    items-center
-
-                    justify-between
-
-                    gap-4
-
-                    bg-gray-50
-
-                    py-2
-
-                    px-5
-
-                    border-solid border-b
-
-                    border-gray-200
-
-                  "
+                    className="w-full max-h-96 flex items-center justify-between gap-4 bg-gray-50 py-2  px-5 border-solid border-b border-gray-200 "
                   >
 
                     <div className="h-12">
@@ -1286,7 +1266,7 @@ export default function TipoEnsaio({
 
                     <strong className="text-blue-600">
 
-                      Total registrado:
+ Total registrado:
 
                       {' '}
 
@@ -1296,9 +1276,7 @@ export default function TipoEnsaio({
 
                     <div
 
-                      className="h-full flex items-center gap-2
-
-                    "
+                      className="h-full flex items-center gap-2"
                     >
 
                       <div className="border-solid border-2 border-blue-600 rounded">
@@ -1573,31 +1551,28 @@ export const getServerSideProps: GetServerSideProps = async ({
 
     : 0;
 
+
+
+ // Last page
+
+   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage
+  : 'No';
+
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
+  }
+
+
   const filterBeforeEdit = req.cookies.filterBeforeEdit
 
     ? req.cookies.filterBeforeEdit
 
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
 
-  // Last page
-
-  const lastPageServer = req.cookies.lastPage
-
-    ? req.cookies.lastPage
-
-    : 'No';
-
-  if (lastPageServer == undefined || lastPageServer == 'No') {
-    removeCookies('filterBeforeEdit', { req, res });
-
-    removeCookies('pageBeforeEdit', { req, res });
-
-    removeCookies('filterBeforeEditTypeOrder', { req, res });
-
-    removeCookies('filterBeforeEditOrderBy', { req, res });
-
-    removeCookies('lastPage', { req, res });
-  }
 
   // RR
 

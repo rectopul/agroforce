@@ -440,16 +440,17 @@ model npe {
 }
 
 model sequencia_delineamento {
-  id              Int          @id @default(autoincrement())
-  id_delineamento Int
-  repeticao       Int
-  sorteio         Int
-  nt              Int
-  bloco           Int
-  status          Int          @default(1)
-  created_by      Int
-  created_at      DateTime     @default(now())
-  delineamento    delineamento @relation(fields: [id_delineamento], references: [id])
+  id                  Int                   @id @default(autoincrement())
+  id_delineamento     Int
+  repeticao           Int
+  sorteio             Int
+  nt                  Int
+  bloco               Int
+  status              Int                   @default(1)
+  created_by          Int
+  created_at          DateTime              @default(now())
+  delineamento        delineamento          @relation(fields: [id_delineamento], references: [id])
+  experiment_genotipe experiment_genotipe[]
 }
 
 model experiment {
@@ -550,32 +551,34 @@ model history_genotype_treatment {
 }
 
 model experiment_genotipe {
-  id            Int       @id @default(autoincrement())
-  created_at    DateTime? @default(now())
-  idSafra       Int
-  idFoco        Int
-  idTypeAssay   Int
-  idTecnologia  Int
-  idExperiment  Int
-  idGenotipo    Int
-  blockLayoutId Int?
-  idLote        Int?
-  gli           String
-  rep           Int
-  nt            Int
-  npe           Int
-  nca           String
-  status        String    @default("SORTEADO")
-  status_t      String    @default("L")
+  id                  Int       @id @default(autoincrement())
+  created_at          DateTime? @default(now())
+  idSafra             Int
+  idFoco              Int
+  idTypeAssay         Int
+  idTecnologia        Int
+  idExperiment        Int
+  idGenotipo          Int
+  id_seq_delineamento Int
+  blockLayoutId       Int?
+  idLote              Int?
+  gli                 String
+  rep                 Int
+  nt                  Int
+  npe                 Int
+  nca                 String
+  status              String    @default("SORTEADO")
+  status_t            String    @default("L")
 
-  safra         safra          @relation(fields: [idSafra], references: [id])
-  type_assay    type_assay     @relation(fields: [idTypeAssay], references: [id])
-  tecnologia    tecnologia     @relation(fields: [idTecnologia], references: [id])
-  foco          foco           @relation(fields: [idFoco], references: [id])
-  experiment    experiment     @relation(fields: [idExperiment], references: [id])
-  genotipo      genotipo       @relation(fields: [idGenotipo], references: [id])
-  layout_quadra layout_quadra? @relation(fields: [blockLayoutId], references: [id])
-  PrintHistory  PrintHistory[]
+  safra                  safra                  @relation(fields: [idSafra], references: [id])
+  type_assay             type_assay             @relation(fields: [idTypeAssay], references: [id])
+  tecnologia             tecnologia             @relation(fields: [idTecnologia], references: [id])
+  foco                   foco                   @relation(fields: [idFoco], references: [id])
+  experiment             experiment             @relation(fields: [idExperiment], references: [id])
+  genotipo               genotipo               @relation(fields: [idGenotipo], references: [id])
+  layout_quadra          layout_quadra?         @relation(fields: [blockLayoutId], references: [id])
+  sequencia_delineamento sequencia_delineamento @relation(fields: [id_seq_delineamento], references: [id])
+  PrintHistory           PrintHistory[]
 }
 
 model ExperimentGroup {

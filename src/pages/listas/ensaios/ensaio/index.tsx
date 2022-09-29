@@ -66,6 +66,8 @@ export default function TipoEnsaio({
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
+
+  // console.log("typeOrder  ",arrowOrder)
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // {
     //   name: 'CamposGerenciados[]', title: 'Favorito ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
@@ -825,7 +827,7 @@ export default function TipoEnsaio({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages-1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}

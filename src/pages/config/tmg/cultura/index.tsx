@@ -16,7 +16,7 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
-import { removeCookies, setCookies } from "cookies-next";
+import { removeCookies, setCookies,getCookies} from "cookies-next";
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
@@ -272,6 +272,18 @@ export default function Listagem({
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
   }
+
+  // useEffect(()=>{
+  //   // console.log("filterparams   -------------------",getCookies('lastPage'))
+  //   removeCookies("filtersParams");
+    
+  //   setFilter('filterStatus=1')
+  //   // removeCookies("filterBeforeEdit");
+  // });
+
+  useEffect(()=>{
+   callingApi(filter)
+  },[filter])
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -805,12 +817,31 @@ export default function Listagem({
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
+
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()
   )?.response[0]?.itens_per_page) ?? 10;
 
   const { token } = req.cookies;
+  //Last page
+  const lastPageServer = req.cookies.lastPage
+    ? req.cookies.lastPage
+    : "No";
+
+
+  if(lastPageServer == undefined || lastPageServer == "No"){
+
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("filtersParams", { req, res });
+    removeCookies("lastPage", { req, res });
+    // setCookies('filterParams','');
+
+  }
+
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
@@ -822,19 +853,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     ? req.cookies.filterBeforeEdit
     : 'filterStatus=1';
 
-  //Last page
-  const lastPageServer = req.cookies.lastPage
-    ? req.cookies.lastPage
-    : "No";
-
-  if(lastPageServer == undefined || lastPageServer == "No"){
-    removeCookies('filterBeforeEdit', { req, res });
-    removeCookies('pageBeforeEdit', { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("filtersParams", { req, res });
-    removeCookies("lastPage", { req, res });
-  }
 
   //RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
@@ -854,6 +872,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   removeCookies("filterBeforeEditOrderBy", { req, res });
   removeCookies("lastPage", { req, res });
   removeCookies("filtersParams", { req, res });
+  setCookies('filterParams','');
 
 
   const { publicRuntimeConfig } = getConfig();
