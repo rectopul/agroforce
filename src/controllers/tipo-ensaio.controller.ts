@@ -20,11 +20,7 @@ export class TypeAssayController {
 
       if (options.filterName) {
         parameters.name = JSON.parse(`{"contains":"${options.filterName}"}`);
-      }
-
-      if (options.filterProtocolName) {
-        parameters.protocol_name = JSON.parse(`{"contains":"${options.filterProtocolName}"}`);
-      }
+      }   
 
       if (options.filterSeedsFrom || options.filterSeedsTo) {
         if (options.filterSeedsFrom && options.filterSeedsTo) {
@@ -119,7 +115,7 @@ export class TypeAssayController {
 
   async create(data: object | any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const assayTypeAlreadyExist = await this.getByData(data);
       if (assayTypeAlreadyExist.status === 200) return { status: 404, message: 'Tipo de ensaio já existe' };
@@ -141,7 +137,7 @@ export class TypeAssayController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
       if (data) {
         const assayTypeAlreadyExist = await this.getOne(data.id);
         if (assayTypeAlreadyExist.status !== 200) return { status: 400, message: 'Tipo de ensaio não encontrado' };

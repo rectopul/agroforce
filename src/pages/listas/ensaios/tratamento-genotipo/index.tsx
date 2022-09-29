@@ -2,7 +2,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
@@ -11,7 +11,6 @@ import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -20,7 +19,11 @@ import {
 } from 'react-beautiful-dnd';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { BsDownload } from 'react-icons/bs';
-import { RiArrowUpDownLine, RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
+import {
+  RiArrowUpDownLine,
+  RiCloseCircleFill,
+  RiFileExcel2Line,
+} from 'react-icons/ri';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import Modal from 'react-modal';
@@ -41,6 +44,12 @@ import {
   Content,
   Input,
   Select,
+  FieldItemsPerPage,
+  SelectAutoComplete,
+  SelectAutoCompleteMaterial,
+  SelectMultiple,
+  MultiSelect,
+  SelectMultipleMaterial,
 } from '../../../../components';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
@@ -49,6 +58,7 @@ import {
   userPreferencesService,
 } from '../../../../services';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import { tableGlobalFunctions } from '../../../../helpers';
 
 export default function Listagem({
   assaySelect,
@@ -57,6 +67,8 @@ export default function Listagem({
   filterApplication,
   idSafra,
   filterBeforeEdit,
+  typeOrderServer,
+  orderByserver,
 }: ITreatmentGrid) {
   const { TabsDropDowns } = ITabs.default;
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -71,7 +83,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.genotypeTreatment || {
     id: 0,
     table_preferences:
-      'id,foco,type_assay,tecnologia,gli,bgm,treatments_number,genotype_treatment,status,action',
+      'id,foco,type_assay,tecnologia,gli,bgm,treatments_number,status,statusAssay,genotipoName,nca',
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
@@ -86,12 +98,6 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number>(0);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    // {
-    //   name: 'CamposGerenciados[]',
-    //   title: 'CheckBox ',
-    //   value: 'id',
-    //   defaultChecked: () => camposGerenciados.includes('id'),
-    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Foco',
@@ -167,8 +173,10 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes('sorteado'),
     },
   ]);
-  const [orderBy, setOrderBy] = useState<string>('');
+
+  // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
+
   const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   // const take: number = itensPerPage;
@@ -178,27 +186,33 @@ export default function Listagem({
   const [nccIsValid, setNccIsValid] = useState<boolean>(false);
   const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
   const [rowsSelected, setRowsSelected] = useState([]);
+  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [orderBy, setOrderBy] = useState<string>(orderByserver);
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
+    orderBy == 'tecnologia' ? 'genotipo.tecnologia.cod_tec' : orderBy
+  }&typeOrder=${typeOrder}`;
 
   const formik = useFormik<ITreatmentFilter>({
     initialValues: {
-      filterFoco: '',
-      filterTypeAssay: '',
-      filterTechnology: '',
-      filterGli: '',
-      filterBgm: '',
-      filterTreatmentsNumber: '',
-      filterStatus: '',
-      filterCodTec: '',
-      filterStatusAssay: '',
-      filterGenotypeName: '',
-      filterNca: '',
+      filterFoco: checkValue('filterFoco'),
+      filterTypeAssay: checkValue('filterTypeAssay'),
+      filterTechnology: checkValue('filterTechnology'),
+      filterGli: checkValue('filterGli'),
+      filterBgm: checkValue('filterBgm'),
+      filterTreatmentsNumber: checkValue('filterTreatmentsNumber'),
+      filterStatus: checkValue('filterStatus'),
+      filterCodTec: checkValue('filterCodTec'),
+      filterStatusAssay: checkValue('filterStatusAssay'),
+      filterGenotypeName: checkValue('filterGenotypeName'),
+      filterNca: checkValue('filterNca'),
       orderBy: '',
       typeOrder: '',
-      filterBgmTo: '',
-      filterBgmFrom: '',
-      filterNtTo: '',
-      filterNtFrom: '',
-      filterStatusT: '',
+      filterBgmTo: checkValue('filterBgmTo'),
+      filterBgmFrom: checkValue('filterBgmFrom'),
+      filterNtTo: checkValue('filterNtTo'),
+      filterNtFrom: checkValue('filterNtFrom'),
+      filterStatusT: checkValue('filterStatusT'),
     },
     onSubmit: async ({
       filterFoco,
@@ -228,63 +242,109 @@ export default function Listagem({
       }
 
       const filterStatus = selecionados.substr(0, selecionados.length - 1);
-      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}`;
-      setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
-      await genotypeTreatmentService
-        .getAll(`${parametersFilter}`)
-        .then(({ response, total: allTotal }) => {
-          setFilter(parametersFilter);
-          setTreatments(response);
-          setTotalItems(allTotal);
-          setAfterFilter(true);
-          setCurrentPage(0);
-          setMessage(true);
-          tableRef.current.dataManager.changePageSize(allTotal >= take ? take : allTotal);
-        });
+      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}&status_experiment=${'IMPORTADO'}`;
+
+      // setFiltersParams(parametersFilter);
+      // setCookies('filterBeforeEdit', filtersParams);
+      // await genotypeTreatmentService
+      //   .getAll(`${parametersFilter}`)
+      //   .then(({ response, total: allTotal }) => {
+      //     setFilter(parametersFilter);
+      //     setTreatments(response);
+      //     setTotalItems(allTotal);
+      //     setAfterFilter(true);
+      //     setCurrentPage(0);
+      //     setMessage(true);
+      //     tableRef.current.dataManager.changePageSize(allTotal >= take ? take : allTotal);
+      //   });
+
+      setFilter(parametersFilter);
+      setCurrentPage(0);
+      await callingApi(parametersFilter);
     },
   });
 
-  async function handleOrder(column: string, order: number): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
+  // Calling common API
+  async function callingApi(parametersFilter: any) {
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
+    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    setFiltersParams(parametersFilter);
+    setCookies('filtersParams', parametersFilter);
+
+    await genotypeTreatmentService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200 || response.status === 400) {
+        setTreatments(response.response);
+        setTotalItems(response.total);
+        setAfterFilter(true);
+        setMessage(true);
+        tableRef.current.dataManager.changePageSize(
+          response.total >= take ? take : response.total,
+        );
       }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
-
-    await genotypeTreatmentService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          setTreatments(response);
-        }
-      });
-
-    if (orderList === 2) {
-      setOrder(0);
-    } else {
-      setOrder(orderList + 1);
-    }
+    });
   }
 
-  function headerTableFactory(name: string, title: string, style: boolean = false) {
+  // Call that function when change type order value.
+  useEffect(() => {
+    callingApi(filter);
+  }, [typeOrder]);
+
+  async function handleOrder(column: string, order: number): Promise<void> {
+    // let typeOrder: any;
+    // let parametersFilter: any;
+    // if (order === 1) {
+    //   typeOrder = 'asc';
+    // } else if (order === 2) {
+    //   typeOrder = 'desc';
+    // } else {
+    //   typeOrder = '';
+    // }
+    // setOrderBy(column);
+    // setOrderType(typeOrder);
+    // if (filter && typeof filter !== 'undefined') {
+    //   if (typeOrder !== '') {
+    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+    //   } else {
+    //     parametersFilter = filter;
+    //   }
+    // } else if (typeOrder !== '') {
+    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    // } else {
+    //   parametersFilter = filter;
+    // }
+
+    // await genotypeTreatmentService
+    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
+    //   .then(({ status, response }) => {
+    //     if (status === 200) {
+    //       setTreatments(response);
+    //     }
+    //   });
+
+    // if (orderList === 2) {
+    //   setOrder(0);
+    // } else {
+    //   setOrder(orderList + 1);
+    // }
+
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
+  }
+
+  function headerTableFactory(
+    name: string,
+    title: string,
+    style: boolean = false,
+  ) {
     return {
       title: (
         <div className="flex items-center">
@@ -305,7 +365,6 @@ export default function Listagem({
 
   function tecnologiaHeaderFactory(name: string, title: string) {
     return {
-
       title: (
         <div className="flex items-center">
           <button
@@ -343,9 +402,7 @@ export default function Listagem({
         );
       }
       if (columnOrder[item] === 'tecnologia') {
-        tableFields.push(
-          tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
-        );
+        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
       }
       if (columnOrder[item] === 'gli') {
         tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
@@ -373,6 +430,8 @@ export default function Listagem({
         tableFields.push(headerTableFactory('NCA', 'lote.ncc', true));
       }
     });
+
+    // console.log("tableFields  ",tableFields)
     return tableFields;
   }
 
@@ -515,36 +574,46 @@ export default function Listagem({
       });
   };
 
-  function handleTotalPages(): void {
+  // manage total pages
+  async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
     }
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
+    // const skip = currentPage * Number(take);
+    // let parametersFilter;
+    // if (orderType) {
+    //   parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    // } else {
+    //   parametersFilter = `skip=${skip}&take=${take}`;
+    // }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
-    await genotypeTreatmentService
-      .getAll(parametersFilter)
-      .then(({ status, response, total }) => {
-        if (status === 200) {
-          setTreatments(response);
-          setTotalItems(total);
-          setAfterFilter(true);
-          setCurrentPage(0);
-        }
-      });
+    // if (filter) {
+    //   parametersFilter = `${parametersFilter}&${filter}`;
+    // }
+    // await genotypeTreatmentService
+    //   .getAll(parametersFilter)
+    //   .then(({ status, response, total }) => {
+    //     if (status === 200) {
+    //       setTreatments(response);
+    //       setTotalItems(total);
+    //       setAfterFilter(true);
+    //       setCurrentPage(0);
+    //     }
+    //   });
+
+    await callingApi(filter); // handle pagination globly
+  }
+
+  // Checking defualt values
+  function checkValue(value: any) {
+    const parameter = tableGlobalFunctions.getValuesForFilter(
+      value,
+      filtersParams,
+    );
+    return parameter;
   }
 
   function filterFieldFactory(title: string, name: string) {
@@ -558,6 +627,7 @@ export default function Listagem({
           placeholder={name}
           id={title}
           name={title}
+          defaultValue={checkValue(title)}
           onChange={formik.handleChange}
         />
       </div>
@@ -566,53 +636,73 @@ export default function Listagem({
 
   function readExcel(value: any) {
     readXlsxFile(value[0]).then((rows) => {
-      importService.validate({
-        table: 'REPLACEMENT_GENOTYPE ',
-        spreadSheet: rows,
-        moduleId: 27,
-        idSafra: userLogado.safras.safra_selecionada,
-        created_by: userLogado.id,
-      }).then(({ message }: any) => {
-        Swal.fire({
-          html: message,
-          width: '800',
+      importService
+        .validate({
+          table: 'REPLACEMENT_GENOTYPE ',
+          spreadSheet: rows,
+          moduleId: 27,
+          idSafra: userLogado.safras.safra_selecionada,
+          created_by: userLogado.id,
+        })
+        .then(({ message }: any) => {
+          Swal.fire({
+            html: message,
+            width: '800',
+          });
         });
-      });
     });
   }
 
   async function handleSubmit(event: any) {
-    const genotypeButton = document.querySelector("input[id='genotipo']:checked");
+    const genotypeButton = document.querySelector(
+      "input[id='genotipo']:checked",
+    );
     const ncaButton = document.querySelector("input[id='nca']:checked");
     const inputFile: any = document.getElementById('import');
     event.preventDefault();
     if (genotypeButton) {
-      const checkedTreatments: any = rowsSelected.map((item: any) => (
-        {
-          id: item.id,
-          idGenotipo: item.id_genotipo,
-          idLote: item.id_lote,
-        }
-      ));
+      const checkedTreatments: any = rowsSelected.map((item: any) => ({
+        id: item.id,
+        idGenotipo: item.id_genotipo,
+        idLote: item.id_lote,
+      }));
 
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
-      localStorage.setItem('treatmentsOptionSelected', JSON.stringify('genotipo'));
+      localStorage.setItem(
+        'treatmentsOptionSelected',
+        JSON.stringify('genotipo'),
+      );
 
-      router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios');
+      setCookies('pageBeforeEdit', currentPage?.toString());
+      setCookies('filterBeforeEdit', filter);
+      setCookies('filterBeforeEditTypeOrder', typeOrder);
+      setCookies('filterBeforeEditOrderBy', orderBy);
+      setCookies('filtersParams', filtersParams);
+      setCookies('lastPage', 'substituicao');
+
+      router.push(
+        '/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios',
+      );
     } else if (ncaButton) {
-      const checkedTreatments: any = rowsSelected.map((item: any) => (
-        {
-          id: item.id,
-          idGenotipo: item.id_genotipo,
-          idLote: item.id_lote,
-        }
-      ));
+      const checkedTreatments: any = rowsSelected.map((item: any) => ({
+        id: item.id,
+        idGenotipo: item.id_genotipo,
+        idLote: item.id_lote,
+      }));
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
       localStorage.setItem('treatmentsOptionSelected', JSON.stringify('nca'));
 
-      router.push('/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios');
+      setCookies('pageBeforeEdit', currentPage?.toString());
+      setCookies('filterBeforeEdit', filter);
+      setCookies('filterBeforeEditTypeOrder', typeOrder);
+      setCookies('filterBeforeEditOrderBy', orderBy);
+      setCookies('filtersParams', filtersParams);
+      setCookies('lastPage', 'substituicao');
+      router.push(
+        '/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios',
+      );
     } else if (inputFile?.files.length !== 0) {
       readExcel(inputFile.files);
     } else {
@@ -640,6 +730,8 @@ export default function Listagem({
     handleTotalPages();
   }, [currentPage]);
 
+  const [itemms, setItemms] = useState([]);
+
   return (
     <>
       <Head>
@@ -650,7 +742,7 @@ export default function Listagem({
         isOpen={isOpenModal}
         shouldCloseOnOverlayClick={false}
         shouldCloseOnEsc={false}
-        onRequestClose={() => { setIsOpenModal(!isOpenModal); }}
+        onRequestClose={() => setIsOpenModal(!isOpenModal)}
         overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
         className="flex
           flex-col
@@ -679,7 +771,10 @@ export default function Listagem({
               setGenotypeIsValid(false);
             }}
           >
-            <RiCloseCircleFill size={35} className="fill-red-600 hover:fill-red-800" />
+            <RiCloseCircleFill
+              size={35}
+              className="fill-red-600 hover:fill-red-800"
+            />
           </button>
 
           <div className="flex px-4  justify-between">
@@ -692,14 +787,24 @@ export default function Listagem({
                   </h2>
                 </div>
                 <div className="flex items-center gap-2">
-                  <input type="radio" name="substituir" id="genotipo" disabled={genotypeIsValid} />
+                  <input
+                    type="radio"
+                    name="substituir"
+                    id="genotipo"
+                    disabled={genotypeIsValid}
+                  />
                   <label htmlFor="genotipo" className="font-normal text-base">
                     Nome do genótipo
                   </label>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <input type="radio" name="substituir" id="nca" disabled={nccIsValid} />
+                <input
+                  type="radio"
+                  name="substituir"
+                  id="nca"
+                  disabled={nccIsValid}
+                />
                 <label htmlFor="nca" className="font-normal text-base">
                   NCA
                 </label>
@@ -763,7 +868,7 @@ export default function Listagem({
         "
         >
           <AccordionFilter title="Filtrar tratamentos genótipos">
-            <div className="w-full flex gap-2">
+            <div className="w-full flex gap-2 z-1">
               <form
                 className="flex flex-col
                   w-full
@@ -799,6 +904,79 @@ export default function Listagem({
                   </div>
 
                   {filterFieldFactory('filterTechnology', 'Nome da tecnologia')}
+
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      GLI
+                    </label>
+                    <SelectAutoComplete
+                      data={[
+                        'apple',
+                        'green',
+                        'teste',
+                        'maça',
+                        'arroz',
+                        'macarrao',
+                      ]}
+                      value="macarrao"
+                      onChange={(e: any) => console.log(e)}
+                    />
+                  </div>
+
+                  {/* <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      GLI
+                    </label>
+                    <SelectAutoCompleteMaterial
+                      data={[
+                        "apple",
+                        "green",
+                        "teste",
+                        "maça",
+                        "arroz",
+                        "macarrao",
+                      ]}
+                      value={"macarrao"}
+                      onChange={(e: any) => console.log(e)}
+                    />
+                  </div> */}
+
+                  <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      GLI
+                    </label>
+                    <SelectMultiple
+                      data={[
+                        'apple',
+                        'green',
+                        'teste',
+                        'maça',
+                        'arroz',
+                        'macarrao',
+                      ]}
+                      values={itemms}
+                      onChange={(e: any) => setItemms(e)}
+                    />
+                  </div>
+
+                  {/* <div className="h-10 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      GLI
+                    </label>
+                    <SelectMultipleMaterial
+                      data={[
+                        "apple",
+                        "green",
+                        "teste",
+                        "maça",
+                        "arroz",
+                        "macarrao",
+                      ]}
+                      values={itemms}
+                      onChange={(e: any) => setItemms(e)}
+                    />
+                  </div> */}
+
                   <div className="h-7 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       GLI
@@ -807,6 +985,7 @@ export default function Listagem({
                       values={assaySelect}
                       id="filterGli"
                       name="filterGli"
+                      defaultValue={checkValue('filterGli')}
                       onChange={formik.handleChange}
                       selected={false}
                     />
@@ -823,6 +1002,7 @@ export default function Listagem({
                         id="filterBgmFrom"
                         name="filterBgmFrom"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue('filterBgmFrom')}
                       />
                       <Input
                         style={{ marginLeft: 8 }}
@@ -830,6 +1010,7 @@ export default function Listagem({
                         id="filterBgmTo"
                         name="filterBgmTo"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue('filterBgmTo')}
                       />
                     </div>
                   </div>
@@ -859,6 +1040,7 @@ export default function Listagem({
                         id="filterNtTo"
                         name="filterNtTo"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue('filterNtTo')}
                       />
                     </div>
                   </div>
@@ -873,27 +1055,16 @@ export default function Listagem({
                         id="filterStatusT"
                         name="filterStatusT"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue('filterStatusT')}
                       />
                     </div>
                   </div>
-
-                  {/* {filterFieldFactory('filterStatus', 'Status T')} */}
 
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status do Ensaio
                     </label>
-                    {/* <div style={{ display: 'flex', flexDirection: 'row' }}>
-                      {statusFilter.map((generate, index) => (
-                        <CheckBox
-                          key={index}
-                          name={generate.name}
-                          title={generate.title?.toString()}
-                          value={generate.value}
-                          defaultChecked={false}
-                        />
-                      ))}
-                    </div> */}
+
                     <AccordionFilter>
                       <DragDropContext onDragEnd={handleOnDragEnd}>
                         <Droppable droppableId="characters">
@@ -939,7 +1110,10 @@ export default function Listagem({
                       Nome do genótipo
                     </label>
                     <Select
-                      values={[{ id: '', name: 'Selecione' }, ...genotypeSelect]}
+                      values={[
+                        { id: '', name: 'Selecione' },
+                        ...genotypeSelect,
+                      ]}
                       id="filterGenotypeName"
                       name="filterGenotypeName"
                       onChange={formik.handleChange}
@@ -948,22 +1122,9 @@ export default function Listagem({
                   </div>
 
                   {/* {filterFieldFactory('filterGenotypeName', 'Nome genótipo')} */}
+                  {filterFieldFactory('filterNca', 'NCA')}
 
-                  <div className="h-7 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Itens por página
-                    </label>
-                    <Select
-                      values={[
-                        { id: 10, name: 10 },
-                        { id: 50, name: 50 },
-                        { id: 100, name: 100 },
-                        { id: 200, name: 200 },
-                      ]}
-                      selected={take}
-                      onChange={(e: any) => setTake(e.target.value)}
-                    />
-                  </div>
+                  <FieldItemsPerPage selected={take} onChange={setTake} />
 
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
@@ -977,7 +1138,6 @@ export default function Listagem({
                     />
                   </div>
                 </div>
-
               </form>
             </div>
           </AccordionFilter>
@@ -991,7 +1151,7 @@ export default function Listagem({
               data={afterFilter ? treatments : []}
               options={{
                 selection: true,
-                selectionProps: (rowData: any) => (isOpenModal && { disabled: rowData }),
+                selectionProps: (rowData: any) => isOpenModal && { disabled: rowData },
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
@@ -1004,10 +1164,12 @@ export default function Listagem({
               }}
               localization={{
                 body: {
-                  emptyDataSourceMessage: tableMessage ? 'Nenhum Trat. Genótipo encontrado!' : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
+                  emptyDataSourceMessage: tableMessage
+                    ? 'Nenhum Trat. Genótipo encontrado!'
+                    : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
                 },
               }}
-              onChangeRowsPerPage={(e: any) => { }}
+              onChangeRowsPerPage={(e: any) => {}}
               onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (
@@ -1173,14 +1335,14 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                ) as any,
+                  ) as any,
               }}
             />
           </div>
@@ -1209,14 +1371,41 @@ export const getServerSideProps: GetServerSideProps = async ({
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
 
+  // Last page
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
+
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
+  }
+
+  // RR
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'desc';
+
+  // RR
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : 'assay_list.foco.name';
+
   const { publicRuntimeConfig } = getConfig();
   const baseUrlTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
   const baseUrlAssay = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
-  const filterApplication = req.cookies.filterBeforeEdit || `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const filterApplication = req.cookies.filterBeforeEdit
+    || `&id_culture=${idCulture}&id_safra=${idSafra}&status_experiment=${'IMPORTADO'}`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
+
+  // RR
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
 
   const param = `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
@@ -1229,7 +1418,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allTreatments, total: totalItems } = await fetch(
+  const { response: allTreatments = [], total: totalItems = 0 } = await fetch(
     urlParametersTreatment.toString(),
     requestOptions,
   ).then((response) => response.json());
@@ -1270,6 +1459,8 @@ export const getServerSideProps: GetServerSideProps = async ({
       idSafra,
       pageBeforeEdit,
       filterBeforeEdit,
+      orderByserver, // RR
+      typeOrderServer, // RR
     },
   };
 };

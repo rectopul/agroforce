@@ -24,7 +24,7 @@ export class EnvelopeController {
 
   async create(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const envelopeAlreadyExists = await this.envelopeRepository.findByData(
         data,
@@ -47,7 +47,7 @@ export class EnvelopeController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const envelope: any = await this.envelopeRepository.findById(data.id);
 

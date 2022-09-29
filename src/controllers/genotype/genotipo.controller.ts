@@ -80,7 +80,14 @@ export class GenotipoController {
           name_experiment: true,
           name_alter: true,
           elit_name: true,
-          tecnologia: true,
+          // tecnologia: true,
+          tecnologia: {
+            select: {
+              name: true,
+              id: true,
+              cod_tec: true,
+            },
+          },
           numberLotes: true,
           type: true,
           gmr: true,
@@ -157,6 +164,19 @@ export class GenotipoController {
       return { status: 200, response };
     } catch (error: any) {
       handleError('Genotipo Controller', 'getOne', error.message);
+      throw new Error('[Controller] - getOne Genotipo erro');
+    }
+  }
+
+  async getOneByName(name: any) {
+    try {
+      const response = await this.genotipoRepository.findOneByName(name);
+
+      if (!response) throw new Error('Item não encontrado');
+
+      return { status: 200, response };
+    } catch (error: any) {
+      handleError('Genotipo Controller', 'getOneByName', error.message);
       throw new Error('[Controller] - getOne Genotipo erro');
     }
   }

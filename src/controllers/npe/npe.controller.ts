@@ -21,7 +21,15 @@ export class NpeController {
     let select: any = [];
     try {
       if (options.filterStatus) {
-        if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
+        if (options.filterStatus !== '2') {
+          if (options.filterStatus == '1') {
+            parameters.status = JSON.parse('{ "in" : [1, 3]}');
+          } else if (options.filterStatus == '4') {
+            parameters.status = 1;
+          } else {
+            parameters.status = Number(options.filterStatus);
+          }
+        }
       }
 
       if (options.filterLocal) {
@@ -40,8 +48,8 @@ export class NpeController {
         parameters.tecnologia = JSON.parse(`{ "name": {"contains": "${options.filterTecnologia}" } }`);
       }
 
-      if (options.filterCodTec) {
-        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterCodTec}" } }`);
+      if (options.filterCodTecnologia) {
+        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterCodTecnologia}" } }`);
       }
 
       if (options.filterEpoca) {
@@ -52,8 +60,16 @@ export class NpeController {
         parameters.npei = Number(options.filterNPE);
       }
 
+      if (options.id_safra) {
+        parameters.safraId = Number(options.id_safra);
+      }
+
       if (options.safraId) {
         parameters.safraId = Number(options.safraId);
+      }
+
+      if (options.filterSafra) {
+        parameters.safra = JSON.parse(`{ "safraName": { "contains": "${options.filterSafra}" } }`);
       }
 
       if (options.focoId) {
@@ -100,6 +116,16 @@ export class NpeController {
         }
       }
 
+      if (options.filterGrpFrom || options.filterGrpTo) {
+        if (options.filterGrpFrom && options.filterGrpTo) {
+          parameters.group = JSON.parse(` { "some" : {"group": {"gte": ${Number(options.filterGrpFrom)}, "lte": ${Number(options.filterGrpTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
+        } else if (options.filterGrpFrom) {
+          parameters.group = JSON.parse(`{ "some" : {"group": {"gte": ${Number(options.filterGrpFrom)} } , "id_safra": ${Number(options.id_safra)}} }`);
+        } else if (options.filterGrpTo) {
+          parameters.group = JSON.parse(` { "some" : {"group": {"lte": ${Number(options.filterGrpTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
+        }
+      }
+
       const take = (options.take) ? Number(options.take) : undefined;
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
@@ -108,7 +134,7 @@ export class NpeController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       } else {
-        orderBy = '{"npei":"asc"}';
+        orderBy = '{"prox_npe":"asc"}';
       }
 
       if (options.paramSelect) {
@@ -135,6 +161,7 @@ export class NpeController {
           type_assay: { select: { name: true, id: true } },
           group: true,
           npei: true,
+          npei_i: true,
           npef: true,
           status: true,
           edited: true,
@@ -149,21 +176,25 @@ export class NpeController {
         orderBy,
       );
 
-      response.map(async (value: any, index: any, elements: any) => {
-        const newItem = value;
-        const next = elements[index + 1];
+      if (response.length > 0) {
+        const next_available_npe = response[response.length - 1].prox_npe;
+        response.map(async (value: any, index: any, elements: any) => {
+          const newItem = value;
+          const next = elements[index + 1];
 
-        if (next) {
-          if (!newItem.npeQT) {
-            newItem.npeQT = next.npei - newItem.npei;
+          if (next) {
+            if (!newItem.npeQT) {
+              newItem.npeQT = newItem.npef < next.npei ? next.npei - newItem.npef : next.npei_i - newItem.npef;
+            }
+            newItem.nextNPE = next;
+          } else {
+            newItem.npeQT = 'N/A';
+            newItem.nextNPE = 0;
           }
-          newItem.nextNPE = next.npei;
-        } else {
-          newItem.npeQT = 'N/A';
-          newItem.nextNPE = 0;
-        }
-        return newItem;
-      });
+          newItem.nextAvailableNPE = next_available_npe;
+          return newItem;
+        });
+      }
 
       if (!response || response.total <= 0) {
         return {
@@ -238,14 +269,14 @@ export class NpeController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-
       if (data) {
+        const operation = data.status === 1 ? 'Ativação' : 'Inativação';
         const npe = await this.npeRepository.update(data.id, data);
         if (!npe) return { status: 400, message: 'Npe não encontrado' };
-        if (npe.status === 0) {
+        if (data.status === 0 || data.status === 1) {
+          const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
           await this.reporteRepository.create({
-            madeBy: npe.created_by, module: 'Npe', operation: 'Inativação', name: JSON.stringify(npe.safraId), ip: JSON.stringify(ip), idOperation: npe.id,
+            madeBy: npe.created_by, module: 'Npe', operation, name: JSON.stringify(npe.safraId), ip: JSON.stringify(ip), idOperation: npe.id,
           });
         }
         return { status: 200, message: 'Npe atualizada' };

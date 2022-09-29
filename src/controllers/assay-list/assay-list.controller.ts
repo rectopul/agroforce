@@ -16,9 +16,6 @@ export class AssayListController {
     const parameters: object | any = {};
     let orderBy: object | any;
     try {
-      if (options.filterProtocol) {
-        parameters.protocol_name = JSON.parse(`{"contains":"${options.filterProtocol}"}`);
-      }
       if (options.filterFoco) {
         parameters.foco = JSON.parse(`{ "name": { "contains": "${options.filterFoco}" } }`);
       }
@@ -36,9 +33,6 @@ export class AssayListController {
       }
       if (options.filterGli) {
         parameters.gli = JSON.parse(`{"contains": "${options.filterGli}" }`);
-      }
-      if (options.filterPeriod) {
-        parameters.period = JSON.parse(`{ "contains": "${options.filterPeriod}" }`);
       }
       if (options.filterBgm) {
         parameters.bgm = JSON.parse(`{ "contains": "${options.filterBgm}" }`);
@@ -63,7 +57,6 @@ export class AssayListController {
       const select = {
         id: true,
         id_safra: true,
-        protocol_name: true,
         type_assay: { select: { name: true } },
         tecnologia: { select: { name: true, cod_tec: true } },
         safra: { select: { safraName: true } },
@@ -75,7 +68,6 @@ export class AssayListController {
         project: true,
         comments: true,
         experiment: true,
-        period: true,
         foco: { select: { name: true } },
       };
 
@@ -150,16 +142,11 @@ export class AssayListController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-
       const assayList: any = await this.assayListRepository.findById(data.id);
 
       if (!assayList) return { status: 404, message: 'Lista de ensaio não existente' };
 
       const response = await this.assayListRepository.update(Number(data.id), data);
-      await this.reporteRepository.create({
-        madeBy: response.created_by, module: 'Ensaio', operation: 'Edição', name: response.protocol_name, ip: JSON.stringify(ip), idOperation: response.id,
-      });
 
       return { status: 200, response, message: 'Lista de ensaio atualizado' };
     } catch (error: any) {
@@ -168,16 +155,20 @@ export class AssayListController {
     }
   }
 
-  async delete(id: number) {
+  async delete(data: any) {
     try {
-      const { status: statusAssay, response } = await this.getOne(Number(id));
+      const { status: statusAssay, response } = await this.getOne(Number(data.id));
       if (statusAssay !== 200) return { status: 400, message: 'Lista de ensaio não encontrada' };
       if (response?.status === 'UTILIZADO') return { status: 400, message: 'Ensaio já relacionado com um experimento ' };
 
-      const { status } = await this.genotypeTreatmentController.deleteAll(id);
-
+      const { status } = await this.genotypeTreatmentController.deleteAll(data.id);
+      const operation = data.status === 1 ? 'Ativação' : 'Inativação';
       if (status === 200) {
-        await this.assayListRepository.delete(Number(id));
+        const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+        await this.reporteRepository.create({
+          madeBy: data.userId, module: 'Ensaio', operation, name: response.type_assay.name, ip: JSON.stringify(ip), idOperation: response.id,
+        });
+        await this.assayListRepository.delete(Number(data.id));
         return { status: 200, message: 'Lista de ensaio excluída' };
       }
       return { status: 400, message: 'Lista de ensaio não excluída' };

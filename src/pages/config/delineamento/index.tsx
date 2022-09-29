@@ -40,6 +40,7 @@ import {
   Select,
 } from '../../../components';
 import * as ITabs from '../../../shared/utils/dropdown';
+import { tableGlobalFunctions } from '../../../helpers';
 
 interface IDelineamentoProps {
   id: number | any;
@@ -76,6 +77,8 @@ interface Idata {
   cultureId: number;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
+  typeOrderServer :any| string, // RR
+  orderByserver : any |string // RR
 }
 
 export default function Listagem({
@@ -86,6 +89,8 @@ export default function Listagem({
   cultureId,
   pageBeforeEdit,
   filterBeforeEdit,
+  typeOrderServer, // RR
+  orderByserver, // RR
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
@@ -156,24 +161,35 @@ export default function Listagem({
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
-  const [orderBy, setOrderBy] = useState<string>('');
+  // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
+  const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+
   const columns = colums(camposGerenciados);
+  const filters = [
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
+  ];
+
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterRepetitionTo: '',
-      filterRepetitionFrom: '',
-      filterTratRepetitionTo: '',
-      filterTratRepetitionFrom: '',
-      filterStatus: '',
-      filterName: '',
-      filterRepeat: '',
-      filterTreatment: '',
+      filterRepetitionTo: checkValue('filterRepetitionTo'),
+      filterRepetitionFrom: checkValue('filterRepetitionFrom'),
+      filterTratRepetitionTo: checkValue('filterTratRepetitionTo'),
+      filterTratRepetitionFrom: checkValue('filterTratRepetitionFrom'),
+      filterStatus: filterStatusBeforeEdit[13],
+      filterName: checkValue('filterName'),
+      filterRepeat: checkValue('filterRepeat'),
+      filterTreatment: checkValue('filterTreatment'),
       orderBy: '',
       typeOrder: '',
     },
@@ -189,26 +205,44 @@ export default function Listagem({
     }) => {
       const parametersFilter = `filterStatus=${filterStatus || 1
       }&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}&filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterTratRepetitionTo=${filterTratRepetitionTo}&filterTratRepetitionFrom=${filterTratRepetitionFrom}`;
-      setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
-      await delineamentoService
-        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
-        .then((response) => {
-          setFilter(parametersFilter);
-          setDelineamento(response.response);
-          setTotalItems(response.total);
-          setCurrentPage(0);
-        });
+      // setFiltersParams(parametersFilter);
+      // setCookies('filterBeforeEdit', filtersParams);
+      // await delineamentoService
+      //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+      //   .then((response) => {
+      //     setFilter(parametersFilter);
+      //     setDelineamento(response.response);
+      //     setTotalItems(response.total);
+      //     setCurrentPage(0);
+      //   });
+
+      setFilter(parametersFilter);
+      setCurrentPage(0);
+      await callingApi(parametersFilter);
     },
   });
 
-  const filters = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
-  ];
+  // Calling common API
+  async function callingApi(parametersFilter : any) {
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
+    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    setFiltersParams(parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
-  const filterStatusBeforeEdit = filterBeforeEdit.split('');
+    await delineamentoService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200 || response.status === 400) {
+        setDelineamento(response.response);
+        setTotalItems(response.total);
+      }
+    });
+  }
+
+  // Call that function when change type order value.
+  useEffect(() => {
+    callingApi(filter);
+  }, [typeOrder]);
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -338,6 +372,12 @@ export default function Listagem({
                 <Button
                   icon={<AiOutlineTable size={14} />}
                   onClick={() => {
+                    setCookies('pageBeforeEdit', currentPage?.toString());
+                    setCookies('filterBeforeEdit', filter);
+                    setCookies('filterBeforeEditTypeOrder', typeOrder);
+                    setCookies('filterBeforeEditOrderBy', orderBy);
+                    setCookies('filtersParams', filtersParams);
+                    setCookies('lastPage', 'sequencia-delineamento');
                     router.push(
                       `delineamento/sequencia-delineamento?id_delineamento=${rowData.id}`,
                     );
@@ -359,48 +399,58 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+    // let typeOrder: any;
+    // let parametersFilter: any;
+    // if (order === 1) {
+    //   typeOrder = 'asc';
+    // } else if (order === 2) {
+    //   typeOrder = 'desc';
+    // } else {
+    //   typeOrder = '';
+    // }
+    // setOrderBy(column);
+    // setOrderType(typeOrder);
+    // if (filter && typeof filter !== 'undefined') {
+    //   if (typeOrder !== '') {
+    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+    //   } else {
+    //     parametersFilter = filter;
+    //   }
+    // } else if (typeOrder !== '') {
+    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    // } else {
+    //   parametersFilter = filter;
+    // }
 
-    await delineamentoService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then((response) => {
-        if (response.status === 200) {
-          setDelineamento(response.response);
-        }
-      });
+    // await delineamentoService
+    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
+    //   .then((response) => {
+    //     if (response.status === 200) {
+    //       setDelineamento(response.response);
+    //     }
+    //   });
 
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
+    // if (orderList === 2) {
+    //   setOrder(0);
+    //   setArrowOrder(<AiOutlineArrowDown />);
+    // } else {
+    //   setOrder(orderList + 1);
+    //   if (orderList === 1) {
+    //     setArrowOrder(<AiOutlineArrowUp />);
+    //   } else {
+    //     setArrowOrder('');
+    //   }
+    // }
+
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
   }
 
   async function getValuesColumns(): Promise<void> {
@@ -450,7 +500,7 @@ export default function Listagem({
     idDelineamento: number,
     data: IDelineamentoProps,
   ): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&name=${data.name}`;
+    const parametersFilter = `filterStatus=${1}&id_culture=${cultureId}&name=${data.name}`;
 
     if (data.status === 0) {
       await delineamentoService.getAll(parametersFilter).then((response) => {
@@ -528,7 +578,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await delineamentoService.getAll(filterApplication).then((response) => {
+    await delineamentoService.getAll(filter).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           if (row.status === 0) {
@@ -572,33 +622,41 @@ export default function Listagem({
     });
   };
 
+  async function handlePagination(): Promise<void> {
+    // const skip = currentPage * Number(take);
+    // let parametersFilter;
+    // if (orderType) {
+    //   parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    // } else {
+    //   parametersFilter = `skip=${skip}&take=${take}`;
+    // }
+
+    // if (filter) {
+    //   parametersFilter = `${parametersFilter}&${filter}`;
+    // }
+    // await delineamentoService.getAll(parametersFilter).then((response) => {
+    //   if (response.status === 200) {
+    //     setDelineamento(response.response);
+    //   }
+    // });
+
+    await callingApi(filter); // handle pagination globly
+  }
+
+  // manage total pages
+  async function handleTotalPages() {
+    if (currentPage < 0) {
+      setCurrentPage(0);
+    }
+  }
+
+  // Checking defualt values
+  function checkValue(value: any) {
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
+    return parameter;
+  }
+
   useEffect(() => {
-    async function handlePagination(): Promise<void> {
-      const skip = currentPage * Number(take);
-      let parametersFilter;
-      if (orderType) {
-        parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-      } else {
-        parametersFilter = `skip=${skip}&take=${take}`;
-      }
-
-      if (filter) {
-        parametersFilter = `${parametersFilter}&${filter}`;
-      }
-      await delineamentoService.getAll(parametersFilter).then((response) => {
-        if (response.status === 200) {
-          setDelineamento(response.response);
-        }
-      });
-    }
-
-    function handleTotalPages(): void {
-      if (currentPage < 0) {
-        setCurrentPage(0);
-      } else if (currentPage >= pages) {
-        setCurrentPage(pages - 1);
-      }
-    }
     handlePagination();
     handleTotalPages();
   }, [currentPage]);
@@ -641,7 +699,8 @@ export default function Listagem({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatusBeforeEdit[13]}
+                      // defaultValue={filterStatusBeforeEdit[13]}
+                      defaultValue={checkValue('filterStatus')}
                       values={filters.map((id) => id)}
                       selected="1"
                     />
@@ -657,6 +716,7 @@ export default function Listagem({
                       id="filterName"
                       name="filterName"
                       onChange={formik.handleChange}
+                      defaultValue={checkValue('filterName')}
                     />
                   </div>
                   <div className="h-6 w-1/2 ml-4">
@@ -668,6 +728,7 @@ export default function Listagem({
                         placeholder="De"
                         id="filterRepetitionFrom"
                         name="filterRepetitionFrom"
+                        defaultValue={checkValue('filterRepetitionFrom')}
                         onChange={formik.handleChange}
                       />
                       <Input
@@ -675,6 +736,7 @@ export default function Listagem({
                         placeholder="Até"
                         id="filterRepetitionTo"
                         name="filterRepetitionTo"
+                        defaultValue={checkValue('filterRepetitionTo')}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -688,6 +750,7 @@ export default function Listagem({
                         placeholder="De"
                         id="filterTratRepetitionFrom"
                         name="filterTratRepetitionFrom"
+                        defaultValue={checkValue('filterTratRepetitionFrom')}
                         onChange={formik.handleChange}
                       />
                       <Input
@@ -695,6 +758,7 @@ export default function Listagem({
                         placeholder="Até"
                         id="filterTratRepetitionTo"
                         name="filterTratRepetitionTo"
+                        defaultValue={checkValue('filterTratRepetitionTo')}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -905,8 +969,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -929,21 +992,51 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     await PreferencesControllers.getConfigGerais()
   )?.response[0]?.itens_per_page) ?? 15;
 
-  const { token } = req.cookies;
   const { cultureId } = req.cookies;
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : 'filterStatus=1';
+    : `filterStatus=1&id_culture=${cultureId}`;
+
+  // Last page
+  const lastPageServer = req.cookies.lastPage
+    ? req.cookies.lastPage
+    : 'No';
+
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
+  }
+
+  // RR
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'desc';
+
+  // RR
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : 'name';
+
+  const { token } = req.cookies;
+  // const { cultureId } = req.cookies;
 
   const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}&id_culture=${cultureId}`
+    ? `${req.cookies.filterBeforeEdit}`
     : `filterStatus=1&id_culture=${cultureId}`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
+
+  // RR
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/delineamento`;
@@ -969,6 +1062,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
       cultureId,
       pageBeforeEdit,
       filterBeforeEdit,
+      orderByserver,
+      typeOrderServer,
     },
   };
 };

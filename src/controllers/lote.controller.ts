@@ -157,6 +157,7 @@ export class LoteController {
         ncc: true,
         fase: true,
         peso: true,
+        safra: true,
         quant_sementes: true,
         genotipo: {
           select: {

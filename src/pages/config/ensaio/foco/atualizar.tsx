@@ -181,7 +181,7 @@ export default function Atualizar({
         parametersFilter = filter;
       }
     } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_safra=${idSafra}&id_foco${idFoco}`;
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_foco${idFoco}`;
     } else {
       parametersFilter = filter;
     }
@@ -384,17 +384,25 @@ export default function Atualizar({
         if (status === 200) {
           const newData = response.map((row: any) => {
             const newRow = row;
+
+            newRow.SAFRA = row.safra.safraName;
+            newRow.GRUPO = Number(row.group);
+            newRow.FOCO = row.foco.name;
+
             delete newRow.npe;
-            newRow.group = Number(row.group);
+            delete newRow.safra;
+            delete newRow.foco;
+            delete newRow.id_foco;
+            delete newRow.group;
             delete newRow.id;
             return newRow;
           });
 
-          newData.map((item: any) => {
-            item.foco = item.foco?.name;
-            item.safra = item.safra?.safraName;
-            return item;
-          });
+          // newData.map((item: any) => {
+          //   item.foco = item.foco?.name;
+          //   item.safra = item.safra?.safraName;
+          //   return item;
+          // });
 
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
@@ -737,14 +745,14 @@ export const getServerSideProps: GetServerSideProps = async ({
   };
 
   const idFoco = Number(query.id);
-  const filterApplication = `&id_safra=${idSafra}&id_foco=${idFoco}`;
+  const filterApplication = `&id_foco=${idFoco}`;
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrlGrupo = `${publicRuntimeConfig.apiUrl}/grupo`;
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/foco`;
 
   const { response: allItens, total: totalItems } = await fetch(
-    `${baseUrlGrupo}?id_foco=${idFoco}&id_safra=${idSafra}`,
+    `${baseUrlGrupo}?id_foco=${idFoco}`,
     requestOptions,
   ).then((response) => response.json());
 

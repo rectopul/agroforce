@@ -85,12 +85,6 @@ model safra {
   ExperimentGroup     ExperimentGroup[]
 }
 
-model uf {
-  id    Int     @id
-  nome  String? @db.Char(255)
-  sigla String? @db.Char(2)
-}
-
 model user {
   id                Int                 @id @default(autoincrement())
   name              String?
@@ -189,18 +183,20 @@ model cultureUnity {
 }
 
 model layout_quadra {
-  id          Int               @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   esquema     String
   plantadeira String
   tiros       Int?
   disparos    Int?
   parcelas    Int?
-  status      Int               @default(1)
+  status      Int      @default(1)
   created_by  Int
-  created_at  DateTime          @default(now())
+  created_at  DateTime @default(now())
   id_culture  Int
-  culture     culture           @relation(fields: [id_culture], references: [id])
-  children    layout_children[]
+
+  culture             culture               @relation(fields: [id_culture], references: [id])
+  children            layout_children[]
+  experiment_genotipe experiment_genotipe[]
 }
 
 model layout_children {
@@ -223,27 +219,31 @@ model layout_children {
 }
 
 model quadra {
-  id            Int        @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   cod_quadra    String
   id_culture    Int
   local_plantio String?
-  larg_q        Int
-  comp_p        Int
+  larg_q        Decimal  @db.Decimal(4, 2)
+  comp_p        Decimal  @db.Decimal(4, 2)
   linha_p       Int
-  comp_c        Decimal    @db.Decimal(2, 1)
+  comp_c        Decimal  @db.Decimal(4, 2)
   esquema       String?
   tiro_fixo     Int?
   disparo_fixo  Int?
   q             String?
-  status        Int        @default(1)
+  status        Int      @default(1)
   created_by    Int
-  created_at    DateTime   @default(now())
+  created_at    DateTime @default(now())
   id_safra      Int
   id_local      Int
-  culture       culture    @relation(fields: [id_culture], references: [id])
-  local         local      @relation(fields: [id_local], references: [id])
-  safra         safra      @relation(fields: [id_safra], references: [id])
-  dividers      dividers[]
+  allocation    String?  @default("IMPORTADO")
+
+  culture             culture               @relation(fields: [id_culture], references: [id])
+  local               local                 @relation(fields: [id_local], references: [id])
+  safra               safra                 @relation(fields: [id_safra], references: [id])
+  dividers            dividers[]
+  experiment          experiment[]
+  AllocatedExperiment AllocatedExperiment[]
 }
 
 model dividers {
@@ -416,6 +416,7 @@ model npe {
   id           Int       @id @default(autoincrement())
   npei         Int
   npef         Int?
+  npei_i       Int?      @default(0)
   prox_npe     Int?
   npeQT        Int?
   created_by   Int
@@ -459,7 +460,6 @@ model experiment {
   clp               Decimal   @db.Decimal(5, 2)
   comments          String    @db.LongText
   density           Int
-  eel               Decimal   @db.Decimal(5, 2)
   experimentName    String
   idAssayList       Int
   idDelineamento    Int
@@ -470,12 +470,14 @@ model experiment {
   orderDraw         Int
   period            Int
   repetitionsNumber Int
+  blockId           Int?
 
   assay_list          assay_list            @relation(fields: [idAssayList], references: [id])
   delineamento        delineamento          @relation(fields: [idDelineamento], references: [id])
   local               local                 @relation(fields: [idLocal], references: [id])
   safra               safra                 @relation(fields: [idSafra], references: [id])
   ExperimentGroup     ExperimentGroup?      @relation(fields: [experimentGroupId], references: [id])
+  quadra              quadra?               @relation(fields: [blockId], references: [id])
   experiment_genotipe experiment_genotipe[]
 }
 
@@ -499,8 +501,6 @@ model assay_list {
   id_type_assay      Int
   id_tecnologia      Int
   gli                String
-  period             Int
-  protocol_name      String
   treatmentsNumber   Int?
   bgm                Int
   project            String
@@ -525,6 +525,7 @@ model genotype_treatment {
   treatments_number Int
   comments          String?
   status            String
+  status_experiment String     @default("IMPORTADO")
   created_by        Int
   assay_list        assay_list @relation(fields: [id_assay_list], references: [id])
   genotipo          genotipo   @relation(fields: [id_genotipo], references: [id])
@@ -549,29 +550,32 @@ model history_genotype_treatment {
 }
 
 model experiment_genotipe {
-  id           Int       @id @default(autoincrement())
-  created_at   DateTime? @default(now())
-  idSafra      Int
-  idFoco       Int
-  idTypeAssay  Int
-  idTecnologia Int
-  idExperiment Int
-  idGenotipo   Int
-  idLote       Int?
-  gli          String
-  rep          Int
-  nt           Int
-  npe          Int
-  nca          String
-  status       String    @default("SORTEADO")
+  id            Int       @id @default(autoincrement())
+  created_at    DateTime? @default(now())
+  idSafra       Int
+  idFoco        Int
+  idTypeAssay   Int
+  idTecnologia  Int
+  idExperiment  Int
+  idGenotipo    Int
+  blockLayoutId Int?
+  idLote        Int?
+  gli           String
+  rep           Int
+  nt            Int
+  npe           Int
+  nca           String
+  status        String    @default("SORTEADO")
+  status_t      String    @default("L")
 
-  safra        safra          @relation(fields: [idSafra], references: [id])
-  type_assay   type_assay     @relation(fields: [idTypeAssay], references: [id])
-  tecnologia   tecnologia     @relation(fields: [idTecnologia], references: [id])
-  foco         foco           @relation(fields: [idFoco], references: [id])
-  experiment   experiment     @relation(fields: [idExperiment], references: [id])
-  genotipo     genotipo       @relation(fields: [idGenotipo], references: [id])
-  PrintHistory PrintHistory[]
+  safra         safra          @relation(fields: [idSafra], references: [id])
+  type_assay    type_assay     @relation(fields: [idTypeAssay], references: [id])
+  tecnologia    tecnologia     @relation(fields: [idTecnologia], references: [id])
+  foco          foco           @relation(fields: [idFoco], references: [id])
+  experiment    experiment     @relation(fields: [idExperiment], references: [id])
+  genotipo      genotipo       @relation(fields: [idGenotipo], references: [id])
+  layout_quadra layout_quadra? @relation(fields: [blockLayoutId], references: [id])
+  PrintHistory  PrintHistory[]
 }
 
 model ExperimentGroup {
@@ -603,12 +607,26 @@ model PrintHistory {
 }
 
 model reportes {
-  id          Int     @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   madeBy      Int?
-  madeIn     DateTime @default(now())
-  module     String?
-  operation     String?
-  idOperation      Int?   
-  name     String? 
-  ip     String?     
+  madeIn      DateTime @default(now())
+  module      String?
+  operation   String?
+  idOperation Int?
+  name        String?
+  ip          String?
+}
+
+model AllocatedExperiment {
+  id             Int      @id @default(autoincrement())
+  seq            Int
+  experimentName String
+  npei           Int
+  npef           Int
+  parcelas       Int
+  blockId        Int
+  createdBy      Int
+  createdAt      DateTime @default(now())
+
+  quadra quadra @relation(fields: [blockId], references: [id])
 }

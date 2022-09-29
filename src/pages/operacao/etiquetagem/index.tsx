@@ -38,6 +38,7 @@ import {
   Input,
   Select,
   ModalComponent,
+  FieldItemsPerPage,
 } from '../../../components';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
@@ -47,6 +48,7 @@ import {
 import * as ITabs from '../../../shared/utils/dropdown';
 import { IExperimentGroupFilter, IExperimentsGroup } from '../../../interfaces/listas/operacao/etiquetagem/etiquetagem.interface';
 import { IReturnObject } from '../../../interfaces/shared/Import.interface';
+import { tableGlobalFunctions } from '../../../helpers';
 
 export default function Listagem({
   allExperimentGroup,
@@ -56,11 +58,16 @@ export default function Listagem({
   filterApplication,
   pageBeforeEdit,
   filterBeforeEdit,
+  cultureId,
+  typeOrderServer,
+  orderByserver,
   // eslint-disable-next-line no-use-before-define
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
-  const tabsEtiquetagemMenu = tabsOperation.map((i) => (i.titleTab === 'ETIQUETAGEM' ? { ...i, statusTab: true } : i));
+  const tabsEtiquetagemMenu = tabsOperation.map((i) => (i.titleTab === 'ETIQUETAGEM'
+    ? { ...i, statusTab: true }
+    : { ...i, statubsTab: false }));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.etiquetagem || {
@@ -74,6 +81,7 @@ export default function Listagem({
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
+
   const [
     experimentGroup,
     setExperimentGroup,
@@ -98,25 +106,25 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Total etiq. a imp.',
+      title: 'Etiq. a imprimir',
       value: 'tagsToPrint',
       defaultChecked: () => camposGerenciados.includes('tagsToPrint'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Total etiq. imp.',
+      title: 'Etiq. impressas',
       value: 'tagsPrinted',
       defaultChecked: () => camposGerenciados.includes('tagsPrinted'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Total etiq.',
+      title: 'Total etiquetas',
       value: 'totalTags',
       defaultChecked: () => camposGerenciados.includes('totalTags'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Status',
+      title: 'Status grupo exp.',
       value: 'status',
       defaultChecked: () => camposGerenciados.includes('status'),
     },
@@ -127,8 +135,29 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes('action'),
     },
   ]);
-  const [orderBy, setOrderBy] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
+    {
+      name: 'StatusCheckbox',
+      title: 'ETIQ. NÃO INICIADA',
+      value: 'ETIQ. NÃO INICIADA',
+      defaultChecked: () => camposGerenciados.includes('ETIQ. NÃO INICIADA'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'ETIQ. EM ANDAMENTO',
+      value: 'ETIQ. EM ANDAMENTO',
+      defaultChecked: () => camposGerenciados.includes('ETIQ. EM ANDAMENTO'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'ETIQ. FINALIZADA',
+      value: 'ETIQ. FINALIZADA',
+      defaultChecked: () => camposGerenciados.includes('ETIQ. FINALIZADA'),
+    },
+  ]);
+  // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
+  const [arrowOrder, setArrowOrder] = useState<any>('');
   const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   // const take: number = itensPerPage;
@@ -136,14 +165,34 @@ export default function Listagem({
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
+  const [orderBy, setOrderBy] = useState<string>(orderByserver);
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  // const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}`;
+
   const formik = useFormik<IExperimentGroupFilter>({
     initialValues: {
-      filterExperimentGroup: '',
-      filterQuantityExperiment: '',
-      filterTagsToPrint: '',
-      filterTagsPrinted: '',
-      filterTotalTags: '',
-      filterStatus: '',
+      // filterExperimentGroup: checkValue('filterExperimentGroup'),
+      // filterQuantityExperiment: checkValue('filterQuantityExperiment'),
+      // filterTagsToPrint: checkValue('filterTagsToPrint'),
+      // filterTagsPrinted: checkValue('filterTagsPrinted'),
+      // filterTotalTags: checkValue('filterTotalTags'),
+      // filterStatus: checkValue('filterStatus'),
+      filterExperimentGroup: checkValue('filterExperimentGroup'),
+      filterQuantityExperiment: checkValue('filterQuantityExperiment'),
+      filterTagsToPrint: checkValue('filterTagsToPrint'),
+      filterTagsPrinted: checkValue('filterTagsPrinted'),
+      filterTotalTags: checkValue('filterTotalTags'),
+      filterStatus: checkValue('filterStatus'),
+      filterQtdExpFrom: checkValue('filterQtdExpFrom'),
+      filterQtdExpTo: checkValue('filterQtdExpTo'),
+      filterTotalEtiqImprimirFrom: checkValue('filterTotalEtiqImprimirFrom'),
+      filterTotalEtiqImprimirTo: checkValue('filterTotalEtiqImprimirTo'),
+      filterTotalEtiqImpressasFrom: checkValue('filterTotalEtiqImpressasFrom'),
+      filterTotalEtiqImpressasTo: checkValue('filterTotalEtiqImpressasTo'),
+      filterTotalEtiqFrom: checkValue('filterTotalEtiqFrom'),
+      filterTotalEtiqTo: checkValue('filterTotalEtiqTo'),
     },
     onSubmit: async ({
       filterExperimentGroup,
@@ -151,6 +200,14 @@ export default function Listagem({
       filterTagsToPrint,
       filterTagsPrinted,
       filterTotalTags,
+      filterQtdExpTo,
+      filterQtdExpFrom,
+      filterTotalEtiqImprimirTo,
+      filterTotalEtiqImprimirFrom,
+      filterTotalEtiqImpressasTo,
+      filterTotalEtiqImpressasFrom,
+      filterTotalEtiqTo,
+      filterTotalEtiqFrom,
       filterStatus,
     }) => {
       const parametersFilter = `&filterExperimentGroup=${filterExperimentGroup
@@ -158,58 +215,99 @@ export default function Listagem({
       }&filterTagsToPrint=${filterTagsToPrint
       }&filterTagsPrinted=${filterTagsPrinted
       }&filterTotalTags=${filterTotalTags
-      }&filterStatus=${filterStatus}`;
-      setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
-      await experimentGroupService
-        .getAll(`${parametersFilter}`)
-        .then(({ response, total: allTotal }) => {
-          setFilter(parametersFilter);
-          setExperimentGroup(response);
-          setTotalItems(allTotal);
-          setCurrentPage(0);
-          tableRef.current.dataManager.changePageSize(allTotal >= take ? take : allTotal);
-        });
+      }&filterStatus=${filterStatus}&safraId=${safraId}&id_culture=${cultureId}`;
+      // setFiltersParams(parametersFilter);
+      // setCookies('filterBeforeEdit', filtersParams);
+      // await experimentGroupService
+      //   .getAll(`${parametersFilter}`)
+      //   .then(({ response, total: allTotal }) => {
+      //     setFilter(parametersFilter);
+      //     setExperimentGroup(response);
+      //     setTotalItems(allTotal);
+      //     setCurrentPage(0);
+      //     tableRef.current.dataManager.changePageSize(allTotal >= take ? take : allTotal);
+      //   });
+
+      setFilter(parametersFilter);
+      setCurrentPage(0);
+      await callingApi(parametersFilter);
     },
   });
 
-  async function handleOrder(column: string, order: number): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
+  // Calling common API
+  async function callingApi(parametersFilter : any) {
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
+    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    setFiltersParams(parametersFilter);
+    // setCookies("filtersParams", parametersFilter);
+
+    setCookies('filtersParams', parametersFilter);
+    await experimentGroupService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200 || response.status === 400) {
+        setExperimentGroup(response.response);
+        setTotalItems(response.total);
       }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+    });
+  }
 
-    await experimentGroupService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          setExperimentGroup(response);
-        }
-      });
+  // Call that function when change type order value.
+  useEffect(() => {
+    callingApi(filter);
+  }, [typeOrder]);
 
-    if (orderList === 2) {
-      setOrder(0);
-    } else {
-      setOrder(orderList + 1);
-    }
+  useEffect(() => {
+    setCookies('filtersParams-test-rr', filtersParams);
+  }, [filtersParams]);
+
+  async function handleOrder(column: string, order: number): Promise<void> {
+    // let typeOrder: any;
+    // let parametersFilter: any;
+    // if (order === 1) {
+    //   typeOrder = 'asc';
+    // } else if (order === 2) {
+    //   typeOrder = 'desc';
+    // } else {
+    //   typeOrder = '';
+    // }
+    // setOrderBy(column);
+    // setOrderType(typeOrder);
+    // if (filter && typeof filter !== 'undefined') {
+    //   if (typeOrder !== '') {
+    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+    //   } else {
+    //     parametersFilter = filter;
+    //   }
+    // } else if (typeOrder !== '') {
+    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    // } else {
+    //   parametersFilter = filter;
+    // }
+
+    // await experimentGroupService
+    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
+    //   .then(({ status, response }) => {
+    //     if (status === 200) {
+    //       setExperimentGroup(response);
+    //     }
+    //   });
+
+    // if (orderList === 2) {
+    //   setOrder(0);
+    // } else {
+    //   setOrder(orderList + 1);
+    // }
+
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
   }
 
   async function deleteItem(id: number) {
@@ -244,11 +342,7 @@ export default function Listagem({
 
   function actionTableFactory() {
     return {
-      title: (
-        <div className="flex items-center">
-          Ação
-        </div>
-      ),
+      title: <div className="flex items-center">Ação</div>,
       field: 'action',
       sorting: false,
       width: 0,
@@ -260,9 +354,11 @@ export default function Listagem({
               type="button"
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
-                localStorage.setItem('filterValueEdit', filtersParams);
-                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('lastPage', 'atualizar');
                 router.push(`/operacao/etiquetagem/atualizar?id=${rowData.id}`);
               }}
               rounder="rounded-full"
@@ -277,9 +373,11 @@ export default function Listagem({
               type="button"
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
-                localStorage.setItem('filterValueEdit', filtersParams);
-                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('lastPage', 'parcelas');
                 router.push(`/operacao/etiquetagem/parcelas?id=${rowData.id}`);
               }}
               rounder="rounded-full"
@@ -315,16 +413,16 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Qtde. exp.', 'experimentAmount'));
       }
       if (columnOrder[item] === 'tagsToPrint') {
-        tableFields.push(headerTableFactory('Total etiq. a imp.', 'tagsToPrint'));
+        tableFields.push(headerTableFactory('Etiq. a imprimir', 'tagsToPrint'));
       }
       if (columnOrder[item] === 'tagsPrinted') {
-        tableFields.push(headerTableFactory('Total etiq. imp.', 'tagsPrinted'));
+        tableFields.push(headerTableFactory('Etiq. impressas', 'tagsPrinted'));
       }
       if (columnOrder[item] === 'totalTags') {
-        tableFields.push(headerTableFactory('Total etiq.', 'totalTags'));
+        tableFields.push(headerTableFactory('Total etiquetas', 'totalTags'));
       }
       if (columnOrder[item] === 'status') {
-        tableFields.push(headerTableFactory('Status', 'status'));
+        tableFields.push(headerTableFactory('Status grupo exp.', 'status'));
       }
       if (columnOrder[item] === 'action') {
         tableFields.push(actionTableFactory());
@@ -391,62 +489,75 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await experimentGroupService
-      .getAll(filter)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          const workSheet = XLSX.utils.json_to_sheet(response);
-          const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Grupos do experimento');
+    await experimentGroupService.getAll(filter).then(({ status, response }) => {
+      if (status === 200) {
+        const workSheet = XLSX.utils.json_to_sheet(response);
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(
+          workBook,
+          workSheet,
+          'Grupos do experimento',
+        );
 
-          // Buffer
-          XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
-            type: 'buffer',
-          });
-          // Binary
-          XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
-            type: 'binary',
-          });
-          // Download
-          XLSX.writeFile(workBook, 'Grupos do experimento.xlsx');
-        }
-      });
+        // Buffer
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
+        });
+        // Binary
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
+        });
+        // Download
+        XLSX.writeFile(workBook, 'Grupos do experimento.xlsx');
+      }
+    });
   };
 
-  function handleTotalPages(): void {
+  // manage total pages
+  async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
     }
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
+    // const skip = currentPage * Number(take);
+    // let parametersFilter;
+    // if (orderType) {
+    //   parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    // } else {
+    //   parametersFilter = `skip=${skip}&take=${take}`;
+    // }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
-    await experimentGroupService
-      .getAll(parametersFilter)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          setExperimentGroup(response);
-        }
-      });
+    // if (filter) {
+    //   parametersFilter = `${parametersFilter}&${filter}`;
+    // }
+    // await experimentGroupService
+    //   .getAll(parametersFilter)
+    //   .then(({ status, response }) => {
+    //     if (status === 200) {
+    //       setExperimentGroup(response);
+    //     }
+    //   });
+
+    await callingApi(filter); // handle pagination globly
   }
 
-  function filterFieldFactory(title: string, name: string) {
+  // Checking defualt values
+  function checkValue(value: any) {
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
+    return parameter;
+  }
+
+  function filterFieldFactory(
+    title: string,
+    name: string,
+    small: boolean = false,
+  ) {
     return (
-      <div className="h-7 w-1/2 ml-2">
+      <div className={small ? 'h-7 w-1/3 ml-2' : 'h-7 w-1/2 ml-2'}>
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -463,7 +574,9 @@ export default function Listagem({
 
   async function handleSubmit(event: any) {
     event.preventDefault();
-    const inputValue: any = (document.getElementById('inputName') as HTMLInputElement)?.value;
+    const inputValue: any = (
+      document.getElementById('inputName') as HTMLInputElement
+    )?.value;
     const { response }: IReturnObject = await experimentGroupService.getAll({
       filterExperimentGroup: inputValue,
       safraId,
@@ -506,7 +619,9 @@ export default function Listagem({
         <form className="flex flex-col">
           <div className="flex flex-col px-4  justify-between">
             <header className="flex flex-col mt-2">
-              <h2 className="mb-2 text-blue-600 text-xl font-medium">Cadastrar grupo</h2>
+              <h2 className="mb-2 text-blue-600 text-xl font-medium">
+                Cadastrar grupo
+              </h2>
             </header>
             <h2 style={{ marginTop: 25, marginBottom: 5 }}>Nome do grupo</h2>
             <Input
@@ -604,54 +719,175 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-8
+                  pb-0
                 "
                 >
-                  {filterFieldFactory('filterExperimentGroup', 'Nome do grupo de experimento')}
-                  {filterFieldFactory('filterQuantityExperiment', 'Qtde. exp.')}
-                  {filterFieldFactory('filterTagsToPrint', 'Total etiq. a imprimir')}
-                  {filterFieldFactory('filterTagsPrinted', 'Total etiq. impressas')}
-                </div>
+                  {filterFieldFactory(
+                    'filterExperimentGroup',
+                    'Nome do grupo de exp.',
+                  )}
+                  {/* {filterFieldFactory(
+                    "filterQuantityExperiment",
+                    "Qtde. exp.",
+                    true
+                  )} */}
+                  {/* {filterFieldFactory(
+                    "filterTagsToPrint",
+                    "Total etiq. a imprimir"
+                  )} */}
+                  {/* {filterFieldFactory(
+                    "filterTagsPrinted",
+                    "Total etiq. impressas"
+                  )} */}
+                  {/* {filterFieldFactory(
+                    "filterTotalTags",
+                    "Total etiquetas",
+                    true
+                  )} */}
+                  {/* {filterFieldFactory("filterStatus", "Status", true)} */}
 
-                <div
-                  className="w-full h-full
-                  flex
-                  justify-center
-                  pb-0
-                  "
-                >
-                  {filterFieldFactory('filterTotalTags', 'Total etiquetas')}
-                  {filterFieldFactory('filterStatus', 'Status')}
-
-                  <div className="h-7 w-1/2 ml-4">
+                  <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Itens por página
+                      Qtde. exp.
                     </label>
-                    <Select
-                      values={[
-                        { id: 10, name: 10 },
-                        { id: 50, name: 50 },
-                        { id: 100, name: 100 },
-                        { id: 200, name: 200 },
-                      ]}
-                      selected={take}
-                      onChange={(e: any) => setTake(e.target.value)}
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterQtdExpFrom"
+                        name="filterQtdExpFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterQtdExpTo"
+                        name="filterQtdExpTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/3 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Etiq. a imprimir
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterTotalEtiqImprimirFrom"
+                        name="filterTotalEtiqImprimirFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterTotalEtiqImprimirTo"
+                        name="filterTotalEtiqImprimirTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/3 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Etiq. impressas
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterTotalEtiqImpressasFrom"
+                        name="filterTotalEtiqImpressasFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterTotalEtiqImpressasTo"
+                        name="filterTotalEtiqImpressasTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/3 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Total etiquetas
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterTotalEtiqFrom"
+                        name="filterTotalEtiqFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterTotalEtiqTo"
+                        name="filterTotalEtiqTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-10 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Status grupo exp.
+                    </label>
+
+                    <AccordionFilter>
+                      <DragDropContext onDragEnd={handleOnDragEnd}>
+                        <Droppable droppableId="characters">
+                          {(provided) => (
+                            <ul
+                              className="w-full h-full characters"
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
+                            >
+                              {statusFilter.map((generate, index) => (
+                                <Draggable
+                                  key={index}
+                                  draggableId={String(generate.title)}
+                                  index={index}
+                                >
+                                  {(providers) => (
+                                    <li
+                                      ref={providers.innerRef}
+                                      {...providers.draggableProps}
+                                      {...providers.dragHandleProps}
+                                    >
+                                      <CheckBox
+                                        name={generate.name}
+                                        title={generate.title?.toString()}
+                                        value={generate.value}
+                                        defaultChecked={false}
+                                      />
+                                    </li>
+                                  )}
+                                </Draggable>
+                              ))}
+                              {provided.placeholder}
+                            </ul>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    </AccordionFilter>
+                  </div>
+
+                  <FieldItemsPerPage selected={take} onChange={setTake} />
+
+                  <div style={{ width: 40 }} />
+                  <div className="h-7 w-32 mt-6">
+                    <Button
+                      onClick={() => {}}
+                      value="Filtrar"
+                      type="submit"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
                     />
                   </div>
                 </div>
-
-                <div style={{ width: 40 }} />
-                <div className="h-7 w-32 mt-6">
-                  <Button
-                    onClick={() => { }}
-                    value="Filtrar"
-                    type="submit"
-                    bgColor="bg-blue-600"
-                    textColor="white"
-                    icon={<BiFilterAlt size={20} />}
-                  />
-                </div>
-
               </form>
             </div>
           </AccordionFilter>
@@ -664,7 +900,7 @@ export default function Listagem({
               columns={columns}
               data={experimentGroup}
               options={{
-                selectionProps: (rowData: any) => (isOpenModal && { disabled: rowData }),
+                selectionProps: (rowData: any) => isOpenModal && { disabled: rowData },
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
@@ -674,7 +910,7 @@ export default function Listagem({
                 filtering: false,
                 pageSize: Number(take),
               }}
-              onChangeRowsPerPage={() => { }}
+              onChangeRowsPerPage={() => {}}
               components={{
                 Toolbar: () => (
                   <div
@@ -826,7 +1062,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -847,42 +1083,139 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page;
+  // const PreferencesControllers = new UserPreferenceController();
+  // const itensPerPage = await (
+  //   await PreferencesControllers.getConfigGerais()
+  // )?.response[0]?.itens_per_page;
 
+  // const pageBeforeEdit = req.cookies.pageBeforeEdit
+  //   ? req.cookies.pageBeforeEdit
+  //   : 0;
+
+  // const { token } = req.cookies;
+  // const { safraId } = req.cookies;
+  // const { cultureId } = req.cookies;
+  // const { publicRuntimeConfig } = getConfig();
+  // const baseUrlExperimentGroup = `${publicRuntimeConfig.apiUrl}/experiment-group`;
+
+  // const filterBeforeEdit = req.cookies.filterBeforeEdit
+  //   ? req.cookies.filterBeforeEdit
+  //   : `safraId=${safraId}&id_culture=${cultureId}`;
+  // //Last page
+  // const lastPageServer = req.cookies.lastPage
+  // ? req.cookies.lastPage
+  // : "No";
+
+  // // if(lastPageServer == undefined || lastPageServer == "No"){
+  // //   removeCookies('filterBeforeEdit', { req, res });
+  // //   removeCookies('pageBeforeEdit', { req, res });
+  // //   removeCookies("filterBeforeEditTypeOrder", { req, res });
+  // //   removeCookies("filterBeforeEditOrderBy", { req, res });
+  // //   removeCookies("lastPage", { req, res });
+  // // }
+
+  // //RR
+  // const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+  // ? req.cookies.filterBeforeEditTypeOrder
+  // : "desc";
+
+  // //RR
+  // const orderByserver = req.cookies.filterBeforeEditOrderBy
+  // ? req.cookies.filterBeforeEditOrderBy
+  // : "name";
+
+  // const filterApplication = req.cookies.filterBeforeEdit || `safraId=${safraId}&id_culture=${cultureId}`;
+
+  // // removeCookies('filterBeforeEdit', { req, res });
+  // // removeCookies('pageBeforeEdit', { req, res });
+
+  // // //RR
+  // // removeCookies("filterBeforeEditTypeOrder", { req, res });
+  // // removeCookies("filterBeforeEditOrderBy", { req, res });
+  // // removeCookies("lastPage", { req, res });
+
+  // const param = `&safraId=${safraId}&id_culture=${cultureId}`;
+
+  // const urlExperimentGroup: any = new URL(baseUrlExperimentGroup);
+  // urlExperimentGroup.search = new URLSearchParams(param).toString();
+  // const requestOptions = {
+  //   method: 'GET',
+  //   credentials: 'include',
+  //   headers: { Authorization: `Bearer ${token}` },
+  // } as RequestInit | undefined;
+
+  // const { response: allExperimentGroup = [], total: totalItems = 0 } = await fetch(
+  //   urlExperimentGroup.toString(),
+  //   requestOptions,
+  // ).then((response) => response.json());
+
+  const PreferencesControllers = new UserPreferenceController();
+  // eslint-disable-next-line max-len
+  const itensPerPage = (await (
+    await PreferencesControllers.getConfigGerais()
+  )?.response[0]?.itens_per_page) ?? 10;
+
+  const { token } = req.cookies;
+  const { cultureId } = req.cookies;
+
+  const idSafra = Number(req.cookies.safraId);
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
+
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
+    : `idSafra=${idSafra}&id_culture=${cultureId}`;
+
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? `${req.cookies.filterBeforeEdit}`
+    : `idSafra=${idSafra}&id_culture=${cultureId}`;
+
+  // Last page
+  const lastPageServer = req.cookies.lastPage
+    ? req.cookies.lastPage
+    : 'No';
+
+  // if(lastPageServer == undefined || lastPageServer == "No"){
+  //   removeCookies('filterBeforeEdit', { req, res });
+  //   removeCookies('pageBeforeEdit', { req, res });
+  //   removeCookies("filterBeforeEditTypeOrder", { req, res });
+  //   removeCookies("filterBeforeEditOrderBy", { req, res });
+  //   removeCookies("lastPage", { req, res });
+  // }
+
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'desc';
+
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
     : '';
-  const { token } = req.cookies;
-  const { safraId } = req.cookies;
+
+  // removeCookies('filterBeforeEdit', { req, res });
+  // removeCookies('pageBeforeEdit', { req, res });
+  // removeCookies("filterBeforeEditTypeOrder", { req, res });
+  // removeCookies("filterBeforeEditOrderBy", { req, res });
+  // removeCookies("lastPage", { req, res });
 
   const { publicRuntimeConfig } = getConfig();
-  const baseUrlExperimentGroup = `${publicRuntimeConfig.apiUrl}/experiment-group`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/experiment`;
 
-  const filterApplication = req.cookies.filterBeforeEdit || `&safraId=${safraId}`;
+  const param = `skip=0&take=${itensPerPage}&idSafra=${idSafra}&id_culture=${cultureId}`;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-
-  const param = `&safraId=${safraId}`;
-
-  const urlExperimentGroup: any = new URL(baseUrlExperimentGroup);
-  urlExperimentGroup.search = new URLSearchParams(param).toString();
+  const urlParameters: any = new URL(baseUrl);
+  urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
+  const {
+    response: allExperimentGroup,
+    total: totalItems,
+  } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
 
-  const { response: allExperimentGroup = [], total: totalItems = 0 } = await fetch(
-    urlExperimentGroup.toString(),
-    requestOptions,
-  ).then((response) => response.json());
+  const safraId = idSafra;
 
   return {
     props: {
@@ -893,6 +1226,9 @@ export const getServerSideProps: GetServerSideProps = async ({
       filterApplication,
       pageBeforeEdit,
       filterBeforeEdit,
+      cultureId,
+      orderByserver,
+      typeOrderServer,
     },
   };
 };

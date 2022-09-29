@@ -39,6 +39,7 @@ import {
   Select,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import { tableGlobalFunctions } from '../../../../helpers';
 
 interface ILayoultProps {
   id: number | any;
@@ -91,6 +92,9 @@ interface Idata {
   local: object | any;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
+  cultureId: number | any;
+  typeOrderServer :any| string,
+  orderByserver : any |string
 }
 
 export default function Listagem({
@@ -101,6 +105,9 @@ export default function Listagem({
   local,
   pageBeforeEdit,
   filterBeforeEdit,
+  cultureId,
+  orderByserver,
+  typeOrderServer,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
@@ -175,13 +182,25 @@ export default function Listagem({
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
-  const [orderBy, setOrderBy] = useState<string>('');
+  // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
+  const [orderBy, setOrderBy] = useState<string>(orderByserver);
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
   const columns = colums(camposGerenciados);
+
+  const filters = [
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
+  ];
+
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -191,7 +210,7 @@ export default function Listagem({
       filterPopTo: '',
       filterParcelFrom: '',
       filterParcelTo: '',
-      filterStatus: '',
+      filterStatus: filterStatusBeforeEdit[13],
       filterCodigo: '',
       filterEsquema: '',
       filterDisparos: '',
@@ -215,27 +234,43 @@ export default function Listagem({
       filterParcelTo,
       filterParcelFrom,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus || 1
-      }&filterEsquema=${filterEsquema}&filterDisparos=${filterDisparos}&filterTiros=${filterTiros}&filterPlantadeira=${filterPlantadeira}&filterParcelas=${filterParcelas}&filterShotsTo=${filterShotsTo}&filterShotsFrom=${filterShotsFrom}&filterPopTo=${filterPopTo}&filterPopFrom=${filterPopFrom}&filterParcelTo=${filterParcelTo}&filterParcelFrom=${filterParcelFrom}`;
-      setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
-      await layoutQuadraService
-        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
-        .then((response) => {
-          setTotaItems(response.total);
-          setFilter(parametersFilter);
-          setQuadra(response.response);
-        });
+      const parametersFilter = `filterStatus=${filterStatus}&filterEsquema=${filterEsquema}&filterDisparos=${filterDisparos}&filterTiros=${filterTiros}&filterPlantadeira=${filterPlantadeira}&filterParcelas=${filterParcelas}&filterShotsTo=${filterShotsTo}&filterShotsFrom=${filterShotsFrom}&filterPopTo=${filterPopTo}&filterPopFrom=${filterPopFrom}&filterParcelTo=${filterParcelTo}&filterParcelFrom=${filterParcelFrom}`;
+      // setFiltersParams(parametersFilter);
+      // setCookies('filterBeforeEdit', filtersParams);
+      // await layoutQuadraService
+      //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+      //   .then((response) => {
+      //     setTotaItems(response.total);
+      //     setFilter(parametersFilter);
+      //     setQuadra(response.response);
+      //   });
+      setFilter(parametersFilter);
+      setCurrentPage(0);
+      await callingApi(parametersFilter);
     },
   });
 
-  const filters = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
-  ];
+  // Calling common API
+  async function callingApi(parametersFilter : any) {
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
+    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    setFiltersParams(parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
-  const filterStatusBeforeEdit = filterBeforeEdit.split('');
+    await layoutQuadraService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200 || response.status === 400) {
+        setQuadra(response.response);
+        setTotaItems(response.total);
+      }
+    });
+  }
+
+  // Call that function when change type order value.
+  useEffect(() => {
+    callingApi(filter);
+  }, [typeOrder]);
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -307,7 +342,11 @@ export default function Listagem({
               textColor="white"
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('lastPage', 'atualizar');
                 router.push(
                   `/config/quadra/layout-quadra/atualizar?id=${rowData.id}`,
                 );
@@ -339,9 +378,13 @@ export default function Listagem({
               textColor="white"
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('lastPage', 'atualizar');
                 router.push(
-                  `/config/layout-quadra/atualizar?id=${rowData.id}`,
+                  `/config/quadra/layout-quadra/atualizar?id=${rowData.id}`,
                 );
               }}
             />
@@ -403,48 +446,58 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+    // let typeOrder: any;
+    // let parametersFilter: any;
+    // if (order === 1) {
+    //   typeOrder = 'asc';
+    // } else if (order === 2) {
+    //   typeOrder = 'desc';
+    // } else {
+    //   typeOrder = '';
+    // }
+    // setOrderBy(column);
+    // setOrderType(typeOrder);
+    // if (filter && typeof filter !== 'undefined') {
+    //   if (typeOrder !== '') {
+    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+    //   } else {
+    //     parametersFilter = filter;
+    //   }
+    // } else if (typeOrder !== '') {
+    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    // } else {
+    //   parametersFilter = filter;
+    // }
 
-    await layoutQuadraService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then((response) => {
-        if (response.status === 200) {
-          setQuadra(response.response);
-        }
-      });
+    // await layoutQuadraService
+    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
+    //   .then((response) => {
+    //     if (response.status === 200) {
+    //       setQuadra(response.response);
+    //     }
+    //   });
 
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
+    // if (orderList === 2) {
+    //   setOrder(0);
+    //   setArrowOrder(<AiOutlineArrowDown />);
+    // } else {
+    //   setOrder(orderList + 1);
+    //   if (orderList === 1) {
+    //     setArrowOrder(<AiOutlineArrowUp />);
+    //   } else {
+    //     setArrowOrder('');
+    //   }
+    // }
+
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
   }
 
   async function getValuesColumns(): Promise<void> {
@@ -571,7 +624,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await layoutQuadraService.getAll(filterApplication).then((response) => {
+    await layoutQuadraService.getAll(filter).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           if (row.status === 0) {
@@ -620,31 +673,38 @@ export default function Listagem({
     });
   };
 
-  function handleTotalPages(): void {
+  // manage total pages
+  async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
     }
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
+    // const skip = currentPage * Number(take);
+    // let parametersFilter;
+    // if (orderType) {
+    //   parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    // } else {
+    //   parametersFilter = `skip=${skip}&take=${take}`;
+    // }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
-    await layoutQuadraService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setQuadra(response.response);
-      }
-    });
+    // if (filter) {
+    //   parametersFilter = `${parametersFilter}&${filter}`;
+    // }
+    // await layoutQuadraService.getAll(parametersFilter).then((response) => {
+    //   if (response.status === 200) {
+    //     setQuadra(response.response);
+    //   }
+    // });
+
+    await callingApi(filter); // handle pagination globly
+  }
+
+  // Checking defualt values
+  function checkValue(value: any) {
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
+    return parameter;
   }
 
   useEffect(() => {
@@ -663,6 +723,7 @@ export default function Listagem({
           placeholder={name}
           max="40"
           id={title}
+          defaultValue={checkValue(title)}
           name={title}
           onChange={formik.handleChange}
         />
@@ -708,7 +769,8 @@ export default function Listagem({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={filterStatusBeforeEdit[13]}
+                      // defaultValue={filterStatusBeforeEdit[13]}
+                      defaultValue={checkValue('filterStatus')}
                       values={filters.map((id) => id)}
                       selected="1"
                     />
@@ -727,6 +789,7 @@ export default function Listagem({
                         placeholder="De"
                         id="filterPopFrom"
                         name="filterPopFrom"
+                        defaultValue={checkValue('filterPopFrom')}
                         onChange={formik.handleChange}
                       />
                       <Input
@@ -734,6 +797,7 @@ export default function Listagem({
                         placeholder="Até"
                         id="filterPopTo"
                         name="filterPopTo"
+                        defaultValue={checkValue('filterPopFrom')}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -974,7 +1038,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -1001,22 +1065,54 @@ export const getServerSideProps: GetServerSideProps = async ({
   )?.response[0]?.itens_per_page) ?? 10;
 
   const { token } = req.cookies;
+  const cultureId: number = Number(req.cookies.cultureId);
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
+
+  // Last page
+  const lastPageServer = req.cookies.lastPage
+    ? req.cookies.lastPage
+    : 'No';
+
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
+  }
+
+  // RR
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'desc';
+
+  // RR
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : 'esquema';
+
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : 'filterStatus=1';
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/layout-quadra`;
   const urlParameters: any = new URL(baseUrl);
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  const filterApplication = 'filterStatus=1';
+  // const filterApplication = `filterStatus=1&id_culture=${cultureId}`;
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? `${req.cookies.filterBeforeEdit}`
+    : 'filterStatus=1';
+
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
     method: 'GET',
@@ -1035,6 +1131,9 @@ export const getServerSideProps: GetServerSideProps = async ({
       filterApplication,
       pageBeforeEdit,
       filterBeforeEdit,
+      cultureId,
+      orderByserver,
+      typeOrderServer,
     },
   };
 };

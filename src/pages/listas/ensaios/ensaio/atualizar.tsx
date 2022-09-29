@@ -4,7 +4,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 import { useFormik } from 'formik';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -36,7 +36,7 @@ import {
   Input,
 } from '../../../../components';
 
-type IAssayListUpdate = Omit<IAssayList, 'id_safra' | 'period' | 'protocol_name'>;
+type IAssayListUpdate = Omit<IAssayList, 'id_safra' | 'period' >;
 
 export default function AtualizarTipoEnsaio({
   allGenotypeTreatment,
@@ -48,7 +48,7 @@ export default function AtualizarTipoEnsaio({
   filterApplication,
   allExperiments,
   totalExperiments,
-}: IGenotypeTreatmentGrid) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -95,6 +95,7 @@ export default function AtualizarTipoEnsaio({
     { name: 'CamposGerenciados[]', title: 'NCA', value: 'nca' },
     { name: 'CamposGerenciados[]', title: 'Cód. lote', value: 'cod_lote' },
     { name: 'CamposGerenciados[]', title: 'OBS', value: 'comments' },
+    { name: 'CamposGerenciados[]', title: 'Status Trat.', value: 'status_experiment' },
   ]);
   const [
     generatesPropsExperiments,
@@ -329,6 +330,9 @@ export default function AtualizarTipoEnsaio({
       }
       if (columnOrder[index] === 'comments') {
         tableFields.push(headerTableFactory('OBS', 'comments'));
+      }
+      if (columnOrder[index] === 'status_experiment') {
+        tableFields.push(headerTableFactory('Status Trat.', 'status_experiment'));
       }
     });
     return tableFields;
@@ -804,10 +808,10 @@ export default function AtualizarTipoEnsaio({
                         <Button
                           title="GENÓTIPOS"
                           value="GENÓTIPOS"
-                          bgColor={table == 'genotipo' ? 'bg-blue-600' : 'bg-gray-600'}
+                          bgColor={table === 'genotipo' ? 'bg-blue-600' : 'bg-gray-600'}
                           textColor="white"
                           onClick={() => setTable('genotipo')}
-                          // icon={<FaSortAmountUpAlt size={20} />}
+                        // icon={<FaSortAmountUpAlt size={20} />}
                         />
                       </div>
                       <div style={{ width: 10 }} />
@@ -815,10 +819,10 @@ export default function AtualizarTipoEnsaio({
                         <Button
                           title="EXPERIMENTOS"
                           value="EXPERIMENTOS"
-                          bgColor={table == 'experimentos' ? 'bg-blue-600' : 'bg-gray-600'}
+                          bgColor={table === 'experimentos' ? 'bg-blue-600' : 'bg-gray-600'}
                           textColor="white"
                           onClick={() => setTable('experimentos')}
-                          // icon={<FaSortAmountUpAlt size={20} />}
+                        // icon={<FaSortAmountUpAlt size={20} />}
                         />
                       </div>
                     </div>

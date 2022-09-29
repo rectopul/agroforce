@@ -24,6 +24,7 @@ export class LayoutChildrenController {
         spc: true,
         scolheita: true,
         tipo_parcela: true,
+        Layout: true,
       };
 
       if (options.id_culture) {
@@ -39,7 +40,6 @@ export class LayoutChildrenController {
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
       const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
-
       const response: object | any = await this.disparoRepository.findAll(
         parameters,
         select,

@@ -41,6 +41,53 @@ export class ExperimentGroupController {
         parameters.id = Number(options.id);
       }
 
+      if (options.filterQtdExpFrom || options.filterQtdExpTo) {
+        if (options.filterQtdExpFrom && options.filterQtdExpTo) {
+          parameters.experimentAmount = JSON.parse(`{"gte": ${Number(options.filterQtdExpFrom)}, "lte": ${Number(options.filterQtdExpTo)} }`);
+        } else if (options.filterQtdExpFrom) {
+          parameters.experimentAmount = JSON.parse(`{"gte": ${Number(options.filterQtdExpFrom)} }`);
+        } else if (options.filterQtdExpTo) {
+          parameters.experimentAmount = JSON.parse(`{"lte": ${Number(options.filterQtdExpTo)} }`);
+        }
+      }
+
+      if (options.filterTotalEtiqImprimirFrom || options.filterTotalEtiqImprimirTo) {
+        if (options.filterTotalEtiqImprimirFrom && options.filterTotalEtiqImprimirTo) {
+          parameters.tagsToPrint = JSON.parse(`{"gte": ${Number(options.filterTotalEtiqImprimirFrom)}, "lte": ${Number(options.filterTotalEtiqImprimirTo)} }`);
+        } else if (options.filterTotalEtiqImprimirFrom) {
+          parameters.tagsToPrint = JSON.parse(`{"gte": ${Number(options.filterTotalEtiqImprimirFrom)} }`);
+        } else if (options.filterTotalEtiqImprimirTo) {
+          parameters.tagsToPrint = JSON.parse(`{"lte": ${Number(options.filterTotalEtiqImprimirTo)} }`);
+        }
+      }
+
+      if (options.filterTotalEtiqImpressasFrom || options.filterTotalEtiqImpressasTo) {
+        if (options.filterTotalEtiqImpressasFrom && options.filterTotalEtiqImpressasTo) {
+          parameters.tagsPrinted = JSON.parse(`{"gte": ${Number(options.filterTotalEtiqImpressasFrom)}, "lte": ${Number(options.filterTotalEtiqImpressasTo)} }`);
+        } else if (options.filterTotalEtiqImpressasFrom) {
+          parameters.tagsPrinted = JSON.parse(`{"gte": ${Number(options.filterTotalEtiqImpressasFrom)} }`);
+        } else if (options.filterTotalEtiqImpressasTo) {
+          parameters.tagsPrinted = JSON.parse(`{"lte": ${Number(options.filterTotalEtiqImpressasTo)} }`);
+        }
+      }
+
+      if (options.filterTotalEtiqFrom || options.filterTotalEtiqTo) {
+        if (options.filterTotalEtiqFrom && options.filterTotalEtiqTo) {
+          parameters.totalTags = JSON.parse(`{"gte": ${Number(options.filterTotalEtiqFrom)}, "lte": ${Number(options.filterTotalEtiqTo)} }`);
+        } else if (options.filterTotalEtiqFrom) {
+          parameters.totalTags = JSON.parse(`{"gte": ${Number(options.filterTotalEtiqFrom)} }`);
+        } else if (options.filterTotalEtiqTo) {
+          parameters.totalTags = JSON.parse(`{"lte": ${Number(options.filterTotalEtiqTo)} }`);
+        }
+      }
+
+      if (options.filterStatus) {
+        parameters.OR = [];
+        const statusParams = options.filterStatus.split(',');
+        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
+        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
+      }
+
       const select = {
         id: true,
         name: true,
@@ -126,7 +173,7 @@ export class ExperimentGroupController {
 
   async delete(id: number) {
     try {
-      const { status, response } = await this.getOne(Number(id));
+      const { status, response }: any = await this.getOne(Number(id));
       response.experiment.forEach(async (item: any) => {
         await this.experimentController.update({ id: item.id, experimentGroupId: null, status: 'SORTEADO' });
       });
@@ -142,7 +189,7 @@ export class ExperimentGroupController {
   }
 
   async countEtiqueta(id: number, idExperiment: any) {
-    const { response } = await this.getOne(id);
+    const { response }: any = await this.getOne(id);
     let totalTags = 0;
     let tagsToPrint = 0;
     let tagsPrinted = 0;

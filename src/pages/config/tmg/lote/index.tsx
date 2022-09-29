@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { removeCookies } from 'cookies-next';
+import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -26,7 +26,7 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
-import { fetchWrapper } from 'src/helpers';
+import { tableGlobalFunctions } from 'src/helpers';
 import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
@@ -45,7 +45,6 @@ interface IFilter {
   filterGmrTo: string | any;
   filterBgmFrom: string | any;
   filterBgmTo: string | any;
-  filterYear: string;
   filterCodLote: string;
   filterNcc: string;
   filterFase: string;
@@ -78,15 +77,25 @@ interface IGenerateProps {
 interface IData {
   allLote: LoteGenotipo[];
   totalItems: number;
-  idSafra: number
+
+  idSafra: number;
+  idCulture : number;
   itensPerPage: number;
+  typeOrderServer :any| string,
+  orderByserver : any |string,
+  filterApplication : any |string,
 }
 
 export default function Listagem({
   allLote,
   totalItems,
   idSafra,
+  idCulture,
   itensPerPage,
+  typeOrderServer,
+  orderByserver,
+  filterApplication,
+
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
@@ -138,13 +147,17 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm' },
     { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
   ]);
-  const [filter, setFilter] = useState<any>();
+  const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
-  const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>('');
+  // const [orderBy, setOrderBy] = useState<string>('');
+  // const [orderType, setOrderType] = useState<string>('');
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
+
+  const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -158,7 +171,6 @@ export default function Listagem({
       filterGmrTo: '',
       filterBgmTo: '',
       filterBgmFrom: '',
-      filterYear: '',
       filterCodLote: '',
       filterNcc: '',
       filterFase: '',
@@ -184,7 +196,6 @@ export default function Listagem({
       filterGmrTo,
       filterBgmTo,
       filterBgmFrom,
-      filterYear,
       filterCodLote,
       filterNcc,
       filterFase,
@@ -197,42 +208,80 @@ export default function Listagem({
       filterTecnologiaCod,
       filterTecnologiaDesc,
     }) => {
-      // Call filter with there parameter
-      const parametersFilter = await fetchWrapper.handleFilterParameter('lote', filterYear, filterCodLote, filterNcc, filterFase, filterPeso, filterSeeds, filterGenotipo, filterMainName, filterGmr, filterBgm, filterTecnologiaCod, filterTecnologiaDesc, filterYearTo, filterYearFrom, filterSeedTo, filterSeedFrom, filterWeightTo, filterWeightFrom, filterGmrFrom, filterGmrTo, filterBgmTo, filterBgmFrom);
-      setFiltersParams(parametersFilter); // Set filter pararameters
+      // // Call filter with there parameter
+      // const parametersFilter = await tableGlobalFunctions.handleFilterParameter('lote', filterYear, filterCodLote, filterNcc, filterFase, filterPeso, filterSeeds, filterGenotipo, filterMainName, filterGmr, filterBgm, filterTecnologiaCod, filterTecnologiaDesc, filterYearTo, filterYearFrom, filterSeedTo, filterSeedFrom, filterWeightTo, filterWeightFrom, filterGmrFrom, filterGmrTo, filterBgmTo, filterBgmFrom);
+      // setFiltersParams(parametersFilter); // Set filter pararameters
 
-      await loteService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
-        setFilter(parametersFilter);
-        setLotes(response.response);
-        setTotalItems(response.total);
-        setCurrentPage(0);
-      });
+      // await loteService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
+      //   setFilter(parametersFilter);
+      //   setLotes(response.response);
+      //   setTotalItems(response.total);
+      //   setCurrentPage(0);
+      // });
+
+      const parametersFilter = `&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterWeightTo=${filterWeightTo}&filterWeightFrom=${filterWeightFrom}&filterSeedTo=${filterSeedTo}&filterSeedFrom=${filterSeedFrom}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterGmrFrom=${filterGmrFrom}&filterGmrTo=${filterGmrTo}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&id_culture=${idCulture}&id_safra=${idSafra}`;
+
+      setFilter(parametersFilter);
+      setCurrentPage(0);
+      await callingApi(parametersFilter);
     },
   });
 
-  async function handleOrder(column: string, order: string | any): Promise<void> {
-    // Manage orders of colunms
-    const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'lote');
+  // Calling common API
+  async function callingApi(parametersFilter : any) {
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
+    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    setFiltersParams(parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
-    const value = await fetchWrapper.skip(currentPage, parametersFilter);
-
-    await loteService.getAll(value).then((response) => {
-      if (response.status === 200) {
+    await loteService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200 || response.status === 400) {
         setLotes(response.response);
-        setFiltersParams(parametersFilter);
+        setTotalItems(response.total);
       }
     });
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
+  }
+
+  // Call that function when change type order value.
+  useEffect(() => {
+    callingApi(filter);
+  }, [typeOrder]);
+
+  async function handleOrder(column: string, order: string | any): Promise<void> {
+    // // Manage orders of colunms
+    // const parametersFilter = await tableGlobalFunctions.handleOrderGlobal(column, order, filter, 'lote');
+
+    // const value = await tableGlobalFunctions.skip(currentPage, parametersFilter);
+
+    // await loteService.getAll(value).then((response) => {
+    //   if (response.status === 200) {
+    //     setLotes(response.response);
+    //     setFiltersParams(parametersFilter);
+    //   }
+    // });
+    // if (orderList === 2) {
+    //   setOrder(0);
+    //   setArrowOrder(<AiOutlineArrowDown />);
+    // } else {
+    //   setOrder(orderList + 1);
+    //   if (orderList === 1) {
+    //     setArrowOrder(<AiOutlineArrowUp />);
+    //   } else {
+    //     setArrowOrder('');
+    //   }
+    // }
+
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
   }
 
   function headerTableFactory(name: any, title: string) {
@@ -365,7 +414,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await loteService.getAll(filtersParams).then(({ status, response }) => {
+    await loteService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((item: any) => {
           const newItem = item;
@@ -395,17 +444,18 @@ export default function Listagem({
           newItem.ID_S2 = item?.id_s2;
           newItem.ID_DADOS = item?.id_dados;
           newItem.ANO = item?.year;
+          newItem.SAFRA = item?.safra.safraName;
           newItem.COD_LOTE = item?.cod_lote;
           newItem.NCC = item?.ncc;
           newItem.FASE = item?.fase;
           newItem.PESO = item?.peso;
           newItem.QUANT_SEMENTES = item?.quant_sementes;
+          newItem.DATA = newItem.DT;
           newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
           newItem.NOME_PRINCIPAL = item?.genotipo.name_main;
           newItem.GMR = item?.genotipo.gmr;
           newItem.BGM = item?.genotipo.bgm;
           newItem.TECNOLOGIA = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
-          newItem.DATA = newItem.DT;
 
           delete newItem.quant_sementes;
           delete newItem.peso;
@@ -419,6 +469,7 @@ export default function Listagem({
           delete newItem.id;
           delete newItem.id_genotipo;
           delete newItem.genotipo;
+          delete newItem.safra;
 
           return newItem;
         });
@@ -512,16 +563,24 @@ export default function Listagem({
   }
 
   async function handlePagination(): Promise<void> {
-    // manage using comman function
-    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filter);
+    // // manage using comman function
+    // const { parametersFilter, currentPages } = await tableGlobalFunctions.handlePaginationGlobal(currentPage, take, filter);
 
-    await loteService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setLotes(response.response);
-        setTotalItems(response.total); // Set new total records
-        setCurrentPage(currentPages); // Set new current page
-      }
-    });
+    // await loteService.getAll(parametersFilter).then((response) => {
+    //   if (response.status === 200) {
+    //     setLotes(response.response);
+    //     setTotalItems(response.total); // Set new total records
+    //     setCurrentPage(currentPages); // Set new current page
+    //   }
+    // });
+
+    await callingApi(filter); // handle pagination globly
+  }
+
+  // Checking defualt values
+  function checkValue(value: any) {
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
+    return parameter;
   }
 
   function filterFieldFactory(title: any, name: any, small: boolean = false) {
@@ -899,9 +958,31 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     await PreferencesControllers.getConfigGerais()
   )?.response[0]?.itens_per_page) ?? 10;
 
+  // Last page
+  const lastPageServer = req.cookies.lastPage
+    ? req.cookies.lastPage
+    : 'No';
+
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
+  }
+  // RR
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'desc';
+
+  // RR
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : 'year';
+
   const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);
-
+  const idCulture = Number(req.cookies.cultureId);
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
@@ -909,8 +990,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const baseUrl = `${publicRuntimeConfig.apiUrl}/lote`;
   const urlParameters: any = new URL(baseUrl);
 
-  const param = `skip=0&take=${itensPerPage}&id_safra=${idSafra}`;
+  const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}`;
   urlParameters.search = new URLSearchParams(param).toString();
+
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? `${req.cookies.filterBeforeEdit}`
+    : `&id_culture=${idCulture}&id_safra=${idSafra}`;
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const requestOptions = {
     method: 'GET',
@@ -926,7 +1014,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
       allLote,
       totalItems,
       idSafra,
+      idCulture,
       itensPerPage,
+      orderByserver,
+      typeOrderServer,
+      filterApplication,
     },
   };
 };

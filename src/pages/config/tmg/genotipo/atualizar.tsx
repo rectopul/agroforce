@@ -99,13 +99,13 @@ interface IData {
 }
 
 export default function Atualizargenotipo({
-      allLote,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      idGenotipo,
-      genotipo,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allLote,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idGenotipo,
+  genotipo,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -408,12 +408,41 @@ export default function Atualizargenotipo({
 
     await loteService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = response.response.map((row: { status: any }) => {
+        const newData = response.response.map((row : any) => {
           if (row.status === 0) {
             row.status = 'Inativo';
           } else {
             row.status = 'Ativo';
           }
+
+          row.ID_S2 = row.id_s2;
+          row.ID_DADOS = row.id_dados;
+          row.SAFRA = row.safra.safraName;
+          row.ANO = row.year;
+          row.COD_LOTE = row.cod_lote;
+          row.NCC = row.ncc;
+          row.FASE = row.fase;
+          row.PESO = row.peso;
+          row.QUANT_SEMENTES = row.quant_sementes;
+          row.GENOTIPO = row.genotipo.name_genotipo;
+          row.STATUS = row.status;
+          row.GMR = row.genotipo.gmr;
+          row.BGM = row.genotipo.bgm;
+          row.TECNOLOGIA = `${row.genotipo.tecnologia.cod_tec} ${row.genotipo.tecnologia.name}`;
+
+          delete row.id_s2;
+          delete row.id_dados;
+          delete row.safra;
+          delete row.year;
+          delete row.cod_lote;
+          delete row.ncc;
+          delete row.fase;
+          delete row.peso;
+          delete row.quant_sementes;
+          delete row.genotipo;
+          delete row.status;
+          delete row.id;
+          delete row.id_genotipo;
 
           return row;
         });

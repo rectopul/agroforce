@@ -20,7 +20,11 @@ import {
 } from 'react-beautiful-dnd';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { BsDownload } from 'react-icons/bs';
-import { RiArrowUpDownLine, RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
+import {
+  RiArrowUpDownLine,
+  RiCloseCircleFill,
+  RiFileExcel2Line,
+} from 'react-icons/ri';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import Modal from 'react-modal';
@@ -42,6 +46,7 @@ import {
   Input,
   ModalConfirmation,
   Select,
+  FieldItemsPerPage,
 } from '../../../components';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
@@ -55,16 +60,15 @@ import { fetchWrapper } from '../../../helpers';
 import { IExperiments } from '../../../interfaces/listas/experimento/experimento.interface';
 
 interface IFilter {
-  filterFoco: string
-  filterProtocol: string
-  filterTypeAssay: string
-  filterGli: string
-  filterExperimentName: string
-  filterTecnologia: string
-  filterCod: string
-  filterPeriod: string
-  filterDelineamento: string
-  filterRepetition: string
+  filterFoco: string;
+  filterTypeAssay: string;
+  filterGli: string;
+  filterExperimentName: string;
+  filterTecnologia: string;
+  filterCod: string;
+  filterPeriod: string;
+  filterDelineamento: string;
+  filterRepetition: string;
   filterRepetitionFrom: string | any;
   filterRepetitionTo: string | any;
   orderBy: object | any;
@@ -89,9 +93,10 @@ export default function Listagem({
   const preferences = userLogado.preferences.experimento || {
     id: 0,
     table_preferences:
-      'id,protocolName,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status,action',
+      'id,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status,action',
   };
 
+  const tableRef = useRef<any>(null);
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
@@ -103,9 +108,8 @@ export default function Listagem({
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [itemsTotal, setTotalItems] = useState<number>(0);
+  const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocolName' },
     { name: 'CamposGerenciados[]', title: 'Foco', value: 'foco' },
     { name: 'CamposGerenciados[]', title: 'Ensaio', value: 'type_assay' },
     { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
@@ -144,7 +148,6 @@ export default function Listagem({
     initialValues: {
       filterFoco: '',
       filterTypeAssay: '',
-      filterProtocol: '',
       filterGli: '',
       filterExperimentName: '',
       filterTecnologia: '',
@@ -160,7 +163,6 @@ export default function Listagem({
     onSubmit: async ({
       filterFoco,
       filterTypeAssay,
-      filterProtocol,
       filterGli,
       filterExperimentName,
       filterTecnologia,
@@ -181,18 +183,36 @@ export default function Listagem({
       const filterStatus = selecionados.substr(0, selecionados.length - 1);
 
       // Call filter with there parameter
-      const parametersFilter = await fetchWrapper.handleFilterParameter('experimento', filterFoco, filterTypeAssay, filterProtocol, filterGli, filterExperimentName, filterTecnologia, filterCod, filterPeriod, filterDelineamento, filterRepetition, filterStatus, idSafra);
+      const parametersFilter = await fetchWrapper.handleFilterParameter(
+        'experimento',
+        filterFoco,
+        filterTypeAssay,
+        filterGli,
+        filterExperimentName,
+        filterTecnologia,
+        filterCod,
+        filterPeriod,
+        filterDelineamento,
+        filterRepetition,
+        filterStatus,
+        idSafra,
+      );
 
       setFiltersParams(parametersFilter);
       setFilter(parametersFilter);
       setCookies('filterBeforeEdit', filter);
 
-      await experimentService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
-        setFilter(parametersFilter);
-        setExperiments(response.response);
-        setTotalItems(response.total);
-        setCurrentPage(0);
-      });
+      await experimentService
+        .getAll(`${parametersFilter}&skip=0&take=${take}`)
+        .then((response) => {
+          setFilter(parametersFilter);
+          setExperiments(response.response);
+          setTotalItems(response.total);
+          setCurrentPage(0);
+          tableRef.current.dataManager.changePageSize(
+            itemsTotal >= take ? take : itemsTotal,
+          );
+        });
     },
   });
 
@@ -255,7 +275,6 @@ export default function Listagem({
 
   function tecnologiaHeaderFactory(name: string, title: string) {
     return {
-
       title: (
         <div className="flex items-center">
           <button
@@ -284,31 +303,32 @@ export default function Listagem({
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((index: any) => {
-      if (columnOrder[index] === 'protocolName') {
-        tableFields.push(headerTableFactory('Protocolo', 'assay_list.protocol_name'));
-      }
       if (columnOrder[index] === 'foco') {
         tableFields.push(headerTableFactory('Foco', 'assay_list.foco.name'));
       }
       if (columnOrder[index] === 'type_assay') {
-        tableFields.push(headerTableFactory('Ensaio', 'assay_list.type_assay.name'));
+        tableFields.push(
+          headerTableFactory('Ensaio', 'assay_list.type_assay.name'),
+        );
       }
       if (columnOrder[index] === 'gli') {
         tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
       }
       if (columnOrder[index] === 'tecnologia') {
-        tableFields.push(
-          tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
-        );
+        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
       }
       if (columnOrder[index] === 'experimentName') {
-        tableFields.push(headerTableFactory('Nome experimento', 'experimentName'));
+        tableFields.push(
+          headerTableFactory('Nome experimento', 'experimentName'),
+        );
       }
       if (columnOrder[index] === 'period') {
         tableFields.push(headerTableFactory('Época', 'period'));
       }
       if (columnOrder[index] === 'delineamento') {
-        tableFields.push(headerTableFactory('Delineamento', 'delineamento.name'));
+        tableFields.push(
+          headerTableFactory('Delineamento', 'delineamento.name'),
+        );
       }
       if (columnOrder[index] === 'repetitionsNumber') {
         tableFields.push(headerTableFactory('Rep.', 'repetitionsNumber'));
@@ -403,7 +423,6 @@ export default function Listagem({
             newItem.Clp = item?.clp;
             newItem.Eel = item?.eel;
             newItem.Observações = item?.comments;
-            newItem.Protocolo = item.assay_list?.protocol_name;
             newItem.CountNT = newItem.countNT;
             newItem.NpeQT = newItem.npeQT;
 
@@ -467,6 +486,7 @@ export default function Listagem({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
+
     await experimentService
       .getAll(parametersFilter)
       .then(({ status, response }: IReturnObject) => {
@@ -494,11 +514,12 @@ export default function Listagem({
   }
 
   async function handleSubmit() {
-    const experimentsSelected = rowsSelected.map((item: IExperiments) => item.id);
+    const experimentsSelected = rowsSelected.map(
+      (item: IExperiments) => item.id,
+    );
     const { status }: IReturnObject = await experimentService.update({
       idList: experimentsSelected,
       experimentGroupId: Number(experimentGroupId),
-      status: 'IMP. N INICI.',
     });
     if (status !== 200) {
       Swal.fire('Erro ao associar experimentos');
@@ -533,7 +554,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar tratamentos genótipos">
+          <AccordionFilter title="Filtrar dados de etiquetagem">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -544,7 +565,8 @@ export default function Listagem({
                                     "
                 onSubmit={formik.handleSubmit}
               >
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                                         flex
                                         justify-center
                                         pb-8
@@ -552,25 +574,49 @@ export default function Listagem({
                 >
                   {filterFieldFactory('filterFoco', 'Foco')}
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
-                  {filterFieldFactory('filterProtocol', 'Protocolo')}
                   {filterFieldFactory('filterGli', 'GLI')}
-                  {filterFieldFactory('filterExperimentName', 'Nome Experimento')}
-                  {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
-
+                  {filterFieldFactory(
+                    'filterExperimentName',
+                    'Nome Experimento',
+                  )}
+                  {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
                 </div>
 
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                                         flex
                                         justify-center
                                         pb-2
                                         "
                 >
-                  {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
+                  {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
                   {filterFieldFactory('filterPeriod', 'Epoca')}
+                  {filterFieldFactory('filterDelineamento', 'Delineamento')}
 
-                  <div className="h-10 w-full ml-4">
+                  <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status do Experimento
+                      Repetição
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterRepetitionFrom"
+                        name="filterRepetitionFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterRepetitionTo"
+                        name="filterRepetitionTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-10 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Status EXP.
                     </label>
                     <AccordionFilter>
                       <DragDropContext onDragEnd={handleOnDragEnd}>
@@ -611,34 +657,13 @@ export default function Listagem({
                     </AccordionFilter>
                   </div>
 
-                  {filterFieldFactory('filterDelineamento', 'Delineamento')}
-
-                  <div className="h-6 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Repetição
-                    </label>
-                    <div className="flex">
-                      <Input
-                        placeholder="De"
-                        id="filterRepetitionFrom"
-                        name="filterRepetitionFrom"
-                        onChange={formik.handleChange}
-                      />
-                      <Input
-                        style={{ marginLeft: 8 }}
-                        placeholder="Até"
-                        id="filterRepetitionTo"
-                        name="filterRepetitionTo"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
+                  <FieldItemsPerPage selected={take} onChange={setTake} />
 
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -646,7 +671,6 @@ export default function Listagem({
                     />
                   </div>
                 </div>
-
               </form>
             </div>
           </AccordionFilter>
@@ -654,6 +678,7 @@ export default function Listagem({
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
+              tableRef={tableRef}
               style={{ background: '#f9fafb' }}
               columns={columns}
               data={experiments}
@@ -670,10 +695,12 @@ export default function Listagem({
               }}
               localization={{
                 body: {
-                  emptyDataSourceMessage: tableMessage ? 'Nenhum experimento encontrado!' : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
+                  emptyDataSourceMessage: tableMessage
+                    ? 'Nenhum experimento encontrado!'
+                    : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
                 },
               }}
-              onChangeRowsPerPage={() => { }}
+              onChangeRowsPerPage={() => {}}
               onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (
@@ -695,7 +722,9 @@ export default function Listagem({
                         title="Salvar grupo de experimento"
                         value="Salvar grupo de experimento"
                         textColor="white"
-                        onClick={() => { setIsOpenModal(true); }}
+                        onClick={() => {
+                          setIsOpenModal(true);
+                        }}
                         bgColor="bg-blue-600"
                         icon={<RiArrowUpDownLine size={20} />}
                       />
@@ -832,7 +861,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                ) as any,
+                  ) as any,
               }}
             />
           </div>
@@ -866,7 +895,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { publicRuntimeConfig } = getConfig();
   const baseUrlExperimento = `${publicRuntimeConfig.apiUrl}/experiment`;
 
-  const filterApplication = req.cookies.filterBeforeEdit || `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const filterApplication = req.cookies.filterBeforeEdit
+    || `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });

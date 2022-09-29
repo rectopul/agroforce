@@ -40,10 +40,7 @@ export class GenotypeTreatmentController {
         parameters.status = JSON.parse(`{ "contains":"${options.filterStatusT}" }`);
       }
       if (options.filterNca) {
-        parameters.nca = JSON.parse(`{ "contains":"${options.filterNca}" }`);
-      }
-      if (options.filterPeriod) {
-        parameters.period = Number(options.filterPeriod);
+        parameters.AND.push(JSON.parse(`{ "lote": {"ncc": "${options.filterNca}" } } `));
       }
       if (options.filterTreatmentsNumber) {
         parameters.treatments_number = Number(options.filterTreatmentsNumber);
@@ -75,13 +72,22 @@ export class GenotypeTreatmentController {
       if (options.filterStatusAssay) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
       }
+      if (options.status_experiment) {
+        parameters.status_experiment = JSON.parse(`{"contains": "${options.status_experiment}" }`);
+      }
       const select = {
         id: true,
         id_lote: true,
         id_genotipo: true,
-        safra: { select: { safraName: true } },
+        safra: {
+          select: {
+            id: true,
+            safraName: true,
+          },
+        },
         genotipo: {
           select: {
+            id: true,
             name_genotipo: true,
             gmr: true,
             bgm: true,
@@ -95,6 +101,7 @@ export class GenotypeTreatmentController {
         },
         treatments_number: true,
         status: true,
+        status_experiment: true,
         lote: {
           select: {
             ncc: true,
@@ -104,9 +111,10 @@ export class GenotypeTreatmentController {
         },
         assay_list: {
           select: {
-            foco: { select: { name: true } },
-            type_assay: { select: { name: true } },
-            tecnologia: { select: { name: true, cod_tec: true } },
+            foco: { select: { id: true, name: true } },
+            experiment: { select: { id: true, experimentName: true } },
+            type_assay: { select: { id: true, name: true } },
+            tecnologia: { select: { id: true, name: true, cod_tec: true } },
             gli: true,
             bgm: true,
             status: true,
@@ -114,6 +122,7 @@ export class GenotypeTreatmentController {
         },
         comments: true,
       };
+
       if (options.id_safra) {
         parameters.id_safra = Number(options.id_safra);
       }
@@ -150,6 +159,7 @@ export class GenotypeTreatmentController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
+
       const response: object | any = await this.genotypeTreatmentRepository.findAll(
         parameters,
         select,

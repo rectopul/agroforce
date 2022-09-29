@@ -20,6 +20,8 @@ import { RiFileExcel2Line, RiOrganizationChart } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { experimentGenotipeService } from 'src/services/experiment-genotipe.service';
+import { ITreatment } from 'src/interfaces/listas/ensaio/genotype-treatment.interface';
 import { experimentService, userPreferencesService } from '../../../../services';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
@@ -28,8 +30,6 @@ import {
   Input, InputMoney,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
-import { experimentGenotipeService } from 'src/services/experiment_genotipe.service';
-import { ITreatment } from 'src/interfaces/listas/ensaio/genotype-treatment.interface';
 
 export interface IData {
   // allItens: any;
@@ -61,21 +61,21 @@ interface IUpdateExperimento {
   density: number
   drawOrder: number
   status: string
-  eel: number
+  eel: any
   nlp: number
-  clp: number
+  clp: any
   comments: string
 }
 
 export default function AtualizarLocal({
-      experimento,
-      allItens,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      idExperiment,
-      pageBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  experimento,
+  allItens,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idExperiment,
+  pageBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -90,7 +90,7 @@ export default function AtualizarLocal({
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.materiais || {
-    id: 0, table_preferences: 'repetitionExperience,genotipo_name,gmr,bgm,fase,tecnologia,treatments_number,status,nca,npe,sequence,block,statusParcial',
+    id: 0, table_preferences: 'repetitionExperience,genotipo,gmr,bgm,fase,tecnologia,nt,rep,status,nca,npe,sequence,block,experiment',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
@@ -139,17 +139,17 @@ export default function AtualizarLocal({
       density: experimento.density,
       drawOrder: experimento.drawOrder,
       status: experimento.status,
-      eel: experimento.eel,
       nlp: experimento.nlp,
-      clp: experimento.clp,
+      eel: parseFloat(experimento.eel)?.toFixed(2),
+      clp: parseFloat(experimento.clp)?.toFixed(2),
       comments: experimento.comments,
     },
     onSubmit: async (values) => {
       await experimentService.update({
         id: Number(values.id),
-        eel: Number(values.eel),
         nlp: Number(values.nlp),
-        clp: Number(values.clp),
+        eel: values.eel,
+        clp: values.clp,
         comments: values.comments,
       }).then((response) => {
         if (response.status === 200) {
@@ -164,12 +164,12 @@ export default function AtualizarLocal({
 
   useEffect(() => {
     getTreatments();
-  }, [])
+  }, []);
 
   async function getTreatments() {
     await experimentGenotipeService.getAll(`&idExperiment=${idExperiment}`).then(({ response, total: allTotal }) => {
       setTreatments(response);
-    })
+    });
   }
 
   async function handleOrder(column: string, order: string | any): Promise<void> {
@@ -215,7 +215,7 @@ export default function AtualizarLocal({
     }
   }
 
-  function headerTableFactory(name: any, title: string) {
+  function headerTableFactory(name: any, title: string, style: boolean = false) {
     return {
       title: (
         <div className="flex items-center">
@@ -230,6 +230,7 @@ export default function AtualizarLocal({
       ),
       field: title,
       sorting: false,
+      cellStyle: style ? { color: '#039be5', fontWeight: 'bold' } : {},
     };
   }
 
@@ -241,7 +242,7 @@ export default function AtualizarLocal({
         tableFields.push(headerTableFactory('Rep. Exp', 'repetitionExperience'));
       }
       if (columnCampos[index] === 'genotipo') {
-        tableFields.push(headerTableFactory('Nome do genotipo', 'genotipo.name_genotipo'));
+        tableFields.push(headerTableFactory('Nome do genotipo', 'genotipo.name_genotipo', true));
       }
       if (columnCampos[index] === 'gmr') {
         tableFields.push(headerTableFactory('GMR', 'genotipo.gmr'));
@@ -265,7 +266,7 @@ export default function AtualizarLocal({
         tableFields.push(headerTableFactory('T', 'status'));
       }
       if (columnCampos[index] === 'nca') {
-        tableFields.push(headerTableFactory('NCA', 'nca'));
+        tableFields.push(headerTableFactory('NCA', 'nca', true));
       }
       if (columnCampos[index] === 'npe') {
         tableFields.push(headerTableFactory('NPE', 'npe'));
@@ -431,9 +432,9 @@ export default function AtualizarLocal({
           {name}
         </label>
         <Input
-          type={type}
           id={title}
           name={title}
+          type={type}
           onChange={formik.handleChange}
           value={values}
         />
@@ -450,7 +451,7 @@ export default function AtualizarLocal({
         <InputMoney
           id={title}
           name={title}
-          onChange={formik.handleChange}
+          onChange={(e) => formik.setFieldValue(title, e)}
           value={values}
         />
       </div>
@@ -538,7 +539,9 @@ export default function AtualizarLocal({
           "
           >
             <div className="w-full h-f10 flex justify-between items-start gap-5">
+
               {updateFieldsFactory('NLP', 'nlp', formik.values.nlp, 'number')}
+
               {updateFieldMoney('EEL', 'eel', formik.values.eel)}
               {updateFieldMoney('CLP', 'clp', formik.values.clp)}
 
@@ -627,7 +630,7 @@ export default function AtualizarLocal({
         "
         >
 
-          {<div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
+          <div style={{ marginTop: '1%' }} className="w-full h-auto overflow-y-scroll">
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
@@ -670,9 +673,11 @@ export default function AtualizarLocal({
                               <Droppable droppableId="characters">
                                 {
                                   (provided) => (
-                                    <ul className="w-full h-full characters"
+                                    <ul
+                                      className="w-full h-full characters"
                                       {...provided.droppableProps}
-                                      ref={provided.innerRef}>
+                                      ref={provided.innerRef}
+                                    >
                                       <div className="h-8 mb-3">
                                         <Button
                                           value="Atualizar"
@@ -718,11 +723,13 @@ export default function AtualizarLocal({
                       </div>
 
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha de materiais"
+                        <Button
+                          title="Exportar planilha de materiais"
                           icon={<RiFileExcel2Line size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
-                          onClick={() => { downloadExcel(); }} />
+                          onClick={() => { downloadExcel(); }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -782,7 +789,7 @@ export default function AtualizarLocal({
                 ) as any,
               }}
             />
-          </div>}
+          </div>
         </main>
       </Content>
     </>

@@ -9,42 +9,54 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
 import {
-  DragDropContext, Draggable, Droppable, DropResult,
+  useEffect, useLayoutEffect, useRef, useState,
+} from 'react';
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
 } from 'react-beautiful-dnd';
 import {
-  AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar,
+  AiOutlineArrowDown,
+  AiOutlineArrowUp,
+  AiTwotoneStar,
 } from 'react-icons/ai';
 import {
   BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line } from 'react-icons/ri';
+import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
+import Modal from 'react-modal';
 import { BsTrashFill } from 'react-icons/bs';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { experimentGenotipeService } from 'src/services/experiment_genotipe.service';
+import { experimentGenotipeService } from 'src/services/experiment-genotipe.service';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import { npeService, userPreferencesService } from '../../../../services';
+import { genotypeTreatmentService, npeService, userPreferencesService } from '../../../../services';
 import { experimentService } from '../../../../services/experiment.service';
 import {
-  AccordionFilter, Button, CheckBox, Content, Input,
+  AccordionFilter,
+  Button,
+  CheckBox,
+  Content,
+  Input,
 } from '../../../../components';
 import LoadingComponent from '../../../../components/Loading';
 import ITabs from '../../../../shared/utils/dropdown';
 
 interface IFilter {
-  filterFoco: string
-  filterTypeAssay: string
-  filterGli: string
-  filterExperimentName: string
-  filterTecnologia: string
-  filterPeriod: string
-  filterDelineamento: string
-  filterRepetition: string
+  filterFoco: string;
+  filterTypeAssay: string;
+  filterGli: string;
+  filterExperimentName: string;
+  filterTecnologia: string;
+  filterPeriod: string;
+  filterDelineamento: string;
+  filterRepetition: string;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -67,7 +79,6 @@ interface INpeProps {
 
 export interface IExperimento {
   id: number;
-  protocol_name: string;
   experiment_name: string;
   year: number;
   rotulo: string;
@@ -91,9 +102,9 @@ interface IData {
   totalItems: number;
   itensPerPage: number;
   filterApplication: object | any;
-  idSafra: number
+  idSafra: number;
   pageBeforeEdit: string | any;
-  filterBeforeEdit: string | any
+  filterBeforeEdit: string | any;
 }
 
 export default function Listagem({
@@ -109,23 +120,27 @@ export default function Listagem({
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.experimento || {
-    id: 0, table_preferences: 'id,protocolName,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber',
+    id: 0, table_preferences: 'id,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,countNT,npeQT',
   };
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(
+    preferences.table_preferences,
+  );
   const router = useRouter();
-
   const [experimentos, setExperimento] = useState<IExperimento[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit || 0));
+  const [experimentosNew, setExperimentoNew] = useState<IExperimento[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(
+    Number(pageBeforeEdit),
+  );
   const [filter, setFilter] = useState<any>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(0);
 
   const [orderList, setOrder] = useState<number>(1);
+  const [lastExperimentNPE, setLastExperimentNPE] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [SortearDisable, setSortearDisable] = useState<boolean>(false);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocolName' },
     { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
     { name: 'CamposGerenciados[]', title: 'Nome do experimento', value: 'experimentName' },
     { name: 'CamposGerenciados[]', title: 'Nome tec.', value: 'tecnologia' },
@@ -136,18 +151,23 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'NPE Inicial', value: 'repetitionsNumber' },
     { name: 'CamposGerenciados[]', title: 'NPE Final', value: 'repetitionsNumber' },
     { name: 'CamposGerenciados[]', title: 'QT. NPE', value: 'npeQT' },
+
   ]);
 
   const [colorStar, setColorStar] = useState<string>('');
   const [NPESelectedRow, setNPESelectedRow] = useState<any>(null);
+  const [npeUsedFrom, setNpeUsedFrom] = useState<number>(0);
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
   const [loading, setLoading] = useState<boolean>(false);
 
   const take: number = itensPerPage;
-  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
+  const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-
-  const selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string);
+  const [selectedNPE, setSelectedNPE] = useState<any[]>(
+    JSON.parse(localStorage.getItem('selectedNPE') as string),
+  );
+  // let selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -175,16 +195,21 @@ export default function Listagem({
       const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}`;
       setFilter(parametersFilter);
       setCookies('filterBeforeEdit', filter);
-      await experimentService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
-        setFilter(parametersFilter);
-        setExperimento(response.response);
-        setTotalItems(response.total);
-        setCurrentPage(0);
-      });
+      await experimentService
+        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+        .then((response) => {
+          setFilter(parametersFilter);
+          setExperimento(response.response);
+          setTotalItems(response.total);
+          setCurrentPage(0);
+        });
     },
   });
 
-  async function handleOrder(column: string, order: string | any): Promise<void> {
+  async function handleOrder(
+    column: string,
+    order: string | any,
+  ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
@@ -195,7 +220,7 @@ export default function Listagem({
       typeOrder = '';
     }
 
-    if (filter && typeof (filter) !== 'undefined') {
+    if (filter && typeof filter !== 'undefined') {
       if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
@@ -207,11 +232,13 @@ export default function Listagem({
       parametersFilter = filter;
     }
 
-    await experimentService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }: any) => {
-      if (status === 200) {
-        setExperimento(response);
-      }
-    });
+    await experimentService
+      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .then(({ status, response }: any) => {
+        if (status === 200) {
+          setExperimento(response);
+        }
+      });
 
     if (orderList === 2) {
       setOrder(0);
@@ -246,48 +273,40 @@ export default function Listagem({
 
   function idHeaderFactory() {
     return {
-      title: (
-        <div className="flex items-center">
-          {arrowOrder}
-        </div>
-      ),
+      title: <div className="flex items-center">{arrowOrder}</div>,
       field: 'id',
       width: 0,
       sorting: false,
-      render: () => (
-        colorStar === '#eba417'
-          ? (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  type="button"
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('')}
-                >
-                  <AiTwotoneStar size={25} color="#eba417" />
-                </button>
-              </div>
-            </div>
-          )
-          : (
-            <div className="h-10 flex">
-              <div>
-                <button
-                  type="button"
-                  className="w-full h-full flex items-center justify-center border-0"
-                  onClick={() => setColorStar('#eba417')}
-                >
-                  <AiTwotoneStar size={25} />
-                </button>
-              </div>
-            </div>
-          )
-      ),
+      render: () => (colorStar === '#eba417' ? (
+        <div className="h-10 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('')}
+            >
+              <AiTwotoneStar size={25} color="#eba417" />
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="h-10 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('#eba417')}
+            >
+              <AiTwotoneStar size={25} />
+            </button>
+          </div>
+        </div>
+      )),
     };
   }
 
   async function deleteItem(id: number) {
-    const { status, message } = await await experimentService.deleted(id);
+    const { status, message } = await experimentService.deleted(id);
     if (status === 200) {
       router.reload();
     } else {
@@ -313,7 +332,9 @@ export default function Listagem({
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
-                router.push(`/listas/experimentos/experimento/atualizar?id=${rowData.id}`);
+                router.push(
+                  `/listas/experimentos/experimento/atualizar?id=${rowData.id}`,
+                );
               }}
               bgColor="bg-blue-600"
               textColor="white"
@@ -340,23 +361,26 @@ export default function Listagem({
       // if (columnCampos[index] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
-      if (columnCampos[index] === 'protocolName') {
-        tableFields.push(headerTableFactory('Protocolo', 'assay_list.protocol_name'));
-      }
       if (columnCampos[index] === 'gli') {
         tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
       }
       if (columnCampos[index] === 'tecnologia') {
-        tableFields.push(headerTableFactory('Cód tec', 'assay_list.tecnologia.name'));
+        tableFields.push(
+          headerTableFactory('Cód tec', 'assay_list.tecnologia.name'),
+        );
       }
       if (columnCampos[index] === 'experimentName') {
-        tableFields.push(headerTableFactory('Nome experimento', 'experimentName'));
+        tableFields.push(
+          headerTableFactory('Nome experimento', 'experimentName'),
+        );
       }
       if (columnCampos[index] === 'period') {
         tableFields.push(headerTableFactory('Época', 'period'));
       }
       if (columnCampos[index] === 'delineamento') {
-        tableFields.push(headerTableFactory('Delineamento', 'delineamento.name'));
+        tableFields.push(
+          headerTableFactory('Delineamento', 'delineamento.name'),
+        );
       }
       if (columnCampos[index] === 'repetitionsNumber') {
         tableFields.push(headerTableFactory('Rep.', 'repetitionsNumber'));
@@ -387,18 +411,20 @@ export default function Listagem({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({
-        table_preferences: campos,
-        userId: userLogado.id,
-        module_id: 22,
-      }).then((response) => {
-        userLogado.preferences.experimento = {
-          id: response.response.id,
-          userId: preferences.userId,
+      await userPreferencesService
+        .create({
           table_preferences: campos,
-        };
-        preferences.id = response.response.id;
-      });
+          userId: userLogado.id,
+          module_id: 22,
+        })
+        .then((response) => {
+          userLogado.preferences.experimento = {
+            id: response.response.id,
+            userId: preferences.userId,
+            table_preferences: campos,
+          };
+          preferences.id = response.response.id;
+        });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
       userLogado.preferences.experimento = {
@@ -440,7 +466,6 @@ export default function Listagem({
           const newItem = item;
           if (item.assay_list) {
             newItem.gli = item.assay_list.gli;
-            newItem.protocol_name = item.assay_list.protocol_name;
             newItem.foco = item.assay_list.foco.name;
             newItem.type_assay = item.assay_list.type_assay.name;
             newItem.tecnologia = item.assay_list.tecnologia.name;
@@ -484,24 +509,29 @@ export default function Listagem({
   }
 
   async function handlePagination(): Promise<void> {
-    console.log({ currentPage });
-
-    if (currentPage > 0) {
+    if (NPESelectedRow) {
       const skip = currentPage * Number(take);
-      let parametersFilter = `skip=${skip}&take=${take}&idSafra=25&idLocal=286`;
+      let parametersFilter = `skip=${skip}&take=${take}&idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}&Status=IMPORTADO`;
 
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
       }
       await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
         if (status === 200) {
-          setExperimento(response);
+          let i = lastExperimentNPE;
+          response.map((item: any) => {
+            item.npei = i;
+            item.npef = i + item.npeQT - 1;
+            i = item.npef + 1;
+          });
+          setLastExperimentNPE(i);
+          setExperimentoNew(response);
         }
       });
     }
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     handlePagination();
     handleTotalPages();
   }, [currentPage]);
@@ -531,7 +561,7 @@ export default function Listagem({
     { title: 'Ensaio', field: 'type_assay.name' },
     { title: 'Tecnologia', field: 'tecnologia.name' },
     { title: 'Epoca', field: 'epoca' },
-    { title: 'NPE Inicial', field: 'npei' },
+    { title: 'NPE Inicial', field: 'prox_npe' },
     { title: 'NPE Final', field: 'npef' },
     { title: 'NPE Quantity', field: 'npeQT' },
   ];
@@ -546,24 +576,41 @@ export default function Listagem({
 
   async function getExperiments(): Promise<void> {
     if (NPESelectedRow) {
-      setLoading(true);
-
+      const skip = currentPage * Number(take);
       let parametersFilter = `idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}&Status=IMPORTADO`;
 
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
       }
+      const temp = [...selectedNPE];
 
+      await experimentService.getAll(parametersFilter).then(({ status, response, total }: any) => {
+        if (status === 200) {
+          let i = 0;
+          response.length > 0 ? i = NPESelectedRow.prox_npe : i = NPESelectedRow.npef;
+          response.map((item: any) => {
+            item.npei = i;
+            item.npef = i + item.npeQT - 1;
+            i = item.npef + 1;
+            i >= NPESelectedRow.nextNPE.npei_i && npeUsedFrom == 0 ? setNpeUsedFrom(NPESelectedRow.nextNPE.npei_i) : '';
+          });
+
+          setExperimento(response);
+          setTotalItems(total);
+          temp.filter((x): any => x == NPESelectedRow)[0].npef = i - 1;
+        }
+      });
+      parametersFilter = `skip=${skip}&take=${take}&${parametersFilter}`;
       await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
         if (status === 200) {
-          let i = NPESelectedRow.npei;
+          let i = NPESelectedRow.prox_npe;
           response.map((item: any) => {
             item.npei = i;
             item.npef = i + item.npeQT - 1;
             i = item.npef + 1;
           });
-          selectedNPE.filter((x: any) => x === NPESelectedRow).npef = i;
-          setExperimento(response);
+          setLastExperimentNPE(i);
+          setExperimentoNew(response);
         }
       });
 
@@ -571,61 +618,98 @@ export default function Listagem({
     }
   }
 
-  async function createExperimentGenotipe({ data, total_consumed }: any) {
-    const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
-    const experimentObj: any[] = [];
-    experimentos.map((item: any) => {
-      const data: any = {};
-      data.id = Number(item.id);
-      data.status = 'SORTEADO';
-      experimentObj.push(data);
-    });
-    if (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE) {
-      await experimentGenotipeService.create(data).then(async ({ status, response }: any) => {
-        if (status === 200) {
-          experimentObj.map(async (x: any) => {
-            await experimentService.update(x).then(({ status, response }: any) => {
-            });
-          });
-
-          await npeService.update({
-            id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
-          }).then(({ status, resposne }: any) => {
-            if (status === 200) {
-              router.push('/operacao/ambiente');
-            }
-          });
-        }
+  async function createExperimentGenotipe({ data, total_consumed, genotipo_treatment }: any) {
+    if (data.length > 0) {
+      const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
+      const experimentObj: any[] = [];
+      experimentos.map((item: any) => {
+        const data: any = {};
+        data.id = Number(item.id);
+        data.status = 'SORTEADO';
+        experimentObj.push(data);
       });
+
+      if (NPESelectedRow?.npeQT == 'N/A' ? true : (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE.npei_i)) {
+        await experimentGenotipeService.create(data).then(async ({ status, response }: any) => {
+          if (status === 200) {
+            genotipo_treatment.map(async (gt: any) => {
+              genotypeTreatmentService.update(gt).then(({ status, message }: any) => {
+              });
+            });
+            experimentObj.map(async (x: any) => {
+              await experimentService.update(x).then(({ status, response }: any) => {
+              });
+            });
+
+            await npeService.update({
+              id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == 'N/A' ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
+            }).then(({ status, resposne }: any) => {
+              if (status === 200) {
+                router.push('/operacao/ambiente');
+              }
+            });
+          }
+        });
+      }
+    } else {
+      Swal.fire('Nenhum experimento para desenhar');
     }
   }
 
   function validateConsumedData() {
-    const experiment_genotipo: any[] = [];
-    let npei = Number(NPESelectedRow?.npei);
-    let total_consumed = 0;
+    if (!SortearDisable) {
+      const experiment_genotipo: any[] = [];
+      const genotipo_treatment: any[] = [];
+      let npei = Number(NPESelectedRow?.npei_i);
+      let total_consumed = 0;
 
-    experimentos?.map((item: any) => {
-      total_consumed += item.npeQT;
-      item.assay_list.genotype_treatment.map((gt: any) => {
-        const data: any = {};
-        data.idSafra = gt.id_safra;
-        data.idFoco = item.assay_list.foco.id;
-        data.idTypeAssay = item.assay_list.type_assay.id;
-        data.idTecnologia = item.assay_list.tecnologia.id;
-        data.gli = item.assay_list.gli;
-        data.idExperiment = item.id;
-        data.rep = item.delineamento.repeticao;
-        data.nt = gt.treatments_number;
-        data.npe = npei;
-        // data.name_genotipo = gt.genotipo.name_genotipo;
-        data.idGenotipo = gt.genotipo.id; // Added new field
-        data.nca = '';
-        experiment_genotipo.push(data);
-        npei++;
+      experimentos?.map((item: any) => {
+        total_consumed += item.npeQT;
+        item.assay_list.genotype_treatment.map((gt: any) => {
+          const data: any = {};
+          const gt_new: any = {};
+          data.idSafra = gt.id_safra;
+          data.idFoco = item.assay_list.foco.id;
+          data.idTypeAssay = item.assay_list.type_assay.id;
+          data.idTecnologia = item.assay_list.tecnologia.id;
+          data.gli = item.assay_list.gli;
+          data.idExperiment = item.id;
+          data.rep = item.delineamento.repeticao;
+          data.nt = gt.treatments_number;
+          data.npe = npei;
+          // data.name_genotipo = gt.genotipo.name_genotipo;
+          data.idGenotipo = gt.genotipo.id; // Added new field
+          data.nca = '';
+          gt_new.id = gt.id;
+          gt_new.status_experiment = 'SORTEADO';
+          experiment_genotipo.push(data);
+          genotipo_treatment.push(gt_new);
+          npei++;
+        });
       });
-    });
-    createExperimentGenotipe({ data: experiment_genotipo, total_consumed });
+      createExperimentGenotipe({ data: experiment_genotipo, total_consumed, genotipo_treatment });
+    } else {
+      const temp = NPESelectedRow;
+      Swal.fire({
+        title: 'NPE Já usado !!!',
+        html:
+          `Existem NPE usados ​​entre <b>${npeUsedFrom}</b> e <b>${temp.npef}</b><br><br>`
+          + `Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : ${temp.nextNPE.foco.name}</b><br><b> Ensaio : ${temp.nextNPE.type_assay.name}</b><br><b> Local : ${temp.nextNPE.local.name_local_culture}</b><br><b>Epoca : ${temp.nextNPE.epoca}</b><br><b>Tecnologia : ${temp.nextNPE.tecnologia.name}</b></p><br>`
+          + `O próximo NPE disponível é <strong>${temp.nextAvailableNPE}</strong></div>`,
+        icon: 'warning',
+        showCloseButton: true,
+        closeButtonHtml:
+          '<span style="background-color:#FF5349; color:#fff; width:35px; height:35px; border-radius:35px; font-size:23px;font-weight:600">x</span>',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Acesse o NPE e atualize',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push({
+            pathname: '/config/npe',
+          });
+        }
+      });
+    }
   }
 
   useEffect(() => {
@@ -634,28 +718,40 @@ export default function Listagem({
 
   useEffect(() => {
     let count = 0;
-    experimentos?.map((item: any) => {
-      item.npei <= NPESelectedRow?.nextNPE && item.npef >= NPESelectedRow?.nextNPE ? count++ : '';
+    experimentos.map((item: any) => {
+      item.npei <= NPESelectedRow?.nextNPE.npei_i
+        && item.npef >= NPESelectedRow?.nextNPE.npei_i
+        && NPESelectedRow?.nextNPE != 0
+        ? count++
+        : '';
     });
     count > 0 ? setSortearDisable(true) : setSortearDisable(false);
   }, [experimentos]);
 
   return (
     <>
-      <Head><title>Listagem de experimentos</title></Head>
+      <Head>
+        <title>Listagem de experimentos</title>
+      </Head>
 
       {loading && <LoadingComponent />}
-
       <Content contentHeader={tabsOperationMenu} moduloActive="operacao">
-        <main className="h-full w-full
+        <main
+          className="h-full w-full
                         flex flex-col
                         items-start
                         gap-0
                         "
         >
-          <div className="w-full">
+          <div
+            className={`w-full ${selectedNPE?.length > 3 && 'max-h-40 overflow-y-scroll'
+            } mb-4`}
+          >
             <MaterialTable
-              style={{ background: '#f9fafb', marginBottom: '15px', paddingBottom: '10px' }}
+              style={{
+                background: '#f9fafb',
+                paddingBottom: selectedNPE?.length > 3 ? 0 : '5px',
+              }}
               columns={columnNPE}
               data={selectedNPE}
               onRowClick={(evt, selectedRow: any) => {
@@ -670,7 +766,11 @@ export default function Listagem({
                 },
                 rowStyle: (rowData) => ({
                   backgroundColor:
-                    NPESelectedRow?.tableData?.id === rowData.tableData.id ? '#d3d3d3' : '#f9fafb',
+                    NPESelectedRow?.tableData?.id === rowData.tableData.id
+                      ? SortearDisable
+                        ? '#FF5349'
+                        : '#d3d3d3'
+                      : '#f9fafb',
                   height: 40,
                 }),
                 search: false,
@@ -692,7 +792,7 @@ export default function Listagem({
                 <MaterialTable
                   style={{ background: '#f9fafb' }}
                   columns={columns}
-                  data={experimentos}
+                  data={experimentosNew}
                   options={{
                     showTitle: false,
                     headerStyle: {
@@ -700,7 +800,7 @@ export default function Listagem({
                     },
                     rowStyle: (rowData) => ({
                       backgroundColor:
-                        rowData.npef >= NPESelectedRow?.nextNPE ? '#FF5349' : '#f9fafb',
+                        (rowData.npef >= NPESelectedRow?.nextNPE.npei_i) && SortearDisable ? '#FF5349' : '#f9fafb',
                       height: 40,
                     }),
                     search: false,
@@ -722,7 +822,6 @@ export default function Listagem({
                                                 border-gray-200
                                             "
                       >
-
                         {/* <div className="h-12">
                       <Button
                         title="Importar Planilha"
@@ -734,9 +833,7 @@ export default function Listagem({
                         icon={<RiFileExcel2Line size={20} />}
                       />
                     </div> */}
-                        <strong className="text-600">
-                          Experimentos
-                        </strong>
+                        <strong className="text-600">Experimentos</strong>
                         <strong className="text-blue-600">
                           Total registrado:
                           {' '}
@@ -746,50 +843,54 @@ export default function Listagem({
                         <div className="h-full flex items-center gap-2">
                           <div className="border-solid border-2 border-blue-600 rounded">
                             <div className="w-72">
-                              <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+                              <AccordionFilter
+                                title="Gerenciar Campos"
+                                grid={statusAccordion}
+                              >
                                 <DragDropContext onDragEnd={handleOnDragEnd}>
                                   <Droppable droppableId="characters">
-                                    {
-                                      (provided) => (
-                                        <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-                                          <div className="h-8 mb-3">
-                                            <Button
-                                              value="Atualizar"
-                                              bgColor="bg-blue-600"
-                                              textColor="white"
-                                              onClick={getValuesColumns}
-                                              icon={<IoReloadSharp size={20} />}
-                                            />
-                                          </div>
-                                          {
-                                            generatesProps.map((generate, index) => (
-                                              <Draggable
-                                                key={index}
-                                                draggableId={String(generate.title)}
-                                                index={index}
+                                    {(provided) => (
+                                      <ul
+                                        className="w-full h-full characters"
+                                        {...provided.droppableProps}
+                                        ref={provided.innerRef}
+                                      >
+                                        <div className="h-8 mb-3">
+                                          <Button
+                                            value="Atualizar"
+                                            bgColor="bg-blue-600"
+                                            textColor="white"
+                                            onClick={getValuesColumns}
+                                            icon={<IoReloadSharp size={20} />}
+                                          />
+                                        </div>
+                                        {generatesProps.map((generate, index) => (
+                                          <Draggable
+                                            key={index}
+                                            draggableId={String(generate.title)}
+                                            index={index}
+                                          >
+                                            {(provider) => (
+                                              <li
+                                                ref={provider.innerRef}
+                                                {...provider.draggableProps}
+                                                {...provider.dragHandleProps}
                                               >
-                                                {(provider) => (
-                                                  <li
-                                                    ref={provider.innerRef}
-                                                    {...provider.draggableProps}
-                                                    {...provider.dragHandleProps}
-                                                  >
-                                                    <CheckBox
-                                                      name={generate.name}
-                                                      title={generate.title?.toString()}
-                                                      value={generate.value}
-                                                      defaultChecked={camposGerenciados
-                                                        .includes(String(generate.value))}
-                                                    />
-                                                  </li>
-                                                )}
-                                              </Draggable>
-                                            ))
-                                          }
-                                          {provided.placeholder}
-                                        </ul>
-                                      )
-                                    }
+                                                <CheckBox
+                                                  name={generate.name}
+                                                  title={generate.title?.toString()}
+                                                  value={generate.value}
+                                                  defaultChecked={camposGerenciados.includes(
+                                                    String(generate.value),
+                                                  )}
+                                                />
+                                              </li>
+                                            )}
+                                          </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                      </ul>
+                                    )}
                                   </Droppable>
                                 </DragDropContext>
                               </AccordionFilter>
@@ -800,9 +901,10 @@ export default function Listagem({
                             <Button
                               title="Sortear"
                               value="Sortear"
-                              bgColor={SortearDisable ? 'bg-gray-400' : 'bg-blue-600'}
+                              bgColor={
+                                SortearDisable ? 'bg-gray-400' : 'bg-blue-600'
+                              }
                               textColor="white"
-                              disabled={SortearDisable}
                               onClick={validateConsumedData}
                             />
                           </div>
@@ -834,18 +936,17 @@ export default function Listagem({
                           icon={<BiLeftArrow size={15} />}
                           disabled={currentPage <= 0}
                         />
-                        {
-                          Array(1).fill('').map((value, index) => (
+                        {Array(1)
+                          .fill('')
+                          .map((value, index) => (
                             <Button
                               key={index}
                               onClick={() => setCurrentPage(index)}
                               value={`${currentPage + 1}`}
                               bgColor="bg-blue-600"
                               textColor="white"
-                              disabled
                             />
-                          ))
-                        }
+                          ))}
                         <Button
                           onClick={() => setCurrentPage(currentPage + 1)}
                           bgColor="bg-blue-600"
@@ -865,22 +966,35 @@ export default function Listagem({
                   }}
                 />
               </div>
-            ) : ''}
+            ) : (
+              ''
+            )}
         </main>
       </Content>
     </>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  res,
+}: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
-  const itensPerPage = await (await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
+  const itensPerPage = (await (
+    await PreferencesControllers.getConfigGerais()
+  )?.response[0]?.itens_per_page) ?? 10;
 
   const idSafra = Number(req.cookies.safraId);
-  const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
-  const filterApplication = req.cookies.filterBeforeEdit ? `${req.cookies.filterBeforeEdit}&idSafra=${idSafra}` : '';
+  const pageBeforeEdit = req.cookies.pageBeforeEdit
+    ? req.cookies.pageBeforeEdit
+    : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : '';
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? `${req.cookies.filterBeforeEdit}&idSafra=${idSafra}`
+    : '';
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });

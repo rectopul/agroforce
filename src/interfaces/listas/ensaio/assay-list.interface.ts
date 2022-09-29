@@ -8,8 +8,6 @@ export interface IAssayList {
   tecnologia: object | any
   experiment: object | any
   gli: string
-  period: number
-  protocol_name: string
   bgm: number
   project: string
   status: string
@@ -57,7 +55,6 @@ export interface IAssayListFilter {
   filterTratFrom: string | any
   filterTratTo: string | any
   filterFoco: string
-  filterProtocol: string
   filterTypeAssay: string
   filterGli: string
   filterTechnology: string

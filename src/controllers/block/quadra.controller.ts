@@ -60,7 +60,9 @@ export class QuadraController {
           local_plantio: true,
           q: true,
           safra: { select: { safraName: true } },
+          allocation: true,
           status: true,
+          AllocatedExperiment: true,
         };
       }
 
@@ -131,14 +133,14 @@ export class QuadraController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-
       if (data) {
         const quadra = await this.quadraRepository.update(data.id, data);
+        const operation = data.status === 1 ? 'Ativação' : 'Inativação';
         if (!quadra) return { status: 400, message: 'Quadra não encontrado' };
-        if (quadra.status === 0) {
+        if (data.status === 0 || data.status === 1) {
+          const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
           await this.reporteRepository.create({
-            madeBy: quadra.created_by, module: 'Quadras-Quadra', operation: 'Inativação', name: quadra.esquema, ip: JSON.stringify(ip), idOperation: quadra.id,
+            madeBy: quadra.created_by, module: 'Quadras-Quadra', operation, name: quadra.esquema, ip: JSON.stringify(ip), idOperation: quadra.id,
           });
         }
         return { status: 200, message: 'Quadra atualizada' };

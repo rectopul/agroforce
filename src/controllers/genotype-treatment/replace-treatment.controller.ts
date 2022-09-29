@@ -1,5 +1,5 @@
 import { GenotypeTreatmentRepository } from '../../repository/genotype-treatment/genotype-treatment.repository';
-import { ExperimentGenotipeRepository } from '../../repository/experiment_genotipe.repository';
+import { ExperimentGenotipeRepository } from '../../repository/experiment-genotipe.repository';
 import { LoteRepository } from '../../repository/lote.repository';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import handleError from '../../shared/utils/handleError';
@@ -11,60 +11,56 @@ export class ReplaceTreatmentController {
   loteRepository = new LoteRepository();
 
   genotypeTreatmentRepository = new GenotypeTreatmentRepository();
+
   experimentGenotipeRepository = new ExperimentGenotipeRepository();
+
   genotipoController = new GenotipoController();
 
   loteController = new LoteController();
 
   async replace({ id, checkedTreatments, value }: any) {
     try {
-       const idList: any = checkedTreatments.map(
+      const idList: any = checkedTreatments.map(
         (row: any) => (row.id ? Number(row.id) : undefined),
       );
-      
+
       const { response: lote }: IReturnObject = await this.loteController.getOne(id);
 
-      const ncc = (lote.ncc).toString(); //Ncc value
-      const lote_id = lote.id; //Lote Id value
-      const geneticName_id = lote.id_genotipo; //Genetic Id value
+      const ncc = (lote.ncc).toString(); // Ncc value
+      const lote_id = lote.id; // Lote Id value
+      const geneticName_id = lote.id_genotipo; // Genetic Id value
       let geneticName;
 
       const { response: genraticName }: IReturnObject = await this.genotipoController.getOne(lote.id_genotipo);
-      geneticName = genraticName.name_genotipo; //Genetic value
+      geneticName = genraticName.name_genotipo; // Genetic value
 
-
-      if (checkedTreatments[0]?.genotipo) {      
-
+      if (checkedTreatments[0]?.genotipo) {
         let response;
-        if(value == 'ensaios'){          
-          response = await this.genotypeTreatment(idList, lote_id, geneticName_id); //third argument for chnage genetic value also
-        }
-        else if(value == 'experiment'){          
-          response = await this.experiment(idList, ncc,lote_id,geneticName_id) //third argument for chnage genetic value also
+        if (value == 'ensaios') {
+          response = await this.genotypeTreatment(idList, lote_id, geneticName_id); // third argument for chnage genetic value also
+        } else if (value == 'experiment') {
+          response = await this.experiment(idList, ncc, lote_id, geneticName_id); // third argument for chnage genetic value also
         }
 
         if (response) {
           return { status: 200, response, message: 'NCA Substituído com sucesso' };
         }
         return { status: 400, response, message: 'Erro ao substituir NCA' };
-
       }
 
       let response;
-      if(value == 'ensaios'){
-       response = await this.genotypeTreatment(idList, lote_id, geneticName_id); //third argument for chnage genetic value also
-      }
-      else if(value == 'experiment'){ 
-        response = await this.experiment(idList, ncc,lote_id,geneticName_id);
+      if (value == 'ensaios') {
+        response = await this.genotypeTreatment(idList, lote_id, geneticName_id); // third argument for chnage genetic value also
+      } else if (value == 'experiment') {
+        response = await this.experiment(idList, ncc, lote_id, geneticName_id);
       }
       if (response) {
         return { status: 200, response, message: 'Genótipo Substituído com sucesso' };
       }
       return { status: 400, response, message: 'Erro ao substituir Genótipo' };
 
-
-      //Old code based on radio button selection
-     /* if (checkedTreatments[0]?.genotipo) {        
+      // Old code based on radio button selection
+      /* if (checkedTreatments[0]?.genotipo) {
         let response;
         if(value == 'ensaios'){
           response = await this.genotypeTreatmentRepository.replaceLote(idList, id);
@@ -86,7 +82,7 @@ export class ReplaceTreatmentController {
         NameOrId = genraticName.name_genotipo;
 
       }
-      
+
       let response;
       if(value == 'ensaios'){
        response = await this.genotypeTreatmentRepository.replaceGenotype(
@@ -95,7 +91,7 @@ export class ReplaceTreatmentController {
         lote.id_genotipo,
       );
       }
-      else if(value == 'experiment'){     
+      else if(value == 'experiment'){
         response = await this.experimentGenotipeRepository.replaceGenotype(
           idList,
           NameOrId,
@@ -104,33 +100,34 @@ export class ReplaceTreatmentController {
       if (response) {
         return { status: 200, response, message: 'Genótipo Substituído com sucesso' };
       }
-      return { status: 400, response, message: 'Erro ao substituir Genótipo' };*/
+      return { status: 400, response, message: 'Erro ao substituir Genótipo' }; */
     } catch (error: any) {
       handleError('Substituição do genótipo do genótipo controller', 'Replace', error.message);
       throw new Error('[Controller] - Substituição do genótipo do genótipo erro');
     }
   }
 
-  async genotypeTreatment (idList:any, lote_id :any, geneticName_id :any){
-   const response = await this.genotypeTreatmentRepository.replaceGenotype(
+  async genotypeTreatment(idList:any, lote_id :any, geneticName_id :any) {
+    const response = await this.genotypeTreatmentRepository.replaceGenotype(
       idList,
       lote_id,
-      geneticName_id
+      geneticName_id,
     );
 
     return response;
   }
-  async experiment( idList:any, ncc :any,lote_id: any, genetic_id :any){
-    
-   const response = await this.experimentGenotipeRepository.replaceLote(
+
+  async experiment(idList:any, ncc :any, lote_id: any, genetic_id :any) {
+    const response = await this.experimentGenotipeRepository.replaceLote(
       idList,
-      ncc,    
+      ncc,
       lote_id,
-      genetic_id
+      genetic_id,
     );
 
     return response;
   }
+
   async getAll(options: any) {
     const parameters: object | any = {};
     let orderBy: object | any;
@@ -185,7 +182,7 @@ export class ReplaceTreatmentController {
         quant_sementes: true,
         genotipo: {
           select: {
-            id:true,
+            id: true,
             name_genotipo: true,
             name_main: true,
             gmr: true,
@@ -202,9 +199,9 @@ export class ReplaceTreatmentController {
       if (options.checkedTreatments) {
         // const checkedParams = options.checkedTreatments.split(',');
         // parameters.OR = checkedParams.map((item: any) => (item ? (JSON.parse(`{ "genotipo": {"name_genotipo":  {"contains": "${item}" }  } }`)) : undefined));
-        parameters.id_genotipo = Number(options.checkedTreatments);
+        const id = options.checkedTreatments.split(',');
+        parameters.id_genotipo = Number(id[0]);
       }
-
       const take = (options.take) ? Number(options.take) : undefined;
 
       const skip = (options.skip) ? Number(options.skip) : undefined;

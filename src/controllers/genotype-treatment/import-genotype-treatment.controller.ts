@@ -9,7 +9,6 @@ import {
   responseGenericFactory,
   responseDoesNotExist,
 } from '../../shared/utils/responseErrorFactory';
-import { AssayListController } from '../assay-list/assay-list.controller';
 import { GenotipoController } from '../genotype/genotipo.controller';
 import { LogImportController } from '../log-import.controller';
 import { LoteController } from '../lote.controller';
@@ -23,7 +22,6 @@ export class ImportGenotypeTreatmentController {
   ): Promise<IReturnObject> {
     const loteController = new LoteController();
     const genotipoController = new GenotipoController();
-    // const assayListController = new AssayListController();
     const logImportController = new LogImportController();
     const genotypeTreatmentController = new GenotypeTreatmentController();
     const historyGenotypeTreatmentController = new HistoryGenotypeTreatmentController();
@@ -45,37 +43,44 @@ export class ImportGenotypeTreatmentController {
           // `<li style="text-align:left"> A ${row}ª linha esta incorreta, o ensaio já foi sorteado </li> <br>`;
           //   }
           // }
-          const treatments: any = await genotypeTreatmentController.getAll({
+          const {
+            status: treatmentsStatus,
+            response: treatments,
+          }: any = await genotypeTreatmentController.getAll({
             gli: spreadSheet[row][4],
             treatments_number: spreadSheet[row][6],
             name_genotipo: spreadSheet[row][8],
             nca: spreadSheet[row][9],
           });
 
-          if (treatments.status === 400) {
+          if (treatmentsStatus === 400) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tratamento de genótipo não encontrado </li> <br>`;
           }
+          if (treatments[0]?.status_experiment === 'SORTEADO') {
+            responseIfError[0]
+              += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tratamento já foi sorteado e não pode ser substituído. </li> <br>`;
+          }
 
-          if (treatments.response[0]?.assay_list.foco.name !== spreadSheet[row][1]) {
+          if (treatments[0]?.assay_list.foco.name !== spreadSheet[row][1]) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o foco e diferente do cadastrado no ensaio. </li> <br>`;
           }
 
-          if (treatments.response[0]?.assay_list.type_assay.name !== spreadSheet[row][2]) {
+          if (treatments[0]?.assay_list.type_assay.name !== spreadSheet[row][2]) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tipo de ensaio e diferente do cadastrado no ensaio. </li> <br>`;
           }
-          if ((typeof (spreadSheet[row][3])) === 'number' && spreadSheet[row][3].toString().length < 2) {
+          if (spreadSheet[row][3].toString().length < 2) {
             // eslint-disable-next-line no-param-reassign
-            spreadSheet[row][3] = `0${spreadSheet[row][3].toString()}`;
+            spreadSheet[row][3] = `0${spreadSheet[row][3]}`;
           }
-          if (treatments.response[0]?.assay_list.tecnologia.cod_tec !== spreadSheet[row][3]) {
+          if (treatments[0]?.assay_list.tecnologia.cod_tec !== spreadSheet[row][3]) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a tecnologia e diferente da cadastrada no ensaio. </li> <br>`;
           }
 
-          if (treatments.response[0]?.assay_list.bgm !== spreadSheet[row][5]) {
+          if (treatments[0]?.assay_list.bgm !== spreadSheet[row][5]) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o bgm e diferente do cadastrado no ensaio. </li> <br>`;
           }

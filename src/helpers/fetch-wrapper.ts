@@ -1,5 +1,10 @@
 import getConfig from 'next/config';
 
+import {
+  AiOutlineArrowDown,
+  AiOutlineArrowUp,
+  AiTwotoneStar,
+} from 'react-icons/ai';
 import { userService } from '../services';
 
 const { publicRuntimeConfig } = getConfig();
@@ -69,7 +74,7 @@ async function put(url: any, body: any) {
 async function deleted(url: any, body: any) {
   const requestOptions: object | any = {
     method: 'DELETE',
-    headers: authHeader(url),
+    headers: { 'Content-Type': 'application/json', ...authHeader(url) },
     body: JSON.stringify(body),
   };
   const response = await fetch(url, requestOptions);
@@ -148,30 +153,6 @@ async function handleFilterParameter(...theArgs: any) {
   const [key] = theArgs;
 
   switch (key) {
-    case 'safra':
-      parametersFilter = await safra(theArgs);
-      break;
-
-    case 'genotipo':
-      parametersFilter = await genotipo(theArgs);
-      break;
-
-    case 'lote':
-      parametersFilter = await lote(theArgs);
-      break;
-
-    case 'setor':
-      parametersFilter = await setor(theArgs);
-      break;
-
-    case 'usuarios':
-      parametersFilter = await usuarios(theArgs);
-      break;
-
-    case 'cultura':
-      parametersFilter = await cultura(theArgs);
-      break;
-
     case 'experimento':
       parametersFilter = await experimento(theArgs);
       break;
@@ -183,56 +164,6 @@ async function handleFilterParameter(...theArgs: any) {
     default:
       parametersFilter = '';
   }
-
-  return parametersFilter;
-}
-
-function safra(theArgs: any) {
-  const [key1, filterStatus,cultureId, filterSafra, filterYear, filterStartDate, filterEndDate] = theArgs;
-  const parametersFilter = `filterStatus=${filterStatus}&filterSafra=${filterSafra}&filterYear=${filterYear}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
-
-  return parametersFilter;
-}
-
-function genotipo(theArgs: any) {
-  const [key2, filterGenotipo, filterMainName, filterCruza, filterTecnologiaCod, filterTecnologiaDesc, filterGmr, idCulture, idSafra, filterGmrRangeTo, filterGmrRangeFrom] = theArgs;
-
-  // const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&id_culture=${idCulture}&id_safra=${idSafra}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&`;
-
-  const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&`;
-
-  return parametersFilter;
-}
-
-function lote(theArgs: any) {
-  const [key3, filterGmrFrom, filterYear1, filterCodLote, filterNcc, filterFase, filterPeso, filterSeeds, filterGenotipo1, filterMainName1, filterGmr1, filterBgm, filterTecnologiaCod1, filterTecnologiaDesc1, filterGmrTo] = theArgs;
-  const parametersFilter = `&filterGmrFrom=${filterGmrFrom}&filterYear=${filterYear1}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo1}&filterMainName=${filterMainName1}&filterGmr=${filterGmr1}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod1}&filterTecnologiaDesc=${filterTecnologiaDesc1}&filterGmrTo=${filterGmrTo}`;
-
-  return parametersFilter;
-}
-
-function setor(theArgs: any) {
-  const [key4,
-    filterStatus2,
-    filterSearch] = theArgs;
-  const parametersFilter = `filterStatus=${filterStatus2 || 1}&filterSearch=${filterSearch}`;
-
-  return parametersFilter;
-}
-
-function usuarios(theArgs: any) {
-  const [key,
-    filterStatus,
-    filterName, filterLogin] = theArgs;
-  const parametersFilter = `filterStatus=${filterStatus || 1
-  }&filterName=${filterName}&filterLogin=${filterLogin}`;
-
-  return parametersFilter;
-}
-
-function cultura(theArgs: any) {
-  const [key, filterStatus, filterSearch] = theArgs;
-  const parametersFilter = `filterStatus=${filterStatus}&filterSearch=${filterSearch}`;
 
   return parametersFilter;
 }
@@ -354,6 +285,49 @@ function getValueParams(ParameterString: any) {
   return c;
 }
 
+// Get value from Url.
+function getValuesForFilter(ParameterString: any, filtersParams :any) {
+  let c;
+  if (filtersParams) {
+    const convert = filtersParams;
+    const url_string = `http://www.example.com/t.html?${convert}`;
+    const url = new URL(url_string);
+    c = url.searchParams.get(ParameterString)?.toString();
+  }
+
+  c = c == undefined ? '' : c;
+
+  return c;
+}
+
+function handleOrderG(columnG:any, orderG :any, orderListG:any) {
+  let typeOrderG: any;
+  let orderByG: any; // RR
+  let arrowOrder : any;
+  if (orderG == 1) {
+    typeOrderG = 'asc';
+  } else if (orderG == 2) {
+    typeOrderG = 'desc';
+  } else {
+    typeOrderG = '';
+  }
+
+  if (orderListG === 2) {
+    orderByG = 0;
+    arrowOrder = AiOutlineArrowDown;
+  } else {
+    orderByG = orderListG + 1;
+    if (orderListG === 1) {
+      arrowOrder = AiOutlineArrowUp;
+    } else {
+      arrowOrder = '';
+    }
+  }
+  return {
+    typeOrderG, columnG, orderByG, arrowOrder,
+  };
+}
+
 // helper functions
 
 export const fetchWrapper = {
@@ -367,4 +341,6 @@ export const fetchWrapper = {
   handleOrderGlobal,
   getValueParams,
   skip,
+  getValuesForFilter,
+  handleOrderG,
 };

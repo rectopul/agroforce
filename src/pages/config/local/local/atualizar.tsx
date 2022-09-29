@@ -283,6 +283,15 @@ export default function AtualizarLocal({
     await unidadeCulturaService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
+          row.SAFRA = row.safra.safraName;
+          row.NOME_LOCAL_CULTURA = row.local.name_local_culture;
+          row.NOME_UNIDADE_CULTURA = row.name_unity_culture;
+          row.ANO = row.year;
+
+          delete row.safra;
+          delete row.name_unity_culture;
+          delete row.year;
+          delete row.id_safra;
           delete row.id;
           delete row.id_unity_culture;
           delete row.id_local;
@@ -307,7 +316,7 @@ export default function AtualizarLocal({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'unidade-cultura.xlsx');
+        XLSX.writeFile(workBook, 'Unidade-Cultura.xlsx');
       }
     });
   };

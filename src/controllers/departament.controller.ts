@@ -3,6 +3,7 @@ import {
 } from 'yup';
 import { DepartamentRepository } from '../repository/departament.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
+import handleError from '../shared/utils/handleError';
 
 interface DepartmentDTO {
   id: number;
@@ -98,7 +99,8 @@ export class DepartamentController {
       }
       return { status: 200, response, total: response.total };
     } catch (err) {
-      return { status: 400, message: err };
+      handleError('Department Controller', 'GetAll', err);
+      throw new Error('[Controller] - GetAll Department erro');
     }
   }
 
@@ -116,7 +118,7 @@ export class DepartamentController {
 
   async postDepartament(data: CreateDepartmentDTO) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const departmentAlreadyExists = await this.departamentRepository.findByName(data.name);
 
@@ -137,7 +139,7 @@ export class DepartamentController {
 
   async updateDepartament(data: UpdateDepartmentDTO) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const departament = await this.departamentRepository.findOne(data.id);
 

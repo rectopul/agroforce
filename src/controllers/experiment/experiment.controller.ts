@@ -6,7 +6,7 @@ import { AssayListController } from '../assay-list/assay-list.controller';
 import { functionsUtils } from '../../shared/utils/functionsUtils';
 import { IReturnObject } from '../../interfaces/shared/Import.interface';
 import { ExperimentGroupController } from '../experiment-group/experiment-group.controller';
-import { ExperimentGenotipeController } from '../experiment_genotipe.controller';
+import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -29,17 +29,15 @@ export class ExperimentController {
           parameters.repetitionsNumber = JSON.parse(`{"lte": ${Number(options.filterRepetitionTo)} }`);
         }
       }
-      if (options.filterStatus) {
-        parameters.OR = [];
-        const statusParams = options.filterStatus.split(',');
-        parameters.OR.push(JSON.parse(` {"status": {"equals": "${statusParams[0]}" } } `));
-        parameters.OR.push(JSON.parse(` {"status": {"equals": "${statusParams[1]}" } } `));
-      }
+      // if (options.filterStatus) {
+      //   parameters.OR = [];
+      //   const statusParams = options.filterStatus.split(',');
+      //   parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
+      //   parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
+      // }
+
       if (options.filterExperimentName) {
         parameters.experimentName = JSON.parse(`{ "contains":"${options.filterExperimentName}" }`);
-      }
-      if (options.filterProtocol) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"protocol_name": {"contains": "${options.filterProtocol}" } } }`));
       }
       if (options.filterCod) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "cod_tec":  {"contains": "${options.filterCod}" } } } }`));
@@ -57,7 +55,7 @@ export class ExperimentController {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"type_assay": {"name": {"contains": "${options.filterTypeAssay}" } } } }`));
       }
       if (options.filterGli) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.filterTypeAssay}" } } }`));
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.filterGli}" } } }`));
       }
       if (options.filterTecnologia) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "name":  {"contains": "${options.filterTecnologia}" } } } }`));
@@ -68,6 +66,7 @@ export class ExperimentController {
       if (options.experimentGroupId) {
         parameters.experimentGroupId = Number(options.experimentGroupId);
       }
+
       const select = {
         id: true,
         idSafra: true,
@@ -77,7 +76,6 @@ export class ExperimentController {
         period: true,
         nlp: true,
         clp: true,
-        eel: true,
         experimentName: true,
         comments: true,
         orderDraw: true,
@@ -86,7 +84,6 @@ export class ExperimentController {
           select: {
             gli: true,
             bgm: true,
-            protocol_name: true,
             status: true,
             genotype_treatment: { include: { genotipo: true } },
             tecnologia: {
@@ -128,10 +125,19 @@ export class ExperimentController {
             id: true,
           },
         },
+        experiment_genotipe: true,
       };
 
       if (options.idSafra) {
         parameters.idSafra = Number(options.idSafra);
+      }
+
+      if (options.id_safra) {
+        parameters.idSafra = Number(options.id_safra);
+      }
+
+      if (options.id) {
+        parameters.id = Number(options.id);
       }
 
       if (options.id_assay_list) {
@@ -139,7 +145,7 @@ export class ExperimentController {
       }
 
       if (options.experimentName) {
-        parameters.experimentName = options.idSafra;
+        parameters.experimentName = options.experimentName;
       }
       if (options.Foco) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"foco": {"id": ${Number(options.Foco)} } } }`));
@@ -153,8 +159,14 @@ export class ExperimentController {
       if (options.Epoca) {
         parameters.period = Number(options.Epoca);
       }
+      if (options.Status) {
+        parameters.status = options.Status;
+      }
       if (options.status) {
-        parameters.AND.push(JSON.parse(` {"status": {"equals": "${options.status}" } } `));
+        parameters.status = options.status;
+      }
+      if (options.gli) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.gli}" } } }`));
       }
 
       const take = (options.take) ? Number(options.take) : undefined;
@@ -165,7 +177,6 @@ export class ExperimentController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
-
       const response: object | any = await this.experimentRepository.findAll(
         parameters,
         select,
@@ -181,7 +192,7 @@ export class ExperimentController {
         newItem.npeQT = item.countNT * item.repetitionsNumber;
         return newItem;
       });
-      if (!response && response.total <= 0) {
+      if (response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhum experimento encontrado',
         };
@@ -198,6 +209,19 @@ export class ExperimentController {
       if (!id) throw new Error('Dados inválidos');
 
       const response = await this.experimentRepository.findOne(id);
+
+      if (!response) return { status: 400, response };
+
+      return { status: 200, response };
+    } catch (error: any) {
+      handleError('Experimento controller', 'GetOne', error.message);
+      throw new Error('[Controller] - GetOne Experimento erro');
+    }
+  }
+
+  async getFromExpName(name: any) {
+    try {
+      const response = await this.experimentRepository.findOneByName(name);
 
       if (!response) throw new Error('Item não encontrado');
 
@@ -223,8 +247,6 @@ export class ExperimentController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
-
       if (data.idList) {
         await this.experimentRepository.relationGroup(data);
         const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
@@ -241,9 +263,6 @@ export class ExperimentController {
         await this.experimentRepository.update(response.id, { status: 'SORTEADO' });
       }
       if (response) {
-        await this.reporteRepository.create({
-          madeBy: response.created_by, module: 'Experimento', operation: 'Inativação', name: response.experimentName, ip: JSON.stringify(ip), idOperation: response.id,
-        });
         return { status: 200, message: 'Experimento atualizado' };
       }
       return { status: 400, message: 'Experimento não atualizado' };
@@ -253,13 +272,13 @@ export class ExperimentController {
     }
   }
 
-  async delete(id: number) {
+  async delete(data: any) {
     try {
-      const { response: experimentExist } = await this.getOne(Number(id));
+      const { response: experimentExist } = await this.getOne(Number(data.id));
 
       if (!experimentExist) return { status: 404, message: 'Experimento não encontrado' };
 
-      const response = await this.experimentRepository.delete(Number(id));
+      const response = await this.experimentRepository.delete(Number(data.id));
       const {
         response: assayList,
       } = await this.assayListController.getOne(Number(experimentExist?.idAssayList));
@@ -300,22 +319,36 @@ export class ExperimentController {
   }
 
   async handleExperimentStatus(id: number) {
-    const { response } : any = await this.getOne(id);
+    const { response }: any = await this.getOne(id);
     const allParcelas = response?.experiment_genotipe?.length;
     let toPrint = 0;
     let printed = 0;
+    let allocated = 0;
     let status = '';
     response.experiment_genotipe?.map((parcelas: any) => {
       if (parcelas.status === 'IMPRESSO') {
         printed += 1;
       } else if (parcelas.status === 'EM ETIQUETAGEM') {
         toPrint += 1;
+      } else if (parcelas.status === 'ALOCADO') {
+        allocated += 1;
       }
     });
     if (toPrint > 1) {
       status = 'ETIQ. EM ANDAMENTO';
-    } else if (printed === allParcelas) {
+    }
+    if (printed === allParcelas) {
       status = 'ETIQ. FINALIZADA';
+    }
+    if (toPrint === allParcelas) {
+      status = 'ETIQ. NÃO INICIADA';
+    }
+
+    if (allocated === allParcelas) {
+      status = 'TOTALMENTE ALOCADO';
+    }
+    if (allocated > 1) {
+      status = 'PARCIALMENTE ALOCADO';
     }
 
     await this.update({ id, status });

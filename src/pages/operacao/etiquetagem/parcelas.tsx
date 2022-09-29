@@ -19,21 +19,13 @@ import {
   DropResult,
 } from 'react-beautiful-dnd';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { BsDownload, BsTrashFill } from 'react-icons/bs';
-import { RiArrowUpDownLine, RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
+import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
-import Swal from 'sweetalert2';
-import readXlsxFile from 'read-excel-file';
 import { HiArrowNarrowRight } from 'react-icons/hi';
-import { AiOutlinePrinter } from 'react-icons/ai';
-import {
-  ITreatment,
-  ITreatmentFilter,
-  ITreatmentGrid,
-} from '../../../interfaces/listas/ensaio/genotype-treatment.interface';
+import { ITreatment } from '../../../interfaces/listas/ensaio/genotype-treatment.interface';
 import { IGenerateProps } from '../../../interfaces/shared/generate-props.interface';
 
 import {
@@ -42,38 +34,36 @@ import {
   CheckBox,
   Content,
   Input,
-  ModalConfirmation,
-  Select,
+  FieldItemsPerPage,
 } from '../../../components';
+import LoadingComponent from '../../../components/Loading';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
   experimentGenotipeService,
   experimentGroupService,
-  importService,
   userPreferencesService,
 } from '../../../services';
 import * as ITabs from '../../../shared/utils/dropdown';
 import { IReturnObject } from '../../../interfaces/shared/Import.interface';
 import { fetchWrapper } from '../../../helpers';
-import { IExperiments } from '../../../interfaces/listas/experimento/experimento.interface';
 
 interface IFilter {
-  filterFoco: string
-  filterTypeAssay: string
-  filterNameTec: string
-  filterCodTec: string
-  filterGli: string
-  filterExperimentName: string
-  filterLocal: string
+  filterFoco: string;
+  filterTypeAssay: string;
+  filterNameTec: string;
+  filterCodTec: string;
+  filterGli: string;
+  filterExperimentName: string;
+  filterLocal: string;
   filterRepetitionFrom: string | any;
   filterRepetitionTo: string | any;
-  filterStatus: string
-  filterNtFrom: string
-  filterNtTo: string
-  filterNpeFrom: string
-  filterNpeTo: string
-  filterGenotypeName: string
-  filterNca: string
+  filterStatus: string;
+  filterNtFrom: string;
+  filterNtTo: string;
+  filterNpeFrom: string;
+  filterNpeTo: string;
+  filterGenotypeName: string;
+  filterNca: string;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -91,15 +81,20 @@ export default function Listagem({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
-  const tabsEtiquetagemMenu = tabsOperation.map((i: any) => (i.titleTab === 'ETIQUETAGEM' ? { ...i, statusTab: true } : i));
+  const router = useRouter();
+
+  const tabsEtiquetagemMenu = tabsOperation.map((i: any) => (i.titleTab === 'ETIQUETAGEM'
+    ? { ...i, statusTab: true }
+    : { ...i, statusTab: false }));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.parcelas || {
     id: 0,
     table_preferences:
-      'id,foco,type_assay,tecnologia,gli,experimentName,local,repetitionsNumber,status,NT,npe,genotypeName,nca,action',
+      'id,foco,type_assay,tecnologia,gli,experiment,local,repetitionsNumber,status,NT,npe,name_genotipo,nca,action',
   };
 
+  const tableRef = useRef<any>(null);
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
@@ -139,7 +134,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Experimento',
+      title: 'Nome experimento',
       value: 'experiment',
       defaultChecked: () => camposGerenciados.includes('experiment'),
     },
@@ -157,7 +152,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Status',
+      title: 'Status da parcela',
       value: 'status',
       defaultChecked: () => camposGerenciados.includes('status'),
     },
@@ -185,17 +180,23 @@ export default function Listagem({
       value: 'nca',
       defaultChecked: () => camposGerenciados.includes('nca'),
     },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Ação',
+      value: 'action',
+      defaultChecked: () => camposGerenciados.includes('action'),
+    },
   ]);
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
     {
       name: 'StatusCheckbox',
-      title: 'IMPORTADO ',
+      title: 'IMPRESSO',
       value: 'importado',
       defaultChecked: () => camposGerenciados.includes('importado'),
     },
     {
       name: 'StatusCheckbox',
-      title: 'SORTEADO',
+      title: 'EM ETIQUETAGEM',
       value: 'sorteado',
       defaultChecked: () => camposGerenciados.includes('sorteado'),
     },
@@ -235,6 +236,8 @@ export default function Listagem({
   const [writeOffId, setWriteOffId] = useState<number>();
   const [writeOffNca, setWriteOffNca] = useState<number>();
   const [rowsSelected, setRowsSelected] = useState([]);
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -312,12 +315,17 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCookies('filterBeforeEdit', filter);
 
-      await experimentGenotipeService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
-        setFilter(parametersFilter);
-        setParcelas(response.response);
-        setTotalItems(response.total);
-        setCurrentPage(0);
-      });
+      await experimentGenotipeService
+        .getAll(`${parametersFilter}&skip=0&take=${take}`)
+        .then((response) => {
+          setFilter(parametersFilter);
+          setParcelas(response.response);
+          setTotalItems(response.total);
+          setCurrentPage(0);
+          tableRef.current.dataManager.changePageSize(
+            itemsTotal >= take ? take : itemsTotal,
+          );
+        });
     },
   });
 
@@ -380,7 +388,6 @@ export default function Listagem({
 
   function tecnologiaHeaderFactory(name: string, title: string) {
     return {
-
       title: (
         <div className="flex items-center">
           <button
@@ -407,15 +414,11 @@ export default function Listagem({
 
   function actionTableFactory() {
     return {
-      title: (
-        <div className="flex items-center">
-          Ação
-        </div>
-      ),
+      title: <div className="flex items-center">Ação</div>,
       field: 'action',
       sorting: false,
       width: 0,
-      render: (rowData: any) => ((rowData.status === 'IMPRESSO') ? (
+      render: (rowData: any) => (rowData.status === 'IMPRESSO' ? (
         <div className="h-7 flex">
           <div className="h-7" />
           <div style={{ width: 5 }} />
@@ -448,45 +451,42 @@ export default function Listagem({
         tableFields.push(headerTableFactory('Foco', 'foco.name'));
       }
       if (columnOrder[index] === 'type_assay') {
-        tableFields.push(
-          headerTableFactory('Ensaio', 'type_assay.name'),
-        );
+        tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
       }
       if (columnOrder[index] === 'tecnologia') {
-        tableFields.push(
-          tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
-        );
+        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
       }
       if (columnOrder[index] === 'gli') {
         tableFields.push(headerTableFactory('GLI', 'gli'));
       }
       if (columnOrder[index] === 'experiment') {
-        tableFields.push(headerTableFactory('Experimento', 'experiment.experimentName'));
+        tableFields.push(
+          headerTableFactory('Nome experimento', 'experiment.experimentName'),
+        );
       }
       if (columnOrder[index] === 'local') {
-        tableFields.push(headerTableFactory('Lugar de plantio', 'experiment.local.name_local_culture'));
+        tableFields.push(
+          headerTableFactory(
+            'Lugar de plantio',
+            'experiment.local.name_local_culture',
+          ),
+        );
       }
       if (columnOrder[index] === 'rep') {
         tableFields.push(headerTableFactory('REP.', 'rep'));
       }
       if (columnOrder[index] === 'status') {
-        tableFields.push(
-          headerTableFactory('Status', 'status'),
-        );
+        tableFields.push(headerTableFactory('Status da parcela', 'status'));
       }
       if (columnOrder[index] === 'nt') {
-        tableFields.push(
-          headerTableFactory('NT.', 'nt'),
-        );
+        tableFields.push(headerTableFactory('NT.', 'nt'));
       }
       if (columnOrder[index] === 'npe') {
-        tableFields.push(
-          headerTableFactory('NPE.', 'npe'),
-        );
+        tableFields.push(headerTableFactory('NPE.', 'npe'));
       }
       if (columnOrder[index] === 'name_genotipo') {
         tableFields.push(
-          headerTableFactory('Nome do genótipo', 'name_genotipo'),
+          headerTableFactory('Nome do genótipo', 'genotipo.name_genotipo'),
         );
       }
       if (columnOrder[index] === 'nca') {
@@ -559,9 +559,28 @@ export default function Listagem({
   const downloadExcel = async (): Promise<void> => {
     await experimentGenotipeService
       .getAll(filter)
-      .then(({ status, response }: IReturnObject) => {
+      .then(({ status, response }) => {
         if (status === 200) {
-          const newData = response.map((item: any) => item);
+          // console.log(response);
+          const newData = response.map((item: any) => {
+            const newItem: any = {};
+
+            newItem.FOCO = item.foco.name;
+            newItem.ENSAIO = item.type_assay.name;
+            newItem.TECNOLOGIA = item.tecnologia.name;
+            newItem.GLI = item.gli;
+            newItem.EXPERIMENTO = item.experiment.experimentName;
+            newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
+            newItem.REP = item.rep;
+            newItem.STATUS = item.status;
+            newItem.NT = item.nt;
+            newItem.NPE = item.npe;
+            newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
+            newItem.NCA = item.nca;
+
+            delete newItem.id;
+            return newItem;
+          });
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(workBook, workSheet, 'Parcelas');
@@ -613,7 +632,7 @@ export default function Listagem({
 
   function filterFieldFactory(title: string, name: string) {
     return (
-      <div className="h-7 w-1/2 ml-2">
+      <div className="h-7 w-full ml-2">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -647,7 +666,9 @@ export default function Listagem({
   }
 
   async function handleSubmit() {
-    const inputCode: any = (document.getElementById('inputCode') as HTMLInputElement)?.value;
+    const inputCode: any = (
+      document.getElementById('inputCode') as HTMLInputElement
+    )?.value;
     let countNca = 0;
     parcelas.map((item: any) => {
       if (item.nca === inputCode) {
@@ -657,7 +678,9 @@ export default function Listagem({
         setNcaOne(item.nca);
       }
     });
-    const { response } = await experimentGroupService.getAll({ id: experimentGroupId });
+    const { response } = await experimentGroupService.getAll({
+      id: experimentGroupId,
+    });
     let colorVerify = '';
     if (countNca > 0) {
       colorVerify = 'bg-green-600';
@@ -677,9 +700,12 @@ export default function Listagem({
   }
 
   async function verifyAgain() {
-    const inputCode: any = (document.getElementById('inputCode') as HTMLInputElement)?.value;
+    const inputCode: any = (
+      document.getElementById('inputCode') as HTMLInputElement
+    )?.value;
     let countNca = 0;
     let secondNca = '';
+
     parcelas.map((item: any) => {
       if (item.nca === inputCode) {
         setGenotypeNameTwo(item.name_genotipo);
@@ -688,8 +714,13 @@ export default function Listagem({
         countNca += 1;
       }
     });
-    const { response } = await experimentGroupService.getAll({ id: experimentGroupId });
+
+    const { response } = await experimentGroupService.getAll({
+      id: experimentGroupId,
+    });
+
     let colorVerify = '';
+
     if (countNca > 0 && secondNca === ncaOne) {
       colorVerify = 'bg-green-600';
       setGroupNameTwo(response[0]?.name);
@@ -699,14 +730,37 @@ export default function Listagem({
       setValidateNcaTwo('bg-red-600');
     }
     setTotalMatch(countNca);
+
     if (colorVerify === 'bg-green-600') {
-      await experimentGenotipeService.update({ idList: parcelasToPrint, status: 'IMPRESSO', userId: userLogado.id });
+      setIsLoading(true);
+
+      await experimentGenotipeService.update({
+        idList: parcelasToPrint,
+        status: 'IMPRESSO',
+        userId: userLogado.id,
+      });
       cleanState();
+
+      const parcelsByNCA = parcelas.filter((i: any) => i.nca === inputCode);
+      const parcels = parcelsByNCA.map((i: any) => ({
+        ...i,
+        envelope: i?.type_assay?.envelope?.filter(
+          (x: any) => x.id_safra === idSafra,
+        )[0]?.seeds,
+      }));
+      if (parcels) {
+        localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
+        router.push('imprimir');
+      }
     }
+
+    setIsLoading(false);
   }
 
   async function writeOff() {
-    const inputCode: any = (document.getElementById('inputCode') as HTMLInputElement)?.value;
+    const inputCode: any = (
+      document.getElementById('inputCode') as HTMLInputElement
+    )?.value;
     if (!doubleVerify) {
       let colorVerify = '';
       if (inputCode === writeOffNca) {
@@ -732,14 +786,20 @@ export default function Listagem({
         setValidateNcaTwo('bg-red-600');
       }
       if (colorVerify === 'bg-green-600') {
-        await experimentGenotipeService.update({ idList: [writeOffId], status: 'EM ETIQUETAGEM', userId: userLogado.id });
+        await experimentGenotipeService.update({
+          idList: [writeOffId],
+          status: 'EM ETIQUETAGEM',
+          userId: userLogado.id,
+        });
         cleanState();
       }
     }
   }
 
   async function validateInput() {
-    const inputCode: any = (document.getElementById('inputCode') as HTMLInputElement)?.value;
+    const inputCode: any = (
+      document.getElementById('inputCode') as HTMLInputElement
+    )?.value;
     if (inputCode.length === 12) {
       if (dismiss) {
         writeOff();
@@ -752,9 +812,28 @@ export default function Listagem({
   }
 
   async function reprint() {
+    setIsLoading(true);
+
     const idList = rowsSelected.map((item: any) => item.id);
-    console.log(`Imprimir ${idList}`);
-    await experimentGenotipeService.update({ idList, status: 'IMPRESSO', userId: userLogado.id });
+
+    await experimentGenotipeService.update({
+      idList,
+      status: 'IMPRESSO',
+      userId: userLogado.id,
+    });
+
+    const parcels = rowsSelected.map((i: any) => ({
+      ...i,
+      envelope: i?.type_assay?.envelope?.filter(
+        (x: any) => x.id_safra == idSafra,
+      )[0]?.seeds,
+    }));
+    if (parcels?.length > 0) {
+      localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
+      router.push('imprimir');
+    }
+
+    setIsLoading(false);
   }
 
   useEffect(() => {
@@ -768,11 +847,17 @@ export default function Listagem({
         <title>Listagem de parcelas</title>
       </Head>
 
+      {isLoading && (
+        <LoadingComponent text="Gerando etiquetas para impressão..." />
+      )}
+
       <Modal
         isOpen={isOpenModal}
         shouldCloseOnOverlayClick={false}
         shouldCloseOnEsc={false}
-        onRequestClose={() => { setIsOpenModal(!isOpenModal); }}
+        onRequestClose={() => {
+          setIsOpenModal(!isOpenModal);
+        }}
         overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
         className="flex
           flex-col
@@ -792,22 +877,30 @@ export default function Listagem({
           shadow-gray-900/50"
       >
         <form className="flex flex-col">
+          <header className="flex flex-col mt-2">
+            <h2 className="mb-2 text-blue-600 text-xl font-medium">
+              {`Total NCA encontrado(s) no grupo: ${totalMatch}`}
+            </h2>
+          </header>
           <button
             type="button"
             className="flex absolute top-4 right-3 justify-end"
             onClick={cleanState}
           >
-            <RiCloseCircleFill size={35} className="fill-red-600 hover:fill-red-800" />
+            <RiCloseCircleFill
+              size={35}
+              className="fill-red-600 hover:fill-red-800"
+            />
           </button>
 
-          <div className="flex px-4  justify-between">
-            <header className="flex flex-col mt-2">
-              <h2 className="mb-2 text-blue-600 text-xl font-medium">Imprimir etiqueta</h2>
-            </header>
+          <div className="w-44">
             <Input
               type="text"
               placeholder="Código de barras (NCA)"
-              disabled={(validateNcaOne === 'bg-red-600' || validateNcaTwo === 'bg-red-600')}
+              disabled={
+                validateNcaOne === 'bg-red-600'
+                || validateNcaTwo === 'bg-red-600'
+              }
               id="inputCode"
               name="inputCode"
               maxLength={12}
@@ -815,33 +908,67 @@ export default function Listagem({
             />
           </div>
 
-          <h1>{`Total nca encontrado no grupo: ${totalMatch}`}</h1>
-          <div className="flex justify-between">
-            <div>
-              <div className={`${validateNcaOne} h-10 w-10 box-border`} />
-              <h1>{ncaOne}</h1>
-              <h1>{genotypeNameOne}</h1>
-              <h1>{groupNameOne}</h1>
+          <div className="flex flex-1 mt-5">
+            <div className="flex flex-1">
+              <div className="bg-blue-600 w-1 h-34 mr-2" />
+              <div>
+                <div className={`${validateNcaOne} h-6 w-20 rounded-xl mb-2`} />
+                <p className="font-bold text-xs">NCA</p>
+                <p className="h-4 font-bold text-xs text-blue-600">{ncaOne}</p>
+                <p className="font-bold text-xs mt-1">Nome do genótipo</p>
+                <p className="h-4 font-bold text-xs text-gray-300">
+                  {genotypeNameOne}
+                </p>
+                <p className="font-bold text-xs mt-1">Nome do grupo de exp.</p>
+                <p className="h-4 font-bold text-xs text-gray-300">
+                  {groupNameOne}
+                </p>
+              </div>
             </div>
-            <div>
-              <div className={`${validateNcaTwo} h-10 w-10 box-border`} />
-              <h1>{ncaTwo}</h1>
-              <h1>{genotypeNameTwo}</h1>
-              <h1>{groupNameTwo}</h1>
+            <div className="flex flex-1">
+              <div className="bg-blue-600 w-1 h-34 mr-2" />
+              <div>
+                <div className={`${validateNcaTwo} h-6 w-20 rounded-xl mb-2`} />
+                <p className="font-bold text-xs">NCA</p>
+                <p className="h-4 font-bold text-xs text-blue-600">{ncaTwo}</p>
+                <p className="font-bold text-xs mt-1">Nome do genótipo</p>
+                <p className="h-4 font-bold text-xs text-gray-300">
+                  {genotypeNameTwo}
+                </p>
+                <p className="font-bold text-xs mt-1">Nome do grupo de exp.</p>
+                <p className="h-4 font-bold text-xs text-gray-300">
+                  {groupNameTwo}
+                </p>
+              </div>
             </div>
           </div>
-          <div className="flex justify-end py-0">
+
+          {/* <div className="flex justify-end py-0">
             <div className="h-10 w-40">
               <Button
                 title="Cancelar"
                 value="Cancelar"
                 textColor="white"
-                disabled={!(validateNcaOne === 'bg-red-600' || validateNcaTwo === 'bg-red-600')}
+                disabled={
+                  !(
+                    validateNcaOne === "bg-red-600" ||
+                    validateNcaTwo === "bg-red-600"
+                  )
+                }
                 onClick={cleanState}
                 bgColor="bg-red-600"
               />
             </div>
-          </div>
+            <div className="h-10 w-40 ml-2">
+              <Button
+                title="Imprimir"
+                value="Imprimir"
+                textColor="white"
+                onClick={() => router.push("imprimir")}
+                bgColor="bg-green-600"
+              />
+            </div>
+          </div> */}
         </form>
       </Modal>
 
@@ -864,7 +991,8 @@ export default function Listagem({
                                     "
                 onSubmit={formik.handleSubmit}
               >
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                                         flex
                                         justify-center
                                         pb-8
@@ -875,61 +1003,21 @@ export default function Listagem({
                   {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
                   {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
                   {filterFieldFactory('filterGli', 'GLI')}
-                  {filterFieldFactory('filterExperimentName', 'Nome Experimento')}
-
+                  {filterFieldFactory(
+                    'filterExperimentName',
+                    'Nome experimento',
+                  )}
+                  {filterFieldFactory('filterLocal', 'Lugar de plantio')}
                 </div>
 
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                                         flex
                                         justify-center
                                         pb-2
                                         "
                 >
-                  {filterFieldFactory('filterLocal', 'Lugar de plantio')}
-
-                  <div className="h-10 w-full ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status do Experimento
-                    </label>
-                    <AccordionFilter>
-                      <DragDropContext onDragEnd={handleOnDragEnd}>
-                        <Droppable droppableId="characters">
-                          {(provided) => (
-                            <ul
-                              className="w-1/2 h-full characters"
-                              {...provided.droppableProps}
-                              ref={provided.innerRef}
-                            >
-                              {statusFilter.map((generate, index) => (
-                                <Draggable
-                                  key={index}
-                                  draggableId={String(generate.title)}
-                                  index={index}
-                                >
-                                  {(providers) => (
-                                    <li
-                                      ref={providers.innerRef}
-                                      {...providers.draggableProps}
-                                      {...providers.dragHandleProps}
-                                    >
-                                      <CheckBox
-                                        name={generate.name}
-                                        title={generate.title?.toString()}
-                                        value={generate.value}
-                                        defaultChecked={false}
-                                      />
-                                    </li>
-                                  )}
-                                </Draggable>
-                              ))}
-                              {provided.placeholder}
-                            </ul>
-                          )}
-                        </Droppable>
-                      </DragDropContext>
-                    </AccordionFilter>
-                  </div>
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-full ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Repetição
                     </label>
@@ -950,9 +1038,9 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  <div className="h-10 w-full ml-4">
+                  <div className="h-10 w-full ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status da Parcela
+                      Status da parcela
                     </label>
                     <AccordionFilter>
                       <DragDropContext onDragEnd={handleOnDragEnd}>
@@ -993,7 +1081,7 @@ export default function Listagem({
                     </AccordionFilter>
                   </div>
 
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-full ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       NT
                     </label>
@@ -1013,7 +1101,7 @@ export default function Listagem({
                       />
                     </div>
                   </div>
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-full ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       NPE
                     </label>
@@ -1035,12 +1123,18 @@ export default function Listagem({
                   </div>
                   {filterFieldFactory('filterGenotypeName', 'Nome do genotipo')}
                   {filterFieldFactory('filterNca', 'NCA')}
-                  <div className="w-full" style={{ marginLeft: -80 }} />
 
+                  <FieldItemsPerPage
+                    widthClass="w-full"
+                    selected={take}
+                    onChange={setTake}
+                  />
+
+                  <div style={{ width: 50 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -1048,7 +1142,6 @@ export default function Listagem({
                     />
                   </div>
                 </div>
-
               </form>
             </div>
           </AccordionFilter>
@@ -1056,11 +1149,16 @@ export default function Listagem({
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
+              tableRef={tableRef}
               style={{ background: '#f9fafb' }}
               columns={columns}
               data={parcelas}
               options={{
+                showSelectAllCheckbox: false,
                 selection: true,
+                selectionProps: (rowData: any) => ({
+                  disabled: rowData.status !== 'IMPRESSO',
+                }),
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
@@ -1070,7 +1168,7 @@ export default function Listagem({
                 filtering: false,
                 pageSize: Number(take),
               }}
-              onChangeRowsPerPage={() => { }}
+              onChangeRowsPerPage={() => {}}
               onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (
@@ -1092,7 +1190,7 @@ export default function Listagem({
                         title="Ação"
                         value="Ação"
                         textColor="white"
-                        onClick={() => ((rowsSelected?.length > 0)
+                        onClick={() => (rowsSelected?.length > 0
                           ? reprint()
                           : setIsOpenModal(true))}
                         bgColor="bg-blue-600"
@@ -1248,7 +1346,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                ) as any,
+                  ) as any,
               }}
             />
           </div>
@@ -1257,6 +1355,7 @@ export default function Listagem({
     </>
   );
 }
+
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
@@ -1279,10 +1378,10 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { id: experimentGroupId } = query;
 
   const { publicRuntimeConfig } = getConfig();
-  const baseUrlParcelas = `${publicRuntimeConfig.apiUrl}/experiment_genotipe`;
+  const baseUrlParcelas = `${publicRuntimeConfig.apiUrl}/experiment-genotipe`;
 
-  const filterApplication = req.cookies.filterBeforeEdit || `&id_culture=${idCulture}&id_safra=${idSafra}`;
-
+  const filterApplication = req.cookies.filterBeforeEdit
+    || `&id_culture=${idCulture}&id_safra=${idSafra}`;
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
@@ -1296,7 +1395,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allParcelas, total: totalItems } = await fetch(
+  const { response: allParcelas = [], total: totalItems = 0 } = await fetch(
     urlParametersParcelas.toString(),
     requestOptions,
   ).then((response) => response.json());

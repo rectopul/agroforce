@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
-import { removeCookies, setCookies } from 'cookies-next';
+
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -9,7 +9,6 @@ import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { setCookie } from 'nookies';
 import { ReactNode, useEffect, useState } from 'react';
 import {
   DragDropContext,
@@ -17,6 +16,7 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
+import { removeCookies, setCookies } from "cookies-next";
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
@@ -30,7 +30,7 @@ import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiPlantLine } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
-import { fetchWrapper } from 'src/helpers';
+import { tableGlobalFunctions } from 'src/helpers';
 import {
   AccordionFilter,
   Button,
@@ -71,16 +71,20 @@ interface IData {
   filterApplication: object | any;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
+  typeOrderServer: any | string, //RR
+  orderByserver: any | string //RR
 }
 
 export default function Listagem({
-  allCultures,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allCultures,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      typeOrderServer, //RR
+      orderByserver //RR
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -134,7 +138,7 @@ export default function Listagem({
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
-  const [orderBy, setOrderBy] = useState<string>('');
+  // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const filtersStatusItem = [
     { id: 2, name: 'Todos' },
@@ -147,31 +151,53 @@ export default function Listagem({
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
+  const [orderBy, setOrderBy] = useState<string>(orderByserver); //RR
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); //RR
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;  //RR
+
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterStatus: '',
-      filterSearch: '',
+      filterStatus: filterStatusBeforeEdit[13],
+      filterSearch: checkValue('filterSearch'),
       orderBy: '',
-      typeOrder: '',
+      typeOrder: ''
     },
     onSubmit: async ({ filterStatus, filterSearch }) => {
-      // Call filter with there parameter
-      const parametersFilter = await fetchWrapper.handleFilterParameter('cultura', filterStatus || 1, filterSearch);
 
-      setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
+      const parametersFilter = `filterStatus=${filterStatus}&filterSearch=${filterSearch}`;
 
-      await cultureService
-        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
-        .then((response) => {
-          setFilter(parametersFilter);
-          setCultures(response.response);
-          setTotalItems(response.total);
-          setCurrentPage(0);
-        });
+      setFilter(parametersFilter);
+      setCurrentPage(0);
+
+      await callingApi(parametersFilter);
     },
   });
+
+  //Calling common API 
+  async function callingApi(parametersFilter: any) {
+
+    setCookies("filterBeforeEdit", parametersFilter);
+    setCookies("filterBeforeEditTypeOrder", typeOrder);
+    setCookies("filterBeforeEditOrderBy", orderBy);
+
+    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    setFiltersParams(parametersFilter);
+    setCookies("filtersParams", parametersFilter);
+
+    await cultureService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200 || response.status === 400) {
+        setCultures(response.response);
+        setTotalItems(response.total);
+      }
+    });
+  }
+
+
+  //Call that function when change type order value.
+  useEffect(() => {
+    callingApi(filter);
+  }, [typeOrder]);
 
   async function handleStatusCulture(
     idCulture: number,
@@ -212,31 +238,39 @@ export default function Listagem({
     column: string,
     order: string | any,
   ): Promise<void> {
-    // Manage orders of colunms
-    const parametersFilter = await fetchWrapper.handleOrderGlobal(column, order, filter, 'safra');
+    // // Manage orders of colunms
+    // const parametersFilter = await tableGlobalFunctions.handleOrderGlobal(column, order, filter, 'safra');
 
-    const value = await fetchWrapper.skip(currentPage, parametersFilter);
+    // const value = await tableGlobalFunctions.skip(currentPage, parametersFilter);
 
-    await cultureService
-      .getAll(value)
-      .then((response) => {
-        if (response.status === 200) {
-          setCultures(response.response);
-          setFiltersParams(parametersFilter);
-        }
-      });
+    // await cultureService
+    //   .getAll(value)
+    //   .then((response) => {
+    //     if (response.status === 200) {
+    //       setCultures(response.response);
+    //       setFiltersParams(parametersFilter);
+    //     }
+    //   });
 
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
+    // if (orderList === 2) {
+    //   setOrder(0);
+    //   setArrowOrder(<AiOutlineArrowDown />);
+    // } else {
+    //   setOrder(orderList + 1);
+    //   if (orderList === 1) {
+    //     setArrowOrder(<AiOutlineArrowUp />);
+    //   } else {
+    //     setArrowOrder('');
+    //   }
+    // }
+
+    //Gobal manage orders
+    const { typeOrderG, columnG, orderByG, arrowOrder } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
   }
 
   function headerTableFactory(name: any, title: string) {
@@ -305,8 +339,12 @@ export default function Listagem({
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
               onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filtersParams);
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filter);
+                setCookies("filterBeforeEditTypeOrder", typeOrder);
+                setCookies("filterBeforeEditOrderBy", orderBy);
+                setCookies("filtersParams", filtersParams);
+                setCookies("lastPage", "atualizar");
                 localStorage.setItem('filterValueEdit', filtersParams);
                 localStorage.setItem('pageBeforeEdit', currentPage?.toString());
                 router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`);
@@ -429,7 +467,7 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     await cultureService
-      .getAll(filtersParams)
+      .getAll(filter)
       .then(({ status, response }) => {
         if (status === 200) {
           const newData = response.map((row: any) => {
@@ -469,40 +507,37 @@ export default function Listagem({
       });
   };
 
-  function handleTotalPages(): void {
+  //manage total pages
+  async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
     }
-
     // else if (currentPage >= pages) {
     //   setCurrentPage(pages - 1);
+    //   console.log("inside....")
     // }
   }
 
   async function handlePagination(): Promise<void> {
-    // manage using comman function
-    const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
+    // // manage using comman function
+    // const { parametersFilter, currentPages } = await tableGlobalFunctions.handlePaginationGlobal(currentPage, take, filtersParams);
 
-    await cultureService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setCultures(response.response);
-        setTotalItems(response.total); // Set new total records
-        setCurrentPage(currentPages); // Set new current page
-        setTimeout(removestate, 3000); // Remove State
-      }
-    });
+    // await cultureService.getAll(parametersFilter).then((response) => {
+    //   if (response.status === 200) {
+    //     setCultures(response.response);
+    //     setTotalItems(response.total); // Set new total records
+    //     setCurrentPage(currentPages); // Set new current page
+    //     setTimeout(removestate, 3000); // Remove State
+    //   }
+    // });
+
+    await callingApi(filter); //handle pagination globly
   }
 
-  // remove states
-  function removestate() {
-    localStorage.removeItem('filterValueEdit');
-    localStorage.removeItem('pageBeforeEdit');
-    setTimeout(() => {}, 5000);
-  }
 
-  // Checkingdefualt values
-  function checkValue(value : any) {
-    const parameter = fetchWrapper.getValueParams(value);
+  // Checking defualt values
+  function checkValue(value: any) {
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
     return parameter;
   }
 
@@ -550,6 +585,7 @@ export default function Listagem({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
+                      // defaultValue={checkValue('filterStatus')}
                       defaultValue={filterStatusBeforeEdit[13]}
                       values={filtersStatusItem.map((id) => id)}
                       selected="1"
@@ -758,7 +794,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>
@@ -786,8 +822,39 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     ? req.cookies.filterBeforeEdit
     : 'filterStatus=1';
 
+  //Last page
+  const lastPageServer = req.cookies.lastPage
+    ? req.cookies.lastPage
+    : "No";
+
+  if(lastPageServer == undefined || lastPageServer == "No"){
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("filtersParams", { req, res });
+    removeCookies("lastPage", { req, res });
+  }
+
+  //RR
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+    ? req.cookies.filterBeforeEditTypeOrder
+    : "desc";
+
+  //RR
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : "name";
+
   removeCookies('pageBeforeEdit', { req, res });
   removeCookies('filterBeforeEdit', { req, res });
+
+  //RR
+  removeCookies("filterBeforeEditTypeOrder", { req, res });
+  removeCookies("filterBeforeEditOrderBy", { req, res });
+  removeCookies("lastPage", { req, res });
+  removeCookies("filtersParams", { req, res });
+
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
@@ -811,6 +878,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
       filterApplication,
       pageBeforeEdit,
       filterBeforeEdit,
+      orderByserver, //RR
+      typeOrderServer,  //RR
     },
   };
 };

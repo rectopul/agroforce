@@ -61,8 +61,8 @@ export class FocoController {
       );
 
       if (response.total > 0) {
-        response.map((item: any) => {
-          item.group.map((group: any) => {
+        response?.map((item: any) => {
+          item.group?.map((group: any) => {
             if (group.id_safra === Number(options.id_safra)) {
               if (group.group.toString().length === 1) {
                 group.group = `0${group.group.toString()}`;
@@ -103,7 +103,7 @@ export class FocoController {
 
   async create(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const focoAlreadyExists = await this.focoRepository.findByName(
         { name: data.name, id_culture: data.id_culture, status: 1 },
@@ -128,7 +128,7 @@ export class FocoController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json());
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       if (data) {
         const foco = await this.focoRepository.update(data.id, data);
