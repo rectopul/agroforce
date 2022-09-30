@@ -595,9 +595,9 @@ export default function Listagem({
     await quadraService.getAll(filter).then(({ status, response }) => {
       // console.log(response);
       if (status === 200) {
-        const experimentArray = [];
-        const object = {};
-        const experimentObject = {
+        const experimentArray: any = [];
+        const object: any = {};
+        const experimentObject: any = {
           id: '',
           safra: '',
           experimentName: '',
@@ -1100,19 +1100,18 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? req.cookies.pageBeforeEdit
     : 0;
 
-
-    // Last page
-    const lastPageServer = req.cookies.lastPage
+  // Last page
+  const lastPageServer = req.cookies.lastPage
     ? req.cookies.lastPage
     : 'No';
 
-    if (lastPageServer == undefined || lastPageServer == 'No') {
+  if (lastPageServer == undefined || lastPageServer == 'No') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
-    }
+  }
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
