@@ -43,7 +43,7 @@ export function SelectMultiple({ data = [], values = [], onChange }) {
   const classInput = "flex flex-1 focus:shadow-0 focus:outline-0";
   const classContainerIcon = "flex w-5";
   const classContainerItems =
-    "flex flex-col overflow-hidden overflow-y-auto relative max-h-24 shadow appearance-none bg-white bg-no-repeat border border-solid border-gray-300 rounded text-gray-900 text-sm leading-tight focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none";
+    "flex flex-col overflow-hidden overflow-y-auto absolute max-h-24 shadow appearance-none bg-white bg-no-repeat border border-solid border-gray-300 rounded text-gray-900 text-sm leading-tight focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none";
   const classButtonItem =
     "flex bg-white align-center pb-2 pt-2 pr-2 pl-2 hover:bg-gray-300 cursor-pointer";
   const classItemText = "ml-1 text-sm";
@@ -52,6 +52,7 @@ export function SelectMultiple({ data = [], values = [], onChange }) {
     <div>
       <button
         className={classContainer}
+        id="classContainer"
         onClick={() => setOpen(!open)}
         onfocusOut={() => setOpen(false)}
       >
@@ -63,7 +64,13 @@ export function SelectMultiple({ data = [], values = [], onChange }) {
         </div>
       </button>
       {open && (
-        <div className={classContainerItems}>
+        <div
+          className={classContainerItems}
+          style={{
+            zIndex: 1,
+            width: document.getElementById("classContainer").clientWidth,
+          }}
+        >
           <button
             className={classButtonItem}
             onClick={() => handleSelectAll(!checkAll)}
