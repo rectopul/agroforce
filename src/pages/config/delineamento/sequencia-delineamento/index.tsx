@@ -907,7 +907,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query}:
   const idDelineamento: number = Number(query.id_delineamento);
 
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/sequencia-delineamento`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/sequencia-delineamento`; 
 
    //Last page
    const lastPageServer = req.cookies.lastPageSquence
@@ -950,7 +950,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query}:
   removeCookies("filterBeforeEditOrderBySquence",{req, res});
   removeCookies("lastPageSquence", {req,res});
 
-  // console.log("Squence  --------------------- ",filterApplication)
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
 
