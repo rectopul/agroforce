@@ -51,7 +51,6 @@ interface IFilter {
   filterCod: string;
   filterPeriod: string;
   filterDelineamento: string;
-  filterRepetition: string;
   filterRepetitionFrom: string | any;
   filterRepetitionTo: string | any;
   orderBy: object | any;
@@ -60,6 +59,7 @@ interface IFilter {
 
 export interface IExperimento {
   id: number;
+  protocol_name: string;
   experiment_name: string;
   year: number;
   rotulo: string;
@@ -84,9 +84,6 @@ interface IData {
   idSafra: number;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
-  typeOrderServer: any | string;
-  orderByserver: any | string;
-  cultureId: number | any;
 }
 
 export default function Listagem({
@@ -97,9 +94,6 @@ export default function Listagem({
   idSafra,
   pageBeforeEdit,
   filterBeforeEdit,
-  typeOrderServer,
-  orderByserver,
-  cultureId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
@@ -115,7 +109,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.experimento || {
     id: 0,
     table_preferences:
-      "id,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status,action",
+      "id,protocolName,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status,action",
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences
@@ -134,6 +128,7 @@ export default function Listagem({
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
+    { name: "CamposGerenciados[]", title: "Protocolo", value: "protocolName" },
     { name: "CamposGerenciados[]", title: "Foco", value: "foco" },
     { name: "CamposGerenciados[]", title: "Ensaio", value: "type_assay" },
     { name: "CamposGerenciados[]", title: "GLI", value: "gli" },
@@ -154,7 +149,7 @@ export default function Listagem({
     { name: "CamposGerenciados[]", title: "Ações", value: "action" },
   ]);
 
-  // const [orderBy, setOrderBy] = useState<string>('');
+  const [orderBy, setOrderBy] = useState<string>("");
   const [orderType, setOrderType] = useState<string>("");
   const [colorStar, setColorStar] = useState<string>("");
   const [order, setOrderParams] = useState<string>("");
@@ -162,12 +157,6 @@ export default function Listagem({
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-  const [orderBy, setOrderBy] = useState<string>(orderByserver);
-  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == "tecnologia" ? "assay_list.tecnologia.cod_tec" : orderBy
-  }&typeOrder=${typeOrder}`;
-
   const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
 
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
@@ -201,6 +190,18 @@ export default function Listagem({
       value: "ETIQ. FINALIZADA",
       defaultChecked: () => camposGerenciados.includes("ETIQ. FINALIZADA"),
     },
+    {
+      name: "StatusCheckbox",
+      title: "PARCIALMENTE ALOCADO",
+      value: "PARCIALMENTE ALOCADO",
+      defaultChecked: () => camposGerenciados.includes("PARCIALMENTE ALOCADO"),
+    },
+    {
+      name: "StatusCheckbox",
+      title: "TOTALMENTE ALOCADO",
+      value: "TOTALMENTE ALOCADO",
+      defaultChecked: () => camposGerenciados.includes("TOTALMENTE ALOCADO"),
+    },
   ]);
   const [statusFilterSelected, setStatusFilterSelected] = useState<any>([]);
 
@@ -229,7 +230,6 @@ export default function Listagem({
       filterCod,
       filterPeriod,
       filterDelineamento,
-      filterRepetition,
       filterRepetitionTo,
       filterRepetitionFrom,
     }) => {
@@ -279,9 +279,18 @@ export default function Listagem({
 
       const parametersFilter = `filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterCod=${filterCod}&filterStatus=${filterStatus}&id_culture=${cultureId}`;
 
+      setFiltersParams(parametersFilter);
       setFilter(parametersFilter);
-      setCurrentPage(0);
-      await callingApi(parametersFilter);
+      setCookies("filterBeforeEdit", filter);
+
+      await experimentService
+        .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
+        .then((response) => {
+          setFilter(parametersFilter);
+          setExperimento(response.response);
+          setTotalItems(response.total);
+          setCurrentPage(0);
+        });
     },
   });
 
@@ -314,45 +323,36 @@ export default function Listagem({
     column: string,
     order: string | any
   ): Promise<void> {
-    // // Manage orders of colunms
-    // const parametersFilter = await fetchWrapper.handleOrderGlobal(
-    //   column,
-    //   order,
-    //   filter,
-    //   'experimento',
-    // );
+    // Manage orders of colunms
+    const parametersFilter = await fetchWrapper.handleOrderGlobal(
+      column,
+      order,
+      filter,
+      "experimento"
+    );
 
-    // setOrderParams(parametersFilter);
+    setOrderParams(parametersFilter);
 
-    // const value = await fetchWrapper.skip(currentPage, parametersFilter);
+    const value = await fetchWrapper.skip(currentPage, parametersFilter);
 
-    // await experimentService.getAll(value).then(({ status, response }: any) => {
-    //   if (status === 200) {
-    //     setExperimento(response);
-    //     setFiltersParams(parametersFilter);
-    //   }
-    // });
+    await experimentService.getAll(value).then(({ status, response }: any) => {
+      if (status === 200) {
+        setExperimento(response);
+        setFiltersParams(parametersFilter);
+      }
+    });
 
-    // if (orderList === 2) {
-    //   setOrder(0);
-    //   setArrowOrder(<AiOutlineArrowDown />);
-    // } else {
-    //   setOrder(orderList + 1);
-    //   if (orderList === 1) {
-    //     setArrowOrder(<AiOutlineArrowUp />);
-    //   } else {
-    //     setArrowOrder('');
-    //   }
-    // }
-
-    // Gobal manage orders
-    const { typeOrderG, columnG, orderByG, arrowOrder } =
-      await tableGlobalFunctions.handleOrderG(column, order, orderList);
-
-    setTypeOrder(typeOrderG);
-    setOrderBy(columnG);
-    setOrder(orderByG);
-    setArrowOrder(arrowOrder);
+    if (orderList === 2) {
+      setOrder(0);
+      setArrowOrder(<AiOutlineArrowDown />);
+    } else {
+      setOrder(orderList + 1);
+      if (orderList === 1) {
+        setArrowOrder(<AiOutlineArrowUp />);
+      } else {
+        setArrowOrder("");
+      }
+    }
   }
 
   function headerTableFactory(name: any, title: string) {
@@ -416,11 +416,7 @@ export default function Listagem({
   // }
 
   async function deleteItem(id: number) {
-    // eslint-disable-next-line max-len
-    const { status, message } = await await experimentService.deleted({
-      id,
-      userId: userLogado.id,
-    });
+    const { status, message } = await await experimentService.deleted(id);
     if (status === 200) {
       router.reload();
     } else {
@@ -446,10 +442,9 @@ export default function Listagem({
               onClick={() => {
                 setCookies("pageBeforeEdit", currentPage?.toString());
                 setCookies("filterBeforeEdit", filter);
-                setCookies("filterBeforeEditTypeOrder", typeOrder);
-                setCookies("filterBeforeEditOrderBy", orderBy);
-                setCookies("filtersParams", filtersParams);
-                setCookies("lastPage", "atualizar");
+                localStorage.setItem("filterValueEdit", filtersParams);
+                localStorage.setItem("pageBeforeEdit", currentPage?.toString());
+                // localStorage.setItem('orderSorting', order);
                 router.push(
                   `/listas/experimentos/experimento/atualizar?id=${rowData.id}`
                 );
@@ -504,6 +499,11 @@ export default function Listagem({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((_, index) => {
+      if (columnCampos[index] === "protocolName") {
+        tableFields.push(
+          headerTableFactory("Protocolo", "assay_list.protocol_name")
+        );
+      }
       if (columnCampos[index] === "foco") {
         tableFields.push(headerTableFactory("Foco", "assay_list.foco.name"));
       }
@@ -602,10 +602,11 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     await experimentService
-      .getAll(filter)
+      .getAll(filtersParams)
       .then(({ status, response, message }: any) => {
         if (status === 200) {
           response.map((item: any) => {
+            console.log(response);
             const newItem = item;
             newItem.SAFRA = item.assay_list?.safra?.safraName;
             newItem.FOCO = item.assay_list?.foco.name;
@@ -626,6 +627,7 @@ export default function Listagem({
             newItem.CLP = item?.clp;
             newItem.EEL = item?.eel;
             newItem.OBSERVAÇÕES = item?.comments;
+            newItem.PROTOCOLO = item.assay_list?.protocol_name;
             newItem.COUNT_NT = newItem.countNT;
             newItem.NPE_QT = newItem.npeQT;
 
@@ -672,35 +674,43 @@ export default function Listagem({
       });
   };
 
-  // manage total pages
-  async function handleTotalPages() {
+  function handleTotalPages(): void {
     if (currentPage < 0) {
       setCurrentPage(0);
     }
   }
 
   async function handlePagination(): Promise<void> {
-    // // manage using comman function
-    // const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
+    // manage using comman function
+    const { parametersFilter, currentPages } =
+      await fetchWrapper.handlePaginationGlobal(
+        currentPage,
+        take,
+        filtersParams
+      );
 
-    // await experimentService.getAll(`${parametersFilter}&idSafra=${idSafra}`).then(({ status, response }: any) => {
-    //   if (status === 200) {
-    //     setExperimento(response);
-    //     // setFiltersParams(parametersFilter);
-    //     // setTotalItems(response.total); //Set new total records
-    //     // setCurrentPage(currentPages); //Set new current page
-    //     setTimeout(removestate, 10000); // Remove State
-    //   }
-    // });
-    await callingApi(filter); // handle pagination globly
+    await experimentService
+      .getAll(`${parametersFilter}&idSafra=${idSafra}`)
+      .then(({ status, response }: any) => {
+        if (status === 200) {
+          setExperimento(response);
+          // setFiltersParams(parametersFilter);
+          // setTotalItems(response.total); //Set new total records
+          // setCurrentPage(currentPages); //Set new current page
+          setTimeout(removestate, 10000); // Remove State
+        }
+      });
   }
 
-  // Checking defualt values
+  // remove states
+  function removestate() {
+    localStorage.removeItem("filterValueEdit");
+    localStorage.removeItem("pageBeforeEdit");
+  }
+
+  // Checkingdefualt values
   function checkValue(value: any) {
-    const parameter = tableGlobalFunctions.getValuesForFilter(
-      value,
-      filtersParams
-    );
+    const parameter = fetchWrapper.getValueParams(value);
     return parameter;
   }
 
@@ -1079,17 +1089,13 @@ export const getServerSideProps: GetServerSideProps = async ({
     )?.response[0]?.itens_per_page) ?? 10;
 
   const { token } = req.cookies;
-  const { cultureId } = req.cookies;
-
   const idSafra = Number(req.cookies.safraId);
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
-
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : `idSafra=${idSafra}&id_culture=${cultureId}`;
-
+    : "";
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}`
     : `idSafra=${idSafra}&id_culture=${cultureId}`;
@@ -1115,14 +1121,11 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   removeCookies("filterBeforeEdit", { req, res });
   removeCookies("pageBeforeEdit", { req, res });
-  removeCookies("filterBeforeEditTypeOrder", { req, res });
-  removeCookies("filterBeforeEditOrderBy", { req, res });
-  removeCookies("lastPage", { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/experiment`;
 
-  const param = `skip=0&take=${itensPerPage}&idSafra=${idSafra}&id_culture=${cultureId}`;
+  const param = `skip=0&take=${itensPerPage}&idSafra=${idSafra}`;
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
@@ -1145,9 +1148,6 @@ export const getServerSideProps: GetServerSideProps = async ({
       idSafra,
       pageBeforeEdit,
       filterBeforeEdit,
-      orderByserver,
-      typeOrderServer,
-      cultureId,
     },
   };
 };
