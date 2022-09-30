@@ -30,6 +30,8 @@ import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { removeCookies, setCookies } from 'cookies-next';
+import experiment from 'src/pages/api/experiment';
+import { number } from 'yup';
 import {
   AccordionFilter,
   Button,
@@ -166,7 +168,7 @@ export default function Listagem({
       filterSchema: checkValue('filterSchema'),
       filterPTo: checkValue('filterPTo'),
       filterPFrom: checkValue('filterPFrom'),
-      filterPreparation: checkValue('filterPreparation'),
+      filterPreparation: '',
       orderBy: '',
       typeOrder: '',
     },
@@ -525,6 +527,7 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     await quadraService.getAll(filter).then(({ status, response }) => {
+      console.log(response);
       if (status === 200) {
         const newData = response.map((row: any) => {
           if (row.status === 0) {
@@ -586,44 +589,56 @@ export default function Listagem({
     });
   };
 
+  const [idArray, setIdArray] = useState([]);
+
   const downloadExcelSintetico = async (): Promise<void> => {
     await quadraService.getAll(filter).then(({ status, response }) => {
+      // console.log(response);
       if (status === 200) {
-        const newData = response.map((row: any) => {
-          if (row.status === 0) {
-            row.status = 'Inativo' as any;
-          } else {
-            row.status = 'Ativo' as any;
-          }
-          row.ALOCAÇÃO = row.AllocatedExperiment;
-          row.COD_QUADRA = row.cod_quadra;
-          row.LOCAL = row.local?.name_local_culture;
-          row.ESQUEMA = row.esquema;
-          row.LARG_Q = row.larg_q;
-          row.COMP_P = row.comp_p;
-          row.LINHA_P = row.linha_p;
-          row.COMP_C = row.comp_c;
-          row.TIRO_FIXO = row.tiro_fixo;
-          row.DISPARO_FIXO = row.disparo_fixo;
-          row.STATUS_ALOCADO = row.allocation;
-          row.STATUS = row.status;
+        const experimentArray = [];
+        const object = {};
+        const experimentObject = {
+          id: '',
+          safra: '',
+          experimentName: '',
+          npei: '',
+          npef: '',
+          ntparcelas: '',
+          locpreparo: '',
+          qm: '',
+        };
 
-          delete row.cod_quadra;
-          delete row.local;
-          delete row.esquema;
-          delete row.larg_q;
-          delete row.comp_p;
-          delete row.linha_p;
-          delete row.q;
-          delete row.comp_c;
-          delete row.tiro_fixo;
-          delete row.disparo_fixo;
-          delete row.status;
-          delete row.id;
-          delete row.safra;
-          delete row.tableData;
-          delete row.local_plantio;
-          delete row.allocation;
+        const data = response.map((tow: any) => {
+          tow.cod = tow.cod_quadra;
+          // tow.local = tow.name_local;
+          console.log(tow);
+          experimentObject.locpreparo = tow.local.name_local_culture;
+          object.qm = tow.cod;
+          // const localMap = tow.local;
+
+          const allocatedMap = tow.AllocatedExperiment.map((a: any) => {
+            // console.log(a);
+            experimentObject.npei = a.npei;
+            experimentObject.npef = a.npef;
+            experimentObject.ntparcelas = a.parcelas;
+            experimentArray.push(experimentObject);
+            return a;
+          });
+          const experimentMap = tow.experiment.map((e: any) => {
+            // console.log(tow);
+            object.id = e.id;
+            experimentObject.safra = e.safra.safraName;
+            experimentObject.experimentName = e.experimentName;
+            return e;
+          });
+          experimentArray.push(object);
+          experimentArray.push(experimentObject);
+          return tow;
+        });
+        console.log(object);
+        // console.log(experimentArray);
+        const newData = experimentArray.map((row: any) => {
+          row.ID_EXPERIMENTO = row.id;
           return row;
         });
 
@@ -645,6 +660,63 @@ export default function Listagem({
         XLSX.writeFile(workBook, 'Sintética.xlsx');
       } else {
         Swal.fire(response);
+      }
+    });
+  };
+
+  const dowloadExcelAnalytics = async () => {
+    await quadraService.getAll(`${filter}&allocation=${'IMPORTADO'}`).then(({ status, response }) => {
+      if (status === 200) {
+        const lines: any = [];
+        response.forEach(async (block: any) => {
+          await block.experiment?.forEach(async (experiment: any) => {
+            await experiment.experiment_genotipe?.forEach((parcela: any, index: number) => {
+              lines.push({
+                ID_EXPERIMENTO: experiment?.id,
+                SAFRA: experiment?.safra?.safraName,
+                EXPE: experiment?.experimentName,
+                NPEI: parcela?.npe,
+                NPEF: parcela?.npe,
+                NTPARC: 1,
+                LOCALPREP: block.local?.name_local_culture,
+                QM: block.cod_quadra,
+                SEQ: block.AllocatedExperiment[index]?.seq,
+                FOCO: experiment?.assay_list?.foco?.name,
+                ENSAIO: experiment?.assay_list?.type_assay?.name,
+                GLI: experiment?.assay_list?.gli,
+                CODLOCAL_EXP: experiment?.local?.name_local_culture,
+                EPOCA: experiment?.period,
+                TECNOLOGIA: experiment?.assay_list?.tecnologia?.name,
+                BGM: experiment?.bgm,
+                REP: experiment?.repetitionsNumber,
+                STATUS_EXP: experiment?.status,
+                CÓDIGO_GENOTIPO: parcela?.genotipo?.name_genotipo,
+                STATUS_PARCELA: parcela?.status,
+              });
+            });
+          });
+        });
+
+        console.log('response');
+        console.log(response);
+        const workSheet = XLSX.utils.json_to_sheet(lines);
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'quadra');
+
+        // Buffer
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
+        });
+        // Binary
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
+        });
+        // Download
+        XLSX.writeFile(workBook, 'Analítico.xlsx');
+      } else {
+        Swal.fire('Nenhuma quadra alocada');
       }
     });
   };
@@ -742,7 +814,6 @@ export default function Listagem({
                       max="40"
                       id="filterPreparation"
                       name="filterPreparation"
-                      defaultValue={checkValue('filterPreparation')}
                       onChange={formik.handleChange}
                     />
                   </div>
@@ -925,6 +996,17 @@ export default function Listagem({
                           textColor="white"
                           onClick={() => {
                             downloadExcelSintetico();
+                          }}
+                        />
+                      </div>
+                      <div className="h-12 flex items-center justify-center w-full">
+                        <Button
+                          title="Exportação Analítico"
+                          icon={<RiFileExcel2Line size={20} />}
+                          bgColor="bg-red-600"
+                          textColor="white"
+                          onClick={() => {
+                            dowloadExcelAnalytics();
                           }}
                         />
                       </div>

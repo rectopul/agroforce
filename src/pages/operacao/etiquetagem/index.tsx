@@ -39,6 +39,7 @@ import {
   Select,
   ModalComponent,
   FieldItemsPerPage,
+  SelectMultiple,
 } from '../../../components';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
@@ -46,7 +47,10 @@ import {
   userPreferencesService,
 } from '../../../services';
 import * as ITabs from '../../../shared/utils/dropdown';
-import { IExperimentGroupFilter, IExperimentsGroup } from '../../../interfaces/listas/operacao/etiquetagem/etiquetagem.interface';
+import {
+  IExperimentGroupFilter,
+  IExperimentsGroup,
+} from '../../../interfaces/listas/operacao/etiquetagem/etiquetagem.interface';
 import { IReturnObject } from '../../../interfaces/shared/Import.interface';
 import { tableGlobalFunctions } from '../../../helpers';
 
@@ -61,8 +65,8 @@ export default function Listagem({
   cultureId,
   typeOrderServer,
   orderByserver,
-  // eslint-disable-next-line no-use-before-define
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+}: // eslint-disable-next-line no-use-before-define
+InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
   const tabsEtiquetagemMenu = tabsOperation.map((i) => (i.titleTab === 'ETIQUETAGEM'
@@ -82,10 +86,9 @@ export default function Listagem({
     preferences.table_preferences,
   );
 
-  const [
-    experimentGroup,
-    setExperimentGroup,
-  ] = useState<IExperimentsGroup[]>(() => allExperimentGroup);
+  const [experimentGroup, setExperimentGroup] = useState<IExperimentsGroup[]>(
+    () => allExperimentGroup,
+  );
   const [currentPage, setCurrentPage] = useState<number>(pageBeforeEdit);
   const [orderList, setOrder] = useState<number>(1);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
@@ -135,6 +138,7 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes('action'),
     },
   ]);
+
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
     {
       name: 'StatusCheckbox',
@@ -155,6 +159,8 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes('ETIQ. FINALIZADA'),
     },
   ]);
+  const [statusFilterSelected, setStatusFilterSelected] = useState<any>([]);
+
   // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const [arrowOrder, setArrowOrder] = useState<any>('');
@@ -167,9 +173,9 @@ export default function Listagem({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  // const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}`;
+  // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}`;
 
   const formik = useFormik<IExperimentGroupFilter>({
     initialValues: {
@@ -208,16 +214,12 @@ export default function Listagem({
       filterTotalEtiqImpressasFrom,
       filterTotalEtiqTo,
       filterTotalEtiqFrom,
-      filterStatus,
+      // filterStatus,
     }) => {
-      const parametersFilter = `&filterExperimentGroup=${filterExperimentGroup
-      }&filterQuantityExperiment=${filterQuantityExperiment
-      }&filterTagsToPrint=${filterTagsToPrint
-      }&filterTagsPrinted=${filterTagsPrinted
-      }&filterTotalTags=${filterTotalTags
-      }&filterStatus=${filterStatus}&safraId=${safraId}&id_culture=${cultureId}`;
+      const filterStatus = statusFilterSelected?.join(',');
+      const parametersFilter = `&filterExperimentGroup=${filterExperimentGroup}&filterQuantityExperiment=${filterQuantityExperiment}&filterTagsToPrint=${filterTagsToPrint}&filterTagsPrinted=${filterTagsPrinted}&filterTotalTags=${filterTotalTags}&filterStatus=${filterStatus}&safraId=${safraId}&id_culture=${cultureId}`;
       // setFiltersParams(parametersFilter);
-      // setCookies('filterBeforeEdit', filtersParams);
+      // setCookies('filterBeforeEditOperation', filtersParams);
       // await experimentGroupService
       //   .getAll(`${parametersFilter}`)
       //   .then(({ response, total: allTotal }) => {
@@ -236,14 +238,14 @@ export default function Listagem({
 
   // Calling common API
   async function callingApi(parametersFilter : any) {
-    setCookies('filterBeforeEdit', parametersFilter);
-    setCookies('filterBeforeEditTypeOrder', typeOrder);
-    setCookies('filterBeforeEditOrderBy', orderBy);
+    setCookies('filterBeforeEditOperation', parametersFilter);
+    setCookies('filterBeforeEditTypeOrderOperation', typeOrder);
+    setCookies('filterBeforeEditOrderByOperation', orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
     // setCookies("filtersParams", parametersFilter);
 
-    setCookies('filtersParams', parametersFilter);
+    setCookies('filtersParamsOperation', parametersFilter);
     await experimentGroupService.getAll(parametersFilter).then((response) => {
       if (response.status === 200 || response.status === 400) {
         setExperimentGroup(response.response);
@@ -353,12 +355,12 @@ export default function Listagem({
               title={`Editar ${rowData.name}`}
               type="button"
               onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filter);
-                setCookies('filterBeforeEditTypeOrder', typeOrder);
-                setCookies('filterBeforeEditOrderBy', orderBy);
-                setCookies('filtersParams', filtersParams);
-                setCookies('lastPage', 'atualizar');
+                setCookies('pageBeforeEditOperation', currentPage?.toString());
+                setCookies('filterBeforeEditOperation', filter);
+                setCookies('filterBeforeEditTypeOrderOperation', typeOrder);
+                setCookies('filterBeforeEditOrderByOperation', orderBy);
+                setCookies('filtersParamsOperation', filtersParams);
+                setCookies('lastPageOperation', 'atualizar');
                 router.push(`/operacao/etiquetagem/atualizar?id=${rowData.id}`);
               }}
               rounder="rounded-full"
@@ -372,12 +374,12 @@ export default function Listagem({
               title=""
               type="button"
               onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filter);
-                setCookies('filterBeforeEditTypeOrder', typeOrder);
-                setCookies('filterBeforeEditOrderBy', orderBy);
-                setCookies('filtersParams', filtersParams);
-                setCookies('lastPage', 'parcelas');
+                setCookies('pageBeforeEditOperation', currentPage?.toString());
+                setCookies('filterBeforeEditOperation', filter);
+                setCookies('filterBeforeEditTypeOrderOperation', typeOrder);
+                setCookies('filterBeforeEditOrderByOperation', orderBy);
+                setCookies('filtersParamsOperation', filtersParams);
+                setCookies('lastPageOperation', 'parcelas');
                 router.push(`/operacao/etiquetagem/parcelas?id=${rowData.id}`);
               }}
               rounder="rounded-full"
@@ -547,7 +549,10 @@ export default function Listagem({
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
+    const parameter = tableGlobalFunctions.getValuesForFilter(
+      value,
+      filtersParams,
+    );
     return parameter;
   }
 
@@ -565,6 +570,7 @@ export default function Listagem({
           type="text"
           placeholder={name}
           id={title}
+          defaultValue={checkValue(title)}
           name={title}
           onChange={formik.handleChange}
         />
@@ -584,10 +590,7 @@ export default function Listagem({
     if (response?.length > 0) {
       Swal.fire('Grupo já cadastrado');
     } else {
-      const {
-        status: createStatus,
-        response: newGroup,
-      }: IReturnObject = await experimentGroupService.create({
+      const { status: createStatus, response: newGroup }: IReturnObject = await experimentGroupService.create({
         name: inputValue,
         safraId: Number(safraId),
         createdBy: userLogado.id,
@@ -629,6 +632,7 @@ export default function Listagem({
               placeholder="Nome do grupo"
               id="inputName"
               name="inputName"
+
             />
           </div>
         </form>
@@ -756,6 +760,7 @@ export default function Listagem({
                         id="filterQtdExpFrom"
                         name="filterQtdExpFrom"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue('filterQtdExpFrom')}
                       />
                       <Input
                         style={{ marginLeft: 8 }}
@@ -763,6 +768,8 @@ export default function Listagem({
                         id="filterQtdExpTo"
                         name="filterQtdExpTo"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue('filterQtdExpTo')}
+
                       />
                     </div>
                   </div>
@@ -777,6 +784,8 @@ export default function Listagem({
                         id="filterTotalEtiqImprimirFrom"
                         name="filterTotalEtiqImprimirFrom"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue('filterTotalEtiqImprimirFrom')}
+
                       />
                       <Input
                         style={{ marginLeft: 8 }}
@@ -784,6 +793,8 @@ export default function Listagem({
                         id="filterTotalEtiqImprimirTo"
                         name="filterTotalEtiqImprimirTo"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue('filterTotalEtiqImprimirTo')}
+
                       />
                     </div>
                   </div>
@@ -798,6 +809,8 @@ export default function Listagem({
                         id="filterTotalEtiqImpressasFrom"
                         name="filterTotalEtiqImpressasFrom"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue('filterTotalEtiqImpressasFrom')}
+
                       />
                       <Input
                         style={{ marginLeft: 8 }}
@@ -805,6 +818,8 @@ export default function Listagem({
                         id="filterTotalEtiqImpressasTo"
                         name="filterTotalEtiqImpressasTo"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue('filterTotalEtiqImpressasTo')}
+
                       />
                     </div>
                   </div>
@@ -819,6 +834,8 @@ export default function Listagem({
                         id="filterTotalEtiqFrom"
                         name="filterTotalEtiqFrom"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue('filterTotalEtiqFrom')}
+
                       />
                       <Input
                         style={{ marginLeft: 8 }}
@@ -826,6 +843,7 @@ export default function Listagem({
                         id="filterTotalEtiqTo"
                         name="filterTotalEtiqTo"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue('filterTotalEtiqTo')}
                       />
                     </div>
                   </div>
@@ -834,8 +852,18 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status grupo exp.
                     </label>
+                    <SelectMultiple
+                      data={statusFilter.map((i: any) => i.title)}
+                      values={statusFilterSelected}
+                      onChange={(e: any) => setStatusFilterSelected(e)}
+                    />
+                  </div>
 
-                    <AccordionFilter>
+                  {/* <div className="h-10 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Status grupo exp.
+                    </label> */}
+                  {/* <AccordionFilter>
                       <DragDropContext onDragEnd={handleOnDragEnd}>
                         <Droppable droppableId="characters">
                           {(provided) => (
@@ -871,8 +899,8 @@ export default function Listagem({
                           )}
                         </Droppable>
                       </DragDropContext>
-                    </AccordionFilter>
-                  </div>
+                    </AccordionFilter> */}
+                  {/* </div> */}
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
@@ -1069,7 +1097,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                ) as any,
+                  ) as any,
               }}
             />
           </div>
@@ -1107,8 +1135,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   // : "No";
 
   // // if(lastPageServer == undefined || lastPageServer == "No"){
-  // //   removeCookies('filterBeforeEdit', { req, res });
-  // //   removeCookies('pageBeforeEdit', { req, res });
+  // //   removeCookies('filterBeforeEditOperation', { req, res });
+  // //   removeCookies('pageBeforeEditOperation', { req, res });
   // //   removeCookies("filterBeforeEditTypeOrder", { req, res });
   // //   removeCookies("filterBeforeEditOrderBy", { req, res });
   // //   removeCookies("lastPage", { req, res });
@@ -1126,8 +1154,8 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   // const filterApplication = req.cookies.filterBeforeEdit || `safraId=${safraId}&id_culture=${cultureId}`;
 
-  // // removeCookies('filterBeforeEdit', { req, res });
-  // // removeCookies('pageBeforeEdit', { req, res });
+  // // removeCookies('filterBeforeEditOperation', { req, res });
+  // // removeCookies('pageBeforeEditOperation', { req, res });
 
   // // //RR
   // // removeCookies("filterBeforeEditTypeOrder", { req, res });
@@ -1159,49 +1187,49 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { cultureId } = req.cookies;
 
   const idSafra = Number(req.cookies.safraId);
-  const pageBeforeEdit = req.cookies.pageBeforeEdit
-    ? req.cookies.pageBeforeEdit
+  const pageBeforeEdit = req.cookies.pageBeforeEditOperation
+    ? req.cookies.pageBeforeEditOperation
     : 0;
 
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : `idSafra=${idSafra}&id_culture=${cultureId}`;
-
-  const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}`
-    : `idSafra=${idSafra}&id_culture=${cultureId}`;
-
   // Last page
-  const lastPageServer = req.cookies.lastPage
-    ? req.cookies.lastPage
+  const lastPageServer = req.cookies.lastPageOperation
+    ? req.cookies.lastPageOperation
     : 'No';
 
-  // if(lastPageServer == undefined || lastPageServer == "No"){
-  //   removeCookies('filterBeforeEdit', { req, res });
-  //   removeCookies('pageBeforeEdit', { req, res });
-  //   removeCookies("filterBeforeEditTypeOrder", { req, res });
-  //   removeCookies("filterBeforeEditOrderBy", { req, res });
-  //   removeCookies("lastPage", { req, res });
-  // }
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEditOperation', { req, res });
+    removeCookies('pageBeforeEditOperation', { req, res });
+    removeCookies('filterBeforeEditTypeOrderOperation', { req, res });
+    removeCookies('filterBeforeEditOrderByOperation', { req, res });
+    removeCookies('lastPageOperation', { req, res });
+  }
 
-  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
-    ? req.cookies.filterBeforeEditTypeOrder
+  const filterBeforeEdit = req.cookies.filterBeforeEditOperation
+    ? req.cookies.filterBeforeEditOperation
+    : `safraId=${idSafra}&id_culture=${cultureId}`;
+
+  const filterApplication = req.cookies.filterBeforeEditOperation
+    ? `${req.cookies.filterBeforeEditOperation}`
+    : `safraId=${idSafra}&id_culture=${cultureId}`;
+
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrderOperation
+    ? req.cookies.filterBeforeEditTypeOrderOperation
     : 'desc';
 
-  const orderByserver = req.cookies.filterBeforeEditOrderBy
-    ? req.cookies.filterBeforeEditOrderBy
-    : '';
+  const orderByserver = req.cookies.filterBeforeEditOrderByOperation
+    ? req.cookies.filterBeforeEditOrderByOperation
+    : 'experimentAmount';
 
-  // removeCookies('filterBeforeEdit', { req, res });
-  // removeCookies('pageBeforeEdit', { req, res });
-  // removeCookies("filterBeforeEditTypeOrder", { req, res });
-  // removeCookies("filterBeforeEditOrderBy", { req, res });
-  // removeCookies("lastPage", { req, res });
+  removeCookies('filterBeforeEditOperation', { req, res });
+  removeCookies('pageBeforeEditOperation', { req, res });
+  removeCookies('filterBeforeEditTypeOrderOperation', { req, res });
+  removeCookies('filterBeforeEditOrderByOperation', { req, res });
+  removeCookies('lastPageOperation', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/experiment`;
 
-  const param = `skip=0&take=${itensPerPage}&idSafra=${idSafra}&id_culture=${cultureId}`;
+  const param = `skip=0&take=${itensPerPage}&safraId=${idSafra}&id_culture=${cultureId}`;
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
@@ -1210,10 +1238,10 @@ export const getServerSideProps: GetServerSideProps = async ({
     credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
-  const {
-    response: allExperimentGroup,
-    total: totalItems,
-  } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
+  const { response: allExperimentGroup, total: totalItems } = await fetch(
+    urlParameters.toString(),
+    requestOptions,
+  ).then((response) => response.json());
 
   const safraId = idSafra;
 

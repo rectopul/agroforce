@@ -1,25 +1,24 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import { useFormik } from 'formik';
-import Head from 'next/head';
-import getConfig from 'next/config';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
-import Swal from 'sweetalert2';
-import { experimentGenotipeService, layoutQuadraService, npeService } from 'src/services';
-import InputMask from 'react-input-mask';
-
-import { IoMdArrowBack } from 'react-icons/io';
-import { MdDateRange } from 'react-icons/md';
-import npe from 'src/pages/api/npe';
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { useFormik } from "formik";
+import Head from "next/head";
+import getConfig from "next/config";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
+import Swal from "sweetalert2";
 import {
-  Content,
-  Input,
-  Select,
-  Button,
-} from '../../../components';
+  experimentGenotipeService,
+  layoutQuadraService,
+  npeService,
+} from "src/services";
+import InputMask from "react-input-mask";
 
-import * as ITabs from '../../../shared/utils/dropdown';
+import { IoMdArrowBack } from "react-icons/io";
+import { MdDateRange } from "react-icons/md";
+import npe from "src/pages/api/npe";
+import { Content, Input, Select, Button } from "../../../components";
+
+import * as ITabs from "../../../shared/utils/dropdown";
 
 interface ILayoultProps {
   id: number | any;
@@ -71,29 +70,27 @@ interface IData {
 }
 
 export default function NovoLocal({
-      local,
-      layoultEdit,
-      npe,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  local,
+  layoultEdit,
+  npe,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'NPE'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === "NPE" ? (tab.statusTab = true) : (tab.statusTab = false)
+  );
 
   const [localMap, setIdLocalMap] = useState<ILocal[]>(() => local);
   const [idLocal, setIdLocal] = useState<number>(layoultEdit.localId);
   const [lat, setLat] = useState<number>(0);
   const [lng, setLng] = useState<number>(0);
-  const [titleLocal, setTitleLocal] = useState<string>('');
+  const [titleLocal, setTitleLocal] = useState<string>("");
 
   const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: 'AIzaSyD2fT6h_lQHgdj4_TgbwV6uDfZ23Hj0vKg',
+    id: "google-map-script",
+    googleMapsApiKey: "AIzaSyD2fT6h_lQHgdj4_TgbwV6uDfZ23Hj0vKg",
   });
 
   const position = {
@@ -101,54 +98,64 @@ export default function NovoLocal({
     lng,
   };
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const locais: object | any = [];
   const router = useRouter();
   const formik = useFormik<INpeProps>({
     initialValues: {
-      id: npe.id,
-      safra: npe.safra.safraName,
-      local: npe.local.name_local_culture,
-      foco: npe.foco.name,
-      epoca: Number(npe.epoca),
-      tecnologia: npe.tecnologia.name,
-      cod_tec: npe.tecnologia.cod_tec,
-      type_assay: npe.type_assay.name,
-      npei: Number(npe.npei),
-      npef: Number(npe.npef),
-      status: Number(npe.status),
-      prox_npe: Number(npe.prox_npe),
+      id: npe?.id,
+      safra: npe?.safra?.safraName,
+      local: npe?.local?.name_local_culture,
+      foco: npe?.foco?.name,
+      epoca: Number(npe?.epoca),
+      tecnologia: npe?.tecnologia?.name,
+      cod_tec: npe?.tecnologia?.cod_tec,
+      type_assay: npe?.type_assay?.name,
+      npei: Number(npe?.npei),
+      npef: Number(npe?.npef),
+      status: Number(npe?.status),
+      prox_npe: Number(npe?.prox_npe),
     },
     onSubmit: async (values) => {
       validateInputs(values);
-      if (!values.prox_npe) { return; }
+      if (!values.prox_npe) {
+        return;
+      }
 
       const parametersFilter = `filterStatus=1&npei=${values.prox_npe}`;
       await npeService.getAll(parametersFilter).then(async (response) => {
         if (response.total <= 0) {
           const paramFilter = `npe=${values.prox_npe}`;
-          await experimentGenotipeService.getAll(paramFilter).then(async (response) => {
-            if (response.total <= 0) {
-              await npeService.update({
-                id: values.id,
-                prox_npe: values.prox_npe,
-                npef: npe.status == 3 ? npe.npef : values.prox_npe,
-                npei_i: values.prox_npe,
-                edited: 1,
-              }).then((response) => {
-                if (response.status === 200) {
-                  Swal.fire('NPE atualizado com sucesso!');
-                  router.back();
-                } else {
-                  Swal.fire(response.message);
-                }
-              });
-            } else {
-              Swal.fire('Unable to update prox npe, prox npe entered is already consumed by experiment genotipe.')
-            }
-          });
+          await experimentGenotipeService
+            .getAll(paramFilter)
+            .then(async (response) => {
+              if (response.total <= 0) {
+                await npeService
+                  .update({
+                    id: values.id,
+                    prox_npe: values.prox_npe,
+                    npef: npe.status == 3 ? npe.npef : values.prox_npe,
+                    npei_i: values.prox_npe,
+                    edited: 1,
+                  })
+                  .then((response) => {
+                    if (response.status === 200) {
+                      Swal.fire("NPE atualizado com sucesso!");
+                      router.back();
+                    } else {
+                      Swal.fire(response.message);
+                    }
+                  });
+              } else {
+                Swal.fire(
+                  "Unable to update prox npe, prox npe entered is already consumed by experiment genotipe."
+                );
+              }
+            });
         } else {
-          Swal.fire('Unable to update prox npe, prox npe entered is already consumed by another npe.')
+          Swal.fire(
+            "Unable to update prox npe, prox npe entered is already consumed by another npe."
+          );
         }
       });
     },
@@ -159,7 +166,13 @@ export default function NovoLocal({
   });
 
   function validateInputs(values: any) {
-    if (!values.prox_npe) { const inputesquema: any = document.getElementById('prox_npe'); inputesquema.style.borderColor = 'red'; } else { const inputesquema: any = document.getElementById('prox_npe'); inputesquema.style.borderColor = ''; }
+    if (!values.prox_npe) {
+      const inputesquema: any = document.getElementById("prox_npe");
+      inputesquema.style.borderColor = "red";
+    } else {
+      const inputesquema: any = document.getElementById("prox_npe");
+      inputesquema.style.borderColor = "";
+    }
   }
 
   useEffect(() => {
@@ -185,14 +198,13 @@ export default function NovoLocal({
         <form
           className="
           w-full
-          h-full
           bg-white
           shadow-md
           rounded
-          px-8
-          pt-6
-          pb-8
-          mt-2
+          px-4
+          pt-2
+          pb-4
+          mt-0
         "
           onSubmit={formik.handleSubmit}
         >
@@ -200,16 +212,17 @@ export default function NovoLocal({
             <h1 className="text-2xl">Informações do NPE</h1>
           </div>
 
-          <div className="w-full
+          <div
+            className="w-1/2
             flex
             justify-around
-            gap-6
+            gap-4
             mt-4
             mb-4
           "
           >
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Safra
               </label>
               <Input
@@ -220,11 +233,11 @@ export default function NovoLocal({
                 onChange={formik.handleChange}
                 value={formik.values.safra}
                 disabled
-                style={{ background: '#e5e7eb' }}
+                style={{ background: "#e5e7eb" }}
               />
             </div>
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Local
               </label>
               <Input
@@ -235,20 +248,42 @@ export default function NovoLocal({
                 onChange={formik.handleChange}
                 value={formik.values.local}
                 disabled
-                style={{ background: '#e5e7eb' }}
+                style={{ background: "#e5e7eb" }}
+              />
+            </div>
+            <div className="w-full">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
+                Status
+              </label>
+              <Input
+                type="text"
+                placeholder="1"
+                id="status"
+                name="status"
+                onChange={formik.handleChange}
+                value={
+                  formik.values.status == 3
+                    ? "SORTEADO"
+                    : formik.values.status == 1
+                    ? "IMPORTADO"
+                    : "INACTIVE"
+                }
+                disabled
+                style={{ background: "#e5e7eb" }}
               />
             </div>
           </div>
 
-          <div className="w-full
+          <div
+            className="w-1/2
             flex
             justify-around
-            gap-6
+            gap-4
             mb-4
           "
           >
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+            <div className="w-1/2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Foco
               </label>
               <Input
@@ -259,11 +294,11 @@ export default function NovoLocal({
                 onChange={formik.handleChange}
                 value={formik.values.foco}
                 disabled
-                style={{ background: '#e5e7eb' }}
+                style={{ background: "#e5e7eb" }}
               />
             </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+            <div className="w-1/2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Epoca
               </label>
               <Input
@@ -274,35 +309,37 @@ export default function NovoLocal({
                 onChange={formik.handleChange}
                 value={formik.values.epoca}
                 disabled
-                style={{ background: '#e5e7eb' }}
+                style={{ background: "#e5e7eb" }}
               />
             </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Tecnologia
+
+            <div className="w-1/2">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
+                Tipo de Ensaio
               </label>
               <Input
                 type="text"
-                placeholder="Tecnologia"
-                id="tecnologia"
-                name="tecnologia"
+                placeholder="Type Assay"
+                id="type_assay"
+                name="type_assay"
                 onChange={formik.handleChange}
-                value={formik.values.tecnologia}
+                value={formik.values.type_assay}
                 disabled
-                style={{ background: '#e5e7eb' }}
+                style={{ background: "#e5e7eb" }}
               />
             </div>
           </div>
 
-          <div className="w-full
+          <div
+            className="w-full
               flex
               justify-around
-              gap-6
+              gap-4
               mb-4
             "
           >
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+            <div className="w-1/3">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Cod Tec.
               </label>
               <Input
@@ -313,26 +350,26 @@ export default function NovoLocal({
                 onChange={formik.handleChange}
                 value={formik.values.cod_tec}
                 disabled
-                style={{ background: '#e5e7eb' }}
+                style={{ background: "#e5e7eb" }}
               />
             </div>
             <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Type Assay
+              <label className="block text-gray-900 text-sm font-bold mb-1">
+                Tecnologia
               </label>
               <Input
                 type="text"
-                placeholder="Type Assay"
-                id="type_assay"
-                name="type_assay"
+                placeholder="Tecnologia"
+                id="tecnologia"
+                name="tecnologia"
                 onChange={formik.handleChange}
-                value={formik.values.type_assay}
+                value={formik.values.tecnologia}
                 disabled
-                style={{ background: '#e5e7eb' }}
+                style={{ background: "#e5e7eb" }}
               />
             </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+            <div className="w-1/3">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 NPE Inicial
               </label>
               <Input
@@ -343,10 +380,10 @@ export default function NovoLocal({
                 onChange={formik.handleChange}
                 value={formik.values.npei}
                 disabled
-                style={{ background: '#e5e7eb' }}
+                style={{ background: "#e5e7eb" }}
               />
             </div>
-            <div className="w-full">
+            <div className="w-1/3">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 NPE Final
               </label>
@@ -358,35 +395,14 @@ export default function NovoLocal({
                 onChange={formik.handleChange}
                 value={formik.values.npef}
                 disabled
-                style={{ background: '#e5e7eb' }}
+                style={{ background: "#e5e7eb" }}
               />
             </div>
           </div>
 
-          <div className="w-full
-              flex
-              justify-around
-              gap-6
-              mb-4
-            "
-          >
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
-                Status
-              </label>
-              <Input
-                type="text"
-                placeholder="1"
-                id="status"
-                name="status"
-                onChange={formik.handleChange}
-                value={formik.values.status == 3 ? 'SORTEADO' : (formik.values.status == 1 ? 'IMPORTADO' : 'INACTIVE')}
-                disabled
-                style={{ background: '#e5e7eb' }}
-              />
-            </div>
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-2">
+          <div className="w-1/2 flex gap-4 mb-4">
+            <div className="w-1/3">
+              <label className="block text-gray-900 text-sm font-bold mb-1">
                 Prox NPE
               </label>
               <Input
@@ -400,12 +416,13 @@ export default function NovoLocal({
             </div>
           </div>
 
-          <div className="
+          <div
+            className="
             h-7 w-full
             flex
             gap-3
             justify-center
-            mt-10
+            mt-4
           "
           >
             <div className="w-40">
@@ -415,7 +432,9 @@ export default function NovoLocal({
                 bgColor="bg-red-600"
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
-                onClick={() => { router.back(); }}
+                onClick={() => {
+                  router.back();
+                }}
               />
             </div>
             <div className="w-40">
@@ -425,7 +444,7 @@ export default function NovoLocal({
                 bgColor="bg-blue-600"
                 icon={<MdDateRange size={18} />}
                 textColor="white"
-                onClick={() => { }}
+                onClick={() => {}}
               />
             </div>
           </div>
@@ -444,14 +463,17 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { token } = context.req.cookies;
 
   const requestOptions: RequestInit | undefined = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   };
 
   const apiLocal = await fetch(baseUrlLocal, requestOptions);
   const resU = await fetch(`${baseUrlLayout}/47`, requestOptions);
-  const apiNpe = await fetch(`${baseUrlNpe}/${context.query.id}`, requestOptions);
+  const apiNpe = await fetch(
+    `${baseUrlNpe}/${context.query.id}`,
+    requestOptions
+  );
 
   const npe = await apiNpe.json();
   const layoultEdit = await resU.json();
