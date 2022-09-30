@@ -29,12 +29,15 @@ export class ExperimentController {
           parameters.repetitionsNumber = JSON.parse(`{"lte": ${Number(options.filterRepetitionTo)} }`);
         }
       }
-      // if (options.filterStatus) {
-      //   parameters.OR = [];
-      //   const statusParams = options.filterStatus.split(',');
-      //   parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
-      //   parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
+      // if (options.filterRepetition) {
+      //   parameters.repetitionsNumber = Number(options.filterRepetition);
       // }
+      if (options.filterStatus) {
+        parameters.OR = [];
+        const statusParams = options.filterStatus.split(',');
+        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
+        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
+      }
 
       if (options.filterExperimentName) {
         parameters.experimentName = JSON.parse(`{ "contains":"${options.filterExperimentName}" }`);
@@ -44,9 +47,6 @@ export class ExperimentController {
       }
       if (options.filterPeriod) {
         parameters.period = Number(options.filterPeriod);
-      }
-      if (options.filterRepetition) {
-        parameters.repetitionsNumber = Number(options.filterRepetition);
       }
       if (options.filterFoco) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"foco": {"name": {"contains": "${options.filterFoco}" } } } }`));
@@ -66,6 +66,8 @@ export class ExperimentController {
       if (options.experimentGroupId) {
         parameters.experimentGroupId = Number(options.experimentGroupId);
       }
+      console.log(parameters);
+      console.log(options);
 
       const select = {
         id: true,
@@ -276,8 +278,9 @@ export class ExperimentController {
   async delete(data: any) {
     try {
       const { response: experimentExist } = await this.getOne(Number(data.id));
-
       if (!experimentExist) return { status: 404, message: 'Experimento não encontrado' };
+      if (response?.status === 'PARCIALMENTE ALOCADO' || response?.status === 'TOTALMENTE  ALOCADO') return { status: 400, message: 'Não é possível deletar.' };
+      console.log(response);
 
       const response = await this.experimentRepository.delete(Number(data.id));
       const {
