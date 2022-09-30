@@ -125,17 +125,6 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (!validateInteger(spreadSheet[row][column])) {
-                responseIfError[Number(column)] += responseGenericFactory(
-                  (Number(column) + 1),
-                  row,
-                  spreadSheet[0][column],
-                  'precisa ser um numero inteiro e positivo',
-                );
-              }
-              if (assayList?.bgm !== spreadSheet[row][column]) {
-                responseIfError[Number(column)]
-                  += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
             }
             if (column === '6') { // LOCAL
@@ -320,6 +309,7 @@ export class ImportExperimentController {
                     repetitionsNumber: spreadSheet[row][10],
                     nlp: spreadSheet[row][11],
                     clp: spreadSheet[row][12],
+                    bgm: spreadSheet[row][5],
                     comments,
                     orderDraw: spreadSheet[row][14],
                     created_by: createdBy,
@@ -338,6 +328,7 @@ export class ImportExperimentController {
                     repetitionsNumber: spreadSheet[row][10],
                     nlp: spreadSheet[row][11],
                     clp: spreadSheet[row][12],
+                    bgm: spreadSheet[row][5],
                     comments,
                     orderDraw: spreadSheet[row][14],
                     created_by: createdBy,

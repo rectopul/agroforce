@@ -28,16 +28,11 @@ export class QuadraController {
       if (options.filterSchema) {
         parameters.esquema = JSON.parse(`{"contains":"${options.filterSchema}"}`);
       }
-<<<<<<< HEAD
 
       if (options.allocation) {
         parameters.allocation = JSON.parse(`{"contains":"${options.allocation}"}`);
       }
 
-=======
-      console.log(parameters);
-      console.log(options);
->>>>>>> 28aad9b789b054fef4aaeb5245dca24f7e499436
       if (options.filterPFrom || options.filterPTo) {
         if (options.filterPFrom && options.filterPTo) {
           parameters.linha_p = JSON.parse(`{"gte": ${Number(options.filterPFrom)}, "lte": ${Number(options.filterPTo)} }`);
