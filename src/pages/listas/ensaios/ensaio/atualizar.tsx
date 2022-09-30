@@ -103,7 +103,7 @@ export default function AtualizarTipoEnsaio({
   const [arrowOrder, setArrowOrder] = useState<ReactNode>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
+    // { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: "CamposGerenciados[]", title: "Fase", value: "fase" },
     {
       name: "CamposGerenciados[]",
@@ -404,9 +404,9 @@ export default function AtualizarTipoEnsaio({
     const tableFields: any = [];
 
     Object.keys(columnOrder).forEach((item, index) => {
-      if (columnOrder[index] === "id") {
-        tableFields.push(idHeaderFactory());
-      }
+      // if (columnOrder[index] === "id") {
+      //   tableFields.push(idHeaderFactory());
+      // }
       if (columnOrder[index] === "experimentName") {
         tableFields.push(
           headerTableFactory("Experimento Planejado", "experimentName")
