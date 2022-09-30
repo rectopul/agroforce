@@ -783,8 +783,8 @@ export default function Listagem({
                     <Select
                       name="filterStatus"
                       onChange={formik.handleChange}
-                      // defaultValue={filterStatusBeforeEdit[13]}
-                      defaultValue={checkValue('filterSearch')}
+                      defaultValue={filterStatusBeforeEdit[13]}
+                      // defaultValue={checkValue('filterSearch')}
                       values={filtersStatusItem.map((id) => id)}
                       selected="1"
                     />
@@ -1085,22 +1085,24 @@ export const getServerSideProps: GetServerSideProps = async ({
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : 'filterStatus=1';
 
-  // Last page
-  const lastPageServer = req.cookies.lastPage
+
+    // Last page
+    const lastPageServer = req.cookies.lastPage
     ? req.cookies.lastPage
     : 'No';
 
-  if (lastPageServer == undefined || lastPageServer == 'No') {
+    if (lastPageServer == undefined || lastPageServer == 'No') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
-  }
+    }
+
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : 'filterStatus=1';
 
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
