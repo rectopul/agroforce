@@ -664,6 +664,63 @@ export default function Listagem({
     });
   };
 
+  const dowloadExcelAnalytics = async () => {
+    await quadraService.getAll(`${filter}&allocation=${'IMPORTADO'}`).then(({ status, response }) => {
+      if (status === 200) {
+        const lines: any = [];
+        response.forEach(async (block: any) => {
+          await block.experiment?.forEach(async (experiment: any) => {
+            await experiment.experiment_genotipe?.forEach((parcela: any, index: number) => {
+              lines.push({
+                ID_EXPERIMENTO: experiment?.id,
+                SAFRA: experiment?.safra?.safraName,
+                EXPE: experiment?.experimentName,
+                NPEI: parcela?.npe,
+                NPEF: parcela?.npe,
+                NTPARC: 1,
+                LOCALPREP: block.local?.name_local_culture,
+                QM: block.cod_quadra,
+                SEQ: block.AllocatedExperiment[index]?.seq,
+                FOCO: experiment?.assay_list?.foco?.name,
+                ENSAIO: experiment?.assay_list?.type_assay?.name,
+                GLI: experiment?.assay_list?.gli,
+                CODLOCAL_EXP: experiment?.local?.name_local_culture,
+                EPOCA: experiment?.period,
+                TECNOLOGIA: experiment?.assay_list?.tecnologia?.name,
+                BGM: experiment?.bgm,
+                REP: experiment?.repetitionsNumber,
+                STATUS_EXP: experiment?.status,
+                CÓDIGO_GENOTIPO: parcela?.genotipo?.name_genotipo,
+                STATUS_PARCELA: parcela?.status,
+              });
+            });
+          });
+        });
+
+        console.log('response');
+        console.log(response);
+        const workSheet = XLSX.utils.json_to_sheet(lines);
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'quadra');
+
+        // Buffer
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
+        });
+        // Binary
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
+        });
+        // Download
+        XLSX.writeFile(workBook, 'Analítico.xlsx');
+      } else {
+        Swal.fire('Nenhuma quadra alocada');
+      }
+    });
+  };
+
   // manage total pages
   async function handleTotalPages() {
     if (currentPage < 0) {
@@ -939,6 +996,17 @@ export default function Listagem({
                           textColor="white"
                           onClick={() => {
                             downloadExcelSintetico();
+                          }}
+                        />
+                      </div>
+                      <div className="h-12 flex items-center justify-center w-full">
+                        <Button
+                          title="Exportação Analítico"
+                          icon={<RiFileExcel2Line size={20} />}
+                          bgColor="bg-red-600"
+                          textColor="white"
+                          onClick={() => {
+                            dowloadExcelAnalytics();
                           }}
                         />
                       </div>
