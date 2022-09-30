@@ -276,10 +276,9 @@ export class ExperimentController {
 
   async delete(data: any) {
     try {
-      const { response: experimentExist } = await this.getOne(Number(data.id));
+      const experimentExist: any = await this.getOne(Number(data.id));
       if (!experimentExist) return { status: 404, message: 'Experimento não encontrado' };
-      if (response?.status === 'PARCIALMENTE ALOCADO' || response?.status === 'TOTALMENTE  ALOCADO') return { status: 400, message: 'Não é possível deletar.' };
-      console.log(response);
+      if (experimentExist?.status === 'PARCIALMENTE ALOCADO' || experimentExist?.status === 'TOTALMENTE  ALOCADO') return { status: 400, message: 'Não é possível deletar.' };
 
       const response = await this.experimentRepository.delete(Number(data.id));
       const {
