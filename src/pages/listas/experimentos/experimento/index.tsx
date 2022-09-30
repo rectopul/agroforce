@@ -614,7 +614,7 @@ export default function Listagem({
             newItem.TECNOLOGIA = item.assay_list?.tecnologia.name;
             newItem.GLI = item.assay_list?.gli;
             newItem.NOME_DO_EXPERIMENTO = item?.experimentName;
-            newItem.BGM = item.assay_list?.bgm;
+            newItem.BGM = item?.bgm;
             newItem.STATUS_ENSAIO = item.assay_list?.status;
             newItem.PLANTIO = newItem.local?.name_local_culture;
             newItem.DELINEAMENTO = item.delineamento?.name;
@@ -1090,6 +1090,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);
+  const cultureId = Number(req.cookies.cultureId);
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;

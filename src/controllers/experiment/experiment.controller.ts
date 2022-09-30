@@ -66,8 +66,6 @@ export class ExperimentController {
       if (options.experimentGroupId) {
         parameters.experimentGroupId = Number(options.experimentGroupId);
       }
-      console.log(parameters);
-      console.log(options);
 
       const select = {
         id: true,
@@ -83,6 +81,7 @@ export class ExperimentController {
         comments: true,
         orderDraw: true,
         status: true,
+        bgm: true,
         assay_list: {
           select: {
             gli: true,

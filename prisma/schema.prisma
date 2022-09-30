@@ -472,6 +472,7 @@ model experiment {
   period            Int
   repetitionsNumber Int
   blockId           Int?
+  bgm               String
 
   assay_list          assay_list            @relation(fields: [idAssayList], references: [id])
   delineamento        delineamento          @relation(fields: [idDelineamento], references: [id])
@@ -503,7 +504,7 @@ model assay_list {
   id_tecnologia      Int
   gli                String
   treatmentsNumber   Int?
-  bgm                Int
+  bgm                String
   project            String
   status             String               @default("IMPORTADO")
   comments           String?
