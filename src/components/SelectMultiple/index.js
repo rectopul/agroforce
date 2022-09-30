@@ -7,6 +7,7 @@ import {
 
 export function SelectMultiple({ data = [], values = [], onChange }) {
   const [open, setOpen] = useState(false);
+  const [checkAll, setCheckAll] = useState(false);
 
   function handleSelect(item) {
     let newValues = values;
@@ -18,6 +19,20 @@ export function SelectMultiple({ data = [], values = [], onChange }) {
       newValues = values?.filter((i) => i !== item);
     } else {
       newValues.push(item);
+    }
+
+    onChange(newValues);
+  }
+
+  function handleSelectAll(check) {
+    setCheckAll(check);
+
+    let newValues = [];
+
+    if (check) {
+      newValues = data;
+    } else {
+      newValues = [];
     }
 
     onChange(newValues);
@@ -49,6 +64,17 @@ export function SelectMultiple({ data = [], values = [], onChange }) {
       </button>
       {open && (
         <div className={classContainerItems}>
+          <button
+            className={classButtonItem}
+            onClick={() => handleSelectAll(!checkAll)}
+          >
+            {checkAll ? (
+              <MdCheckBox size={22} className="text-blue-600" />
+            ) : (
+              <MdCheckBoxOutlineBlank size={22} color="#000" />
+            )}
+            <span className={classItemText}>Todos</span>
+          </button>
           {data?.map((i) => (
             <button className={classButtonItem} onClick={() => handleSelect(i)}>
               {values?.filter((x) => x === i)?.length > 0 ? (
