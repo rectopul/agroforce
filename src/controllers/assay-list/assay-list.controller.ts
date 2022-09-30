@@ -53,7 +53,8 @@ export class AssayListController {
           parameters.treatmentsNumber = JSON.parse(`{"lte": ${Number(options.filterTratTo)} }`);
         }
       }
-
+      console.log(parameters);
+      console.log(options);
       const select = {
         id: true,
         id_safra: true,

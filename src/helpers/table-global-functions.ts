@@ -183,13 +183,21 @@ function handleOrderG(columnG:any, orderG :any, orderListG:any ){
   let typeOrderG: any;
   let orderByG: any; //RR
   let arrowOrder : any;
+  // if (orderG == 1) {
+  //   typeOrderG = "asc";
+  //   } else if (orderG == 2) {
+  //   typeOrderG = "desc";
+  // } else {
+  //   typeOrderG = "asc";
+  // }
+
+
   if (orderG == 1) {
     typeOrderG = "asc";
-    } else if (orderG == 2) {
+    } else{
     typeOrderG = "desc";
-  } else {
-    typeOrderG = "";
   }
+  
 
   if (orderListG === 2) {
       orderByG = 0;
@@ -199,7 +207,7 @@ function handleOrderG(columnG:any, orderG :any, orderListG:any ){
     if (orderListG === 1) {
       arrowOrder  = AiOutlineArrowUp;    
     } else {     
-      arrowOrder = "";
+      arrowOrder = AiOutlineArrowDown;
     }
   }
   return {typeOrderG, columnG, orderByG, arrowOrder }

@@ -983,8 +983,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);
   const idCulture = Number(req.cookies.cultureId);
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  // removeCookies('filterBeforeEdit', { req, res });
+  // removeCookies('pageBeforeEdit', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/lote`;

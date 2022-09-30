@@ -35,6 +35,7 @@ package-lock.json
 
 .vscode/settings.json
 src.zip
+ .vscode/settings.json
 
 # vercel
 .vercel

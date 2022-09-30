@@ -145,13 +145,6 @@ export class ImportAssayListController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (!validateInteger(spreadSheet[row][column])) {
-                responseIfError[Number(column)] += responseGenericFactory(
-                  (Number(column) + 1),
-                  row,
-                  spreadSheet[0][column],
-                  'precisa ser um numero inteiro e positivo',
-                );
               }
             }
             // Validação do campo PRJ
@@ -299,7 +292,7 @@ export class ImportAssayListController {
                   id_type_assay: typeAssay[0]?.id,
                   id_tecnologia: technology[0]?.id,
                   gli: spreadSheet[row][3],
-                  bgm: Number(spreadSheet[row][5]),
+                  bgm: spreadSheet[row][5],
                   project: String(spreadSheet[row][6]),
                   created_by: createdBy,
                 });
@@ -324,7 +317,7 @@ export class ImportAssayListController {
                   id_type_assay: typeAssay[0]?.id,
                   id_tecnologia: technology[0]?.id,
                   gli: spreadSheet[row][3],
-                  bgm: Number(spreadSheet[row][5]),
+                  bgm: spreadSheet[row][5],
                   project: String(spreadSheet[row][6]),
                   created_by: createdBy,
                 });

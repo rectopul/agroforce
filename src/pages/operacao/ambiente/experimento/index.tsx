@@ -27,8 +27,13 @@ import {
   BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
+import {
+  MdFirstPage, MdLastPage,
+} from 'react-icons/md';
+import {
+  RiCloseCircleFill, RiFileExcel2Line,
+} from 'react-icons/ri';
+import { IoMdArrowBack } from 'react-icons/io';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import Modal from 'react-modal';
@@ -36,7 +41,9 @@ import { BsTrashFill } from 'react-icons/bs';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { experimentGenotipeService } from 'src/services/experiment-genotipe.service';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import { genotypeTreatmentService, npeService, userPreferencesService } from '../../../../services';
+import {
+  genotypeTreatmentService, npeService, sequenciaDelineamentoService, userPreferencesService,
+} from '../../../../services';
 import { experimentService } from '../../../../services/experiment.service';
 import {
   AccordionFilter,
@@ -120,7 +127,9 @@ export default function Listagem({
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.experimento || {
-    id: 0, table_preferences: 'id,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,countNT,npeQT',
+    id: 0,
+    table_preferences:
+      'id,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,countNT,npeQT',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -142,16 +151,35 @@ export default function Listagem({
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
-    { name: 'CamposGerenciados[]', title: 'Nome do experimento', value: 'experimentName' },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Nome do experimento',
+      value: 'experimentName',
+    },
     { name: 'CamposGerenciados[]', title: 'Nome tec.', value: 'tecnologia' },
     { name: 'CamposGerenciados[]', title: 'Época', value: 'period' },
-    { name: 'CamposGerenciados[]', title: 'Delineamento', value: 'delineamento' },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Delineamento',
+      value: 'delineamento',
+    },
     { name: 'CamposGerenciados[]', title: 'Rep.', value: 'repetitionsNumber' },
-    { name: 'CamposGerenciados[]', title: 'Number of treatment', value: 'countNT' },
-    { name: 'CamposGerenciados[]', title: 'NPE Inicial', value: 'repetitionsNumber' },
-    { name: 'CamposGerenciados[]', title: 'NPE Final', value: 'repetitionsNumber' },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Number of treatment',
+      value: 'countNT',
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'NPE Inicial',
+      value: 'repetitionsNumber',
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'NPE Final',
+      value: 'repetitionsNumber',
+    },
     { name: 'CamposGerenciados[]', title: 'QT. NPE', value: 'npeQT' },
-
   ]);
 
   const [colorStar, setColorStar] = useState<string>('');
@@ -460,44 +488,46 @@ export default function Listagem({
     //   filterApplication +=
     // }
 
-    await experimentService.getAll(excelFilters).then(({ status, response, message }: any) => {
-      if (status === 200) {
-        response.map((item: any) => {
-          const newItem = item;
-          if (item.assay_list) {
-            newItem.gli = item.assay_list.gli;
-            newItem.foco = item.assay_list.foco.name;
-            newItem.type_assay = item.assay_list.type_assay.name;
-            newItem.tecnologia = item.assay_list.tecnologia.name;
-          }
-          if (item.delineamento) {
-            newItem.repeticao = item.delineamento.repeticao;
-            newItem.delineamento = item.delineamento.name;
-          }
-          delete newItem.assay_list;
-          return newItem;
-        });
+    await experimentService
+      .getAll(excelFilters)
+      .then(({ status, response, message }: any) => {
+        if (status === 200) {
+          response.map((item: any) => {
+            const newItem = item;
+            if (item.assay_list) {
+              newItem.gli = item.assay_list.gli;
+              newItem.foco = item.assay_list.foco.name;
+              newItem.type_assay = item.assay_list.type_assay.name;
+              newItem.tecnologia = item.assay_list.tecnologia.name;
+            }
+            if (item.delineamento) {
+              newItem.repeticao = item.delineamento.repeticao;
+              newItem.delineamento = item.delineamento.name;
+            }
+            delete newItem.assay_list;
+            return newItem;
+          });
 
-        const workSheet = XLSX.utils.json_to_sheet(response);
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'experimentos');
+          const workSheet = XLSX.utils.json_to_sheet(response);
+          const workBook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'experimentos');
 
-        // Buffer
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
-        });
-        // Download
-        XLSX.writeFile(workBook, 'Experimentos.xlsx');
-      } else {
-        Swal.fire(message);
-      }
-    });
+          // Buffer
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
+          });
+          // Binary
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
+          });
+          // Download
+          XLSX.writeFile(workBook, 'Experimentos.xlsx');
+        } else {
+          Swal.fire(message);
+        }
+      });
   };
 
   function handleTotalPages(): void {
@@ -516,18 +546,20 @@ export default function Listagem({
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
       }
-      await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
-        if (status === 200) {
-          let i = lastExperimentNPE;
-          response.map((item: any) => {
-            item.npei = i;
-            item.npef = i + item.npeQT - 1;
-            i = item.npef + 1;
-          });
-          setLastExperimentNPE(i);
-          setExperimentoNew(response);
-        }
-      });
+      await experimentService
+        .getAll(parametersFilter)
+        .then(({ status, response }: any) => {
+          if (status === 200) {
+            let i = lastExperimentNPE;
+            response.map((item: any) => {
+              item.npei = i;
+              item.npef = i + item.npeQT - 1;
+              i = item.npef + 1;
+            });
+            setLastExperimentNPE(i);
+            setExperimentoNew(response);
+          }
+        });
     }
   }
 
@@ -582,43 +614,68 @@ export default function Listagem({
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
       }
-      const temp = [...selectedNPE];
-
-      await experimentService.getAll(parametersFilter).then(({ status, response, total }: any) => {
-        if (status === 200) {
-          let i = 0;
-          response.length > 0 ? i = NPESelectedRow.prox_npe : i = NPESelectedRow.npef;
-          response.map((item: any) => {
-            item.npei = i;
-            item.npef = i + item.npeQT - 1;
-            i = item.npef + 1;
-            i >= NPESelectedRow.nextNPE.npei_i && npeUsedFrom == 0 ? setNpeUsedFrom(NPESelectedRow.nextNPE.npei_i) : '';
-          });
-
-          setExperimento(response);
-          setTotalItems(total);
-          temp.filter((x): any => x == NPESelectedRow)[0].npef = i - 1;
-        }
-      });
-      parametersFilter = `skip=${skip}&take=${take}&${parametersFilter}`;
-      await experimentService.getAll(parametersFilter).then(({ status, response }: any) => {
-        if (status === 200) {
+      await experimentService.getAll(`skip=${skip}&take=${take}&${parametersFilter}`).then(({ status, response }: any) => {
+        if (status === 200 || status === 400) {
           let i = NPESelectedRow.prox_npe;
-          response.map((item: any) => {
-            item.npei = i;
-            item.npef = i + item.npeQT - 1;
-            i = item.npef + 1;
+          response.map(async (item: any) => {
+            await sequenciaDelineamentoService.getAll(`id_delineamento=${item.delineamento.id}&nt=${item.countNT}`).then(async ({ status, response, total }: any) => {
+              if (status === 200 || status === 400) {
+                item.seq_delineamento = response;
+                item.npei = i;
+                item.npef = i + item.npeQT * (item.seq_delineamento.length) - 1;
+                i = item.npef + 1;
+              }
+            });
           });
           setLastExperimentNPE(i);
           setExperimentoNew(response);
         }
       });
+      getAllExperiments();
+      setLoading(false);
+    }
+  }
 
+  async function getAllExperiments(): Promise<void> {
+    if (NPESelectedRow) {
+      const skip = currentPage * Number(take);
+      let parametersFilter = `idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}&Status=IMPORTADO`;
+
+      if (filter) {
+        parametersFilter = `${parametersFilter}&${filter}`;
+      }
+
+      const temp = [...selectedNPE];
+
+      await experimentService.getAll(parametersFilter).then(({ status, response, total }: any) => {
+        if (status === 200 || status === 400) {
+          let i = 0;
+          response.length > 0 ? i = NPESelectedRow.prox_npe : i = NPESelectedRow.npef;
+          response.map(async (item: any) => {
+            sequenciaDelineamentoService.getAll(`id_delineamento=${item.delineamento.id}&nt=${item.countNT}`).then(async ({ status, response, total }: any) => {
+              if (status === 200 || status === 400) {
+                item.seq_delineamento = response;
+              }
+            });
+            item.npei = i;
+            item.npef = i + item.npeQT - 1;
+            i = item.npef + 1;
+            i >= NPESelectedRow.nextNPE.npei_i && npeUsedFrom == 0 ? setNpeUsedFrom(NPESelectedRow.nextNPE.npei_i) : '';
+          });
+          // temp.filter((x): any => x == NPESelectedRow)[0].npef = response[response.length - 1].npef;
+          setExperimento(response);
+          console.log('Experimentos : ', response[response.length - 1]);
+          setTotalItems(total);
+        }
+      });
       setLoading(false);
     }
   }
 
   async function createExperimentGenotipe({ data, total_consumed, genotipo_treatment }: any) {
+    console.log('data : ', data);
+    console.log('total_consumed : ', total_consumed);
+    console.log('genotype treatment : ', genotipo_treatment);
     if (data.length > 0) {
       const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
       const experimentObj: any[] = [];
@@ -629,27 +686,45 @@ export default function Listagem({
         experimentObj.push(data);
       });
 
-      if (NPESelectedRow?.npeQT == 'N/A' ? true : (((NPESelectedRow?.npeQT - total_consumed) > 0) && lastNpe < NPESelectedRow?.nextNPE.npei_i)) {
-        await experimentGenotipeService.create(data).then(async ({ status, response }: any) => {
-          if (status === 200) {
-            genotipo_treatment.map(async (gt: any) => {
-              genotypeTreatmentService.update(gt).then(({ status, message }: any) => {
+      if (
+        NPESelectedRow?.npeQT == 'N/A'
+          ? true
+          : NPESelectedRow?.npeQT - total_consumed > 0
+            && lastNpe < NPESelectedRow?.nextNPE.npei_i
+      ) {
+        await experimentGenotipeService
+          .create(data)
+          .then(async ({ status, response }: any) => {
+            if (status === 200) {
+              genotipo_treatment.map(async (gt: any) => {
+                genotypeTreatmentService
+                  .update(gt)
+                  .then(({ status, message }: any) => {});
               });
-            });
-            experimentObj.map(async (x: any) => {
-              await experimentService.update(x).then(({ status, response }: any) => {
+              experimentObj.map(async (x: any) => {
+                await experimentService
+                  .update(x)
+                  .then(({ status, response }: any) => {});
               });
-            });
 
-            await npeService.update({
-              id: NPESelectedRow?.id, npef: lastNpe, npeQT: NPESelectedRow?.npeQT == 'N/A' ? null : NPESelectedRow?.npeQT - total_consumed, status: 3, prox_npe: lastNpe + 1,
-            }).then(({ status, resposne }: any) => {
-              if (status === 200) {
-                router.push('/operacao/ambiente');
-              }
-            });
-          }
-        });
+              await npeService
+                .update({
+                  id: NPESelectedRow?.id,
+                  npef: lastNpe,
+                  npeQT:
+                    NPESelectedRow?.npeQT == 'N/A'
+                      ? null
+                      : NPESelectedRow?.npeQT - total_consumed,
+                  status: 3,
+                  prox_npe: lastNpe + 1,
+                })
+                .then(({ status, resposne }: any) => {
+                  if (status === 200) {
+                    router.push('/operacao/ambiente');
+                  }
+                });
+            }
+          });
       }
     } else {
       Swal.fire('Nenhum experimento para desenhar');
@@ -661,33 +736,34 @@ export default function Listagem({
       const experiment_genotipo: any[] = [];
       const genotipo_treatment: any[] = [];
       let npei = Number(NPESelectedRow?.npei_i);
-      let total_consumed = 0;
 
       experimentos?.map((item: any) => {
-        total_consumed += item.npeQT;
         item.assay_list.genotype_treatment.map((gt: any) => {
-          const data: any = {};
+          item.seq_delineamento.map((sd: any) => {
+            const data: any = {};
+            data.idSafra = gt.id_safra;
+            data.idFoco = item.assay_list.foco.id;
+            data.idTypeAssay = item.assay_list.type_assay.id;
+            data.idTecnologia = item.assay_list.tecnologia.id;
+            data.gli = item.assay_list.gli;
+            data.idExperiment = item.id;
+            data.rep = item.delineamento.repeticao;
+            data.nt = gt.treatments_number;
+            data.npe = npei;
+            // data.name_genotipo = gt.genotipo.name_genotipo;
+            data.idGenotipo = gt.genotipo.id; // Added new field
+            data.id_seq_delineamento = sd.id;
+            data.nca = '';
+            experiment_genotipo.push(data);
+            npei++;
+          });
           const gt_new: any = {};
-          data.idSafra = gt.id_safra;
-          data.idFoco = item.assay_list.foco.id;
-          data.idTypeAssay = item.assay_list.type_assay.id;
-          data.idTecnologia = item.assay_list.tecnologia.id;
-          data.gli = item.assay_list.gli;
-          data.idExperiment = item.id;
-          data.rep = item.delineamento.repeticao;
-          data.nt = gt.treatments_number;
-          data.npe = npei;
-          // data.name_genotipo = gt.genotipo.name_genotipo;
-          data.idGenotipo = gt.genotipo.id; // Added new field
-          data.nca = '';
           gt_new.id = gt.id;
           gt_new.status_experiment = 'SORTEADO';
-          experiment_genotipo.push(data);
           genotipo_treatment.push(gt_new);
-          npei++;
         });
       });
-      createExperimentGenotipe({ data: experiment_genotipo, total_consumed, genotipo_treatment });
+      createExperimentGenotipe({ data: experiment_genotipo, total_consumed: experiment_genotipo.length, genotipo_treatment });
     } else {
       const temp = NPESelectedRow;
       Swal.fire({
@@ -720,8 +796,8 @@ export default function Listagem({
     let count = 0;
     experimentos.map((item: any) => {
       item.npei <= NPESelectedRow?.nextNPE.npei_i
-        && item.npef >= NPESelectedRow?.nextNPE.npei_i
-        && NPESelectedRow?.nextNPE != 0
+      && item.npef >= NPESelectedRow?.nextNPE.npei_i
+      && NPESelectedRow?.nextNPE != 0
         ? count++
         : '';
     });
@@ -786,31 +862,33 @@ export default function Listagem({
               }}
             />
           </div>
-          {NPESelectedRow
-            ? (
-              <div className="w-full h-full overflow-y-scroll">
-                <MaterialTable
-                  style={{ background: '#f9fafb' }}
-                  columns={columns}
-                  data={experimentosNew}
-                  options={{
-                    showTitle: false,
-                    headerStyle: {
-                      zIndex: 20,
-                    },
-                    rowStyle: (rowData) => ({
-                      backgroundColor:
-                        (rowData.npef >= NPESelectedRow?.nextNPE.npei_i) && SortearDisable ? '#FF5349' : '#f9fafb',
-                      height: 40,
-                    }),
-                    search: false,
-                    filtering: false,
-                    pageSize: itensPerPage,
-                  }}
-                  components={{
-                    Toolbar: () => (
-                      <div
-                        className="w-full max-h-96
+          {NPESelectedRow ? (
+            <div className="w-full h-full overflow-y-scroll">
+              <MaterialTable
+                style={{ background: '#f9fafb' }}
+                columns={columns}
+                data={experimentosNew}
+                options={{
+                  showTitle: false,
+                  headerStyle: {
+                    zIndex: 20,
+                  },
+                  rowStyle: (rowData) => ({
+                    backgroundColor:
+                      rowData.npef >= NPESelectedRow?.nextNPE.npei_i
+                      && SortearDisable
+                        ? '#FF5349'
+                        : '#f9fafb',
+                    height: 40,
+                  }),
+                  search: false,
+                  filtering: false,
+                  pageSize: itensPerPage,
+                }}
+                components={{
+                  Toolbar: () => (
+                    <div
+                      className="w-full max-h-96
                                                 flex
                                                 items-center
                                                 justify-between
@@ -821,8 +899,8 @@ export default function Listagem({
                                                 border-solid border-b
                                                 border-gray-200
                                             "
-                      >
-                        {/* <div className="h-12">
+                    >
+                      {/* <div className="h-12">
                       <Button
                         title="Importar Planilha"
                         value="Importar Planilha"
@@ -833,142 +911,155 @@ export default function Listagem({
                         icon={<RiFileExcel2Line size={20} />}
                       />
                     </div> */}
-                        <strong className="text-600">Experimentos</strong>
-                        <strong className="text-blue-600">
-                          Total registrado:
-                          {' '}
-                          {experimentos?.length}
-                        </strong>
+                      <div className="flex flex-col items-center justify-center h-7 w-32">
+                        <Button
+                          type="button"
+                          value="Voltar"
+                          bgColor="bg-red-600"
+                          textColor="white"
+                          icon={<IoMdArrowBack size={18} />}
+                          onClick={() => {
+                            router.back();
+                          }}
+                        />
+                      </div>
 
-                        <div className="h-full flex items-center gap-2">
-                          <div className="border-solid border-2 border-blue-600 rounded">
-                            <div className="w-72">
-                              <AccordionFilter
-                                title="Gerenciar Campos"
-                                grid={statusAccordion}
-                              >
-                                <DragDropContext onDragEnd={handleOnDragEnd}>
-                                  <Droppable droppableId="characters">
-                                    {(provided) => (
-                                      <ul
-                                        className="w-full h-full characters"
-                                        {...provided.droppableProps}
-                                        ref={provided.innerRef}
-                                      >
-                                        <div className="h-8 mb-3">
-                                          <Button
-                                            value="Atualizar"
-                                            bgColor="bg-blue-600"
-                                            textColor="white"
-                                            onClick={getValuesColumns}
-                                            icon={<IoReloadSharp size={20} />}
-                                          />
-                                        </div>
-                                        {generatesProps.map((generate, index) => (
-                                          <Draggable
-                                            key={index}
-                                            draggableId={String(generate.title)}
-                                            index={index}
-                                          >
-                                            {(provider) => (
-                                              <li
-                                                ref={provider.innerRef}
-                                                {...provider.draggableProps}
-                                                {...provider.dragHandleProps}
-                                              >
-                                                <CheckBox
-                                                  name={generate.name}
-                                                  title={generate.title?.toString()}
-                                                  value={generate.value}
-                                                  defaultChecked={camposGerenciados.includes(
-                                                    String(generate.value),
-                                                  )}
-                                                />
-                                              </li>
-                                            )}
-                                          </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                      </ul>
-                                    )}
-                                  </Droppable>
-                                </DragDropContext>
-                              </AccordionFilter>
-                            </div>
-                          </div>
+                      <strong className="text-600">Experimentos</strong>
+                      <strong className="text-blue-600">
+                        Total registrado:
+                        {' '}
+                        {experimentos?.length}
+                      </strong>
 
-                          <div className="h-12 flex items-center justify-center w-full">
-                            <Button
-                              title="Sortear"
-                              value="Sortear"
-                              bgColor={
-                                SortearDisable ? 'bg-gray-400' : 'bg-blue-600'
-                              }
-                              textColor="white"
-                              onClick={validateConsumedData}
-                            />
+                      <div className="h-full flex items-center gap-2">
+                        <div className="border-solid border-2 border-blue-600 rounded">
+                          <div className="w-72">
+                            <AccordionFilter
+                              title="Gerenciar Campos"
+                              grid={statusAccordion}
+                            >
+                              <DragDropContext onDragEnd={handleOnDragEnd}>
+                                <Droppable droppableId="characters">
+                                  {(provided) => (
+                                    <ul
+                                      className="w-full h-full characters"
+                                      {...provided.droppableProps}
+                                      ref={provided.innerRef}
+                                    >
+                                      <div className="h-8 mb-3">
+                                        <Button
+                                          value="Atualizar"
+                                          bgColor="bg-blue-600"
+                                          textColor="white"
+                                          onClick={getValuesColumns}
+                                          icon={<IoReloadSharp size={20} />}
+                                        />
+                                      </div>
+                                      {generatesProps.map((generate, index) => (
+                                        <Draggable
+                                          key={index}
+                                          draggableId={String(generate.title)}
+                                          index={index}
+                                        >
+                                          {(provider) => (
+                                            <li
+                                              ref={provider.innerRef}
+                                              {...provider.draggableProps}
+                                              {...provider.dragHandleProps}
+                                            >
+                                              <CheckBox
+                                                name={generate.name}
+                                                title={generate.title?.toString()}
+                                                value={generate.value}
+                                                defaultChecked={camposGerenciados.includes(
+                                                  String(generate.value),
+                                                )}
+                                              />
+                                            </li>
+                                          )}
+                                        </Draggable>
+                                      ))}
+                                      {provided.placeholder}
+                                    </ul>
+                                  )}
+                                </Droppable>
+                              </DragDropContext>
+                            </AccordionFilter>
                           </div>
                         </div>
+
+                        <div className="h-12 flex items-center justify-center w-full">
+                          <Button
+                            title="Sortear"
+                            value="Sortear"
+                            bgColor={
+                              SortearDisable ? 'bg-gray-400' : 'bg-blue-600'
+                            }
+                            textColor="white"
+                            onClick={validateConsumedData}
+                          />
+                        </div>
                       </div>
-                    ),
-                    Pagination: (props) => (
-                      <div
-                        className="flex
+                    </div>
+                  ),
+                  Pagination: (props) => (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                        {...props}
-                      >
-                        <Button
-                          onClick={() => setCurrentPage(currentPage - 10)}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          icon={<MdFirstPage size={18} />}
-                          disabled={currentPage <= 1}
-                        />
-                        <Button
-                          onClick={() => setCurrentPage(currentPage - 1)}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          icon={<BiLeftArrow size={15} />}
-                          disabled={currentPage <= 0}
-                        />
-                        {Array(1)
-                          .fill('')
-                          .map((value, index) => (
-                            <Button
-                              key={index}
-                              onClick={() => setCurrentPage(index)}
-                              value={`${currentPage + 1}`}
-                              bgColor="bg-blue-600"
-                              textColor="white"
-                            />
-                          ))}
-                        <Button
-                          onClick={() => setCurrentPage(currentPage + 1)}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          icon={<BiRightArrow size={15} />}
-                          disabled={currentPage + 1 >= pages}
-                        />
-                        <Button
-                          onClick={() => setCurrentPage(currentPage + 10)}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          icon={<MdLastPage size={18} />}
-                          disabled={currentPage + 1 >= pages}
-                        />
-                      </div>
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage <= 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill('')
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                          />
+                        ))}
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                     ) as any,
-                  }}
-                />
-              </div>
-            ) : (
-              ''
-            )}
+                }}
+              />
+            </div>
+          ) : (
+            ''
+          )}
         </main>
       </Content>
     </>

@@ -115,8 +115,8 @@ export default function AtualizarLocal({
     { name: 'CamposGerenciados[]', title: 'T', value: 'status' },
     { name: 'CamposGerenciados[]', title: 'NCA', value: 'nca' },
     { name: 'CamposGerenciados[]', title: 'NPE', value: 'npe' },
-    { name: 'CamposGerenciados[]', title: 'Seq.', value: 'sequence' },
-    { name: 'CamposGerenciados[]', title: 'Bloco', value: 'block' },
+    { name: 'CamposGerenciados[]', title: 'Seq.', value: 'sorteio' },
+    { name: 'CamposGerenciados[]', title: 'Bloco', value: 'bloco' },
     { name: 'CamposGerenciados[]', title: 'Status parc.', value: 'experiment' },
   ]);
 
@@ -132,7 +132,7 @@ export default function AtualizarLocal({
       tecnologia: `${experimento.assay_list?.tecnologia.cod_tec} ${experimento.assay_list?.tecnologia.name}`,
       gli: experimento.assay_list?.gli,
       experimentName: experimento?.experimentName,
-      bgm: experimento.assay_list?.bgm,
+      bgm: experimento?.bgm,
       local: experimento.local?.name_local_culture,
       delineamento: experimento.delineamento?.name,
       repetition: experimento.repetition,
@@ -248,7 +248,7 @@ export default function AtualizarLocal({
         tableFields.push(headerTableFactory('GMR', 'genotipo.gmr'));
       }
       if (columnCampos[index] === 'bgm') {
-        tableFields.push(headerTableFactory('BGM', 'genotipo.bgm'));
+        tableFields.push(headerTableFactory('BGM', 'bgm'));
       }
       if (columnCampos[index] === 'fase') {
         tableFields.push(headerTableFactory('Fase', 'fase'));
@@ -272,10 +272,10 @@ export default function AtualizarLocal({
         tableFields.push(headerTableFactory('NPE', 'npe'));
       }
       if (columnCampos[index] === 'sequence') {
-        tableFields.push(headerTableFactory('Sequence', 'seq'));
+        tableFields.push(headerTableFactory('Sequence', 'sequencia_delineamento.sorteio'));
       }
       if (columnCampos[index] === 'block') {
-        tableFields.push(headerTableFactory('Bloco', 'block'));
+        tableFields.push(headerTableFactory('Bloco', 'sequencia_delineamento.bloco'));
       }
       if (columnCampos[index] === 'experiment') {
         tableFields.push(headerTableFactory('Status parc.', 'experiment.status'));
@@ -491,7 +491,7 @@ export default function AtualizarLocal({
 
               {fieldsFactory('Experimento', 'experimentName', experimento.experimentName)}
 
-              {fieldsFactory('BGM', 'bgm', experimento.assay_list?.bgm)}
+              {fieldsFactory('BGM', 'bgm', experimento?.bgm)}
 
               {fieldsFactory('Status do ensaio', 'status', experimento.assay_list?.status)}
 
@@ -825,6 +825,9 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
 
   const allItens: any = [];
   const totalItems = 0;
+
+  console.log('experimento');
+  console.log(experimento);
 
   return {
     props: {
