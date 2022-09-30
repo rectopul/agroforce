@@ -38,10 +38,6 @@ export class SafraController {
         );
       }
 
-      if (options.filterYear) {
-        parameters.year = Number(options.filterYear);
-      }
-
       if (options.filterYearFrom || options.filterYearTo) {
         if (options.filterYearFrom && options.filterYearTo) {
           parameters.year = JSON.parse(`{"gte": ${Number(options.filterYearFrom)}, "lte": ${Number(options.filterYearTo)} }`);
@@ -51,6 +47,8 @@ export class SafraController {
           parameters.year = JSON.parse(`{"lte": ${Number(options.filterYearTo)} }`);
         }
       }
+      console.log(parameters);
+      console.log(options);
       const select = {
         id: true,
         safraName: true,

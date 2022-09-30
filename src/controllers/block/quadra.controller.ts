@@ -28,7 +28,8 @@ export class QuadraController {
       if (options.filterSchema) {
         parameters.esquema = JSON.parse(`{"contains":"${options.filterSchema}"}`);
       }
-
+      console.log(parameters);
+      console.log(options);
       if (options.filterPFrom || options.filterPTo) {
         if (options.filterPFrom && options.filterPTo) {
           parameters.linha_p = JSON.parse(`{"gte": ${Number(options.filterPFrom)}, "lte": ${Number(options.filterPTo)} }`);
@@ -49,7 +50,13 @@ export class QuadraController {
         select = {
           id: true,
           cod_quadra: true,
-          local: { select: { name_local_culture: true } },
+          local: {
+            select: {
+              name_local_culture: true,
+              name_locality: true,
+              quadra: true,
+            },
+          },
           esquema: true,
           larg_q: true,
           comp_p: true,
@@ -63,6 +70,13 @@ export class QuadraController {
           allocation: true,
           status: true,
           AllocatedExperiment: true,
+          experiment: {
+            select: {
+              id: true,
+              safra: true,
+              experimentName: true,
+            },
+          },
         };
       }
 

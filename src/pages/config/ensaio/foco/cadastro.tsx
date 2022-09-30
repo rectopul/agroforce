@@ -96,7 +96,7 @@ export default function Cadastro() {
           >
             <div className="w-full h-10">
               <label className="block text-gray-900 text-sm font-bold mb-1">
-                Nome
+                *Nome
               </label>
               <Input
                 id="name"

@@ -32,14 +32,12 @@ import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
-import { tableGlobalFunctions } from '../../../../helpers';
 
 export default function TipoEnsaio({
   allAssay,
   itensPerPage,
   filterApplication,
   totalItems,
-  idCulture,
   idSafra,
   pageBeforeEdit,
   filterBeforeEdit,
@@ -57,7 +55,7 @@ export default function TipoEnsaio({
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.assayList || { id: 0, table_preferences: 'id,foco,type_assay,gli,tecnologia,treatmentsNumber,status,action' };
+  const preferences = userLogado.preferences.assayList || { id: 0, table_preferences: 'id,protocol_name,foco,type_assay,gli,tecnologia,treatmentsNumber,status,action' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   const [assayList, setAssayList] = useState<IAssayList[]>(() => allAssay);
   const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
@@ -72,6 +70,9 @@ export default function TipoEnsaio({
     // {
     //   name: 'CamposGerenciados[]', title: 'Favorito ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
     // },
+    {
+      name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocol_name', defaultChecked: () => camposGerenciados.includes('protocol_name'),
+    },
     {
       name: 'CamposGerenciados[]', title: 'Foco', value: 'foco', defaultChecked: () => camposGerenciados.includes('foco'),
     },
@@ -96,7 +97,7 @@ export default function TipoEnsaio({
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
-  // const [orderBy, setOrderBy] = useState<string>('');
+  const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const router = useRouter();
   const take: number = itensPerPage;
@@ -172,34 +173,34 @@ export default function TipoEnsaio({
   }, [typeOrder]);
 
   async function handleOrder(column: string, order: number): Promise<void> {
-    // let typeOrder: any;
-    // let parametersFilter: any;
-    // if (order === 1) {
-    //   typeOrder = 'asc';
-    // } else if (order === 2) {
-    //   typeOrder = 'desc';
-    // } else {
-    //   typeOrder = '';
-    // }
-    // setOrderBy(column);
-    // setOrderType(typeOrder);
-    // if (filter && typeof (filter) !== 'undefined') {
-    //   if (typeOrder !== '') {
-    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-    //   } else {
-    //     parametersFilter = filter;
-    //   }
-    // } else if (typeOrder !== '') {
-    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    // } else {
-    //   parametersFilter = filter;
-    // }
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+    setOrderBy(column);
+    setOrderType(typeOrder);
+    if (filter && typeof (filter) !== 'undefined') {
+      if (typeOrder !== '') {
+        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+      } else {
+        parametersFilter = filter;
+      }
+    } else if (typeOrder !== '') {
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    } else {
+      parametersFilter = filter;
+    }
 
-    // await assayListService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }) => {
-    //   if (status === 200) {
-    //     setAssayList(response);
-    //   }
-    // });
+    await assayListService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }) => {
+      if (status === 200) {
+        setAssayList(response);
+      }
+    });
 
     // if (orderList === 2) {
     //   setOrder(0);
@@ -400,6 +401,9 @@ export default function TipoEnsaio({
       // if (columnOrder[item] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
+      if (columnOrder[item] === 'protocol_name') {
+        tableFields.push(headerTableFactory('Protocolo', 'protocol_name'));
+      }
       if (columnOrder[item] === 'foco') {
         tableFields.push(headerTableFactory('Foco', 'foco.name'));
       }
@@ -480,12 +484,13 @@ export default function TipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await assayListService.getAll(filter).then(({ status, response }) => {
+    await assayListService.getAll(filterApplication).then(({ status, response }) => {
       if (status === 200) {
         response.map((item: any) => {
           const newItem = item;
 
           newItem.SAFRA = newItem.safra?.safraName;
+          newItem.PROTOCOLO = newItem?.protocol_name;
           newItem.FOCO = newItem.foco?.name;
           newItem.TIPO_DE_ENSAIO = newItem.type_assay?.name;
           newItem.TECNOLOGIA = newItem.tecnologia?.name;
@@ -504,7 +509,9 @@ export default function TipoEnsaio({
           delete newItem.gli;
           delete newItem.tecnologia;
           delete newItem.foco;
+          delete newItem.protocol_name;
           delete newItem.countNT;
+          delete newItem.period;
           delete newItem.comments;
           delete newItem.type_assay;
           delete newItem.id;
@@ -538,17 +545,19 @@ export default function TipoEnsaio({
   async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
+    } else if (currentPage >= pages) {
+      setCurrentPage(pages - 1);
     }
   }
 
   async function handlePagination(): Promise<void> {
-    // const skip = currentPage * Number(take);
-    // let parametersFilter;
-    // if (orderType) {
-    //   parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    // } else {
-    //   parametersFilter = `skip=${skip}&take=${take}`;
-    // }
+    const skip = currentPage * Number(take);
+    let parametersFilter;
+    if (orderType) {
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    } else {
+      parametersFilter = `skip=${skip}&take=${take}`;
+    }
 
     // if (filter) {
     //   parametersFilter = `${parametersFilter}&${filter}`;
@@ -578,7 +587,6 @@ export default function TipoEnsaio({
           type="text"
           placeholder={name}
           id={title}
-          defaultValue={checkValue(title)}
           name={title}
           onChange={formik.handleChange}
         />
@@ -885,8 +893,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const filterApplication = req.cookies.filterBeforeEdit
     ? filterBeforeEdit
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
-  // removeCookies('filterBeforeEdit', { req, res });
-  // removeCookies('pageBeforeEdit', { req, res });
 
   // //RR
   removeCookies('filterBeforeEditTypeOrder', { req, res });
