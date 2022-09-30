@@ -75,20 +75,24 @@ export function SelectMultiple({ data = [], values = [], onChange }) {
             className={classButtonItem}
             onClick={() => handleSelectAll(!checkAll)}
           >
-            {checkAll ? (
-              <MdCheckBox size={22} className="text-blue-600" />
-            ) : (
-              <MdCheckBoxOutlineBlank size={22} color="#000" />
-            )}
-            <span className={classItemText}>Todos</span>
-          </button>
-          {data?.map((i) => (
-            <button className={classButtonItem} onClick={() => handleSelect(i)}>
-              {values?.filter((x) => x === i)?.length > 0 ? (
+            <div>
+              {checkAll ? (
                 <MdCheckBox size={22} className="text-blue-600" />
               ) : (
                 <MdCheckBoxOutlineBlank size={22} color="#000" />
               )}
+            </div>
+            <span className={classItemText}>Todos</span>
+          </button>
+          {data?.map((i) => (
+            <button className={classButtonItem} onClick={() => handleSelect(i)}>
+              <div>
+                {values?.filter((x) => x === i)?.length > 0 ? (
+                  <MdCheckBox size={22} className="text-blue-600" />
+                ) : (
+                  <MdCheckBoxOutlineBlank size={22} color="#000" />
+                )}
+              </div>
               <span className={classItemText}>{i}</span>
             </button>
           ))}
