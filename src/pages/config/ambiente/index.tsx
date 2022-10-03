@@ -111,7 +111,9 @@ export default function Listagem({
 
   // eslint-disable-next-line no-return-assign, no-param-reassign
   tabsDropDowns.map((tab) =>
-    tab.titleTab === "NPE" ? (tab.statusTab = true) : (tab.statusTab = false)
+    tab.titleTab === "AMBIENTE"
+      ? (tab.statusTab = true)
+      : (tab.statusTab = false)
   );
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
@@ -358,7 +360,7 @@ export default function Listagem({
                 setCookies("filterBeforeEditOrderBy", orderBy);
                 setCookies("filtersParams", filtersParams);
                 setCookies("lastPage", "atualizar");
-                router.push(`/config/npe/atualizar?id=${rowData.id}`);
+                router.push(`/config/ambiente/atualizar?id=${rowData.id}`);
               }}
             />
           </div>
@@ -767,7 +769,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar npe's">
+          <AccordionFilter title="Filtrar ambiente">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -793,8 +795,6 @@ export default function Listagem({
                     />
                   </div>
 
-                  {filterFieldFactory("filterLocal", "Lugar cultura")}
-
                   {filterFieldFactory("filterSafra", "Safra")}
 
                   {filterFieldFactory("filterFoco", "Foco")}
@@ -804,6 +804,8 @@ export default function Listagem({
                   {filterFieldFactory("filterCodTecnologia", "Cód. Tec.")}
 
                   {filterFieldFactory("filterTecnologia", "Nome Tec.")}
+
+                  {filterFieldFactory("filterLocal", "Lugar cultura")}
 
                   {filterFieldFactory("filterEpoca", "Epoca")}
 
