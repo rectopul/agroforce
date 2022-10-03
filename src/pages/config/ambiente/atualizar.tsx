@@ -79,7 +79,9 @@ export default function NovoLocal({
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) =>
-    tab.titleTab === "NPE" ? (tab.statusTab = true) : (tab.statusTab = false)
+    tab.titleTab === "AMBIENTE"
+      ? (tab.statusTab = true)
+      : (tab.statusTab = false)
   );
 
   const [localMap, setIdLocalMap] = useState<ILocal[]>(() => local);

@@ -82,7 +82,7 @@ export function SelectMultiple({ data = [], values = [], onChange }) {
                 <MdCheckBoxOutlineBlank size={22} color="#000" />
               )}
             </div>
-            <span className={classItemText}>Todos</span>
+            <span className={classItemText}>TODOS</span>
           </button>
           {data?.map((i) => (
             <button className={classButtonItem} onClick={() => handleSelect(i)}>
