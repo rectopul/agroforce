@@ -435,7 +435,6 @@ export default function Listagem({
       }
     });
 
-    // console.log("tableFields  ",tableFields)
     return tableFields;
   }
 

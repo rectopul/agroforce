@@ -14,6 +14,7 @@ import { DelineamentoController } from './delineamento.controller';
 import { LogImportController } from '../log-import.controller';
 import { SequenciaDelineamentoController } from '../sequencia-delineamento.controller';
 import { ImportController } from '../import.controller';
+import { CulturaController } from '../cultura.controller';
 
 export class ImportDelimitationController {
   static async validate(
@@ -23,6 +24,7 @@ export class ImportDelimitationController {
     }: ImportValidate,
   ): Promise<IReturnObject> {
     const importController = new ImportController();
+    const culturaController = new CulturaController();
     const logImportController = new LogImportController();
     const delineamentoController = new DelineamentoController();
     const sequenciaDelineamentoController = new SequenciaDelineamentoController();
@@ -33,6 +35,22 @@ export class ImportDelimitationController {
       for (const row in spreadSheet) {
         if (row !== '0') {
           for (const column in spreadSheet[row]) {
+            if (configModule.response[0]?.fields[column] === 'Cultura') {
+              if (spreadSheet[row][column] !== null) {
+                const {
+                  response,
+                }: any = await culturaController.getOneCulture(Number(idCulture));
+                if (response?.name !== spreadSheet[row][column]) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                    'a cultura e diferente da selecionada',
+                  );
+                }
+              }
+            }
+
             if (configModule.response[0]?.fields[column] === 'Nome') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -66,7 +84,7 @@ export class ImportDelimitationController {
                     row,
                     spreadSheet[0][column],
                   );
-              } else if (spreadSheet[Number(row) - 1][0]
+              } else if (spreadSheet[Number(row) - 1][1]
                 !== spreadSheet[row][0]
                 || row === '1') {
                 if (spreadSheet[row][column] !== 1) {
@@ -100,8 +118,8 @@ export class ImportDelimitationController {
                     row,
                     spreadSheet[0][column],
                   );
-              } else if (spreadSheet[Number(row) - 1][0]
-                !== spreadSheet[row][0]
+              } else if (spreadSheet[Number(row) - 1][1]
+                !== spreadSheet[row][1]
                 || row === '1') {
                 if (spreadSheet[row][column] !== 1) {
                   responseIfError[Number(column)]
@@ -151,14 +169,14 @@ export class ImportDelimitationController {
                 status,
                 response: delineamento,
               }: IReturnObject = await delineamentoController.getAll({
-                name: spreadSheet[row][0],
+                name: spreadSheet[row][1],
                 id_culture: idCulture,
                 status: 1,
               });
               if (status === 200) {
                 await delineamentoController.update({
                   id: delineamento[0]?.id,
-                  name: spreadSheet[row][0],
+                  name: spreadSheet[row][1],
                   id_culture: idCulture,
                   repeticao: 1,
                   trat_repeticao: 1,
@@ -166,15 +184,15 @@ export class ImportDelimitationController {
                 });
                 await sequenciaDelineamentoController.create({
                   id_delineamento: delineamento[0]?.id,
-                  repeticao: spreadSheet[row][1],
-                  sorteio: spreadSheet[row][2],
-                  nt: spreadSheet[row][3],
-                  bloco: spreadSheet[row][4],
+                  repeticao: spreadSheet[row][2],
+                  sorteio: spreadSheet[row][3],
+                  nt: spreadSheet[row][4],
+                  bloco: spreadSheet[row][5],
                   created_by: createdBy,
                 });
               } else {
                 const { response }: IReturnObject = await delineamentoController.create({
-                  name: spreadSheet[row][0],
+                  name: spreadSheet[row][1],
                   id_culture: idCulture,
                   repeticao: 1,
                   trat_repeticao: 1,
@@ -182,10 +200,10 @@ export class ImportDelimitationController {
                 });
                 await sequenciaDelineamentoController.create({
                   id_delineamento: response?.id,
-                  repeticao: spreadSheet[row][1],
-                  sorteio: spreadSheet[row][2],
-                  nt: spreadSheet[row][3],
-                  bloco: spreadSheet[row][4],
+                  repeticao: spreadSheet[row][2],
+                  sorteio: spreadSheet[row][3],
+                  nt: spreadSheet[row][4],
+                  bloco: spreadSheet[row][5],
                   created_by: createdBy,
                 });
               }

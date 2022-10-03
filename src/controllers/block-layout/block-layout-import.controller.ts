@@ -14,6 +14,7 @@ import { LogImportController } from '../log-import.controller';
 import { ImportController } from '../import.controller';
 import { LayoutQuadraController } from './layout-quadra.controller';
 import { LayoutChildrenController } from '../layout-children.controller';
+import { CulturaController } from '../cultura.controller';
 
 export class ImportLayoutBlockController {
   static aux: any = {};
@@ -25,6 +26,7 @@ export class ImportLayoutBlockController {
     }: ImportValidate,
   ): Promise<IReturnObject> {
     const importController = new ImportController();
+    const culturaController = new CulturaController();
     const logImportController = new LogImportController();
     const layoutQuadraController = new LayoutQuadraController();
     const layoutChildrenController = new LayoutChildrenController();
@@ -43,6 +45,22 @@ export class ImportLayoutBlockController {
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
           for (const column in spreadSheet[row]) {
+            if (configModule.response[0]?.fields[column] === 'Cultura') {
+              if (spreadSheet[row][column] !== null) {
+                const {
+                  response,
+                }: any = await culturaController.getOneCulture(Number(idCulture));
+                if (response?.name !== spreadSheet[row][column]) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                    'a cultura e diferente da selecionada',
+                  );
+                }
+              }
+            }
+
             if (configModule.response[0]?.fields[column] === 'Esquema') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
@@ -81,7 +99,7 @@ export class ImportLayoutBlockController {
                   spreadSheet[0][column],
                   'a plantadeira deve ser 4,8 ou 12',
                 );
-              } else if (spreadSheet[Number(row) - 1][0] === spreadSheet[row][0]
+              } else if (spreadSheet[Number(row) - 1][1] === spreadSheet[row][1]
               && spreadSheet[Number(row) - 1][column] !== spreadSheet[row][column]) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
@@ -130,11 +148,11 @@ export class ImportLayoutBlockController {
                     'o campo tiro precisa vir antes que a campo disparo',
                   );
                 }
-                if (spreadSheet[row][0] !== spreadSheet[Number(row) - 1][0]) {
+                if (spreadSheet[row][1] !== spreadSheet[Number(row) - 1][1]) {
                   tiroXdisparo[spreadSheet[row][0]] = [];
                 }
                 combinacao = `${spreadSheet[row][5]}x${spreadSheet[row][column]}`;
-                if (tiroXdisparo[spreadSheet[row][0]]?.includes(combinacao)) {
+                if (tiroXdisparo[spreadSheet[row][1]]?.includes(combinacao)) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     row,
@@ -160,8 +178,8 @@ export class ImportLayoutBlockController {
                     row,
                     spreadSheet[0][column],
                   );
-              } else if (spreadSheet[row][0] === spreadSheet[Number(row) - 1][0]) {
-                if (sl[spreadSheet[row][0]]?.includes(spreadSheet[row][column])) {
+              } else if (spreadSheet[row][1] === spreadSheet[Number(row) - 1][1]) {
+                if (sl[spreadSheet[row][1]]?.includes(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     row,
@@ -170,10 +188,10 @@ export class ImportLayoutBlockController {
                   );
                 }
               }
-              if (spreadSheet[row][0] !== spreadSheet[Number(row) - 1][0]) {
-                sl[spreadSheet[row][0]] = [];
+              if (spreadSheet[row][1] !== spreadSheet[Number(row) - 1][1]) {
+                sl[spreadSheet[row][1]] = [];
               }
-              sl[spreadSheet[row][0]]?.push(Number(spreadSheet[row][column]));
+              sl[spreadSheet[row][1]]?.push(Number(spreadSheet[row][column]));
             }
 
             if (configModule.response[0]?.fields[column] === 'SC') {
@@ -190,8 +208,8 @@ export class ImportLayoutBlockController {
                     row,
                     spreadSheet[0][column],
                   );
-              } else if (spreadSheet[row][0] === spreadSheet[Number(row) - 1][0]) {
-                if (sc[spreadSheet[row][0]]?.includes(spreadSheet[row][column])) {
+              } else if (spreadSheet[row][1] === spreadSheet[Number(row) - 1][1]) {
+                if (sc[spreadSheet[row][1]]?.includes(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     row,
@@ -200,10 +218,10 @@ export class ImportLayoutBlockController {
                   );
                 }
               }
-              if (spreadSheet[row][0] !== spreadSheet[Number(row) - 1][0]) {
-                sc[spreadSheet[row][0]] = [];
+              if (spreadSheet[row][1] !== spreadSheet[Number(row) - 1][1]) {
+                sc[spreadSheet[row][1]] = [];
               }
-              sc[spreadSheet[row][0]]?.push(Number(spreadSheet[row][column]));
+              sc[spreadSheet[row][1]]?.push(Number(spreadSheet[row][column]));
             }
 
             if (configModule.response[0]?.fields[column] === 'SALOC') {
@@ -220,8 +238,8 @@ export class ImportLayoutBlockController {
                     row,
                     spreadSheet[0][column],
                   );
-              } else if (spreadSheet[row][0] === spreadSheet[Number(row) - 1][0]) {
-                if (sAloc[spreadSheet[row][0]]?.includes(spreadSheet[row][column])) {
+              } else if (spreadSheet[row][1] === spreadSheet[Number(row) - 1][1]) {
+                if (sAloc[spreadSheet[row][1]]?.includes(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     row,
@@ -230,10 +248,10 @@ export class ImportLayoutBlockController {
                   );
                 }
               }
-              if (spreadSheet[row][0] !== spreadSheet[Number(row) - 1][0]) {
-                sAloc[spreadSheet[row][0]] = [];
+              if (spreadSheet[row][1] !== spreadSheet[Number(row) - 1][1]) {
+                sAloc[spreadSheet[row][1]] = [];
               }
-              sAloc[spreadSheet[row][0]]?.push(Number(spreadSheet[row][column]));
+              sAloc[spreadSheet[row][1]]?.push(Number(spreadSheet[row][column]));
             }
 
             if (configModule.response[0]?.fields[column] === 'CJ') {
@@ -312,8 +330,8 @@ export class ImportLayoutBlockController {
                   'a scolheita é obrigatorio',
                 );
               } else {
-                if (spreadSheet[row][0] === spreadSheet[Number(row) - 1][0]) {
-                  if (sColheita[spreadSheet[row][0]]?.includes(spreadSheet[row][column])) {
+                if (spreadSheet[row][1] === spreadSheet[Number(row) - 1][1]) {
+                  if (sColheita[spreadSheet[row][1]]?.includes(spreadSheet[row][column])) {
                     responseIfError[Number(column)] += responseGenericFactory(
                       Number(column) + 1,
                       row,
@@ -322,10 +340,10 @@ export class ImportLayoutBlockController {
                     );
                   }
                 }
-                if (spreadSheet[row][0] !== spreadSheet[Number(row) - 1][0]) {
-                  sColheita[spreadSheet[row][0]] = [];
+                if (spreadSheet[row][1] !== spreadSheet[Number(row) - 1][1]) {
+                  sColheita[spreadSheet[row][1]] = [];
                 }
-                sColheita[spreadSheet[row][0]]?.push(Number(spreadSheet[row][column]));
+                sColheita[spreadSheet[row][1]]?.push(Number(spreadSheet[row][column]));
               }
             }
 
@@ -344,10 +362,10 @@ export class ImportLayoutBlockController {
                   spreadSheet[0][column],
                   'no tipo de parcela só é aceitado P ou V',
                 );
-              } else if (spreadSheet[row][0] !== spreadSheet[Number(row) - 1][0]) {
-                parcelas[spreadSheet[row][0]] = [];
+              } else if (spreadSheet[row][1] !== spreadSheet[Number(row) - 1][1]) {
+                parcelas[spreadSheet[row][1]] = [];
               }
-              parcelas[spreadSheet[row][0]]?.push(spreadSheet[row][column]);
+              parcelas[spreadSheet[row][1]]?.push(spreadSheet[row][column]);
             }
           }
         }

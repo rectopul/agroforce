@@ -1355,6 +1355,20 @@ export const getServerSideProps: GetServerSideProps = async ({
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
+
+
+
+  // Last page
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
+
+  if (lastPageServer == undefined || lastPageServer == "No") {
+    removeCookies("filterBeforeEdit", { req, res });
+    removeCookies("pageBeforeEdit", { req, res });
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("lastPage", { req, res });
+  }
+  
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : "";
@@ -1370,16 +1384,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     req.cookies.filterBeforeEdit ||
     `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
-  // Last page
-  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
-
-  if (lastPageServer == undefined || lastPageServer == "No") {
-    removeCookies("filterBeforeEdit", { req, res });
-    removeCookies("pageBeforeEdit", { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });
-  }
 
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder

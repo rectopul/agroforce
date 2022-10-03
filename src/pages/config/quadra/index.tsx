@@ -527,7 +527,6 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     await quadraService.getAll(filter).then(({ status, response }) => {
-      console.log(response);
       if (status === 200) {
         const newData = response.map((row: any) => {
           if (row.status === 0) {
@@ -593,7 +592,6 @@ export default function Listagem({
 
   const downloadExcelSintetico = async (): Promise<void> => {
     await quadraService.getAll(filter).then(({ status, response }) => {
-      // console.log(response);
       if (status === 200) {
         const experimentArray: any = [];
         const object: any = {};
@@ -611,13 +609,11 @@ export default function Listagem({
         const data = response.map((tow: any) => {
           tow.cod = tow.cod_quadra;
           // tow.local = tow.name_local;
-          console.log(tow);
           experimentObject.locpreparo = tow.local.name_local_culture;
           object.qm = tow.cod;
           // const localMap = tow.local;
 
           const allocatedMap = tow.AllocatedExperiment.map((a: any) => {
-            // console.log(a);
             experimentObject.npei = a.npei;
             experimentObject.npef = a.npef;
             experimentObject.ntparcelas = a.parcelas;
@@ -625,7 +621,6 @@ export default function Listagem({
             return a;
           });
           const experimentMap = tow.experiment.map((e: any) => {
-            // console.log(tow);
             object.id = e.id;
             experimentObject.safra = e.safra.safraName;
             experimentObject.experimentName = e.experimentName;
@@ -635,8 +630,6 @@ export default function Listagem({
           experimentArray.push(experimentObject);
           return tow;
         });
-        console.log(object);
-        // console.log(experimentArray);
         const newData = experimentArray.map((row: any) => {
           row.ID_EXPERIMENTO = row.id;
           return row;
@@ -697,8 +690,6 @@ export default function Listagem({
           });
         });
 
-        console.log('response');
-        console.log(response);
         const workSheet = XLSX.utils.json_to_sheet(lines);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'quadra');
