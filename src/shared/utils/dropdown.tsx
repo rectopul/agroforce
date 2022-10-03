@@ -94,7 +94,7 @@ export function TabsDropDowns(typeAside: any = "config") {
             hrefTab: "/config/ambiente",
             data: [
               {
-                labelDropDown: "AMBIENTE",
+                labelDropDown: "Ambiente",
                 hrefDropDown: "/config/ambiente",
                 iconDropDown: <FiMapPin />,
               },

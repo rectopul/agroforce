@@ -759,7 +759,7 @@ export default function Listagem({
   return (
     <>
       <Head>
-        <title>Listagem dos NPEs</title>
+        <title>Listagem dos Ambientes</title>
       </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main

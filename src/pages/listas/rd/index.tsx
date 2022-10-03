@@ -661,6 +661,70 @@ export default function Import({
                     />
                   </div>
                 </div>
+
+                <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+                  <div className=" h-20 w-20 flex items-center mr-1">
+                    <Button
+                      textColor="white"
+                      title={
+                        disabledButton
+                          ? "Outra planilha já esta sendo importada"
+                          : "Upload"
+                      }
+                      bgColor={bgColor}
+                      rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                      onClick={() => readExcel(22, "EXPERIMENT")}
+                      icon={<IoIosCloudUpload size={40} />}
+                      disabled={disabledButton}
+                      type="button"
+                    />
+                  </div>
+                  <div className="col-span-2" style={{ marginLeft: "-12%" }}>
+                    <span className="font-bold">
+                      Importar Subs. de genótipo/nca Ensaio
+                    </span>
+                    <p>ultimo update 28/06/22</p>
+                    <Input
+                      type="file"
+                      required
+                      id="inputFile-22"
+                      name="inputFile-22"
+                    />
+                  </div>
+                </div>
+
+                <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+                  <div className=" h-20 w-20 flex items-center mr-1">
+                    <Button
+                      textColor="white"
+                      title={
+                        disabledButton
+                          ? "Outra planilha já esta sendo importada"
+                          : "Upload"
+                      }
+                      bgColor={bgColor}
+                      rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                      onClick={() => readExcel(22, "EXPERIMENT")}
+                      icon={<IoIosCloudUpload size={40} />}
+                      disabled={disabledButton}
+                      type="button"
+                    />
+                  </div>
+                  <div className="col-span-2" style={{ marginLeft: "-12%" }}>
+                    <span className="font-bold">
+                      Importar Subs. de genótipo/nca Experimento
+                    </span>
+                    <p>ultimo update 28/06/22</p>
+                    <Input
+                      type="file"
+                      required
+                      id="inputFile-22"
+                      name="inputFile-22"
+                    />
+                  </div>
+                </div>
+
+                <div className="h-10" />
               </TabPanel>
 
               <TabPanel value={value} index={1}>
