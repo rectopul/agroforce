@@ -686,7 +686,7 @@ export default function Listagem({
       setCookies("lastPage", "substituicao");
 
       router.push(
-        "/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios"
+        "/listas/ensaios/genotipos-ensaio/substituicao?value=ensaios"
       );
     } else if (ncaButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => ({
@@ -705,7 +705,7 @@ export default function Listagem({
       setCookies("filtersParams", filtersParams);
       setCookies("lastPage", "substituicao");
       router.push(
-        "/listas/ensaios/tratamento-genotipo/substituicao?value=ensaios"
+        "/listas/ensaios/genotipos-ensaio/substituicao?value=ensaios"
       );
     } else if (inputFile?.files.length !== 0) {
       readExcel(inputFile.files);
@@ -734,7 +734,20 @@ export default function Listagem({
     handleTotalPages();
   }, [currentPage]);
 
-  const [itemms, setItemms] = useState([]);
+  function removeSameItems(data: any) {
+    let newList: any = [];
+
+    data?.map((i: any) => {
+      const item = newList?.filter((x: any) => x.name == i.name);
+      if (item?.length <= 0) newList.push({ id: i.id, name: i.name });
+    });
+
+    const sortList = newList?.sort((a: any, b: any) => {
+      return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+    });
+
+    return sortList;
+  }
 
   return (
     <>
@@ -867,7 +880,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar tratamentos genótipos">
+          <AccordionFilter title="Filtrar genótipos do ensaio">
             <div className="w-full flex gap-2 z-1">
               <form
                 className="flex flex-col
@@ -882,19 +895,18 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-8
+                  pb-6
                 "
                 >
                   {filterFieldFactory("filterFoco", "Foco")}
                   {filterFieldFactory("filterTypeAssay", "Ensaio")}
 
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Cód. Tecnologia
                     </label>
                     <div className="flex">
                       <Input
-                        style={{ marginLeft: 8 }}
                         placeholder="Cód. Tecnologia"
                         id="filterCodTec"
                         name="filterCodTec"
@@ -905,7 +917,7 @@ export default function Listagem({
 
                   {filterFieldFactory("filterTechnology", "Nome da tecnologia")}
 
-                  <div className="h-10 w-1/2 ml-4">
+                  <div className="h-10 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       GLI
                     </label>
@@ -933,7 +945,7 @@ export default function Listagem({
                   </div> */}
 
                   {/* {filterFieldFactory('filterGli', 'GLI')} */}
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       BGM
                     </label>
@@ -961,10 +973,10 @@ export default function Listagem({
                   flex
                   justify-center
                   pt-2
-                  pb-3
+                  pb-0
                   "
                 >
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       NT
                     </label>
@@ -985,13 +997,12 @@ export default function Listagem({
                       />
                     </div>
                   </div>
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status T
                     </label>
                     <div className="flex">
                       <Input
-                        style={{ marginLeft: 8 }}
                         placeholder="Status T"
                         id="filterStatusT"
                         name="filterStatusT"
@@ -1001,7 +1012,7 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  <div className="h-10 w-1/2 ml-4">
+                  <div className="h-10 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status do Ensaio
                     </label>
@@ -1057,11 +1068,11 @@ export default function Listagem({
                   </div> */}
                   {/* {filterFieldFactory('filterStatusAssay', 'Status do ensaio')} */}
 
-                  <div className="h-7 w-1/2 ml-4">
+                  <div className="h-7 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Nome do genótipo
                     </label>
-                    <Select
+                    {/* <Select
                       values={[
                         { id: "", name: "Selecione" },
                         ...genotypeSelect,
@@ -1070,6 +1081,15 @@ export default function Listagem({
                       name="filterGenotypeName"
                       onChange={formik.handleChange}
                       selected={false}
+                    /> */}
+                    <SelectAutoComplete
+                      data={removeSameItems(genotypeSelect)?.map(
+                        (i: any) => i.name
+                      )}
+                      value={checkValue("filterGenotypeName")}
+                      onChange={(e: any) =>
+                        formik.setFieldValue("filterGenotypeName", e)
+                      }
                     />
                   </div>
 
