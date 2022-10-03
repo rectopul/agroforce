@@ -107,7 +107,7 @@ export default function AtualizarTipoEnsaio({
     { name: "CamposGerenciados[]", title: "Fase", value: "fase" },
     {
       name: "CamposGerenciados[]",
-      title: "GGEM",
+      title: "GGEN",
       value: "cod_tec",
     },
     { name: "CamposGerenciados[]", title: "NT", value: "treatments_number" },
@@ -313,6 +313,31 @@ export default function AtualizarTipoEnsaio({
     };
   }
 
+  function commentsTableFactory(name: any, title: string) {
+    return {
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: title,
+      sorting: false,
+      render: (rowData: any) => (
+        <div className="flex" title={rowData?.comments}>
+          {rowData?.comments?.length > 11
+            ? `${rowData?.comments?.slice(0, 11)}...`
+            : rowData?.comments}
+        </div>
+      ),
+    };
+  }
+
   function idHeaderFactory() {
     return {
       title: <div className="flex items-center">{arrowOrder}</div>,
@@ -361,7 +386,7 @@ export default function AtualizarTipoEnsaio({
       }
       if (columnOrder[index] === "cod_tec") {
         tableFields.push(
-          headerTableFactory("GGEM", "genotipo.tecnologia.cod_tec")
+          headerTableFactory("GGEN", "genotipo.tecnologia.cod_tec")
         );
       }
       if (columnOrder[index] === "treatments_number") {
@@ -388,7 +413,7 @@ export default function AtualizarTipoEnsaio({
         tableFields.push(headerTableFactory("Cód. lote", "lote.cod_lote"));
       }
       if (columnOrder[index] === "comments") {
-        tableFields.push(headerTableFactory("OBS", "comments"));
+        tableFields.push(commentsTableFactory("OBS", "comments"));
       }
       if (columnOrder[index] === "status_experiment") {
         tableFields.push(
@@ -713,10 +738,10 @@ export default function AtualizarTipoEnsaio({
     );
   }
 
-  useEffect(() => {
-    table === "genotipo" ? handlePagination() : handlePaginationExperiments();
-    table === "genotipo" ? handleTotalPages() : handleTotalPagesExperiments();
-  }, [currentPage]);
+  // useEffect(() => {
+  //   table === "genotipo" ? handlePagination() : handlePaginationExperiments();
+  //   table === "genotipo" ? handleTotalPages() : handleTotalPagesExperiments();
+  // }, [currentPage]);
 
   return (
     <>
