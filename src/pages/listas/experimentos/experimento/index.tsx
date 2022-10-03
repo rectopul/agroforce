@@ -1059,6 +1059,21 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? req.cookies.pageBeforeEdit
     : 0;
 
+     // Last page
+  const lastPageServer = req.cookies.lastPage
+  ? req.cookies.lastPage
+  : 'No';
+
+if (lastPageServer == undefined || lastPageServer == 'No') {
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
+}
+
+
+// console.log("safra id---------------- ",idSafra);
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : `idSafra=${idSafra}&id_culture=${cultureId}`;
@@ -1067,19 +1082,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? `${req.cookies.filterBeforeEdit}`
     : `idSafra=${idSafra}&id_culture=${cultureId}`;
 
-  // Last page
-  const lastPageServer = req.cookies.lastPage
-    ? req.cookies.lastPage
-    : 'No';
-
-  if (lastPageServer == undefined || lastPageServer == 'No') {
-    removeCookies('filterBeforeEdit', { req, res });
-    removeCookies('pageBeforeEdit', { req, res });
-    removeCookies('filterBeforeEditTypeOrder', { req, res });
-    removeCookies('filterBeforeEditOrderBy', { req, res });
-    removeCookies('lastPage', { req, res });
-  }
-
+ 
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
     : 'asc';
