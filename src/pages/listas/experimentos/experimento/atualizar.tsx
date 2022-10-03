@@ -826,9 +826,6 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const allItens: any = [];
   const totalItems = 0;
 
-  console.log('experimento');
-  console.log(experimento);
-
   return {
     props: {
       allItens,

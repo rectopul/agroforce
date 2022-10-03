@@ -18,6 +18,7 @@ import { ExperimentGenotipeController } from '../experiment-genotipe.controller'
 import { LayoutQuadraController } from '../block-layout/layout-quadra.controller';
 import { LayoutChildrenController } from '../layout-children.controller';
 import { AllocatedExperimentController } from './allocated-experimento.controller';
+import { CulturaController } from '../cultura.controller';
 
 export class ImportAllocationController {
   static async validate(
@@ -29,6 +30,7 @@ export class ImportAllocationController {
     const safraController = new SafraController();
     const localController = new LocalController();
     const quadraController = new QuadraController();
+    const culturaController = new CulturaController();
     const logImportController = new LogImportController();
     const experimentController = new ExperimentController();
     const layoutQuadraController = new LayoutQuadraController();
@@ -55,16 +57,34 @@ export class ImportAllocationController {
             if (column === '0') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
+                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              }
+              const {
+                response,
+              }: any = await culturaController.getOneCulture(Number(idCulture));
+              if (response?.name !== spreadSheet[row][column]) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  Number(column) + 1,
+                  row,
+                  spreadSheet[0][column],
+                  'a cultura e diferente da selecionada',
+                );
+              }
+            }
+
+            if (column === '1') {
+              if (spreadSheet[row][column] === null) {
+                responseIfError[Number(column)]
                   += responseNullFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][9],
+                    spreadSheet[row][10],
                     spreadSheet[0][column],
                   );
               } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][9],
+                    spreadSheet[row][10],
                     spreadSheet[row][column],
                   );
               } else {
@@ -76,31 +96,9 @@ export class ImportAllocationController {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
-                      spreadSheet[row][9],
+                      spreadSheet[row][10],
                       spreadSheet[0][column],
                       'o id do experimento não encontrado nessa safra',
-                    );
-                }
-              }
-            }
-
-            if (column === '1') {
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)]
-                  += responseNullFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][9],
-                    spreadSheet[0][column],
-                  );
-              } else {
-                const { response }: IReturnObject = await safraController.getOne(Number(idSafra));
-                if (response.safraName !== spreadSheet[row][column]) {
-                  responseIfError[Number(column)]
-                    += responseGenericFactory(
-                      (Number(column) + 1),
-                      spreadSheet[row][9],
-                      spreadSheet[0][column],
-                      'safra e diferente da safra selecionada',
                     );
                 }
               }
@@ -111,7 +109,29 @@ export class ImportAllocationController {
                 responseIfError[Number(column)]
                   += responseNullFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][9],
+                    spreadSheet[row][10],
+                    spreadSheet[0][column],
+                  );
+              } else {
+                const { response }: IReturnObject = await safraController.getOne(Number(idSafra));
+                if (response.safraName !== spreadSheet[row][column]) {
+                  responseIfError[Number(column)]
+                    += responseGenericFactory(
+                      (Number(column) + 1),
+                      spreadSheet[row][10],
+                      spreadSheet[0][column],
+                      'safra e diferente da safra selecionada',
+                    );
+                }
+              }
+            }
+
+            if (column === '3') {
+              if (spreadSheet[row][column] === null) {
+                responseIfError[Number(column)]
+                  += responseNullFactory(
+                    (Number(column) + 1),
+                    spreadSheet[row][10],
                     spreadSheet[0][column],
                   );
               } else {
@@ -123,7 +143,7 @@ export class ImportAllocationController {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
-                      spreadSheet[row][9],
+                      spreadSheet[row][10],
                       spreadSheet[0][column],
                       'o nome do experimento não cadastrado nessa safra',
                     );
@@ -131,30 +151,30 @@ export class ImportAllocationController {
               }
             }
 
-            if (column === '3') {
+            if (column === '4') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][9],
+                    spreadSheet[row][10],
                     spreadSheet[0][column],
                   );
               } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][9],
+                    spreadSheet[row][10],
                     spreadSheet[row][column],
                   );
               } else {
                 const { response }: IReturnObject = await experimentController.getAll({
-                  id: spreadSheet[row][0],
+                  id: spreadSheet[row][1],
                   idSafra,
                 });
                 const allNpe = response[0]?.experiment_genotipe.map((item: any) => (item.status === 'IMPRESSO' ? item.npe : 0));
                 let npeRange = Number(spreadSheet[row][column]);
                 const validateNpeRange = [];
-                while (npeRange <= Number(spreadSheet[row][4])) {
+                while (npeRange <= Number(spreadSheet[row][5])) {
                   if (allNpe?.includes(npeRange)) {
                     validateNpeRange.push(true);
                   } else {
@@ -167,29 +187,11 @@ export class ImportAllocationController {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
-                      spreadSheet[row][9],
+                      spreadSheet[row][10],
                       spreadSheet[0][column],
                       'as parcelas desse experimento não estão dentro do intervalo de NPE',
                     );
                 }
-              }
-            }
-
-            if (column === '4') {
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)]
-                  += responseNullFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][9],
-                    spreadSheet[0][column],
-                  );
-              } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
-                responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][9],
-                    spreadSheet[row][column],
-                  );
               }
             }
 
@@ -198,20 +200,38 @@ export class ImportAllocationController {
                 responseIfError[Number(column)]
                   += responseNullFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][9],
+                    spreadSheet[row][10],
                     spreadSheet[0][column],
                   );
               } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][9],
+                    spreadSheet[row][10],
+                    spreadSheet[row][column],
+                  );
+              }
+            }
+
+            if (column === '6') {
+              if (spreadSheet[row][column] === null) {
+                responseIfError[Number(column)]
+                  += responseNullFactory(
+                    (Number(column) + 1),
+                    spreadSheet[row][10],
+                    spreadSheet[0][column],
+                  );
+              } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
+                responseIfError[Number(column)]
+                  += responsePositiveNumericFactory(
+                    (Number(column) + 1),
+                    spreadSheet[row][10],
                     spreadSheet[row][column],
                   );
               } else {
-                if (spreadSheet[Number(row) - 1][7] !== spreadSheet[row][7]
+                if (spreadSheet[Number(row) - 1][8] !== spreadSheet[row][8]
                       || row === '1') {
-                  allParcelas[spreadSheet[row][7]] = 0;
+                  allParcelas[spreadSheet[row][8]] = 0;
                 }
                 // eslint-disable-next-line max-len
                 const npeDiff = Number(spreadSheet[row][Number(column) - 1]) === Number(spreadSheet[row][Number(column) - 2])
@@ -222,16 +242,16 @@ export class ImportAllocationController {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
-                      spreadSheet[row][9],
+                      spreadSheet[row][10],
                       spreadSheet[0][column],
                       'o numero de parcelas estão fora do alcance de NPE',
                     );
                 } else if ((spreadSheet.length - 1) !== Number(row)) {
-                  if (spreadSheet[Number(row) + 1][7] !== spreadSheet[row][7]
+                  if (spreadSheet[Number(row) + 1][8] !== spreadSheet[row][8]
                   || Number(row) === (Number(spreadSheet?.length) - 1)) {
-                    allParcelas[spreadSheet[row][7]] += Number(spreadSheet[row][column]);
+                    allParcelas[spreadSheet[row][8]] += Number(spreadSheet[row][column]);
                     const { response }: IReturnObject = await quadraController.getAll({
-                      cod_quadra: spreadSheet[Number(row) - 1][7],
+                      cod_quadra: spreadSheet[Number(row) - 1][8],
                       id_safra: idSafra,
                     });
                     const {
@@ -240,22 +260,22 @@ export class ImportAllocationController {
                       filterEsquema: response[0]?.esquema,
                       id_culture: idCulture,
                     });
-                    if (allParcelas[spreadSheet[Number(row) - 1][7]] !== esquema[0]?.parcelas) {
+                    if (allParcelas[spreadSheet[Number(row) - 1][8]] !== esquema[0]?.parcelas) {
                       responseIfError[Number(column)]
                       += responseGenericFactory(
                           (Number(column) + 1),
-                          spreadSheet[row][9],
+                          spreadSheet[row][10],
                           spreadSheet[0][column],
                           'o numero de parcelas e diferente das parcelas do layout',
                         );
                     }
                   } else {
-                    allParcelas[spreadSheet[row][7]] += Number(spreadSheet[row][column]);
+                    allParcelas[spreadSheet[row][8]] += Number(spreadSheet[row][column]);
                   }
                 } else {
-                  allParcelas[spreadSheet[Number(row) - 1][7]] += Number(spreadSheet[row][column]);
+                  allParcelas[spreadSheet[Number(row) - 1][8]] += Number(spreadSheet[row][column]);
                   const { response }: IReturnObject = await quadraController.getAll({
-                    cod_quadra: spreadSheet[Number(row) - 1][7],
+                    cod_quadra: spreadSheet[Number(row) - 1][8],
                     id_safra: idSafra,
                   });
                   const {
@@ -264,11 +284,11 @@ export class ImportAllocationController {
                     filterEsquema: response[0]?.esquema,
                     id_culture: idCulture,
                   });
-                  if (allParcelas[spreadSheet[Number(row) - 1][7]] !== esquema[0]?.parcelas) {
+                  if (allParcelas[spreadSheet[Number(row) - 1][8]] !== esquema[0]?.parcelas) {
                     responseIfError[Number(column)]
                       += responseGenericFactory(
                         (Number(column) + 1),
-                        spreadSheet[row][9],
+                        spreadSheet[row][10],
                         spreadSheet[0][column],
                         'o numero de parcelas e diferente das parcelas do layout',
                       );
@@ -277,12 +297,12 @@ export class ImportAllocationController {
               }
             }
 
-            if (column === '6') {
+            if (column === '7') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][9],
+                    spreadSheet[row][10],
                     spreadSheet[0][column],
                   );
               } else {
@@ -293,7 +313,7 @@ export class ImportAllocationController {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
-                      spreadSheet[row][9],
+                      spreadSheet[row][10],
                       spreadSheet[0][column],
                       'o local de preparo não cadastrado no sistema',
                     );
@@ -309,7 +329,7 @@ export class ImportAllocationController {
                     responseIfError[Number(column)]
                     += responseGenericFactory(
                         (Number(column) + 1),
-                        spreadSheet[row][9],
+                        spreadSheet[row][10],
                         spreadSheet[0][column],
                         'não tem unidade de cultura cadastrada no local informado',
                       );
@@ -318,12 +338,12 @@ export class ImportAllocationController {
               }
             }
 
-            if (column === '7') {
+            if (column === '8') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][9],
+                    spreadSheet[row][10],
                     spreadSheet[0][column],
                   );
               } else {
@@ -335,15 +355,15 @@ export class ImportAllocationController {
                   responseIfError[Number(column)]
                       += responseGenericFactory(
                       (Number(column) + 1),
-                      spreadSheet[row][9],
+                      spreadSheet[row][10],
                       spreadSheet[0][column],
                       'quadra não cadastrada nessa safra',
                     );
-                } else if (response[0]?.local?.name_local_culture !== spreadSheet[row][6]) {
+                } else if (response[0]?.local?.name_local_culture !== spreadSheet[row][7]) {
                   responseIfError[Number(column)]
                       += responseGenericFactory(
                       (Number(column) + 1),
-                      spreadSheet[row][9],
+                      spreadSheet[row][10],
                       spreadSheet[0][column],
                       'local de preparo não e o mesmo relacionado a quadra',
                     );
@@ -351,28 +371,28 @@ export class ImportAllocationController {
               }
             }
 
-            if (column === '8') {
+            if (column === '9') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][9],
+                    spreadSheet[row][10],
                     spreadSheet[0][column],
                   );
               } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][9],
+                    spreadSheet[row][10],
                     spreadSheet[row][column],
                   );
-              } else if (spreadSheet[row][7] === spreadSheet[Number(row) - 1][7]) {
+              } else if (spreadSheet[row][8] === spreadSheet[Number(row) - 1][8]) {
                 if ((Number(spreadSheet[row][column]) - 1)
                 !== spreadSheet[Number(row) - 1][column]) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
-                      spreadSheet[row][9],
+                      spreadSheet[row][10],
                       spreadSheet[0][column],
                       'a seq deve ser sequencial',
                     );
@@ -381,7 +401,7 @@ export class ImportAllocationController {
                 responseIfError[Number(column)]
                     += responseGenericFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][9],
+                    spreadSheet[row][10],
                     spreadSheet[0][column],
                     'a seq precisa começar em 1 por quadra',
                   );
@@ -395,10 +415,10 @@ export class ImportAllocationController {
           for (const row in spreadSheet) {
             if (row !== '0') {
               const { response: quadra }: any = await quadraController.getAll({
-                id_safra: idSafra, name: spreadSheet[row][7],
+                id_safra: idSafra, name: spreadSheet[row][8],
               });
               const { response: experiment }: any = await experimentController.getAll({
-                filterExperimentName: spreadSheet[row][2],
+                filterExperimentName: spreadSheet[row][3],
                 idSafra,
               });
               const { response: blockLayout }: any = await layoutQuadraController.getAll({
@@ -423,12 +443,12 @@ export class ImportAllocationController {
               await quadraController.update({ id: quadra[0]?.id, allocation: 'ALOCADO' });
               await experimentController.update({ id: experiment[0]?.id, blockId: quadra[0]?.id });
               await allocatedExperimentController.create({
-                seq: Number(spreadSheet[row][8]),
-                experimentName: spreadSheet[row][2],
-                npei: Number(spreadSheet[row][3]),
-                npef: Number(spreadSheet[row][4]),
+                seq: Number(spreadSheet[row][9]),
+                experimentName: spreadSheet[row][3],
+                npei: Number(spreadSheet[row][4]),
+                npef: Number(spreadSheet[row][5]),
                 blockId: quadra[0]?.id,
-                parcelas: Number(spreadSheet[row][5]),
+                parcelas: Number(spreadSheet[row][6]),
                 createdBy,
               });
             }
@@ -453,18 +473,18 @@ export class ImportAllocationController {
 
   private static orderByBlock(ordenanteSpreadSheet: any) {
     function orderBlock(item: any, next: any) {
-      if (item[7] === next[7]) {
-        return 0;
-      }
-
-      return (item[7] < next[7]) ? -1 : 1;
-    }
-    function orderSeq(item: any, next: any) {
       if (item[8] === next[8]) {
         return 0;
       }
 
       return (item[8] < next[8]) ? -1 : 1;
+    }
+    function orderSeq(item: any, next: any) {
+      if (item[9] === next[9]) {
+        return 0;
+      }
+
+      return (item[9] < next[9]) ? -1 : 1;
     }
 
     ordenanteSpreadSheet.sort(orderBlock || orderSeq);
