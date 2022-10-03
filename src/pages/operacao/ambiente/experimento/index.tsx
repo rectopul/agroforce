@@ -759,7 +759,7 @@ export default function Listagem({
           });
           const gt_new: any = {};
           gt_new.id = gt.id;
-          gt_new.status_experiment = 'SORTEADO';
+          gt_new.status_experiment = 'EXP. SORTEADO';
           genotipo_treatment.push(gt_new);
         });
       });
