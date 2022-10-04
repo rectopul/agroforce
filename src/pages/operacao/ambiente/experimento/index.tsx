@@ -1076,12 +1076,15 @@ export const getServerSideProps: GetServerSideProps = async ({
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : '';
-  const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}&idSafra=${idSafra}`
-    : '';
+  // const filterBeforeEdit = req.cookies.filterBeforeEdit
+  //   ? req.cookies.filterBeforeEdit
+  //   : '';
+  // const filterApplication = req.cookies.filterBeforeEdit
+  //   ? `${req.cookies.filterBeforeEdit}&idSafra=${idSafra}`
+  //   : '';
+
+  const filterBeforeEdit = '';
+  const filterApplication = '';
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });

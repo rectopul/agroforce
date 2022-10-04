@@ -20,6 +20,8 @@ export class ExperimentController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
+      console.log('options');
+      console.log(options);
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
         if (options.filterRepetitionFrom && options.filterRepetitionTo) {
           parameters.repetitionsNumber = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);
@@ -179,6 +181,9 @@ export class ExperimentController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
+
+      console.log('parameters');
+      console.log(parameters);
       const response: object | any = await this.experimentRepository.findAll(
         parameters,
         select,
@@ -186,6 +191,9 @@ export class ExperimentController {
         skip,
         orderBy,
       );
+
+      console.log('response');
+      console.log(response);
 
       response.map((item: any) => {
         const newItem = item;
