@@ -160,9 +160,8 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == 'tecnologia' ? 'assay_list.tecnologia.cod_tec' : orderBy
-  }&typeOrder=${typeOrder}`;
+
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == 'tecnologia' ? 'assay_list.tecnologia.cod_tec' : orderBy}&typeOrder=${typeOrder}`;
 
   const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
 
@@ -693,10 +692,7 @@ export default function Listagem({
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = tableGlobalFunctions.getValuesForFilter(
-      value,
-      filtersParams,
-    );
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
     return parameter;
   }
 

@@ -141,9 +141,15 @@ export class ImportExperimentController {
               }
             }
             if (column === '6') { // GGM // BGM
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              if (spreadSheet[row][column] !== null) {
+                if (!validateInteger(spreadSheet[row][column])) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    (Number(column) + 1),
+                    row,
+                    spreadSheet[0][column],
+                    'precisa ser um numero inteiro e positivo',
+                  );
+                }
               }
             }
             if (column === '7') { // LOCAL
