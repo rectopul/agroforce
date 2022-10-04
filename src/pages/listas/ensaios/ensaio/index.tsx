@@ -40,6 +40,7 @@ export default function TipoEnsaio({
   filterApplication,
   totalItems,
   idSafra,
+  idCulture,
   pageBeforeEdit,
   filterBeforeEdit,
   typeOrderServer,

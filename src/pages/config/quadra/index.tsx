@@ -527,7 +527,6 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     await quadraService.getAll(filter).then(({ status, response }) => {
-      console.log(response);
       if (status === 200) {
         const newData = response.map((row: any) => {
           if (row.status === 0) {
@@ -593,11 +592,10 @@ export default function Listagem({
 
   const downloadExcelSintetico = async (): Promise<void> => {
     await quadraService.getAll(filter).then(({ status, response }) => {
-      // console.log(response);
       if (status === 200) {
-        const experimentArray = [];
-        const object = {};
-        const experimentObject = {
+        const experimentArray: any = [];
+        const object: any = {};
+        const experimentObject: any = {
           id: '',
           safra: '',
           experimentName: '',
@@ -611,13 +609,11 @@ export default function Listagem({
         const data = response.map((tow: any) => {
           tow.cod = tow.cod_quadra;
           // tow.local = tow.name_local;
-          console.log(tow);
           experimentObject.locpreparo = tow.local.name_local_culture;
           object.qm = tow.cod;
           // const localMap = tow.local;
 
           const allocatedMap = tow.AllocatedExperiment.map((a: any) => {
-            // console.log(a);
             experimentObject.npei = a.npei;
             experimentObject.npef = a.npef;
             experimentObject.ntparcelas = a.parcelas;
@@ -625,7 +621,6 @@ export default function Listagem({
             return a;
           });
           const experimentMap = tow.experiment.map((e: any) => {
-            // console.log(tow);
             object.id = e.id;
             experimentObject.safra = e.safra.safraName;
             experimentObject.experimentName = e.experimentName;
@@ -635,8 +630,6 @@ export default function Listagem({
           experimentArray.push(experimentObject);
           return tow;
         });
-        console.log(object);
-        // console.log(experimentArray);
         const newData = experimentArray.map((row: any) => {
           row.ID_EXPERIMENTO = row.id;
           return row;
@@ -660,6 +653,61 @@ export default function Listagem({
         XLSX.writeFile(workBook, 'Sintética.xlsx');
       } else {
         Swal.fire(response);
+      }
+    });
+  };
+
+  const dowloadExcelAnalytics = async () => {
+    await quadraService.getAll(`${filter}&allocation=${'IMPORTADO'}`).then(({ status, response }) => {
+      if (status === 200) {
+        const lines: any = [];
+        response.forEach(async (block: any) => {
+          await block.experiment?.forEach(async (experiment: any) => {
+            await experiment.experiment_genotipe?.forEach((parcela: any, index: number) => {
+              lines.push({
+                ID_EXPERIMENTO: experiment?.id,
+                SAFRA: experiment?.safra?.safraName,
+                EXPE: experiment?.experimentName,
+                NPEI: parcela?.npe,
+                NPEF: parcela?.npe,
+                NTPARC: 1,
+                LOCALPREP: block.local?.name_local_culture,
+                QM: block.cod_quadra,
+                SEQ: block.AllocatedExperiment[index]?.seq,
+                FOCO: experiment?.assay_list?.foco?.name,
+                ENSAIO: experiment?.assay_list?.type_assay?.name,
+                GLI: experiment?.assay_list?.gli,
+                CODLOCAL_EXP: experiment?.local?.name_local_culture,
+                EPOCA: experiment?.period,
+                TECNOLOGIA: experiment?.assay_list?.tecnologia?.name,
+                BGM: experiment?.bgm,
+                REP: experiment?.repetitionsNumber,
+                STATUS_EXP: experiment?.status,
+                CÓDIGO_GENOTIPO: parcela?.genotipo?.name_genotipo,
+                STATUS_PARCELA: parcela?.status,
+              });
+            });
+          });
+        });
+
+        const workSheet = XLSX.utils.json_to_sheet(lines);
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'quadra');
+
+        // Buffer
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
+        });
+        // Binary
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
+        });
+        // Download
+        XLSX.writeFile(workBook, 'Analítico.xlsx');
+      } else {
+        Swal.fire('Nenhuma quadra alocada');
       }
     });
   };
@@ -944,6 +992,17 @@ export default function Listagem({
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
+                          title="Exportação Analítico"
+                          icon={<RiFileExcel2Line size={20} />}
+                          bgColor="bg-red-600"
+                          textColor="white"
+                          onClick={() => {
+                            dowloadExcelAnalytics();
+                          }}
+                        />
+                      </div>
+                      <div className="h-12 flex items-center justify-center w-full">
+                        <Button
                           title="Configurar Importação de Planilha"
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
@@ -1032,19 +1091,18 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? req.cookies.pageBeforeEdit
     : 0;
 
-
-    // Last page
-    const lastPageServer = req.cookies.lastPage
+  // Last page
+  const lastPageServer = req.cookies.lastPage
     ? req.cookies.lastPage
     : 'No';
 
-    if (lastPageServer == undefined || lastPageServer == 'No') {
+  if (lastPageServer == undefined || lastPageServer == 'No') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
-    }
+  }
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit

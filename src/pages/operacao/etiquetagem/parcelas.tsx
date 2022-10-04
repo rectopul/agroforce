@@ -36,6 +36,7 @@ import {
   Content,
   Input,
   FieldItemsPerPage,
+  SelectMultiple,
 } from "../../../components";
 import LoadingComponent from "../../../components/Loading";
 import { UserPreferenceController } from "../../../controllers/user-preference.controller";
@@ -190,6 +191,7 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("action"),
     },
   ]);
+
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
     {
       name: "StatusCheckbox",
@@ -204,6 +206,8 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("sorteado"),
     },
   ]);
+  const [statusFilterSelected, setStatusFilterSelected] = useState<any>([]);
+
   const [statusImp, setStatusImp] = useState<IGenerateProps[]>(() => [
     {
       name: "StatusCheckbox",
@@ -273,7 +277,7 @@ export default function Listagem({
       filterLocal,
       filterRepetitionFrom,
       filterRepetitionTo,
-      filterStatus,
+      //filterStatus,
       filterNtFrom,
       filterNtTo,
       filterNpeFrom,
@@ -290,7 +294,8 @@ export default function Listagem({
           selecionados += `${allCheckBox[i].value},`;
         }
       }
-      const filterStatusT = selecionados.substr(0, selecionados.length - 1);
+      //const filterStatusT = selecionados.substr(0, selecionados.length - 1);
+      const filterStatus = statusFilterSelected?.join(",");
 
       // Call filter with there parameter
       const parametersFilter = await fetchWrapper.handleFilterParameter(
@@ -565,7 +570,6 @@ export default function Listagem({
       .getAll(filter)
       .then(({ status, response }) => {
         if (status === 200) {
-          // console.log(response);
           const newData = response.map((item: any) => {
             const newItem: any = {};
 
@@ -1046,6 +1050,17 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status da parcela
                     </label>
+                    <SelectMultiple
+                      data={statusFilter.map((i: any) => i.title)}
+                      values={statusFilterSelected}
+                      onChange={(e: any) => setStatusFilterSelected(e)}
+                    />
+                  </div>
+
+                  {/* <div className="h-10 w-full ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Status da parcela
+                    </label>
                     <AccordionFilter>
                       <DragDropContext onDragEnd={handleOnDragEnd}>
                         <Droppable droppableId="characters">
@@ -1083,7 +1098,7 @@ export default function Listagem({
                         </Droppable>
                       </DragDropContext>
                     </AccordionFilter>
-                  </div>
+                  </div> */}
 
                   <div className="h-6 w-full ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">

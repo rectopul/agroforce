@@ -200,7 +200,7 @@ export class NpeController {
 
       if (!response || response.total <= 0) {
         return {
-          status: 404, response: [], total: 0, message: 'Nenhuma NPE cadastrada',
+          status: 400, response: [], total: 0, message: 'Nenhuma NPE cadastrada',
         };
       }
       return { status: 200, response, total: response.total };
