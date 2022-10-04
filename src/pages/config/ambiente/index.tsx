@@ -577,6 +577,7 @@ export default function Listagem({
   async function handleStatus(idNPE: number, data: any): Promise<void> {
     const parametersFilter = `filterStatus=${1}&safraId=${data.safraId
     }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
+
     }&epoca=${String(data.epoca)}`;
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {

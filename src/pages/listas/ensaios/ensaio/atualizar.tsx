@@ -619,21 +619,21 @@ export default function AtualizarTipoEnsaio({
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'genotypeTreatments');
 
-        // Buffer
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
-        });
-        // Download
-        XLSX.writeFile(workBook, 'Tratamentos-genótipos.xlsx');
-      }
-    });
-  };
+          // Buffer
+          XLSX.write(workBook, {
+            bookType: "xlsx", // xlsx
+            type: "buffer",
+          });
+          // Binary
+          XLSX.write(workBook, {
+            bookType: "xlsx", // xlsx
+            type: "binary",
+          });
+          // Download
+          XLSX.writeFile(workBook, "Tratamentos-genótipos.xlsx");
+        }
+      });
+ };
 
   const downloadExcelExperiments = async (): Promise<void> => {
     await experimentService

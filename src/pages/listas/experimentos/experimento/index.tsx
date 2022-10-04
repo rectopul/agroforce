@@ -82,9 +82,9 @@ interface IData {
   idSafra: number;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
-  typeOrderServer: any | string;
-  orderByserver: any | string;
-  cultureId: number | any;
+  typeOrderServer :any| string;
+  orderByserver : any |string;
+  cultureId :number | any;
 }
 
 export default function Listagem({
@@ -160,6 +160,7 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+
   const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == 'tecnologia' ? 'assay_list.tecnologia.cod_tec' : orderBy}&typeOrder=${typeOrder}`;
 
   const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
@@ -410,6 +411,7 @@ export default function Listagem({
   // }
 
   async function deleteItem(id: number) {
+    // eslint-disable-next-line max-len
     const { status, message } = await await experimentService.deleted({
       id,
       userId: userLogado.id,
@@ -690,10 +692,7 @@ export default function Listagem({
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = tableGlobalFunctions.getValuesForFilter(
-      value,
-      filtersParams,
-    );
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
     return parameter;
   }
 
