@@ -8,6 +8,7 @@ import {
   IReturnObject,
 } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
+import { validateInteger } from '../../shared/utils/numberValidate';
 import {
   responseGenericFactory,
   responseNullFactory,
@@ -176,35 +177,27 @@ export class ImportGenotypeController {
 
             if (configModule.response[0]?.fields[column] === 'GMR') {
               if (spreadSheet[row][column] !== null) {
-                responseIfError[Number(column)] += responseNullFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                );
-              } else if (typeof spreadSheet[row][column] !== 'number') {
-                responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
-                    Number(column) + 1,
+                if (!validateInteger(spreadSheet[row][column])) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    (Number(column) + 1),
                     row,
                     spreadSheet[0][column],
+                    'precisa ser um numero inteiro e positivo',
                   );
+                }
               }
             }
 
             if (configModule.response[0]?.fields[column] === 'BGM') {
               if (spreadSheet[row][column] !== null) {
-                responseIfError[Number(column)] += responseNullFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                );
-              } else if (typeof spreadSheet[row][column] !== 'number') {
-                responseIfError[Number(column)]
-                  += responsePositiveNumericFactory(
-                    Number(column) + 1,
+                if (!validateInteger(spreadSheet[row][column])) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    (Number(column) + 1),
                     row,
                     spreadSheet[0][column],
+                    'precisa ser um numero inteiro e positivo',
                   );
+                }
               }
             }
 
