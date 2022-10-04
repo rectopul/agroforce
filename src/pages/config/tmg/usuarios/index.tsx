@@ -256,6 +256,7 @@ export default function Listagem({
     await userService.update({
       id: idItem,
       status: data.status,
+      created_by: userLogado.id,
     });
 
     if (index === -1) {
@@ -279,6 +280,7 @@ export default function Listagem({
       tel,
       status,
       avatar,
+      created_by: userLogado.id,
     });
   }
 
@@ -897,18 +899,18 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     ? req.cookies.pageBeforeEdit
     : 0;
 
-    // Last page
-    const lastPageServer = req.cookies.lastPage
+  // Last page
+  const lastPageServer = req.cookies.lastPage
     ? req.cookies.lastPage
     : 'No';
-    if (lastPageServer == undefined || lastPageServer == 'No') {
+  if (lastPageServer == undefined || lastPageServer == 'No') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });  
-    removeCookies("filtersParams", { req, res });
-    }
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
+    removeCookies('filtersParams', { req, res });
+  }
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
@@ -929,11 +931,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
-  removeCookies("filterBeforeEditTypeOrder", { req, res });
-  removeCookies("filterBeforeEditOrderBy", { req, res });
-  removeCookies("lastPage", { req, res });  
-  removeCookies("filtersParams", { req, res });
-  
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
+  removeCookies('filtersParams', { req, res });
+
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
   const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
