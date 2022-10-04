@@ -570,11 +570,16 @@ export default function Atualizar({
                     <div className="h-12">
 
                       <Button
-                        title={grupos.length ? 'Grupo ja cadastrado na safra' : 'Cadastrar grupo'}
-                        value={`${grupos.length ? 'Grupo ja cadastrado na safra' : 'Cadastrar grupo'}`}
-                        bgColor={grupos.length ? 'bg-gray-400' : 'bg-blue-600'}
+                        // eslint-disable-next-line max-len
+                        // title={grupos.length ? 'Grupo ja cadastrado na safra' : 'Cadastrar grupo'}
+                        title="Cadastrar grupo"
+                        // eslint-disable-next-line max-len
+                        // value={`${grupos.length ? 'Grupo ja cadastrado na safra' : 'Cadastrar grupo'}`}
+                        value="Cadastrar grupo"
+                        // bgColor={grupos.length ? 'bg-gray-400' : 'bg-blue-600'}
+                        bgColor="bg-blue-600"
                         textColor="white"
-                        disabled={grupos.length}
+                        // disabled={grupos.length}
                         onClick={() => {
                           router.push(`grupo/cadastro?id_foco=${idFoco}`);
                         }}
