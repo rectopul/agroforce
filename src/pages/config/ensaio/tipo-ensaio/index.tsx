@@ -978,7 +978,17 @@ export default function TipoEnsaio({
                     </div>
 
                     <strong className="text-blue-600">
+<<<<<<< HEAD
+
+                      Total registrado:
+
+                      {' '}
+
+                      {itemsTotal}
+
+=======
                       Total registrado: {itemsTotal}
+>>>>>>> ee8ed9fc6804270b94c58c13cb1514f58fb597a2
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
@@ -1150,6 +1160,19 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 0;
   // Last page
 
+<<<<<<< HEAD
+  // Last page
+
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage
+    : 'No';
+
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
+=======
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
   if (lastPageServer == undefined || lastPageServer == "No") {
     removeCookies("filterBeforeEdit", { req, res });
@@ -1157,11 +1180,16 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies("filterBeforeEditTypeOrder", { req, res });
     removeCookies("filterBeforeEditOrderBy", { req, res });
     removeCookies("lastPage", { req, res });
+>>>>>>> ee8ed9fc6804270b94c58c13cb1514f58fb597a2
   }
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
+<<<<<<< HEAD
+
+=======
+>>>>>>> ee8ed9fc6804270b94c58c13cb1514f58fb597a2
   // RR
 
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder

@@ -247,9 +247,14 @@ export default function Listagem({
       filterNpeFinalFrom,
     }) => {
       // &filterSafra=${filterSafra}
+<<<<<<< HEAD:src/pages/config/npe/index.tsx
+      const parametersFilter = `filterStatus=${filterStatus || 1
+      }&filterNpeTo=${filterNpeTo}&filterCodTecnologia=${filterCodTecnologia}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_culture=${idCulture}&id_safra=${safraId}`;
+=======
       const parametersFilter = `filterStatus=${
         filterStatus || 1
       }&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_culture=${idCulture}&id_safra=${safraId}`;
+>>>>>>> ee8ed9fc6804270b94c58c13cb1514f58fb597a2:src/pages/config/ambiente/index.tsx
       // &id_safra=${safraId}
       // await npeService
       //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
@@ -580,10 +585,15 @@ export default function Listagem({
   }
 
   async function handleStatus(idNPE: number, data: any): Promise<void> {
+<<<<<<< HEAD:src/pages/config/npe/index.tsx
+    const parametersFilter = `filterStatus=${1}&safraId=${data.safraId
+    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
+=======
     const parametersFilter = `filterStatus=${1}&safraId=${
       data.safraId
     }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${
       data.id_type_assay
+>>>>>>> ee8ed9fc6804270b94c58c13cb1514f58fb597a2:src/pages/config/ambiente/index.tsx
     }&epoca=${String(data.epoca)}`;
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {

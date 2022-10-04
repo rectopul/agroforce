@@ -20,7 +20,7 @@ export class TypeAssayController {
 
       if (options.filterName) {
         parameters.name = JSON.parse(`{"contains":"${options.filterName}"}`);
-      }   
+      }
 
       if (options.filterSeedsFrom || options.filterSeedsTo) {
         if (options.filterSeedsFrom && options.filterSeedsTo) {
@@ -67,9 +67,7 @@ export class TypeAssayController {
 
       response.map((item: any) => {
         item.envelope.map((envelope: any) => {
-          if (envelope.id_safra === Number(options.id_safra)) {
-            item.envelope = envelope;
-          }
+          item.envelope = envelope;
         });
       });
       if (!response || response.total <= 0) {

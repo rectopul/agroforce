@@ -163,9 +163,15 @@ export class ImportAssayListController {
             }
             // Validação do campo BGM
             if (column === '6') {
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              if (spreadSheet[row][column] !== null) {
+                if (!validateInteger(spreadSheet[row][column])) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    (Number(column) + 1),
+                    row,
+                    spreadSheet[0][column],
+                    'precisa ser um numero inteiro e positivo',
+                  );
+                }
               }
             }
             // Validação do campo PRJ
