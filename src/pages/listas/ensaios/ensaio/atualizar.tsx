@@ -584,42 +584,6 @@ export default function AtualizarTipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
-<<<<<<< HEAD
-    await genotypeTreatmentService.getAll(filterApplication).then(({ status, response }) => {
-      if (status === 200) {
-        const newData = response.map((row: any) => {
-          const newRow = row;
-          newRow.SAFRA = row.safra.safraName;
-          newRow.FASE = newRow.lote?.fase;
-          newRow.COD_TEC = newRow.genotipo?.tecnologia?.cod_tec;
-          newRow.NT = newRow.treatments_number;
-          newRow.NOME_GENOTIPO = newRow.genotipo?.name_genotipo;
-          newRow.GMR_GENOTIPO = newRow.genotipo?.gmr;
-          newRow.BGM_GENOTIPO = newRow.genotipo?.bgm;
-          newRow.STATUS_T = newRow.status;
-          newRow.STATUS_EXPERIMENTO = newRow.status_experiment;
-          newRow.NCA = newRow.lote?.ncc;
-          newRow.COD_LOTE = newRow.lote?.cod_lote;
-          newRow.COMENTÁRIOS = newRow.comments;
-
-          delete row.id_lote;
-          delete row.id_genotipo;
-          delete row.safra;
-          delete row.treatments_number;
-          delete row.status;
-          delete row.status_experiment;
-          delete row.comments;
-          delete row.genotipo;
-          delete row.lote;
-          delete row.id;
-          delete row.id_safra;
-          delete row.assay_list;
-          return newRow;
-        });
-        const workSheet = XLSX.utils.json_to_sheet(newData);
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'genotypeTreatments');
-=======
     await genotypeTreatmentService
       .getAll(filterApplication)
       .then(({ status, response }) => {
@@ -648,7 +612,6 @@ export default function AtualizarTipoEnsaio({
             workSheet,
             "genotypeTreatments"
           );
->>>>>>> ee8ed9fc6804270b94c58c13cb1514f58fb597a2
 
           // Buffer
           XLSX.write(workBook, {
