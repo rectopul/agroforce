@@ -125,8 +125,6 @@ export class NpeController {
           parameters.group = JSON.parse(` { "some" : {"group": {"lte": ${Number(options.filterGrpTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
         }
       }
-      console.log(parameters);
-      console.log(options);
 
       const take = (options.take) ? Number(options.take) : undefined;
 

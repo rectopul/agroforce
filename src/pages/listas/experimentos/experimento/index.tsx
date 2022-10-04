@@ -82,9 +82,9 @@ interface IData {
   idSafra: number;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
-  typeOrderServer :any| string;
-  orderByserver : any |string;
-  cultureId :number | any;
+  typeOrderServer: any | string;
+  orderByserver: any | string;
+  cultureId: number | any;
 }
 
 export default function Listagem({

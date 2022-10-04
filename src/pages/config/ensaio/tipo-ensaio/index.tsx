@@ -1165,7 +1165,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
-
   // RR
 
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
