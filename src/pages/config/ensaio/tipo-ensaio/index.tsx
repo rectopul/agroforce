@@ -1266,7 +1266,7 @@ export default function TipoEnsaio({
 
                     <strong className="text-blue-600">
 
- Total registrado:
+                      Total registrado:
 
                       {' '}
 
@@ -1551,28 +1551,24 @@ export const getServerSideProps: GetServerSideProps = async ({
 
     : 0;
 
+  // Last page
 
-
- // Last page
-
-   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage
-  : 'No';
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage
+    : 'No';
 
   if (lastPageServer == undefined || lastPageServer == 'No') {
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-  removeCookies('filterBeforeEditTypeOrder', { req, res });
-  removeCookies('filterBeforeEditOrderBy', { req, res });
-  removeCookies('lastPage', { req, res });
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
   }
-
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
 
     ? req.cookies.filterBeforeEdit
 
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
-
 
   // RR
 

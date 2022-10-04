@@ -92,16 +92,16 @@ interface IData {
 }
 
 export default function Listagem({
-      allNpe,
-      itensPerPage,
-      filterApplication,
-      filterBeforeEdit,
-      totalItems,
-      typeOrderServer,
-      orderByserver,
-      safraId,
-      idCulture,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allNpe,
+  itensPerPage,
+  filterApplication,
+  filterBeforeEdit,
+  totalItems,
+  typeOrderServer,
+  orderByserver,
+  safraId,
+  idCulture,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -240,7 +240,7 @@ export default function Listagem({
     }) => {
       // &filterSafra=${filterSafra}
       const parametersFilter = `filterStatus=${filterStatus || 1
-        }&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_culture=${idCulture}&id_safra=${safraId}`;
+      }&filterNpeTo=${filterNpeTo}&filterCodTecnologia=${filterCodTecnologia}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_culture=${idCulture}&id_safra=${safraId}`;
       // &id_safra=${safraId}
       // await npeService
       //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
@@ -568,8 +568,8 @@ export default function Listagem({
 
   async function handleStatus(idNPE: number, data: any): Promise<void> {
     const parametersFilter = `filterStatus=${1}&safraId=${data.safraId
-      }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
-      }&epoca=${String(data.epoca)}`;
+    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
+    }&epoca=${String(data.epoca)}`;
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {
         if (response.total > 0) {

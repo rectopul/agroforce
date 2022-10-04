@@ -490,14 +490,26 @@ export default function AtualizarTipoEnsaio({
       if (status === 200) {
         const newData = response.map((row: any) => {
           const newRow = row;
-          newRow.fase = newRow.lote?.fase;
-          newRow.cod_tec = newRow.genotipo?.tecnologia?.cod_tec;
-          newRow.nome_genotipo = newRow.genotipo?.name_genotipo;
-          newRow.gmr_genotipo = newRow.genotipo?.gmr;
-          newRow.bgm_genotipo = newRow.genotipo?.bgm;
-          newRow.nca = newRow.lote?.ncc;
-          newRow.cod_lote = newRow.lote?.cod_lote;
+          newRow.SAFRA = row.safra.safraName;
+          newRow.FASE = newRow.lote?.fase;
+          newRow.COD_TEC = newRow.genotipo?.tecnologia?.cod_tec;
+          newRow.NT = newRow.treatments_number;
+          newRow.NOME_GENOTIPO = newRow.genotipo?.name_genotipo;
+          newRow.GMR_GENOTIPO = newRow.genotipo?.gmr;
+          newRow.BGM_GENOTIPO = newRow.genotipo?.bgm;
+          newRow.STATUS_T = newRow.status;
+          newRow.STATUS_EXPERIMENTO = newRow.status_experiment;
+          newRow.NCA = newRow.lote?.ncc;
+          newRow.COD_LOTE = newRow.lote?.cod_lote;
+          newRow.COMENTÁRIOS = newRow.comments;
 
+          delete row.id_lote;
+          delete row.id_genotipo;
+          delete row.safra;
+          delete row.treatments_number;
+          delete row.status;
+          delete row.status_experiment;
+          delete row.comments;
           delete row.genotipo;
           delete row.lote;
           delete row.id;

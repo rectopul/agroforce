@@ -32,6 +32,7 @@ import {
   AccordionFilter, Button, CheckBox, Content, Input,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import { tableGlobalFunctions } from '../../../../helpers';
 
 export default function TipoEnsaio({
   allAssay,
@@ -97,7 +98,6 @@ export default function TipoEnsaio({
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
-  const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const router = useRouter();
   const take: number = itensPerPage;
@@ -835,7 +835,7 @@ export default function TipoEnsaio({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages-1)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
