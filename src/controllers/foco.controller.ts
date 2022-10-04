@@ -33,6 +33,8 @@ export class FocoController {
           parameters.group = JSON.parse(` { "some" : {"group": {"lte": ${Number(options.filterGroupTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
         }
       }
+      console.log(parameters);
+      console.log(options);
 
       const select = {
         id: true,

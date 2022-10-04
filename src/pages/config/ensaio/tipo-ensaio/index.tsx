@@ -978,7 +978,13 @@ export default function TipoEnsaio({
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado: {itemsTotal}
+
+                      Total registrado:
+
+                      {' '}
+
+                      {itemsTotal}
+
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
@@ -1148,15 +1154,18 @@ export const getServerSideProps: GetServerSideProps = async ({
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
+
   // Last page
 
-  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
-  if (lastPageServer == undefined || lastPageServer == "No") {
-    removeCookies("filterBeforeEdit", { req, res });
-    removeCookies("pageBeforeEdit", { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage
+    : 'No';
+
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
   }
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
