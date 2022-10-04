@@ -4,6 +4,7 @@
 /* eslint-disable no-restricted-syntax */
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
+import { validateInteger } from '../../shared/utils/numberValidate';
 import {
   responseNullFactory,
   responseGenericFactory,
@@ -80,10 +81,10 @@ export class ImportGenotypeTreatmentController {
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a tecnologia e diferente da cadastrada no ensaio. </li> <br>`;
           }
 
-          if (treatments[0]?.assay_list.bgm !== spreadSheet[row][5]) {
-            responseIfError[0]
-              += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o bgm e diferente do cadastrado no ensaio. </li> <br>`;
-          }
+          // if (treatments[0]?.assay_list.bgm !== spreadSheet[row][5]) {
+          //   responseIfError[0]
+          //     += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o bgm e diferente do cadastrado no ensaio. </li> <br>`;
+          // }
 
           for (const column in spreadSheet[row]) {
             if (column === '0') { // SAFRA
@@ -117,9 +118,15 @@ export class ImportGenotypeTreatmentController {
               }
             }
             if (column === '5') { // BGM
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              if (spreadSheet[row][column] !== null) {
+                if (!validateInteger(spreadSheet[row][column])) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    (Number(column) + 1),
+                    row,
+                    spreadSheet[0][column],
+                    'precisa ser um numero inteiro e positivo',
+                  );
+                }
               }
             }
             if (column === '6') { // NT
