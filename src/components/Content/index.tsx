@@ -160,7 +160,7 @@ export function Content({
       setSafraSelecionada(value);
       userLogado.safras.safra_selecionada = Number(value);
       localStorage.setItem('user', JSON.stringify(userLogado));
-      setTimeout(2000);
+      setTimeout(() => 2000);
       location.reload();
     }
   }
