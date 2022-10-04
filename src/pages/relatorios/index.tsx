@@ -55,13 +55,11 @@ import * as ITabs from '../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../helpers';
 
 export default function Listagem({
-  allReportes,
   totalItems,
   itensPerPage,
   filterApplication,
   idCulture,
   idSafra,
-  pageBeforeEdit,
   filterBeforeEdit,
   orderByserver,
   typeOrderServer,
@@ -86,11 +84,9 @@ export default function Listagem({
   const [reportes, setReportes] = useState<ITreatment[] | any>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(1);
-  const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
-  const [itemsTotal, setTotalItems] = useState<number>(0);
+  const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
       name: 'CamposGerenciados[]',
@@ -176,21 +172,6 @@ export default function Listagem({
 
       const filterStatus = selecionados.substr(0, selecionados.length - 1);
       const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}&id_culture=${idCulture}`;
-      // setFiltersParams(parametersFilter);
-      // setCookies('filterBeforeEdit', filtersParams);
-      // await reporteService
-      //   .getAll(`${parametersFilter}`)
-      //   .then(({ response, total: allTotal }) => {
-      //     setFilter(parametersFilter);
-      //     setReportes(response);
-      //     setTotalItems(allTotal);
-      //     setAfterFilter(true);
-      //     setCurrentPage(0);
-      //     setMessage(true);
-      //     tableRef.current.dataManager.changePageSize(
-      //       allTotal >= take ? take : allTotal,
-      //     );
-      //   });
 
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -265,7 +246,6 @@ export default function Listagem({
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
-    setArrowOrder(arrowOrder);
   }
 
   function headerTableFactory(name: string, title: string) {
@@ -328,7 +308,7 @@ export default function Listagem({
           module_id: 27,
         })
         .then((response) => {
-          userLogado.preferences.genotypeTreatment = {
+          userLogado.preferences.reporte = {
             id: response.response.id,
             userId: preferences.userId,
             table_preferences: campos,
@@ -337,7 +317,7 @@ export default function Listagem({
         });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.genotypeTreatment = {
+      userLogado.preferences.reporte = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
@@ -405,48 +385,6 @@ export default function Listagem({
       });
   };
 
-  const replacementExcel = async (): Promise<void> => {
-    await reporteService
-      .getAll(filter)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          const newData = response.map((item: any) => {
-            const newItem: any = {};
-            newItem.safra = item.safra.safraName;
-            newItem.foco = item.assay_list.foco.name;
-            newItem.ensaio = item.assay_list.type_assay.name;
-            newItem.tecnologia = item.assay_list.tecnologia.cod_tec;
-            newItem.gli = item.assay_list.gli;
-            newItem.bgm = item.assay_list.bgm;
-            newItem.nt = item.treatments_number;
-            newItem.status_t = item.status;
-            newItem.genotipo = item.genotipo.name_genotipo;
-            newItem.nca = item.lote.ncc;
-            newItem.novo_genotipo = '';
-            newItem.novo_status = '';
-            newItem.novo_nca = '';
-            return newItem;
-          });
-          const workSheet = XLSX.utils.json_to_sheet(newData);
-          const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
-
-          // Buffer
-          XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
-            type: 'buffer',
-          });
-          // Binary
-          XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
-            type: 'binary',
-          });
-          // Download
-          XLSX.writeFile(workBook, 'Substituição-genótipos.xlsx');
-        }
-      });
-  };
-
   // manage total pages
   async function handleTotalPages() {
     if (currentPage < 0) {
@@ -474,12 +412,6 @@ export default function Listagem({
     //     }
     //   });
     await callingApi(filter); // handle pagination globly
-  }
-
-  // Checking defualt values
-  function checkValue(value: any) {
-    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
-    return parameter;
   }
 
   function filterFieldFactory(title: string, name: string) {
@@ -571,7 +503,6 @@ export default function Listagem({
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
-              tableRef={tableRef}
               style={{ background: '#f9fafb' }}
               columns={columns}
               data={reportes}
@@ -583,7 +514,6 @@ export default function Listagem({
                 rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
-                // pageSize: itensPerPage,
                 pageSize: Number(take),
               }}
               components={{
@@ -666,17 +596,6 @@ export default function Listagem({
                             </DragDropContext>
                           </AccordionFilter>
                         </div>
-                      </div>
-                      <div className="h-12 flex items-center justify-center w-full">
-                        <Button
-                          title="Exportar planilha para substituição"
-                          icon={<BsDownload size={20} />}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          onClick={() => {
-                            replacementExcel();
-                          }}
-                        />
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
