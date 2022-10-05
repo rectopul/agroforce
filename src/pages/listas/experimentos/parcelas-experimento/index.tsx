@@ -59,15 +59,15 @@ import * as ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
 
 export default function Listagem({
-  // assaySelect,
-  genotypeSelect,
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  filterBeforeEdit,
-  typeOrderServer,
-  orderByserver,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      // assaySelect,
+      genotypeSelect,
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      filterBeforeEdit,
+      typeOrderServer,
+      orderByserver,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const [isOpenModal, setIsOpenModal] = useState(false);
 
@@ -225,9 +225,8 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == "tecnologia" ? "genotipo.tecnologia.cod_tec" : orderBy
-  }&typeOrder=${typeOrder}`; // RR
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == "tecnologia" ? "genotipo.tecnologia.cod_tec" : orderBy
+    }&typeOrder=${typeOrder}`; // RR
 
   const [nccIsValid, setNccIsValid] = useState<boolean>(false);
   const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
@@ -295,7 +294,7 @@ export default function Listagem({
       //const filterStatus = selecionados.substr(0, selecionados.length - 1);
       const filterStatus = statusFilterSelected?.join(",");
 
-      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}`;
+      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterExperimentName=${filterExperimentName}&filterRepetitionTo=${filterRepTo}&filterRepetitionFrom=${filterRepFrom}`;
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEdit', filtersParams);
       // await genotypeTreatmentService
@@ -1121,7 +1120,7 @@ export default function Listagem({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       type="submit"
                       bgColor="bg-blue-600"
@@ -1162,7 +1161,7 @@ export default function Listagem({
                     : "",
                 },
               }}
-              onChangeRowsPerPage={(e: any) => {}}
+              onChangeRowsPerPage={(e: any) => { }}
               onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (
@@ -1368,7 +1367,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies("filterBeforeEditOrderBy", { req, res });
     removeCookies("lastPage", { req, res });
   }
-  
+
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : "";

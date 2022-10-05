@@ -31,11 +31,11 @@ export class ExperimentGenotipeController {
         );
       }
 
-      if (options.filterGli) {
-        parameters.assayList = JSON.parse(
-          `{ "name": { "contains": "${options.filterGli}" } }`,
-        );
-      }
+      // if (options.filterGli) {
+      //   parameters.assayList = JSON.parse(
+      //     `{ "name": { "contains": "${options.filterGli}" } }`,
+      //   );
+      // }
 
       if (options.filterNameTec) {
         parameters.tecnologia = JSON.parse(
