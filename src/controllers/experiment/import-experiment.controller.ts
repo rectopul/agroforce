@@ -17,6 +17,7 @@ import { AssayListController } from '../assay-list/assay-list.controller';
 import { ExperimentController } from './experiment.controller';
 import { LogImportController } from '../log-import.controller';
 import { validateInteger } from '../../shared/utils/numberValidate';
+import { CulturaController } from '../cultura.controller';
 
 export class ImportExperimentController {
   static async validate(
@@ -27,6 +28,7 @@ export class ImportExperimentController {
   ): Promise<IReturnObject> {
     const safraController = new SafraController();
     const localController = new LocalController();
+    const culturaController = new CulturaController();
     const logImportController = new LogImportController();
     const assayListController = new AssayListController();
     const experimentController = new ExperimentController();
@@ -37,7 +39,7 @@ export class ImportExperimentController {
     try {
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
-          const experimentName = `${spreadSheet[row][0]}_${spreadSheet[row][3]}_${spreadSheet[row][6]}_${spreadSheet[row][8]}`;
+          const experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_${spreadSheet[row][9]}`;
           const { response: experiment } = await experimentController.getAll({
             filterExperimentName: experimentName,
             idSafra,
@@ -55,18 +57,35 @@ export class ImportExperimentController {
           }
           experimentNameTemp[row] = experimentName;
           let assayList: any = {};
-          if (spreadSheet[row][3] === null) { // GLI
+          if (spreadSheet[row][4] === null) { // GLI
             responseIfError[Number(3)]
-              += responseNullFactory(Number(3 + 1), row, spreadSheet[0][3]);
+              += responseNullFactory(Number(3 + 1), row, spreadSheet[0][4]);
           } else {
             const { response } = await assayListController.getAll({
-              gli: spreadSheet[row][3],
+              gli: spreadSheet[row][4],
               id_safra: idSafra,
             });
             assayList = response.length > 0 ? response[0] : [];
           }
           for (const column in spreadSheet[row]) {
-            if (column === '0') { // SAFRA
+            if (column === '0') { // CULTURA
+              if (spreadSheet[row][column] === null) {
+                responseIfError[Number(column)]
+                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              }
+              const {
+                response,
+              }: any = await culturaController.getOneCulture(Number(idCulture));
+              if (response?.name !== spreadSheet[row][column]) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  Number(column) + 1,
+                  row,
+                  spreadSheet[0][column],
+                  'a cultura e diferente da selecionada',
+                );
+              }
+            }
+            if (column === '1') { // SAFRA
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -90,7 +109,7 @@ export class ImportExperimentController {
                 }
               }
             }
-            if (column === '1') { // ENSAIO
+            if (column === '2') { // ENSAIO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -99,7 +118,7 @@ export class ImportExperimentController {
                   += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
             }
-            if (column === '2') { // FOCO
+            if (column === '3') { // FOCO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -108,7 +127,7 @@ export class ImportExperimentController {
                   += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
             }
-            if (column === '4') { // GGEN // TECNOLOGIA
+            if (column === '5') { // GGEN // TECNOLOGIA
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -121,13 +140,19 @@ export class ImportExperimentController {
                   += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
             }
-            if (column === '5') { // GGM // BGM
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+            if (column === '6') { // GGM // BGM
+              if (spreadSheet[row][column] !== null) {
+                if (!validateInteger(spreadSheet[row][column])) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    (Number(column) + 1),
+                    row,
+                    spreadSheet[0][column],
+                    'precisa ser um numero inteiro e positivo',
+                  );
+                }
               }
             }
-            if (column === '6') { // LOCAL
+            if (column === '7') { // LOCAL
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -158,7 +183,7 @@ export class ImportExperimentController {
                 }
               }
             }
-            if (column === '7') { // DENSIDADE
+            if (column === '8') { // DENSIDADE
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -173,7 +198,7 @@ export class ImportExperimentController {
                   );
               }
             }
-            if (column === '8') { // EPOCA
+            if (column === '9') { // EPOCA
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -188,7 +213,7 @@ export class ImportExperimentController {
                   );
               }
             }
-            if (column === '9') { // DELINEAMENTO
+            if (column === '10') { // DELINEAMENTO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -200,7 +225,7 @@ export class ImportExperimentController {
                 if (response?.length === 0) {
                   responseIfError[Number(column)]
                     += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
-                } else if (response[0]?.repeticao < spreadSheet[row][10]) {
+                } else if (response[0]?.repeticao < spreadSheet[row][11]) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
@@ -219,7 +244,7 @@ export class ImportExperimentController {
                 }
               }
             }
-            if (column === '10') { // NREP
+            if (column === '11') { // NREP
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -232,7 +257,7 @@ export class ImportExperimentController {
                 );
               }
             }
-            if (column === '11') { // NPL
+            if (column === '12') { // NPL
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -245,7 +270,7 @@ export class ImportExperimentController {
                 );
               }
             }
-            if (column === '12') { // CLP
+            if (column === '13') { // CLP
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -259,7 +284,7 @@ export class ImportExperimentController {
                 );
               }
             }
-            if (column === '14') { // ORDEM SORTEIO
+            if (column === '15') { // ORDEM SORTEIO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -280,17 +305,17 @@ export class ImportExperimentController {
           for (const row in spreadSheet) {
             if (row !== '0') {
               const { response: local } = await localController.getAll({
-                name_local_culture: spreadSheet[row][6],
+                name_local_culture: spreadSheet[row][7],
               });
               const { response: assayList } = await assayListController.getAll({
-                gli: spreadSheet[row][3],
+                gli: spreadSheet[row][4],
                 id_safra: idSafra,
               });
               const { response: delineamento } = await delineamentoController.getAll({
-                id_culture: idCulture, name: spreadSheet[row][9],
+                id_culture: idCulture, name: spreadSheet[row][10],
               });
-              const comments = spreadSheet[row][13]?.substr(0, 255) ? spreadSheet[row][13]?.substr(0, 255) : '';
-              const experimentName = `${spreadSheet[row][0]}_${spreadSheet[row][3]}_${spreadSheet[row][6]}_${spreadSheet[row][8]}`;
+              const comments = spreadSheet[row][14]?.substr(0, 255) ? spreadSheet[row][14]?.substr(0, 255) : '';
+              const experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_${spreadSheet[row][9]}`;
               const { response: experiment } = await experimentController.getAll({
                 filterExperimentName: experimentName,
                 idSafra,
@@ -304,14 +329,14 @@ export class ImportExperimentController {
                     idDelineamento: delineamento[0]?.id,
                     idSafra,
                     experimentName,
-                    density: spreadSheet[row][7],
-                    period: spreadSheet[row][8],
-                    repetitionsNumber: spreadSheet[row][10],
-                    nlp: spreadSheet[row][11],
-                    clp: spreadSheet[row][12],
-                    bgm: spreadSheet[row][5],
+                    density: spreadSheet[row][8],
+                    period: spreadSheet[row][9],
+                    repetitionsNumber: spreadSheet[row][11],
+                    nlp: spreadSheet[row][12],
+                    clp: spreadSheet[row][13],
+                    bgm: String(spreadSheet[row][6]),
                     comments,
-                    orderDraw: spreadSheet[row][14],
+                    orderDraw: spreadSheet[row][15],
                     created_by: createdBy,
                   },
                 );
@@ -323,14 +348,14 @@ export class ImportExperimentController {
                     idDelineamento: delineamento[0]?.id,
                     idSafra,
                     experimentName,
-                    density: spreadSheet[row][7],
-                    period: spreadSheet[row][8],
-                    repetitionsNumber: spreadSheet[row][10],
-                    nlp: spreadSheet[row][11],
-                    clp: spreadSheet[row][12],
-                    bgm: spreadSheet[row][5],
+                    density: spreadSheet[row][8],
+                    period: spreadSheet[row][9],
+                    repetitionsNumber: spreadSheet[row][11],
+                    nlp: spreadSheet[row][12],
+                    clp: spreadSheet[row][13],
+                    bgm: String(spreadSheet[row][6]),
                     comments,
-                    orderDraw: spreadSheet[row][14],
+                    orderDraw: spreadSheet[row][15],
                     created_by: createdBy,
                   },
                 );

@@ -664,7 +664,6 @@ export default function Listagem({
           });
           // temp.filter((x): any => x == NPESelectedRow)[0].npef = response[response.length - 1].npef;
           setExperimento(response);
-          console.log('Experimentos : ', response[response.length - 1]);
           setTotalItems(total);
         }
       });
@@ -673,9 +672,6 @@ export default function Listagem({
   }
 
   async function createExperimentGenotipe({ data, total_consumed, genotipo_treatment }: any) {
-    console.log('data : ', data);
-    console.log('total_consumed : ', total_consumed);
-    console.log('genotype treatment : ', genotipo_treatment);
     if (data.length > 0) {
       const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
       const experimentObj: any[] = [];
@@ -759,7 +755,7 @@ export default function Listagem({
           });
           const gt_new: any = {};
           gt_new.id = gt.id;
-          gt_new.status_experiment = 'SORTEADO';
+          gt_new.status_experiment = 'EXP. SORTEADO';
           genotipo_treatment.push(gt_new);
         });
       });
@@ -1080,12 +1076,15 @@ export const getServerSideProps: GetServerSideProps = async ({
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : '';
-  const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}&idSafra=${idSafra}`
-    : '';
+  // const filterBeforeEdit = req.cookies.filterBeforeEdit
+  //   ? req.cookies.filterBeforeEdit
+  //   : '';
+  // const filterApplication = req.cookies.filterBeforeEdit
+  //   ? `${req.cookies.filterBeforeEdit}&idSafra=${idSafra}`
+  //   : '';
+
+  const filterBeforeEdit = '';
+  const filterApplication = '';
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });

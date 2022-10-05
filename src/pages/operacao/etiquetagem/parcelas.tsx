@@ -570,7 +570,6 @@ export default function Listagem({
       .getAll(filter)
       .then(({ status, response }) => {
         if (status === 200) {
-          // console.log(response);
           const newData = response.map((item: any) => {
             const newItem: any = {};
 

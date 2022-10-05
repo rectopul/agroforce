@@ -6,7 +6,7 @@ import React, { useRef } from 'react';
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
@@ -48,31 +48,24 @@ import {
 } from '../../components';
 import { UserPreferenceController } from '../../controllers/user-preference.controller';
 import {
-  genotypeTreatmentService,
-  importService,
+  reporteService,
   userPreferencesService,
 } from '../../services';
 import * as ITabs from '../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../helpers';
 
 export default function Listagem({
-  allTreatments,
-  assaySelect,
-  genotypeSelect,
   totalItems,
   itensPerPage,
   filterApplication,
   idCulture,
   idSafra,
-  pageBeforeEdit,
   filterBeforeEdit,
   orderByserver,
   typeOrderServer,
 
-
-}: ITreatmentGrid) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsReport } = ITabs.default;
-  const [isOpenModal, setIsOpenModal] = useState(false);
 
   const tableRef = useRef<any>(null);
 
@@ -82,74 +75,52 @@ export default function Listagem({
   const preferences = userLogado.preferences.genotypeTreatment || {
     id: 0,
     table_preferences:
-      'id,foco,type_assay,tecnologia,gli,bgm,treatments_number,genotype_treatment,status,action',
+      'madeBy,madeIn,module,operation',
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
-  const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
-  const [tableMessage, setMessage] = useState<boolean>(false);
+  const [reportes, setReportes] = useState<ITreatment[] | any>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(1);
-  const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
-  const [itemsTotal, setTotalItems] = useState<number>(0);
+  const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    // {
-    //   name: 'CamposGerenciados[]',
-    //   title: 'CheckBox ',
-    //   value: 'id',
-    //   defaultChecked: () => camposGerenciados.includes('id'),
-    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Feito Por',
-      value: 'foco',
-      defaultChecked: () => camposGerenciados.includes('foco'),
+      value: 'madeBy',
+      defaultChecked: () => camposGerenciados.includes('madeBy'),
     },
     {
       name: 'CamposGerenciados[]',
       title: 'Feito Em',
-      value: 'type_assay',
-      defaultChecked: () => camposGerenciados.includes('type_assay'),
-    },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Subsistema',
-      value: 'tecnologia',
-      defaultChecked: () => camposGerenciados.includes('tecnologia'),
+      value: 'madeIn',
+      defaultChecked: () => camposGerenciados.includes('madeIn'),
     },
     {
       name: 'CamposGerenciados[]',
       title: 'Módulo',
-      value: 'tecnologia',
-      defaultChecked: () => camposGerenciados.includes('tecnologia'),
+      value: 'module',
+      defaultChecked: () => camposGerenciados.includes('module'),
     },
     {
       name: 'CamposGerenciados[]',
       title: 'Operação',
-      value: 'tecnologia',
-      defaultChecked: () => camposGerenciados.includes('tecnologia'),
+      value: 'operation',
+      defaultChecked: () => camposGerenciados.includes('operation'),
     },
   ]);
-  // const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>('');
-  const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   // const take: number = itensPerPage;
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-  const [nccIsValid, setNccIsValid] = useState<boolean>(false);
-  const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
-  const [rowsSelected, setRowsSelected] = useState([]);
-  const [orderBy,setOrderBy]=useState<string>(orderByserver); 
-  const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); 
-  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; 
-
+  const [orderBy, setOrderBy] = useState<string>(orderByserver);
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
   const formik = useFormik<ITreatmentFilter>({
     initialValues: {
@@ -201,53 +172,34 @@ export default function Listagem({
 
       const filterStatus = selecionados.substr(0, selecionados.length - 1);
       const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}&id_culture=${idCulture}`;
-      // setFiltersParams(parametersFilter);
-      // setCookies('filterBeforeEdit', filtersParams);
-      // await genotypeTreatmentService
-      //   .getAll(`${parametersFilter}`)
-      //   .then(({ response, total: allTotal }) => {
-      //     setFilter(parametersFilter);
-      //     setTreatments(response);
-      //     setTotalItems(allTotal);
-      //     setAfterFilter(true);
-      //     setCurrentPage(0);
-      //     setMessage(true);
-      //     tableRef.current.dataManager.changePageSize(
-      //       allTotal >= take ? take : allTotal,
-      //     );
-      //   });
 
-
-    setFilter(parametersFilter);
-    setCurrentPage(0);
-    await callingApi(parametersFilter); 
+      setFilter(parametersFilter);
+      setCurrentPage(0);
+      await callingApi(parametersFilter);
     },
   });
 
-
-  //Calling common API 
-  async function callingApi(parametersFilter : any ){
-
-    setCookies("filterBeforeEdit", parametersFilter);
-    setCookies("filterBeforeEditTypeOrder", typeOrder);
-    setCookies("filterBeforeEditOrderBy", orderBy);  
+  // Calling common API
+  async function callingApi(parametersFilter : any) {
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies("filtersParams", parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
-    await genotypeTreatmentService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400 ) {
-        setTreatments(response.response);
+    await reporteService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200 || response.status === 400) {
+        setReportes(response.response);
         setTotalItems(response.total);
       }
     });
-  } 
+  }
 
-  //Call that function when change type order value.
+  // Call that function when change type order value.
   useEffect(() => {
     callingApi(filter);
   }, [typeOrder]);
-
 
   async function handleOrder(column: string, order: number): Promise<void> {
     // let typeOrder: any;
@@ -273,11 +225,11 @@ export default function Listagem({
     //   parametersFilter = filter;
     // }
 
-    // await genotypeTreatmentService
+    // await reporteService
     //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
     //   .then(({ status, response }) => {
     //     if (status === 200) {
-    //       setTreatments(response);
+    //       setReportes(response);
     //     }
     //   });
 
@@ -286,13 +238,14 @@ export default function Listagem({
     // } else {
     //   setOrder(orderList + 1);
     // }
-      //Gobal manage orders
-      const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order , orderList);
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-      setTypeOrder(typeOrderG);
-      setOrderBy(columnG);
-      setOrder(orderByG);
-      setArrowOrder(arrowOrder);
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
   }
 
   function headerTableFactory(name: string, title: string) {
@@ -313,52 +266,23 @@ export default function Listagem({
     };
   }
 
-  function tecnologiaHeaderFactory(name: string, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: 'tecnologia',
-      width: 0,
-      sorting: true,
-      render: (rowData: any) => (
-        <div className="h-10 flex">
-          <div>
-            {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
-          </div>
-        </div>
-      ),
-    };
-  }
-
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
-      if (columnOrder[item] === 'foco') {
-        tableFields.push(headerTableFactory('Feito Por', 'assay_list.foco.name'));
+      if (columnOrder[item] === 'madeBy') {
+        tableFields.push(headerTableFactory('Feito Por', 'user.name'));
       }
-      if (columnOrder[item] === 'type_assay') {
+      if (columnOrder[item] === 'madeIn') {
         tableFields.push(
-          headerTableFactory('Feito Em', 'assay_list.type_assay.name'),
+          headerTableFactory('Feito Em', 'madeIn'),
         );
       }
-      if (columnOrder[item] === 'tecnologia') {
-        tableFields.push(tecnologiaHeaderFactory('Subsistema', 'tecnologia'));
+      if (columnOrder[item] === 'module') {
+        tableFields.push(headerTableFactory('Módulo', 'module'));
       }
-      if (columnOrder[item] === 'gli') {
-        tableFields.push(headerTableFactory('Módulo', 'assay_list.gli'));
-      }
-      if (columnOrder[item] === 'gli') {
-        tableFields.push(headerTableFactory('Operação', 'assay_list.gli'));
+      if (columnOrder[item] === 'operation') {
+        tableFields.push(headerTableFactory('Operação', 'operation'));
       }
     });
     return tableFields;
@@ -384,7 +308,7 @@ export default function Listagem({
           module_id: 27,
         })
         .then((response) => {
-          userLogado.preferences.genotypeTreatment = {
+          userLogado.preferences.reporte = {
             id: response.response.id,
             userId: preferences.userId,
             table_preferences: campos,
@@ -393,7 +317,7 @@ export default function Listagem({
         });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.genotypeTreatment = {
+      userLogado.preferences.reporte = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
@@ -422,7 +346,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await genotypeTreatmentService
+    await reporteService
       .getAll(filter)
       .then(({ status, response }) => {
         if (status === 200) {
@@ -461,49 +385,7 @@ export default function Listagem({
       });
   };
 
-  const replacementExcel = async (): Promise<void> => {
-    await genotypeTreatmentService
-      .getAll(filter)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          const newData = response.map((item: any) => {
-            const newItem: any = {};
-            newItem.safra = item.safra.safraName;
-            newItem.foco = item.assay_list.foco.name;
-            newItem.ensaio = item.assay_list.type_assay.name;
-            newItem.tecnologia = item.assay_list.tecnologia.cod_tec;
-            newItem.gli = item.assay_list.gli;
-            newItem.bgm = item.assay_list.bgm;
-            newItem.nt = item.treatments_number;
-            newItem.status_t = item.status;
-            newItem.genotipo = item.genotipo.name_genotipo;
-            newItem.nca = item.lote.ncc;
-            newItem.novo_genotipo = '';
-            newItem.novo_status = '';
-            newItem.novo_nca = '';
-            return newItem;
-          });
-          const workSheet = XLSX.utils.json_to_sheet(newData);
-          const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
-
-          // Buffer
-          XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
-            type: 'buffer',
-          });
-          // Binary
-          XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
-            type: 'binary',
-          });
-          // Download
-          XLSX.writeFile(workBook, 'Substituição-genótipos.xlsx');
-        }
-      });
-  };
-
-  //manage total pages
+  // manage total pages
   async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
@@ -522,21 +404,15 @@ export default function Listagem({
     // if (filter) {
     //   parametersFilter = `${parametersFilter}&${filter}`;
     // }
-    // await genotypeTreatmentService
+    // await reporteService
     //   .getAll(parametersFilter)
     //   .then(({ status, response }) => {
     //     if (status === 200) {
-    //       setTreatments(response);
+    //       setReportes(response);
     //     }
     //   });
-    await callingApi(filter); //handle pagination globly
+    await callingApi(filter); // handle pagination globly
   }
-
-    // Checking defualt values
-    function checkValue(value: any) {
-      const parameter = tableGlobalFunctions.getValuesForFilter(value , filtersParams);
-      return parameter;
-    }
 
   function filterFieldFactory(title: string, name: string) {
     return (
@@ -549,81 +425,10 @@ export default function Listagem({
           placeholder={name}
           id={title}
           name={title}
-          defaultValue={checkValue(title)}
           onChange={formik.handleChange}
         />
       </div>
     );
-  }
-
-  function readExcel(value: any) {
-    readXlsxFile(value[0]).then((rows) => {
-      importService
-        .validate({
-          table: 'REPLACEMENT_GENOTYPE ',
-          spreadSheet: rows,
-          moduleId: 27,
-          idSafra: userLogado.safras.safra_selecionada,
-          created_by: userLogado.id,
-        })
-        .then(({ message }: any) => {
-          Swal.fire({
-            html: message,
-            width: '800',
-          });
-        });
-    });
-  }
-
-  async function handleSubmit(event: any) {
-    const genotypeButton = document.querySelector(
-      "input[id='genotipo']:checked",
-    );
-    const ncaButton = document.querySelector("input[id='nca']:checked");
-    const inputFile: any = document.getElementById('import');
-    event.preventDefault();
-    if (genotypeButton) {
-      const checkedTreatments: any = rowsSelected.map((item: any) => ({
-        id: item.id,
-      }));
-      const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
-      localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
-      localStorage.setItem(
-        'treatmentsOptionSelected',
-        JSON.stringify('genotipo'),
-      );
-
-      router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
-    } else if (ncaButton) {
-      const checkedTreatments: any = rowsSelected.map((item: any) => ({
-        id: item.id,
-        genotipo: item.genotipo.name_genotipo,
-      }));
-      const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
-      localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
-      localStorage.setItem('treatmentsOptionSelected', JSON.stringify('nca'));
-
-      router.push('/listas/ensaios/tratamento-genotipo/substituicao/');
-    } else if (inputFile?.files.length !== 0) {
-      readExcel(inputFile.files);
-    } else {
-      Swal.fire('Selecione alguma opção ou import');
-    }
-  }
-
-  async function setRadioStatus() {
-    const selectedGenotype: any = {};
-    rowsSelected.forEach((item: any) => {
-      selectedGenotype[item.genotipo.name_genotipo] = true;
-    });
-    const checkedLength = Object.getOwnPropertyNames(selectedGenotype);
-    if (checkedLength.length > 1) {
-      setNccIsValid(true);
-    }
-    if (rowsSelected.length <= 0) {
-      setNccIsValid(true);
-      setGenotypeIsValid(true);
-    }
   }
 
   useEffect(() => {
@@ -636,129 +441,6 @@ export default function Listagem({
       <Head>
         <title>Listagem de genótipos do ensaio</title>
       </Head>
-
-      <Modal
-        isOpen={isOpenModal}
-        shouldCloseOnOverlayClick={false}
-        shouldCloseOnEsc={false}
-        onRequestClose={() => {
-          setIsOpenModal(!isOpenModal);
-        }}
-        overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
-        className="flex
-          flex-col
-          w-full
-          h-64
-          max-w-xl
-          bg-gray-50
-          rounded-tl-2xl
-          rounded-tr-2xl
-          rounded-br-2xl
-          rounded-bl-2xl
-          pt-2
-          pb-4
-          px-8
-          relative
-          shadow-lg
-          shadow-gray-900/50"
-      >
-        <form className="flex flex-col">
-          <button
-            type="button"
-            className="flex absolute top-4 right-3 justify-end"
-            onClick={() => {
-              setIsOpenModal(!isOpenModal);
-              setNccIsValid(false);
-              setGenotypeIsValid(false);
-            }}
-          >
-            <RiCloseCircleFill
-              size={35}
-              className="fill-red-600 hover:fill-red-800"
-            />
-          </button>
-
-          <div className="flex px-4  justify-between">
-            <header className="flex flex-col mt-2">
-              <h2 className="mb-2 text-blue-600 text-xl font-medium">Ação</h2>
-              <div>
-                <div className="border-l-8 border-l-blue-600 mt-4">
-                  <h2 className="mb-2 font-normal text-xl ml-2 text-gray-900">
-                    Substituir
-                  </h2>
-                </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="substituir"
-                    id="genotipo"
-                    disabled={genotypeIsValid}
-                  />
-                  <label htmlFor="genotipo" className="font-normal text-base">
-                    Nome do genótipo
-                  </label>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="substituir"
-                  id="nca"
-                  disabled={nccIsValid}
-                />
-                <label htmlFor="nca" className="font-normal text-base">
-                  NCA
-                </label>
-              </div>
-            </header>
-            <div>
-              <div className="mb-2 text-blue-600 text-xl mt-2 font-medium">
-                <h2>
-                  Total selecionados:
-                  {' '}
-                  {rowsSelected?.length}
-                </h2>
-              </div>
-
-              <div className="border-l-8 border-l-blue-600">
-                <h2 className="mb-2 font-normal text-xl ml-2 text-gray-900 mt-6">
-                  Importa Arquivo:
-                </h2>
-              </div>
-
-              <h2>Excel</h2>
-              <Input
-                id="import"
-                type="file"
-                className="
-              shadow
-              appearance-none
-              bg-white bg-no-repeat
-              border border-solid border-gray-300
-              rounded
-              w-full
-              py-1 px-1
-              text-gray-900
-              leading-tight
-              focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-        "
-              />
-            </div>
-          </div>
-          <div className="flex justify-end py-0">
-            <div className="h-10 w-40">
-              <button
-                type="submit"
-                value="Cadastrar"
-                className="w-full h-full ml-auto mt-6 bg-green-600 text-white px-8 rounded-lg text-sm hover:bg-green-800"
-                onClick={(e) => handleSubmit(e)}
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
-        </form>
-      </Modal>
 
       <Content contentHeader={tabsDropDowns} moduloActive="relatorios">
         <main
@@ -786,10 +468,10 @@ export default function Listagem({
                   pb-8
                 "
                 >
-                  {filterFieldFactory('filterFoco', 'Feito Por')}
-                  {filterFieldFactory('filterTypeAssay', 'Feito Em')}
-                  {filterFieldFactory('filterTypeAssay', 'Módulo')}
-                  {filterFieldFactory('filterTechnology', 'Operação')}
+                  {filterFieldFactory('filterMadeBy', 'Feito Por')}
+                  {filterFieldFactory('filterMadeIn', 'Feito Em')}
+                  {filterFieldFactory('filterModule', 'Módulo')}
+                  {filterFieldFactory('filterOperation', 'Operação')}
 
                 </div>
                 <div
@@ -820,13 +502,10 @@ export default function Listagem({
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
-              tableRef={tableRef}
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={afterFilter ? treatments : []}
+              data={reportes}
               options={{
-                selection: true,
-                selectionProps: (rowData: any) => isOpenModal && { disabled: rowData },
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
@@ -834,18 +513,8 @@ export default function Listagem({
                 rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
-                // pageSize: itensPerPage,
                 pageSize: Number(take),
               }}
-              localization={{
-                body: {
-                  emptyDataSourceMessage: tableMessage
-                    ? 'Nenhum Trat. Genótipo encontrado!'
-                    : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
-                },
-              }}
-              onChangeRowsPerPage={(e: any) => {}}
-              onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (
                   <div
@@ -929,17 +598,6 @@ export default function Listagem({
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
-                          title="Exportar planilha para substituição"
-                          icon={<BsDownload size={20} />}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          onClick={() => {
-                            replacementExcel();
-                          }}
-                        />
-                      </div>
-                      <div className="h-12 flex items-center justify-center w-full">
-                        <Button
                           title="Exportar planilha de tratamentos"
                           icon={<RiFileExcel2Line size={20} />}
                           bgColor="bg-blue-600"
@@ -997,7 +655,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages-1)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -1034,88 +692,57 @@ export const getServerSideProps: GetServerSideProps = async ({
   const idSafra = req.cookies.safraId;
 
   const { publicRuntimeConfig } = getConfig();
-  const baseUrlTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
-  const baseUrlAssay = `${publicRuntimeConfig.apiUrl}/assay-list`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/reporte`;
 
-
-  //Last page
+  // Last page
   const lastPageServer = req.cookies.lastPage
-  ? req.cookies.lastPage
-  : "No";
+    ? req.cookies.lastPage
+    : 'No';
 
-  if(lastPageServer == undefined || lastPageServer == "No"){
+  if (lastPageServer == undefined || lastPageServer == 'No') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });  
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
   }
 
-  //RR
+  // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
-  ? req.cookies.filterBeforeEditTypeOrder
-  : "desc";
-        
-  //RR
-  const orderByserver = req.cookies.filterBeforeEditOrderBy
-  ? req.cookies.filterBeforeEditOrderBy
-  : "assay_list.foco.name";
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'desc';
 
-  
+  // RR
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : '';
+
   const filterApplication = req.cookies.filterBeforeEdit
     || `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
-    removeCookies('filterBeforeEdit', { req, res });
-    removeCookies('pageBeforeEdit', { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });  
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
 
   const param = `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
-  const urlParametersAssay: any = new URL(baseUrlAssay);
-  const urlParametersTreatment: any = new URL(baseUrlTreatment);
-  urlParametersTreatment.search = new URLSearchParams(param).toString();
+  const urlParameters: any = new URL(baseUrl);
+  urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allTreatments, total: totalItems } = await fetch(
-    urlParametersTreatment.toString(),
+  const { response: allReportes, total: totalItems } = await fetch(
+    urlParameters.toString(),
     requestOptions,
   ).then((response) => response.json());
-
-  const { response: allAssay } = await fetch(
-    `${urlParametersAssay.toString()}/?id_culture=${idCulture}&id_safra=${idSafra}`,
-    requestOptions,
-  ).then((response) => response.json());
-
-  const assaySelect = allAssay.map((item: any) => {
-    const newItem: any = {};
-    newItem.id = item.gli;
-    newItem.name = item.gli;
-    return newItem;
-  });
-
-  const teste: any = {};
-  teste.id = '';
-  teste.name = 'Selecione';
-  assaySelect.unshift(teste);
-
-  const genotypeSelect = allTreatments?.map((item: any) => {
-    const newItem: any = {};
-    newItem.id = item.genotipo.name_genotipo;
-    newItem.name = item.genotipo.name_genotipo;
-    return newItem;
-  });
-
   return {
     props: {
-      allTreatments,
-      assaySelect,
-      genotypeSelect,
+      allReportes,
       totalItems,
       itensPerPage,
       filterApplication,
@@ -1124,7 +751,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       pageBeforeEdit,
       filterBeforeEdit,
       orderByserver,
-      typeOrderServer,  
+      typeOrderServer,
     },
   };
 };

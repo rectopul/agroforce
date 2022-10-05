@@ -15,11 +15,7 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
-import {
-  AiOutlineArrowDown,
-  AiOutlineArrowUp,
-  AiTwotoneStar,
-} from 'react-icons/ai';
+import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai';
 import {
   BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
@@ -39,6 +35,7 @@ import {
   CheckBox,
   Content,
   Input,
+  SelectMultiple,
 } from '../../../../components';
 import ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
@@ -85,9 +82,9 @@ interface IData {
   idSafra: number;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
-  typeOrderServer :any| string;
-  orderByserver : any |string;
-  cultureId :number | any;
+  typeOrderServer: any | string;
+  orderByserver: any | string;
+  cultureId: number | any;
 }
 
 export default function Listagem({
@@ -120,7 +117,9 @@ export default function Listagem({
     preferences.table_preferences,
   );
   const router = useRouter();
-  const [experimentos, setExperimento] = useState<IExperimento[]>(() => (allExperiments));
+  const [experimentos, setExperimento] = useState<IExperimento[]>(
+    () => allExperiments,
+  );
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit),
   );
@@ -161,6 +160,7 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+
   const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == 'tecnologia' ? 'assay_list.tecnologia.cod_tec' : orderBy}&typeOrder=${typeOrder}`;
 
   const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
@@ -197,6 +197,7 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes('ETIQ. FINALIZADA'),
     },
   ]);
+  const [statusFilterSelected, setStatusFilterSelected] = useState<any>([]);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -236,7 +237,8 @@ export default function Listagem({
           selecionados += `${allCheckBox[i].value},`;
         }
       }
-      const filterStatus = selecionados.substr(0, selecionados.length - 1);
+      // const filterStatus = selecionados.substr(0, selecionados.length - 1);
+      const filterStatus = statusFilterSelected?.join(',')?.toLowerCase();
 
       //   // Call filter with there parameter
       //   const parametersFilter = await fetchWrapper.handleFilterParameter(
@@ -278,7 +280,7 @@ export default function Listagem({
   });
 
   // Calling common API
-  async function callingApi(parametersFilter : any) {
+  async function callingApi(parametersFilter: any) {
     setCookies('filterBeforeEdit', parametersFilter);
     setCookies('filterBeforeEditTypeOrder', typeOrder);
     setCookies('filterBeforeEditOrderBy', orderBy);
@@ -287,7 +289,10 @@ export default function Listagem({
     setCookies('filtersParams', parametersFilter);
 
     await experimentService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || (response.status === 400 && response.total == 0)) {
+      if (
+        response.status === 200
+        || (response.status === 400 && response.total == 0)
+      ) {
         setExperimento(response.response);
         setTotalItems(response.total);
       }
@@ -407,7 +412,10 @@ export default function Listagem({
 
   async function deleteItem(id: number) {
     // eslint-disable-next-line max-len
-    const { status, message } = await await experimentService.deleted({ id, userId: userLogado.id });
+    const { status, message } = await await experimentService.deleted({
+      id,
+      userId: userLogado.id,
+    });
     if (status === 200) {
       router.reload();
     } else {
@@ -696,7 +704,7 @@ export default function Listagem({
 
   function filterFieldFactory(title: any, name: any) {
     return (
-      <div className="h-7 w-full ml-4">
+      <div className="h-7 w-full ml-2">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -766,7 +774,7 @@ export default function Listagem({
                   {filterFieldFactory('filterPeriod', 'Epoca')}
                   {filterFieldFactory('filterDelineamento', 'Delineamento')}
 
-                  <div className="h-6 w-full ml-4">
+                  <div className="h-6 w-full ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Repetição
                     </label>
@@ -787,11 +795,22 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  <div className="h-10 w-full ml-4">
+                  <div className="h-10 w-full ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Status do Ensaio
+                    </label>
+                    <SelectMultiple
+                      data={statusFilter.map((i: any) => i.title)}
+                      values={statusFilterSelected}
+                      onChange={(e: any) => setStatusFilterSelected(e)}
+                    />
+                  </div>
+
+                  {/* <div className="h-10 w-full ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status do Experimento
-                    </label>
-                    {/* <div style={{ display: 'flex', flexDirection: 'row' }}>
+                    </label> */}
+                  {/* <div style={{ display: 'flex', flexDirection: 'row' }}>
                       {statusFilter.map((generate, index) => (
                         <CheckBox
                           key={index}
@@ -802,7 +821,7 @@ export default function Listagem({
                         />
                       ))}
                     </div> */}
-                    <AccordionFilter>
+                  {/* <AccordionFilter>
                       <DragDropContext onDragEnd={handleOnDragEnd}>
                         <Droppable droppableId="characters">
                           {(provided) => (
@@ -838,14 +857,14 @@ export default function Listagem({
                           )}
                         </Droppable>
                       </DragDropContext>
-                    </AccordionFilter>
-                  </div>
+                    </AccordionFilter> */}
+                  {/* </div> */}
 
                   <div style={{ width: 80 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -1031,7 +1050,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                ) as any,
+                  ) as any,
               }}
             />
           </div>
@@ -1059,14 +1078,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? req.cookies.pageBeforeEdit
     : 0;
 
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : `idSafra=${idSafra}&id_culture=${cultureId}`;
-
-  const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}`
-    : `idSafra=${idSafra}&id_culture=${cultureId}`;
-
   // Last page
   const lastPageServer = req.cookies.lastPage
     ? req.cookies.lastPage
@@ -1079,6 +1090,15 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
   }
+
+  // console.log("safra id---------------- ",idSafra);
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : `idSafra=${idSafra}&id_culture=${cultureId}`;
+
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? `${req.cookies.filterBeforeEdit}`
+    : `idSafra=${idSafra}&id_culture=${cultureId}`;
 
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
@@ -1106,10 +1126,10 @@ export const getServerSideProps: GetServerSideProps = async ({
     credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
-  const {
-    response: allExperiments,
-    total: totalItems,
-  } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
+  const { response: allExperiments = [], total: totalItems = 0 } = await fetch(
+    urlParameters.toString(),
+    requestOptions,
+  ).then((response) => response.json());
 
   return {
     props: {

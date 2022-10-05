@@ -18,6 +18,8 @@ import { TecnologiaController } from '../technology/tecnologia.controller';
 import { GroupController } from '../group.controller';
 import { FocoController } from '../foco.controller';
 import { TypeAssayController } from '../tipo-ensaio.controller';
+import { UserCultureController } from '../user-culture.controller';
+import { CulturaController } from '../cultura.controller';
 
 export class ImportNpeController {
   static aux: any = {};
@@ -28,15 +30,16 @@ export class ImportNpeController {
       spreadSheet, idSafra, idCulture, created_by: createdBy,
     }: ImportValidate,
   ): Promise<IReturnObject> {
+    const npeController = new NpeController();
+    const focoController = new FocoController();
     const safraController = new SafraController();
     const localController = new LocalController();
-    const importController = new ImportController();
-    const logImportController = new LogImportController();
-    const npeController = new NpeController();
-    const tecnologiaController = new TecnologiaController();
     const groupController = new GroupController();
-    const focoController = new FocoController();
+    const importController = new ImportController();
+    const culturaController = new CulturaController();
+    const logImportController = new LogImportController();
     const typeAssayController = new TypeAssayController();
+    const tecnologiaController = new TecnologiaController();
 
     const npeTemp: Array<string> = [];
     const responseIfError: Array<string> = [];
@@ -58,7 +61,6 @@ export class ImportNpeController {
           if (status === 200) {
             return { status: 400, message: `Erro na linha ${Number(row) + 1}. NPE já cadastrada no sistema` };
           }
-
           if (npeTemp.includes(npeName)) {
             await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
             npeTemp[row] = npeName;
@@ -68,6 +70,28 @@ export class ImportNpeController {
           for (const column in spreadSheet[row]) {
             this.aux.status = 1;
             this.aux.created_by = createdBy;
+            if (configModule.response[0]?.fields[column] === 'Cultura') {
+              if (spreadSheet[row][column] !== null) {
+                const {
+                  response,
+                }: any = await culturaController.getOneCulture(Number(idCulture));
+                if (response?.name !== spreadSheet[row][column]) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                    'a cultura e diferente da selecionada',
+                  );
+                }
+              } else {
+                responseIfError[Number(column)] += responseNullFactory(
+                  Number(column) + 1,
+                  row,
+                  spreadSheet[0][column],
+                );
+              }
+            }
+
             if (configModule.response[0]?.fields[column] === 'Local') {
               if (spreadSheet[row][column] !== null) {
                 if (typeof (spreadSheet[row][column]) === 'string') {
@@ -328,6 +352,7 @@ export class ImportNpeController {
               for (const column in spreadSheet[row]) {
                 this.aux.status = 1;
                 this.aux.created_by = createdBy;
+
                 if (configModule.response[0]?.fields[column] === 'Local') {
                   const local: any = await localController.getAll(
                     { name_local_culture: spreadSheet[row][column] },

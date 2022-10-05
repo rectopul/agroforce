@@ -1,52 +1,50 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
-import Head from 'next/head';
-import readXlsxFile from 'read-excel-file';
-import Swal from 'sweetalert2';
-import React, { useState, ReactNode, useEffect } from 'react';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import getConfig from 'next/config';
-import { IoIosCloudUpload } from 'react-icons/io';
-import MaterialTable from 'material-table';
+import Head from "next/head";
+import readXlsxFile from "read-excel-file";
+import Swal from "sweetalert2";
+import React, { useState, ReactNode, useEffect } from "react";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import { IoIosCloudUpload } from "react-icons/io";
+import MaterialTable from "material-table";
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from 'react-beautiful-dnd';
-import Spinner from 'react-bootstrap/Spinner';
+} from "react-beautiful-dnd";
+import Spinner from "react-bootstrap/Spinner";
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiTwotoneStar,
-} from 'react-icons/ai';
-import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line } from 'react-icons/ri';
-import * as XLSX from 'xlsx';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { useFormik } from 'formik';
-import {
-  Box, Tab, Tabs, Typography,
-} from '@mui/material';
+} from "react-icons/ai";
+import { BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line } from "react-icons/ri";
+import * as XLSX from "xlsx";
+import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import { useFormik } from "formik";
+import { Box, Tab, Tabs, Typography } from "@mui/material";
 import {
   AccordionFilter,
   CheckBox,
   Button,
   Content,
   Input,
-} from '../../../components';
-import { UserPreferenceController } from '../../../controllers/user-preference.controller';
+} from "../../../components";
+import { UserPreferenceController } from "../../../controllers/user-preference.controller";
 import {
   userPreferencesService,
   logImportService,
   importService,
-} from '../../../services';
-import * as ITabs from '../../../shared/utils/dropdown';
-import ComponentLoading from '../../../components/Loading';
-import { fetchWrapper } from 'src/helpers';
+} from "../../../services";
+import * as ITabs from "../../../shared/utils/dropdown";
+import ComponentLoading from "../../../components/Loading";
+import { fetchWrapper } from "src/helpers";
 
 export interface LogData {
   id: number;
@@ -68,34 +66,36 @@ interface TabPanelProps {
 }
 
 export default function Import({
-      allLogs,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      uploadInProcess,
-      idSafra,
-      idCulture,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allLogs,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  uploadInProcess,
+  idSafra,
+  idCulture,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
-  const tabsDropDowns = TabsDropDowns('listas');
+  const tabsDropDowns = TabsDropDowns("listas");
 
-  tabsDropDowns.map((tab) => (tab.titleTab === 'RD' ? (tab.statusTab = true) : (tab.statusTab = false)));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === "RD" ? (tab.statusTab = true) : (tab.statusTab = false)
+  );
 
   const [executeUpload, setExecuteUpload] = useState<any>(
-    Number(uploadInProcess),
+    Number(uploadInProcess)
   );
   const disabledButton = executeUpload === 1;
-  const bgColor = executeUpload === 1 ? 'bg-red-600' : 'bg-blue-600';
+  const bgColor = executeUpload === 1 ? "bg-red-600" : "bg-blue-600";
   const [loading, setLoading] = useState<boolean>(false);
 
   async function readExcel(moduleId: number, table: string) {
     const value: any = document.getElementById(`inputFile-${moduleId}`);
     if (!value.files[0]) {
-      Swal.fire('Insira um arquivo');
+      Swal.fire("Insira um arquivo");
       return;
     }
-    const userLogado = JSON.parse(localStorage.getItem('user') as string);
+    const userLogado = JSON.parse(localStorage.getItem("user") as string);
     setExecuteUpload(1);
     readXlsxFile(value.files[0]).then(async (rows) => {
       setLoading(true);
@@ -112,7 +112,7 @@ export default function Import({
         setLoading(false);
         Swal.fire({
           html: message,
-          width: '800',
+          width: "800",
         });
         setExecuteUpload(0);
       } else {
@@ -128,7 +128,7 @@ export default function Import({
         setLoading(false);
         Swal.fire({
           html: message,
-          width: '800',
+          width: "800",
         });
         setExecuteUpload(0);
       }
@@ -137,13 +137,13 @@ export default function Import({
     (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
   }
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.rd || {
     id: 0,
-    table_preferences: 'id,user_id,created_at,table,state',
+    table_preferences: "id,user_id,created_at,table,state",
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+    preferences.table_preferences
   );
 
   const [logs, setLogs] = useState<LogData[]>(allLogs);
@@ -151,32 +151,34 @@ export default function Import({
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [orderList, setOrder] = useState<number>(0);
-  const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
+  const [arrowOrder, setArrowOrder] = useState<ReactNode>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Usuário', value: 'user_id' },
-    { name: 'CamposGerenciados[]', title: 'Tabela', value: 'table' },
-    { name: 'CamposGerenciados[]', title: 'Status', value: 'state' },
-    { name: 'CamposGerenciados[]', title: 'Importado em', value: 'created_at' },
+    { name: "CamposGerenciados[]", title: "Usuário", value: "user_id" },
+    { name: "CamposGerenciados[]", title: "Tabela", value: "table" },
+    { name: "CamposGerenciados[]", title: "Status", value: "state" },
+    { name: "CamposGerenciados[]", title: "Importado em", value: "created_at" },
   ]);
-  const [colorStar, setColorStar] = useState<string>('');
-  const [orderBy, setOrderBy] = useState<string>('');
-  const [typeOrder, setTypeOrder] = useState<string>('');
+  const [colorStar, setColorStar] = useState<string>("");
+  const [orderBy, setOrderBy] = useState<string>("");
+  const [typeOrder, setTypeOrder] = useState<string>("");
 
   const take: number = itensPerPage || 10;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${
+    currentPage * Number(take)
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
   const pages = Math.ceil(total / take);
   const formik = useFormik<any>({
     initialValues: {
-      filterUser: '',
-      filterTable: '',
-      filterStartDate: '',
-      filterEndDate: '',
-      filterState: '',
-      orderBy: '',
-      typeOrder: '',
+      filterUser: "",
+      filterTable: "",
+      filterStartDate: "",
+      filterEndDate: "",
+      filterState: "",
+      orderBy: "",
+      typeOrder: "",
     },
     onSubmit: async ({
       filterUser,
@@ -188,7 +190,6 @@ export default function Import({
       const parametersFilter = `filterUser=${filterUser}&filterTable=${filterTable}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&filterState=${filterState}`;
       setFilter(parametersFilter);
       await getAllLogs(`${parametersFilter}`);
-
     },
   });
 
@@ -278,56 +279,57 @@ export default function Import({
   function idHeaderFactory() {
     return {
       title: <div className="flex items-center">{arrowOrder}</div>,
-      field: 'id',
+      field: "id",
       width: 0,
       sorting: false,
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-7 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
+      render: () =>
+        colorStar === "#eba417" ? (
+          <div className="h-7 flex">
+            <div>
+              <button
+                type="button"
+                className="w-full h-full flex items-center justify-center border-0"
+                onClick={() => setColorStar("")}
+              >
+                <AiTwotoneStar size={20} color="#eba417" />
+              </button>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="h-7 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
+        ) : (
+          <div className="h-7 flex">
+            <div>
+              <button
+                type="button"
+                className="w-full h-full flex items-center justify-center border-0"
+                onClick={() => setColorStar("#eba417")}
+              >
+                <AiTwotoneStar size={20} />
+              </button>
+            </div>
           </div>
-        </div>
-      )),
+        ),
     };
   }
 
   function columnsOrder(columnOrder: string) {
-    const columnCampos: string[] = columnOrder.split(',');
+    const columnCampos: string[] = columnOrder.split(",");
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
       // if (columnCampos[index] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
-      if (columnCampos[index] === 'user_id') {
-        tableFields.push(headerTableFactory('Usuário', 'user.name'));
+      if (columnCampos[index] === "user_id") {
+        tableFields.push(headerTableFactory("Usuário", "user.name"));
       }
-      if (columnCampos[index] === 'table') {
-        tableFields.push(headerTableFactory('Tabela', 'table'));
+      if (columnCampos[index] === "table") {
+        tableFields.push(headerTableFactory("Tabela", "table"));
       }
-      if (columnCampos[index] === 'created_at') {
-        tableFields.push(headerTableFactory('Importado em', 'created_at'));
+      if (columnCampos[index] === "created_at") {
+        tableFields.push(headerTableFactory("Importado em", "created_at"));
       }
-      if (columnCampos[index] === 'state') {
-        tableFields.push(headerTableFactory('Status', 'state'));
+      if (columnCampos[index] === "state") {
+        tableFields.push(headerTableFactory("Status", "state"));
       }
     });
     return tableFields;
@@ -335,9 +337,13 @@ export default function Import({
 
   const columns = columnsOrder(camposGerenciados);
 
-  async function handleOrder(column: string, order: string | any): Promise<void> {
+  async function handleOrder(
+    column: string,
+    order: string | any
+  ): Promise<void> {
     //Gobal manage orders
-    const { typeOrderG, columnG, orderByG, arrowOrder } = await fetchWrapper.handleOrderG(column, order, orderList);
+    const { typeOrderG, columnG, orderByG, arrowOrder } =
+      await fetchWrapper.handleOrderG(column, order, orderList);
 
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
@@ -347,7 +353,7 @@ export default function Import({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
+    let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -370,7 +376,7 @@ export default function Import({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
       userLogado.preferences.rd = {
         id: preferences.id,
@@ -381,7 +387,7 @@ export default function Import({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -431,44 +437,42 @@ export default function Import({
   // }
 
   const downloadExcel = async (): Promise<void> => {
-    await logImportService
-      .getAll(filter)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          response.map((item: any) => {
-            const newItem = item;
+    await logImportService.getAll(filter).then(({ status, response }) => {
+      if (status === 200) {
+        response.map((item: any) => {
+          const newItem = item;
 
-            newItem.USUÁRIO = item.user.name;
-            newItem.TABELA = item.table;
-            newItem.STATUS = item.state;
-            newItem.IMPORTADO_EM = item.created_at;
+          newItem.USUÁRIO = item.user.name;
+          newItem.TABELA = item.table;
+          newItem.STATUS = item.state;
+          newItem.IMPORTADO_EM = item.created_at;
 
-            delete newItem.user;
-            delete newItem.table;
-            delete newItem.state;
-            delete newItem.created_at;
-            delete newItem.id;
-            delete newItem.status;
-            return newItem;
-          });
-          const workSheet = XLSX.utils.json_to_sheet(response);
-          const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'logs');
+          delete newItem.user;
+          delete newItem.table;
+          delete newItem.state;
+          delete newItem.created_at;
+          delete newItem.id;
+          delete newItem.status;
+          return newItem;
+        });
+        const workSheet = XLSX.utils.json_to_sheet(response);
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, "logs");
 
-          // Buffer
-          XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
-            type: 'buffer',
-          });
-          // Binary
-          XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
-            type: 'binary',
-          });
-          // Download
-          XLSX.writeFile(workBook, 'Logs.xlsx');
-        }
-      });
+        // Buffer
+        XLSX.write(workBook, {
+          bookType: "xlsx", // xlsx
+          type: "buffer",
+        });
+        // Binary
+        XLSX.write(workBook, {
+          bookType: "xlsx", // xlsx
+          type: "binary",
+        });
+        // Download
+        XLSX.writeFile(workBook, "Logs.xlsx");
+      }
+    });
   };
 
   function handleTotalPages(): void {
@@ -501,9 +505,7 @@ export default function Import({
   }
 
   function TabPanel(props: TabPanelProps) {
-    const {
-      children, value, index, ...other
-    } = props;
+    const { children, value, index, ...other } = props;
 
     return (
       <div
@@ -525,7 +527,7 @@ export default function Import({
   function a11yProps(index: number) {
     return {
       id: `simple-tab-${index}`,
-      'aria-controls': `simple-tabpanel-${index}`,
+      "aria-controls": `simple-tabpanel-${index}`,
     };
   }
 
@@ -551,14 +553,14 @@ export default function Import({
         <div className="grid grid-cols-3 gap-4 h-screen">
           <div className="bg-white rounded-lg">
             <div className="mt-2 justify-center flex">
-              <span className="text-xl" style={{ marginLeft: '5%' }}>
+              <span className="text-xl" style={{ marginLeft: "5%" }}>
                 IMPORTAÇÃO DE PLANILHAS
               </span>
             </div>
             <hr />
 
-            <Box sx={{ width: '100%' }}>
-              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Box sx={{ width: "100%" }}>
+              <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
                 <Tabs
                   value={value}
                   onChange={handleChange}
@@ -578,17 +580,17 @@ export default function Import({
                       bgColor={bgColor}
                       title={
                         disabledButton
-                          ? 'Outra planilha já esta sendo importada'
-                          : 'Upload'
+                          ? "Outra planilha já esta sendo importada"
+                          : "Upload"
                       }
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(0, '')}
+                      onClick={() => readExcel(0, "")}
                       icon={<IoIosCloudUpload size={40} />}
                       disabled={disabledButton}
                       type="button"
                     />
                   </div>
-                  <div className="col-span-2" style={{ marginLeft: '-12%' }}>
+                  <div className="col-span-2" style={{ marginLeft: "-12%" }}>
                     <span className="font-bold">Cadastros RD</span>
                     <p>ultimo update 28/06/22</p>
                     <Input
@@ -607,17 +609,17 @@ export default function Import({
                       bgColor={bgColor}
                       title={
                         disabledButton
-                          ? 'Outra planilha já esta sendo importada'
-                          : 'Upload'
+                          ? "Outra planilha já esta sendo importada"
+                          : "Upload"
                       }
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(26, 'ASSAY_LIST')}
+                      onClick={() => readExcel(26, "ASSAY_LIST")}
                       icon={<IoIosCloudUpload size={40} />}
                       disabled={disabledButton}
                       type="button"
                     />
                   </div>
-                  <div className="col-span-2" style={{ marginLeft: '-12%' }}>
+                  <div className="col-span-2" style={{ marginLeft: "-12%" }}>
                     <span className="font-bold">Importar Lista de Ensaio</span>
                     <p>ultimo update 28/06/22</p>
                     <Input
@@ -635,18 +637,18 @@ export default function Import({
                       textColor="white"
                       title={
                         disabledButton
-                          ? 'Outra planilha já esta sendo importada'
-                          : 'Upload'
+                          ? "Outra planilha já esta sendo importada"
+                          : "Upload"
                       }
                       bgColor={bgColor}
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(22, 'EXPERIMENT')}
+                      onClick={() => readExcel(22, "EXPERIMENT")}
                       icon={<IoIosCloudUpload size={40} />}
                       disabled={disabledButton}
                       type="button"
                     />
                   </div>
-                  <div className="col-span-2" style={{ marginLeft: '-12%' }}>
+                  <div className="col-span-2" style={{ marginLeft: "-12%" }}>
                     <span className="font-bold">
                       Importar Lista de Experimento
                     </span>
@@ -659,6 +661,70 @@ export default function Import({
                     />
                   </div>
                 </div>
+
+                <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+                  <div className=" h-20 w-20 flex items-center mr-1">
+                    <Button
+                      textColor="white"
+                      title={
+                        disabledButton
+                          ? "Outra planilha já esta sendo importada"
+                          : "Upload"
+                      }
+                      bgColor={bgColor}
+                      rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                      onClick={() => readExcel(22, "EXPERIMENT")}
+                      icon={<IoIosCloudUpload size={40} />}
+                      disabled={disabledButton}
+                      type="button"
+                    />
+                  </div>
+                  <div className="col-span-2" style={{ marginLeft: "-12%" }}>
+                    <span className="font-bold">
+                      Importar Subs. de genótipo/nca Ensaio
+                    </span>
+                    <p>ultimo update 28/06/22</p>
+                    <Input
+                      type="file"
+                      required
+                      id="inputFile-22"
+                      name="inputFile-22"
+                    />
+                  </div>
+                </div>
+
+                <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+                  <div className=" h-20 w-20 flex items-center mr-1">
+                    <Button
+                      textColor="white"
+                      title={
+                        disabledButton
+                          ? "Outra planilha já esta sendo importada"
+                          : "Upload"
+                      }
+                      bgColor={bgColor}
+                      rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+                      onClick={() => readExcel(22, "EXPERIMENT")}
+                      icon={<IoIosCloudUpload size={40} />}
+                      disabled={disabledButton}
+                      type="button"
+                    />
+                  </div>
+                  <div className="col-span-2" style={{ marginLeft: "-12%" }}>
+                    <span className="font-bold">
+                      Importar Subs. de genótipo/nca Experimento
+                    </span>
+                    <p>ultimo update 28/06/22</p>
+                    <Input
+                      type="file"
+                      required
+                      id="inputFile-22"
+                      name="inputFile-22"
+                    />
+                  </div>
+                </div>
+
+                <div className="h-10" />
               </TabPanel>
 
               <TabPanel value={value} index={1}>
@@ -669,17 +735,17 @@ export default function Import({
                       bgColor={bgColor}
                       title={
                         disabledButton
-                          ? 'Outra planilha já esta sendo importada'
-                          : 'Upload'
+                          ? "Outra planilha já esta sendo importada"
+                          : "Upload"
                       }
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(7, 'DELIMITATION')}
+                      onClick={() => readExcel(7, "DELIMITATION")}
                       icon={<IoIosCloudUpload size={40} />}
                       disabled={disabledButton}
                       type="button"
                     />
                   </div>
-                  <div className="col-span-2" style={{ marginLeft: '-12%' }}>
+                  <div className="col-span-2" style={{ marginLeft: "-12%" }}>
                     <span className="font-bold">Importar Delineamento</span>
                     <p>ultimo update 28/06/22</p>
                     <Input
@@ -698,17 +764,17 @@ export default function Import({
                       bgColor={bgColor}
                       title={
                         disabledButton
-                          ? 'Outra planilha já esta sendo importada'
-                          : 'Upload'
+                          ? "Outra planilha já esta sendo importada"
+                          : "Upload"
                       }
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(14, 'NPE')}
+                      onClick={() => readExcel(14, "NPE")}
                       icon={<IoIosCloudUpload size={40} />}
                       disabled={disabledButton}
                       type="button"
                     />
                   </div>
-                  <div className="col-span-2" style={{ marginLeft: '-12%' }}>
+                  <div className="col-span-2" style={{ marginLeft: "-12%" }}>
                     <span className="font-bold">Importar NPE</span>
                     <p>ultimo update 28/06/22</p>
                     <Input
@@ -727,17 +793,17 @@ export default function Import({
                       bgColor={bgColor}
                       title={
                         disabledButton
-                          ? 'Outra planilha já esta sendo importada'
-                          : 'Upload'
+                          ? "Outra planilha já esta sendo importada"
+                          : "Upload"
                       }
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(5, 'BLOCK_LAYOUT')}
+                      onClick={() => readExcel(5, "BLOCK_LAYOUT")}
                       icon={<IoIosCloudUpload size={40} />}
                       disabled={disabledButton}
                       type="button"
                     />
                   </div>
-                  <div className="col-span-2" style={{ marginLeft: '-12%' }}>
+                  <div className="col-span-2" style={{ marginLeft: "-12%" }}>
                     <span className="font-bold">Importar Layout de quadra</span>
                     <p>ultimo update 28/06/22</p>
                     <Input
@@ -756,17 +822,17 @@ export default function Import({
                       bgColor={bgColor}
                       title={
                         disabledButton
-                          ? 'Outra planilha já esta sendo importada'
-                          : 'Upload'
+                          ? "Outra planilha já esta sendo importada"
+                          : "Upload"
                       }
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(17, 'BLOCK')}
+                      onClick={() => readExcel(17, "BLOCK")}
                       icon={<IoIosCloudUpload size={40} />}
                       disabled={disabledButton}
                       type="button"
                     />
                   </div>
-                  <div className="col-span-2" style={{ marginLeft: '-12%' }}>
+                  <div className="col-span-2" style={{ marginLeft: "-12%" }}>
                     <span className="font-bold">Importar Quadra</span>
                     <p>ultimo update 28/06/22</p>
                     <Input
@@ -785,18 +851,20 @@ export default function Import({
                       bgColor={bgColor}
                       title={
                         disabledButton
-                          ? 'Outra planilha já esta sendo importada'
-                          : 'Upload'
+                          ? "Outra planilha já esta sendo importada"
+                          : "Upload"
                       }
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(31, 'ALLOCATION')}
+                      onClick={() => readExcel(31, "ALLOCATION")}
                       icon={<IoIosCloudUpload size={40} />}
                       disabled={disabledButton}
                       type="button"
                     />
                   </div>
-                  <div className="col-span-2" style={{ marginLeft: '-12%' }}>
-                    <span className="font-bold">Importar Alocação</span>
+                  <div className="col-span-2" style={{ marginLeft: "-12%" }}>
+                    <span className="font-bold">
+                      Importar Alocação de Quadra
+                    </span>
                     <p>ultimo update 28/06/22</p>
                     <Input
                       type="file"
@@ -812,7 +880,7 @@ export default function Import({
 
           <div className="bg-white rounded-lg col-span-2">
             <div className="mt-2 justify-center flex">
-              <span className="text-xl" style={{ marginLeft: '5%' }}>
+              <span className="text-xl" style={{ marginLeft: "5%" }}>
                 HISTÓRICO DE IMPORTAÇÕES
               </span>
             </div>
@@ -836,8 +904,8 @@ export default function Import({
                       pb-0
                     "
                   >
-                    {filterFieldFactory('filterUser', 'Usuário')}
-                    {filterFieldFactory('filterTable', 'Tabela')}
+                    {filterFieldFactory("filterUser", "Usuário")}
+                    {filterFieldFactory("filterTable", "Tabela")}
                     <div className="h-10 w-1/2 ml-4">
                       <label className="block text-gray-900 text-sm font-bold mb-1">
                         De:
@@ -860,12 +928,12 @@ export default function Import({
                         onChange={formik.handleChange}
                       />
                     </div>
-                    {filterFieldFactory('filterState', 'Status')}
+                    {filterFieldFactory("filterState", "Status")}
 
                     <div style={{ width: 40 }} />
                     <div className="h-7 w-32 mt-6">
                       <Button
-                        onClick={() => { }}
+                        onClick={() => {}}
                         value="Filtrar"
                         bgColor="bg-blue-600"
                         textColor="white"
@@ -878,11 +946,11 @@ export default function Import({
             </AccordionFilter>
 
             <div
-              style={{ marginTop: '1%' }}
+              style={{ marginTop: "1%" }}
               className="w-full h-auto overflow-y-scroll"
             >
               <MaterialTable
-                style={{ background: '#f9fafb' }}
+                style={{ background: "#f9fafb" }}
                 columns={columns}
                 data={logs}
                 options={{
@@ -890,7 +958,7 @@ export default function Import({
                   headerStyle: {
                     zIndex: 20,
                   },
-                  rowStyle: { background: '#f9fafb', height: 35 },
+                  rowStyle: { background: "#f9fafb", height: 35 },
                   search: false,
                   filtering: false,
                   pageSize: itensPerPage,
@@ -901,9 +969,7 @@ export default function Import({
                       <div />
 
                       <strong className="text-blue-600">
-                        Total registrado:
-                        {' '}
-                        {itemsTotal}
+                        Total registrado: {itemsTotal}
                       </strong>
 
                       <div className="h-full flex items-center gap-2">
@@ -947,7 +1013,7 @@ export default function Import({
                                                 title={genarate.title?.toString()}
                                                 value={genarate.value}
                                                 defaultChecked={camposGerenciados.includes(
-                                                  genarate.value as string,
+                                                  genarate.value as string
                                                 )}
                                               />
                                             </li>
@@ -977,53 +1043,54 @@ export default function Import({
                       </div>
                     </div>
                   ),
-                  Pagination: (props) => (
-                    <div
-                      className="flex h-20 gap-2 pr-2 py-5 bg-gray-50"
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(0)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage < 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill('')
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setCurrentPage(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(pages)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
-                  ) as any,
+                  Pagination: (props) =>
+                    (
+                      <div
+                        className="flex h-20 gap-2 pr-2 py-5 bg-gray-50"
+                        {...props}
+                      >
+                        <Button
+                          onClick={() => setCurrentPage(0)}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          icon={<MdFirstPage size={18} />}
+                          disabled={currentPage < 1}
+                        />
+                        <Button
+                          onClick={() => setCurrentPage(currentPage - 1)}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          icon={<BiLeftArrow size={15} />}
+                          disabled={currentPage <= 0}
+                        />
+                        {Array(1)
+                          .fill("")
+                          .map((value, index) => (
+                            <Button
+                              key={index}
+                              onClick={() => setCurrentPage(index)}
+                              value={`${currentPage + 1}`}
+                              bgColor="bg-blue-600"
+                              textColor="white"
+                              disabled
+                            />
+                          ))}
+                        <Button
+                          onClick={() => setCurrentPage(currentPage + 1)}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          icon={<BiRightArrow size={15} />}
+                          disabled={currentPage + 1 >= pages}
+                        />
+                        <Button
+                          onClick={() => setCurrentPage(pages)}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          icon={<MdLastPage size={18} />}
+                          disabled={currentPage + 1 >= pages}
+                        />
+                      </div>
+                    ) as any,
                 }}
               />
             </div>
@@ -1038,35 +1105,38 @@ export default function Import({
 export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) ?? 15;
+  const itensPerPage =
+    (await (
+      await PreferencesControllers.getConfigGerais()
+    )?.response[0]?.itens_per_page) ?? 15;
 
   const { publicRuntimeConfig } = getConfig();
   const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);
   const idCulture = Number(req.cookies.cultureId);
 
-  const filterApplication = '';
+  const filterApplication = "";
   const param = `skip=0&take=${itensPerPage}`;
 
   const urlParameters: any = new URL(
-    `${publicRuntimeConfig.apiUrl}/log-import`,
+    `${publicRuntimeConfig.apiUrl}/log-import`
   );
   urlParameters.search = new URLSearchParams(param).toString();
 
   const requestOptions: RequestInit | undefined = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   };
 
   const { response: allLogs, total: totalItems } = await fetch(
     urlParameters.toString(),
-    requestOptions,
+    requestOptions
   ).then((response) => response.json());
   let uploadInProcess: number = 0;
-  allLogs?.map((item: any) => (item.status === 2 ? (uploadInProcess = 1) : false));
+  allLogs?.map((item: any) =>
+    item.status === 2 ? (uploadInProcess = 1) : false
+  );
   return {
     props: {
       allLogs,

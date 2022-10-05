@@ -147,6 +147,7 @@ export class ImportController {
       status: 2,
       table: String(data.spreadSheet[1][0]),
       totalRecords: (data.spreadSheet.length - 1),
+      state: 'EM ANDAMENTO',
     });
     try {
       if (status === 400) {
@@ -193,6 +194,7 @@ export class ImportController {
       status: 2,
       table: data.table,
       totalRecords: (data.spreadSheet.length - 1),
+      state: 'EM ANDAMENTO',
     });
     try {
       if (!data.moduleId) return { status: 400, message: 'precisa ser informado o modulo que está sendo acessado!' };

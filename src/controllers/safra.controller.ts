@@ -47,8 +47,6 @@ export class SafraController {
           parameters.year = JSON.parse(`{"lte": ${Number(options.filterYearTo)} }`);
         }
       }
-      console.log(parameters);
-      console.log(options);
       const select = {
         id: true,
         safraName: true,
