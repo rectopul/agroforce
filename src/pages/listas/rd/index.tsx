@@ -45,6 +45,7 @@ import {
 import * as ITabs from "../../../shared/utils/dropdown";
 import ComponentLoading from "../../../components/Loading";
 import { fetchWrapper } from "src/helpers";
+import { functionsUtils } from "../../../shared/utils/functionsUtils";
 
 export interface LogData {
   id: number;
@@ -95,6 +96,17 @@ export default function Import({
       Swal.fire("Insira um arquivo");
       return;
     }
+
+    const fileExtension = functionsUtils.getFileExtension(
+      value?.files[0]?.name
+    );
+
+    if (fileExtension !== "xlsx") {
+      Swal.fire("Apenas arquivos .xlsx são aceitos.");
+      (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
+      return;
+    }
+
     const userLogado = JSON.parse(localStorage.getItem("user") as string);
     setExecuteUpload(1);
     readXlsxFile(value.files[0]).then(async (rows) => {
@@ -631,7 +643,7 @@ export default function Import({
                   </div>
                 </div>
 
-                <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
+                <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-24 items-center">
                   <div className=" h-20 w-20 flex items-center mr-1">
                     <Button
                       textColor="white"
@@ -650,7 +662,7 @@ export default function Import({
                   </div>
                   <div className="col-span-2" style={{ marginLeft: "-12%" }}>
                     <span className="font-bold">
-                      Importar Lista de Experimento
+                      Importar Subs. de genótipo/nca Ensaio
                     </span>
                     <p>ultimo update 28/06/22</p>
                     <Input
@@ -681,7 +693,7 @@ export default function Import({
                   </div>
                   <div className="col-span-2" style={{ marginLeft: "-12%" }}>
                     <span className="font-bold">
-                      Importar Subs. de genótipo/nca Ensaio
+                      Importar Lista de Experimento
                     </span>
                     <p>ultimo update 28/06/22</p>
                     <Input
