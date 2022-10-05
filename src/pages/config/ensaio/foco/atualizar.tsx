@@ -187,7 +187,7 @@ export default function Atualizar({
     }
 
     await groupService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .getAll(`${parametersFilter}&skip=0&take=${take}&id_safra=${idSafra}`)
       .then((response: any) => {
         if (response.status === 200) {
           setGrupos(response.response);
@@ -436,14 +436,16 @@ export default function Atualizar({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
+      parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
     }
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
+    console.log('parametersFilter');
+    console.log(parametersFilter);
     await groupService.getAll(parametersFilter).then((response: any) => {
       if (response.status === 200) {
         setGrupos(response.response);
@@ -570,16 +572,14 @@ export default function Atualizar({
                     <div className="h-12">
 
                       <Button
-                        // eslint-disable-next-line max-len
-                        // title={grupos.length ? 'Grupo ja cadastrado na safra' : 'Cadastrar grupo'}
-                        title="Cadastrar grupo"
-                        // eslint-disable-next-line max-len
-                        // value={`${grupos.length ? 'Grupo ja cadastrado na safra' : 'Cadastrar grupo'}`}
-                        value="Cadastrar grupo"
-                        // bgColor={grupos.length ? 'bg-gray-400' : 'bg-blue-600'}
-                        bgColor="bg-blue-600"
+                        title={grupos.length ? 'Grupo ja cadastrado na safra' : 'Cadastrar grupo'}
+                        // title="Cadastrar grupo"
+                        value={`${grupos.length ? 'Grupo ja cadastrado na safra' : 'Cadastrar grupo'}`}
+                        // value="Cadastrar grupo"
+                        bgColor={grupos.length ? 'bg-gray-400' : 'bg-blue-600'}
+                        // bgColor="bg-blue-600"
                         textColor="white"
-                        // disabled={grupos.length}
+                        disabled={grupos.length}
                         onClick={() => {
                           router.push(`grupo/cadastro?id_foco=${idFoco}`);
                         }}
@@ -757,7 +757,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/foco`;
 
   const { response: allItens, total: totalItems } = await fetch(
-    `${baseUrlGrupo}?id_foco=${idFoco}`,
+    `${baseUrlGrupo}?id_foco=${idFoco}&id_safra=${idSafra}`,
     requestOptions,
   ).then((response) => response.json());
 
