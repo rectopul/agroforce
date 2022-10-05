@@ -107,6 +107,8 @@ export default function Listagem({
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
+  const [selectedCheckBox, setSelectedCheckBox] = useState([]);
+
   async function handleOrder(column: string, order: number): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
@@ -183,7 +185,7 @@ export default function Listagem({
       render: (rowData: any) => (
         <div className="h-10 flex">
           <div>
-            {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
+            {`${rowData?.assay_list?.tecnologia?.cod_tec} ${rowData?.assay_list?.tecnologia?.name}`}
           </div>
         </div>
       ),
@@ -455,6 +457,29 @@ export default function Listagem({
     }
   }
 
+  async function deleteMultipleItems() {
+    // pegar os ids selecionados no estado selectedCheckBox
+    console.log({ selectedCheckBox });
+    //enviar para a api a lista de ids
+
+    if (selectedCheckBox?.length <= 0) {
+      return Swal.fire("Selecione os experimentos para excluir.");
+    }
+
+    // const { status, message } = await experimentService.update({
+    //   id,
+    //   experimentGroupId: null,
+    // });
+    // if (status === 200) {
+    //   router.reload();
+    // } else {
+    //   Swal.fire({
+    //     html: message,
+    //     width: "800",
+    //   });
+    // }
+  }
+
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -516,7 +541,7 @@ export default function Listagem({
                 search: false,
                 filtering: false,
                 selection: true,
-                showSelectAllCheckbox: false,
+                showSelectAllCheckbox: true,
                 pageSize: Number(take),
               }}
               // localization={{
@@ -525,7 +550,7 @@ export default function Listagem({
               //   },
               // }}
               onChangeRowsPerPage={() => {}}
-              onSelectionChange={(e: any) => console.log({ e })}
+              onSelectionChange={setSelectedCheckBox}
               components={{
                 Toolbar: () => (
                   <div
@@ -559,7 +584,7 @@ export default function Listagem({
                         <Button
                           title="Excluir grupo"
                           type="button"
-                          onClick={() => deleteItem(experimentGroupId)}
+                          onClick={deleteMultipleItems}
                           bgColor="bg-red-600"
                           textColor="white"
                           icon={<BsTrashFill size={20} />}
