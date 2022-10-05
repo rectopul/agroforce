@@ -458,13 +458,16 @@ export default function Listagem({
   }
 
   async function deleteMultipleItems() {
-    // pegar os ids selecionados no estado selectedCheckBox
     console.log({ selectedCheckBox });
-    //enviar para a api a lista de ids
+    // pegar os ids selecionados no estado selectedCheckBox
+    const selectedCheckBoxIds = selectedCheckBox.map((i: any) => i.id);
+    console.log({ selectedCheckBoxIds });
 
     if (selectedCheckBox?.length <= 0) {
       return Swal.fire("Selecione os experimentos para excluir.");
     }
+
+    //enviar para a api a lista de ids
 
     // const { status, message } = await experimentService.update({
     //   id,

@@ -612,6 +612,8 @@ export default function Listagem({
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
       }
+
+      setLoading(true);
       await experimentService
         .getAll(`skip=${skip}&take=${take}&${parametersFilter}`)
         .then(({ status, response }: any) => {
@@ -637,7 +639,7 @@ export default function Listagem({
           }
         });
       getAllExperiments();
-      setLoading(false);
+      //setLoading(false);
     }
   }
 
@@ -652,6 +654,7 @@ export default function Listagem({
 
       const temp = [...selectedNPE];
 
+      setLoading(true);
       await experimentService
         .getAll(parametersFilter)
         .then(({ status, response, total }: any) => {
@@ -707,6 +710,7 @@ export default function Listagem({
           : NPESelectedRow?.npeQT - total_consumed > 0 &&
             lastNpe < NPESelectedRow?.nextNPE.npei_i
       ) {
+        setLoading(true);
         await experimentGenotipeService
           .create(data)
           .then(async ({ status, response }: any) => {
@@ -740,6 +744,8 @@ export default function Listagem({
                 });
             }
           });
+
+        setLoading(false);
       }
     } else {
       Swal.fire("Nenhum experimento para desenhar");
