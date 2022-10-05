@@ -645,6 +645,7 @@ export class ImportGenotypeController {
                 if (
                   spreadSheet[row].length === Number(column) + 1
                   && this.aux !== []
+
                 ) {
                   if (this.aux.id_genotipo) {
                     await genotipoController.update({
