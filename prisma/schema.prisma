@@ -105,6 +105,7 @@ model user {
   users_permissions users_permissions[]
   users_preferences users_preferences[]
   PrintHistory      PrintHistory[]
+  reportes          reportes[]
 }
 
 model users_cultures {
@@ -619,6 +620,8 @@ model reportes {
   idOperation Int?
   name        String?
   ip          String?
+
+  user user? @relation(fields: [madeBy], references: [id])
 }
 
 model AllocatedExperiment {

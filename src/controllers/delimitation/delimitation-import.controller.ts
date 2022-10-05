@@ -85,7 +85,7 @@ export class ImportDelimitationController {
                     spreadSheet[0][column],
                   );
               } else if (spreadSheet[Number(row) - 1][1]
-                !== spreadSheet[row][0]
+                !== spreadSheet[row][1]
                 || row === '1') {
                 if (spreadSheet[row][column] !== 1) {
                   responseIfError[Number(column)]

@@ -30,3 +30,4 @@ export * from './genotypeTratment/replace-treatment.service';
 export * from './log-import.service';
 export * from './experiment-group.service';
 export * from './experiment-genotipe.service';
+export * from './reporte.service';
