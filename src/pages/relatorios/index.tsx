@@ -425,7 +425,6 @@ export default function Listagem({
           placeholder={name}
           id={title}
           name={title}
-          defaultValue={checkValue(title)}
           onChange={formik.handleChange}
         />
       </div>
