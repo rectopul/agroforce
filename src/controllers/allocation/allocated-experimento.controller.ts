@@ -59,7 +59,7 @@ export class AllocatedExperimentController {
         experimentName: true,
         npei: true,
         npef: true,
-        parcela: true,
+        parcelas: true,
       };
 
       const take = (options.take) ? Number(options.take) : undefined;
