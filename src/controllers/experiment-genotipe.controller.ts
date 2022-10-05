@@ -239,11 +239,20 @@ export class ExperimentGenotipeController {
         rep: true,
         nt: true,
         npe: true,
-        genotipo: true,
+        genotipo: {
+          select: {
+            name_genotipo: true,
+            lote: {
+              select: {
+                fase: true,
+              },
+            },
+          },
+        },
         nca: true,
         idLote: true,
         status_t: true,
-        sequencia_delineamento: true
+        sequencia_delineamento: true,
       };
 
       if (options.experimentGroupId) {
@@ -321,6 +330,9 @@ export class ExperimentGenotipeController {
         skip,
         orderBy,
       );
+
+      console.log('response');
+      console.log(response);
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
