@@ -1204,31 +1204,32 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    <div className="flex flex-col items-center justify-center h-7 w-32">
-                      <Button
-                        type="button"
-                        value="Voltar"
-                        bgColor="bg-red-600"
-                        textColor="white"
-                        icon={<IoMdArrowBack size={18} />}
-                        onClick={() => {
-                          router.back();
-                        }}
-                      />
-                    </div>
-
-                    <div className="h-12 w-32 ml-0">
-                      <Button
-                        title="Ação"
-                        value="Ação"
-                        textColor="white"
-                        onClick={() =>
-                          rowsSelected?.length > 0
-                            ? reprint()
-                            : setIsOpenModal(true)
-                        }
-                        bgColor="bg-blue-600"
-                      />
+                    <div className="flex">
+                      <div className="h-12 w-32">
+                        <Button
+                          title="Ação"
+                          value="Ação"
+                          textColor="white"
+                          onClick={() =>
+                            rowsSelected?.length > 0
+                              ? reprint()
+                              : setIsOpenModal(true)
+                          }
+                          bgColor="bg-blue-600"
+                        />
+                      </div>
+                      <div className="h-12 w-32 ml-4">
+                        <Button
+                          type="button"
+                          value="Voltar"
+                          bgColor="bg-red-600"
+                          textColor="white"
+                          icon={<IoMdArrowBack size={18} />}
+                          onClick={() => {
+                            router.back();
+                          }}
+                        />
+                      </div>
                     </div>
 
                     <strong className="text-blue-600">
