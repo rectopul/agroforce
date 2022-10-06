@@ -745,7 +745,9 @@ export default function Listagem({
     });
     count > 0 ? setSortearDisable(true) : setSortearDisable(false);
     setExperimentoNew(experimentos.slice(0, 10));
-    selectedNPE.filter((x): any => x == NPESelectedRow)[0].npef = experimentos.length > 0 ? experimentos[experimentos.length - 1].npef : NPESelectedRow.npef;
+    if (NPESelectedRow) {
+      selectedNPE.filter((x): any => x == NPESelectedRow)[0].npef = experimentos.length > 0 ? experimentos[experimentos.length - 1].npef : NPESelectedRow.npef;
+    }
   }, [experimentos]);
 
   return (
