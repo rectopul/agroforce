@@ -658,7 +658,7 @@ export default function Import({
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
                       onClick={() => readExcel(27, 'GENOTYPE_TREATMENT')}
                       icon={<IoIosCloudUpload size={40} />}
-                      disabled={disabledButton}
+                      disabled
                       type="button"
                     />
                   </div>
@@ -689,7 +689,7 @@ export default function Import({
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
                       onClick={() => readExcel(22, 'EXPERIMENT')}
                       icon={<IoIosCloudUpload size={40} />}
-                      disabled
+                      disabled={disabledButton}
                       type="button"
                     />
                   </div>
@@ -720,7 +720,7 @@ export default function Import({
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
                       onClick={() => readExcel(22, 'EXPERIMENT')}
                       icon={<IoIosCloudUpload size={40} />}
-                      disabled={disabledButton}
+                      disabled
                       type="button"
                     />
                   </div>
