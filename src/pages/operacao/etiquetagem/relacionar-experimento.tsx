@@ -937,7 +937,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allExperiments, total: totalItems } = await fetch(
+  const { response: allExperiments = [], total: totalItems = 0 } = await fetch(
     urlParametersExperiment.toString(),
     requestOptions
   ).then((response) => response.json());

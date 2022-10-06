@@ -84,6 +84,7 @@ export class ExperimentController {
         orderDraw: true,
         status: true,
         bgm: true,
+        
         assay_list: {
           select: {
             gli: true,

@@ -161,7 +161,9 @@ export default function Listagem({
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
 
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == 'tecnologia' ? 'assay_list.tecnologia.cod_tec' : orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
+    orderBy == 'tecnologia' ? 'assay_list.tecnologia.cod_tec' : orderBy
+  }&typeOrder=${typeOrder}`;
 
   const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
 
@@ -432,7 +434,7 @@ export default function Listagem({
       field: 'action',
       sorting: false,
       searchable: false,
-      render: (rowData: IExperimento) => (
+      render: (rowData: any) => (
         <div className="h-7 flex">
           <div className="h-7">
             <Button
@@ -459,7 +461,14 @@ export default function Listagem({
               title={`Deletar ${rowData.experiment_name}`}
               icon={<BsTrashFill size={14} />}
               onClick={() => deleteItem(rowData.id)}
-              bgColor="bg-red-600"
+              disabled={
+                rowData.status == 'IMPORTADO' || rowData.status == 'SORTEADO'
+              }
+              bgColor={
+                rowData.status == 'IMPORTADO' || rowData.status == 'SORTEADO'
+                  ? 'bg-gray-600'
+                  : 'bg-red-600'
+              }
               textColor="white"
             />
           </div>
@@ -487,7 +496,7 @@ export default function Listagem({
       render: (rowData: any) => (
         <div className="h-10 flex">
           <div>
-            {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
+            {`${rowData?.assay_list?.tecnologia?.cod_tec} ${rowData?.assay_list?.tecnologia?.name}`}
           </div>
         </div>
       ),
@@ -692,7 +701,10 @@ export default function Listagem({
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
+    const parameter = tableGlobalFunctions.getValuesForFilter(
+      value,
+      filtersParams,
+    );
     return parameter;
   }
 
@@ -1079,9 +1091,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 0;
 
   // Last page
-  const lastPageServer = req.cookies.lastPage
-    ? req.cookies.lastPage
-    : 'No';
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
   if (lastPageServer == undefined || lastPageServer == 'No') {
     removeCookies('filterBeforeEdit', { req, res });
