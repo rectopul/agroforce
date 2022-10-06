@@ -4,6 +4,7 @@ import handleError from '../shared/utils/handleError';
 import { ExperimentGroupController } from './experiment-group/experiment-group.controller';
 import { ExperimentController } from './experiment/experiment.controller';
 import { PrintHistoryController } from './print-history/print-history.controller';
+import handleOrderForeign from '../shared/utils/handleOrderForeign';
 
 export class ExperimentGenotipeController {
   private ExperimentGenotipeRepository = new ExperimentGenotipeRepository();
@@ -31,11 +32,11 @@ export class ExperimentGenotipeController {
         );
       }
 
-      if (options.filterGli) {
-        parameters.assayList = JSON.parse(
-          `{ "name": { "contains": "${options.filterGli}" } }`,
-        );
-      }
+      // if (options.filterGli) {
+      //   parameters.assayList = JSON.parse(
+      //     `{ "name": { "contains": "${options.filterGli}" } }`,
+      //   );
+      // }
 
       if (options.filterNameTec) {
         parameters.tecnologia = JSON.parse(
@@ -239,11 +240,20 @@ export class ExperimentGenotipeController {
         rep: true,
         nt: true,
         npe: true,
-        genotipo: true,
+        genotipo: {
+          select: {
+            name_genotipo: true,
+            lote: {
+              select: {
+                fase: true,
+              },
+            },
+          },
+        },
         nca: true,
-        idLote: true,
+        lote: true,
         status_t: true,
-        sequencia_delineamento: true
+        sequencia_delineamento: true,
       };
 
       if (options.experimentGroupId) {
@@ -314,6 +324,11 @@ export class ExperimentGenotipeController {
 
       const skip = options.skip ? Number(options.skip) : undefined;
 
+      if (options.orderBy) {
+        orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
+        orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+      }
+
       const response: object | any = await this.ExperimentGenotipeRepository.findAll(
         parameters,
         select,
@@ -321,6 +336,9 @@ export class ExperimentGenotipeController {
         skip,
         orderBy,
       );
+
+      console.log('response');
+      console.log(response);
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };

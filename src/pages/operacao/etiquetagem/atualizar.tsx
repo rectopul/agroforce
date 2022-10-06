@@ -75,6 +75,7 @@ export default function Listagem({
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
+
   const [itemsTotal, setTotalItems] = useState<number>(0);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: 'CamposGerenciados[]', title: 'Foco', value: 'foco' },
@@ -104,6 +105,8 @@ export default function Listagem({
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
+
+  const [selectedCheckBox, setSelectedCheckBox] = useState([]);
 
   async function handleOrder(column: string, order: number): Promise<void> {
     let typeOrder: any;
@@ -181,7 +184,7 @@ export default function Listagem({
       render: (rowData: any) => (
         <div className="h-10 flex">
           <div>
-            {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
+            {`${rowData?.assay_list?.tecnologia?.cod_tec} ${rowData?.assay_list?.tecnologia?.name}`}
           </div>
         </div>
       ),
@@ -453,6 +456,32 @@ export default function Listagem({
     }
   }
 
+  async function deleteMultipleItems() {
+    console.log({ selectedCheckBox });
+    // pegar os ids selecionados no estado selectedCheckBox
+    const selectedCheckBoxIds = selectedCheckBox.map((i: any) => i.id);
+    console.log({ selectedCheckBoxIds });
+
+    if (selectedCheckBox?.length <= 0) {
+      return Swal.fire('Selecione os experimentos para excluir.');
+    }
+
+    // enviar para a api a lista de ids
+
+    // const { status, message } = await experimentService.update({
+    //   id,
+    //   experimentGroupId: null,
+    // });
+    // if (status === 200) {
+    //   router.reload();
+    // } else {
+    //   Swal.fire({
+    //     html: message,
+    //     width: "800",
+    //   });
+    // }
+  }
+
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -513,6 +542,8 @@ export default function Listagem({
                 rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
+                selection: true,
+                showSelectAllCheckbox: true,
                 pageSize: Number(take),
               }}
               // localization={{
@@ -521,6 +552,7 @@ export default function Listagem({
               //   },
               // }}
               onChangeRowsPerPage={() => {}}
+              onSelectionChange={setSelectedCheckBox}
               components={{
                 Toolbar: () => (
                   <div
@@ -554,7 +586,7 @@ export default function Listagem({
                         <Button
                           title="Excluir grupo"
                           type="button"
-                          onClick={() => deleteItem(experimentGroupId)}
+                          onClick={deleteMultipleItems}
                           bgColor="bg-red-600"
                           textColor="white"
                           icon={<BsTrashFill size={20} />}
@@ -726,14 +758,16 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { publicRuntimeConfig } = getConfig();
   const baseUrlExperiments = `${publicRuntimeConfig.apiUrl}/experiment`;
 
-  const filterApplication = `${req.cookies.filterBeforeEdit}&experimentGroupId=${experimentGroupId}`
+  const filterApplication = `experimentGroupId=${experimentGroupId}&safraId=${safraId}`
     || `&experimentGroupId=${experimentGroupId}&safraId=${safraId}`;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  // console.log("server  ----- ",filterApplication);
+  // removeCookies("filterBeforeEdit", { req, res });
+  // removeCookies("pageBeforeEdit", { req, res });
 
   const param = `&experimentGroupId=${experimentGroupId}&safraId=${safraId}`;
 
+  // console.log("parama ---  ",param);
   const urlParametersExperiments: any = new URL(baseUrlExperiments);
   urlParametersExperiments.search = new URLSearchParams(param).toString();
   const requestOptions = {

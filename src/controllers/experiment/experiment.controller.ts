@@ -7,6 +7,8 @@ import { functionsUtils } from '../../shared/utils/functionsUtils';
 import { IReturnObject } from '../../interfaces/shared/Import.interface';
 import { ExperimentGroupController } from '../experiment-group/experiment-group.controller';
 import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
+import { sequenciaDelineamentoService } from 'src/services/sequencia-delineamento.service';
+import EventEmitter from 'events';
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -20,8 +22,6 @@ export class ExperimentController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
         if (options.filterRepetitionFrom && options.filterRepetitionTo) {
           parameters.repetitionsNumber = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);
@@ -84,6 +84,7 @@ export class ExperimentController {
         orderDraw: true,
         status: true,
         bgm: true,
+        
         assay_list: {
           select: {
             gli: true,
@@ -127,6 +128,7 @@ export class ExperimentController {
             name: true,
             repeticao: true,
             id: true,
+            sequencia_delineamento: true,
           },
         },
         experiment_genotipe: true,
@@ -182,8 +184,6 @@ export class ExperimentController {
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
-      console.log('parameters');
-      console.log(parameters);
       const response: object | any = await this.experimentRepository.findAll(
         parameters,
         select,
@@ -192,14 +192,12 @@ export class ExperimentController {
         orderBy,
       );
 
-      console.log('response');
-      console.log(response);
-
-      response.map((item: any) => {
+      response.map(async (item: any) => {
         const newItem = item;
         newItem.countNT = functionsUtils
           .countChildrenForSafra(item.assay_list.genotype_treatment, Number(options.idSafra));
         newItem.npeQT = item.countNT * item.repetitionsNumber;
+        newItem.seq_delineamento = item.delineamento.sequencia_delineamento.filter((x: any) => x.nt == item.countNT);
         return newItem;
       });
       if (response.total <= 0) {

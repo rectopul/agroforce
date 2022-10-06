@@ -27,12 +27,8 @@ import {
   BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
-import {
-  MdFirstPage, MdLastPage,
-} from 'react-icons/md';
-import {
-  RiCloseCircleFill, RiFileExcel2Line,
-} from 'react-icons/ri';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
 import { IoMdArrowBack } from 'react-icons/io';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
@@ -42,7 +38,10 @@ import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { experimentGenotipeService } from 'src/services/experiment-genotipe.service';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
-  genotypeTreatmentService, npeService, sequenciaDelineamentoService, userPreferencesService,
+  genotypeTreatmentService,
+  npeService,
+  sequenciaDelineamentoService,
+  userPreferencesService,
 } from '../../../../services';
 import { experimentService } from '../../../../services/experiment.service';
 import {
@@ -541,25 +540,7 @@ export default function Listagem({
   async function handlePagination(): Promise<void> {
     if (NPESelectedRow) {
       const skip = currentPage * Number(take);
-      let parametersFilter = `skip=${skip}&take=${take}&idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}&Status=IMPORTADO`;
-
-      if (filter) {
-        parametersFilter = `${parametersFilter}&${filter}`;
-      }
-      await experimentService
-        .getAll(parametersFilter)
-        .then(({ status, response }: any) => {
-          if (status === 200) {
-            let i = lastExperimentNPE;
-            response.map((item: any) => {
-              item.npei = i;
-              item.npef = i + item.npeQT - 1;
-              i = item.npef + 1;
-            });
-            setLastExperimentNPE(i);
-            setExperimentoNew(response);
-          }
-        });
+      setExperimentoNew(experimentos.slice(skip, skip + take));
     }
   }
 
@@ -614,55 +595,19 @@ export default function Listagem({
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
       }
-      await experimentService.getAll(`skip=${skip}&take=${take}&${parametersFilter}`).then(({ status, response }: any) => {
-        if (status === 200 || status === 400) {
-          let i = NPESelectedRow.prox_npe;
-          response.map(async (item: any) => {
-            await sequenciaDelineamentoService.getAll(`id_delineamento=${item.delineamento.id}&nt=${item.countNT}`).then(async ({ status, response, total }: any) => {
-              if (status === 200 || status === 400) {
-                item.seq_delineamento = response;
-                item.npei = i;
-                item.npef = i + item.npeQT * (item.seq_delineamento.length) - 1;
-                i = item.npef + 1;
-              }
-            });
-          });
-          setLastExperimentNPE(i);
-          setExperimentoNew(response);
-        }
-      });
-      getAllExperiments();
-      setLoading(false);
-    }
-  }
-
-  async function getAllExperiments(): Promise<void> {
-    if (NPESelectedRow) {
-      const skip = currentPage * Number(take);
-      let parametersFilter = `idSafra=${NPESelectedRow?.safraId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}&Status=IMPORTADO`;
-
-      if (filter) {
-        parametersFilter = `${parametersFilter}&${filter}`;
-      }
-
-      const temp = [...selectedNPE];
 
       await experimentService.getAll(parametersFilter).then(({ status, response, total }: any) => {
         if (status === 200 || status === 400) {
           let i = 0;
           response.length > 0 ? i = NPESelectedRow.prox_npe : i = NPESelectedRow.npef;
           response.map(async (item: any) => {
-            sequenciaDelineamentoService.getAll(`id_delineamento=${item.delineamento.id}&nt=${item.countNT}`).then(async ({ status, response, total }: any) => {
-              if (status === 200 || status === 400) {
-                item.seq_delineamento = response;
-              }
+            item.seq_delineamento.map((it: any) => {
+              item.npei = i;
+              item.npef = i + item.npeQT - 1;
+              i = item.npef + 1;
+              i >= NPESelectedRow.nextNPE.npei_i && npeUsedFrom == 0 ? setNpeUsedFrom(NPESelectedRow.nextNPE.npei_i) : '';
             });
-            item.npei = i;
-            item.npef = i + item.npeQT - 1;
-            i = item.npef + 1;
-            i >= NPESelectedRow.nextNPE.npei_i && npeUsedFrom == 0 ? setNpeUsedFrom(NPESelectedRow.nextNPE.npei_i) : '';
           });
-          // temp.filter((x): any => x == NPESelectedRow)[0].npef = response[response.length - 1].npef;
           setExperimento(response);
           setTotalItems(total);
         }
@@ -671,7 +616,11 @@ export default function Listagem({
     }
   }
 
-  async function createExperimentGenotipe({ data, total_consumed, genotipo_treatment }: any) {
+  async function createExperimentGenotipe({
+    data,
+    total_consumed,
+    genotipo_treatment,
+  }: any) {
     if (data.length > 0) {
       const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
       const experimentObj: any[] = [];
@@ -686,8 +635,9 @@ export default function Listagem({
         NPESelectedRow?.npeQT == 'N/A'
           ? true
           : NPESelectedRow?.npeQT - total_consumed > 0
-            && lastNpe < NPESelectedRow?.nextNPE.npei_i
+          && lastNpe < NPESelectedRow?.nextNPE.npei_i
       ) {
+        setLoading(true);
         await experimentGenotipeService
           .create(data)
           .then(async ({ status, response }: any) => {
@@ -695,12 +645,12 @@ export default function Listagem({
               genotipo_treatment.map(async (gt: any) => {
                 genotypeTreatmentService
                   .update(gt)
-                  .then(({ status, message }: any) => {});
+                  .then(({ status, message }: any) => { });
               });
               experimentObj.map(async (x: any) => {
                 await experimentService
                   .update(x)
-                  .then(({ status, response }: any) => {});
+                  .then(({ status, response }: any) => { });
               });
 
               await npeService
@@ -721,6 +671,8 @@ export default function Listagem({
                 });
             }
           });
+
+        setLoading(false);
       }
     } else {
       Swal.fire('Nenhum experimento para desenhar');
@@ -735,6 +687,8 @@ export default function Listagem({
 
       experimentos?.map((item: any) => {
         item.assay_list.genotype_treatment.map((gt: any) => {
+          console.log(' item  ', item.seq_delineamento);
+
           item.seq_delineamento.map((sd: any) => {
             const data: any = {};
             data.idSafra = gt.id_safra;
@@ -745,8 +699,9 @@ export default function Listagem({
             data.idExperiment = item.id;
             data.rep = item.delineamento.repeticao;
             data.nt = gt.treatments_number;
+            data.idLote = gt.id_lote;
             data.npe = npei;
-            // data.name_genotipo = gt.genotipo.name_genotipo;
+            data.idLote = gt.genotipo.id_lote;
             data.idGenotipo = gt.genotipo.id; // Added new field
             data.id_seq_delineamento = sd.id;
             data.nca = '';
@@ -759,7 +714,15 @@ export default function Listagem({
           genotipo_treatment.push(gt_new);
         });
       });
-      createExperimentGenotipe({ data: experiment_genotipo, total_consumed: experiment_genotipo.length, genotipo_treatment });
+
+      // console.log("data  ",experiment_genotipo);
+
+      // return false;
+      createExperimentGenotipe({
+        data: experiment_genotipo,
+        total_consumed: experiment_genotipo.length,
+        genotipo_treatment,
+      });
     } else {
       const temp = NPESelectedRow;
       Swal.fire({
@@ -777,7 +740,7 @@ export default function Listagem({
       }).then((result) => {
         if (result.isConfirmed) {
           router.push({
-            pathname: '/config/npe',
+            pathname: '/config/ambiente',
           });
         }
       });
@@ -792,12 +755,16 @@ export default function Listagem({
     let count = 0;
     experimentos.map((item: any) => {
       item.npei <= NPESelectedRow?.nextNPE.npei_i
-      && item.npef >= NPESelectedRow?.nextNPE.npei_i
-      && NPESelectedRow?.nextNPE != 0
+        && item.npef >= NPESelectedRow?.nextNPE.npei_i
+        && NPESelectedRow?.nextNPE != 0
         ? count++
         : '';
     });
     count > 0 ? setSortearDisable(true) : setSortearDisable(false);
+    setExperimentoNew(experimentos.slice(0, 10));
+    if (NPESelectedRow) {
+      selectedNPE.filter((x): any => x == NPESelectedRow)[0].npef = experimentos.length > 0 ? experimentos[experimentos.length - 1].npef : NPESelectedRow.npef;
+    }
   }, [experimentos]);
 
   return (
@@ -872,7 +839,7 @@ export default function Listagem({
                   rowStyle: (rowData) => ({
                     backgroundColor:
                       rowData.npef >= NPESelectedRow?.nextNPE.npei_i
-                      && SortearDisable
+                        && SortearDisable
                         ? '#FF5349'
                         : '#f9fafb',
                     height: 40,
@@ -1049,7 +1016,7 @@ export default function Listagem({
                         disabled={currentPage + 1 >= pages}
                       />
                     </div>
-                    ) as any,
+                  ) as any,
                 }}
               />
             </div>

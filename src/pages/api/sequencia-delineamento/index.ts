@@ -4,6 +4,7 @@ import { apiHandler } from '../../../helpers/api';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const sequenciaDelineamentoController = new SequenciaDelineamentoController();
+
   switch (req.method) {
     case 'GET': {
       const result = await sequenciaDelineamentoController.getAll(req.query);
