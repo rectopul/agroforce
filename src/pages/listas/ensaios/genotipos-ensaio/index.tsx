@@ -922,10 +922,11 @@ export default function Listagem({
                     </label>
                     <SelectAutoComplete
                       data={assaySelect.map((i: any) => i.name)}
-                      value={checkValue("filterGli")}
+                      // value={checkValue("filterGli")}
                       onChange={(e: any) =>
                         formik.setFieldValue("filterGli", e)
                       }
+                      defaultValue={checkValue("filterGli")}
                     />
                   </div>
 
@@ -1332,6 +1333,20 @@ export const getServerSideProps: GetServerSideProps = async ({
     await PreferencesControllers.getConfigGerais()
   )?.response[0]?.itens_per_page;
 
+
+    // Last page
+    const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
+
+    if (lastPageServer == undefined || lastPageServer == "No") {
+      removeCookies("filterBeforeEdit", { req, res });
+      removeCookies("pageBeforeEdit", { req, res });
+      removeCookies("filterBeforeEditTypeOrder", { req, res });
+      removeCookies("filterBeforeEditOrderBy", { req, res });
+      removeCookies("lastPage", { req, res });
+    }
+
+    
+
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
@@ -1342,16 +1357,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
 
-  // Last page
-  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
-
-  if (lastPageServer == undefined || lastPageServer == "No") {
-    removeCookies("filterBeforeEdit", { req, res });
-    removeCookies("pageBeforeEdit", { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });
-  }
 
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
