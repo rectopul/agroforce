@@ -1,25 +1,25 @@
 /* eslint-disable no-return-assign */
-const CryptoJS = require("crypto");
+const CryptoJS = require('crypto');
 
-const alg = "aes-256-ctr";
-const pwd = "TMG2022";
+const alg = 'aes-256-ctr';
+const pwd = 'TMG2022';
 
 function validationCPF(cpf: any) {
-  const newCpf = cpf.replace(/[^\d]+/g, "");
-  if (newCpf === "") return false;
+  const newCpf = cpf.replace(/[^\d]+/g, '');
+  if (newCpf === '') return false;
   // Elimina CPFs invalidos conhecidos
   if (
-    newCpf.length !== 11 ||
-    newCpf === "00000000000" ||
-    newCpf === "11111111111" ||
-    newCpf === "22222222222" ||
-    newCpf === "33333333333" ||
-    newCpf === "44444444444" ||
-    newCpf === "55555555555" ||
-    newCpf === "66666666666" ||
-    newCpf === "77777777777" ||
-    newCpf === "88888888888" ||
-    newCpf === "99999999999"
+    newCpf.length !== 11
+    || newCpf === '00000000000'
+    || newCpf === '11111111111'
+    || newCpf === '22222222222'
+    || newCpf === '33333333333'
+    || newCpf === '44444444444'
+    || newCpf === '55555555555'
+    || newCpf === '66666666666'
+    || newCpf === '77777777777'
+    || newCpf === '88888888888'
+    || newCpf === '99999999999'
   ) {
     return false;
   }
@@ -51,14 +51,14 @@ function validationCPF(cpf: any) {
 }
 
 function Crypto(data: any, type: any) {
-  if (type === "cipher") {
+  if (type === 'cipher') {
     const cipher: any = CryptoJS.createCipher(alg, pwd);
-    const newData = cipher.update(data, "utf8", "hex");
+    const newData = cipher.update(data, 'utf8', 'hex');
     return newData;
   }
-  if (type === "decipher") {
+  if (type === 'decipher') {
     const decipher = CryptoJS.createDecipher(alg, pwd);
-    const newData = decipher.update(data, "hex", "utf8");
+    const newData = decipher.update(data, 'hex', 'utf8');
     return newData;
   }
 }
@@ -66,9 +66,7 @@ function Crypto(data: any, type: any) {
 function countChildrenForSafra(dataChildren: [], safraId: number = 0) {
   let countChildren: number = 0;
   if (safraId !== 0) {
-    dataChildren.map((item: any) =>
-      Number(item.id_safra) === safraId ? (countChildren += 1) : ""
-    );
+    dataChildren.map((item: any) => (Number(item.id_safra) === safraId ? (countChildren += 1) : ''));
   }
   return countChildren;
 }
@@ -80,19 +78,18 @@ function formatDate(data: any) {
   const mesF = mes.length === 1 ? `0${mes}` : mes;
   const anoF = data.getFullYear();
   const hour = data.getHours();
-  const min =
-    data.getMinutes() < 10 ? `0${data.getMinutes()}` : data.getMinutes();
+  const min = data.getMinutes() < 10 ? `0${data.getMinutes()}` : data.getMinutes();
   return `${diaF}/${mesF}/${anoF} ${hour}:${min}`;
 }
 
-function getFileExtension(filename: string) {
-  return filename?.slice(((filename?.lastIndexOf(".") - 1) >>> 0) + 2);
-}
+// function getFileExtension(filename: string) {
+//   return filename?.slice(((filename?.lastIndexOf('.') - 1) >>> 0) + 2);
+// }
 
 export const functionsUtils = {
   validationCPF,
   Crypto,
   countChildrenForSafra,
   formatDate,
-  getFileExtension,
+  //  getFileExtension,
 };

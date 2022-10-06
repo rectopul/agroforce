@@ -361,12 +361,7 @@ export class ImportGenotypeController {
                   );
                 }
                 if (status === 200) {
-                  let lastDtImport = response[0]?.dt_import?.getTime();
-                  response.forEach((item: any) => {
-                    lastDtImport = item.dt_import.getTime() > lastDtImport
-                      ? item.dt_import.getTime()
-                      : lastDtImport;
-                  });
+                  const lastDtImport = response[0]?.dt_import?.getTime();
                   if (
                     lastDtImport
                     > spreadSheet[row][column].getTime()
@@ -636,7 +631,9 @@ export class ImportGenotypeController {
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'DT') {
+                if (configModule.response[0]?.fields[column] === 'DT_IMPORT') {
+                  console.log('spreadSheet[row][column]');
+                  console.log(spreadSheet[row][column]);
                   if (spreadSheet[row][column] !== null) {
                     this.aux.dt_import = spreadSheet[row][column];
                   }

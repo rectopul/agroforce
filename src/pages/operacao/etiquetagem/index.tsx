@@ -251,6 +251,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     // setCookies("filtersParams", parametersFilter);
 
     setCookies("filtersParamsOperation", parametersFilter);
+    
     await experimentGroupService.getAll(parametersFilter).then((response) => {
       if (response.status === 200 || response.status === 400) {
         setExperimentGroup(response.response);
@@ -1227,11 +1228,11 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? req.cookies.filterBeforeEditOrderByOperation
     : "experimentAmount";
 
-  removeCookies("filterBeforeEditOperation", { req, res });
-  removeCookies("pageBeforeEditOperation", { req, res });
-  removeCookies("filterBeforeEditTypeOrderOperation", { req, res });
-  removeCookies("filterBeforeEditOrderByOperation", { req, res });
-  removeCookies("lastPageOperation", { req, res });
+  // removeCookies("filterBeforeEditOperation", { req, res });
+  // removeCookies("pageBeforeEditOperation", { req, res });
+  // removeCookies("filterBeforeEditTypeOrderOperation", { req, res });
+  // removeCookies("filterBeforeEditOrderByOperation", { req, res });
+  // removeCookies("lastPageOperation", { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/experiment`;
