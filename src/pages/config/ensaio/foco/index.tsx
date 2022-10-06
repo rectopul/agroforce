@@ -70,7 +70,6 @@ interface IGenerateProps {
 }
 
 interface IData {
-  allFocos: IFocos[];
   totalItems: number;
   itensPerPage: number;
   cultureId: number;
@@ -83,7 +82,6 @@ interface IData {
 }
 
 export default function Listagem({
-  allFocos,
   totalItems,
   itensPerPage,
   cultureId,
@@ -109,7 +107,7 @@ export default function Listagem({
     preferences.table_preferences,
   );
 
-  const [focos, setFocos] = useState<IFocos[]>(() => allFocos);
+  const [focos, setFocos] = useState<IFocos[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit),
   );
@@ -928,7 +926,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   ).then((response) => response.json());
   return {
     props: {
-      allFocos,
       totalItems,
       itensPerPage,
       cultureId,

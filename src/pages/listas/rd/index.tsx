@@ -656,7 +656,7 @@ export default function Import({
                       }
                       bgColor={bgColor}
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(22, 'EXPERIMENT')}
+                      onClick={() => readExcel(27, 'GENOTYPE_TREATMENT')}
                       icon={<IoIosCloudUpload size={40} />}
                       disabled={disabledButton}
                       type="button"
@@ -670,8 +670,8 @@ export default function Import({
                     <Input
                       type="file"
                       required
-                      id="inputFile-22"
-                      name="inputFile-22"
+                      id="inputFile-27"
+                      name="inputFile-27"
                     />
                   </div>
                 </div>
@@ -689,7 +689,7 @@ export default function Import({
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
                       onClick={() => readExcel(22, 'EXPERIMENT')}
                       icon={<IoIosCloudUpload size={40} />}
-                      disabled={disabledButton}
+                      disabled
                       type="button"
                     />
                   </div>
