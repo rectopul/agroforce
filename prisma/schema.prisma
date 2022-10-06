@@ -580,6 +580,7 @@ model experiment_genotipe {
   genotipo               genotipo               @relation(fields: [idGenotipo], references: [id])
   layout_quadra          layout_quadra?         @relation(fields: [blockLayoutId], references: [id])
   sequencia_delineamento sequencia_delineamento @relation(fields: [id_seq_delineamento], references: [id])
+  lote                   lote?                  @relation(fields: [idLote], references: [id])
   PrintHistory           PrintHistory[]
 }
 
