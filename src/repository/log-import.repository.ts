@@ -1,7 +1,12 @@
 import { prisma } from '../pages/api/db/db';
 
 export class LogImportRepository {
+
+
+
   async create(data: any) {
+    console.log("callin gme 3  ");
+
     const result = await prisma.log_import.create({
       data,
     });

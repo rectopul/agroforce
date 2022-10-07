@@ -241,30 +241,30 @@ function Listagem(_a) {
     var _y = react_2.useState([]), rowsSelected = _y[0], setRowsSelected = _y[1];
     var formik = formik_1.useFormik({
         initialValues: {
-            filterFoco: checkValue(''),
-            filterTypeAssay: checkValue(''),
-            filterTechnology: checkValue(),
-            filterGli: checkValue(),
-            filterBgm: checkValue(),
-            filterTreatmentsNumber: checkValue(),
-            filterStatus: checkValue(),
-            filterStatusAssay: checkValue(),
-            filterGenotypeName: checkValue("filterGenotypeName"),
-            filterNca: checkValue("filterNca"),
+            filterFoco: "",
+            filterTypeAssay: "",
+            filterTechnology: "",
+            filterGli: "",
+            filterBgm: "",
+            filterTreatmentsNumber: "",
+            filterStatus: "",
+            filterStatusAssay: "",
+            filterGenotypeName: "",
+            filterNca: "",
             orderBy: "",
             typeOrder: "",
-            filterBgmTo: checkValue("filterBgmTo"),
-            filterBgmFrom: checkValue("filterBgmFrom"),
-            filterNtTo: checkValue("filterNtTo"),
-            filterNtFrom: checkValue("filterNtFrom"),
-            filterNpeTo: checkValue("filterNpeTo"),
-            filterNpeFrom: checkValue("filterNpeFrom"),
-            filterRepTo: checkValue("filterRepTo"),
-            filterRepFrom: checkValue("filterRepFrom"),
-            filterStatusT: checkValue("filterStatusT"),
-            filterCodTec: checkValue("filterCodTec"),
-            filterExperimentName: checkValue("filterExperimentName"),
-            filterPlacingPlace: checkValue("filterPlacingPlace")
+            filterBgmTo: "",
+            filterBgmFrom: "",
+            filterNtTo: "",
+            filterNtFrom: "",
+            filterNpeTo: "",
+            filterNpeFrom: "",
+            filterRepTo: "",
+            filterRepFrom: "",
+            filterStatusT: "",
+            filterCodTec: "",
+            filterExperimentName: "",
+            filterPlacingPlace: ""
         },
         onSubmit: function (_a) {
             var filterFoco = _a.filterFoco, filterTypeAssay = _a.filterTypeAssay, filterTechnology = _a.filterTechnology, filterGli = _a.filterGli, filterBgm = _a.filterBgm, filterTreatmentsNumber = _a.filterTreatmentsNumber, filterStatusAssay = _a.filterStatusAssay, filterGenotypeName = _a.filterGenotypeName, filterNca = _a.filterNca, filterBgmTo = _a.filterBgmTo, filterBgmFrom = _a.filterBgmFrom, filterNtTo = _a.filterNtTo, filterNtFrom = _a.filterNtFrom, filterNpeTo = _a.filterNpeTo, filterNpeFrom = _a.filterNpeFrom, filterRepTo = _a.filterRepTo, filterRepFrom = _a.filterRepFrom, filterCodTec = _a.filterCodTec, filterExperimentName = _a.filterExperimentName, filterPlacingPlace = _a.filterPlacingPlace;
@@ -281,7 +281,7 @@ function Listagem(_a) {
                                 }
                             }
                             filterStatus = statusFilterSelected === null || statusFilterSelected === void 0 ? void 0 : statusFilterSelected.join(",");
-                            parametersFilter = "&filterFoco=" + filterFoco + "&filterTypeAssay=" + filterTypeAssay + "&filterTechnology=" + filterTechnology + "&filterGli=" + filterGli + "&filterBgm=" + filterBgm + "&filterTreatmentsNumber=" + filterTreatmentsNumber + "&filterStatus=" + filterStatus + "&filterStatusAssay=" + filterStatusAssay + "&filterGenotypeName=" + filterGenotypeName + "&filterNca=" + filterNca + "&id_safra=" + idSafra + "&filterBgmTo=" + filterBgmTo + "&filterBgmFrom=" + filterBgmFrom + "&filterNtTo=" + filterNtTo + "&filterNtFrom=" + filterNtFrom + "&filterNpeTo=" + filterNpeTo + "&filterNpeFrom=" + filterNpeFrom + "&filterExperimentName=" + filterExperimentName + "&filterRepetitionTo=" + filterRepTo + "&filterRepetitionFrom=" + filterRepFrom;
+                            parametersFilter = "&filterFoco=" + filterFoco + "&filterTypeAssay=" + filterTypeAssay + "&filterTechnology=" + filterTechnology + "&filterGli=" + filterGli + "&filterBgm=" + filterBgm + "&filterTreatmentsNumber=" + filterTreatmentsNumber + "&filterStatus=" + filterStatus + "&filterStatusAssay=" + filterStatusAssay + "&filterGenotypeName=" + filterGenotypeName + "&filterNca=" + filterNca + "&id_safra=" + idSafra + "&filterBgmTo=" + filterBgmTo + "&filterBgmFrom=" + filterBgmFrom + "&filterNtTo=" + filterNtTo + "&filterNtFrom=" + filterNtFrom;
                             // setFiltersParams(parametersFilter);
                             // setCookies('filterBeforeEdit', filtersParams);
                             // await genotypeTreatmentService
@@ -712,7 +712,9 @@ function Listagem(_a) {
                         checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
                         localStorage.setItem("checkedTreatments", checkedTreatmentsLocal);
                         localStorage.setItem("treatmentsOptionSelected", JSON.stringify("genotipo"));
-                        router.push("/listas/ensaios/tratamento-genotipo/substituicao?value=experiment");
+                        router.push("/listas/ensaios/genotipos-ensaio/substituicao?value=experiment"
+                        //"/listas/ensaios/tratamento-genotipo/substituicao?value=experiment"
+                        );
                         return [3 /*break*/, 5];
                     case 1:
                         if (!ncaButton) return [3 /*break*/, 2];
@@ -725,7 +727,7 @@ function Listagem(_a) {
                         checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
                         localStorage.setItem("checkedTreatments", checkedTreatmentsLocal);
                         localStorage.setItem("treatmentsOptionSelected", JSON.stringify("nca"));
-                        router.push("/listas/ensaios/tratamento-genotipo/substituicao?value=experiment");
+                        router.push("/listas/ensaios/genotipos-ensaio/substituicao?value=experiment");
                         return [3 /*break*/, 5];
                     case 2:
                         if (!((inputFile === null || inputFile === void 0 ? void 0 : inputFile.files.length) !== 0)) return [3 /*break*/, 4];

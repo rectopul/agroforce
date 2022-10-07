@@ -109,9 +109,14 @@ export default function Import({
 
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
     setExecuteUpload(1);
+
+
+
     readXlsxFile(value.files[0]).then(async (rows) => {
       setLoading(true);
+
       if (moduleId) {
+       
         const { message } = await importService.validate({
           spreadSheet: rows,
           moduleId,

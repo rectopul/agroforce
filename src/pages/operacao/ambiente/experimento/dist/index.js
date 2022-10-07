@@ -78,13 +78,11 @@ function Listagem(_a) {
     var _this = this;
     var itensPerPage = _a.itensPerPage, filterApplication = _a.filterApplication, idSafra = _a.idSafra, pageBeforeEdit = _a.pageBeforeEdit, filterBeforeEdit = _a.filterBeforeEdit;
     var tabsOperation = dropdown_1["default"].tabsOperation;
-    var tabsOperationMenu = tabsOperation.map(function (i) {
-        return i.titleTab === "AMBIENTE" ? __assign(__assign({}, i), { statusTab: true }) : i;
-    });
-    var userLogado = JSON.parse(localStorage.getItem("user"));
+    var tabsOperationMenu = tabsOperation.map(function (i) { return (i.titleTab === 'AMBIENTE' ? __assign(__assign({}, i), { statusTab: true }) : i); });
+    var userLogado = JSON.parse(localStorage.getItem('user'));
     var preferences = userLogado.preferences.experimento || {
         id: 0,
-        table_preferences: "id,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,countNT,npeQT"
+        table_preferences: 'id,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,countNT,npeQT'
     };
     var _b = react_1.useState(preferences.table_preferences), camposGerenciados = _b[0], setCamposGerenciados = _b[1];
     var router = router_1.useRouter();
@@ -95,43 +93,43 @@ function Listagem(_a) {
     var _g = react_1.useState(0), itemsTotal = _g[0], setTotalItems = _g[1];
     var _h = react_1.useState(1), orderList = _h[0], setOrder = _h[1];
     var _j = react_1.useState(0), lastExperimentNPE = _j[0], setLastExperimentNPE = _j[1];
-    var _k = react_1.useState(""), arrowOrder = _k[0], setArrowOrder = _k[1];
+    var _k = react_1.useState(''), arrowOrder = _k[0], setArrowOrder = _k[1];
     var _l = react_1.useState(false), SortearDisable = _l[0], setSortearDisable = _l[1];
     var _m = react_1.useState(false), statusAccordion = _m[0], setStatusAccordion = _m[1];
     var _o = react_1.useState(function () { return [
         // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-        { name: "CamposGerenciados[]", title: "GLI", value: "gli" },
+        { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
         {
-            name: "CamposGerenciados[]",
-            title: "Nome do experimento",
-            value: "experimentName"
+            name: 'CamposGerenciados[]',
+            title: 'Nome do experimento',
+            value: 'experimentName'
         },
-        { name: "CamposGerenciados[]", title: "Nome tec.", value: "tecnologia" },
-        { name: "CamposGerenciados[]", title: "Época", value: "period" },
+        { name: 'CamposGerenciados[]', title: 'Nome tec.', value: 'tecnologia' },
+        { name: 'CamposGerenciados[]', title: 'Época', value: 'period' },
         {
-            name: "CamposGerenciados[]",
-            title: "Delineamento",
-            value: "delineamento"
+            name: 'CamposGerenciados[]',
+            title: 'Delineamento',
+            value: 'delineamento'
         },
-        { name: "CamposGerenciados[]", title: "Rep.", value: "repetitionsNumber" },
+        { name: 'CamposGerenciados[]', title: 'Rep.', value: 'repetitionsNumber' },
         {
-            name: "CamposGerenciados[]",
-            title: "Number of treatment",
-            value: "countNT"
-        },
-        {
-            name: "CamposGerenciados[]",
-            title: "NPE Inicial",
-            value: "repetitionsNumber"
+            name: 'CamposGerenciados[]',
+            title: 'Number of treatment',
+            value: 'countNT'
         },
         {
-            name: "CamposGerenciados[]",
-            title: "NPE Final",
-            value: "repetitionsNumber"
+            name: 'CamposGerenciados[]',
+            title: 'NPE Inicial',
+            value: 'repetitionsNumber'
         },
-        { name: "CamposGerenciados[]", title: "QT. NPE", value: "npeQT" },
+        {
+            name: 'CamposGerenciados[]',
+            title: 'NPE Final',
+            value: 'repetitionsNumber'
+        },
+        { name: 'CamposGerenciados[]', title: 'QT. NPE', value: 'npeQT' },
     ]; }), generatesProps = _o[0], setGeneratesProps = _o[1];
-    var _p = react_1.useState(""), colorStar = _p[0], setColorStar = _p[1];
+    var _p = react_1.useState(''), colorStar = _p[0], setColorStar = _p[1];
     var _q = react_1.useState(null), NPESelectedRow = _q[0], setNPESelectedRow = _q[1];
     var _r = react_1.useState(0), npeUsedFrom = _r[0], setNpeUsedFrom = _r[1];
     var _s = react_1.useState(false), isOpenModal = _s[0], setIsOpenModal = _s[1];
@@ -139,20 +137,20 @@ function Listagem(_a) {
     var take = itensPerPage;
     var total = itemsTotal <= 0 ? 1 : itemsTotal;
     var pages = Math.ceil(total / take);
-    var _u = react_1.useState(JSON.parse(localStorage.getItem("selectedNPE"))), selectedNPE = _u[0], setSelectedNPE = _u[1];
+    var _u = react_1.useState(JSON.parse(localStorage.getItem('selectedNPE'))), selectedNPE = _u[0], setSelectedNPE = _u[1];
     // let selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string);
     var formik = formik_1.useFormik({
         initialValues: {
-            filterFoco: "",
-            filterTypeAssay: "",
-            filterGli: "",
-            filterExperimentName: "",
-            filterTecnologia: "",
-            filterPeriod: "",
-            filterDelineamento: "",
-            filterRepetition: "",
-            orderBy: "",
-            typeOrder: ""
+            filterFoco: '',
+            filterTypeAssay: '',
+            filterGli: '',
+            filterExperimentName: '',
+            filterTecnologia: '',
+            filterPeriod: '',
+            filterDelineamento: '',
+            filterRepetition: '',
+            orderBy: '',
+            typeOrder: ''
         },
         onSubmit: function (_a) {
             var filterFoco = _a.filterFoco, filterTypeAssay = _a.filterTypeAssay, filterGli = _a.filterGli, filterExperimentName = _a.filterExperimentName, filterTecnologia = _a.filterTecnologia, filterPeriod = _a.filterPeriod, filterDelineamento = _a.filterDelineamento, filterRepetition = _a.filterRepetition;
@@ -163,7 +161,7 @@ function Listagem(_a) {
                         case 0:
                             parametersFilter = "filterFoco=" + filterFoco + "&filterTypeAssay=" + filterTypeAssay + "&filterGli=" + filterGli + "&filterExperimentName=" + filterExperimentName + "&filterTecnologia=" + filterTecnologia + "&filterPeriod=" + filterPeriod + "&filterRepetition=" + filterRepetition + "&filterDelineamento=" + filterDelineamento + "&idSafra=" + idSafra;
                             setFilter(parametersFilter);
-                            cookies_next_1.setCookies("filterBeforeEdit", filter);
+                            cookies_next_1.setCookies('filterBeforeEdit', filter);
                             return [4 /*yield*/, experiment_service_1.experimentService
                                     .getAll(parametersFilter + "&skip=0&take=" + itensPerPage)
                                     .then(function (response) {
@@ -187,23 +185,23 @@ function Listagem(_a) {
                 switch (_a.label) {
                     case 0:
                         if (order === 1) {
-                            typeOrder = "asc";
+                            typeOrder = 'asc';
                         }
                         else if (order === 2) {
-                            typeOrder = "desc";
+                            typeOrder = 'desc';
                         }
                         else {
-                            typeOrder = "";
+                            typeOrder = '';
                         }
-                        if (filter && typeof filter !== "undefined") {
-                            if (typeOrder !== "") {
+                        if (filter && typeof filter !== 'undefined') {
+                            if (typeOrder !== '') {
                                 parametersFilter = filter + "&orderBy=" + column + "&typeOrder=" + typeOrder;
                             }
                             else {
                                 parametersFilter = filter;
                             }
                         }
-                        else if (typeOrder !== "") {
+                        else if (typeOrder !== '') {
                             parametersFilter = "orderBy=" + column + "&typeOrder=" + typeOrder;
                         }
                         else {
@@ -229,7 +227,7 @@ function Listagem(_a) {
                                 setArrowOrder(React.createElement(ai_1.AiOutlineArrowUp, null));
                             }
                             else {
-                                setArrowOrder("");
+                                setArrowOrder('');
                             }
                         }
                         return [2 /*return*/];
@@ -248,18 +246,16 @@ function Listagem(_a) {
     function idHeaderFactory() {
         return {
             title: React.createElement("div", { className: "flex items-center" }, arrowOrder),
-            field: "id",
+            field: 'id',
             width: 0,
             sorting: false,
-            render: function () {
-                return colorStar === "#eba417" ? (React.createElement("div", { className: "h-10 flex" },
-                    React.createElement("div", null,
-                        React.createElement("button", { type: "button", className: "w-full h-full flex items-center justify-center border-0", onClick: function () { return setColorStar(""); } },
-                            React.createElement(ai_1.AiTwotoneStar, { size: 25, color: "#eba417" }))))) : (React.createElement("div", { className: "h-10 flex" },
-                    React.createElement("div", null,
-                        React.createElement("button", { type: "button", className: "w-full h-full flex items-center justify-center border-0", onClick: function () { return setColorStar("#eba417"); } },
-                            React.createElement(ai_1.AiTwotoneStar, { size: 25 })))));
-            }
+            render: function () { return (colorStar === '#eba417' ? (React.createElement("div", { className: "h-10 flex" },
+                React.createElement("div", null,
+                    React.createElement("button", { type: "button", className: "w-full h-full flex items-center justify-center border-0", onClick: function () { return setColorStar(''); } },
+                        React.createElement(ai_1.AiTwotoneStar, { size: 25, color: "#eba417" }))))) : (React.createElement("div", { className: "h-10 flex" },
+                React.createElement("div", null,
+                    React.createElement("button", { type: "button", className: "w-full h-full flex items-center justify-center border-0", onClick: function () { return setColorStar('#eba417'); } },
+                        React.createElement(ai_1.AiTwotoneStar, { size: 25 })))))); }
         };
     }
     function deleteItem(id) {
@@ -276,7 +272,7 @@ function Listagem(_a) {
                         else {
                             sweetalert2_1["default"].fire({
                                 html: message,
-                                width: "800"
+                                width: '800'
                             });
                         }
                         return [2 /*return*/];
@@ -286,15 +282,15 @@ function Listagem(_a) {
     }
     function statusHeaderFactory() {
         return {
-            title: "Ações",
-            field: "action",
+            title: 'Ações',
+            field: 'action',
             sorting: false,
             searchable: false,
             render: function (rowData) { return (React.createElement("div", { className: "h-10 flex" },
                 React.createElement("div", { className: "h-10" },
                     React.createElement(components_1.Button, { icon: React.createElement(bi_1.BiEdit, { size: 16 }), title: "Atualizar " + rowData.experiment_name, onClick: function () {
-                            cookies_next_1.setCookies("pageBeforeEdit", currentPage === null || currentPage === void 0 ? void 0 : currentPage.toString());
-                            cookies_next_1.setCookies("filterBeforeEdit", filter);
+                            cookies_next_1.setCookies('pageBeforeEdit', currentPage === null || currentPage === void 0 ? void 0 : currentPage.toString());
+                            cookies_next_1.setCookies('filterBeforeEdit', filter);
                             router.push("/listas/experimentos/experimento/atualizar?id=" + rowData.id);
                         }, bgColor: "bg-blue-600", textColor: "white" })),
                 React.createElement("div", null,
@@ -302,35 +298,35 @@ function Listagem(_a) {
         };
     }
     function columnsOrder(columnsCampos) {
-        var columnCampos = columnsCampos.split(",");
+        var columnCampos = columnsCampos.split(',');
         var tableFields = [];
         Object.keys(columnCampos).forEach(function (_, index) {
             // if (columnCampos[index] === 'id') {
             //   tableFields.push(idHeaderFactory());
             // }
-            if (columnCampos[index] === "gli") {
-                tableFields.push(headerTableFactory("GLI", "assay_list.gli"));
+            if (columnCampos[index] === 'gli') {
+                tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
             }
-            if (columnCampos[index] === "tecnologia") {
-                tableFields.push(headerTableFactory("Cód tec", "assay_list.tecnologia.name"));
+            if (columnCampos[index] === 'tecnologia') {
+                tableFields.push(headerTableFactory('Cód tec', 'assay_list.tecnologia.name'));
             }
-            if (columnCampos[index] === "experimentName") {
-                tableFields.push(headerTableFactory("Nome experimento", "experimentName"));
+            if (columnCampos[index] === 'experimentName') {
+                tableFields.push(headerTableFactory('Nome experimento', 'experimentName'));
             }
-            if (columnCampos[index] === "period") {
-                tableFields.push(headerTableFactory("Época", "period"));
+            if (columnCampos[index] === 'period') {
+                tableFields.push(headerTableFactory('Época', 'period'));
             }
-            if (columnCampos[index] === "delineamento") {
-                tableFields.push(headerTableFactory("Delineamento", "delineamento.name"));
+            if (columnCampos[index] === 'delineamento') {
+                tableFields.push(headerTableFactory('Delineamento', 'delineamento.name'));
             }
-            if (columnCampos[index] === "repetitionsNumber") {
-                tableFields.push(headerTableFactory("Rep.", "repetitionsNumber"));
+            if (columnCampos[index] === 'repetitionsNumber') {
+                tableFields.push(headerTableFactory('Rep.', 'repetitionsNumber'));
             }
         });
-        tableFields.push(headerTableFactory("Number of Treatment", "countNT"));
-        tableFields.push(headerTableFactory("NPE Inicial", "npei"));
-        tableFields.push(headerTableFactory("NPE Final", "npef"));
-        tableFields.push(headerTableFactory("QT. NPE", "npeQT"));
+        tableFields.push(headerTableFactory('Number of Treatment', 'countNT'));
+        tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
+        tableFields.push(headerTableFactory('NPE Final', 'npef'));
+        tableFields.push(headerTableFactory('QT. NPE', 'npeQT'));
         return tableFields;
     }
     var columns = columnsOrder(camposGerenciados);
@@ -341,7 +337,7 @@ function Listagem(_a) {
                 switch (_a.label) {
                     case 0:
                         els = document.querySelectorAll("input[type='checkbox']");
-                        selecionados = "";
+                        selecionados = '';
                         for (i = 0; i < els.length; i += 1) {
                             if (els[i].checked) {
                                 selecionados += els[i].value + ",";
@@ -366,7 +362,7 @@ function Listagem(_a) {
                             })];
                     case 1:
                         _a.sent();
-                        localStorage.setItem("user", JSON.stringify(userLogado));
+                        localStorage.setItem('user', JSON.stringify(userLogado));
                         return [3 /*break*/, 4];
                     case 2:
                         userLogado.preferences.experimento = {
@@ -380,7 +376,7 @@ function Listagem(_a) {
                             })];
                     case 3:
                         _a.sent();
-                        localStorage.setItem("user", JSON.stringify(userLogado));
+                        localStorage.setItem('user', JSON.stringify(userLogado));
                         _a.label = 4;
                     case 4:
                         setStatusAccordion(false);
@@ -432,19 +428,19 @@ function Listagem(_a) {
                                 });
                                 var workSheet = XLSX.utils.json_to_sheet(response);
                                 var workBook = XLSX.utils.book_new();
-                                XLSX.utils.book_append_sheet(workBook, workSheet, "experimentos");
+                                XLSX.utils.book_append_sheet(workBook, workSheet, 'experimentos');
                                 // Buffer
                                 XLSX.write(workBook, {
-                                    bookType: "xlsx",
-                                    type: "buffer"
+                                    bookType: 'xlsx',
+                                    type: 'buffer'
                                 });
                                 // Binary
                                 XLSX.write(workBook, {
-                                    bookType: "xlsx",
-                                    type: "binary"
+                                    bookType: 'xlsx',
+                                    type: 'binary'
                                 });
                                 // Download
-                                XLSX.writeFile(workBook, "Experimentos.xlsx");
+                                XLSX.writeFile(workBook, 'Experimentos.xlsx');
                             }
                             else {
                                 sweetalert2_1["default"].fire(message);
@@ -489,15 +485,15 @@ function Listagem(_a) {
             React.createElement(components_1.Input, { type: "text", placeholder: name, max: "40", id: title, name: title, onChange: formik.handleChange })));
     }
     var columnNPE = [
-        { title: "Local", field: "local.name_local_culture" },
-        { title: "Safra", field: "safra.safraName" },
-        { title: "Foco", field: "foco.name" },
-        { title: "Ensaio", field: "type_assay.name" },
-        { title: "Tecnologia", field: "tecnologia.name" },
-        { title: "Epoca", field: "epoca" },
-        { title: "NPE Inicial", field: "prox_npe" },
-        { title: "NPE Final", field: "npef" },
-        { title: "NPE Quantity", field: "npeQT" },
+        { title: 'Local', field: 'local.name_local_culture' },
+        { title: 'Safra', field: 'safra.safraName' },
+        { title: 'Foco', field: 'foco.name' },
+        { title: 'Ensaio', field: 'type_assay.name' },
+        { title: 'Tecnologia', field: 'tecnologia.name' },
+        { title: 'Epoca', field: 'epoca' },
+        { title: 'NPE Inicial', field: 'prox_npe' },
+        { title: 'NPE Final', field: 'npef' },
+        { title: 'NPE Quantity', field: 'npeQT' },
     ];
     var handleNPERowSelection = function (rowData) {
         if ((NPESelectedRow === null || NPESelectedRow === void 0 ? void 0 : NPESelectedRow.tableData.id) !== rowData.tableData.id) {
@@ -563,14 +559,13 @@ function Listagem(_a) {
                         experimentos.map(function (item) {
                             var data = {};
                             data.id = Number(item.id);
-                            data.status = "SORTEADO";
+                            data.status = 'SORTEADO';
                             experimentObj_1.push(data);
                         });
-                        if (!((NPESelectedRow === null || NPESelectedRow === void 0 ? void 0 : NPESelectedRow.npeQT) == "N/A"
+                        if (!((NPESelectedRow === null || NPESelectedRow === void 0 ? void 0 : NPESelectedRow.npeQT) == 'N/A'
                             ? true
                             : (NPESelectedRow === null || NPESelectedRow === void 0 ? void 0 : NPESelectedRow.npeQT) - total_consumed > 0
                                 && lastNpe_1 < (NPESelectedRow === null || NPESelectedRow === void 0 ? void 0 : NPESelectedRow.nextNPE.npei_i))) return [3 /*break*/, 2];
-                        setLoading(true);
                         return [4 /*yield*/, experiment_genotipe_service_1.experimentGenotipeService
                                 .create(data)
                                 .then(function (_a) {
@@ -609,7 +604,7 @@ function Listagem(_a) {
                                                         .update({
                                                         id: NPESelectedRow === null || NPESelectedRow === void 0 ? void 0 : NPESelectedRow.id,
                                                         npef: lastNpe_1,
-                                                        npeQT: (NPESelectedRow === null || NPESelectedRow === void 0 ? void 0 : NPESelectedRow.npeQT) == "N/A"
+                                                        npeQT: (NPESelectedRow === null || NPESelectedRow === void 0 ? void 0 : NPESelectedRow.npeQT) == 'N/A'
                                                             ? null
                                                             : (NPESelectedRow === null || NPESelectedRow === void 0 ? void 0 : NPESelectedRow.npeQT) - total_consumed,
                                                         status: 3,
@@ -618,7 +613,7 @@ function Listagem(_a) {
                                                         .then(function (_a) {
                                                         var status = _a.status, resposne = _a.resposne;
                                                         if (status === 200) {
-                                                            router.push("/operacao/ambiente");
+                                                            router.push('/operacao/ambiente');
                                                         }
                                                     })];
                                             case 1:
@@ -631,11 +626,10 @@ function Listagem(_a) {
                             })];
                     case 1:
                         _b.sent();
-                        setLoading(false);
                         _b.label = 2;
                     case 2: return [3 /*break*/, 4];
                     case 3:
-                        sweetalert2_1["default"].fire("Nenhum experimento para desenhar");
+                        sweetalert2_1["default"].fire('Nenhum experimento para desenhar');
                         _b.label = 4;
                     case 4: return [2 /*return*/];
                 }
@@ -649,56 +643,47 @@ function Listagem(_a) {
             var npei_1 = Number(NPESelectedRow === null || NPESelectedRow === void 0 ? void 0 : NPESelectedRow.npei_i);
             experimentos === null || experimentos === void 0 ? void 0 : experimentos.map(function (item) {
                 item.assay_list.genotype_treatment.map(function (gt) {
-                    console.log(" item  ", item.seq_delineamento);
                     item.seq_delineamento.map(function (sd) {
                         var data = {};
                         data.idSafra = gt.id_safra;
                         data.idFoco = item.assay_list.foco.id;
                         data.idTypeAssay = item.assay_list.type_assay.id;
                         data.idTecnologia = item.assay_list.tecnologia.id;
-                        data.gli = item.assay_list.gli;
                         data.idExperiment = item.id;
                         data.rep = item.delineamento.repeticao;
                         data.nt = gt.treatments_number;
-                        data.idLote = gt.id_lote;
                         data.npe = npei_1;
                         data.idLote = gt.genotipo.id_lote;
                         data.idGenotipo = gt.genotipo.id; // Added new field
                         data.id_seq_delineamento = sd.id;
-                        data.nca = "";
+                        data.nca = '';
                         experiment_genotipo_1.push(data);
                         npei_1++;
                     });
                     var gt_new = {};
                     gt_new.id = gt.id;
-                    gt_new.status_experiment = "EXP. SORTEADO";
+                    gt_new.status_experiment = 'EXP. SORTEADO';
                     genotipo_treatment_1.push(gt_new);
                 });
             });
-            // console.log("data  ",experiment_genotipo);
-            // return false;
-            createExperimentGenotipe({
-                data: experiment_genotipo_1,
-                total_consumed: experiment_genotipo_1.length,
-                genotipo_treatment: genotipo_treatment_1
-            });
+            createExperimentGenotipe({ data: experiment_genotipo_1, total_consumed: experiment_genotipo_1.length, genotipo_treatment: genotipo_treatment_1 });
         }
         else {
             var temp = NPESelectedRow;
             sweetalert2_1["default"].fire({
-                title: "NPE Já usado !!!",
-                html: "Existem NPE usados \u200B\u200Bentre <b>" + npeUsedFrom + "</b> e <b>" + temp.npef + "</b><br><br>" +
-                    ("Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : " + temp.nextNPE.foco.name + "</b><br><b> Ensaio : " + temp.nextNPE.type_assay.name + "</b><br><b> Local : " + temp.nextNPE.local.name_local_culture + "</b><br><b>Epoca : " + temp.nextNPE.epoca + "</b><br><b>Tecnologia : " + temp.nextNPE.tecnologia.name + "</b></p><br>") +
-                    ("O pr\u00F3ximo NPE dispon\u00EDvel \u00E9 <strong>" + temp.nextAvailableNPE + "</strong></div>"),
-                icon: "warning",
+                title: 'NPE Já usado !!!',
+                html: "Existem NPE usados \u200B\u200Bentre <b>" + npeUsedFrom + "</b> e <b>" + temp.npef + "</b><br><br>"
+                    + ("Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : " + temp.nextNPE.foco.name + "</b><br><b> Ensaio : " + temp.nextNPE.type_assay.name + "</b><br><b> Local : " + temp.nextNPE.local.name_local_culture + "</b><br><b>Epoca : " + temp.nextNPE.epoca + "</b><br><b>Tecnologia : " + temp.nextNPE.tecnologia.name + "</b></p><br>")
+                    + ("O pr\u00F3ximo NPE dispon\u00EDvel \u00E9 <strong>" + temp.nextAvailableNPE + "</strong></div>"),
+                icon: 'warning',
                 showCloseButton: true,
                 closeButtonHtml: '<span style="background-color:#FF5349; color:#fff; width:35px; height:35px; border-radius:35px; font-size:23px;font-weight:600">x</span>',
-                confirmButtonColor: "#3085d6",
-                confirmButtonText: "Acesse o NPE e atualize"
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Acesse o NPE e atualize'
             }).then(function (result) {
                 if (result.isConfirmed) {
                     router.push({
-                        pathname: "/config/ambiente"
+                        pathname: '/config/npe'
                     });
                 }
             });
@@ -714,7 +699,7 @@ function Listagem(_a) {
                 && item.npef >= (NPESelectedRow === null || NPESelectedRow === void 0 ? void 0 : NPESelectedRow.nextNPE.npei_i)
                 && (NPESelectedRow === null || NPESelectedRow === void 0 ? void 0 : NPESelectedRow.nextNPE) != 0
                 ? count++
-                : "";
+                : '';
         });
         count > 0 ? setSortearDisable(true) : setSortearDisable(false);
         setExperimentoNew(experimentos.slice(0, 10));
@@ -730,8 +715,8 @@ function Listagem(_a) {
             React.createElement("main", { className: "h-full w-full\n                        flex flex-col\n                        items-start\n                        gap-0\n                        " },
                 React.createElement("div", { className: "w-full " + ((selectedNPE === null || selectedNPE === void 0 ? void 0 : selectedNPE.length) > 3 && 'max-h-40 overflow-y-scroll') + " mb-4" },
                     React.createElement(material_table_1["default"], { style: {
-                            background: "#f9fafb",
-                            paddingBottom: (selectedNPE === null || selectedNPE === void 0 ? void 0 : selectedNPE.length) > 3 ? 0 : "5px"
+                            background: '#f9fafb',
+                            paddingBottom: (selectedNPE === null || selectedNPE === void 0 ? void 0 : selectedNPE.length) > 3 ? 0 : '5px'
                         }, columns: columnNPE, data: selectedNPE, onRowClick: function (evt, selectedRow) {
                             setNPESelectedRow(selectedRow);
                             selectedRow.tableData.checked = true;
@@ -746,9 +731,9 @@ function Listagem(_a) {
                                 return ({
                                     backgroundColor: ((_a = NPESelectedRow === null || NPESelectedRow === void 0 ? void 0 : NPESelectedRow.tableData) === null || _a === void 0 ? void 0 : _a.id) === rowData.tableData.id
                                         ? SortearDisable
-                                            ? "#FF5349"
-                                            : "#d3d3d3"
-                                        : "#f9fafb",
+                                            ? '#FF5349'
+                                            : '#d3d3d3'
+                                        : '#f9fafb',
                                     height: 40
                                 });
                             },
@@ -762,7 +747,7 @@ function Listagem(_a) {
                             Toolbar: function () { return null; }
                         } })),
                 NPESelectedRow ? (React.createElement("div", { className: "w-full h-full overflow-y-scroll" },
-                    React.createElement(material_table_1["default"], { style: { background: "#f9fafb" }, columns: columns, data: experimentosNew, options: {
+                    React.createElement(material_table_1["default"], { style: { background: '#f9fafb' }, columns: columns, data: experimentosNew, options: {
                             showTitle: false,
                             headerStyle: {
                                 zIndex: 20
@@ -785,7 +770,8 @@ function Listagem(_a) {
                                         } })),
                                 React.createElement("strong", { className: "text-600" }, "Experimentos"),
                                 React.createElement("strong", { className: "text-blue-600" },
-                                    "Total registrado: ", experimentos === null || experimentos === void 0 ? void 0 :
+                                    "Total registrado:",
+                                    ' ', experimentos === null || experimentos === void 0 ? void 0 :
                                     experimentos.length),
                                 React.createElement("div", { className: "h-full flex items-center gap-2" },
                                     React.createElement("div", { className: "border-solid border-2 border-blue-600 rounded" },
@@ -802,18 +788,16 @@ function Listagem(_a) {
                                                         })); }),
                                                         provided.placeholder)); }))))),
                                     React.createElement("div", { className: "h-12 flex items-center justify-center w-full" },
-                                        React.createElement(components_1.Button, { title: "Sortear", value: "Sortear", bgColor: SortearDisable ? "bg-gray-400" : "bg-blue-600", textColor: "white", onClick: validateConsumedData }))))); },
-                            Pagination: function (props) {
-                                return (React.createElement("div", __assign({ className: "flex\n                      h-20\n                      gap-2\n                      pr-2\n                      py-5\n                      bg-gray-50\n                    " }, props),
-                                    React.createElement(components_1.Button, { onClick: function () { return setCurrentPage(currentPage - 10); }, bgColor: "bg-blue-600", textColor: "white", icon: React.createElement(md_1.MdFirstPage, { size: 18 }), disabled: currentPage <= 1 }),
-                                    React.createElement(components_1.Button, { onClick: function () { return setCurrentPage(currentPage - 1); }, bgColor: "bg-blue-600", textColor: "white", icon: React.createElement(bi_1.BiLeftArrow, { size: 15 }), disabled: currentPage <= 0 }),
-                                    Array(1)
-                                        .fill("")
-                                        .map(function (value, index) { return (React.createElement(components_1.Button, { key: index, onClick: function () { return setCurrentPage(index); }, value: "" + (currentPage + 1), bgColor: "bg-blue-600", textColor: "white" })); }),
-                                    React.createElement(components_1.Button, { onClick: function () { return setCurrentPage(currentPage + 1); }, bgColor: "bg-blue-600", textColor: "white", icon: React.createElement(bi_1.BiRightArrow, { size: 15 }), disabled: currentPage + 1 >= pages }),
-                                    React.createElement(components_1.Button, { onClick: function () { return setCurrentPage(currentPage + 10); }, bgColor: "bg-blue-600", textColor: "white", icon: React.createElement(md_1.MdLastPage, { size: 18 }), disabled: currentPage + 1 >= pages })));
-                            }
-                        } }))) : ("")))));
+                                        React.createElement(components_1.Button, { title: "Sortear", value: "Sortear", bgColor: SortearDisable ? 'bg-gray-400' : 'bg-blue-600', textColor: "white", onClick: validateConsumedData }))))); },
+                            Pagination: function (props) { return (React.createElement("div", __assign({ className: "flex\n                      h-20\n                      gap-2\n                      pr-2\n                      py-5\n                      bg-gray-50\n                    " }, props),
+                                React.createElement(components_1.Button, { onClick: function () { return setCurrentPage(currentPage - 10); }, bgColor: "bg-blue-600", textColor: "white", icon: React.createElement(md_1.MdFirstPage, { size: 18 }), disabled: currentPage <= 1 }),
+                                React.createElement(components_1.Button, { onClick: function () { return setCurrentPage(currentPage - 1); }, bgColor: "bg-blue-600", textColor: "white", icon: React.createElement(bi_1.BiLeftArrow, { size: 15 }), disabled: currentPage <= 0 }),
+                                Array(1)
+                                    .fill('')
+                                    .map(function (value, index) { return (React.createElement(components_1.Button, { key: index, onClick: function () { return setCurrentPage(index); }, value: "" + (currentPage + 1), bgColor: "bg-blue-600", textColor: "white" })); }),
+                                React.createElement(components_1.Button, { onClick: function () { return setCurrentPage(currentPage + 1); }, bgColor: "bg-blue-600", textColor: "white", icon: React.createElement(bi_1.BiRightArrow, { size: 15 }), disabled: currentPage + 1 >= pages }),
+                                React.createElement(components_1.Button, { onClick: function () { return setCurrentPage(currentPage + 10); }, bgColor: "bg-blue-600", textColor: "white", icon: React.createElement(md_1.MdLastPage, { size: 18 }), disabled: currentPage + 1 >= pages }))); }
+                        } }))) : ('')))));
 }
 exports["default"] = Listagem;
 exports.getServerSideProps = function (_a) {
@@ -833,10 +817,10 @@ exports.getServerSideProps = function (_a) {
                     pageBeforeEdit = req.cookies.pageBeforeEdit
                         ? req.cookies.pageBeforeEdit
                         : 0;
-                    filterBeforeEdit = "";
-                    filterApplication = "";
-                    cookies_next_1.removeCookies("filterBeforeEdit", { req: req, res: res });
-                    cookies_next_1.removeCookies("pageBeforeEdit", { req: req, res: res });
+                    filterBeforeEdit = '';
+                    filterApplication = '';
+                    cookies_next_1.removeCookies('filterBeforeEdit', { req: req, res: res });
+                    cookies_next_1.removeCookies('pageBeforeEdit', { req: req, res: res });
                     return [2 /*return*/, {
                             props: {
                                 itensPerPage: itensPerPage,

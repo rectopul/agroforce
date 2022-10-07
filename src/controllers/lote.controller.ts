@@ -116,6 +116,8 @@ export class LoteController {
         parameters.cod_lote = JSON.parse(`{ "contains":"${options.filterCodLote}" }`);
       }
       if (options.filterNcc) {
+        console.log("nccc   ",options.filterNcc);
+        
         parameters.ncc = Number(options.filterNcc);
       }
       if (options.filterPeso) {
@@ -213,6 +215,8 @@ export class LoteController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
+
+      console.log("paramter   ",parameters)
 
       const response: object | any = await this.loteRepository.findAll(
         parameters,

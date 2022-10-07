@@ -682,12 +682,12 @@ export default function Listagem({
       experimentos?.map((item: any) => {
         item.assay_list.genotype_treatment.map((gt: any) => {
           item.seq_delineamento.map((sd: any) => {
+           
             const data: any = {};
             data.idSafra = gt.id_safra;
             data.idFoco = item.assay_list.foco.id;
             data.idTypeAssay = item.assay_list.type_assay.id;
             data.idTecnologia = item.assay_list.tecnologia.id;
-            data.gli = item.assay_list.gli;
             data.idExperiment = item.id;
             data.rep = item.delineamento.repeticao;
             data.nt = gt.treatments_number;
