@@ -84,13 +84,13 @@ export class ExperimentController {
         orderDraw: true,
         status: true,
         bgm: true,
-        
+
         assay_list: {
           select: {
             gli: true,
             bgm: true,
             status: true,
-            genotype_treatment: { include: { genotipo: true } },
+            genotype_treatment: { include: { genotipo: true, lote: true } },
             tecnologia: {
               select: {
                 name: true,

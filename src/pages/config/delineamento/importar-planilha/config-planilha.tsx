@@ -4,6 +4,7 @@ import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 
 const data: object = [
+  { id: 'Cultura', name: '*Cultura' },
   { id: 'Nome', name: '*Nome' },
   { id: 'Repeticao', name: '*Repetição' },
   { id: 'Sorteio', name: '*Sorteio' },

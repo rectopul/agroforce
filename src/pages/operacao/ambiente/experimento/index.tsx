@@ -27,8 +27,12 @@ import {
   BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
+import {
+  MdFirstPage, MdLastPage,
+} from 'react-icons/md';
+import {
+  RiCloseCircleFill, RiFileExcel2Line,
+} from 'react-icons/ri';
 import { IoMdArrowBack } from 'react-icons/io';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
@@ -38,10 +42,7 @@ import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { experimentGenotipeService } from 'src/services/experiment-genotipe.service';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
-  genotypeTreatmentService,
-  npeService,
-  sequenciaDelineamentoService,
-  userPreferencesService,
+  genotypeTreatmentService, npeService, sequenciaDelineamentoService, userPreferencesService,
 } from '../../../../services';
 import { experimentService } from '../../../../services/experiment.service';
 import {
@@ -616,11 +617,7 @@ export default function Listagem({
     }
   }
 
-  async function createExperimentGenotipe({
-    data,
-    total_consumed,
-    genotipo_treatment,
-  }: any) {
+  async function createExperimentGenotipe({ data, total_consumed, genotipo_treatment }: any) {
     if (data.length > 0) {
       const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
       const experimentObj: any[] = [];
@@ -637,7 +634,6 @@ export default function Listagem({
           : NPESelectedRow?.npeQT - total_consumed > 0
           && lastNpe < NPESelectedRow?.nextNPE.npei_i
       ) {
-        setLoading(true);
         await experimentGenotipeService
           .create(data)
           .then(async ({ status, response }: any) => {
@@ -671,8 +667,6 @@ export default function Listagem({
                 });
             }
           });
-
-        setLoading(false);
       }
     } else {
       Swal.fire('Nenhum experimento para desenhar');
@@ -687,24 +681,21 @@ export default function Listagem({
 
       experimentos?.map((item: any) => {
         item.assay_list.genotype_treatment.map((gt: any) => {
-          console.log(' item  ', item.seq_delineamento);
-
           item.seq_delineamento.map((sd: any) => {
+           
             const data: any = {};
             data.idSafra = gt.id_safra;
             data.idFoco = item.assay_list.foco.id;
             data.idTypeAssay = item.assay_list.type_assay.id;
             data.idTecnologia = item.assay_list.tecnologia.id;
-            data.gli = item.assay_list.gli;
             data.idExperiment = item.id;
             data.rep = item.delineamento.repeticao;
             data.nt = gt.treatments_number;
-            data.idLote = gt.id_lote;
             data.npe = npei;
             data.idLote = gt.genotipo.id_lote;
             data.idGenotipo = gt.genotipo.id; // Added new field
             data.id_seq_delineamento = sd.id;
-            data.nca = '';
+            data.nca = gt.lote.ncc;
             experiment_genotipo.push(data);
             npei++;
           });
@@ -714,15 +705,7 @@ export default function Listagem({
           genotipo_treatment.push(gt_new);
         });
       });
-
-      // console.log("data  ",experiment_genotipo);
-
-      // return false;
-      createExperimentGenotipe({
-        data: experiment_genotipo,
-        total_consumed: experiment_genotipo.length,
-        genotipo_treatment,
-      });
+      createExperimentGenotipe({ data: experiment_genotipo, total_consumed: experiment_genotipo.length, genotipo_treatment });
     } else {
       const temp = NPESelectedRow;
       Swal.fire({
@@ -740,7 +723,7 @@ export default function Listagem({
       }).then((result) => {
         if (result.isConfirmed) {
           router.push({
-            pathname: '/config/ambiente',
+            pathname: '/config/npe',
           });
         }
       });

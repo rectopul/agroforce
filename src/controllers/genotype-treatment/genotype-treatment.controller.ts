@@ -191,8 +191,24 @@ export class GenotypeTreatmentController {
     }
   }
 
+  // async create(data: any) {
+  //   try {
+  //     console.log("herere   ");
+  //     return false
+  //     await this.genotypeTreatmentRepository.create(data);
+  //     await countTreatmentsNumber(data.id_assay_list);
+  //     return { status: 200, message: 'Tratamentos do genótipo cadastrada' };
+  //   } catch (error: any) {
+  //     handleError('Tratamentos do genótipo controller', 'Create', error.message);
+  //     throw new Error('[Controller] - Create Tratamentos do genótipo erro');
+  //   }
+  // }
+
+
   async create(data: any) {
     try {
+      // console.log("herere   ",data);
+      // return false
       await this.genotypeTreatmentRepository.create(data);
       await countTreatmentsNumber(data.id_assay_list);
       return { status: 200, message: 'Tratamentos do genótipo cadastrada' };

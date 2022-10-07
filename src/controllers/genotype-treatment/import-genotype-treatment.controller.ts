@@ -17,6 +17,7 @@ import { GenotypeTreatmentController } from './genotype-treatment.controller';
 import { HistoryGenotypeTreatmentController } from './history-genotype-treatment.controller';
 
 export class ImportGenotypeTreatmentController {
+  
   static async validate(
     idLog: number,
     { spreadSheet, created_by: createdBy }: ImportValidate,

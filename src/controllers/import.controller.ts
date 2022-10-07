@@ -31,7 +31,7 @@ import { ImportGenotypeTreatmentController } from './genotype-treatment/import-g
 import { ImportRepository } from '../repository/import.repository';
 // eslint-disable-next-line import/no-cycle
 import { ImportGenotypeController } from './genotype/import-genotype.controller';
-import { removeProtocolLevel } from '../shared/utils/removeProtocolLevel';
+import { removeProtocolLevel, validateProtocolLevel } from '../shared/utils/removeProtocolLevel';
 // eslint-disable-next-line import/no-cycle
 import { ImportLocalController } from './local/import-local.controller';
 import { ImportAssayListController } from './assay-list/import-assay-list.controller';
@@ -154,6 +154,10 @@ export class ImportController {
         return {
           status: 400, message,
         };
+      }
+      const protocolMessage = validateProtocolLevel(data.spreadSheet);
+      if (protocolMessage.length > 0) {
+        return { status: 400, message: protocolMessage };
       }
 
       const protocolLevel = String(data.spreadSheet[1][0]);

@@ -100,7 +100,6 @@ export class GenotipoController {
           progenitores_origem: true,
           parentesco_completo: true,
           lote: true,
-          dt_import: true,
         };
       }
 
@@ -193,8 +192,6 @@ export class GenotipoController {
 
   async update(data: any) {
     try {
-      console.log('data');
-      console.log(data);
       const genotipo: any = await this.genotipoRepository.findOne(data.id);
 
       if (!genotipo) return { status: 400, message: 'Genótipo não encontrado' };
