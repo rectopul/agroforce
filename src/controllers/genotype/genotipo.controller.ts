@@ -100,7 +100,6 @@ export class GenotipoController {
           progenitores_origem: true,
           parentesco_completo: true,
           lote: true,
-          dt_import: true,
         };
       }
 

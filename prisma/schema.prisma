@@ -287,7 +287,6 @@ model genotipo {
   progenitores_origem String?
   type                String?
   safraId             Int?
-  dt_import           DateTime              @default(now())
   culture             culture               @relation(fields: [id_culture], references: [id])
   tecnologia          tecnologia            @relation(fields: [id_tecnologia], references: [id])
   safra               safra?                @relation(fields: [safraId], references: [id])
@@ -392,6 +391,7 @@ model lote {
   peso                Decimal?              @db.Decimal(5, 0)
   quant_sementes      Int?
   year                Int?
+  dt_import           DateTime
   genotipo            genotipo              @relation(fields: [id_genotipo], references: [id])
   safra               safra                 @relation(fields: [id_safra], references: [id])
   genotype_treatment  genotype_treatment[]

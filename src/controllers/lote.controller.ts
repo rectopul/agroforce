@@ -159,6 +159,7 @@ export class LoteController {
         peso: true,
         safra: true,
         quant_sementes: true,
+        dt_import: true,
         genotipo: {
           select: {
             id: true,

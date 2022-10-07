@@ -221,16 +221,16 @@ export class ImportGenotypeController {
                     spreadSheet[0][column],
                   );
                 }
-                const { status }: IReturnObject = await safraController.getAll({
+                const { response }: IReturnObject = await safraController.getAll({
                   id_culture: idCulture,
                   safraName: String(spreadSheet[row][Number(column) + 1]),
                 });
-                if (status === 400) {
+                if (Number(response[0]?.year) !== Number(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     row,
                     spreadSheet[0][column],
-                    'ano não é igual ao ano da safra',
+                    'ano não é igual ao da safra',
                   );
                 }
               }
@@ -243,23 +243,25 @@ export class ImportGenotypeController {
                     spreadSheet[0][column],
                   );
                 } else {
-                  const { status, response }: IReturnObject = await safraController.getAll({
+                  const { response }: IReturnObject = await safraController.getOne(idSafra);
+                  if (response.safraName !== spreadSheet[row][column]) {
+                    responseIfError[Number(column)] += responseGenericFactory(
+                      Number(column) + 1,
+                      row,
+                      spreadSheet[0][column],
+                      'safra e diferente da selecionada',
+                    );
+                  }
+                  const { response: safras }: IReturnObject = await safraController.getAll({
                     id_culture: idCulture,
                     safraName: String(spreadSheet[row][column]),
                   });
-                  if (status === 400) {
+                  if (safras.total <= 0) {
                     responseIfError[Number(column)] += responseGenericFactory(
                       Number(column) + 1,
                       row,
                       spreadSheet[0][column],
-                      'safra não cadastrada',
-                    );
-                  } else if (response[0]?.id !== Number(idSafra)) {
-                    responseIfError[Number(column)] += responseGenericFactory(
-                      Number(column) + 1,
-                      row,
-                      spreadSheet[0][column],
-                      'safra informada diferente da safra selecionada',
+                      'safra não cadastrada nessa cultura',
                     );
                   }
                 }
@@ -339,9 +341,9 @@ export class ImportGenotypeController {
               } else {
                 // eslint-disable-next-line no-param-reassign
                 spreadSheet[row][column] = new Date(spreadSheet[row][column]);
-                const { status, response }: IReturnObject = await genotipoController.getAll({
-                  id_dados: spreadSheet[row][1],
-                  id_culture: idCulture,
+                const { status, response }: IReturnObject = await loteController.getAll({
+                  id_s2: spreadSheet[row][20],
+                  id_safra: idSafra,
                 });
                 const dateNow = new Date();
                 if (dateNow.getTime() < spreadSheet[row][column].getTime()) {
@@ -632,8 +634,6 @@ export class ImportGenotypeController {
                 }
 
                 if (configModule.response[0]?.fields[column] === 'DT_IMPORT') {
-                  console.log('spreadSheet[row][column]');
-                  console.log(spreadSheet[row][column]);
                   if (spreadSheet[row][column] !== null) {
                     this.aux.dt_import = spreadSheet[row][column];
                   }
@@ -666,7 +666,6 @@ export class ImportGenotypeController {
                       progenitor_m_origem: this.aux.progenitor_m_origem,
                       progenitores_origem: this.aux.progenitores_origem,
                       parentesco_completo: this.aux.parentesco_completo,
-                      dt_import: this.aux.dt_import,
                       created_by: this.aux.created_by,
                     });
                   } else {
@@ -692,7 +691,6 @@ export class ImportGenotypeController {
                       progenitor_m_origem: this.aux.progenitor_m_origem,
                       progenitores_origem: this.aux.progenitores_origem,
                       parentesco_completo: this.aux.parentesco_completo,
-                      dt_import: this.aux.dt_import,
                       created_by: this.aux.created_by,
                     });
                     this.aux.id_genotipo = genotipo.response.id;
@@ -712,6 +710,7 @@ export class ImportGenotypeController {
                         fase: this.aux.fase,
                         peso: this.aux.peso,
                         quant_sementes: this.aux.quant_sementes,
+                        dt_import: this.aux.dt_import,
                         created_by: this.aux.created_by,
                       });
                       delete this.aux.id_lote;
@@ -728,6 +727,7 @@ export class ImportGenotypeController {
                         fase: this.aux.fase,
                         peso: this.aux.peso,
                         quant_sementes: this.aux.quant_sementes,
+                        dt_import: this.aux.dt_import,
                         created_by: this.aux.created_by,
                       });
                       delete this.aux.id_genotipo;

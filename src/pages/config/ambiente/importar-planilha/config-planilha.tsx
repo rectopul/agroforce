@@ -5,6 +5,7 @@ import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 
 const data: object = [
+  { id: 'Cultura', name: '*Cultura' },
   { id: 'Local', name: '*Local' },
   { id: 'Foco', name: '*Foco' },
   { id: 'OGM', name: '*Tecnologia' },
