@@ -682,7 +682,6 @@ export default function Listagem({
       experimentos?.map((item: any) => {
         item.assay_list.genotype_treatment.map((gt: any) => {
           item.seq_delineamento.map((sd: any) => {
-           
             const data: any = {};
             data.idSafra = gt.id_safra;
             data.idFoco = item.assay_list.foco.id;
@@ -713,7 +712,7 @@ export default function Listagem({
         html:
           `Existem NPE usados ​​entre <b>${npeUsedFrom}</b> e <b>${temp.npef}</b><br><br>`
           + `Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : ${temp.nextNPE.foco.name}</b><br><b> Ensaio : ${temp.nextNPE.type_assay.name}</b><br><b> Local : ${temp.nextNPE.local.name_local_culture}</b><br><b>Epoca : ${temp.nextNPE.epoca}</b><br><b>Tecnologia : ${temp.nextNPE.tecnologia.name}</b></p><br>`
-          + `O próximo NPE disponível é <strong>${temp.nextAvailableNPE}</strong></div>`,
+          + `O próximo NPE disponível é <strong>${(Number(temp.nextAvailableNPE) + 1)}</strong></div>`,
         icon: 'warning',
         showCloseButton: true,
         closeButtonHtml:
