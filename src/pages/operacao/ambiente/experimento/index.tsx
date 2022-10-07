@@ -695,7 +695,7 @@ export default function Listagem({
             data.idLote = gt.genotipo.id_lote;
             data.idGenotipo = gt.genotipo.id; // Added new field
             data.id_seq_delineamento = sd.id;
-            data.nca = '';
+            data.nca = gt.lote.ncc;
             experiment_genotipo.push(data);
             npei++;
           });
