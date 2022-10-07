@@ -688,6 +688,7 @@ export default function Listagem({
             data.idTypeAssay = item.assay_list.type_assay.id;
             data.idTecnologia = item.assay_list.tecnologia.id;
             data.idExperiment = item.id;
+            data.gli = item.assay_list.gli;
             data.rep = item.delineamento.repeticao;
             data.nt = gt.treatments_number;
             data.npe = npei;

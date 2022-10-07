@@ -352,6 +352,8 @@ export class ExperimentGenotipeController {
 
   async create(data: object | any) {
     try {
+      console.log('data');
+      console.log(data);
       const response = await this.ExperimentGenotipeRepository.createMany(data);
       if (response) {
         return { status: 200, message: 'Tratamento experimental registrado' };
