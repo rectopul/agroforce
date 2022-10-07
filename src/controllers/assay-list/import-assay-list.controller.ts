@@ -38,6 +38,8 @@ export class ImportAssayListController {
 
     const responseIfError: any = [];
     try {
+
+
       for (const row in spreadSheet) {
         if (row !== '0') {
           for (const column in spreadSheet[row]) {
@@ -163,9 +165,15 @@ export class ImportAssayListController {
             }
             // Validação do campo BGM
             if (column === '6') {
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              if (spreadSheet[row][column] !== null) {
+                if (!validateInteger(spreadSheet[row][column])) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    (Number(column) + 1),
+                    row,
+                    spreadSheet[0][column],
+                    'precisa ser um numero inteiro e positivo',
+                  );
+                }
               }
             }
             // Validação do campo PRJ
@@ -298,9 +306,17 @@ export class ImportAssayListController {
                 id_culture: idCulture,
 
               });
+              console.log("spreadSheet[row][11]  ",spreadSheet[row][11]);
+              console.log("technology  ",technology);
+              console.log("idCulture  ",idCulture );
+              console.log("genotype  ",genotype[0]?.id );
+
               const { response: lote }: IReturnObject = await loteController.getAll({
                 filterNcc: spreadSheet[row][11] || '0',
               });
+
+              // console.log("lote   ",lote);
+              // return false;
               const { response: assayList }: IReturnObject = await assayListController.getAll({
                 filterGli: spreadSheet[row][4],
                 id_safra: idSafra,

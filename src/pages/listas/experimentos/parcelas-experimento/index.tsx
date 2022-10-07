@@ -754,7 +754,8 @@ export default function Listagem({
       );
 
       router.push(
-        "/listas/ensaios/tratamento-genotipo/substituicao?value=experiment"
+        "/listas/ensaios/genotipos-ensaio/substituicao?value=experiment"
+        //"/listas/ensaios/tratamento-genotipo/substituicao?value=experiment"
       );
     } else if (ncaButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => ({
@@ -768,7 +769,7 @@ export default function Listagem({
       localStorage.setItem("treatmentsOptionSelected", JSON.stringify("nca"));
 
       router.push(
-        "/listas/ensaios/tratamento-genotipo/substituicao?value=experiment"
+        "/listas/ensaios/genotipos-ensaio/substituicao?value=experiment"
       );
     } else if (inputFile?.files.length !== 0) {
       const value = await readExcel(inputFile.files);

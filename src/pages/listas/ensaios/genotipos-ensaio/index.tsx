@@ -925,6 +925,7 @@ export default function Listagem({
                       data={assaySelect.map((i: any) => i.name)}
                       // value={checkValue("filterGli")}
                       onChange={(e: any) => formik.setFieldValue('filterGli', e)}
+                      value={checkValue('filterGli')}
                     />
                   </div>
 

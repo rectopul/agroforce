@@ -1,3 +1,5 @@
+import { sequenciaDelineamentoService } from 'src/services/sequencia-delineamento.service';
+import EventEmitter from 'events';
 import handleError from '../../shared/utils/handleError';
 import { ExperimentRepository } from '../../repository/experiment.repository';
 import { ReporteRepository } from '../../repository/reporte.repository';
@@ -7,8 +9,6 @@ import { functionsUtils } from '../../shared/utils/functionsUtils';
 import { IReturnObject } from '../../interfaces/shared/Import.interface';
 import { ExperimentGroupController } from '../experiment-group/experiment-group.controller';
 import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
-import { sequenciaDelineamentoService } from 'src/services/sequencia-delineamento.service';
-import EventEmitter from 'events';
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -22,6 +22,8 @@ export class ExperimentController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
+      console.log('options');
+      console.log(options);
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
         if (options.filterRepetitionFrom && options.filterRepetitionTo) {
           parameters.repetitionsNumber = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);
@@ -84,13 +86,13 @@ export class ExperimentController {
         orderDraw: true,
         status: true,
         bgm: true,
-        
+
         assay_list: {
           select: {
             gli: true,
             bgm: true,
             status: true,
-            genotype_treatment: { include: { genotipo: true } },
+            genotype_treatment: { include: { genotipo: true, lote: true } },
             tecnologia: {
               select: {
                 name: true,
@@ -191,6 +193,9 @@ export class ExperimentController {
         skip,
         orderBy,
       );
+
+      console.log('response');
+      console.log(response);
 
       response.map(async (item: any) => {
         const newItem = item;

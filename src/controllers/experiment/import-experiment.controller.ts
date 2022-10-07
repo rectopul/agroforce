@@ -39,7 +39,12 @@ export class ImportExperimentController {
     try {
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
-          const experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_${spreadSheet[row][9]}`;
+          let experimentName;
+          if (spreadSheet[row][9].toString().length < 2) {
+            experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_0${spreadSheet[row][9]}`;
+          } else {
+            experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_${spreadSheet[row][9]}`;
+          }
           const { response: experiment } = await experimentController.getAll({
             filterExperimentName: experimentName,
             idSafra,
