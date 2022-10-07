@@ -759,7 +759,7 @@ function Listagem(_a) {
                                         // value={checkValue("filterGli")}
                                         onChange: function (e) {
                                             return formik.setFieldValue("filterGli", e);
-                                        }, defaultValue: checkValue("filterGli") })),
+                                        }, value: checkValue("filterGli") })),
                                 react_1["default"].createElement("div", { className: "h-6 w-1/2 ml-2" },
                                     react_1["default"].createElement("label", { className: "block text-gray-900 text-sm font-bold mb-1" }, "BGM"),
                                     react_1["default"].createElement("div", { className: "flex" },

@@ -926,7 +926,7 @@ export default function Listagem({
                       onChange={(e: any) =>
                         formik.setFieldValue("filterGli", e)
                       }
-                      defaultValue={checkValue("filterGli")}
+                      value={checkValue("filterGli")}
                     />
                   </div>
 
