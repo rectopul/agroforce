@@ -2,7 +2,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import React, { useRef } from 'react';
+import React, { HtmlHTMLAttributes, useRef } from 'react';
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
@@ -38,6 +38,7 @@ import {
   FieldItemsPerPage,
   SelectMultiple,
 } from '../../../components';
+import InputRef from '../../../components/InputRef';
 import LoadingComponent from '../../../components/Loading';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
@@ -84,6 +85,7 @@ export default function Listagem({
   const { tabsOperation } = ITabs.default;
 
   const router = useRouter();
+  const inputRef = useRef();
 
   const tabsEtiquetagemMenu = tabsOperation.map((i: any) => (i.titleTab === 'ETIQUETAGEM'
     ? { ...i, statusTab: true }
@@ -667,7 +669,7 @@ export default function Listagem({
     setValidateNcaOne('bg-gray-300');
     setValidateNcaTwo('bg-gray-300');
     setParcelasToPrint([]);
-    setIsOpenModal(!isOpenModal);
+    // setIsOpenModal(!isOpenModal);
   }
 
   async function handleSubmit() {
@@ -745,6 +747,7 @@ export default function Listagem({
         userId: userLogado.id,
       });
       cleanState();
+      setIsOpenModal(false);
 
       const parcelsByNCA = parcelas.filter((i: any) => i.nca === inputCode);
       const parcels = parcelsByNCA.map((i: any) => ({
@@ -755,7 +758,10 @@ export default function Listagem({
       }));
       if (parcels) {
         localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
-        router.push('imprimir');
+        window.open('imprimir', '_blank');
+        cleanState();
+        setTimeout(() => inputRef?.current?.focus(), 100);
+        // router.push("imprimir");
       }
     }
 
@@ -797,6 +803,7 @@ export default function Listagem({
           userId: userLogado.id,
         });
         cleanState();
+        setIsOpenModal(false);
       }
     }
   }
@@ -805,7 +812,7 @@ export default function Listagem({
     const inputCode: any = (
       document.getElementById('inputCode') as HTMLInputElement
     )?.value;
-    if (inputCode.length === 12) {
+    if (inputCode.length === 13) {
       if (dismiss) {
         writeOff();
       } else if (doubleVerify) {
@@ -835,7 +842,8 @@ export default function Listagem({
     }));
     if (parcels?.length > 0) {
       localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
-      router.push('imprimir');
+      // router.push("imprimir");
+      window.open('imprimir', '_blank');
     }
 
     setIsLoading(false);
@@ -845,6 +853,11 @@ export default function Listagem({
     handlePagination();
     handleTotalPages();
   }, [currentPage]);
+
+  function openModal() {
+    setIsOpenModal(true);
+    setTimeout(() => inputRef?.current?.focus(), 100);
+  }
 
   return (
     <>
@@ -890,7 +903,10 @@ export default function Listagem({
           <button
             type="button"
             className="flex absolute top-4 right-3 justify-end"
-            onClick={cleanState}
+            onClick={() => {
+              cleanState();
+              setIsOpenModal(false);
+            }}
           >
             <RiCloseCircleFill
               size={35}
@@ -899,7 +915,7 @@ export default function Listagem({
           </button>
 
           <div className="w-44">
-            <Input
+            <InputRef
               type="text"
               placeholder="Código de barras (NCA)"
               disabled={
@@ -908,8 +924,9 @@ export default function Listagem({
               }
               id="inputCode"
               name="inputCode"
-              maxLength={12}
+              maxLength={13}
               onChange={validateInput}
+              ref={inputRef}
             />
           </div>
 
@@ -1207,9 +1224,7 @@ export default function Listagem({
                           title="Ação"
                           value="Ação"
                           textColor="white"
-                          onClick={() => (rowsSelected?.length > 0
-                            ? reprint()
-                            : setIsOpenModal(true))}
+                          onClick={() => (rowsSelected?.length > 0 ? reprint() : openModal())}
                           bgColor="bg-blue-600"
                         />
                       </div>

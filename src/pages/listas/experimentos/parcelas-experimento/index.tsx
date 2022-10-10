@@ -48,6 +48,7 @@ import {
   Select,
   SelectMultiple,
   FieldItemsPerPage,
+  SelectAutoComplete,
 } from '../../../../components';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
@@ -798,6 +799,19 @@ export default function Listagem({
     handleTotalPages();
   }, [currentPage]);
 
+  function removeSameItems(data: any) {
+    const newList: any = [];
+
+    data?.map((i: any) => {
+      const item = newList?.filter((x: any) => x.name == i.name);
+      if (item?.length <= 0) newList.push({ id: i.id, name: i.name });
+    });
+
+    const sortList = newList?.sort((a: any, b: any) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+
+    return sortList;
+  }
+
   return (
     <>
       <Head>
@@ -1097,7 +1111,7 @@ export default function Listagem({
                   </div>
                   {/* {filterFieldFactory('filterStatusAssay', 'Status do ensaio')} */}
 
-                  <div className="h-7 w-1/2 ml-2">
+                  {/* <div className="h-7 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Nome genótipo
                     </label>
@@ -1110,6 +1124,19 @@ export default function Listagem({
                       name="filterGenotypeName"
                       onChange={formik.handleChange}
                       selected={false}
+                    />
+                  </div> */}
+
+                  <div className="h-7 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Nome do genótipo
+                    </label>
+                    <SelectAutoComplete
+                      data={removeSameItems(genotypeSelect)?.map(
+                        (i: any) => i.name,
+                      )}
+                      value={checkValue('filterGenotypeName')}
+                      onChange={(e: any) => formik.setFieldValue('filterGenotypeName', e)}
                     />
                   </div>
 
