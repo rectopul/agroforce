@@ -445,7 +445,9 @@ export default function Listagem({
     const { status, message } = await experimentService.update({
       id,
       experimentGroupId: null,
-    });
+      userId: userLogado.id,
+    }
+    );
     if (status === 200) {
       router.reload();
     } else {

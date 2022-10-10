@@ -618,6 +618,14 @@ export default function Listagem({
   }
 
   async function createExperimentGenotipe({ data, total_consumed, genotipo_treatment }: any) {
+    console.log('data front');
+    console.log(data);
+
+    console.log('total_consumed');
+    console.log(total_consumed);
+
+    console.log('genotipo_treatment');
+    console.log(genotipo_treatment);
     if (data.length > 0) {
       const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
       const experimentObj: any[] = [];
@@ -705,7 +713,11 @@ export default function Listagem({
           genotipo_treatment.push(gt_new);
         });
       });
-      createExperimentGenotipe({ data: experiment_genotipo, total_consumed: experiment_genotipo.length, genotipo_treatment });
+      createExperimentGenotipe({
+        data: experiment_genotipo,
+        total_consumed: experiment_genotipo.length,
+        genotipo_treatment,
+      });
     } else {
       const temp = NPESelectedRow;
       Swal.fire({

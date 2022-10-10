@@ -22,8 +22,6 @@ export class ExperimentController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
         if (options.filterRepetitionFrom && options.filterRepetitionTo) {
           parameters.repetitionsNumber = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);
@@ -194,9 +192,6 @@ export class ExperimentController {
         orderBy,
       );
 
-      console.log('response');
-      console.log(response);
-
       response.map(async (item: any) => {
         const newItem = item;
         newItem.countNT = functionsUtils
@@ -260,6 +255,7 @@ export class ExperimentController {
 
   async update(data: any) {
     try {
+      const experimentGenotipeController = new ExperimentGenotipeController();
       if (data.idList) {
         await this.experimentRepository.relationGroup(data);
         const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
@@ -268,6 +264,14 @@ export class ExperimentController {
       }
       const experimento: any = await this.experimentRepository.findOne(data.id);
       if (!experimento) return { status: 404, message: 'Experimento não encontrado' };
+      if (data.experimentGroupId === null) {
+        const parcelasId: any = [];
+        await experimento.experiment_genotipe.forEach(async (parcela: any) => {
+          parcelasId.push(parcela.id);
+        });
+        await experimentGenotipeController.update({ idList: parcelasId, status: 'SORTEADO', userId: data.userId });
+        delete data.userId;
+      }
       const response = await this.experimentRepository.update(experimento.id, data);
       if (experimento.experimentGroupId) {
         await this.countExperimentGroupChildren(experimento.experimentGroupId);
@@ -347,7 +351,8 @@ export class ExperimentController {
         allocated += 1;
       }
     });
-    if (toPrint > 1) {
+
+    if (toPrint >= 1) {
       status = 'ETIQ. EM ANDAMENTO';
     }
     if (printed === allParcelas) {
@@ -356,7 +361,6 @@ export class ExperimentController {
     if (toPrint === allParcelas) {
       status = 'ETIQ. NÃO INICIADA';
     }
-
     if (allocated === allParcelas) {
       status = 'TOTALMENTE ALOCADO';
     }
