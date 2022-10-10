@@ -682,9 +682,10 @@ export default function Listagem({
     let countNca = 0;
     parcelas.map((item: any) => {
       if (item.nca === inputCode) {
+        console.log({ item });
         setParcelasToPrint((current: any) => [...current, item.id]);
         countNca += 1;
-        setGenotypeNameOne(item.name_genotipo);
+        setGenotypeNameOne(item?.genotipo?.name_genotipo);
         setNcaOne(item.nca);
       }
     });
@@ -718,7 +719,7 @@ export default function Listagem({
 
     parcelas.map((item: any) => {
       if (item.nca === inputCode) {
-        setGenotypeNameTwo(item.name_genotipo);
+        setGenotypeNameTwo(item?.genotipo?.name_genotipo);
         secondNca = item.nca;
         setNcaTwo(item.nca);
         countNca += 1;
@@ -750,7 +751,7 @@ export default function Listagem({
         userId: userLogado.id,
       });
       cleanState();
-      setIsOpenModal(false);
+      //setIsOpenModal(false);
 
       const parcelsByNCA = parcelas.filter((i: any) => i.nca === inputCode);
       const parcels = parcelsByNCA.map((i: any) => ({
@@ -762,8 +763,10 @@ export default function Listagem({
       if (parcels) {
         localStorage.setItem("parcelasToPrint", JSON.stringify(parcels));
         window.open("imprimir", "_blank");
+
         cleanState();
-        setTimeout(() => inputRef?.current?.focus(), 100);
+        document.getElementById("inputCode")?.value = null;
+        setTimeout(() => inputRef?.current?.focus(), 2000);
         // router.push("imprimir");
       }
     }
@@ -815,12 +818,15 @@ export default function Listagem({
     const inputCode: any = (
       document.getElementById("inputCode") as HTMLInputElement
     )?.value;
-    if (inputCode.length === 13) {
+    if (inputCode.length === 12) {
       if (dismiss) {
+        console.log("dimiss");
         writeOff();
       } else if (doubleVerify) {
+        console.log("verifyAgain");
         verifyAgain();
       } else {
+        console.log("handlesub");
         handleSubmit();
       }
     }
