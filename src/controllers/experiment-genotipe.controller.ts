@@ -186,6 +186,7 @@ export class ExperimentGenotipeController {
       // if (options.npe) {
       //   parameters.npe = Number(options.npe);
       // }
+      
       const select = {
         id: true,
         safra: { select: { safraName: true } },
@@ -336,9 +337,6 @@ export class ExperimentGenotipeController {
         skip,
         orderBy,
       );
-
-      console.log('response');
-      console.log(response);
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };

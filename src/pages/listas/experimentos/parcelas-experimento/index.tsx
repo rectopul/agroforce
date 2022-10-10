@@ -225,9 +225,14 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
+
+  // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
+  //   orderBy == "tecnologia" ? "genotipo.tecnologia.cod_tec" : orderBy
+  // }&typeOrder=${typeOrder}`; // RR
+
   const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == "tecnologia" ? "genotipo.tecnologia.cod_tec" : orderBy
-  }&typeOrder=${typeOrder}`; // RR
+    orderBy}&typeOrder=${typeOrder}`; // RR
+
 
   const [nccIsValid, setNccIsValid] = useState<boolean>(false);
   const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
@@ -443,21 +448,32 @@ export default function Listagem({
     Object.keys(columnOrder).forEach((item) => {
       if (columnOrder[item] === "foco") {
         tableFields.push(
-          headerTableFactory("Foco", "experiment.assay_list.foco.name")
+          // headerTableFactory("Foco", "experiment.assay_list.foco.name")
+
+          headerTableFactory("Foco", "foco.name")
+
         );
       }
       if (columnOrder[item] === "type_assay") {
         tableFields.push(
-          headerTableFactory("Ensaio", "experiment.assay_list.type_assay.name")
-        );
+          // headerTableFactory("Ensaio", "experiment.assay_list.type_assay.name")
+          headerTableFactory("Ensaio", "type_assay.name")
+        
+          );
       }
       if (columnOrder[item] === "tecnologia") {
-        tableFields.push(tecnologiaHeaderFactory("Tecnologia", "tecnologia"));
+        tableFields.push(tecnologiaHeaderFactory("Tecnologia", "tecnologia.cod_tec"));
       }
       if (columnOrder[item] === "gli") {
+        // tableFields.push(
+        //   headerTableFactory("GLI", "experiment.assay_list.gli")
+        // );
+
         tableFields.push(
-          headerTableFactory("GLI", "experiment.assay_list.gli")
-        );
+          // headerTableFactory("GLI", "experiment.assay_list.gli")
+          headerTableFactory("GLI", "gli")
+
+          );
       }
       if (columnOrder[item] === "experiment") {
         tableFields.push(
@@ -466,6 +482,11 @@ export default function Listagem({
       }
       if (columnOrder[item] === "culture") {
         tableFields.push(
+          // headerTableFactory(
+          //   "Lugar plantio",
+          //   "experiment.local.name_local_culture"
+          // )
+
           headerTableFactory(
             "Lugar plantio",
             "experiment.local.name_local_culture"
@@ -477,8 +498,10 @@ export default function Listagem({
       }
       if (columnOrder[item] === "status") {
         tableFields.push(
-          headerTableFactory("Status EXP.", "experiment.status")
-        );
+          // headerTableFactory("Status EXP.", "experiment.status")
+          headerTableFactory("Status EXP.", "status")
+        
+          );
       }
       if (columnOrder[item] === "nt") {
         tableFields.push(headerTableFactory("NT.", "nt"));
@@ -1394,7 +1417,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : "";
+    : "gli";
 
   removeCookies("filterBeforeEdit", { req, res });
   removeCookies("pageBeforeEdit", { req, res });
