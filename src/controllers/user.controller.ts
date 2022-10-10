@@ -169,7 +169,7 @@ export class UserController {
 
         // Validação de login existente.
         const validateLogin: object | any = await this.getAll({ login: data.login });
-        if (validateLogin.total > 0) return { status: 400, message: 'Login ja cadastrado' };
+        if (validateLogin.total > 0) return { status: 400, message: 'Login ja cadastrado, favor checar registros inativos.' };
 
         // Validação de cpf existente.
         const validateCPF: object | any = await this.getAll({ cpf: data.cpf });
