@@ -233,7 +233,7 @@ export default function Listagem({
       filterNtTo,
       filterNtFrom,
       filterStatusT,
-      filterStatus,
+      //filterStatus,
       filterCodTec,
     }) => {
       const allCheckBox: any = document.querySelectorAll(
