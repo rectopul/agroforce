@@ -2,7 +2,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import React, { useRef } from "react";
+import React, { HtmlHTMLAttributes, useRef } from "react";
 import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
@@ -38,6 +38,7 @@ import {
   FieldItemsPerPage,
   SelectMultiple,
 } from "../../../components";
+import InputRef from "../../../components/InputRef";
 import LoadingComponent from "../../../components/Loading";
 import { UserPreferenceController } from "../../../controllers/user-preference.controller";
 import {
@@ -84,6 +85,7 @@ export default function Listagem({
   const { tabsOperation } = ITabs.default;
 
   const router = useRouter();
+  const inputRef = useRef();
 
   const tabsEtiquetagemMenu = tabsOperation.map((i: any) =>
     i.titleTab === "ETIQUETAGEM"
@@ -849,6 +851,11 @@ export default function Listagem({
     handleTotalPages();
   }, [currentPage]);
 
+  function openModal() {
+    setIsOpenModal(true);
+    setTimeout(() => inputRef?.current?.focus(), 100);
+  }
+
   return (
     <>
       <Head>
@@ -902,7 +909,7 @@ export default function Listagem({
           </button>
 
           <div className="w-44">
-            <Input
+            <InputRef
               type="text"
               placeholder="Código de barras (NCA)"
               disabled={
@@ -913,6 +920,7 @@ export default function Listagem({
               name="inputCode"
               maxLength={12}
               onChange={validateInput}
+              ref={inputRef}
             />
           </div>
 
@@ -1211,9 +1219,7 @@ export default function Listagem({
                           value="Ação"
                           textColor="white"
                           onClick={() =>
-                            rowsSelected?.length > 0
-                              ? reprint()
-                              : setIsOpenModal(true)
+                            rowsSelected?.length > 0 ? reprint() : openModal()
                           }
                           bgColor="bg-blue-600"
                         />
