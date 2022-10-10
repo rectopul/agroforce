@@ -186,6 +186,7 @@ export class ExperimentGenotipeController {
       // if (options.npe) {
       //   parameters.npe = Number(options.npe);
       // }
+      
       const select = {
         id: true,
         safra: { select: { safraName: true } },
