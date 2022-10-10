@@ -765,7 +765,7 @@ export default function Listagem({
         window.open("imprimir", "_blank");
 
         cleanState();
-        document.getElementById("inputCode")?.value = null;
+        (document.getElementById("inputCode") as HTMLInputElement).value = "";
         setTimeout(() => inputRef?.current?.focus(), 2000);
         // router.push("imprimir");
       }
