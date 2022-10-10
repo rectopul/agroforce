@@ -5,7 +5,6 @@ import { CulturaRepository } from '../repository/culture.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
 import handleError from '../shared/utils/handleError';
 
-
 interface CultureDTO {
   id: number;
   name: string;
@@ -34,7 +33,7 @@ export class CulturaController {
 
     try {
       if (options.filterStatus) {
-        if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
+        if (options.filterStatus !== '2') { parameters.status = Number(options.filterStatus); }
       }
 
       if (options.filterSearch) {
@@ -65,7 +64,7 @@ export class CulturaController {
       }
 
       if (options.take) {
-        if (typeof (options.take) === 'string') {
+        if (typeof options.take === 'string') {
           take = Number(options.take);
         } else {
           take = options.take;
@@ -73,7 +72,7 @@ export class CulturaController {
       }
 
       if (options.skip) {
-        if (typeof (options.skip) === 'string') {
+        if (typeof options.skip === 'string') {
           skip = Number(options.skip);
         } else {
           skip = options.skip;
@@ -133,17 +132,26 @@ export class CulturaController {
 
   async postCulture(data: CreateCultureDTO) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+      const { ip } = await fetch('https://api.ipify.org/?format=json')
+        .then((results) => results.json())
+        .catch(() => '0.0.0.0');
 
-      const cultureAlreadyExists = await this.culturaRepository.findByName(data.name);
+      const cultureAlreadyExists = await this.culturaRepository.findByName(
+        data.name,
+      );
 
       if (cultureAlreadyExists) {
-        return { status: 400, message: 'Cultura ja cadastrado' };
+        return { status: 400, message: 'Cultura ja cadastrado, favor checar registros inativos.' };
       }
       const culture = await this.culturaRepository.create(data);
 
       await this.reporteRepository.create({
-        madeBy: data.created_by, module: 'Cultura', operation: 'Cadastro', name: data.desc, ip: JSON.stringify(ip), idOperation: culture.id,
+        madeBy: data.created_by,
+        module: 'Cultura',
+        operation: 'Cadastro',
+        name: data.desc,
+        ip: JSON.stringify(ip),
+        idOperation: culture.id,
       });
       return { status: 200, message: 'Cultura cadastrada' };
     } catch (err) {
@@ -154,13 +162,17 @@ export class CulturaController {
 
   async updateCulture(data: UpdateCultureDTO) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+      const { ip } = await fetch('https://api.ipify.org/?format=json')
+        .then((results) => results.json())
+        .catch(() => '0.0.0.0');
 
       const culture = await this.culturaRepository.findOne(data.id);
 
       if (!culture) return { status: 400, message: 'Cultura não existente' };
 
-      const cultureAlreadyExists = await this.culturaRepository.findByName(data.name);
+      const cultureAlreadyExists = await this.culturaRepository.findByName(
+        data.name,
+      );
 
       if (cultureAlreadyExists && cultureAlreadyExists.id !== culture.id) {
         return { status: 400, message: 'Cultura ja cadastrada' };
@@ -174,12 +186,22 @@ export class CulturaController {
 
       if (data.status === 1) {
         await this.reporteRepository.create({
-          madeBy: data.created_by, module: 'Cultura', operation: 'Edição', idOperation: data.id, name: data.desc, ip: JSON.stringify(ip),
+          madeBy: data.created_by,
+          module: 'Cultura',
+          operation: 'Edição',
+          idOperation: data.id,
+          name: data.desc,
+          ip: JSON.stringify(ip),
         });
       }
       if (data.status === 0) {
         await this.reporteRepository.create({
-          madeBy: data.created_by, module: 'Cultura', operation: 'Inativação', idOperation: data.id, name: data.desc, ip: JSON.stringify(ip),
+          madeBy: data.created_by,
+          module: 'Cultura',
+          operation: 'Inativação',
+          idOperation: data.id,
+          name: data.desc,
+          ip: JSON.stringify(ip),
         });
         console.log(data);
       }

@@ -33,7 +33,6 @@ export class ImportExperimentGenotypeController {
     const experimentGenotipeController = new ExperimentGenotipeController();
 
     const responseIfError: Array<string> = [];
-
     try {
       const value_hold: any = {};
 

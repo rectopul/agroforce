@@ -97,26 +97,23 @@ export default function Import({
       return;
     }
 
-    // const fileExtension: any = functionsUtils.getFileExtension(
-    //   value?.files[0]?.name,
-    // );
+    const fileExtension: any = functionsUtils.getFileExtension(
+      value?.files[0]?.name,
+    );
 
-    // if (fileExtension !== 'xlsx') {
-    //   Swal.fire('Apenas arquivos .xlsx são aceitos.');
-    //   (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
-    //   return;
-    // }
+    if (fileExtension !== 'xlsx') {
+      Swal.fire('Apenas arquivos .xlsx são aceitos.');
+      (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
+      return;
+    }
 
     const userLogado = JSON.parse(localStorage.getItem('user') as string);
     setExecuteUpload(1);
-
-
 
     readXlsxFile(value.files[0]).then(async (rows) => {
       setLoading(true);
 
       if (moduleId) {
-       
         const { message } = await importService.validate({
           spreadSheet: rows,
           moduleId,
@@ -663,7 +660,7 @@ export default function Import({
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
                       onClick={() => readExcel(27, 'GENOTYPE_TREATMENT')}
                       icon={<IoIosCloudUpload size={40} />}
-                      disabled
+                      disabled={disabledButton}
                       type="button"
                     />
                   </div>
@@ -723,9 +720,9 @@ export default function Import({
                       }
                       bgColor={bgColor}
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(22, 'EXPERIMENT')}
+                      onClick={() => readExcel(31, 'PARCELS')}
                       icon={<IoIosCloudUpload size={40} />}
-                      disabled
+                      disabled={disabledButton}
                       type="button"
                     />
                   </div>
@@ -737,8 +734,8 @@ export default function Import({
                     <Input
                       type="file"
                       required
-                      id="inputFile-22"
-                      name="inputFile-22"
+                      id="inputFile-31"
+                      name="inputFile-31"
                     />
                   </div>
                 </div>

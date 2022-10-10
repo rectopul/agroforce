@@ -215,7 +215,7 @@ export default function NovoLocal({
           </div>
 
           <div
-            className="w-1/2
+            className="w-full
             flex
             justify-around
             gap-4
@@ -277,7 +277,7 @@ export default function NovoLocal({
           </div>
 
           <div
-            className="w-1/2
+            className="w-full
             flex
             justify-around
             gap-4
@@ -330,16 +330,6 @@ export default function NovoLocal({
                 style={{ background: "#e5e7eb" }}
               />
             </div>
-          </div>
-
-          <div
-            className="w-full
-              flex
-              justify-around
-              gap-4
-              mb-4
-            "
-          >
             <div className="w-1/3">
               <label className="block text-gray-900 text-sm font-bold mb-1">
                 Cod Tec.
@@ -370,7 +360,17 @@ export default function NovoLocal({
                 style={{ background: "#e5e7eb" }}
               />
             </div>
-            <div className="w-1/3">
+          </div>
+
+          <div
+            className="w-full
+              flex
+              justify-around
+              gap-4
+              mb-4
+            "
+          >
+            <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-1">
                 NPE Inicial
               </label>
@@ -385,7 +385,7 @@ export default function NovoLocal({
                 style={{ background: "#e5e7eb" }}
               />
             </div>
-            <div className="w-1/3">
+            <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 NPE Final
               </label>
@@ -400,10 +400,7 @@ export default function NovoLocal({
                 style={{ background: "#e5e7eb" }}
               />
             </div>
-          </div>
-
-          <div className="w-1/2 flex gap-4 mb-4">
-            <div className="w-1/3">
+            <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-1">
                 Prox NPE
               </label>
@@ -417,6 +414,8 @@ export default function NovoLocal({
               />
             </div>
           </div>
+
+          <div className="w-1/2 flex gap-4 mb-4"></div>
 
           <div
             className="

@@ -135,7 +135,7 @@ export class SafraController {
         id_culture: data.id_culture,
       });
       if (safraAlreadyExists) {
-        return { status: 400, message: 'Safra já cadastrada' };
+        return { status: 400, message: 'Safra já cadastrada, favor checar registros inativos.' };
       }
 
       const safra = await this.safraRepository.create(data);

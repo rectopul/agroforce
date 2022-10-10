@@ -123,7 +123,7 @@ export class DepartamentController {
       const departmentAlreadyExists = await this.departamentRepository.findByName(data.name);
 
       if (departmentAlreadyExists) {
-        return { status: 400, message: 'Esse item já está cadastro. favor consultar os inativos' };
+        return { status: 400, message: 'Esse item já está cadastro, favor checar registros inativos.' };
       }
 
       const setor = await this.departamentRepository.create(data);

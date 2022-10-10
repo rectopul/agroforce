@@ -186,6 +186,7 @@ export class ExperimentGenotipeController {
       // if (options.npe) {
       //   parameters.npe = Number(options.npe);
       // }
+      
       const select = {
         id: true,
         safra: { select: { safraName: true } },
@@ -337,9 +338,6 @@ export class ExperimentGenotipeController {
         orderBy,
       );
 
-      console.log('response');
-      console.log(response);
-
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }
@@ -352,8 +350,6 @@ export class ExperimentGenotipeController {
 
   async create(data: object | any) {
     try {
-      console.log('data');
-      console.log(data);
       const response = await this.ExperimentGenotipeRepository.createMany(data);
       if (response) {
         return { status: 200, message: 'Tratamento experimental registrado' };
@@ -378,7 +374,7 @@ export class ExperimentGenotipeController {
     }
   }
 
-  async update({ idList, status, userId }: any) {
+  async update({ idList, status, userId = 0 }: any) {
     try {
       await this.ExperimentGenotipeRepository.printed(idList, status);
       const { response: parcelas } = await this.getOne(idList[0]);
