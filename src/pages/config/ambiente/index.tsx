@@ -224,6 +224,7 @@ export default function Listagem({
       filterFoco: checkValue('filterFoco'),
       filterEnsaio: checkValue('filterEnsaio'),
       filterTecnologia: checkValue('filterTecnologia'),
+      filterCodTecnologia: checkValue('filterCodTecnologia'),
       filterEpoca: checkValue('filterEpoca'),
       filterNPE: checkValue('filterNPE'),
       filterNpeTo: checkValue('filterNpeTo'),

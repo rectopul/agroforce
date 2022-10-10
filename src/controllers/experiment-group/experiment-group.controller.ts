@@ -3,6 +3,7 @@ import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { ExperimentGroupRepository } from '../../repository/experiment-group.repository';
 import { IExperiments } from '../../interfaces/listas/experimento/experimento.interface';
 import { ExperimentController } from '../experiment/experiment.controller';
+import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
 
 export class ExperimentGroupController {
   experimentGroupRepository = new ExperimentGroupRepository();
@@ -212,7 +213,7 @@ export class ExperimentGroupController {
     if (typeof idExperiment === 'number') {
       await this.experimentController.handleExperimentStatus(idExperiment);
     } else {
-      idExperiment?.map(async (experimentId: number) => {
+      await idExperiment?.map(async (experimentId: number) => {
         await this.experimentController.handleExperimentStatus(experimentId);
       });
     }
@@ -224,19 +225,36 @@ export class ExperimentGroupController {
     const allExperiments = response?.experiment?.length;
     let toPrint = 0;
     let printed = 0;
+    let initial = 0;
     let status = '';
-    response?.experiment?.map((experiment: any) => {
+    await response?.experiment?.map((experiment: any) => {
       if (experiment.status === 'ETIQ. FINALIZADA') {
         printed += 1;
       } else if (experiment.status === 'ETIQ. EM ANDAMENTO') {
         toPrint += 1;
+      } else if (experiment.status === 'ETIQ. NÃO INICIADA') {
+        initial += 1;
       }
     });
+
+    console.log('toPrint');
+    console.log(toPrint);
+    console.log('printed');
+    console.log(printed);
+
+    console.log('initial');
+    console.log(initial);
+    console.log('allExperiments');
+    console.log(allExperiments);
 
     if (toPrint >= 1) {
       status = 'ETIQ. EM ANDAMENTO';
     } else if (printed === allExperiments) {
       status = 'ETIQ. FINALIZADA';
+    } else if (initial === allExperiments) {
+      status = 'ETIQ. NÃO INICIADA';
+    } else {
+      status = 'ETIQ. EM ANDAMENTO';
     }
     await this.update({ id, status });
   }

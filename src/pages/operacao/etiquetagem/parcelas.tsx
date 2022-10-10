@@ -279,7 +279,7 @@ export default function Listagem({
       filterLocal,
       filterRepetitionFrom,
       filterRepetitionTo,
-      //filterStatus,
+      // filterStatus,
       filterNtFrom,
       filterNtTo,
       filterNpeFrom,
@@ -296,7 +296,7 @@ export default function Listagem({
           selecionados += `${allCheckBox[i].value},`;
         }
       }
-      //const filterStatusT = selecionados.substr(0, selecionados.length - 1);
+      // const filterStatusT = selecionados.substr(0, selecionados.length - 1);
       const filterStatus = statusFilterSelected?.join(",");
 
       // Call filter with there parameter
@@ -763,7 +763,6 @@ export default function Listagem({
       if (parcels) {
         localStorage.setItem("parcelasToPrint", JSON.stringify(parcels));
         window.open("imprimir", "_blank");
-
         cleanState();
         (document.getElementById("inputCode") as HTMLInputElement).value = "";
         setTimeout(() => inputRef?.current?.focus(), 2000);
@@ -851,7 +850,7 @@ export default function Listagem({
     }));
     if (parcels?.length > 0) {
       localStorage.setItem("parcelasToPrint", JSON.stringify(parcels));
-      //router.push("imprimir");
+      // router.push("imprimir");
       window.open("imprimir", "_blank");
     }
 

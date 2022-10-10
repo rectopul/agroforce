@@ -57,8 +57,10 @@ import {
 } from "../../../services";
 import * as ITabs from "../../../shared/utils/dropdown";
 import { IReturnObject } from "../../../interfaces/shared/Import.interface";
-import { fetchWrapper } from "../../../helpers";
+// import { fetchWrapper } from "../../../helpers";
 import { IExperiments } from "../../../interfaces/listas/experimento/experimento.interface";
+import { tableGlobalFunctions } from '../../../helpers';
+
 
 interface IFilter {
   filterFoco: string;
@@ -85,6 +87,9 @@ export default function Listagem({
   idSafra,
   pageBeforeEdit,
   filterBeforeEdit,
+  idCulture,
+  typeOrderServer, // RR
+  orderByserver, // RR
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
@@ -112,6 +117,8 @@ export default function Listagem({
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
+  const [arrowOrder, setArrowOrder] = useState<any>('');
+
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Foco", value: "foco" },
     { name: "CamposGerenciados[]", title: "Ensaio", value: "type_assay" },
@@ -149,12 +156,18 @@ export default function Listagem({
   ]);
   const [statusFilterSelected, setStatusFilterSelected] = useState<any>([]);
 
-  const [orderBy, setOrderBy] = useState<string>("");
+  // const [orderBy, setOrderBy] = useState<string>("");
   const [orderType, setOrderType] = useState<string>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
+
+  const [orderBy, setOrderBy] = useState<string>(orderByserver);
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
+
   const [rowsSelected, setRowsSelected] = useState([]);
   const router = useRouter();
 
@@ -197,77 +210,121 @@ export default function Listagem({
       //const filterStatus = selecionados.substr(0, selecionados.length - 1);
       const filterStatus = statusFilterSelected?.join(",");
 
-      // Call filter with there parameter
-      const parametersFilter = await fetchWrapper.handleFilterParameter(
-        "experimento",
-        filterFoco,
-        filterTypeAssay,
-        filterGli,
-        filterExperimentName,
-        filterTecnologia,
-        filterCod,
-        filterPeriod,
-        filterDelineamento,
-        filterRepetition,
-        filterStatus,
-        idSafra
-      );
+      // // Call filter with there parameter
+      // const parametersFilter = await fetchWrapper.handleFilterParameter(
+      //   "experimento",
+      //   filterFoco,
+      //   filterTypeAssay,
+      //   filterGli,
+      //   filterExperimentName,
+      //   filterTecnologia,
+      //   filterCod,
+      //   filterPeriod,
+      //   filterDelineamento,
+      //   filterRepetition,
+      //   filterStatus,
+      //   idSafra
+      // );
 
-      setFiltersParams(parametersFilter);
+      // setFiltersParams(parametersFilter);
+      // setFilter(parametersFilter);
+      // setCookies("filterBeforeEdit", filter);
+
+      // await experimentService
+      //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      //   .then((response) => {
+      //     setFilter(parametersFilter);
+      //     setExperiments(response.response);
+      //     setTotalItems(response.total);
+      //     setCurrentPage(0);
+      //     tableRef.current.dataManager.changePageSize(
+      //       itemsTotal >= take ? take : itemsTotal
+      //     );
+      //   });
+
+      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterCod=${filterCod}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterStatus=${filterStatus}`;
+
       setFilter(parametersFilter);
-      setCookies("filterBeforeEdit", filter);
-
-      await experimentService
-        .getAll(`${parametersFilter}&skip=0&take=${take}`)
-        .then((response) => {
-          setFilter(parametersFilter);
-          setExperiments(response.response);
-          setTotalItems(response.total);
-          setCurrentPage(0);
-          tableRef.current.dataManager.changePageSize(
-            itemsTotal >= take ? take : itemsTotal
-          );
-        });
+      setCurrentPage(0);
+      await callingApi(parametersFilter);
     },
   });
 
-  async function handleOrder(column: string, order: number): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = "asc";
-    } else if (order === 2) {
-      typeOrder = "desc";
-    } else {
-      typeOrder = "";
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== "undefined") {
-      if (typeOrder !== "") {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
+
+
+  // Calling common API
+  async function callingApi(parametersFilter : any) {
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
+    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    setFiltersParams(parametersFilter);
+    setCookies('filtersParams', parametersFilter);
+
+    await experimentService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200 || response.status === 400) {
+        setExperiments(response.response);
+        setTotalItems(response.total);
+        tableRef.current.dataManager.changePageSize(
+          itemsTotal >= take ? take : itemsTotal
+        );
       }
-    } else if (typeOrder !== "") {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+    });
+  }
 
-    await experimentService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then(({ status, response }: IReturnObject) => {
-        if (status === 200) {
-          setExperiments(response);
-        }
-      });
+  // Call that function when change type order value.
+  useEffect(() => {
+    callingApi(filter);
+  }, [typeOrder]);
 
-    if (orderList === 2) {
-      setOrder(0);
-    } else {
-      setOrder(orderList + 1);
-    }
+
+  async function handleOrder(column: string, order: number): Promise<void> {
+    // let typeOrder: any;
+    // let parametersFilter: any;
+    // if (order === 1) {
+    //   typeOrder = "asc";
+    // } else if (order === 2) {
+    //   typeOrder = "desc";
+    // } else {
+    //   typeOrder = "";
+    // }
+    // setOrderBy(column);
+    // setOrderType(typeOrder);
+    // if (filter && typeof filter !== "undefined") {
+    //   if (typeOrder !== "") {
+    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+    //   } else {
+    //     parametersFilter = filter;
+    //   }
+    // } else if (typeOrder !== "") {
+    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    // } else {
+    //   parametersFilter = filter;
+    // }
+
+    // await experimentService
+    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
+    //   .then(({ status, response }: IReturnObject) => {
+    //     if (status === 200) {
+    //       setExperiments(response);
+    //     }
+    //   });
+
+    // if (orderList === 2) {
+    //   setOrder(0);
+    // } else {
+    //   setOrder(orderList + 1);
+    // }
+
+        // Gobal manage orders
+        const {
+          typeOrderG, columnG, orderByG, arrowOrder,
+        } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    
+        setTypeOrder(typeOrderG);
+        setOrderBy(columnG);
+        setOrder(orderByG);
+        setArrowOrder(arrowOrder);
   }
 
   function headerTableFactory(name: string, title: string) {
@@ -330,7 +387,7 @@ export default function Listagem({
         tableFields.push(headerTableFactory("GLI", "assay_list.gli"));
       }
       if (columnOrder[index] === "tecnologia") {
-        tableFields.push(tecnologiaHeaderFactory("Tecnologia", "tecnologia"));
+        tableFields.push(tecnologiaHeaderFactory("Tecnologia", "assay_list.tecnologia.cod_tec"));
       }
       if (columnOrder[index] === "experimentName") {
         tableFields.push(
@@ -484,31 +541,31 @@ export default function Listagem({
   function handleTotalPages(): void {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
-    }
+    } 
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&status=${"SORTEADO"}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}&status=${"SORTEADO"}`;
-    }
+    // const skip = currentPage * Number(take);
+    // let parametersFilter;
+    // if (orderType) {
+    //   parametersFilter = `skip=${skip}&take=${take}&status=${"SORTEADO"}&orderBy=${orderBy}&typeOrder=${orderType}`;
+    // } else {
+    //   parametersFilter = `skip=${skip}&take=${take}&status=${"SORTEADO"}`;
+    // }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
+    // if (filter) {
+    //   parametersFilter = `${parametersFilter}&${filter}`;
+    // }
 
-    await experimentService
-      .getAll(parametersFilter)
-      .then(({ status, response }: IReturnObject) => {
-        if (status === 200) {
-          setExperiments(response);
-        }
-      });
+    // await experimentService
+    //   .getAll(parametersFilter)
+    //   .then(({ status, response }: IReturnObject) => {
+    //     if (status === 200) {
+    //       setExperiments(response);
+    //     }
+    //   });
+
+    await callingApi(filter); // handle pagination globly
   }
 
   function filterFieldFactory(title: string, name: string) {
@@ -879,7 +936,7 @@ export default function Listagem({
                         disabled={currentPage + 1 >= pages}
                       />
                       <Button
-                        onClick={() => setCurrentPage(pages)}
+                        onClick={() => setCurrentPage(pages-1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdLastPage size={18} />}
@@ -906,17 +963,44 @@ export const getServerSideProps: GetServerSideProps = async ({
     await PreferencesControllers.getConfigGerais()
   )?.response[0]?.itens_per_page;
 
+
+  // Last page
+  const lastPageServer = req.cookies.lastPage
+  ? req.cookies.lastPage
+  : 'No';
+
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
+  }
+
+  
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : "";
+
+  // RR
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+  ? req.cookies.filterBeforeEditTypeOrder
+  : 'desc';
+
+  // RR
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+  ? req.cookies.filterBeforeEditOrderBy
+  : 'assay_list.foco.name';
+
   const { token } = req.cookies;
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
   const { experimentGroupId } = query;
-
+  
+ 
   const { publicRuntimeConfig } = getConfig();
   const baseUrlExperimento = `${publicRuntimeConfig.apiUrl}/experiment`;
 
@@ -952,6 +1036,9 @@ export const getServerSideProps: GetServerSideProps = async ({
       idSafra,
       pageBeforeEdit,
       filterBeforeEdit,
+      idCulture,
+      orderByserver, // RR
+      typeOrderServer, // RR
     },
   };
 };
