@@ -74,8 +74,11 @@ var cookies_next_1 = require("cookies-next");
 var user_preference_controller_1 = require("../../../controllers/user-preference.controller");
 var services_1 = require("../../../services");
 var components_1 = require("../../../components");
+
 var ITabs = require("../../../shared/utils/dropdown");
 var helpers_1 = require("../../../helpers");
+
+
 function Listagem(_a) {
     var _this = this;
     var allNpe = _a.allNpe, itensPerPage = _a.itensPerPage, filterApplication = _a.filterApplication, filterBeforeEdit = _a.filterBeforeEdit, totalItems = _a.totalItems, typeOrderServer = _a.typeOrderServer, orderByserver = _a.orderByserver, safraId = _a.safraId, idCulture = _a.idCulture;
