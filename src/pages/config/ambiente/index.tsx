@@ -27,6 +27,7 @@ import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { removeCookies, setCookies } from 'cookies-next';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { BsTrashFill } from 'react-icons/bs';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
   experimentService,
@@ -305,36 +306,16 @@ export default function Listagem({
     };
   }
 
-  function idHeaderFactory() {
-    return {
-      title: <div className="flex items-center">{arrowOrder}</div>,
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-9 flex">
-          <div>
-            <button
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="h-9 flex">
-          <div>
-            <button
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
-          </div>
-        </div>
-      )),
-    };
+  async function deleteItem(id: number) {
+    const { status, message } = await npeService.deleted({ id, userId: userLogado.id });
+    if (status === 200) {
+      router.reload();
+    } else {
+      Swal.fire({
+        html: message,
+        width: '800',
+      });
+    }
   }
 
   function statusHeaderFactory() {
@@ -349,7 +330,7 @@ export default function Listagem({
           <div className="h-7">
             <Button
               icon={<BiEdit size={14} />}
-              bgColor={rowData.edited == 1 ? 'bg-blue-900' : 'bg-blue-600'}
+              bgColor={rowData.edited === 1 ? 'bg-blue-900' : 'bg-blue-600'}
               textColor="white"
               title="Editar"
               onClick={() => {
@@ -364,18 +345,15 @@ export default function Listagem({
             />
           </div>
           <div style={{ width: 5 }} />
-          {rowData.status == 1 || rowData.status == 3 ? (
+          {rowData.status === 1 || rowData.status === 3 ? (
             <div>
               <Button
-                title={rowData.status == 3 ? '' : 'Ativo'}
-                icon={<FaRegThumbsUp size={14} />}
-                onClick={() => handleStatus(rowData.id, {
-                  status: rowData.status,
-                  ...rowData,
-                })}
-                bgColor={rowData.status == 3 ? 'bg-gray-400' : 'bg-green-600'}
+                title={rowData.status === 3 ? '' : 'Ativo'}
+                icon={<BsTrashFill size={14} />}
+                onClick={() => deleteItem(rowData.id)}
+                bgColor={rowData.status === 3 ? 'bg-gray-400' : 'bg-red-600'}
                 textColor="white"
-                disabled={rowData.status == 3}
+                disabled={rowData.status === 3}
               />
             </div>
           ) : (
@@ -384,11 +362,8 @@ export default function Listagem({
               <div>
                 <Button
                   title="Inativo"
-                  icon={<FaRegThumbsDown size={14} />}
-                  onClick={async () => handleStatus(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })}
+                  icon={<BsTrashFill size={14} />}
+                  onClick={async () => deleteItem(rowData.id)}
                   bgColor="bg-red-800"
                   textColor="white"
                 />

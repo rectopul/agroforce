@@ -58,4 +58,9 @@ export class NpeRepository {
   async queryRaw(query: any) {
     return prisma.$queryRaw`${query}`;
   }
+
+  async delete(id: number) {
+    const result = await prisma.npe.delete({ where: { id } });
+    return result;
+  }
 }

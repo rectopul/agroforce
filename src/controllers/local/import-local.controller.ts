@@ -227,12 +227,7 @@ export class ImportLocalController {
               );
             }
             if (status === 200) {
-              let lastDtImport = response[0]?.dt_import?.getTime();
-              response.forEach((item: any) => {
-                lastDtImport = item.dt_import.getTime() > lastDtImport
-                  ? item.dt_import.getTime()
-                  : lastDtImport;
-              });
+              const lastDtImport = response[0]?.dt_import?.getTime();
               if (
                 lastDtImport
                 > spreadSheet[row][column].getTime()

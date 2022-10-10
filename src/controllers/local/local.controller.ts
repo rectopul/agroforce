@@ -111,6 +111,8 @@ export class LocalController {
 
   async create(data: object | any) {
     try {
+      console.log('create');
+      console.log(data);
       const response = await this.localRepository.create(data);
       if (response) {
         return { status: 200, response, message: 'Local criado' };
@@ -124,6 +126,8 @@ export class LocalController {
 
   async update(data: any) {
     try {
+      console.log('update');
+      console.log(data);
       const localCultura: any = await this.localRepository.findOne(data.id);
 
       if (!localCultura) return { status: 404, message: 'Local de cultura não existente' };
