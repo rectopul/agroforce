@@ -208,7 +208,8 @@ export default function Listagem({
         }
       }
       //const filterStatus = selecionados.substr(0, selecionados.length - 1);
-      const filterStatus = statusFilterSelected?.join(",");
+      // const filterStatus = statusFilterSelected?.join(",");
+           
 
       // // Call filter with there parameter
       // const parametersFilter = await fetchWrapper.handleFilterParameter(
@@ -242,7 +243,8 @@ export default function Listagem({
       //     );
       //   });
 
-      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterCod=${filterCod}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterStatus=${filterStatus}`;
+      const filterStatus ="SORTEADO";
+      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterCod=${filterCod}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterStatus=SORTEADO`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -686,7 +688,7 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  <div className="h-10 w-1/2 ml-2">
+                  {/* <div className="h-10 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status EXP.
                     </label>
@@ -695,7 +697,7 @@ export default function Listagem({
                       values={statusFilterSelected}
                       onChange={(e: any) => setStatusFilterSelected(e)}
                     />
-                  </div>
+                  </div> */}
 
                   {/* <div className="h-10 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -1006,12 +1008,12 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const filterApplication =
     req.cookies.filterBeforeEdit ||
-    `&id_culture=${idCulture}&id_safra=${idSafra}`;
+    `&id_culture=${idCulture}&id_safra=${idSafra}&filterStatus=SORTEADO`;
 
   removeCookies("filterBeforeEdit", { req, res });
   removeCookies("pageBeforeEdit", { req, res });
 
-  const param = `&id_culture=${idCulture}&id_safra=${idSafra}&status=${"SORTEADO"}`;
+  const param = `&id_culture=${idCulture}&id_safra=${idSafra}&filterStatus=SORTEADO`;
 
   const urlParametersExperiment: any = new URL(baseUrlExperimento);
   urlParametersExperiment.search = new URLSearchParams(param).toString();
