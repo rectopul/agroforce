@@ -133,15 +133,9 @@ export class ImportLocalController {
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
             }
           } else if (spreadSheet[0][column].includes('MLOC')) {
-            if (spreadSheet[row][column] === null) {
-              responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-            }
+            // vazio
           } else if (spreadSheet[0][column].includes('Endereço')) {
-            if (spreadSheet[row][column] === null) {
-              responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-            }
+            // vazio
           } else if (spreadSheet[0][column].includes('Identificador de localidade')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]

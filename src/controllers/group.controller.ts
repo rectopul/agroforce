@@ -63,8 +63,6 @@ export class GroupController {
   async getAll(options: any) {
     const parameters: object | any = {};
     try {
-      console.log('options');
-      console.log(options);
       const select = {
         id: true,
         id_foco: true,

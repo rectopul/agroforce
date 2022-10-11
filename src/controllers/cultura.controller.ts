@@ -203,7 +203,6 @@ export class CulturaController {
           name: data.desc,
           ip: JSON.stringify(ip),
         });
-        console.log(data);
       }
 
       return { status: 200, message: 'Cultura atualizada' };
