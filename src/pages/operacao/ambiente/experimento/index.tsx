@@ -114,12 +114,12 @@ interface IData {
 }
 
 export default function Listagem({
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs;
 
   const tableRef = useRef<any>(null);
@@ -645,6 +645,7 @@ export default function Listagem({
         });
       setLoading(false);
     }
+
   }
 
   async function createExperimentGenotipe({
@@ -665,8 +666,8 @@ export default function Listagem({
       if (
         NPESelectedRow?.npeQT == 'N/A'
           ? true
-          : NPESelectedRow?.npeQT - total_consumed > 0
-            && lastNpe < NPESelectedRow?.nextNPE.npei_i
+          : NPESelectedRow?.npeQT - total_consumed > 0 &&
+          lastNpe < NPESelectedRow?.nextNPE.npei_i
       ) {
         await experimentGenotipeService
           .create(data)
@@ -675,12 +676,12 @@ export default function Listagem({
               genotipo_treatment.map(async (gt: any) => {
                 genotypeTreatmentService
                   .update(gt)
-                  .then(({ status, message }: any) => {});
+                  .then(({ status, message }: any) => { });
               });
               experimentObj.map(async (x: any) => {
                 await experimentService
                   .update(x)
-                  .then(({ status, response }: any) => {});
+                  .then(({ status, response }: any) => { });
               });
 
               await npeService
@@ -715,7 +716,7 @@ export default function Listagem({
 
       experimentos?.map((item: any) => {
         item.assay_list?.genotype_treatment.map((gt: any) => {
-          item.seq_delineamento.map((sd: any) => {
+          item.seq_delineamento?.map((sd: any) => {
             const data: any = {};
             data.idSafra = gt.id_safra;
             data.idFoco = item.assay_list?.foco.id;
@@ -728,6 +729,7 @@ export default function Listagem({
             data.npe = npei;
             data.idLote = gt.genotipo?.id_lote;
             data.idGenotipo = gt.genotipo?.id; // Added new field
+            data.gli = item.assay_list?.gli;
             data.id_seq_delineamento = sd.id;
             data.nca = gt.lote?.ncc;
             experiment_genotipo.push(data);
@@ -749,10 +751,9 @@ export default function Listagem({
       Swal.fire({
         title: 'NPE Já usado !!!',
         html:
-          `Existem NPE usados ​​entre <b>${npeUsedFrom}</b> e <b>${temp.npef}</b><br><br>`
-          + `Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : ${temp.nextNPE.foco.name}</b><br><b> Ensaio : ${temp.nextNPE.type_assay.name}</b><br><b> Local : ${temp.nextNPE.local.name_local_culture}</b><br><b>Epoca : ${temp.nextNPE.epoca}</b><br><b>Tecnologia : ${temp.nextNPE.tecnologia.name}</b></p><br>`
-          + `O próximo NPE disponível é <strong>${
-            Number(temp.nextAvailableNPE) + 1
+          `Existem NPE usados ​​entre <b>${npeUsedFrom}</b> e <b>${temp.npef}</b><br><br>` +
+          `Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : ${temp.nextNPE.foco.name}</b><br><b> Ensaio : ${temp.nextNPE.type_assay.name}</b><br><b> Local : ${temp.nextNPE.local.name_local_culture}</b><br><b>Epoca : ${temp.nextNPE.epoca}</b><br><b>Tecnologia : ${temp.nextNPE.tecnologia.name}</b></p><br>` +
+          `O próximo NPE disponível é <strong>${Number(temp.nextAvailableNPE) + 1
           }</strong></div>`,
         icon: 'warning',
         showCloseButton: true,
@@ -776,11 +777,15 @@ export default function Listagem({
   }, [NPESelectedRow]);
 
   useEffect(() => {
+    setNPESelectedRow(selectedNPE[0]);
+  }, [])
+
+  useEffect(() => {
     let count = 0;
     experimentos.map((item: any) => {
-      item.npei <= NPESelectedRow?.nextNPE.npei_i
-      && item.npef >= NPESelectedRow?.nextNPE.npei_i
-      && NPESelectedRow?.nextNPE != 0
+      item.npei <= NPESelectedRow?.nextNPE.npei_i &&
+        item.npef >= NPESelectedRow?.nextNPE.npei_i &&
+        NPESelectedRow?.nextNPE != 0
         ? count++
         : '';
     });
@@ -809,9 +814,8 @@ export default function Listagem({
                         "
         >
           <div
-            className={`w-full ${
-              selectedNPE?.length > 3 && 'max-h-40 overflow-y-scroll'
-            } mb-4`}
+            className={`w-full ${selectedNPE?.length > 3 && "max-h-40 overflow-y-scroll"
+              } mb-4`}
           >
             <MaterialTable
               style={{
@@ -866,10 +870,10 @@ export default function Listagem({
                   },
                   rowStyle: (rowData) => ({
                     backgroundColor:
-                      rowData.npef >= NPESelectedRow?.nextNPE.npei_i
-                      && SortearDisable
-                        ? '#FF5349'
-                        : '#f9fafb',
+                      rowData.npef >= NPESelectedRow?.nextNPE.npei_i &&
+                        SortearDisable
+                        ? "#FF5349"
+                        : "#f9fafb",
                     height: 40,
                   }),
                   search: false,
