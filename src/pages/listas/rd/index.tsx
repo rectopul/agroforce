@@ -124,6 +124,7 @@ export default function Import({
           disabledButton,
         });
         setLoading(false);
+        handlePagination();
         Swal.fire({
           html: message,
           width: '800',
@@ -140,6 +141,7 @@ export default function Import({
           disabledButton,
         });
         setLoading(false);
+        handlePagination();
         Swal.fire({
           html: message,
           width: '800',
@@ -498,6 +500,7 @@ export default function Import({
   }
 
   async function handlePagination(): Promise<void> {
+    console.log('chamou a handle');
     await getAllLogs(filter);
   }
 
