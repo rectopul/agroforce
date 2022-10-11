@@ -207,7 +207,7 @@ export default function Listagem({
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
   const pathExtra = `skip=${
     currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  }&take=${take}&orderBy=${orderBy== "Tecnologia"?'tecnologia.cod_tec':orderBy}&typeOrder=${typeOrder}`;
 
   const filters = [
     { id: 2, name: 'Todos' },
@@ -426,7 +426,7 @@ export default function Listagem({
       //   tableFields.push(headerTableFactory('Nome tec.', 'tecnologia.name'));
       // }
       if (columnCampos[item] === 'tecnologia') {
-        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
+        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia.cod_tec'));
       }
       if (columnCampos[item] === 'epoca') {
         tableFields.push(headerTableFactory('Epoca', 'epoca'));
