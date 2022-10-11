@@ -286,6 +286,7 @@ model genotipo {
   progenitor_m_origem String?
   progenitores_origem String?
   type                String?
+  dt_import           DateTime?
   safraId             Int?
   culture             culture               @relation(fields: [id_culture], references: [id])
   tecnologia          tecnologia            @relation(fields: [id_tecnologia], references: [id])
@@ -391,7 +392,7 @@ model lote {
   peso                Decimal?              @db.Decimal(5, 0)
   quant_sementes      Int?
   year                Int?
-  dt_import           DateTime
+  dt_import           DateTime?
   genotipo            genotipo              @relation(fields: [id_genotipo], references: [id])
   safra               safra                 @relation(fields: [id_safra], references: [id])
   genotype_treatment  genotype_treatment[]
@@ -561,7 +562,7 @@ model experiment_genotipe {
   idTypeAssay         Int
   idTecnologia        Int
   idExperiment        Int
-  idGenotipo          Int
+  idGenotipo          Int?
   id_seq_delineamento Int
   blockLayoutId       Int?
   idLote              Int?
@@ -569,7 +570,7 @@ model experiment_genotipe {
   rep                 Int
   nt                  Int
   npe                 Int
-  nca                 String
+  nca                 String?
   status              String    @default("SORTEADO")
   status_t            String    @default("L")
 
@@ -578,7 +579,7 @@ model experiment_genotipe {
   tecnologia             tecnologia             @relation(fields: [idTecnologia], references: [id])
   foco                   foco                   @relation(fields: [idFoco], references: [id])
   experiment             experiment             @relation(fields: [idExperiment], references: [id])
-  genotipo               genotipo               @relation(fields: [idGenotipo], references: [id])
+  genotipo               genotipo?              @relation(fields: [idGenotipo], references: [id])
   layout_quadra          layout_quadra?         @relation(fields: [blockLayoutId], references: [id])
   sequencia_delineamento sequencia_delineamento @relation(fields: [id_seq_delineamento], references: [id])
   lote                   lote?                  @relation(fields: [idLote], references: [id])

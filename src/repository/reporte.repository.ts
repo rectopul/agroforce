@@ -42,8 +42,4 @@ export class ReporteRepository {
     });
     return result;
   }
-
-  async queryRaw() {
-    console.log('queryRaw');
-  }
 }

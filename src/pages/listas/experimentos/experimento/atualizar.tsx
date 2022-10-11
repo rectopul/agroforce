@@ -25,6 +25,7 @@ import Swal from 'sweetalert2';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { experimentGenotipeService } from 'src/services/experiment-genotipe.service';
 import { ITreatment } from 'src/interfaces/listas/ensaio/genotype-treatment.interface';
+import { removeCookies, setCookies } from 'cookies-next';
 import {
   experimentService,
   userPreferencesService,
@@ -39,6 +40,7 @@ import {
   InputMoney,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import { tableGlobalFunctions } from '../../../../helpers';
 
 export interface IData {
   // allItens: any;
@@ -48,6 +50,8 @@ export interface IData {
   // idExperiment: number;
   experimento: object | any;
   // pageBeforeEdit: string | any
+  typeOrderServer :any| string, // RR
+  orderByserver : any |string // RR
 }
 
 interface IGenerateProps {
@@ -84,6 +88,8 @@ export default function AtualizarLocal({
   filterApplication,
   idExperiment,
   pageBeforeEdit,
+  typeOrderServer, // RR
+  orderByserver, // RR
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
@@ -112,9 +118,11 @@ export default function AtualizarLocal({
   );
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [orderList, setOrder] = useState<number>(1);
-  const [setArrowOrder] = useState<any>('');
+  // const [setArrowOrder] = useState<any>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [filter, setFilter] = useState<any>(filterApplication);
+  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [filtersParams, setFiltersParams] = useState<any>(''); // Set filter Parameter
   // const [colorStar, setColorStar] = useState<string>('');
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
@@ -144,6 +152,10 @@ export default function AtualizarLocal({
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
+
+  const [orderBy, setOrderBy] = useState<string>(orderByserver);
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IUpdateExperimento>({
     initialValues: {
@@ -185,62 +197,95 @@ export default function AtualizarLocal({
     },
   });
 
-  useEffect(() => {
-    getTreatments();
-  }, []);
+  // Calling common API
+  async function getTreatments(parametersFilter : any) {
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
+    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    setFiltersParams(parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
-  async function getTreatments() {
-    await experimentGenotipeService
-      .getAll(`&idExperiment=${idExperiment}`)
-      .then(({ response, total: allTotal }) => {
-        setTreatments(response);
-      });
+    await experimentGenotipeService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200 || response.status === 400) {
+        setTreatments(response.response);
+        setTotaItems(response.total);
+      }
+    });
   }
+
+  useEffect(() => {
+    const value = `idExperiment=${idExperiment}`;
+    getTreatments(value);
+  }, [idExperiment]);
+
+  // Call that function when change type order value.
+  useEffect(() => {
+    getTreatments(filter);
+  }, [typeOrder]);
+
+  // async function getTreatments() {
+  //   await experimentGenotipeService
+  //     .getAll(`&idExperiment=${idExperiment}`)
+  //     .then(({ response, total: allTotal }) => {
+  //       setTreatments(response);
+  //     });
+  // }
 
   async function handleOrder(
     column: string,
     order: string | any,
   ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
+    // let typeOrder: any;
+    // let parametersFilter: any;
+    // if (order === 1) {
+    //   typeOrder = "asc";
+    // } else if (order === 2) {
+    //   typeOrder = "desc";
+    // } else {
+    //   typeOrder = "";
+    // }
 
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
-
-    // await materiaisService.getAll(`${parametersFilter}&skip=0&take=${take}`)
-    //   .then(({ status, response }: any) => {
-    //   if (status === 200) {
-    //     setMateriais(response);
+    // if (filter && typeof filter !== "undefined") {
+    //   if (typeOrder !== "") {
+    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+    //   } else {
+    //     parametersFilter = filter;
     //   }
-    // });
+    // } else if (typeOrder !== "") {
+    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    // } else {
+    //   parametersFilter = filter;
+    // }
 
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
+    // // await materiaisService.getAll(`${parametersFilter}&skip=0&take=${take}`)
+    // //   .then(({ status, response }: any) => {
+    // //   if (status === 200) {
+    // //     setMateriais(response);
+    // //   }
+    // // });
+
+    // if (orderList === 2) {
+    //   setOrder(0);
+    //   setArrowOrder(<AiOutlineArrowDown />);
+    // } else {
+    //   setOrder(orderList + 1);
+    //   if (orderList === 1) {
+    //     setArrowOrder(<AiOutlineArrowUp />);
+    //   } else {
+    //     setArrowOrder("");
+    //   }
+    // }
+
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
   }
 
   function headerTableFactory(
@@ -272,7 +317,7 @@ export default function AtualizarLocal({
     Object.keys(columnCampos).forEach((item, index) => {
       if (columnCampos[index] === 'repetitionExperience') {
         tableFields.push(
-          headerTableFactory('Rep. Exp', 'repetitionExperience'),
+          headerTableFactory('Rep. Exp', 'rep'),
         );
       }
       if (columnCampos[index] === 'genotipo') {
@@ -284,10 +329,10 @@ export default function AtualizarLocal({
         tableFields.push(headerTableFactory('GMR', 'genotipo.gmr'));
       }
       if (columnCampos[index] === 'bgm') {
-        tableFields.push(headerTableFactory('BGM', 'bgm'));
+        tableFields.push(headerTableFactory('BGM', 'genotipo.bgm'));
       }
       if (columnCampos[index] === 'fase') {
-        tableFields.push(headerTableFactory('Fase', 'fase'));
+        tableFields.push(headerTableFactory('Fase', 'genotipo.lote[0].fase'));
       }
       if (columnCampos[index] === 'tecnologia') {
         tableFields.push(
@@ -426,26 +471,37 @@ export default function AtualizarLocal({
     // });
   };
 
-  function handleTotalPages(): void {
+  // function handleTotalPages(): void {
+  //   if (currentPage < 0) {
+  //     setCurrentPage(0);
+  //   } else if (currentPage >= pages) {
+  //     setCurrentPage(pages - 1);
+  //   }
+  // }
+
+  // async function handlePagination(): Promise<void> {
+  //   const skip = currentPage * Number(take);
+  //   let parametersFilter = `skip=${skip}&take=${take}`;
+
+  //   if (filter) {
+  //     parametersFilter = `${parametersFilter}&${filter}`;
+  //   }
+  //   // await materiaisService.getAll(parametersFilter).then((response) => {
+  //   //   if (response.status === 200) {
+  //   //     setMateriais(response.response);
+  //   //   }
+  //   // });
+  // }
+
+  // manage total pages
+  async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
-    } else if (currentPage >= pages) {
-      setCurrentPage(pages - 1);
     }
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter = `skip=${skip}&take=${take}`;
-
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
-    // await materiaisService.getAll(parametersFilter).then((response) => {
-    //   if (response.status === 200) {
-    //     setMateriais(response.response);
-    //   }
-    // });
+    await getTreatments(filter); // handle pagination globly
   }
 
   useEffect(() => {
@@ -703,7 +759,7 @@ export default function AtualizarLocal({
                     bgColor="bg-blue-600"
                     textColor="white"
                     icon={<RiOrganizationChart size={18} />}
-                    onClick={() => {}}
+                    onClick={() => { }}
                   />
                 </div>
               </div>
@@ -752,7 +808,7 @@ export default function AtualizarLocal({
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
-                      {treatments.length}
+                      {itemsTotal}
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
@@ -871,7 +927,7 @@ export default function AtualizarLocal({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -888,16 +944,16 @@ export default function AtualizarLocal({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context: any) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res, query }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()
   )?.response[0]?.itens_per_page) ?? 5;
 
-  const { token } = context.req.cookies;
-  const pageBeforeEdit = context.req.cookies.pageBeforeEdit
-    ? context.req.cookies.pageBeforeEdit
+  const { token } = req.cookies;
+  const pageBeforeEdit = req.cookies.pageBeforeEdit
+    ? req.cookies.pageBeforeEdit
     : 0;
 
   const requestOptions: RequestInit | undefined = {
@@ -906,11 +962,31 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
     headers: { Authorization: `Bearer ${token}` },
   };
 
-  const idExperiment = Number(context.query.id);
+  const idExperiment = Number(query.id);
 
   const { publicRuntimeConfig } = getConfig();
 
-  const filterApplication = `filterStatus=1&$id_experimento=${idExperiment}`;
+  const filterApplication = `idExperiment=${idExperiment}`;
+
+  // const filterApplication = `id_experimento=${idExperiment}`;
+
+  // RR
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+    ? req.cookies.filterBeforeEditTypeOrder
+    : '';
+
+  // RR
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : '';
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+
+  // RR
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
 
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/experiment`;
   const experimento = await fetch(
@@ -930,6 +1006,8 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
       idExperiment,
       experimento,
       pageBeforeEdit,
+      orderByserver, // RR
+      typeOrderServer, // RR
     },
   };
 };
