@@ -69,11 +69,11 @@ var react_modal_1 = require("react-modal");
 var XLSX = require("xlsx");
 var sweetalert2_1 = require("sweetalert2");
 var read_excel_file_1 = require("read-excel-file");
-var components_1 = require("../../../../components");
-var user_preference_controller_1 = require("../../../../controllers/user-preference.controller");
-var services_1 = require("../../../../services");
-var ITabs = require("../../../../shared/utils/dropdown");
-var helpers_1 = require("../../../../helpers");
+var components_1 = require("../../../../../components");
+var user_preference_controller_1 = require("../../../../../controllers/user-preference.controller");
+var services_1 = require("../../../../../services");
+var ITabs = require("../../../../../shared/utils/dropdown");
+var helpers_1 = require("../../../../../helpers");
 function Listagem(_a) {
     var _this = this;
     var _b;

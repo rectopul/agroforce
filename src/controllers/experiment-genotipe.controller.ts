@@ -340,6 +340,7 @@ export class ExperimentGenotipeController {
         orderBy,
       );
 
+      // console.log("response   ",response)
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }
