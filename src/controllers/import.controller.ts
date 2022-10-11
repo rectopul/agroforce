@@ -42,6 +42,7 @@ import { ImportLayoutBlockController } from './block-layout/block-layout-import.
 import { ImportDelimitationController } from './delimitation/delimitation-import.controller';
 import { ImportNpeController } from './npe/import-npe.controller';
 import { ImportAllocationController } from './allocation/import-allocation.controller';
+import { ImportExperimentGenotypeController } from './experiment-genotype/import-experiment-genotype.controller';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -215,6 +216,7 @@ export class ImportController {
 
       if (data.moduleId !== 22
           && data.moduleId !== 31
+          && data.moduleId !== 30
           && data.moduleId !== 23
           && data.moduleId !== 27
           && data.moduleId !== 26) {
@@ -271,6 +273,11 @@ export class ImportController {
       // Validação do modulo alocação
       if (data.moduleId === 31) {
         return await ImportAllocationController.validate(responseLog?.id, data);
+      }
+
+      // Validação do modulo alocação
+      if (data.moduleId === 30) {
+        return await ImportExperimentGenotypeController.validate(responseLog?.id, data);
       }
 
       return { status: 200, message: response, error: erro };

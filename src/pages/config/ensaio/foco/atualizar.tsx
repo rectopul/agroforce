@@ -444,8 +444,6 @@ export default function Atualizar({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    console.log('parametersFilter');
-    console.log(parametersFilter);
     await groupService.getAll(parametersFilter).then((response: any) => {
       if (response.status === 200) {
         setGrupos(response.response);

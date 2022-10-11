@@ -20,7 +20,7 @@ export class TypeAssayController {
 
       if (options.filterName) {
         parameters.name = JSON.parse(`{"contains":"${options.filterName}"}`);
-      }   
+      }
 
       if (options.filterSeedsFrom || options.filterSeedsTo) {
         if (options.filterSeedsFrom && options.filterSeedsTo) {
@@ -118,7 +118,7 @@ export class TypeAssayController {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const assayTypeAlreadyExist = await this.getByData(data);
-      if (assayTypeAlreadyExist.status === 200) return { status: 404, message: 'Tipo de ensaio já existe' };
+      if (assayTypeAlreadyExist.status === 200) return { status: 404, message: 'Tipo de ensaio já existe, favor checar registros inativos.' };
       const response = await this.typeAssayRepository.create(data);
 
       await this.reporteRepository.create({

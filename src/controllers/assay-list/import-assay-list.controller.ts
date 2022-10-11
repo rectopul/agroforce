@@ -38,8 +38,6 @@ export class ImportAssayListController {
 
     const responseIfError: any = [];
     try {
-
-
       for (const row in spreadSheet) {
         if (row !== '0') {
           for (const column in spreadSheet[row]) {
@@ -306,10 +304,6 @@ export class ImportAssayListController {
                 id_culture: idCulture,
 
               });
-              console.log("spreadSheet[row][11]  ",spreadSheet[row][11]);
-              console.log("technology  ",technology);
-              console.log("idCulture  ",idCulture );
-              console.log("genotype  ",genotype[0]?.id );
 
               const { response: lote }: IReturnObject = await loteController.getAll({
                 filterNcc: spreadSheet[row][11] || '0',

@@ -32,8 +32,6 @@ export class ImportGenotypeController {
       spreadSheet, idSafra, idCulture, created_by: createdBy,
     }: ImportValidate,
   ): Promise<IReturnObject> {
-
-    console.log("herere -----------------");
     const loteController = new LoteController();
     const safraController = new SafraController();
     const importController = new ImportController();
@@ -315,11 +313,18 @@ export class ImportGenotypeController {
               }
 
               if (configModule.response[0]?.fields[column] === 'NCC') {
-
-              
+                if (!validateInteger(spreadSheet[row][column])
+                || spreadSheet[row][column].toString().length > 12) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    (Number(column) + 1),
+                    row,
+                    spreadSheet[0][column],
+                    'precisa ser um numero inteiro e positivo e ter 12 dígitos',
+                  );
+                }
                 const nccDados: any = [];
                 // eslint-disable-next-line array-callback-return
-                spreadSheet.map((val: any, index: any) => {                  
+                spreadSheet.map((val: any, index: any) => {
                   if (index === column) {
                     if (nccDados.includes(val)) {
                       responseIfError[Number(column)] += responseGenericFactory(
@@ -330,11 +335,8 @@ export class ImportGenotypeController {
                       );
                     } else {
                       nccDados.push(val);
-                     
                     }
                   }
-
-                 
                 });
               }
             }
@@ -646,6 +648,8 @@ export class ImportGenotypeController {
                   }
                 }
 
+                console.log('this.aux');
+                console.log(this.aux);
                 if (
                   spreadSheet[row].length === Number(column) + 1
                   && this.aux !== []
@@ -703,10 +707,6 @@ export class ImportGenotypeController {
                     this.aux.id_genotipo = genotipo.response.id;
                   }
 
-                  // console.log("this.aux.id_genotipo && this.aux.ncc  ",this.aux.id_genotipo && this.aux.ncc)
-                  // console.log("this.aux.id_genotipo && this.aux.ncc  ",this.aux.id_genotipo )
-                  // console.log("")
-
                   if (this.aux.id_genotipo && this.aux.ncc) {
                     if (this.aux.id_lote) {
                       await loteController.update({
@@ -726,8 +726,8 @@ export class ImportGenotypeController {
                       });
                       delete this.aux.id_lote;
                       delete this.aux.id_genotipo;
+                      this.aux = [];
                     } else {
-                      //console.log("created--- ", Number(this.aux.ncc),)
                       await loteController.create({
                         id_genotipo: Number(this.aux.id_genotipo),
                         id_safra: Number(this.aux.id_safra),
@@ -743,6 +743,7 @@ export class ImportGenotypeController {
                         created_by: this.aux.created_by,
                       });
                       delete this.aux.id_genotipo;
+                      this.aux = [];
                     }
                   }
                 }

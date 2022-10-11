@@ -293,4 +293,25 @@ export class NpeController {
       throw new Error('[Controller] - Update NPE erro');
     }
   }
+
+  async delete(data: any) {
+    try {
+      const { status: statusAssay, response }: any = await this.getOne(Number(data.id));
+      if (statusAssay !== 200) return { status: 400, message: 'NPE não encontrada' };
+      if (response?.status === 3) return { status: 400, message: 'NPE já sorteada' };
+
+      if (statusAssay === 200) {
+        const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+        await this.reporteRepository.create({
+          madeBy: data.userId, module: 'NPE', operation: 'Exclusão', name: response.npe, ip: JSON.stringify(ip), idOperation: response.id,
+        });
+        await this.npeRepository.delete(Number(data.id));
+        return { status: 200, message: 'NPE excluída' };
+      }
+      return { status: 400, message: 'NPE não excluída' };
+    } catch (error: any) {
+      handleError('NPE controller', 'Delete', error.message);
+      throw new Error('[Controller] - Delete NPE erro');
+    }
+  }
 }

@@ -36,12 +36,12 @@ export class ExperimentController {
       // if (options.filterRepetition) {
       //   parameters.repetitionsNumber = Number(options.filterRepetition);
       // }
-      if (options.filterStatus) {
-        parameters.OR = [];
-        const statusParams = options.filterStatus.split(',');
-        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
-        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
-      }
+      // if (options.filterStatus) {
+      //   parameters.OR = [];
+      //   const statusParams = options.filterStatus.split(',');
+      //   parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
+      //   parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
+      // }
 
       if (options.filterExperimentName) {
         parameters.experimentName = JSON.parse(`{ "contains":"${options.filterExperimentName}" }`);
@@ -170,9 +170,7 @@ export class ExperimentController {
       if (options.Status) {
         parameters.status = options.Status;
       }
-      if (options.status) {
-        parameters.status = options.status;
-      }
+
       if (options.gli) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.gli}" } } }`));
       }
@@ -185,7 +183,7 @@ export class ExperimentController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
-
+      console.log(parameters);
       const response: object | any = await this.experimentRepository.findAll(
         parameters,
         select,
@@ -193,9 +191,6 @@ export class ExperimentController {
         skip,
         orderBy,
       );
-
-      console.log('response');
-      console.log(response);
 
       response.map(async (item: any) => {
         const newItem = item;
@@ -260,6 +255,7 @@ export class ExperimentController {
 
   async update(data: any) {
     try {
+      const experimentGenotipeController = new ExperimentGenotipeController();
       if (data.idList) {
         await this.experimentRepository.relationGroup(data);
         const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
@@ -268,6 +264,14 @@ export class ExperimentController {
       }
       const experimento: any = await this.experimentRepository.findOne(data.id);
       if (!experimento) return { status: 404, message: 'Experimento não encontrado' };
+      if (data.experimentGroupId === null) {
+        const parcelasId: any = [];
+        await experimento.experiment_genotipe.forEach(async (parcela: any) => {
+          parcelasId.push(parcela.id);
+        });
+        await experimentGenotipeController.update({ idList: parcelasId, status: 'SORTEADO', userId: data.userId });
+        delete data.userId;
+      }
       const response = await this.experimentRepository.update(experimento.id, data);
       if (experimento.experimentGroupId) {
         await this.countExperimentGroupChildren(experimento.experimentGroupId);
@@ -347,7 +351,8 @@ export class ExperimentController {
         allocated += 1;
       }
     });
-    if (toPrint > 1) {
+
+    if (toPrint >= 1) {
       status = 'ETIQ. EM ANDAMENTO';
     }
     if (printed === allParcelas) {
@@ -356,7 +361,6 @@ export class ExperimentController {
     if (toPrint === allParcelas) {
       status = 'ETIQ. NÃO INICIADA';
     }
-
     if (allocated === allParcelas) {
       status = 'TOTALMENTE ALOCADO';
     }

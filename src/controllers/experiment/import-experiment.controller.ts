@@ -320,7 +320,12 @@ export class ImportExperimentController {
                 id_culture: idCulture, name: spreadSheet[row][10],
               });
               const comments = spreadSheet[row][14]?.substr(0, 255) ? spreadSheet[row][14]?.substr(0, 255) : '';
-              const experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_${spreadSheet[row][9]}`;
+              let experimentName;
+              if (spreadSheet[row][9].toString().length < 2) {
+                experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_0${spreadSheet[row][9]}`;
+              } else {
+                experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_${spreadSheet[row][9]}`;
+              }
               const { response: experiment } = await experimentController.getAll({
                 filterExperimentName: experimentName,
                 idSafra,

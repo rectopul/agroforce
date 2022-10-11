@@ -27,12 +27,8 @@ import {
   BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
-import {
-  MdFirstPage, MdLastPage,
-} from 'react-icons/md';
-import {
-  RiCloseCircleFill, RiFileExcel2Line,
-} from 'react-icons/ri';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
 import { IoMdArrowBack } from 'react-icons/io';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
@@ -42,7 +38,10 @@ import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { experimentGenotipeService } from 'src/services/experiment-genotipe.service';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
-  genotypeTreatmentService, npeService, sequenciaDelineamentoService, userPreferencesService,
+  genotypeTreatmentService,
+  npeService,
+  sequenciaDelineamentoService,
+  userPreferencesService,
 } from '../../../../services';
 import { experimentService } from '../../../../services/experiment.service';
 import {
@@ -115,14 +114,15 @@ interface IData {
 }
 
 export default function Listagem({
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs;
 
+  const tableRef = useRef<any>(null);
   const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
@@ -156,7 +156,7 @@ export default function Listagem({
       title: 'Nome do experimento',
       value: 'experimentName',
     },
-    { name: 'CamposGerenciados[]', title: 'Nome tec.', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
     { name: 'CamposGerenciados[]', title: 'Época', value: 'period' },
     {
       name: 'CamposGerenciados[]',
@@ -166,7 +166,7 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'Rep.', value: 'repetitionsNumber' },
     {
       name: 'CamposGerenciados[]',
-      title: 'Number of treatment',
+      title: 'Qtd Genótipos',
       value: 'countNT',
     },
     {
@@ -381,6 +381,27 @@ export default function Listagem({
     };
   }
 
+  function tecnologiaTableFactory(name: any, title: string) {
+    return {
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: title,
+      sorting: false,
+      render: (rowData: any) => (
+        <div>{`${rowData?.tecnologia?.cod_tec} ${rowData?.tecnologia?.name}`}</div>
+      ),
+    };
+  }
+
   function columnsOrder(columnsCampos: any): any {
     const columnCampos: any = columnsCampos.split(',');
     const tableFields: any = [];
@@ -394,7 +415,7 @@ export default function Listagem({
       }
       if (columnCampos[index] === 'tecnologia') {
         tableFields.push(
-          headerTableFactory('Cód tec', 'assay_list.tecnologia.name'),
+          tecnologiaTableFactory('Tecnologia', 'assay_list.tecnologia.name'),
         );
       }
       if (columnCampos[index] === 'experimentName') {
@@ -415,7 +436,7 @@ export default function Listagem({
       }
     });
 
-    tableFields.push(headerTableFactory('Number of Treatment', 'countNT'));
+    tableFields.push(headerTableFactory('Qtd Genótipos', 'countNT'));
 
     tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
 
@@ -597,27 +618,41 @@ export default function Listagem({
         parametersFilter = `${parametersFilter}&${filter}`;
       }
 
-      await experimentService.getAll(parametersFilter).then(({ status, response, total }: any) => {
-        if (status === 200 || status === 400) {
-          let i = 0;
-          response.length > 0 ? i = NPESelectedRow.prox_npe : i = NPESelectedRow.npef;
-          response.map(async (item: any) => {
-            item.seq_delineamento.map((it: any) => {
-              item.npei = i;
-              item.npef = i + item.npeQT - 1;
-              i = item.npef + 1;
-              i >= NPESelectedRow.nextNPE.npei_i && npeUsedFrom == 0 ? setNpeUsedFrom(NPESelectedRow.nextNPE.npei_i) : '';
+      setLoading(true);
+
+      await experimentService
+        .getAll(parametersFilter)
+        .then(({ status, response, total }: any) => {
+          if (status === 200 || status === 400) {
+            let i = 0;
+            response.length > 0
+              ? (i = NPESelectedRow.prox_npe)
+              : (i = NPESelectedRow.npef);
+            response.map(async (item: any) => {
+              item.seq_delineamento.map((it: any) => {
+                item.npei = i;
+                item.npef = i + item.npeQT - 1;
+                i = item.npef + 1;
+                i >= NPESelectedRow.nextNPE.npei_i && npeUsedFrom == 0
+                  ? setNpeUsedFrom(NPESelectedRow.nextNPE.npei_i)
+                  : '';
+              });
             });
-          });
-          setExperimento(response);
-          setTotalItems(total);
-        }
-      });
+            setExperimento(response);
+            setTotalItems(total);
+            tableRef.current.dataManager.changePageSize(total);
+          }
+        });
       setLoading(false);
     }
+
   }
 
-  async function createExperimentGenotipe({ data, total_consumed, genotipo_treatment }: any) {
+  async function createExperimentGenotipe({
+    data,
+    total_consumed,
+    genotipo_treatment,
+  }: any) {
     if (data.length > 0) {
       const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
       const experimentObj: any[] = [];
@@ -631,8 +666,8 @@ export default function Listagem({
       if (
         NPESelectedRow?.npeQT == 'N/A'
           ? true
-          : NPESelectedRow?.npeQT - total_consumed > 0
-          && lastNpe < NPESelectedRow?.nextNPE.npei_i
+          : NPESelectedRow?.npeQT - total_consumed > 0 &&
+          lastNpe < NPESelectedRow?.nextNPE.npei_i
       ) {
         await experimentGenotipeService
           .create(data)
@@ -680,22 +715,23 @@ export default function Listagem({
       let npei = Number(NPESelectedRow?.npei_i);
 
       experimentos?.map((item: any) => {
-        item.assay_list.genotype_treatment.map((gt: any) => {
-          item.seq_delineamento.map((sd: any) => {
+        item.assay_list?.genotype_treatment.map((gt: any) => {
+          item.seq_delineamento?.map((sd: any) => {
             const data: any = {};
             data.idSafra = gt.id_safra;
-            data.idFoco = item.assay_list.foco.id;
-            data.idTypeAssay = item.assay_list.type_assay.id;
-            data.idTecnologia = item.assay_list.tecnologia.id;
+            data.idFoco = item.assay_list?.foco.id;
+            data.idTypeAssay = item.assay_list?.type_assay.id;
+            data.idTecnologia = item.assay_list?.tecnologia.id;
             data.idExperiment = item.id;
-            data.gli = item.assay_list.gli;
-            data.rep = item.delineamento.repeticao;
+            data.gli = item.assay_list?.gli;
+            data.rep = item.delineamento?.repeticao;
             data.nt = gt.treatments_number;
             data.npe = npei;
-            data.idLote = gt.genotipo.id_lote;
-            data.idGenotipo = gt.genotipo.id; // Added new field
+            data.idLote = gt.genotipo?.id_lote;
+            data.idGenotipo = gt.genotipo?.id; // Added new field
+            data.gli = item.assay_list?.gli;
             data.id_seq_delineamento = sd.id;
-            data.nca = gt.lote.ncc;
+            data.nca = gt.lote?.ncc;
             experiment_genotipo.push(data);
             npei++;
           });
@@ -705,15 +741,20 @@ export default function Listagem({
           genotipo_treatment.push(gt_new);
         });
       });
-      createExperimentGenotipe({ data: experiment_genotipo, total_consumed: experiment_genotipo.length, genotipo_treatment });
+      createExperimentGenotipe({
+        data: experiment_genotipo,
+        total_consumed: experiment_genotipo.length,
+        genotipo_treatment,
+      });
     } else {
       const temp = NPESelectedRow;
       Swal.fire({
         title: 'NPE Já usado !!!',
         html:
-          `Existem NPE usados ​​entre <b>${npeUsedFrom}</b> e <b>${temp.npef}</b><br><br>`
-          + `Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : ${temp.nextNPE.foco.name}</b><br><b> Ensaio : ${temp.nextNPE.type_assay.name}</b><br><b> Local : ${temp.nextNPE.local.name_local_culture}</b><br><b>Epoca : ${temp.nextNPE.epoca}</b><br><b>Tecnologia : ${temp.nextNPE.tecnologia.name}</b></p><br>`
-          + `O próximo NPE disponível é <strong>${(Number(temp.nextAvailableNPE) + 1)}</strong></div>`,
+          `Existem NPE usados ​​entre <b>${npeUsedFrom}</b> e <b>${temp.npef}</b><br><br>` +
+          `Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : ${temp.nextNPE.foco.name}</b><br><b> Ensaio : ${temp.nextNPE.type_assay.name}</b><br><b> Local : ${temp.nextNPE.local.name_local_culture}</b><br><b>Epoca : ${temp.nextNPE.epoca}</b><br><b>Tecnologia : ${temp.nextNPE.tecnologia.name}</b></p><br>` +
+          `O próximo NPE disponível é <strong>${Number(temp.nextAvailableNPE) + 1
+          }</strong></div>`,
         icon: 'warning',
         showCloseButton: true,
         closeButtonHtml:
@@ -722,9 +763,10 @@ export default function Listagem({
         confirmButtonText: 'Acesse o NPE e atualize',
       }).then((result) => {
         if (result.isConfirmed) {
-          router.push({
-            pathname: '/config/npe',
-          });
+          window.open('/config/ambiente', '_ blank');
+          // router.push({
+          //   pathname: "/config/npe",
+          // });
         }
       });
     }
@@ -735,18 +777,24 @@ export default function Listagem({
   }, [NPESelectedRow]);
 
   useEffect(() => {
+    setNPESelectedRow(selectedNPE[0]);
+  }, [])
+
+  useEffect(() => {
     let count = 0;
     experimentos.map((item: any) => {
-      item.npei <= NPESelectedRow?.nextNPE.npei_i
-        && item.npef >= NPESelectedRow?.nextNPE.npei_i
-        && NPESelectedRow?.nextNPE != 0
+      item.npei <= NPESelectedRow?.nextNPE.npei_i &&
+        item.npef >= NPESelectedRow?.nextNPE.npei_i &&
+        NPESelectedRow?.nextNPE != 0
         ? count++
         : '';
     });
     count > 0 ? setSortearDisable(true) : setSortearDisable(false);
     setExperimentoNew(experimentos.slice(0, 10));
     if (NPESelectedRow) {
-      selectedNPE.filter((x): any => x == NPESelectedRow)[0].npef = experimentos.length > 0 ? experimentos[experimentos.length - 1].npef : NPESelectedRow.npef;
+      selectedNPE.filter((x): any => x == NPESelectedRow)[0].npef = experimentos.length > 0
+        ? experimentos[experimentos.length - 1].npef
+        : NPESelectedRow.npef;
     }
   }, [experimentos]);
 
@@ -766,8 +814,8 @@ export default function Listagem({
                         "
         >
           <div
-            className={`w-full ${selectedNPE?.length > 3 && 'max-h-40 overflow-y-scroll'
-            } mb-4`}
+            className={`w-full ${selectedNPE?.length > 3 && "max-h-40 overflow-y-scroll"
+              } mb-4`}
           >
             <MaterialTable
               style={{
@@ -811,6 +859,7 @@ export default function Listagem({
           {NPESelectedRow ? (
             <div className="w-full h-full overflow-y-scroll">
               <MaterialTable
+                tableRef={tableRef}
                 style={{ background: '#f9fafb' }}
                 columns={columns}
                 data={experimentosNew}
@@ -821,10 +870,10 @@ export default function Listagem({
                   },
                   rowStyle: (rowData) => ({
                     backgroundColor:
-                      rowData.npef >= NPESelectedRow?.nextNPE.npei_i
-                        && SortearDisable
-                        ? '#FF5349'
-                        : '#f9fafb',
+                      rowData.npef >= NPESelectedRow?.nextNPE.npei_i &&
+                        SortearDisable
+                        ? "#FF5349"
+                        : "#f9fafb",
                     height: 40,
                   }),
                   search: false,
@@ -999,7 +1048,7 @@ export default function Listagem({
                         disabled={currentPage + 1 >= pages}
                       />
                     </div>
-                  ) as any,
+                    ) as any,
                 }}
               />
             </div>
