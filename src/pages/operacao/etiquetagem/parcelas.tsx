@@ -679,7 +679,6 @@ export default function Listagem({
     let countNca = 0;
     parcelas.map((item: any) => {
       if (item.nca === inputCode) {
-        console.log({ item });
         setParcelasToPrint((current: any) => [...current, item.id]);
         countNca += 1;
         setGenotypeNameOne(item?.genotipo?.name_genotipo);
@@ -816,13 +815,10 @@ export default function Listagem({
     )?.value;
     if (inputCode.length === 12) {
       if (dismiss) {
-        console.log('dimiss');
         writeOff();
       } else if (doubleVerify) {
-        console.log('verifyAgain');
         verifyAgain();
       } else {
-        console.log('handlesub');
         handleSubmit();
       }
     }
