@@ -1,35 +1,35 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
-import { useFormik } from "formik";
-import MaterialTable from "material-table";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import getConfig from "next/config";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import getConfig from 'next/config';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from "react-beautiful-dnd";
-import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
-import { BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { IoMdArrowBack } from "react-icons/io";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line, RiOrganizationChart } from "react-icons/ri";
-import * as XLSX from "xlsx";
-import Swal from "sweetalert2";
-import { RequestInit } from "next/dist/server/web/spec-extension/request";
-import { experimentGenotipeService } from "src/services/experiment-genotipe.service";
-import { ITreatment } from "src/interfaces/listas/ensaio/genotype-treatment.interface";
+} from 'react-beautiful-dnd';
+import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai';
+import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import { IoMdArrowBack } from 'react-icons/io';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RiFileExcel2Line, RiOrganizationChart } from 'react-icons/ri';
+import * as XLSX from 'xlsx';
+import Swal from 'sweetalert2';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { experimentGenotipeService } from 'src/services/experiment-genotipe.service';
+import { ITreatment } from 'src/interfaces/listas/ensaio/genotype-treatment.interface';
 import {
   experimentService,
   userPreferencesService,
-} from "../../../../services";
-import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
+} from '../../../../services';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   AccordionFilter,
   Button,
@@ -37,8 +37,8 @@ import {
   Content,
   Input,
   InputMoney,
-} from "../../../../components";
-import * as ITabs from "../../../../shared/utils/dropdown";
+} from '../../../../components';
+import * as ITabs from '../../../../shared/utils/dropdown';
 
 export interface IData {
   // allItens: any;
@@ -87,60 +87,58 @@ export default function AtualizarLocal({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
-  const tabsDropDowns = TabsDropDowns("listas");
+  const tabsDropDowns = TabsDropDowns('listas');
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "EXPERIMENTOS"
-      ? (tab.statusTab = true)
-      : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'EXPERIMENTOS'
+    ? (tab.statusTab = true)
+    : (tab.statusTab = false)));
 
   const router = useRouter();
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.materiais || {
     id: 0,
     table_preferences:
-      "repetitionExperience,genotipo,gmr,bgm,fase,tecnologia,nt,rep,status,nca,npe,sequence,block,experiment",
+      'repetitionExperience,genotipo,gmr,bgm,fase,tecnologia,nt,rep,status,nca,npe,sequence,block,experiment',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences
+    preferences.table_preferences,
   );
 
   const [materiais, setMateriais] = useState<any>(() => allItens);
   const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
   const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit)
+    Number(pageBeforeEdit),
   );
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [orderList, setOrder] = useState<number>(1);
-  const [setArrowOrder] = useState<any>("");
+  const [setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [filter, setFilter] = useState<any>(filterApplication);
   // const [colorStar, setColorStar] = useState<string>('');
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
-      name: "CamposGerenciados[]",
-      title: "Rep. Exp",
-      value: "repetitionExperience",
+      name: 'CamposGerenciados[]',
+      title: 'Rep. Exp',
+      value: 'repetitionExperience',
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Nome do genotipo",
-      value: "genotipo",
+      name: 'CamposGerenciados[]',
+      title: 'Nome do genotipo',
+      value: 'genotipo',
     },
-    { name: "CamposGerenciados[]", title: "GMR", value: "gmr" },
-    { name: "CamposGerenciados[]", title: "BGM", value: "bgm" },
-    { name: "CamposGerenciados[]", title: "Fase", value: "fase" },
-    { name: "CamposGerenciados[]", title: "Tecnologia", value: "tecnologia" },
-    { name: "CamposGerenciados[]", title: "NT", value: "nt" },
-    { name: "CamposGerenciados[]", title: "Rep. trat.", value: "rep" },
-    { name: "CamposGerenciados[]", title: "T", value: "status" },
-    { name: "CamposGerenciados[]", title: "NCA", value: "nca" },
-    { name: "CamposGerenciados[]", title: "NPE", value: "npe" },
-    { name: "CamposGerenciados[]", title: "Seq.", value: "sorteio" },
-    { name: "CamposGerenciados[]", title: "Bloco", value: "bloco" },
-    { name: "CamposGerenciados[]", title: "Status parc.", value: "experiment" },
+    { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
+    { name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm' },
+    { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
+    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'NT', value: 'nt' },
+    { name: 'CamposGerenciados[]', title: 'Rep. trat.', value: 'rep' },
+    { name: 'CamposGerenciados[]', title: 'T', value: 'status' },
+    { name: 'CamposGerenciados[]', title: 'NCA', value: 'nca' },
+    { name: 'CamposGerenciados[]', title: 'NPE', value: 'npe' },
+    // { name: "CamposGerenciados[]", title: "Seq.", value: "sorteio" },
+    { name: 'CamposGerenciados[]', title: 'Bloco', value: 'bloco' },
+    { name: 'CamposGerenciados[]', title: 'Status parc.', value: 'experiment' },
   ]);
 
   const take: number = itensPerPage;
@@ -178,7 +176,7 @@ export default function AtualizarLocal({
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire("Experimento atualizado com sucesso!");
+            Swal.fire('Experimento atualizado com sucesso!');
             router.back();
           } else {
             Swal.fire(response.message);
@@ -201,25 +199,25 @@ export default function AtualizarLocal({
 
   async function handleOrder(
     column: string,
-    order: string | any
+    order: string | any,
   ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = "asc";
+      typeOrder = 'asc';
     } else if (order === 2) {
-      typeOrder = "desc";
+      typeOrder = 'desc';
     } else {
-      typeOrder = "";
+      typeOrder = '';
     }
 
-    if (filter && typeof filter !== "undefined") {
-      if (typeOrder !== "") {
+    if (filter && typeof filter !== 'undefined') {
+      if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== "") {
+    } else if (typeOrder !== '') {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
     } else {
       parametersFilter = filter;
@@ -240,7 +238,7 @@ export default function AtualizarLocal({
       if (orderList === 1) {
         setArrowOrder(<AiOutlineArrowUp />);
       } else {
-        setArrowOrder("");
+        setArrowOrder('');
       }
     }
   }
@@ -248,7 +246,7 @@ export default function AtualizarLocal({
   function headerTableFactory(
     name: any,
     title: string,
-    style: boolean = false
+    style: boolean = false,
   ) {
     return {
       title: (
@@ -264,66 +262,66 @@ export default function AtualizarLocal({
       ),
       field: title,
       sorting: false,
-      cellStyle: style ? { color: "#039be5", fontWeight: "bold" } : {},
+      cellStyle: style ? { color: '#039be5', fontWeight: 'bold' } : {},
     };
   }
 
   function columnsOrder(columnsCampos: string) {
-    const columnCampos: string[] = columnsCampos.split(",");
+    const columnCampos: string[] = columnsCampos.split(',');
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === "repetitionExperience") {
+      if (columnCampos[index] === 'repetitionExperience') {
         tableFields.push(
-          headerTableFactory("Rep. Exp", "repetitionExperience")
+          headerTableFactory('Rep. Exp', 'repetitionExperience'),
         );
       }
-      if (columnCampos[index] === "genotipo") {
+      if (columnCampos[index] === 'genotipo') {
         tableFields.push(
-          headerTableFactory("Nome do genotipo", "genotipo.name_genotipo", true)
+          headerTableFactory('Nome do genotipo', 'genotipo.name_genotipo', true),
         );
       }
-      if (columnCampos[index] === "gmr") {
-        tableFields.push(headerTableFactory("GMR", "genotipo.gmr"));
+      if (columnCampos[index] === 'gmr') {
+        tableFields.push(headerTableFactory('GMR', 'genotipo.gmr'));
       }
-      if (columnCampos[index] === "bgm") {
-        tableFields.push(headerTableFactory("BGM", "bgm"));
+      if (columnCampos[index] === 'bgm') {
+        tableFields.push(headerTableFactory('BGM', 'bgm'));
       }
-      if (columnCampos[index] === "fase") {
-        tableFields.push(headerTableFactory("Fase", "fase"));
+      if (columnCampos[index] === 'fase') {
+        tableFields.push(headerTableFactory('Fase', 'fase'));
       }
-      if (columnCampos[index] === "tecnologia") {
+      if (columnCampos[index] === 'tecnologia') {
         tableFields.push(
-          headerTableFactory("Tecnologia", "tecnologia.cod_tec")
+          headerTableFactory('Tecnologia', 'tecnologia.cod_tec'),
         );
       }
-      if (columnCampos[index] === "nt") {
-        tableFields.push(headerTableFactory("NT", "nt"));
+      if (columnCampos[index] === 'nt') {
+        tableFields.push(headerTableFactory('NT', 'nt'));
       }
-      if (columnCampos[index] === "treatments_number") {
-        tableFields.push(headerTableFactory("Rep. trat.", "rep"));
+      if (columnCampos[index] === 'treatments_number') {
+        tableFields.push(headerTableFactory('Rep. trat.', 'rep'));
       }
-      if (columnCampos[index] === "status") {
-        tableFields.push(headerTableFactory("T", "status"));
+      if (columnCampos[index] === 'status') {
+        tableFields.push(headerTableFactory('T', 'status'));
       }
-      if (columnCampos[index] === "nca") {
-        tableFields.push(headerTableFactory("NCA", "nca", true));
+      if (columnCampos[index] === 'nca') {
+        tableFields.push(headerTableFactory('NCA', 'nca', true));
       }
-      if (columnCampos[index] === "npe") {
-        tableFields.push(headerTableFactory("NPE", "npe"));
+      if (columnCampos[index] === 'npe') {
+        tableFields.push(headerTableFactory('NPE', 'npe'));
       }
-      if (columnCampos[index] === "sequence") {
+      // if (columnCampos[index] === "sequence") {
+      //   tableFields.push(
+      //     headerTableFactory("Sequence", "sequencia_delineamento.sorteio")
+      //   );
+      // }
+      if (columnCampos[index] === 'block') {
         tableFields.push(
-          headerTableFactory("Sequence", "sequencia_delineamento.sorteio")
+          headerTableFactory('Bloco', 'sequencia_delineamento.bloco'),
         );
       }
-      if (columnCampos[index] === "block") {
+      if (columnCampos[index] === 'experiment') {
         tableFields.push(
-          headerTableFactory("Bloco", "sequencia_delineamento.bloco")
-        );
-      }
-      if (columnCampos[index] === "experiment") {
-        tableFields.push(
-          headerTableFactory("Status parc.", "experiment.status")
+          headerTableFactory('Status parc.', 'experiment.status'),
         );
       }
     });
@@ -334,7 +332,7 @@ export default function AtualizarLocal({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = "";
+    let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -357,7 +355,7 @@ export default function AtualizarLocal({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
       userLogado.preferences.materiais = {
         id: preferences.id,
@@ -368,7 +366,7 @@ export default function AtualizarLocal({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -387,7 +385,7 @@ export default function AtualizarLocal({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes("paramSelect")) {
+    if (!filterApplication.includes('paramSelect')) {
       filterApplication += `&paramSelect=${camposGerenciados}&id_experimento=${idExperiment}`;
     }
     // await materiaisService.getAll(filterApplication).then((response) => {
@@ -462,7 +460,7 @@ export default function AtualizarLocal({
           {name}
         </label>
         <Input
-          style={{ background: "#e5e7eb" }}
+          style={{ background: '#e5e7eb' }}
           disabled
           required
           id={title}
@@ -477,7 +475,7 @@ export default function AtualizarLocal({
     name: string,
     title: string,
     values: any,
-    type: string = "text"
+    type: string = 'text',
   ) {
     return (
       <div className="w-1/4 h-7 mt-7">
@@ -536,34 +534,34 @@ export default function AtualizarLocal({
           "
           >
             <div className="w-full flex justify-between items-start gap-5 mt-1">
-              {fieldsFactory("Foco", "foco", experimento.assay_list?.foco.name)}
+              {fieldsFactory('Foco', 'foco', experimento.assay_list?.foco.name)}
 
               {fieldsFactory(
-                "Ensaio",
-                "type_assay",
-                experimento.assay_list?.type_assay.name
+                'Ensaio',
+                'type_assay',
+                experimento.assay_list?.type_assay.name,
               )}
 
               {fieldsFactory(
-                "Tecnologia",
-                "tecnologia",
-                `${experimento.assay_list?.tecnologia.cod_tec} ${experimento.assay_list?.tecnologia.name}`
+                'Tecnologia',
+                'tecnologia',
+                `${experimento.assay_list?.tecnologia.cod_tec} ${experimento.assay_list?.tecnologia.name}`,
               )}
 
-              {fieldsFactory("GLI", "gli", experimento.assay_list?.gli)}
+              {fieldsFactory('GLI', 'gli', experimento.assay_list?.gli)}
 
               {fieldsFactory(
-                "Experimento",
-                "experimentName",
-                experimento.experimentName
+                'Experimento',
+                'experimentName',
+                experimento.experimentName,
               )}
 
-              {fieldsFactory("BGM", "bgm", experimento?.bgm)}
+              {fieldsFactory('BGM', 'bgm', experimento?.bgm)}
 
               {fieldsFactory(
-                "Status do ensaio",
-                "status",
-                experimento.assay_list?.status
+                'Status do ensaio',
+                'status',
+                experimento.assay_list?.status,
               )}
             </div>
           </div>
@@ -579,35 +577,35 @@ export default function AtualizarLocal({
           >
             <div className="w-full flex justify-between items-start gap-5 mt-3">
               {fieldsFactory(
-                "Lugar plantio",
-                "local",
-                experimento.local?.name_local_culture
+                'Lugar plantio',
+                'local',
+                experimento.local?.name_local_culture,
               )}
 
               {fieldsFactory(
-                "Delineamento",
-                "delineamento",
-                experimento.delineamento?.name
+                'Delineamento',
+                'delineamento',
+                experimento.delineamento?.name,
               )}
 
               {fieldsFactory(
-                "Repetições",
-                "repetitionsNumber",
-                experimento.repetitionsNumber
+                'Repetições',
+                'repetitionsNumber',
+                experimento.repetitionsNumber,
               )}
 
-              {fieldsFactory("Densidade", "density", experimento.density)}
+              {fieldsFactory('Densidade', 'density', experimento.density)}
 
               {fieldsFactory(
-                "Ordem de sorteio",
-                "orderDraw",
-                experimento.orderDraw
+                'Ordem de sorteio',
+                'orderDraw',
+                experimento.orderDraw,
               )}
 
               {fieldsFactory(
-                "Status do experimento",
-                "status",
-                experimento.status
+                'Status do experimento',
+                'status',
+                experimento.status,
               )}
             </div>
           </div>
@@ -627,10 +625,10 @@ export default function AtualizarLocal({
           "
           >
             <div className="w-full h-f10 flex justify-between items-start gap-5">
-              {updateFieldsFactory("NLP", "nlp", formik.values.nlp, "number")}
+              {updateFieldsFactory('NLP', 'nlp', formik.values.nlp, 'number')}
 
               {/* {updateFieldMoney('EEL', 'eel', formik.values.eel)} */}
-              {updateFieldMoney("CLP", "clp", formik.values.clp)}
+              {updateFieldMoney('CLP', 'clp', formik.values.clp)}
 
               {/* <input
                 style={{ border: 1, borderColor: '#000', width: 200 }}
@@ -720,11 +718,11 @@ export default function AtualizarLocal({
         "
         >
           <div
-            style={{ marginTop: "1%" }}
+            style={{ marginTop: '1%' }}
             className="w-full h-auto overflow-y-scroll"
           >
             <MaterialTable
-              style={{ background: "#f9fafb" }}
+              style={{ background: '#f9fafb' }}
               columns={columns}
               data={treatments}
               options={{
@@ -752,7 +750,9 @@ export default function AtualizarLocal({
                   "
                   >
                     <strong className="text-blue-600">
-                      Total registrado: {treatments.length}
+                      Total registrado:
+                      {' '}
+                      {treatments.length}
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
@@ -796,7 +796,7 @@ export default function AtualizarLocal({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value as string
+                                                generate.value as string,
                                               )}
                                             />
                                           </li>
@@ -826,59 +826,58 @@ export default function AtualizarLocal({
                     </div>
                   </div>
                 ),
-                Pagination: (props) =>
-                  (
-                    <div
-                      className="flex
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(0)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage < 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill("")
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setCurrentPage(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(pages)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(0)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage < 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(pages)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
                   ) as any,
               }}
             />
@@ -892,10 +891,9 @@ export default function AtualizarLocal({
 export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
-  const itensPerPage =
-    (await (
-      await PreferencesControllers.getConfigGerais()
-    )?.response[0]?.itens_per_page) ?? 5;
+  const itensPerPage = (await (
+    await PreferencesControllers.getConfigGerais()
+  )?.response[0]?.itens_per_page) ?? 5;
 
   const { token } = context.req.cookies;
   const pageBeforeEdit = context.req.cookies.pageBeforeEdit
@@ -903,8 +901,8 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
     : 0;
 
   const requestOptions: RequestInit | undefined = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   };
 
@@ -917,7 +915,7 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/experiment`;
   const experimento = await fetch(
     `${baseUrlShow}/${idExperiment}`,
-    requestOptions
+    requestOptions,
   ).then((response) => response.json());
 
   const allItens: any = [];
