@@ -888,7 +888,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar genótipos do ensaio">
+          <AccordionFilter title="Filtrar Genótipo/NCA">
             <div className="w-full flex gap-2 z-1">
               <form
                 className="flex flex-col
