@@ -881,8 +881,8 @@ export default function Listagem({
             />
           </button>
 
-          <div className="flex px-4  justify-between">
-            <header className="flex flex-col mt-2">
+          <div className="flex px-4 justify-between">
+            <div className="flex w-1/3 flex-col mt-2">
               <h2 className="mb-2 text-blue-600 text-xl font-medium">Ação</h2>
               <div>
                 <div className="border-l-8 border-l-blue-600 mt-4">
@@ -913,24 +913,30 @@ export default function Listagem({
                   NCA
                 </label>
               </div>
-            </header>
-            <div>
-              <div className="mb-2 text-blue-600 text-xl mt-2 font-medium">
-                <h2>
-                  Total selecionados:
-                  {' '}
-                  {rowsSelected?.length}
-                </h2>
-              </div>
+            </div>
+            <div className="flex flex-1 flex-col ml-8">
+              <h2 className="mb-2 text-blue-600 text-xl mt-2 font-medium">
+                Total selecionados:
+                {' '}
+                {rowsSelected?.length}
+              </h2>
 
-              <div className="border-l-8 border-l-blue-600">
-                <h2 className="mb-2 font-normal text-xl ml-2 text-gray-900 mt-6">
-                  Importa Arquivo:
-                </h2>
-              </div>
+              <div>
+                <div className="border-l-8 border-l-blue-600">
+                  <h2 className="mb-2 font-normal text-xl ml-2 text-gray-900 mt-4">
+                    Importar Arquivo:
+                  </h2>
+                </div>
 
-              <h2>Excel</h2>
-              <Input
+                <h2>Excel</h2>
+                <button
+                  type="submit"
+                  className="w-full h-8 ml-auto mt-0 bg-green-600 text-white px-8 rounded-lg text-sm hover:bg-green-800"
+                  onClick={() => router.push('/listas/rd')}
+                >
+                  Importar arquivo
+                </button>
+                {/* <Input
                 id="import"
                 type="file"
                 className="
@@ -945,7 +951,8 @@ export default function Listagem({
               leading-tight
               focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
         "
-              />
+              /> */}
+              </div>
             </div>
           </div>
           <div className="flex justify-end py-0">
