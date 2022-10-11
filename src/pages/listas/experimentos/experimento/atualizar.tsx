@@ -77,14 +77,14 @@ interface IUpdateExperimento {
 }
 
 export default function AtualizarLocal({
-  experimento,
-  allItens,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idExperiment,
-  pageBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      experimento,
+      allItens,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idExperiment,
+      pageBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns("listas");
@@ -274,7 +274,7 @@ export default function AtualizarLocal({
     Object.keys(columnCampos).forEach((item, index) => {
       if (columnCampos[index] === "repetitionExperience") {
         tableFields.push(
-          headerTableFactory("Rep. Exp", "repetitionExperience")
+          headerTableFactory("Rep. Exp", "rep")
         );
       }
       if (columnCampos[index] === "genotipo") {
@@ -286,10 +286,10 @@ export default function AtualizarLocal({
         tableFields.push(headerTableFactory("GMR", "genotipo.gmr"));
       }
       if (columnCampos[index] === "bgm") {
-        tableFields.push(headerTableFactory("BGM", "bgm"));
+        tableFields.push(headerTableFactory("BGM", "genotipo.bgm"));
       }
       if (columnCampos[index] === "fase") {
-        tableFields.push(headerTableFactory("Fase", "fase"));
+        tableFields.push(headerTableFactory("Fase", "genotipo.lote[0].fase"));
       }
       if (columnCampos[index] === "tecnologia") {
         tableFields.push(
@@ -705,7 +705,7 @@ export default function AtualizarLocal({
                     bgColor="bg-blue-600"
                     textColor="white"
                     icon={<RiOrganizationChart size={18} />}
-                    onClick={() => {}}
+                    onClick={() => { }}
                   />
                 </div>
               </div>

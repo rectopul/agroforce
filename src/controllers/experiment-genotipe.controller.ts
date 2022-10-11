@@ -244,6 +244,8 @@ export class ExperimentGenotipeController {
         genotipo: {
           select: {
             name_genotipo: true,
+            gmr: true,
+            bgm: true,
             lote: {
               select: {
                 fase: true,
