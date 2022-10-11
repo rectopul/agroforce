@@ -201,11 +201,12 @@ export default function Listagem({
         <div className="flex gap-2">
           <div className="h-10 w-10">
             <Button
+              disabled={rowData.status === 'ETIQ. EM ANDAMENTO' || rowData.status === 'ETIQ. FINALIZADA'}
               title={`Excluir ${rowData.name}`}
               type="button"
               onClick={() => deleteItem(rowData.id)}
               rounder="rounded-full"
-              bgColor="bg-red-600"
+              bgColor={rowData.status === 'ETIQ. EM ANDAMENTO' || rowData.status === 'ETIQ. FINALIZADA' ? 'bg-gray-600' : 'bg-red-600'}
               textColor="white"
               icon={<BsTrashFill size={20} />}
             />
@@ -446,8 +447,7 @@ export default function Listagem({
       id,
       experimentGroupId: null,
       userId: userLogado.id,
-    }
-    );
+    });
     if (status === 200) {
       router.reload();
     } else {
@@ -541,11 +541,14 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 0,
                 },
+                showSelectAllCheckbox: false,
+                selection: true,
+                selectionProps: (rowData: any) => ({
+                  disabled: rowData.status === 'ETIQ. EM ANDAMENTO' || rowData.status === 'ETIQ. FINALIZADA',
+                }),
                 rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
-                selection: true,
-                showSelectAllCheckbox: true,
                 pageSize: Number(take),
               }}
               // localization={{
@@ -684,49 +687,49 @@ export default function Listagem({
                       py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(0)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage < 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill("")
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setCurrentPage(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(pages-1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(0)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage < 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(pages - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
                   ) as any,
               }}
             />
