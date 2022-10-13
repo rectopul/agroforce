@@ -38,8 +38,6 @@ export class ImportAssayListController {
 
     const responseIfError: any = [];
     try {
-
-
       for (const row in spreadSheet) {
         if (row !== '0') {
           for (const column in spreadSheet[row]) {
