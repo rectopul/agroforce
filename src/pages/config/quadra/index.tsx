@@ -904,7 +904,7 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-
+                    <div />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
