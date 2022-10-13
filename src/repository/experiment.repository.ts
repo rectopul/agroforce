@@ -22,12 +22,12 @@ export class ExperimentRepository {
         clp: true,
         comments: true,
         orderDraw: true,
-        bgm: true,
         experiment_genotipe: true,
         assay_list: {
           select: {
             status: true,
             gli: true,
+            bgm: true,
             tecnologia: {
               select: {
                 name: true,

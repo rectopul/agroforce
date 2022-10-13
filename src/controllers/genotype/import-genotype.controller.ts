@@ -39,7 +39,6 @@ export class ImportGenotypeController {
     const genotipoController = new GenotipoController();
     const logImportController = new LogImportController();
     const tecnologiaController = new TecnologiaController();
-
     const responseIfError: any = [];
     try {
       const configModule: object | any = await importController.getAll(10);
@@ -392,8 +391,6 @@ export class ImportGenotypeController {
       }
 
       if (responseIfError.length === 0) {
-        this.aux.created_by = Number(createdBy);
-        this.aux.id_culture = Number(idCulture);
         try {
           for (const row in spreadSheet) {
             if (row !== '0') {
@@ -648,8 +645,6 @@ export class ImportGenotypeController {
                   }
                 }
 
-                console.log('this.aux');
-                console.log(this.aux);
                 if (
                   spreadSheet[row].length === Number(column) + 1
                   && this.aux !== []
@@ -659,6 +654,7 @@ export class ImportGenotypeController {
                     await genotipoController.update({
                       id: this.aux.id_genotipo,
                       id_tecnologia: Number(this.aux.id_tecnologia),
+                      id_culture: idCulture,
                       id_s1: this.aux.id_s1,
                       id_dados: String(this.aux.id_dados_geno),
                       name_genotipo: this.aux.name_genotipo,
@@ -677,13 +673,13 @@ export class ImportGenotypeController {
                       progenitor_m_origem: this.aux.progenitor_m_origem,
                       progenitores_origem: this.aux.progenitores_origem,
                       parentesco_completo: this.aux.parentesco_completo,
-                      created_by: this.aux.created_by,
+                      created_by: createdBy,
                     });
                   } else {
                     delete this.aux.id_genotipo;
                     const genotipo: any = await genotipoController.create({
-                      id_culture: this.aux.id_culture,
                       id_tecnologia: this.aux.id_tecnologia,
+                      id_culture: idCulture,
                       id_s1: this.aux.id_s1,
                       id_dados: String(this.aux.id_dados_geno),
                       name_genotipo: this.aux.name_genotipo,
@@ -702,7 +698,7 @@ export class ImportGenotypeController {
                       progenitor_m_origem: this.aux.progenitor_m_origem,
                       progenitores_origem: this.aux.progenitores_origem,
                       parentesco_completo: this.aux.parentesco_completo,
-                      created_by: this.aux.created_by,
+                      created_by: createdBy,
                     });
                     this.aux.id_genotipo = genotipo.response.id;
                   }
@@ -712,7 +708,7 @@ export class ImportGenotypeController {
                       await loteController.update({
                         id: Number(this.aux.id_lote),
                         id_genotipo: Number(this.aux.id_genotipo),
-                        id_safra: Number(this.aux.id_safra),
+                        id_safra: Number(idSafra),
                         cod_lote: String(this.aux.cod_lote),
                         id_s2: Number(this.aux.id_s2),
                         id_dados: Number(this.aux.id_dados_lote),
@@ -722,7 +718,7 @@ export class ImportGenotypeController {
                         peso: this.aux.peso,
                         quant_sementes: this.aux.quant_sementes,
                         dt_import: this.aux.dt_import,
-                        created_by: this.aux.created_by,
+                        created_by: createdBy,
                       });
                       delete this.aux.id_lote;
                       delete this.aux.id_genotipo;
@@ -730,7 +726,7 @@ export class ImportGenotypeController {
                     } else {
                       await loteController.create({
                         id_genotipo: Number(this.aux.id_genotipo),
-                        id_safra: Number(this.aux.id_safra),
+                        id_safra: Number(idSafra),
                         cod_lote: String(this.aux.cod_lote),
                         id_s2: Number(this.aux.id_s2),
                         id_dados: Number(this.aux.id_dados_lote),
@@ -740,7 +736,7 @@ export class ImportGenotypeController {
                         peso: this.aux.peso,
                         quant_sementes: this.aux.quant_sementes,
                         dt_import: this.aux.dt_import,
-                        created_by: this.aux.created_by,
+                        created_by: createdBy,
                       });
                       delete this.aux.id_genotipo;
                       this.aux = [];
