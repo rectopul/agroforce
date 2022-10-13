@@ -983,7 +983,7 @@ export default function Listagem({
                         <Button
                           title="Exportação Sintética"
                           icon={<RiFileExcel2Line size={20} />}
-                          bgColor="bg-red-600"
+                          bgColor="bg-yellow-500"
                           textColor="white"
                           onClick={() => {
                             downloadExcelSintetico();
@@ -994,7 +994,7 @@ export default function Listagem({
                         <Button
                           title="Exportação Analítico"
                           icon={<RiFileExcel2Line size={20} />}
-                          bgColor="bg-red-600"
+                          bgColor="bg-green-600"
                           textColor="white"
                           onClick={() => {
                             dowloadExcelAnalytics();
