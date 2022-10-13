@@ -70,6 +70,7 @@ export class ImportExperimentController {
               gli: spreadSheet[row][4],
               id_safra: idSafra,
             });
+
             assayList = response.length > 0 ? response[0] : [];
           }
           for (const column in spreadSheet[row]) {
@@ -96,7 +97,6 @@ export class ImportExperimentController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
                 const { status, response }: IReturnObject = await safraController.getOne(idSafra);
-
                 if (status === 200) {
                   if (response?.safraName !== spreadSheet[row][column]) {
                     responseIfError[Number(column)]
@@ -154,6 +154,10 @@ export class ImportExperimentController {
                     spreadSheet[0][column],
                     'precisa ser um numero inteiro e positivo',
                   );
+                }
+                if (Number(assayList?.bgm) !== Number(spreadSheet[row][column])) {
+                  responseIfError[Number(column)]
+                    += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
                 }
               }
             }
@@ -344,7 +348,6 @@ export class ImportExperimentController {
                     repetitionsNumber: spreadSheet[row][11],
                     nlp: spreadSheet[row][12],
                     clp: spreadSheet[row][13],
-                    bgm: String(spreadSheet[row][6]),
                     comments,
                     orderDraw: spreadSheet[row][15],
                     created_by: createdBy,
@@ -363,7 +366,6 @@ export class ImportExperimentController {
                     repetitionsNumber: spreadSheet[row][11],
                     nlp: spreadSheet[row][12],
                     clp: spreadSheet[row][13],
-                    bgm: String(spreadSheet[row][6]),
                     comments,
                     orderDraw: spreadSheet[row][15],
                     created_by: createdBy,

@@ -150,7 +150,7 @@ model local {
   created_at         DateTime       @default(now())
   created_by         Int
   status             Int            @default(1)
-  adress             String
+  adress             String?
   id_country         Int
   id_local_culture   Int            @unique
   id_locality        Int
@@ -158,7 +158,7 @@ model local {
   label              String
   label_country      String
   label_region       String
-  mloc               String
+  mloc               String?
   name_country       String
   name_local_culture String
   name_locality      String
@@ -475,7 +475,6 @@ model experiment {
   period            Int
   repetitionsNumber Int
   blockId           Int?
-  bgm               String
 
   assay_list          assay_list            @relation(fields: [idAssayList], references: [id])
   delineamento        delineamento          @relation(fields: [idDelineamento], references: [id])

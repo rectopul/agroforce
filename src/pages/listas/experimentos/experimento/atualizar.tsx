@@ -165,7 +165,7 @@ export default function AtualizarLocal({
       tecnologia: `${experimento?.assay_list?.tecnologia?.cod_tec || ''} ${experimento?.assay_list?.tecnologia?.name || ''}`,
       gli: experimento.assay_list?.gli,
       experimentName: experimento?.experimentName,
-      bgm: experimento?.bgm || '',
+      bgm: experimento.assay_list?.bgm || '',
       local: experimento.local?.name_local_culture,
       delineamento: experimento.delineamento?.name,
       repetition: experimento.repetition,
@@ -612,7 +612,7 @@ export default function AtualizarLocal({
                 experimento.experimentName,
               )}
 
-              {fieldsFactory('BGM', 'bgm', experimento?.bgm)}
+              {fieldsFactory('BGM', 'bgm', experimento.assay_list?.bgm)}
 
               {fieldsFactory(
                 'Status do ensaio',

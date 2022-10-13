@@ -182,6 +182,8 @@ export class GenotipoController {
 
   async create(data: any) {
     try {
+      console.log('create lote');
+      console.log(data);
       const response = await this.genotipoRepository.create(data);
       return { status: 200, message: 'Genealogia cadastrada', response };
     } catch (error: any) {
@@ -192,6 +194,8 @@ export class GenotipoController {
 
   async update(data: any) {
     try {
+      console.log('update lote');
+      console.log(data);
       const genotipo: any = await this.genotipoRepository.findOne(data.id);
 
       if (!genotipo) return { status: 400, message: 'Genótipo não encontrado' };

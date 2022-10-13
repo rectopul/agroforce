@@ -250,33 +250,33 @@ export class ImportLocalController {
                 } else if (spreadSheet[0][column].includes('Ano')) {
                   unityCultureDTO.year = Number(spreadSheet[row][column]);
                 } else if (spreadSheet[0][column].includes('Nome da unidade de cultura')) {
-                  unityCultureDTO.name_unity_culture = (spreadSheet[row][column].toString());
+                  unityCultureDTO.name_unity_culture = (spreadSheet[row][column]?.toString());
                 } else if (spreadSheet[0][column].includes('ID do lugar de cultura')) {
                   localCultureDTO.id_local_culture = Number(spreadSheet[row][column]);
                 } else if (spreadSheet[0][column].includes('Nome do lugar de cultura')) {
-                  localCultureDTO.name_local_culture = (spreadSheet[row][column].toString());
+                  localCultureDTO.name_local_culture = (spreadSheet[row][column]?.toString());
                 } else if (spreadSheet[0][column].includes('CP_LIBELLE')) {
-                  localCultureDTO.label = (spreadSheet[row][column].toString());
+                  localCultureDTO.label = (spreadSheet[row][column]?.toString());
                 } else if (spreadSheet[0][column].includes('MLOC')) {
-                  localCultureDTO.mloc = (spreadSheet[row][column].toString());
+                  localCultureDTO.mloc = (spreadSheet[row][column]?.toString());
                 } else if (spreadSheet[0][column].includes('Endereço')) {
-                  localCultureDTO.adress = (spreadSheet[row][column].toString());
+                  localCultureDTO.adress = (spreadSheet[row][column]?.toString());
                 } else if (spreadSheet[0][column].includes('Identificador de localidade')) {
                   localCultureDTO.id_locality = Number(spreadSheet[row][column]);
                 } else if (spreadSheet[0][column].includes('Nome da localidade')) {
-                  localCultureDTO.name_locality = (spreadSheet[row][column].toString());
+                  localCultureDTO.name_locality = (spreadSheet[row][column]?.toString());
                 } else if (spreadSheet[0][column].includes('Identificador de região')) {
                   localCultureDTO.id_region = Number(spreadSheet[row][column]);
                 } else if (spreadSheet[0][column].includes('Nome da região')) {
-                  localCultureDTO.name_region = (spreadSheet[row][column].toString());
+                  localCultureDTO.name_region = (spreadSheet[row][column]?.toString());
                 } else if (spreadSheet[0][column].includes('REG_LIBELLE')) {
-                  localCultureDTO.label_region = (spreadSheet[row][column].toString());
+                  localCultureDTO.label_region = (spreadSheet[row][column]?.toString());
                 } else if (spreadSheet[0][column].includes('ID do País')) {
                   localCultureDTO.id_country = Number(spreadSheet[row][column]);
                 } else if (spreadSheet[0][column].includes('Nome do país')) {
-                  localCultureDTO.name_country = (spreadSheet[row][column].toString());
+                  localCultureDTO.name_country = (spreadSheet[row][column]?.toString());
                 } else if (spreadSheet[0][column].includes('CNTR_LIBELLE')) {
-                  localCultureDTO.label_country = (spreadSheet[row][column].toString());
+                  localCultureDTO.label_country = (spreadSheet[row][column]?.toString());
                 } else if (spreadSheet[0][column].includes('DT')) {
                   localCultureDTO.dt_import = spreadSheet[row][column];
                 }
