@@ -21,6 +21,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       res.status(200).json(resultPut);
       break;
     }
+    case 'DELETE': {
+      const resultDelete = await unidadeCulturaController.delete(req.body);
+      res.status(200).json(resultDelete);
+      break;
+    }
     default:
       res.status(405).end(`Method ${req.method} Not Allowed`);
   }

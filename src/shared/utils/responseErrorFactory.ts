@@ -11,7 +11,7 @@ export function responseDiffFactory(
   row: string,
   header: string,
 ) {
-  return `<li style="text-align:left"> A ${column}º coluna da ${row}º linha está incorreta, o campo ${header} é diferente do relacionado ao tipo de experiment. </li> <br>`;
+  return `<li style="text-align:left"> A ${column}º coluna da ${row}º linha está incorreta, o campo ${header} é diferente do relacionado ao tipo de ensaio. </li> <br>`;
 }
 
 export function responsePositiveNumericFactory(

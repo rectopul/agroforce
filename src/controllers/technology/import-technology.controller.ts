@@ -99,6 +99,7 @@ export class ImportTechnologyController {
                 spreadSheet[row][column] = new Date(spreadSheet[row][column]);
                 const { status, response }: IReturnObject = await tecnologiaController.getAll({
                   filterCode: spreadSheet[row][0],
+                  id_culture: idCulture,
                 });
                 const dateNow = new Date();
                 if (dateNow.getTime() < spreadSheet[row][column].getTime()) {

@@ -95,10 +95,10 @@ export class ImportNpeController {
             if (configModule.response[0]?.fields[column] === 'Local') {
               if (spreadSheet[row][column] !== null) {
                 if (typeof (spreadSheet[row][column]) === 'string') {
-                  const local: any = await localController.getAll(
-                    { name_local_culture: spreadSheet[row][column] },
-                  );
-                  if (local.total === 0) {
+                  const { response } = await localController.getAll({
+                    name_local_culture: spreadSheet[row][column],
+                  });
+                  if (response.total === 0) {
                     responseIfError[Number(column)] += responseGenericFactory(
                       Number(column) + 1,
                       row,
@@ -106,7 +106,24 @@ export class ImportNpeController {
                       'o local não existe no sistema',
                     );
                   } else {
-                    this.aux.localId = local.response[0]?.id;
+                    const {
+                      response: responseSafra,
+                    }: IReturnObject = await safraController.getOne(idSafra);
+                    const cultureUnityValidate = response[0]?.cultureUnity.map((item: any) => {
+                      if (item?.year === responseSafra?.year) return true;
+                      return false;
+                    });
+                    if (!cultureUnityValidate?.includes(true)) {
+                      responseIfError[Number(column)]
+                        += responseGenericFactory(
+                          (Number(column) + 1),
+                          row,
+                          spreadSheet[0][column],
+                          'o local não tem unidades referentes ao ano da safra selecionada',
+                        );
+                    } else {
+                      this.aux.localId = response[0]?.id;
+                    }
                   }
                 } else {
                   responseIfError[Number(column)] += responseGenericFactory(

@@ -31,6 +31,8 @@ import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
 import { UserPreferenceController } from 'src/controllers/user-preference.controller';
 import { unidadeCulturaService, userPreferencesService } from 'src/services';
 import * as XLSX from 'xlsx';
+import { BsTrashFill } from 'react-icons/bs';
+import Swal from 'sweetalert2';
 import {
   AccordionFilter,
   Button,
@@ -41,7 +43,6 @@ import {
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
-
 
 interface IUnityCultureProps {
   id: number;
@@ -85,8 +86,8 @@ interface IData {
   filterApplication: object | any;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
-  typeOrderServer :any| string, //RR
-  orderByserver : any |string, //RR
+  typeOrderServer :any| string, // RR
+  orderByserver : any |string, // RR
   cultureId :any | number
 
 }
@@ -99,9 +100,9 @@ export default function Listagem({
   filterApplication,
   pageBeforeEdit,
   filterBeforeEdit,
-  typeOrderServer, 
-  orderByserver, 
-  cultureId
+  typeOrderServer,
+  orderByserver,
+  cultureId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const tabsDropDowns = TabsDropDowns('config');
@@ -111,7 +112,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.unidadeCultura || {
     id: 0,
     table_preferences:
-      'id,name_unity_culture,year,name_local_culture,label,mloc,adress,label_country,label_region,name_locality',
+      'id,name_unity_culture,year,name_local_culture,label,mloc,adress,label_country,label_region,name_locality,action',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -188,6 +189,12 @@ export default function Listagem({
       value: 'name_locality',
       defaultChecked: () => camposGerenciados.includes('name_locality'),
     },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Ação',
+      value: 'action',
+      defaultChecked: () => camposGerenciados.includes('action'),
+    },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [selectedRowById, setSelectedRowById] = useState<number>();
@@ -197,10 +204,10 @@ export default function Listagem({
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-  
-  const [orderBy,setOrderBy]=useState<string>(orderByserver); 
-  const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); 
-  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; 
+
+  const [orderBy, setOrderBy] = useState<string>(orderByserver);
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -234,40 +241,38 @@ export default function Listagem({
       const parametersFilter = `&filterNameUnityCulture=${filterNameUnityCulture}&filterYear=${filterYear}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&id_safra=${idSafra}`;
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEdit', filtersParams);
-    //   await unidadeCulturaService
-    //     .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}&id_safra=${idSafra}`)
-    //     .then((response) => {
-    //       setFilter(parametersFilter);
-    //       setTotalItems(response.total);
-    //       setUnidadeCultura(response.response);
-    //       setCurrentPage(0);
-    //     });
-    setFilter(parametersFilter);
-    setCurrentPage(0);
-    await callingApi(parametersFilter); 
+      //   await unidadeCulturaService
+      //     .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}&id_safra=${idSafra}`)
+      //     .then((response) => {
+      //       setFilter(parametersFilter);
+      //       setTotalItems(response.total);
+      //       setUnidadeCultura(response.response);
+      //       setCurrentPage(0);
+      //     });
+      setFilter(parametersFilter);
+      setCurrentPage(0);
+      await callingApi(parametersFilter);
     },
   });
 
-
-  //Calling common API 
-  async function callingApi(parametersFilter : any ){
-
-    setCookies("filterBeforeEdit", parametersFilter);
-    setCookies("filterBeforeEditTypeOrder", typeOrder);
-    setCookies("filterBeforeEditOrderBy", orderBy);  
+  // Calling common API
+  async function callingApi(parametersFilter : any) {
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies("filtersParams", parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
     await unidadeCulturaService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400 ) {
+      if (response.status === 200 || response.status === 400) {
         setUnidadeCultura(response.response);
         setTotalItems(response.total);
       }
     });
-  } 
+  }
 
-  //Call that function when change type order value.
+  // Call that function when change type order value.
   useEffect(() => {
     callingApi(filter);
   }, [typeOrder]);
@@ -319,13 +324,27 @@ export default function Listagem({
     //   }
     // }
 
-      //Gobal manage orders
-      const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order , orderList);
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-      setTypeOrder(typeOrderG);
-      setOrderBy(columnG);
-      setOrder(orderByG);
-      setArrowOrder(arrowOrder);
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
+  }
+
+  async function deleteItem(id: number) {
+    const { status, message } = await unidadeCulturaService.deleted({ id, userId: userLogado.id });
+    if (status === 200) {
+      router.reload();
+    } else {
+      Swal.fire({
+        html: message,
+        width: '800',
+      });
+    }
   }
 
   function headerTableFactory(name: any, title: string) {
@@ -346,37 +365,25 @@ export default function Listagem({
     };
   }
 
-  function idHeaderFactory() {
+  function statusHeaderFactory() {
     return {
-      title: <div className="flex items-center">{arrowOrder}</div>,
-      field: 'id',
-      width: 0,
+      title: 'Ações',
+      field: 'action',
       sorting: false,
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-9 flex">
+      searchable: false,
+      render: (rowData: any) => (
+        <div className="h-7 flex">
           <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
+            <Button
+              icon={<BsTrashFill size={14} />}
+              title="Deletar unidade de cultura"
+              onClick={() => deleteItem(rowData.id)}
+              bgColor="bg-red-600"
+              textColor="white"
+            />
           </div>
         </div>
-      ) : (
-        <div className="h-9 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
-          </div>
-        </div>
-      )),
+      ),
     };
   }
 
@@ -384,9 +391,6 @@ export default function Listagem({
     const columnCampos: any = columnOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item) => {
-      // if (columnCampos[item] === 'id') {
-      //   tableFields.push(idHeaderFactory());
-      // }
       if (columnCampos[item] === 'name_unity_culture') {
         tableFields.push(
           headerTableFactory('Nome un. cultura', 'name_unity_culture'),
@@ -419,6 +423,9 @@ export default function Listagem({
         tableFields.push(
           headerTableFactory('Localidade', 'local.name_locality'),
         );
+      }
+      if (columnCampos[item] === 'action') {
+        tableFields.push(statusHeaderFactory());
       }
     });
     return tableFields;
@@ -552,7 +559,7 @@ export default function Listagem({
       });
   };
 
-  //manage total pages
+  // manage total pages
   async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
@@ -579,7 +586,7 @@ export default function Listagem({
     //     }
     //   });
 
-    await callingApi(filter); //handle pagination globly
+    await callingApi(filter); // handle pagination globly
   }
 
   function filterFieldFactory(title: any, name: any) {
@@ -600,10 +607,9 @@ export default function Listagem({
     );
   }
 
-
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = tableGlobalFunctions.getValuesForFilter(value , filtersParams);
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
     return parameter;
   }
 
@@ -870,7 +876,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages-1)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -905,28 +911,28 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     ? req.cookies.filterBeforeEdit
     : `id_safra=${idSafra}`;
 
-  //Last page
+  // Last page
   const lastPageServer = req.cookies.lastPage
-  ? req.cookies.lastPage
-  : "No";
+    ? req.cookies.lastPage
+    : 'No';
 
-  if(lastPageServer == undefined || lastPageServer == "No"){
+  if (lastPageServer == undefined || lastPageServer == 'No') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });  
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
   }
 
-  //RR
+  // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
-  ? req.cookies.filterBeforeEditTypeOrder
-  : "desc";
-        
-  //RR
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'desc';
+
+  // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
-  ? req.cookies.filterBeforeEditOrderBy
-  : "name_unity_culture";
+    ? req.cookies.filterBeforeEditOrderBy
+    : 'name_unity_culture';
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
@@ -934,9 +940,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
-  removeCookies("filterBeforeEditTypeOrder", { req, res });
-  removeCookies("filterBeforeEditOrderBy", { req, res });
-  removeCookies("lastPage", { req, res });  
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/unidade-cultura`;
@@ -964,9 +970,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
       filterApplication,
       pageBeforeEdit,
       filterBeforeEdit,
-      orderByserver, //RR
-      typeOrderServer,  //RR
-      cultureId
+      orderByserver, // RR
+      typeOrderServer, // RR
+      cultureId,
     },
   };
 };
