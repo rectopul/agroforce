@@ -80,7 +80,6 @@ model safra {
   lote                lote[]
   npe                 npe[]
   quadra              quadra[]
-  cultureUnity        cultureUnity[]
   experiment_genotipe experiment_genotipe[]
   ExperimentGroup     ExperimentGroup[]
 }
@@ -149,7 +148,6 @@ model local {
   altitude           String?
   created_at         DateTime       @default(now())
   created_by         Int
-  status             Int            @default(1)
   adress             String?
   id_country         Int
   id_local_culture   Int            @unique
@@ -163,7 +161,6 @@ model local {
   name_local_culture String
   name_locality      String
   name_region        String
-  dt_import          DateTime       @default(now())
   cultureUnity       cultureUnity[]
   experiment         experiment[]
   npe                npe[]
@@ -172,15 +169,14 @@ model local {
 
 model cultureUnity {
   id                 Int       @id @default(autoincrement())
-  id_safra           Int
   id_local           Int
   id_unity_culture   Int
   year               Int
   name_unity_culture String
   created_by         Int
+  dt_import          DateTime
   created_at         DateTime? @default(now())
   local              local     @relation(fields: [id_local], references: [id])
-  safra              safra     @relation(fields: [id_safra], references: [id])
 }
 
 model layout_quadra {
@@ -370,7 +366,7 @@ model tecnologia {
   created_at          DateTime?             @default(now())
   desc                String?
   cod_tec             String                @default("")
-  dt_import           DateTime              @default(now())
+  dt_import           DateTime
   culture             culture               @relation(fields: [id_culture], references: [id])
   assay_list          assay_list[]
   genotipo            genotipo[]

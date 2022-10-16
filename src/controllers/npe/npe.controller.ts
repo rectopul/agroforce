@@ -20,8 +20,6 @@ export class NpeController {
     let orderBy: object | any;
     let select: any = [];
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterStatus) {
         if (options.filterStatus !== '2') {
           if (options.filterStatus == '1') {
