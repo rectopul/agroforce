@@ -168,9 +168,8 @@ export class ImportExperimentController {
               } else {
                 const { response } = await localController.getAll({
                   name_local_culture: spreadSheet[row][column],
-                  id_safra: idSafra,
                 });
-                if (response?.length === 0) {
+                if (response.total === 0) {
                   responseIfError[Number(column)]
                     += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
                 }

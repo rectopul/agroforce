@@ -200,8 +200,9 @@ export class ImportLocalController {
           } else if (spreadSheet[0][column].includes('DT')) {
             // eslint-disable-next-line no-param-reassign
             spreadSheet[row][column] = new Date(spreadSheet[row][column]);
-            const { status, response }: IReturnObject = await localController.getAll({
-              filterNameLocalCulture: spreadSheet[row][4],
+            const { status, response }: IReturnObject = await unidadeCulturaController.getAll({
+              filterNameUnityCulture: spreadSheet[row][2],
+              filterYear: spreadSheet[row][1],
             });
             const dateNow = new Date();
             if (dateNow.getTime() < spreadSheet[row][column].getTime()) {
@@ -278,7 +279,7 @@ export class ImportLocalController {
                 } else if (spreadSheet[0][column].includes('CNTR_LIBELLE')) {
                   localCultureDTO.label_country = (spreadSheet[row][column]?.toString());
                 } else if (spreadSheet[0][column].includes('DT')) {
-                  localCultureDTO.dt_import = spreadSheet[row][column];
+                  unityCultureDTO.dt_import = spreadSheet[row][column];
                 }
               }
               localCultureDTO.created_by = Number(createdBy);
