@@ -220,11 +220,8 @@ export class ImportGenotypeController {
                     spreadSheet[0][column],
                   );
                 }
-                const { response }: IReturnObject = await safraController.getAll({
-                  id_culture: idCulture,
-                  safraName: String(spreadSheet[row][Number(column) + 1]),
-                });
-                if (Number(response[0]?.year) !== Number(spreadSheet[row][column])) {
+                const { response }: IReturnObject = await safraController.getOne(idSafra);
+                if (Number(response?.year) !== Number(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     row,

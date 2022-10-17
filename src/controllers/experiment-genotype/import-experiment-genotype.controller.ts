@@ -27,8 +27,6 @@ export class ImportExperimentGenotypeController {
     const genotipoController = new GenotipoController();
     // const assayListController = new AssayListController();
     const logImportController = new LogImportController();
-    const genotypeTreatmentController = new GenotypeTreatmentController();
-    const historyGenotypeTreatmentController = new HistoryGenotypeTreatmentController();
     const experimentController = new ExperimentController();
     const experimentGenotipeController = new ExperimentGenotipeController();
 
@@ -368,11 +366,11 @@ export class ImportExperimentGenotypeController {
               // console.log("response12   ",response12);
             }
           }
-          return { status: 200, message: 'Genotic de genótipo importado com sucesso' };
+          return { status: 200, message: 'Sub. de parcelas importado com sucesso' };
         } catch (error: any) {
           await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
-          handleError('Tratamento de genótipo controller', 'Save Import', error.message);
-          return { status: 500, message: 'Erro ao salvar planilha Experiment de genótipo' };
+          handleError('Sub. de parcelas controller', 'Save Import', error.message);
+          return { status: 500, message: 'Erro ao salvar planilha de Sub. de parcelas' };
         }
       }
       await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
@@ -380,8 +378,8 @@ export class ImportExperimentGenotypeController {
       return { status: 400, message: responseStringError };
     } catch (error: any) {
       await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
-      handleError('Experimento de genótipo controller', 'Validate Import', error.message);
-      return { status: 500, message: 'Erro ao validar planilha de tratamento de genótipo' };
+      handleError('Sub. de parcelas controller', 'Validate Import', error.message);
+      return { status: 500, message: 'Erro ao validar planilha de Sub. de parcelas' };
     }
   }
 }
