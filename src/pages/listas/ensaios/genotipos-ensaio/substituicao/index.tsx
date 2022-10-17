@@ -533,7 +533,7 @@ export default function Listagem({
           <AccordionFilter
             title={
               treatmentsOptionSelected === 'genotipo'
-                ? 'Filtrar genótipos'
+                ? 'Filtrar Genótipo/NCA'
                 : 'Filtrar lotes'
             }
           >

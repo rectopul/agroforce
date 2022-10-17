@@ -1,11 +1,15 @@
 import handleError from '../../shared/utils/handleError';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { UnidadeCulturaRepository } from '../../repository/unidade-cultura.repository';
+import { IReturnObject } from '../../interfaces/shared/Import.interface';
+import { SafraController } from '../safra.controller';
 
 export class UnidadeCulturaController {
   public readonly required = 'Campo obrigatório';
 
   unidadeCulturaRepository = new UnidadeCulturaRepository();
+
+  safraController = new SafraController();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -59,13 +63,12 @@ export class UnidadeCulturaController {
 
       const select = {
         id: true,
-        id_safra: true,
-        safra: true,
         id_unity_culture: true,
         id_local: true,
         name_unity_culture: true,
         year: true,
         local: true,
+        dt_import: true,
       };
 
       if (options.id_unity_culture) {
@@ -81,7 +84,8 @@ export class UnidadeCulturaController {
       }
 
       if (options.id_safra) {
-        parameters.id_safra = Number(options.id_safra);
+        const { response }: any = await this.safraController.getOne(Number(options.id_safra));
+        parameters.year = Number(response.year);
       }
 
       const take = (options.take) ? Number(options.take) : undefined;
@@ -150,6 +154,20 @@ export class UnidadeCulturaController {
     } catch (error: any) {
       handleError('Unidade cultura controller', 'Update', error.message);
       throw new Error('[Controller] - Update Unidade Cultura erro');
+    }
+  }
+
+  async delete(data: any) {
+    try {
+      const { status }: any = await this.getOne({ id: Number(data.id) });
+
+      if (status !== 200) return { status: 400, message: 'Unidade de cultura não encontrada' };
+
+      await this.unidadeCulturaRepository.delete(Number(data.id));
+      return { status: 200, message: 'Unidade de cultura excluída' };
+    } catch (error: any) {
+      handleError('Unidade de cultura controller', 'Delete', error.message);
+      throw new Error('[Controller] - Delete Unidade de cultura erro');
     }
   }
 }

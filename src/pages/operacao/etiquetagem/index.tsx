@@ -400,11 +400,12 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
           </div>
           <div className="h-10 w-10">
             <Button
+              disabled={rowData.status === 'ETIQ. EM ANDAMENTO' || rowData.status === 'ETIQ. FINALIZADA'}
               title={`Excluir ${rowData.name}`}
               type="button"
               onClick={() => deleteItem(rowData.id)}
               rounder="rounded-full"
-              bgColor="bg-red-600"
+              bgColor={rowData.status === 'ETIQ. EM ANDAMENTO' || rowData.status === 'ETIQ. FINALIZADA' ? 'bg-gray-600' : 'bg-red-600'}
               textColor="white"
               icon={<BsTrashFill size={20} />}
             />

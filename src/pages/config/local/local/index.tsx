@@ -77,10 +77,10 @@ interface Idata {
   filterApplication: object | any;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
-  typeOrderServer :any| string; 
+  typeOrderServer :any| string;
   orderByserver : any |string;
   cultureId : object |any;
-  safraId :object |any; 
+  safraId :object |any;
 }
 
 export default function Listagem({
@@ -90,10 +90,10 @@ export default function Listagem({
   totalItems,
   pageBeforeEdit,
   filterBeforeEdit,
-  typeOrderServer, 
+  typeOrderServer,
   orderByserver,
   cultureId,
-  safraId 
+  safraId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const tabsDropDowns = TabsDropDowns('config');
@@ -103,7 +103,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.local || {
     id: 0,
     table_preferences:
-      'id,name_local_culture,label,mloc,adress,label_country,label_region,name_locality,status',
+      'id,name_local_culture,label,mloc,adress,label_country,label_region,name_locality,action',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -169,9 +169,9 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Status',
-      value: 'status',
-      defaultChecked: () => camposGerenciados.includes('status'),
+      title: 'Ação',
+      value: 'action',
+      defaultChecked: () => camposGerenciados.includes('action'),
     },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -183,9 +183,9 @@ export default function Listagem({
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
-  const [orderBy,setOrderBy]=useState<string>(orderByserver); //RR
-  const [typeOrder,setTypeOrder]=useState<string>(typeOrderServer); //RR
-  const pathExtra=`skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;  //RR
+  const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const columns = columnsOrder(camposGerenciados);
   const filters = [
@@ -196,17 +196,16 @@ export default function Listagem({
 
   const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
-
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterStatus:filterStatusBeforeEdit[13],
+      filterStatus: filterStatusBeforeEdit[13],
       filterNameLocalCulture: checkValue('filterNameLocalCulture'),
-      filterLabel:  checkValue('filterLabel'),
-      filterMloc:  checkValue('filterMloc'),
-      filterAdress:  checkValue('filterAdress'),
-      filterLabelCountry:  checkValue('filterLabelCountry'),
-      filterLabelRegion:  checkValue('filterLabelRegion'),
-      filterNameLocality:  checkValue('filterNameLocality'),
+      filterLabel: checkValue('filterLabel'),
+      filterMloc: checkValue('filterMloc'),
+      filterAdress: checkValue('filterAdress'),
+      filterLabelCountry: checkValue('filterLabelCountry'),
+      filterLabelRegion: checkValue('filterLabelRegion'),
+      filterNameLocality: checkValue('filterNameLocality'),
       orderBy: '',
       typeOrder: '',
     },
@@ -220,7 +219,7 @@ export default function Listagem({
       filterLabelRegion,
       filterNameLocality,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}&id_culture=${cultureId}`;
+      const parametersFilter = `&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}&id_culture=${cultureId}`;
 
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEdit', filtersParams);
@@ -234,34 +233,31 @@ export default function Listagem({
       //   });
       setFilter(parametersFilter);
       setCurrentPage(0);
-      await callingApi(parametersFilter); 
+      await callingApi(parametersFilter);
     },
   });
 
-
-  //Calling common API 
-  async function callingApi(parametersFilter : any ){
-
-    setCookies("filterBeforeEdit", parametersFilter);
-    setCookies("filterBeforeEditTypeOrder", typeOrder);
-    setCookies("filterBeforeEditOrderBy", orderBy);  
+  // Calling common API
+  async function callingApi(parametersFilter : any) {
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies("filtersParams", parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
     await localService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400 ) {
+      if (response.status === 200 || response.status === 400) {
         setLocal(response.response);
         setTotalItems(response.total);
       }
     });
-  } 
+  }
 
-  //Call that function when change type order value.
+  // Call that function when change type order value.
   useEffect(() => {
     callingApi(filter);
   }, [typeOrder]);
-
 
   function headerTableFactory(name: any, title: string) {
     return {
@@ -323,7 +319,7 @@ export default function Listagem({
       sorting: false,
       searchable: false,
       filterPlaceholder: 'Filtrar por status',
-      render: (rowData: ILocalProps) => (rowData.status ? (
+      render: (rowData: ILocalProps) => (
         <div className="h-7 flex">
           <div
             className="
@@ -334,64 +330,20 @@ export default function Listagem({
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name_local_culture}`}
               onClick={() => {
-                setCookies("pageBeforeEdit", currentPage?.toString());
-                setCookies("filterBeforeEdit", filter);
-                setCookies("filterBeforeEditTypeOrder", typeOrder);
-                setCookies("filterBeforeEditOrderBy", orderBy);
-                setCookies("filtersParams", filtersParams);
-                setCookies("lastPage", "atualizar");
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('lastPage', 'atualizar');
                 router.push(`/config/local/local/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
               textColor="white"
             />
           </div>
-          <div style={{ width: 5 }} />
-          <div>
-            <Button
-              title="Ativo"
-              icon={<FaRegThumbsUp size={14} />}
-              onClick={async () => handleStatus(rowData.id, rowData.status)}
-              bgColor="bg-green-600"
-              textColor="white"
-            />
-          </div>
         </div>
-      ) : (
-        <div className="h-7 flex">
-          <div
-            className="
-							h-7
-						"
-          >
-            <Button
-              icon={<BiEdit size={14} />}
-              title={`Atualizar ${rowData.name_local_culture}`}
-              onClick={() => {
-                setCookies("pageBeforeEdit", currentPage?.toString());
-                setCookies("filterBeforeEdit", filter);
-                setCookies("filterBeforeEditTypeOrder", typeOrder);
-                setCookies("filterBeforeEditOrderBy", orderBy);
-                setCookies("filtersParams", filtersParams);
-                setCookies("lastPage", "atualizar");
-                router.push(`/config/local/local/atualizar?id=${rowData.id}`);
-              }}
-              bgColor="bg-blue-600"
-              textColor="white"
-            />
-          </div>
-          <div style={{ width: 5 }} />
-          <div>
-            <Button
-              title="Inativo"
-              icon={<FaRegThumbsDown size={14} />}
-              onClick={async () => await handleStatus(rowData.id, rowData.status)}
-              bgColor="bg-red-800"
-              textColor="white"
-            />
-          </div>
-        </div>
-      )),
+      ),
     };
   }
 
@@ -425,7 +377,7 @@ export default function Listagem({
       if (objectCampos[item] === 'name_locality') {
         arrOb.push(headerTableFactory('Localidade', 'name_locality'));
       }
-      if (objectCampos[item] === 'status') {
+      if (objectCampos[item] === 'action') {
         arrOb.push(statusHeaderFactory());
       }
     });
@@ -479,14 +431,15 @@ export default function Listagem({
     //   }
     // }
 
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-  //Gobal manage orders
-  const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order , orderList);
-
-  setTypeOrder(typeOrderG);
-  setOrderBy(columnG);
-  setOrder(orderByG);
-  setArrowOrder(arrowOrder);
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
   }
 
   async function getValuesColumns(): Promise<void> {
@@ -530,33 +483,6 @@ export default function Listagem({
 
     setStatusAccordion(false);
     setCamposGerenciados(campos);
-  }
-
-  async function handleStatus(idLocal: number, rowStatus: any): Promise<void> {
-    if (rowStatus === 0) {
-      rowStatus = 1;
-    } else {
-      rowStatus = 0;
-    }
-
-    const index = local.findIndex((local) => local.id === idLocal);
-
-    if (index === -1) {
-      return;
-    }
-
-    setLocal((oldLocal) => {
-      const copy = [...oldLocal];
-      copy[index].status = rowStatus;
-      return copy;
-    });
-
-    const { id, status } = local[index];
-
-    await localService.update({
-      id,
-      status,
-    });
   }
 
   function handleOnDragEnd(result: DropResult) {
@@ -646,7 +572,7 @@ export default function Listagem({
     });
   };
 
-  //manage total pages
+  // manage total pages
   async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
@@ -670,16 +596,15 @@ export default function Listagem({
     //     setLocal(response.response);
     //   }
     // });
-    await callingApi(filter); //handle pagination globly
+    await callingApi(filter); // handle pagination globly
   }
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = tableGlobalFunctions.getValuesForFilter(value , filtersParams);
+    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
     return parameter;
   }
 
-  
   function filterFieldFactory(title: any, name: any) {
     return (
       <div className="h-10 w-1/2 ml-2">
@@ -728,19 +653,6 @@ export default function Listagem({
                   pb-0
                 "
                 >
-                  <div className="h-6 w-1/2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status
-                    </label>
-                    <Select
-                      name="filterStatus"
-                      onChange={formik.handleChange}
-                      defaultValue={filterStatusBeforeEdit[13]}
-                      // defaultValue={checkValue('filterStatus')}
-                      values={filters.map((id) => id)}
-                      selected="1"
-                    />
-                  </div>
 
                   {filterFieldFactory(
                     'filterNameLocalCulture',
@@ -983,34 +895,32 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
-  
-  const cultureId = req.cookies.cultureId;
+
+  const { cultureId } = req.cookies;
   const { safraId } = req.cookies;
 
-
-  //Last page
+  // Last page
   const lastPageServer = req.cookies.lastPage
-  ? req.cookies.lastPage
-  : "No";
+    ? req.cookies.lastPage
+    : 'No';
 
-  if(lastPageServer == undefined || lastPageServer == "No"){
+  if (lastPageServer == undefined || lastPageServer == 'No') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });  
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
   }
 
-  //RR
+  // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
-  ? req.cookies.filterBeforeEditTypeOrder
-  : "desc";
-      
-  //RR
-  const orderByserver = req.cookies.filterBeforeEditOrderBy
-  ? req.cookies.filterBeforeEditOrderBy
-  : "name_local_culture";
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'desc';
 
+  // RR
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : 'name_local_culture';
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
@@ -1021,18 +931,16 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     : `filterStatus=1&id_culture=${cultureId}`;
   const { token } = req.cookies;
 
-
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/local`;
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
 
-  
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
-  removeCookies("filterBeforeEditTypeOrder", { req, res });
-  removeCookies("filterBeforeEditOrderBy", { req, res });
-  removeCookies("lastPage", { req, res });  
-  
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
+
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -1052,10 +960,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
       filterApplication,
       pageBeforeEdit,
       filterBeforeEdit,
-      orderByserver, //RR
-      typeOrderServer,  //RR
+      orderByserver, // RR
+      typeOrderServer, // RR
       cultureId,
-      safraId
+      safraId,
     },
   };
 };

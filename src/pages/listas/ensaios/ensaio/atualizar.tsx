@@ -169,9 +169,9 @@ export default function AtualizarTipoEnsaio({
       id: assayList?.id,
       foco: assayList?.foco?.name,
       type_assay: assayList?.type_assay?.name,
-      tecnologia: `${assayList?.tecnologia?.cod_tec} ${assayList?.tecnologia?.name}`,
+      tecnologia: `${assayList?.tecnologia?.cod_tec || ''} ${assayList?.tecnologia?.name || ''}`,
       gli: assayList?.gli,
-      bgm: assayList?.bgm,
+      bgm: assayList?.bgm || '',
       status: assayList?.status,
       project: assayList?.project,
       comments: assayList?.comments,
@@ -724,7 +724,7 @@ export default function AtualizarTipoEnsaio({
       });
   }
 
-  function updateFieldFactory(name: string, title: any) {
+  function updateFieldFactory(name: string, title: any = null) {
     return (
       <div className="w-full h-7">
         <label className="block text-gray-900 text-sm font-bold mb-0">
