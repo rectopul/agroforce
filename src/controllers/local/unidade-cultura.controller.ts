@@ -116,8 +116,6 @@ export class UnidadeCulturaController {
 
   async getOne({ id }: any) {
     try {
-      console.log('id');
-      console.log(id);
       const response = await this.unidadeCulturaRepository.findById(id);
 
       if (!response) throw new Error('Unidade de cultura não encontrada');
