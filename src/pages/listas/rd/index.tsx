@@ -723,7 +723,7 @@ export default function Import({
                       }
                       bgColor={bgColor}
                       rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                      onClick={() => readExcel(31, 'PARCELS')}
+                      onClick={() => readExcel(30, 'PARCELS')}
                       icon={<IoIosCloudUpload size={40} />}
                       disabled={disabledButton}
                       type="button"
@@ -737,8 +737,8 @@ export default function Import({
                     <Input
                       type="file"
                       required
-                      id="inputFile-31"
-                      name="inputFile-31"
+                      id="inputFile-30"
+                      name="inputFile-30"
                     />
                   </div>
                 </div>

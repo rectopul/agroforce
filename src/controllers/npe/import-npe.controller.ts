@@ -47,7 +47,7 @@ export class ImportNpeController {
       const configModule: object | any = await importController.getAll(14);
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
-          const npeName = `${spreadSheet[row][0]}_${spreadSheet[row][1]}_${spreadSheet[row][2]}_${spreadSheet[row][3]}_${spreadSheet[row][4]}_${spreadSheet[row][6]}`;
+          const npeName = `${spreadSheet[row][1]}_${spreadSheet[row][2]}_${spreadSheet[row][3]}_${spreadSheet[row][4]}_${spreadSheet[row][5]}_${spreadSheet[row][7]}`;
           const { status }: IReturnObject = await npeController.getAll({
             safraId: idSafra,
             filterFoco: spreadSheet[row][1],
@@ -186,7 +186,15 @@ export class ImportNpeController {
 
             if (configModule.response[0]?.fields[column] === 'OGM') {
               if (spreadSheet[row][column] !== null) {
-                if ((typeof (spreadSheet[row][column])) === 'number' && spreadSheet[row][column].toString().length < 2) {
+                if ((typeof (spreadSheet[row][column])) === 'number') {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                    'precisa ser numérico',
+                  );
+                }
+                if (spreadSheet[row][column].toString().length < 2) {
                   // eslint-disable-next-line no-param-reassign
                   spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
                 }

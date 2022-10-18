@@ -334,7 +334,7 @@ export class ImportAssayListController {
                   id_lote: lote[0]?.id,
                   treatments_number: spreadSheet[row][8],
                   status: spreadSheet[row][9],
-                  comments: spreadSheet[row][14] || '',
+                  comments: spreadSheet[row][12] || '',
                   created_by: createdBy,
                 });
               } else {
@@ -362,7 +362,7 @@ export class ImportAssayListController {
                   id_genotipo: genotype[0]?.id,
                   id_lote: lote[0]?.id,
                   treatments_number: spreadSheet[row][8],
-                  comments: spreadSheet[row][14] || '',
+                  comments: spreadSheet[row][12] || '',
                   status: spreadSheet[row][9],
                   created_by: createdBy,
                 });
