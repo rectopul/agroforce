@@ -547,7 +547,9 @@ export default function Listagem({
             newItem.ensaio = item.assay_list?.type_assay.name;
             newItem.tecnologia = item.assay_list?.tecnologia.cod_tec;
             newItem.gli = item.assay_list?.gli;
-            newItem.bgm = item.assay_list?.bgm;
+            console.log(item.assay_list?.bgm);
+            newItem.bgm = (item.assay_list?.bgm === null) ? '' : Number(item.assay_list?.bgm);
+            console.log(newItem.bgm);
             newItem.nt = item.treatments_number;
             newItem.status_t = item.status;
             newItem.genotipo = item.genotipo.name_genotipo;

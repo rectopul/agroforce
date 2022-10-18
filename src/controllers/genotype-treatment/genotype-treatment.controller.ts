@@ -204,7 +204,6 @@ export class GenotypeTreatmentController {
   //   }
   // }
 
-
   async create(data: any) {
     try {
       // console.log("herere   ",data);
