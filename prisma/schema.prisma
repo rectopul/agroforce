@@ -80,7 +80,6 @@ model safra {
   lote                lote[]
   npe                 npe[]
   quadra              quadra[]
-  cultureUnity        cultureUnity[]
   experiment_genotipe experiment_genotipe[]
   ExperimentGroup     ExperimentGroup[]
 }
@@ -149,8 +148,7 @@ model local {
   altitude           String?
   created_at         DateTime       @default(now())
   created_by         Int
-  status             Int            @default(1)
-  adress             String
+  adress             String?
   id_country         Int
   id_local_culture   Int            @unique
   id_locality        Int
@@ -158,12 +156,11 @@ model local {
   label              String
   label_country      String
   label_region       String
-  mloc               String
+  mloc               String?
   name_country       String
   name_local_culture String
   name_locality      String
   name_region        String
-  dt_import          DateTime       @default(now())
   cultureUnity       cultureUnity[]
   experiment         experiment[]
   npe                npe[]
@@ -172,15 +169,14 @@ model local {
 
 model cultureUnity {
   id                 Int       @id @default(autoincrement())
-  id_safra           Int
   id_local           Int
   id_unity_culture   Int
   year               Int
   name_unity_culture String
   created_by         Int
+  dt_import          DateTime
   created_at         DateTime? @default(now())
   local              local     @relation(fields: [id_local], references: [id])
-  safra              safra     @relation(fields: [id_safra], references: [id])
 }
 
 model layout_quadra {
@@ -370,7 +366,7 @@ model tecnologia {
   created_at          DateTime?             @default(now())
   desc                String?
   cod_tec             String                @default("")
-  dt_import           DateTime              @default(now())
+  dt_import           DateTime
   culture             culture               @relation(fields: [id_culture], references: [id])
   assay_list          assay_list[]
   genotipo            genotipo[]
@@ -475,7 +471,6 @@ model experiment {
   period            Int
   repetitionsNumber Int
   blockId           Int?
-  bgm               String
 
   assay_list          assay_list            @relation(fields: [idAssayList], references: [id])
   delineamento        delineamento          @relation(fields: [idDelineamento], references: [id])
@@ -562,7 +557,7 @@ model experiment_genotipe {
   idTypeAssay         Int
   idTecnologia        Int
   idExperiment        Int
-  idGenotipo          Int
+  idGenotipo          Int?
   id_seq_delineamento Int
   blockLayoutId       Int?
   idLote              Int?
@@ -570,7 +565,7 @@ model experiment_genotipe {
   rep                 Int
   nt                  Int
   npe                 Int
-  nca                 String
+  nca                 String?
   status              String    @default("SORTEADO")
   status_t            String    @default("L")
 
@@ -579,7 +574,7 @@ model experiment_genotipe {
   tecnologia             tecnologia             @relation(fields: [idTecnologia], references: [id])
   foco                   foco                   @relation(fields: [idFoco], references: [id])
   experiment             experiment             @relation(fields: [idExperiment], references: [id])
-  genotipo               genotipo               @relation(fields: [idGenotipo], references: [id])
+  genotipo               genotipo?              @relation(fields: [idGenotipo], references: [id])
   layout_quadra          layout_quadra?         @relation(fields: [blockLayoutId], references: [id])
   sequencia_delineamento sequencia_delineamento @relation(fields: [id_seq_delineamento], references: [id])
   lote                   lote?                  @relation(fields: [idLote], references: [id])

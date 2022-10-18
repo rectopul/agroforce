@@ -53,4 +53,9 @@ export class UnidadeCulturaRepository {
     result.total = count;
     return result;
   }
+
+  async delete(id: number) {
+    const result = await prisma.cultureUnity.delete({ where: { id } });
+    return result;
+  }
 }

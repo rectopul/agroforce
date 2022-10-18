@@ -679,7 +679,6 @@ export default function Listagem({
     let countNca = 0;
     parcelas.map((item: any) => {
       if (item.nca === inputCode) {
-        console.log({ item });
         setParcelasToPrint((current: any) => [...current, item.id]);
         countNca += 1;
         setGenotypeNameOne(item?.genotipo?.name_genotipo);
@@ -763,6 +762,7 @@ export default function Listagem({
         cleanState();
         (document.getElementById('inputCode') as HTMLInputElement).value = '';
         setTimeout(() => (inputRef?.current as any)?.focus(), 2000);
+        handlePagination();
         // router.push("imprimir");
       }
     }
@@ -805,6 +805,7 @@ export default function Listagem({
           userId: userLogado.id,
         });
         cleanState();
+        handlePagination();
         setIsOpenModal(false);
       }
     }
@@ -816,13 +817,10 @@ export default function Listagem({
     )?.value;
     if (inputCode.length === 12) {
       if (dismiss) {
-        console.log('dimiss');
         writeOff();
       } else if (doubleVerify) {
-        console.log('verifyAgain');
         verifyAgain();
       } else {
-        console.log('handlesub');
         handleSubmit();
       }
     }
@@ -849,6 +847,7 @@ export default function Listagem({
       localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
       // router.push("imprimir");
       window.open('imprimir', '_blank');
+      handlePagination();
     }
 
     setIsLoading(false);

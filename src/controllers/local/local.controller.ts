@@ -8,10 +8,6 @@ export class LocalController {
     const parameters: object | any = {};
     let select: any = [];
     try {
-      if (options.filterStatus) {
-        if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
-      }
-
       if (options.filterNameLocalCulture) {
         parameters.name_local_culture = JSON.parse(`{ "contains":"${options.filterNameLocalCulture}" }`);
       }
@@ -70,9 +66,7 @@ export class LocalController {
           label_country: true,
           label_region: true,
           name_locality: true,
-          status: true,
           cultureUnity: true,
-          dt_import: true,
         };
       }
 
@@ -111,8 +105,6 @@ export class LocalController {
 
   async create(data: object | any) {
     try {
-      console.log('create');
-      console.log(data);
       const response = await this.localRepository.create(data);
       if (response) {
         return { status: 200, response, message: 'Local criado' };
@@ -126,8 +118,6 @@ export class LocalController {
 
   async update(data: any) {
     try {
-      console.log('update');
-      console.log(data);
       const localCultura: any = await this.localRepository.findOne(data.id);
 
       if (!localCultura) return { status: 404, message: 'Local de cultura não existente' };

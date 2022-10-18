@@ -6,7 +6,7 @@
 
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
-import { responseGenericFactory, responseNullFactory, responsePositiveNumericFactory } from '../../shared/utils/responseErrorFactory';
+import { responseDoesNotExist, responseGenericFactory, responseNullFactory, responsePositiveNumericFactory } from '../../shared/utils/responseErrorFactory';
 import { CulturaController } from '../cultura.controller';
 import { DividersController } from '../dividers.controller';
 // eslint-disable-next-line import/no-cycle
@@ -99,16 +99,27 @@ export class ImportBlockController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                const { status, response }: IReturnObject = await localController.getAll(
-                  { name_local_culture: spreadSheet[row][column] },
-                );
-                if (status !== 200) {
+                const { response } = await localController.getAll({
+                  name_local_culture: spreadSheet[row][column],
+                });
+                if (response.total === 0) {
                   responseIfError[Number(column)]
-                      += responseGenericFactory(
+                    += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
+                }
+                const {
+                  response: responseSafra,
+                }: IReturnObject = await safraController.getOne(idSafra);
+                const cultureUnityValidate = response[0]?.cultureUnity.map((item: any) => {
+                  if (item?.year === responseSafra?.year) return true;
+                  return false;
+                });
+                if (!cultureUnityValidate?.includes(true)) {
+                  responseIfError[Number(column)]
+                    += responseGenericFactory(
                       (Number(column) + 1),
                       row,
                       spreadSheet[0][column],
-                      'o local não existe no sistema',
+                      'não tem unidade de cultura cadastrada no local informado',
                     );
                 } else {
                   aux.local_preparo = response[0]?.id;

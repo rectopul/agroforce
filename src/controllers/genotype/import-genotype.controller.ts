@@ -34,8 +34,6 @@ export class ImportGenotypeController {
       spreadSheet, idSafra, idCulture, created_by: createdBy,
     }: ImportValidate,
   ): Promise<IReturnObject> {
-
-    console.log("herere -----------------");
     const loteController = new LoteController();
     const safraController = new SafraController();
     const importController = new ImportController();
@@ -43,7 +41,6 @@ export class ImportGenotypeController {
     const genotipoController = new GenotipoController();
     const logImportController = new LogImportController();
     const tecnologiaController = new TecnologiaController();
-
     const responseIfError: any = [];
     try {
       const configModule: object | any = await importController.getAll(10);
@@ -318,8 +315,15 @@ export class ImportGenotypeController {
               }
 
               if (configModule.response[0]?.fields[column] === 'NCC') {
-
-
+                if (!validateInteger(spreadSheet[row][column])
+                  || spreadSheet[row][column].toString().length > 12) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    (Number(column) + 1),
+                    row,
+                    spreadSheet[0][column],
+                    'precisa ser um numero inteiro e positivo e ter 12 dígitos',
+                  );
+                }
                 const nccDados: any = [];
                 // eslint-disable-next-line array-callback-return
                 spreadSheet.map((val: any, index: any) => {
@@ -333,11 +337,8 @@ export class ImportGenotypeController {
                       );
                     } else {
                       nccDados.push(val);
-
                     }
                   }
-
-
                 });
               }
             }
@@ -393,8 +394,6 @@ export class ImportGenotypeController {
       }
 
       if (responseIfError.length === 0) {
-        this.aux.created_by = Number(createdBy);
-        this.aux.id_culture = Number(idCulture);
         try {
           for (const row in spreadSheet) {
             if (row !== '0') {
@@ -658,6 +657,7 @@ export class ImportGenotypeController {
                     const genotipo_obj = {
                       id: this.aux.id_genotipo,
                       id_tecnologia: Number(this.aux.id_tecnologia),
+                      id_culture: idCulture,
                       id_s1: this.aux.id_s1,
                       id_dados: String(this.aux.id_dados_geno),
                       name_genotipo: this.aux.name_genotipo,
@@ -677,8 +677,10 @@ export class ImportGenotypeController {
                       progenitores_origem: this.aux.progenitores_origem,
                       parentesco_completo: this.aux.parentesco_completo,
                       dt_import: this.aux.dt_import,
-                      created_by: this.aux.created_by,
+                      created_by: createdBy,
                     }
+                    this.aux.created_by = createdBy;
+                    // console.log(genotipo_obj);
                     genotipeQueue.add({
                       instance: genotipo_obj,
                       request_type: 'update',
@@ -711,8 +713,9 @@ export class ImportGenotypeController {
                   } else {
                     delete this.aux.id_genotipo;
                     const genotipo_obj = {
-                      id_culture: this.aux.id_culture,
+                      // id_culture: this.aux.id_culture,
                       id_tecnologia: this.aux.id_tecnologia,
+                      id_culture: idCulture,
                       id_s1: this.aux.id_s1,
                       id_dados: String(this.aux.id_dados_geno),
                       name_genotipo: this.aux.name_genotipo,
@@ -732,8 +735,10 @@ export class ImportGenotypeController {
                       progenitores_origem: this.aux.progenitores_origem,
                       parentesco_completo: this.aux.parentesco_completo,
                       dt_import: this.aux.dt_import,
-                      created_by: this.aux.created_by,
+                      created_by: createdBy,
                     };
+                    this.aux.created_by = createdBy;
+                    // console.log(genotipo_obj);
                     genotipeQueue.add({
                       instance: genotipo_obj,
                       request_type: 'create',

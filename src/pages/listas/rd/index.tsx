@@ -124,6 +124,7 @@ export default function Import({
           disabledButton,
         });
         setLoading(false);
+        handlePagination();
         Swal.fire({
           html: message,
           width: '800',
@@ -140,6 +141,7 @@ export default function Import({
           disabledButton,
         });
         setLoading(false);
+        handlePagination();
         Swal.fire({
           html: message,
           width: '800',
@@ -498,6 +500,7 @@ export default function Import({
   }
 
   async function handlePagination(): Promise<void> {
+    console.log('chamou a handle');
     await getAllLogs(filter);
   }
 
@@ -791,7 +794,7 @@ export default function Import({
                     />
                   </div>
                   <div className="col-span-2" style={{ marginLeft: '-12%' }}>
-                    <span className="font-bold">Importar NPE</span>
+                    <span className="font-bold">Importar Ambiente</span>
                     <p>ultimo update 28/06/22</p>
                     <Input
                       type="file"

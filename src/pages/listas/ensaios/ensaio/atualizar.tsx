@@ -74,7 +74,7 @@ export default function AtualizarTipoEnsaio({
   const preferences = userLogado.preferences.genotypeTreatment || {
     id: 0,
     table_preferences:
-      'id,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments',
+      'safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -101,6 +101,7 @@ export default function AtualizarTipoEnsaio({
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
+    { name: 'CamposGerenciados[]', title: 'Safra', value: 'safra' },
     { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
     {
       name: 'CamposGerenciados[]',
@@ -168,9 +169,9 @@ export default function AtualizarTipoEnsaio({
       id: assayList?.id,
       foco: assayList?.foco?.name,
       type_assay: assayList?.type_assay?.name,
-      tecnologia: `${assayList?.tecnologia?.cod_tec} ${assayList?.tecnologia?.name}`,
+      tecnologia: `${assayList?.tecnologia?.cod_tec || ''} ${assayList?.tecnologia?.name || ''}`,
       gli: assayList?.gli,
-      bgm: assayList?.bgm,
+      bgm: assayList?.bgm || '',
       status: assayList?.status,
       project: assayList?.project,
       comments: assayList?.comments,
@@ -375,6 +376,9 @@ export default function AtualizarTipoEnsaio({
       // if (columnOrder[index] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
+      if (columnOrder[index] === 'safra') {
+        tableFields.push(headerTableFactory('Safra', 'safra.safraName'));
+      }
       if (columnOrder[index] === 'fase') {
         tableFields.push(headerTableFactory('Fase', 'lote.fase'));
       }
@@ -720,7 +724,7 @@ export default function AtualizarTipoEnsaio({
       });
   }
 
-  function updateFieldFactory(name: string, title: any) {
+  function updateFieldFactory(name: string, title: any = null) {
     return (
       <div className="w-full h-7">
         <label className="block text-gray-900 text-sm font-bold mb-0">
