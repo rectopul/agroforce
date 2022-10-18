@@ -309,8 +309,6 @@ export class ImportAssayListController {
                 filterNcc: spreadSheet[row][11] || '0',
               });
 
-              // console.log("lote   ",lote);
-              // return false;
               const { response: assayList }: IReturnObject = await assayListController.getAll({
                 filterGli: spreadSheet[row][4],
                 id_safra: idSafra,
@@ -323,7 +321,7 @@ export class ImportAssayListController {
                   id_type_assay: typeAssay[0]?.id,
                   id_tecnologia: technology[0]?.id,
                   gli: spreadSheet[row][4],
-                  bgm: String(spreadSheet[row][6]),
+                  bgm: spreadSheet[row][6],
                   project: String(spreadSheet[row][7]),
                   created_by: createdBy,
                 });
@@ -348,7 +346,7 @@ export class ImportAssayListController {
                   id_type_assay: typeAssay[0]?.id,
                   id_tecnologia: technology[0]?.id,
                   gli: spreadSheet[row][4],
-                  bgm: String(spreadSheet[row][6]),
+                  bgm: spreadSheet[row][6],
                   project: String(spreadSheet[row][7]),
                   created_by: createdBy,
                 });

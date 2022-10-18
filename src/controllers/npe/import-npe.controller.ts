@@ -186,7 +186,7 @@ export class ImportNpeController {
 
             if (configModule.response[0]?.fields[column] === 'OGM') {
               if (spreadSheet[row][column] !== null) {
-                if ((typeof (spreadSheet[row][column])) === 'number') {
+                if ((typeof (spreadSheet[row][column])) !== 'number') {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     row,
