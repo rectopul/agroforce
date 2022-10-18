@@ -51,7 +51,6 @@ export class ImportGenotypeTreatmentController {
             gli: spreadSheet[row][4],
             treatments_number: spreadSheet[row][6],
             name_genotipo: spreadSheet[row][8],
-            nca: spreadSheet[row][9],
           });
 
           if (treatmentsStatus === 400) {
@@ -156,14 +155,8 @@ export class ImportGenotypeTreatmentController {
               }
             }
             if (column === '9') { // NCA
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else {
-                const { status } = await genotypeTreatmentController.getAll({
-                  nca: String(spreadSheet[row][column]),
-                });
-                if (status === 400) {
+              if (treatments[0]?.lote) {
+                if (Number(treatments[0]?.lote?.ncc) !== Number(spreadSheet[row][column])) {
                   responseIfError[Number(column)]
                     += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
                 }
