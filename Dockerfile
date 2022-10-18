@@ -15,7 +15,7 @@ RUN npm install next  --frozen-lockfile --legacy-peer-deps
 RUN npx prisma generate
 RUN npx update
 ENV DATABASE_URL "mysql://root:root@localhost:3306/agro_force" 
-ENV COPYMOD "tmg" 
+ENV COPYMOD "tmgdns-qa" 
 RUN npm run build
 RUN yarn build
 RUN yarn cache clean
