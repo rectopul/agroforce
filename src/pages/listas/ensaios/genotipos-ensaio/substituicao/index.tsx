@@ -582,7 +582,7 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-2
+                  pb-0
                   mt-4
                 "
                 >

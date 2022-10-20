@@ -1009,7 +1009,7 @@ export default function Listagem({
                   flex
                   justify-center
                   pt-2
-                  pb-3
+                  pb-0
                   "
                 >
                   <div className="h-6 w-1/2 ml-2">
