@@ -753,9 +753,7 @@ export default function Listagem({
 
       <ModalConfirmation
         isOpen={isOpenModalConfirm}
-        text={`Tem certeza que deseja deletar o item ${
-          itemSelectedDelete?.experimentName || ""
-        }?`}
+        text={`Tem certeza que deseja deletar o item ${itemSelectedDelete?.experimentName}?`}
         onPress={deleteItem}
         onCancel={() => setIsOpenModalConfirm(false)}
       />
@@ -916,9 +914,9 @@ export default function Listagem({
               data={experimentos}
               options={{
                 showTitle: false,
-                // headerStyle: {
-                //   zIndex: 9999,
-                // },
+                headerStyle: {
+                  zIndex: 0,
+                },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
