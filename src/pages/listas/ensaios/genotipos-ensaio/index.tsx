@@ -74,8 +74,6 @@ export default function Listagem({
   const { TabsDropDowns } = ITabs.default;
   const [isOpenModal, setIsOpenModal] = useState(false);
 
-  console.log({ allTreatments });
-
   const tableRef = useRef<any>(null);
 
   const tabsDropDowns = TabsDropDowns("listas");
@@ -849,7 +847,7 @@ export default function Listagem({
 
                 <h2>Excel</h2>
                 <button
-                  type="submit"
+                  type="button"
                   className="w-full h-8 ml-auto mt-0 bg-green-600 text-white px-8 rounded-lg text-sm hover:bg-green-800"
                   onClick={() => window.open("/listas/rd", "_blank")}
                 >
@@ -920,11 +918,11 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cód. Tecnologia
+                      Cód. Tec. Ens.
                     </label>
                     <div className="flex">
                       <Input
-                        placeholder="Cód. Tecnologia"
+                        placeholder="Cód. Tec. Ens."
                         id="filterCodTec"
                         name="filterCodTec"
                         onChange={formik.handleChange}
@@ -932,7 +930,7 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory("filterTechnology", "Nome da tecnologia")}
+                  {filterFieldFactory("filterTechnology", "Nome Tec. Ens.")}
 
                   {filterFieldFactory("filterGli", "GLI")}
 

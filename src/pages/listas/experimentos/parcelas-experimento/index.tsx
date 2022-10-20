@@ -930,9 +930,9 @@ export default function Listagem({
 
                 <h2>Excel</h2>
                 <button
-                  type="submit"
+                  type="button"
                   className="w-full h-8 ml-auto mt-0 bg-green-600 text-white px-8 rounded-lg text-sm hover:bg-green-800"
-                  onClick={() => router.push("/listas/rd")}
+                  onClick={() => window.open("/listas/rd", "_black")}
                 >
                   Importar arquivo
                 </button>
