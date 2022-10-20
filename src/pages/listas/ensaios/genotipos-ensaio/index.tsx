@@ -61,6 +61,7 @@ import * as ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
 
 export default function Listagem({
+  allTreatments,
   assaySelect,
   genotypeSelect,
   itensPerPage,
@@ -72,6 +73,8 @@ export default function Listagem({
 }: ITreatmentGrid) {
   const { TabsDropDowns } = ITabs.default;
   const [isOpenModal, setIsOpenModal] = useState(false);
+
+  console.log({ allTreatments });
 
   const tableRef = useRef<any>(null);
 
@@ -91,7 +94,9 @@ export default function Listagem({
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences
   );
-  const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
+  const [treatments, setTreatments] = useState<ITreatment[] | any>(
+    allTreatments
+  );
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(1);
@@ -283,7 +288,7 @@ export default function Listagem({
       if (response.status === 200 || response.status === 400) {
         setTreatments(response.response);
         setTotalItems(response.total);
-        setAfterFilter(true);
+        // setAfterFilter(true);
         setMessage(true);
         tableRef.current.dataManager.changePageSize(
           response.total >= take ? take : response.total
@@ -846,7 +851,7 @@ export default function Listagem({
                 <button
                   type="submit"
                   className="w-full h-8 ml-auto mt-0 bg-green-600 text-white px-8 rounded-lg text-sm hover:bg-green-800"
-                  onClick={() => router.push("/listas/rd")}
+                  onClick={() => window.open("/listas/rd", "_blank")}
                 >
                   Importar arquivo
                 </button>
@@ -1128,7 +1133,8 @@ export default function Listagem({
               tableRef={tableRef}
               style={{ background: "#f9fafb" }}
               columns={columns}
-              data={afterFilter ? treatments : []}
+              //data={afterFilter ? treatments : []}
+              data={treatments}
               options={{
                 selection: true,
                 selectionProps: (rowData: any) =>
@@ -1143,11 +1149,16 @@ export default function Listagem({
                 // pageSize: itensPerPage,
                 pageSize: Number(take),
               }}
+              // localization={{
+              //   body: {
+              //     emptyDataSourceMessage: tableMessage
+              //       ? "Nenhum Trat. Genótipo encontrado!"
+              //       : "ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.",
+              //   },
+              // }}
               localization={{
                 body: {
-                  emptyDataSourceMessage: tableMessage
-                    ? "Nenhum Trat. Genótipo encontrado!"
-                    : "ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.",
+                  emptyDataSourceMessage: "Nenhum Trat. Genótipo encontrado!",
                 },
               }}
               onChangeRowsPerPage={(e: any) => {}}
