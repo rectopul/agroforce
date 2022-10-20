@@ -292,13 +292,7 @@ export class ImportGenotypeController {
                 configModule.response[0]?.fields[column]
                 === 'Cruzamento de origem'
               ) {
-                if (spreadSheet[row][column] === null) {
-                  responseIfError[Number(column)] += responseNullFactory(
-                    Number(column) + 1,
-                    row,
-                    spreadSheet[0][column],
-                  );
-                }
+                // cruzamento sem validação
               }
 
               if (configModule.response[0]?.fields[column] === 'id_s2') {

@@ -502,7 +502,7 @@ model assay_list {
   id_tecnologia      Int
   gli                String
   treatmentsNumber   Int?
-  bgm                String
+  bgm                Int?
   project            String
   status             String               @default("IMPORTADO")
   comments           String?

@@ -198,41 +198,49 @@ export class ImportLocalController {
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
             }
           } else if (spreadSheet[0][column].includes('DT')) {
-            // eslint-disable-next-line no-param-reassign
-            spreadSheet[row][column] = new Date(spreadSheet[row][column]);
-            const { status, response }: IReturnObject = await unidadeCulturaController.getAll({
-              filterNameUnityCulture: spreadSheet[row][2],
-              filterYear: spreadSheet[row][1],
-            });
-            const dateNow = new Date();
-            if (dateNow.getTime() < spreadSheet[row][column].getTime()) {
-              responseIfError[Number(column)] += responseGenericFactory(
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)] += responseNullFactory(
                 Number(column) + 1,
                 row,
                 spreadSheet[0][column],
-                'a data e maior que a data atual',
               );
-            }
-            if (spreadSheet[row][column].getTime() < 100000) {
-              responseIfError[Number(column)] += responseGenericFactory(
-                Number(column) + 1,
-                row,
-                spreadSheet[0][column],
-                'o campo DT precisa ser no formato data',
-              );
-            }
-            if (status === 200) {
-              const lastDtImport = response[0]?.dt_import?.getTime();
-              if (
-                lastDtImport
-                > spreadSheet[row][column].getTime()
-              ) {
+            } else {
+              // eslint-disable-next-line no-param-reassign
+              spreadSheet[row][column] = new Date(spreadSheet[row][column]);
+              const { status, response }: IReturnObject = await unidadeCulturaController.getAll({
+                filterNameUnityCulture: spreadSheet[row][2],
+                filterYear: spreadSheet[row][1],
+              });
+              const dateNow = new Date();
+              if (dateNow.getTime() < spreadSheet[row][column].getTime()) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
                   row,
                   spreadSheet[0][column],
-                  'essa informação é mais antiga do que a informação do software',
+                  'a data e maior que a data atual',
                 );
+              }
+              if (spreadSheet[row][column].getTime() < 100000) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  Number(column) + 1,
+                  row,
+                  spreadSheet[0][column],
+                  'o campo DT precisa ser no formato data',
+                );
+              }
+              if (status === 200) {
+                const lastDtImport = response[0]?.dt_import?.getTime();
+                if (
+                  lastDtImport
+                    > spreadSheet[row][column].getTime()
+                ) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                    'essa informação é mais antiga do que a informação do software',
+                  );
+                }
               }
             }
           }
