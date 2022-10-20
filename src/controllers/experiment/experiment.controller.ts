@@ -140,6 +140,10 @@ export class ExperimentController {
         parameters.idSafra = Number(options.id_safra);
       }
 
+      if (options.idLocal) {
+        parameters.idLocal = Number(options.idLocal);
+      }
+
       if (options.id) {
         parameters.id = Number(options.id);
       }
@@ -192,7 +196,7 @@ export class ExperimentController {
         newItem.countNT = functionsUtils
           .countChildrenForSafra(item.assay_list.genotype_treatment, Number(options.idSafra));
         newItem.npeQT = item.countNT * item.repetitionsNumber;
-        newItem.seq_delineamento = item.delineamento.sequencia_delineamento.filter((x: any) => x.nt == item.countNT);
+        newItem.seq_delineamento = item.delineamento.sequencia_delineamento.filter((x: any) => x.nt == item.countNT && x.repeticao <= item.repetitionsNumber);
         return newItem;
       });
       if (response.total <= 0) {
