@@ -19,6 +19,7 @@ import { LayoutQuadraController } from '../block-layout/layout-quadra.controller
 import { LayoutChildrenController } from '../layout-children.controller';
 import { AllocatedExperimentController } from './allocated-experimento.controller';
 import { CulturaController } from '../cultura.controller';
+import { validateHeaders } from '../../shared/utils/validateHeaders';
 
 export class ImportAllocationController {
   static async validate(
@@ -49,7 +50,22 @@ export class ImportAllocationController {
 
     spreadSheet.unshift(header);
 
+    const headers = [
+      'ID_EXPERIMENTO',
+      'SAFRA',
+      'EXPE',
+      'NPEI',
+      'NPEF',
+      'NTPARC',
+      'LOCPREP',
+      'QM',
+      'SEQ',
+    ];
     try {
+      const validate: any = await validateHeaders(spreadSheet, headers);
+      if (validate.length > 0) {
+        return { status: 400, message: validate };
+      }
       const allParcelas: any = {};
       for (const row in spreadSheet) {
         if (row !== '0') {

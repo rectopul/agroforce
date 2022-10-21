@@ -4,6 +4,7 @@
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
 import { responseGenericFactory, responseNullFactory } from '../../shared/utils/responseErrorFactory';
+import { validateHeaders } from '../../shared/utils/validateHeaders';
 import { CulturaController } from '../cultura.controller';
 import { LogImportController } from '../log-import.controller';
 import { TecnologiaController } from './tecnologia.controller';
@@ -18,7 +19,18 @@ export class ImportTechnologyController {
     const tecnologiaController = new TecnologiaController();
 
     const responseIfError: any = [];
+    const headers = [
+      'Código da tecnologia (S1_C0189)',
+      'Nome da tecnologia (S1_C0190)',
+      'Rótulo (S1_C0101)',
+      'Cultura (C0002)',
+      'DT_IMPORT (SCRIPT0002)',
+    ];
     try {
+      const validate: any = await validateHeaders(spreadSheet, headers);
+      if (validate.length > 0) {
+        return { status: 400, message: validate };
+      }
       for (const row in spreadSheet) {
         if (row !== '0') {
           for (const column in spreadSheet[row]) {

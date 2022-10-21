@@ -14,6 +14,7 @@ import {
   responseNullFactory,
   responsePositiveNumericFactory,
 } from '../../shared/utils/responseErrorFactory';
+import { validateHeaders } from '../../shared/utils/validateHeaders';
 import { CulturaController } from '../cultura.controller';
 import { ImportController } from '../import.controller';
 import { LogImportController } from '../log-import.controller';
@@ -40,7 +41,43 @@ export class ImportGenotypeController {
     const logImportController = new LogImportController();
     const tecnologiaController = new TecnologiaController();
     const responseIfError: any = [];
+    const headers = [
+      'ID_S1 (S1_ID_S1)',
+      'Identificador de dados (S1_DATA_ID)',
+      'Cultura (S1_C0002)',
+      'Nome do genótipo (S1_C0001)',
+      'Nome principal (S1_C0000)',
+      'Nome público (S1_C0003)',
+      'Nome experimental (S1_C0012)',
+      'Nome alternativo (S1_C0162)',
+      'ELITE_NOME (S1_C3166)',
+      'Código da tecnologia (S1_C0189)',
+      'Tipo (S1_C0005)',
+      'GMR (S1_C3061)',
+      'BGM (S1_C3074)',
+      'Cruzamento de origem (S1_C0201)',
+      'Progenitor F direto (S1_C0006)',
+      'Progenitor M direto (S1_C0007)',
+      'Progenitor F de origem (S1_C0008)',
+      'Progenitor M de origem (S1_C0009)',
+      'Progenitores de origem (S1_C0010)',
+      'Parentesco completo (S1_C0011)',
+      'ID_S2 (ID_S2)',
+      'Identificador de dados (DATA_ID)',
+      'Ano do lote (C0052)',
+      'SAFRA (C0199)',
+      'Código do lote (C0050)',
+      'NCC (C3107)',
+      'FASE (C0200)',
+      'PESO',
+      'SEMENTES',
+      'DT_IMPORT (SCRIPT0002)',
+    ];
     try {
+      const validate: any = await validateHeaders(spreadSheet, headers);
+      if (validate.length > 0) {
+        return { status: 400, message: validate };
+      }
       const configModule: object | any = await importController.getAll(10);
       if (spreadSheet[0]?.length < 30) {
         return {

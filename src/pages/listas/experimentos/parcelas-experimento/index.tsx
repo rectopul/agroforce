@@ -633,7 +633,7 @@ export default function Listagem({
             newItem.SAFRA = item.safra.safraName;
             newItem.FOCO = item.foco.name;
             newItem.ENSAIO = item.type_assay.name;
-            newItem.TECNOLOGIA = item.tecnologia.name;
+            newItem.TECNOLOGIA = item.tecnologia.cod_tec;
             newItem.GLI = item.gli;
             newItem.EXPERIMENTO = item.experiment.experimentName;
             newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
@@ -666,7 +666,7 @@ export default function Listagem({
             type: "binary",
           });
           // Download
-          XLSX.writeFile(workBook, "Substituição-genótipos.xlsx");
+          XLSX.writeFile(workBook, 'Substituição-parcelas.xlsx');
         }
       });
   };
