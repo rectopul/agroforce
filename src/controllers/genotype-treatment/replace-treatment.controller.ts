@@ -137,6 +137,15 @@ export class ReplaceTreatmentController {
       if (options.filterYear) {
         parameters.year = Number(options.filterYear);
       }
+      if (options.filterYearFrom || options.filterYearTo) {
+        if (options.filterYearFrom && options.filterYearTo) {
+          parameters.year = JSON.parse(`{"gte": ${Number(options.filterYearFrom)}, "lte": ${Number(options.filterYearTo)} }`);
+        } else if (options.filterYearFrom) {
+          parameters.year = JSON.parse(`{"gte": ${Number(options.filterYearFrom)} }`);
+        } else if (options.filterYearTo) {
+          parameters.year = JSON.parse(`{"lte": ${Number(options.filterYearTo)} }`);
+        }
+      }
       if (options.filterCodLote) {
         parameters.cod_lote = JSON.parse(`{ "contains":"${options.filterCodLote}" }`);
       }
@@ -146,11 +155,29 @@ export class ReplaceTreatmentController {
       if (options.filterPeso) {
         parameters.peso = Number(options.filterPeso);
       }
+      if (options.filterPesoFrom || options.filterFaseTo) {
+        if (options.filterPesoFrom && options.filterFaseTo) {
+          parameters.peso = JSON.parse(`{"gte": ${Number(options.filterPesoFrom)}, "lte": ${Number(options.filterFaseTo)} }`);
+        } else if (options.filterPesoFrom) {
+          parameters.peso = JSON.parse(`{"gte": ${Number(options.filterPesoFrom)} }`);
+        } else if (options.filterFaseTo) {
+          parameters.peso = JSON.parse(`{"lte": ${Number(options.filterFaseTo)} }`);
+        }
+      }
       if (options.filterFase) {
         parameters.fase = JSON.parse(`{ "contains":"${options.filterFase}" }`);
       }
       if (options.filterSeeds) {
         parameters.quant_sementes = Number(options.filterSeeds);
+      }
+      if (options.filterSeedsFrom || options.filterSeedsTo) {
+        if (options.filterSeedsFrom && options.filterSeedsTo) {
+          parameters.quant_sementes = JSON.parse(`{"gte": ${Number(options.filterSeedsFrom)}, "lte": ${Number(options.filterSeedsTo)} }`);
+        } else if (options.filterSeedsFrom) {
+          parameters.quant_sementes = JSON.parse(`{"gte": ${Number(options.filterSeedsFrom)} }`);
+        } else if (options.filterSeedsTo) {
+          parameters.quant_sementes = JSON.parse(`{"lte": ${Number(options.filterSeedsTo)} }`);
+        }
       }
       if (options.filterGenotipo) {
         parameters.AND.push(JSON.parse(`{ "genotipo": {"name_genotipo": {"contains": "${options.filterGenotipo}" } } }`));
@@ -161,8 +188,26 @@ export class ReplaceTreatmentController {
       if (options.filterGmr) {
         parameters.AND.push(JSON.parse(`{ "genotipo": { "gmr":  ${Number(options.filterGmr)}  } }`));
       }
+      if (options.filterGmrFrom || options.filterGmrTo) {
+        if (options.filterGmrFrom && options.filterGmrTo) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"gmr": {"gte": ${Number(options.filterGmrFrom)}, "lte": ${Number(options.filterGmrTo)} }}}`));
+        } else if (options.filterGmrFrom) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"gmr": {"gte": ${Number(options.filterGmrFrom)} }}}`));
+        } else if (options.filterGmrTo) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"gmr": {"lte": ${Number(options.filterGmrTo)} }}}`));
+        }
+      }
       if (options.filterBgm) {
         parameters.AND.push(JSON.parse(`{ "genotipo": { "bgm":  ${Number(options.filterBgm)}  } }`));
+      }
+      if (options.filterBgmFrom || options.filterBgmTo) {
+        if (options.filterBgmFrom && options.filterBgmTo) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"bgm": {"gte": ${Number(options.filterBgmFrom)}, "lte": ${Number(options.filterBgmTo)} }}}`));
+        } else if (options.filterBgmFrom) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"bgm": {"gte": ${Number(options.filterBgmFrom)} }}}`));
+        } else if (options.filterBgmTo) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"bgm": {"lte": ${Number(options.filterBgmTo)} }}}`));
+        }
       }
       if (options.filterTecnologia) {
         parameters.AND.push(JSON.parse(`{ "genotipo": { "name": {"contains": "${options.filterTecnologia}" } } }`));

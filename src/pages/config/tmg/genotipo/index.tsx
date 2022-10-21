@@ -593,6 +593,7 @@ export default function Listagem({
   const downloadExcel = async (): Promise<void> => {
     await genotipoService.getAll(filter).then(({ response, status }) => {
       if (status === 200) {
+        console.log(response);
         const newData = response.map((row: any) => {
           const dataExp = new Date();
           let hours: string;
@@ -619,9 +620,11 @@ export default function Listagem({
 
           row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.name}`;
 
+          row.CULTURA = row.culture.desc;
           row.ID_S1 = row.id_s1;
           row.ID_DADOS = row.id_dados;
           row.NOME_GENÓTIPO = row.name_genotipo;
+          row.NOME_PRINCIPAL = row.name_main;
           row.NOME_PÚBLICO = row.name_public;
           row.NOME_EXPERIMENTAL = row.name_experiment;
           row.NOME_ALTERNATIVO = row.name_alter;
@@ -640,6 +643,7 @@ export default function Listagem({
           row.PARENTESCO_COMPLETO = row.parentesco_completo;
           row.DATA = row.DT;
 
+          delete row.culture;
           delete row.id_s1;
           delete row.name_main;
           delete row.id_dados;
@@ -1094,23 +1098,19 @@ export const getServerSideProps: GetServerSideProps = async ({
   const idSafra = Number(req.cookies.safraId);
   const idCulture = Number(req.cookies.cultureId);
 
-
-    //Last page
-    const lastPageServer = req.cookies.lastPage
+  // Last page
+  const lastPageServer = req.cookies.lastPage
     ? req.cookies.lastPage
-    : "No";
+    : 'No';
 
-
-  if(lastPageServer == undefined || lastPageServer == "No"){
-
+  if (lastPageServer == undefined || lastPageServer == 'No') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("filtersParams", { req, res });
-    removeCookies("lastPage", { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('filtersParams', { req, res });
+    removeCookies('lastPage', { req, res });
     // setCookies('filterParams','');
-
   }
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
@@ -1120,7 +1120,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? req.cookies.filterBeforeEdit
     : '';
 
-
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
     : 'desc';
@@ -1128,7 +1127,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
     : 'name_genotipo';
-
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
