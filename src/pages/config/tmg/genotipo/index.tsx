@@ -593,6 +593,7 @@ export default function Listagem({
   const downloadExcel = async (): Promise<void> => {
     await genotipoService.getAll(filter).then(({ response, status }) => {
       if (status === 200) {
+        console.log(response);
         const newData = response.map((row: any) => {
           const dataExp = new Date();
           let hours: string;
@@ -619,9 +620,11 @@ export default function Listagem({
 
           row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.name}`;
 
+          row.CULTURA = row.culture.desc;
           row.ID_S1 = row.id_s1;
           row.ID_DADOS = row.id_dados;
           row.NOME_GENÓTIPO = row.name_genotipo;
+          row.NOME_PRINCIPAL = row.name_main;
           row.NOME_PÚBLICO = row.name_public;
           row.NOME_EXPERIMENTAL = row.name_experiment;
           row.NOME_ALTERNATIVO = row.name_alter;
@@ -640,6 +643,7 @@ export default function Listagem({
           row.PARENTESCO_COMPLETO = row.parentesco_completo;
           row.DATA = row.DT;
 
+          delete row.culture;
           delete row.id_s1;
           delete row.name_main;
           delete row.id_dados;

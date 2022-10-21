@@ -45,15 +45,25 @@ import ITabs from '../../../../../shared/utils/dropdown';
 
 interface IFilter {
   filterYear: string;
+  filterYearFrom: string;
+  filterYearTo: string;
   filterCodLote: string;
   filterNcc: string;
   filterFase: string;
+  filterPesoFrom: string;
+  filterPesoTo: string;
   filterPeso: string;
   filterSeeds: string;
+  filterSeedsFrom: string;
+  filterSeedsTo: string;
   filterGenotipo: string;
   filterMainName: string;
   filterGmr: string;
+  filterGmrFrom: string;
+  filterGmrTo: string;
   filterBgm: string;
+  filterBgmFrom: string;
+  filterBgmTo: string;
   filterTecnologia: string;
   orderBy: object | any;
   typeOrder: object | any;
@@ -182,15 +192,25 @@ export default function Listagem({
     },
     onSubmit: async ({
       filterYear,
+      filterYearFrom,
+      filterYearTo,
       filterCodLote,
       filterNcc,
       filterFase,
+      filterPesoFrom,
+      filterPesoTo,
+      filterSeedsFrom,
+      filterSeedsTo,
       filterPeso,
       filterSeeds,
       filterGenotipo,
       filterMainName,
       filterGmr,
+      filterGmrFrom,
+      filterGmrTo,
       filterBgm,
+      filterBgmFrom,
+      filterBgmTo,
       filterTecnologia,
     }) => {
       const tempParams: any = [];
@@ -201,7 +221,7 @@ export default function Listagem({
           }
         });
       }
-      const parametersFilter = `filterStatus=${1}&id_safra=${idSafra}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologia=${filterTecnologia}`;
+      const parametersFilter = `filterStatus=${1}&id_safra=${idSafra}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologia=${filterTecnologia}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterPesoTo=${filterPesoTo}&filterPesoFrom=${filterPesoFrom}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}`;
 
       await replaceTreatmentService
         .getAll(
