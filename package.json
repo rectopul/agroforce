@@ -33,6 +33,7 @@
     "@types/yup": "^0.29.13",
     "bcryptjs": "^2.4.3",
     "bootstrap": "^5.2.0",
+    "bull": "^4.10.0",
     "cache-manager": "^3.6.0",
     "canary": "^0.1.5",
     "chart.js": "^3.9.1",
