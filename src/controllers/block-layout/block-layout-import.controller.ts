@@ -15,6 +15,7 @@ import { ImportController } from '../import.controller';
 import { LayoutQuadraController } from './layout-quadra.controller';
 import { LayoutChildrenController } from '../layout-children.controller';
 import { CulturaController } from '../cultura.controller';
+import { validateHeaders } from '../../shared/utils/validateHeaders';
 
 export class ImportLayoutBlockController {
   static aux: any = {};
@@ -33,7 +34,27 @@ export class ImportLayoutBlockController {
 
     const responseIfError: Array<string> = [];
     const configModule: object | any = await importController.getAll(Number(5));
+    const headers = [
+      'CULTURA',
+      'CODIGO',
+      'LINHAS_PLANTADEIRA 4 / 8 / 12',
+      'SL',
+      'SC',
+      'S_ALOC',
+      'TIRO',
+      'DISPARO',
+      'CJ',
+      'DIST',
+      'ST',
+      'SPC',
+      'SCOLHEITA',
+      'TIPO_PARCELA',
+    ];
     try {
+      const validate: any = await validateHeaders(spreadSheet, headers);
+      if (validate.length > 0) {
+        return { status: 400, message: validate };
+      }
       const sColheita: any = {};
       const sl: any = {};
       const sc: any = {};

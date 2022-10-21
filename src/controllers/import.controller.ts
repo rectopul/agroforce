@@ -215,11 +215,11 @@ export class ImportController {
       const configModule: object | any = await this.getAll(Number(data.moduleId));
 
       if (data.moduleId !== 22
-          && data.moduleId !== 31
-          && data.moduleId !== 30
-          && data.moduleId !== 23
-          && data.moduleId !== 27
-          && data.moduleId !== 26) {
+        && data.moduleId !== 31
+        && data.moduleId !== 30
+        && data.moduleId !== 23
+        && data.moduleId !== 27
+        && data.moduleId !== 26) {
         if (configModule.response == '') return { status: 200, message: 'Primeiro é preciso configurar o modelo de planilha para esse modulo!' };
       }
 

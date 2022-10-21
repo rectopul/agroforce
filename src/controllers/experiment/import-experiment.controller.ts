@@ -18,6 +18,7 @@ import { ExperimentController } from './experiment.controller';
 import { LogImportController } from '../log-import.controller';
 import { validateInteger } from '../../shared/utils/numberValidate';
 import { CulturaController } from '../cultura.controller';
+import { validateHeaders } from '../../shared/utils/validateHeaders';
 
 export class ImportExperimentController {
   static async validate(
@@ -36,7 +37,29 @@ export class ImportExperimentController {
 
     const experimentNameTemp: Array<string> = [];
     const responseIfError: Array<string> = [];
+    const headers = [
+      'CULTURA',
+      'SAFRA',
+      'ENSAIO',
+      'FOCO',
+      'GLI',
+      'GGEN',
+      'BGM',
+      'CODLOCAL',
+      'DENSIDADE',
+      'EP',
+      'DELI',
+      'NREP',
+      'NLP',
+      'CLP',
+      'OBS',
+      'ORDEM_SORTEIO',
+    ];
     try {
+      const validate: any = await validateHeaders(spreadSheet, headers);
+      if (validate.length > 0) {
+        return { status: 400, message: validate };
+      }
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
           let experimentName;

@@ -6,7 +6,9 @@
 
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
-import { responseDoesNotExist, responseGenericFactory, responseNullFactory, responsePositiveNumericFactory } from '../../shared/utils/responseErrorFactory';
+import {
+  responseDoesNotExist, responseGenericFactory, responseNullFactory, responsePositiveNumericFactory,
+} from '../../shared/utils/responseErrorFactory';
 import { CulturaController } from '../cultura.controller';
 import { DividersController } from '../dividers.controller';
 // eslint-disable-next-line import/no-cycle
@@ -17,6 +19,7 @@ import { LogImportController } from '../log-import.controller';
 import { SafraController } from '../safra.controller';
 import { QuadraController } from './quadra.controller';
 import { validateInteger } from '../../shared/utils/numberValidate';
+import { validateHeaders } from '../../shared/utils/validateHeaders';
 
 export class ImportBlockController {
   static async validate(
@@ -36,7 +39,28 @@ export class ImportBlockController {
 
     const responseIfError: any = [];
     const aux: any = {};
+    const headers = [
+      'SAFRA',
+      'CULTURA',
+      'LOCALPREP',
+      'CODIGO_QUADRA_PREP',
+      'LARGQ',
+      'COMPP',
+      'LINHAP',
+      'COMPC',
+      'ESQUEMA',
+      'DIVISOR',
+      'SEMMETRO',
+      'T4I',
+      'T4F',
+      'DI',
+      'DF',
+    ];
     try {
+      const validate: any = await validateHeaders(spreadSheet, headers);
+      if (validate.length > 0) {
+        return { status: 400, message: validate };
+      }
       const configModule: object | any = await importController.getAll(17);
 
       let larg_q: any;

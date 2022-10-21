@@ -1,38 +1,52 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { removeCookies, setCookies } from 'cookies-next';
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import getConfig from 'next/config';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { removeCookies, setCookies } from "cookies-next";
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import {
-  DragDropContext, Draggable, Droppable, DropResult,
-} from 'react-beautiful-dnd';
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons/ai';
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from "react-beautiful-dnd";
 import {
-  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
-} from 'react-icons/bi';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line } from 'react-icons/ri';
-import * as XLSX from 'xlsx';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { BsTrashFill } from 'react-icons/bs';
-import Swal from 'sweetalert2';
-import foco from 'src/pages/api/foco';
-import { IGenerateProps } from '../../../../interfaces/shared/generate-props.interface';
-import { IAssayList, IAssayListGrid, IAssayListFilter } from '../../../../interfaces/listas/ensaio/assay-list.interface';
-import { assayListService, userPreferencesService } from '../../../../services';
-import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+  AiOutlineArrowDown,
+  AiOutlineArrowUp,
+  AiTwotoneStar,
+} from "react-icons/ai";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line } from "react-icons/ri";
+import * as XLSX from "xlsx";
+import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import { BsTrashFill } from "react-icons/bs";
+import Swal from "sweetalert2";
+import foco from "src/pages/api/foco";
+import { IGenerateProps } from "../../../../interfaces/shared/generate-props.interface";
 import {
-  AccordionFilter, Button, CheckBox, Content, Input,
-} from '../../../../components';
-import * as ITabs from '../../../../shared/utils/dropdown';
-import { tableGlobalFunctions } from '../../../../helpers';
+  IAssayList,
+  IAssayListGrid,
+  IAssayListFilter,
+} from "../../../../interfaces/listas/ensaio/assay-list.interface";
+import { assayListService, userPreferencesService } from "../../../../services";
+import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
+import {
+  AccordionFilter,
+  Button,
+  CheckBox,
+  Content,
+  Input,
+  ModalConfirmation,
+} from "../../../../components";
+import * as ITabs from "../../../../shared/utils/dropdown";
+import { tableGlobalFunctions } from "../../../../helpers";
 
 export default function TipoEnsaio({
   allAssay,
@@ -48,24 +62,33 @@ export default function TipoEnsaio({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
-  const tabsDropDowns = TabsDropDowns('listas');
+  const tabsDropDowns = TabsDropDowns("listas");
 
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'ENSAIO'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === "ENSAIO" ? (tab.statusTab = true) : (tab.statusTab = false)
+  );
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.assayList || { id: 0, table_preferences: 'id,protocol_name,foco,type_assay,gli,tecnologia,treatmentsNumber,status,action' };
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const preferences = userLogado.preferences.assayList || {
+    id: 0,
+    table_preferences:
+      "id,protocol_name,foco,type_assay,gli,tecnologia,treatmentsNumber,status,action",
+  };
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(
+    preferences.table_preferences
+  );
   const [assayList, setAssayList] = useState<IAssayList[]>(() => allAssay);
-  const [currentPage, setCurrentPage] = useState<number>(Number(pageBeforeEdit));
+  const [currentPage, setCurrentPage] = useState<number>(
+    Number(pageBeforeEdit)
+  );
   const [orderList, setOrder] = useState<number>(1);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
+
+  const [isOpenModalConfirm, setIsOpenModalConfirm] = useState<boolean>(false);
+  const [itemSelectedDelete, setItemSelectedDelete] = useState<any>(null);
 
   // console.log("typeOrder  ",arrowOrder)
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -73,56 +96,82 @@ export default function TipoEnsaio({
     //   name: 'CamposGerenciados[]', title: 'Favorito ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
     // },
     {
-      name: 'CamposGerenciados[]', title: 'Protocolo', value: 'protocol_name', defaultChecked: () => camposGerenciados.includes('protocol_name'),
+      name: "CamposGerenciados[]",
+      title: "Protocolo",
+      value: "protocol_name",
+      defaultChecked: () => camposGerenciados.includes("protocol_name"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Foco', value: 'foco', defaultChecked: () => camposGerenciados.includes('foco'),
+      name: "CamposGerenciados[]",
+      title: "Foco",
+      value: "foco",
+      defaultChecked: () => camposGerenciados.includes("foco"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Ensaio', value: 'type_assay', defaultChecked: () => camposGerenciados.includes('type_assay'),
+      name: "CamposGerenciados[]",
+      title: "Ensaio",
+      value: "type_assay",
+      defaultChecked: () => camposGerenciados.includes("type_assay"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'GLI', value: 'gli', defaultChecked: () => camposGerenciados.includes('gli'),
+      name: "CamposGerenciados[]",
+      title: "GLI",
+      value: "gli",
+      defaultChecked: () => camposGerenciados.includes("gli"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia', defaultChecked: () => camposGerenciados.includes('tecnologia'),
+      name: "CamposGerenciados[]",
+      title: "Tecnologia",
+      value: "tecnologia",
+      defaultChecked: () => camposGerenciados.includes("tecnologia"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Nº de trat.', value: 'treatmentsNumber', defaultChecked: () => camposGerenciados.includes('treatmentsNumber'),
+      name: "CamposGerenciados[]",
+      title: "Nº de trat.",
+      value: "treatmentsNumber",
+      defaultChecked: () => camposGerenciados.includes("treatmentsNumber"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Status do ensaio', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
+      name: "CamposGerenciados[]",
+      title: "Status do ensaio",
+      value: "status",
+      defaultChecked: () => camposGerenciados.includes("status"),
     },
     {
-      name: 'CamposGerenciados[]', title: 'Ação', value: 'action', defaultChecked: () => camposGerenciados.includes('action'),
+      name: "CamposGerenciados[]",
+      title: "Ação",
+      value: "action",
+      defaultChecked: () => camposGerenciados.includes("action"),
     },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [colorStar, setColorStar] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>('');
+  const [colorStar, setColorStar] = useState<string>("");
+  const [orderType, setOrderType] = useState<string>("");
   const router = useRouter();
   const take: number = itensPerPage;
-  const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
+  const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
+    orderBy == "tecnologia" ? "tecnologia.cod_tec" : orderBy
+  }&typeOrder=${typeOrder}`;
 
   // console.log("filterApplication  ",filterApplication)
   const formik = useFormik<IAssayListFilter>({
     initialValues: {
-      filterTratFrom: checkValue('filterTratFrom'),
-      filterTratTo: checkValue('filterTratTo'),
-      filterFoco: checkValue('filterFoco'),
-      filterTypeAssay: checkValue('filterTypeAssay'),
-      filterGli: checkValue('filterGli'),
-      filterTechnology: checkValue('filterTechnology'),
-      filterCod: checkValue('filterCod'),
-      filterTreatmentNumber: checkValue('filterTreatmentNumber'),
-      filterStatusAssay: checkValue('filterStatusAssay'),
-      orderBy: '',
-      typeOrder: '',
+      filterTratFrom: checkValue("filterTratFrom"),
+      filterTratTo: checkValue("filterTratTo"),
+      filterFoco: checkValue("filterFoco"),
+      filterTypeAssay: checkValue("filterTypeAssay"),
+      filterGli: checkValue("filterGli"),
+      filterTechnology: checkValue("filterTechnology"),
+      filterCod: checkValue("filterCod"),
+      filterTreatmentNumber: checkValue("filterTreatmentNumber"),
+      filterStatusAssay: checkValue("filterStatusAssay"),
+      orderBy: "",
+      typeOrder: "",
     },
     onSubmit: async ({
       filterCod,
@@ -152,13 +201,13 @@ export default function TipoEnsaio({
   });
 
   // Calling common API
-  async function callingApi(parametersFilter : any) {
-    setCookies('filterBeforeEdit', parametersFilter);
-    setCookies('filterBeforeEditTypeOrder', typeOrder);
-    setCookies('filterBeforeEditOrderBy', orderBy);
+  async function callingApi(parametersFilter: any) {
+    setCookies("filterBeforeEdit", parametersFilter);
+    setCookies("filterBeforeEditTypeOrder", typeOrder);
+    setCookies("filterBeforeEditOrderBy", orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies('filtersParams', parametersFilter);
+    setCookies("filtersParams", parametersFilter);
 
     await assayListService.getAll(parametersFilter).then((response) => {
       if (response.status === 200 || response.status === 400) {
@@ -177,31 +226,33 @@ export default function TipoEnsaio({
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = 'asc';
+      typeOrder = "asc";
     } else if (order === 2) {
-      typeOrder = 'desc';
+      typeOrder = "desc";
     } else {
-      typeOrder = '';
+      typeOrder = "";
     }
     setOrderBy(column);
     setOrderType(typeOrder);
-    if (filter && typeof (filter) !== 'undefined') {
-      if (typeOrder !== '') {
+    if (filter && typeof filter !== "undefined") {
+      if (typeOrder !== "") {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== '') {
+    } else if (typeOrder !== "") {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
     } else {
       parametersFilter = filter;
     }
 
-    await assayListService.getAll(`${parametersFilter}&skip=0&take=${take}`).then(({ status, response }) => {
-      if (status === 200) {
-        setAssayList(response);
-      }
-    });
+    await assayListService
+      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .then(({ status, response }) => {
+        if (status === 200) {
+          setAssayList(response);
+        }
+      });
 
     // if (orderList === 2) {
     //   setOrder(0);
@@ -216,9 +267,8 @@ export default function TipoEnsaio({
     // }
 
     // Gobal manage orders
-    const {
-      typeOrderG, columnG, orderByG, arrowOrder,
-    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    const { typeOrderG, columnG, orderByG, arrowOrder } =
+      await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
@@ -230,7 +280,11 @@ export default function TipoEnsaio({
     return {
       title: (
         <div className="flex items-center">
-          <button type="button" className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
             {name}
           </button>
         </div>
@@ -240,25 +294,35 @@ export default function TipoEnsaio({
     };
   }
 
-  async function deleteItem(id: number) {
-    const { status, message } = await assayListService.deleted({ id, userId: userLogado.id });
+  async function deleteConfirmItem(item: any) {
+    setItemSelectedDelete(item);
+    setIsOpenModalConfirm(true);
+  }
+
+  async function deleteItem() {
+    setIsOpenModalConfirm(false);
+
+    const { status, message } = await assayListService.deleted({
+      id: itemSelectedDelete?.id,
+      userId: userLogado.id,
+    });
     if (status === 200) {
       router.reload();
     } else {
       Swal.fire({
         html: message,
-        width: '800',
+        width: "800",
       });
     }
   }
 
   function statusHeaderFactory() {
     return {
-      title: 'Ações',
-      field: 'action',
+      title: "Ações",
+      field: "action",
       sorting: false,
       searchable: false,
-      render: (rowData: IAssayList) => (
+      render: (rowData: IAssayList) =>
         !rowData.experiment.length ? (
           <div className="h-7 flex">
             <div className="h-7">
@@ -266,13 +330,15 @@ export default function TipoEnsaio({
                 icon={<BiEdit size={14} />}
                 title={`Atualizar ${rowData.gli}`}
                 onClick={() => {
-                  setCookies('pageBeforeEdit', currentPage?.toString());
-                  setCookies('filterBeforeEdit', filter);
-                  setCookies('filterBeforeEditTypeOrder', typeOrder);
-                  setCookies('filterBeforeEditOrderBy', orderBy);
-                  setCookies('filtersParams', filtersParams);
-                  setCookies('lastPage', 'atualizar');
-                  router.push(`/listas/ensaios/ensaio/atualizar?id=${rowData.id}`);
+                  setCookies("pageBeforeEdit", currentPage?.toString());
+                  setCookies("filterBeforeEdit", filter);
+                  setCookies("filterBeforeEditTypeOrder", typeOrder);
+                  setCookies("filterBeforeEditOrderBy", orderBy);
+                  setCookies("filtersParams", filtersParams);
+                  setCookies("lastPage", "atualizar");
+                  router.push(
+                    `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`
+                  );
                 }}
                 bgColor="bg-blue-600"
                 textColor="white"
@@ -283,7 +349,7 @@ export default function TipoEnsaio({
               <Button
                 title={`Deletar ${rowData.gli}`}
                 icon={<BsTrashFill size={14} />}
-                onClick={() => deleteItem(rowData.id)}
+                onClick={() => deleteConfirmItem(rowData)}
                 bgColor="bg-red-600"
                 textColor="white"
               />
@@ -296,13 +362,15 @@ export default function TipoEnsaio({
                 icon={<BiEdit size={14} />}
                 title={`Atualizar ${rowData.gli}`}
                 onClick={() => {
-                  setCookies('pageBeforeEdit', currentPage?.toString());
-                  setCookies('filterBeforeEdit', filter);
-                  setCookies('filterBeforeEditTypeOrder', typeOrder);
-                  setCookies('filterBeforeEditOrderBy', orderBy);
-                  setCookies('filtersParams', filtersParams);
-                  setCookies('lastPage', 'atualizar');
-                  router.push(`/listas/ensaios/ensaio/atualizar?id=${rowData.id}`);
+                  setCookies("pageBeforeEdit", currentPage?.toString());
+                  setCookies("filterBeforeEdit", filter);
+                  setCookies("filterBeforeEditTypeOrder", typeOrder);
+                  setCookies("filterBeforeEditOrderBy", orderBy);
+                  setCookies("filtersParams", filtersParams);
+                  setCookies("lastPage", "atualizar");
+                  router.push(
+                    `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`
+                  );
                 }}
                 bgColor="bg-blue-600"
                 textColor="white"
@@ -314,21 +382,18 @@ export default function TipoEnsaio({
                 icon={<BsTrashFill size={14} />}
                 title="Ensaio já associado a um experimento"
                 disabled
-                onClick={() => deleteItem(rowData.id)}
+                onClick={() => {}}
                 bgColor="bg-gray-600"
                 textColor="white"
               />
             </div>
           </div>
-        )
-
-      ),
+        ),
     };
   }
 
   function tecnologiaHeaderFactory(name: string, title: string) {
     return {
-
       title: (
         <div className="flex items-center">
           <button
@@ -340,7 +405,7 @@ export default function TipoEnsaio({
           </button>
         </div>
       ),
-      field: 'tecnologia',
+      field: "tecnologia",
       width: 0,
       sorting: true,
       render: (rowData: any) => (
@@ -354,36 +419,34 @@ export default function TipoEnsaio({
   }
 
   function orderColumns(columnsOrder: string): Array<object> {
-    const columnOrder: any = columnsOrder.split(',');
+    const columnOrder: any = columnsOrder.split(",");
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
       // if (columnOrder[item] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
-      if (columnOrder[item] === 'protocol_name') {
-        tableFields.push(headerTableFactory('Protocolo', 'protocol_name'));
+      if (columnOrder[item] === "protocol_name") {
+        tableFields.push(headerTableFactory("Protocolo", "protocol_name"));
       }
-      if (columnOrder[item] === 'foco') {
-        tableFields.push(headerTableFactory('Foco', 'foco.name'));
+      if (columnOrder[item] === "foco") {
+        tableFields.push(headerTableFactory("Foco", "foco.name"));
       }
-      if (columnOrder[item] === 'type_assay') {
-        tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
+      if (columnOrder[item] === "type_assay") {
+        tableFields.push(headerTableFactory("Ensaio", "type_assay.name"));
       }
-      if (columnOrder[item] === 'gli') {
-        tableFields.push(headerTableFactory('GLI', 'gli'));
+      if (columnOrder[item] === "gli") {
+        tableFields.push(headerTableFactory("GLI", "gli"));
       }
-      if (columnOrder[item] === 'tecnologia') {
-        tableFields.push(
-          tecnologiaHeaderFactory('Tecnologia', 'tecnologia'),
-        );
+      if (columnOrder[item] === "tecnologia") {
+        tableFields.push(tecnologiaHeaderFactory("Tecnologia", "tecnologia"));
       }
-      if (columnOrder[item] === 'treatmentsNumber') {
-        tableFields.push(headerTableFactory('Nº de trat.', 'treatmentsNumber'));
+      if (columnOrder[item] === "treatmentsNumber") {
+        tableFields.push(headerTableFactory("Nº de trat.", "treatmentsNumber"));
       }
-      if (columnOrder[item] === 'status') {
-        tableFields.push(headerTableFactory('Status do ensaio', 'status'));
+      if (columnOrder[item] === "status") {
+        tableFields.push(headerTableFactory("Status do ensaio", "status"));
       }
-      if (columnOrder[item] === 'action') {
+      if (columnOrder[item] === "action") {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -394,7 +457,7 @@ export default function TipoEnsaio({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
+    let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -403,27 +466,32 @@ export default function TipoEnsaio({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({
-        table_preferences: campos,
-        userId: userLogado.id,
-        module_id: 26,
-      }).then((response) => {
-        userLogado.preferences.assayList = {
-          id: response.response.id,
-          userId: preferences.userId,
+      await userPreferencesService
+        .create({
           table_preferences: campos,
-        };
-        preferences.id = response.response.id;
-      });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+          userId: userLogado.id,
+          module_id: 26,
+        })
+        .then((response) => {
+          userLogado.preferences.assayList = {
+            id: response.response.id,
+            userId: preferences.userId,
+            table_preferences: campos,
+          };
+          preferences.id = response.response.id;
+        });
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
       userLogado.preferences.assayList = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
       };
-      await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      await userPreferencesService.update({
+        table_preferences: campos,
+        id: preferences.id,
+      });
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -443,61 +511,63 @@ export default function TipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await assayListService.getAll(filterApplication).then(({ status, response }) => {
-      if (status === 200) {
-        response.map((item: any) => {
-          const newItem = item;
+    await assayListService
+      .getAll(filterApplication)
+      .then(({ status, response }) => {
+        if (status === 200) {
+          response.map((item: any) => {
+            const newItem = item;
 
-          newItem.SAFRA = newItem.safra?.safraName;
-          newItem.PROTOCOLO = newItem?.protocol_name;
-          newItem.FOCO = newItem.foco?.name;
-          newItem.TIPO_DE_ENSAIO = newItem.type_assay?.name;
-          newItem.TECNOLOGIA = newItem.tecnologia?.name;
-          newItem.GLI = newItem?.gli;
-          newItem.BGM = newItem?.bgm;
-          newItem.STATUS = newItem?.status;
-          newItem.PROJETO = newItem?.project;
-          newItem.OBSERVAÇÕES = newItem?.comments;
-          newItem.NÚMERO_DE_TRATAMENTOS = newItem?.countNT;
+            newItem.SAFRA = newItem.safra?.safraName;
+            newItem.PROTOCOLO = newItem?.protocol_name;
+            newItem.FOCO = newItem.foco?.name;
+            newItem.TIPO_DE_ENSAIO = newItem.type_assay?.name;
+            newItem.TECNOLOGIA = newItem.tecnologia?.name;
+            newItem.GLI = newItem?.gli;
+            newItem.BGM = newItem?.bgm;
+            newItem.STATUS = newItem?.status;
+            newItem.PROJETO = newItem?.project;
+            newItem.OBSERVAÇÕES = newItem?.comments;
+            newItem.NÚMERO_DE_TRATAMENTOS = newItem?.countNT;
 
-          delete newItem.safra;
-          delete newItem.treatmentsNumber;
-          delete newItem.project;
-          delete newItem.status;
-          delete newItem.bgm;
-          delete newItem.gli;
-          delete newItem.tecnologia;
-          delete newItem.foco;
-          delete newItem.protocol_name;
-          delete newItem.countNT;
-          delete newItem.period;
-          delete newItem.comments;
-          delete newItem.type_assay;
-          delete newItem.id;
-          delete newItem.id_safra;
-          delete newItem.experiment;
-          delete newItem.genotype_treatment;
+            delete newItem.safra;
+            delete newItem.treatmentsNumber;
+            delete newItem.project;
+            delete newItem.status;
+            delete newItem.bgm;
+            delete newItem.gli;
+            delete newItem.tecnologia;
+            delete newItem.foco;
+            delete newItem.protocol_name;
+            delete newItem.countNT;
+            delete newItem.period;
+            delete newItem.comments;
+            delete newItem.type_assay;
+            delete newItem.id;
+            delete newItem.id_safra;
+            delete newItem.experiment;
+            delete newItem.genotype_treatment;
 
-          return newItem;
-        });
-        const workSheet = XLSX.utils.json_to_sheet(response);
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'Tipo_Ensaio');
+            return newItem;
+          });
+          const workSheet = XLSX.utils.json_to_sheet(response);
+          const workBook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workBook, workSheet, "Tipo_Ensaio");
 
-        // Buffer
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
-        });
-        // Download
-        XLSX.writeFile(workBook, 'Ensaio.xlsx');
-      }
-    });
+          // Buffer
+          XLSX.write(workBook, {
+            bookType: "xlsx", // xlsx
+            type: "buffer",
+          });
+          // Binary
+          XLSX.write(workBook, {
+            bookType: "xlsx", // xlsx
+            type: "binary",
+          });
+          // Download
+          XLSX.writeFile(workBook, "Ensaio.xlsx");
+        }
+      });
   };
 
   // manage total pages
@@ -532,7 +602,10 @@ export default function TipoEnsaio({
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = tableGlobalFunctions.getValuesForFilter(value, filtersParams);
+    const parameter = tableGlobalFunctions.getValuesForFilter(
+      value,
+      filtersParams
+    );
     return parameter;
   }
 
@@ -563,8 +636,17 @@ export default function TipoEnsaio({
       <Head>
         <title>Listagem de Ensaio</title>
       </Head>
+
+      <ModalConfirmation
+        isOpen={isOpenModalConfirm}
+        text={`Tem certeza que deseja deletar o item ${itemSelectedDelete?.gli}?`}
+        onPress={deleteItem}
+        onCancel={() => setIsOpenModalConfirm(false)}
+      />
+
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
-        <main className="h-full w-full
+        <main
+          className="h-full w-full
           flex flex-col
           items-start
           gap-4
@@ -581,18 +663,18 @@ export default function TipoEnsaio({
                 "
                 onSubmit={formik.handleSubmit}
               >
-                <div className="w-full h-full
+                <div
+                  className="w-full h-full
                   flex
                   justify-center
                   pb-0
                 "
                 >
-
-                  {filterFieldFactory('filterFoco', 'Foco')}
-                  {filterFieldFactory('filterTypeAssay', 'Ensaio')}
-                  {filterFieldFactory('filterGli', 'GLI')}
-                  {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
-                  {filterFieldFactory('filterTechnology', 'Nome Tecnologia')}
+                  {filterFieldFactory("filterFoco", "Foco")}
+                  {filterFieldFactory("filterTypeAssay", "Ensaio")}
+                  {filterFieldFactory("filterGli", "GLI")}
+                  {filterFieldFactory("filterCod", "Cód. Tecnologia")}
+                  {filterFieldFactory("filterTechnology", "Nome Tecnologia")}
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Nº de trat.
@@ -613,12 +695,12 @@ export default function TipoEnsaio({
                       />
                     </div>
                   </div>
-                  {filterFieldFactory('filterStatusAssay', 'Status do ensaio')}
+                  {filterFieldFactory("filterStatusAssay", "Status do ensaio")}
 
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -626,7 +708,6 @@ export default function TipoEnsaio({
                     />
                   </div>
                 </div>
-
               </form>
             </div>
           </AccordionFilter>
@@ -634,15 +715,15 @@ export default function TipoEnsaio({
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
-              style={{ background: '#f9fafb' }}
+              style={{ background: "#f9fafb" }}
               columns={columns}
               data={assayList}
               options={{
                 showTitle: false,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 0,
                 },
-                rowStyle: { background: '#f9fafb', height: 35 },
+                rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -676,61 +757,63 @@ export default function TipoEnsaio({
 
                     <div />
                     <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
+                      Total registrado: {itemsTotal}
                     </strong>
 
-                    <div className="h-full flex items-center gap-2
+                    <div
+                      className="h-full flex items-center gap-2
                     "
                     >
                       <div className="border-solid border-2 border-blue-600 rounded">
                         <div className="w-64">
-                          <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+                          <AccordionFilter
+                            title="Gerenciar Campos"
+                            grid={statusAccordion}
+                          >
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                               <Droppable droppableId="characters">
-                                {
-                                  (provided) => (
-                                    <ul className="w-full h-full characters" {...provided.droppableProps} ref={provided.innerRef}>
-                                      <div className="h-8 mb-3">
-                                        <Button
-                                          value="Atualizar"
-                                          bgColor="bg-blue-600"
-                                          textColor="white"
-                                          onClick={getValuesColumns}
-                                          icon={<IoReloadSharp size={20} />}
-                                        />
-                                      </div>
-                                      {
-                                        generatesProps.map((generate, index) => (
-                                          <Draggable
-                                            key={index}
-                                            draggableId={String(generate.title)}
-                                            index={index}
+                                {(provided) => (
+                                  <ul
+                                    className="w-full h-full characters"
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                  >
+                                    <div className="h-8 mb-3">
+                                      <Button
+                                        value="Atualizar"
+                                        bgColor="bg-blue-600"
+                                        textColor="white"
+                                        onClick={getValuesColumns}
+                                        icon={<IoReloadSharp size={20} />}
+                                      />
+                                    </div>
+                                    {generatesProps.map((generate, index) => (
+                                      <Draggable
+                                        key={index}
+                                        draggableId={String(generate.title)}
+                                        index={index}
+                                      >
+                                        {(providers) => (
+                                          <li
+                                            ref={providers.innerRef}
+                                            {...providers.draggableProps}
+                                            {...providers.dragHandleProps}
                                           >
-                                            {(providers) => (
-                                              <li
-                                                ref={providers.innerRef}
-                                                {...providers.draggableProps}
-                                                {...providers.dragHandleProps}
-                                              >
-                                                <CheckBox
-                                                  name={generate.name}
-                                                  title={generate.title?.toString()}
-                                                  value={generate.value}
-                                                  defaultChecked={
-                                                    camposGerenciados.includes(generate.value)
-                                                  }
-                                                />
-                                              </li>
-                                            )}
-                                          </Draggable>
-                                        ))
-                                      }
-                                      {provided.placeholder}
-                                    </ul>
-                                  )
-                                }
+                                            <CheckBox
+                                              name={generate.name}
+                                              title={generate.title?.toString()}
+                                              value={generate.value}
+                                              defaultChecked={camposGerenciados.includes(
+                                                generate.value
+                                              )}
+                                            />
+                                          </li>
+                                        )}
+                                      </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                  </ul>
+                                )}
                               </Droppable>
                             </DragDropContext>
                           </AccordionFilter>
@@ -743,65 +826,68 @@ export default function TipoEnsaio({
                           icon={<RiFileExcel2Line size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
-                          onClick={() => { downloadExcel(); }}
+                          onClick={() => {
+                            downloadExcel();
+                          }}
                         />
                       </div>
                     </div>
                   </div>
                 ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => setCurrentPage(0)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {
-                      Array(1).fill('').map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))
-                    }
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(pages - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
-                ) as any,
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(0)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage < 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(pages - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
+                  ) as any,
               }}
             />
           </div>
@@ -811,14 +897,21 @@ export default function TipoEnsaio({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  res,
+}: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (
     await PreferencesControllers.getConfigGerais()
   )?.response[0]?.itens_per_page;
 
-  const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit ? req.cookies.filterBeforeEdit : '';
+  const pageBeforeEdit = req.cookies.pageBeforeEdit
+    ? req.cookies.pageBeforeEdit
+    : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : "";
   const { token } = req.cookies;
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
@@ -827,51 +920,49 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const baseUrl = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
   // Last page
-  const lastPageServer = req.cookies.lastPage
-    ? req.cookies.lastPage
-    : 'No';
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
 
-  if (lastPageServer == undefined || lastPageServer == 'No') {
-    removeCookies('filterBeforeEdit', { req, res });
-    removeCookies('pageBeforeEdit', { req, res });
-    removeCookies('filterBeforeEditTypeOrder', { req, res });
-    removeCookies('filterBeforeEditOrderBy', { req, res });
-    removeCookies('lastPage', { req, res });
+  if (lastPageServer == undefined || lastPageServer == "No") {
+    removeCookies("filterBeforeEdit", { req, res });
+    removeCookies("pageBeforeEdit", { req, res });
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("lastPage", { req, res });
   }
 
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : 'asc';
+    : "asc";
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : '';
+    : "";
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? filterBeforeEdit
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   // //RR
-  removeCookies('filterBeforeEditTypeOrder', { req, res });
-  removeCookies('filterBeforeEditOrderBy', { req, res });
-  removeCookies('lastPage', { req, res });
+  removeCookies("filterBeforeEditTypeOrder", { req, res });
+  removeCookies("filterBeforeEditOrderBy", { req, res });
+  removeCookies("lastPage", { req, res });
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const {
-    response: allAssay,
-    total: totalItems,
-  } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
+  const { response: allAssay, total: totalItems } = await fetch(
+    urlParameters.toString(),
+    requestOptions
+  ).then((response) => response.json());
 
   return {
     props: {

@@ -14,6 +14,7 @@ import {
   responseNullFactory,
   responsePositiveNumericFactory,
 } from '../../shared/utils/responseErrorFactory';
+import { validateHeaders } from '../../shared/utils/validateHeaders';
 import { CulturaController } from '../cultura.controller';
 import { ImportController } from '../import.controller';
 import { LogImportController } from '../log-import.controller';
@@ -21,6 +22,8 @@ import { LoteController } from '../lote.controller';
 import { SafraController } from '../safra.controller';
 import { TecnologiaController } from '../technology/tecnologia.controller';
 import { GenotipoController } from './genotipo.controller';
+import { genotipeQueue } from './genotipeQueue';
+import { loteQueue } from './loteQueue';
 
 /* eslint-disable no-restricted-syntax */
 export class ImportGenotypeController {
@@ -40,7 +43,43 @@ export class ImportGenotypeController {
     const logImportController = new LogImportController();
     const tecnologiaController = new TecnologiaController();
     const responseIfError: any = [];
+    const headers = [
+      'ID_S1 (S1_ID_S1)',
+      'Identificador de dados (S1_DATA_ID)',
+      'Cultura (S1_C0002)',
+      'Nome do genótipo (S1_C0001)',
+      'Nome principal (S1_C0000)',
+      'Nome público (S1_C0003)',
+      'Nome experimental (S1_C0012)',
+      'Nome alternativo (S1_C0162)',
+      'ELITE_NOME (S1_C3166)',
+      'Código da tecnologia (S1_C0189)',
+      'Tipo (S1_C0005)',
+      'GMR (S1_C3061)',
+      'BGM (S1_C3074)',
+      'Cruzamento de origem (S1_C0201)',
+      'Progenitor F direto (S1_C0006)',
+      'Progenitor M direto (S1_C0007)',
+      'Progenitor F de origem (S1_C0008)',
+      'Progenitor M de origem (S1_C0009)',
+      'Progenitores de origem (S1_C0010)',
+      'Parentesco completo (S1_C0011)',
+      'ID_S2 (ID_S2)',
+      'Identificador de dados (DATA_ID)',
+      'Ano do lote (C0052)',
+      'SAFRA (C0199)',
+      'Código do lote (C0050)',
+      'NCC (C3107)',
+      'FASE (C0200)',
+      'PESO',
+      'SEMENTES',
+      'DT_IMPORT (SCRIPT0002)',
+    ];
     try {
+      const validate: any = await validateHeaders(spreadSheet, headers);
+      if (validate.length > 0) {
+        return { status: 400, message: validate };
+      }
       const configModule: object | any = await importController.getAll(10);
       if (spreadSheet[0]?.length < 30) {
         return {
@@ -54,6 +93,7 @@ export class ImportGenotypeController {
           message: 'O numero de colunas e maior do que o esperado',
         };
       }
+
       for (const row in spreadSheet) {
         for (const column in spreadSheet[row]) {
           if (row === '0') {
@@ -304,7 +344,7 @@ export class ImportGenotypeController {
 
               if (configModule.response[0]?.fields[column] === 'NCC') {
                 if (!validateInteger(spreadSheet[row][column])
-                || spreadSheet[row][column].toString().length > 12) {
+                  || spreadSheet[row][column].toString().length > 12) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     (Number(column) + 1),
                     row,
@@ -642,7 +682,7 @@ export class ImportGenotypeController {
 
                 ) {
                   if (this.aux.id_genotipo) {
-                    await genotipoController.update({
+                    const genotipo_obj = {
                       id: this.aux.id_genotipo,
                       id_tecnologia: Number(this.aux.id_tecnologia),
                       id_culture: idCulture,
@@ -664,11 +704,44 @@ export class ImportGenotypeController {
                       progenitor_m_origem: this.aux.progenitor_m_origem,
                       progenitores_origem: this.aux.progenitores_origem,
                       parentesco_completo: this.aux.parentesco_completo,
+                      dt_import: this.aux.dt_import,
                       created_by: createdBy,
+                    }
+                    this.aux.created_by = createdBy;
+                    // console.log(genotipo_obj);
+                    genotipeQueue.add({
+                      instance: genotipo_obj,
+                      request_type: 'update',
+                      aux: this.aux,
                     });
+                    // await genotipoController.update({
+                    //   id: this.aux.id_genotipo,
+                    //   id_tecnologia: Number(this.aux.id_tecnologia),
+                    //   id_s1: this.aux.id_s1,
+                    //   id_dados: String(this.aux.id_dados_geno),
+                    //   name_genotipo: this.aux.name_genotipo,
+                    //   name_main: this.aux.name_main,
+                    //   name_public: this.aux.name_public,
+                    //   name_experiment: this.aux.name_experiment,
+                    //   name_alter: this.aux.name_alter,
+                    //   elit_name: this.aux.elit_name,
+                    //   type: this.aux.type,
+                    //   gmr: this.aux.gmr,
+                    //   bgm: this.aux.bgm,
+                    //   cruza: this.aux.cruza,
+                    //   progenitor_f_direto: this.aux.progenitor_f_direto,
+                    //   progenitor_m_direto: this.aux.progenitor_m_direto,
+                    //   progenitor_f_origem: this.aux.progenitor_f_origem,
+                    //   progenitor_m_origem: this.aux.progenitor_m_origem,
+                    //   progenitores_origem: this.aux.progenitores_origem,
+                    //   parentesco_completo: this.aux.parentesco_completo,
+                    //   dt_import: this.aux.dt_import,
+                    //   created_by: this.aux.created_by,
+                    // });
                   } else {
                     delete this.aux.id_genotipo;
-                    const genotipo: any = await genotipoController.create({
+                    const genotipo_obj = {
+                      // id_culture: this.aux.id_culture,
                       id_tecnologia: this.aux.id_tecnologia,
                       id_culture: idCulture,
                       id_s1: this.aux.id_s1,
@@ -689,66 +762,135 @@ export class ImportGenotypeController {
                       progenitor_m_origem: this.aux.progenitor_m_origem,
                       progenitores_origem: this.aux.progenitores_origem,
                       parentesco_completo: this.aux.parentesco_completo,
+                      dt_import: this.aux.dt_import,
                       created_by: createdBy,
+                    };
+                    this.aux.created_by = createdBy;
+                    // console.log(genotipo_obj);
+                    genotipeQueue.add({
+                      instance: genotipo_obj,
+                      request_type: 'create',
+                      aux: this.aux,
                     });
-                    this.aux.id_genotipo = genotipo.response.id;
+                    // const genotipo: any = await genotipoController.create({
+                    //   id_culture: this.aux.id_culture,
+                    //   id_tecnologia: this.aux.id_tecnologia,
+                    //   id_s1: this.aux.id_s1,
+                    //   id_dados: String(this.aux.id_dados_geno),
+                    //   name_genotipo: this.aux.name_genotipo,
+                    //   name_main: this.aux.name_main,
+                    //   name_public: this.aux.name_public,
+                    //   name_experiment: this.aux.name_experiment,
+                    //   name_alter: this.aux.name_alter,
+                    //   elit_name: this.aux.elit_name,
+                    //   type: this.aux.type,
+                    //   gmr: this.aux.gmr,
+                    //   bgm: this.aux.bgm,
+                    //   cruza: this.aux.cruza,
+                    //   progenitor_f_direto: this.aux.progenitor_f_direto,
+                    //   progenitor_m_direto: this.aux.progenitor_m_direto,
+                    //   progenitor_f_origem: this.aux.progenitor_f_origem,
+                    //   progenitor_m_origem: this.aux.progenitor_m_origem,
+                    //   progenitores_origem: this.aux.progenitores_origem,
+                    //   parentesco_completo: this.aux.parentesco_completo,
+                    //   dt_import: this.aux.dt_import,
+                    //   created_by: this.aux.created_by,
+                    // });
+                    // this.aux.id_genotipo = genotipo.response.id;
                   }
 
-                  if (this.aux.id_genotipo && this.aux.ncc) {
-                    if (this.aux.id_lote) {
-                      await loteController.update({
-                        id: Number(this.aux.id_lote),
-                        id_genotipo: Number(this.aux.id_genotipo),
-                        id_safra: Number(idSafra),
-                        cod_lote: String(this.aux.cod_lote),
-                        id_s2: Number(this.aux.id_s2),
-                        id_dados: Number(this.aux.id_dados_lote),
-                        year: Number(this.aux.year),
-                        ncc: Number(this.aux.ncc),
-                        fase: this.aux.fase,
-                        peso: this.aux.peso,
-                        quant_sementes: this.aux.quant_sementes,
-                        dt_import: this.aux.dt_import,
-                        created_by: createdBy,
-                      });
-                      delete this.aux.id_lote;
-                      delete this.aux.id_genotipo;
-                      this.aux = [];
-                    } else {
-                      await loteController.create({
-                        id_genotipo: Number(this.aux.id_genotipo),
-                        id_safra: Number(idSafra),
-                        cod_lote: String(this.aux.cod_lote),
-                        id_s2: Number(this.aux.id_s2),
-                        id_dados: Number(this.aux.id_dados_lote),
-                        year: Number(this.aux.year),
-                        ncc: Number(this.aux.ncc),
-                        fase: this.aux.fase,
-                        peso: this.aux.peso,
-                        quant_sementes: this.aux.quant_sementes,
-                        dt_import: this.aux.dt_import,
-                        created_by: createdBy,
-                      });
-                      delete this.aux.id_genotipo;
-                      this.aux = [];
-                    }
-                  }
+                  // console.log("this.aux.id_genotipo && this.aux.ncc  ",this.aux.id_genotipo && this.aux.ncc)
+                  // console.log("this.aux.id_genotipo && this.aux.ncc  ",this.aux.id_genotipo )
+                  // console.log("")
+
+                  // if (this.aux.id_genotipo && this.aux.ncc) {
+                  //   if (this.aux.id_lote) {
+                  //     const lote_obj = {
+                  //       id: Number(this.aux.id_lote),
+                  //       id_genotipo: Number(this.aux.id_genotipo),
+                  //       id_safra: Number(this.aux.id_safra),
+                  //       cod_lote: String(this.aux.cod_lote),
+                  //       id_s2: Number(this.aux.id_s2),
+                  //       id_dados: Number(this.aux.id_dados_lote),
+                  //       year: Number(this.aux.year),
+                  //       ncc: Number(this.aux.ncc),
+                  //       fase: this.aux.fase,
+                  //       peso: this.aux.peso,
+                  //       quant_sementes: this.aux.quant_sementes,
+                  //       dt_import: this.aux.dt_import,
+                  //       created_by: this.aux.created_by,
+                  //     };
+                  //     loteQueue.add({
+                  //       instance: lote_obj,
+                  //       request_type: 'update'
+                  //     });
+                  //     // await loteController.update({
+                  //     //   id: Number(this.aux.id_lote),
+                  //     //   id_genotipo: Number(this.aux.id_genotipo),
+                  //     //   id_safra: Number(this.aux.id_safra),
+                  //     //   cod_lote: String(this.aux.cod_lote),
+                  //     //   id_s2: Number(this.aux.id_s2),
+                  //     //   id_dados: Number(this.aux.id_dados_lote),
+                  //     //   year: Number(this.aux.year),
+                  //     //   ncc: Number(this.aux.ncc),
+                  //     //   fase: this.aux.fase,
+                  //     //   peso: this.aux.peso,
+                  //     //   quant_sementes: this.aux.quant_sementes,
+                  //     //   created_by: this.aux.created_by,
+                  //     // });
+                  //     delete this.aux.id_lote;
+                  //     delete this.aux.id_genotipo;
+                  //   } else {
+                  //     const lote_obj = {
+                  //       id_genotipo: Number(this.aux.id_genotipo),
+                  //       id_safra: Number(this.aux.id_safra),
+                  //       cod_lote: String(this.aux.cod_lote),
+                  //       id_s2: Number(this.aux.id_s2),
+                  //       id_dados: Number(this.aux.id_dados_lote),
+                  //       year: Number(this.aux.year),
+                  //       ncc: Number(this.aux.ncc),
+                  //       fase: this.aux.fase,
+                  //       peso: this.aux.peso,
+                  //       quant_sementes: this.aux.quant_sementes,
+                  //       dt_import: this.aux.dt_import,
+                  //       created_by: this.aux.created_by,
+                  //     };
+                  //     loteQueue.add({
+                  //       instance: lote_obj,
+                  //       request_type: 'create'
+                  //     });
+                  //     // await loteController.create({
+                  //     //   id_genotipo: Number(this.aux.id_genotipo),
+                  //     //   id_safra: Number(this.aux.id_safra),
+                  //     //   cod_lote: String(this.aux.cod_lote),
+                  //     //   id_s2: Number(this.aux.id_s2),
+                  //     //   id_dados: Number(this.aux.id_dados_lote),
+                  //     //   year: Number(this.aux.year),
+                  //     //   ncc: Number(this.aux.ncc),
+                  //     //   fase: this.aux.fase,
+                  //     //   peso: this.aux.peso,
+                  //     //   quant_sementes: this.aux.quant_sementes,
+                  //     //   created_by: this.aux.created_by,
+                  //     // });
+                  //     delete this.aux.id_genotipo;
+                  //   }
+                  // }
                 }
               }
             }
           }
-          await logImportController.update({
-            id: idLog,
-            status: 1,
-            state: 'SUCESSO',
-          });
+          // await logImportController.update({
+          //   id: idLog,
+          //   status: 1,
+          //   state: 'SUCESSO',
+          // });
           return { status: 200, message: 'Genótipo importado com sucesso' };
         } catch (error: any) {
-          await logImportController.update({
-            id: idLog,
-            status: 1,
-            state: 'FALHA',
-          });
+          // await logImportController.update({
+          //   id: idLog,
+          //   status: 1,
+          //   state: 'FALHA',
+          // });
           handleError('Genótipo controller', 'Save Import', error.message);
           return {
             status: 500,

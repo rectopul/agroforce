@@ -5,6 +5,7 @@ import { ReactNode, useEffect, useState, useRef } from "react";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
 import getConfig from "next/config";
 import { RequestInit } from "next/dist/server/web/spec-extension/request";
 import Head from "next/head";
@@ -19,6 +20,7 @@ import {
   AiOutlineArrowUp,
   AiTwotoneStar,
 } from "react-icons/ai";
+import { IoMdArrowBack } from "react-icons/io";
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
@@ -100,6 +102,8 @@ export default function Listagem({
   const { TabsDropDowns } = ITabs;
 
   const tableRef = useRef<any>(null);
+
+  const router = useRouter();
 
   const tabsDropDowns = TabsDropDowns();
 
@@ -788,6 +792,19 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
+                    <div className="w-40 h-7">
+                      <Button
+                        type="button"
+                        value="Voltar"
+                        bgColor="bg-red-600"
+                        textColor="white"
+                        onClick={() => {
+                          router.back();
+                        }}
+                        icon={<IoMdArrowBack size={18} />}
+                      />
+                    </div>
+
                     <div className="h-12" />
                     <strong className="text-blue-600">
                       Total registrado: {itemsTotal}
@@ -941,7 +958,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const idDelineamento: number = Number(query.id_delineamento);
 
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/sequencia-delineamento`; 
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/sequencia-delineamento`;
 
   //Last page
   const lastPageServer = req.cookies.lastPageSquence
