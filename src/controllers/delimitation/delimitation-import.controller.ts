@@ -15,6 +15,7 @@ import { LogImportController } from '../log-import.controller';
 import { SequenciaDelineamentoController } from '../sequencia-delineamento.controller';
 import { ImportController } from '../import.controller';
 import { CulturaController } from '../cultura.controller';
+import { validateHeaders } from '../../shared/utils/validateHeaders';
 
 export class ImportDelimitationController {
   static async validate(
@@ -30,7 +31,21 @@ export class ImportDelimitationController {
     const sequenciaDelineamentoController = new SequenciaDelineamentoController();
 
     const responseIfError: Array<string> = [];
+    const headers = [
+      'CULTURA',
+      'DELI',
+      'R',
+      'ORDEM',
+      'NT',
+      'B',
+      'ORIG_BLOCO',
+      'SEQ',
+    ];
     try {
+      const validate: any = await validateHeaders(spreadSheet, headers);
+      if (validate.length > 0) {
+        return { status: 400, message: validate };
+      }
       const configModule: object | any = await importController.getAll(7);
       for (const row in spreadSheet) {
         if (row !== '0') {

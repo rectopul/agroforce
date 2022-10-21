@@ -132,9 +132,8 @@ export class ImportExperimentGenotypeController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
                 const { response: treatment } = await experimentGenotipeController.getAll({
-                  filterCodTec: spreadSheet[row][3],
+                  filterCodTec: spreadSheet[row][column],
                 });
-
                 if (treatment.length == 0) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
@@ -163,7 +162,6 @@ export class ImportExperimentGenotypeController {
                 );
               }
             }
-
             if (column === '9') { // NT
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -199,7 +197,6 @@ export class ImportExperimentGenotypeController {
                 value_hold.nt = spreadSheet[row][9];
               }
             }
-
             if (column === '10') { // NPE
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -221,7 +218,6 @@ export class ImportExperimentGenotypeController {
                 value_hold.npe = spreadSheet[row][10];
               }
             }
-
             if (column === '11') { // STATUS_T
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -259,18 +255,7 @@ export class ImportExperimentGenotypeController {
                 value_hold.idLote = response[0]?.id;
               }
             }
-
-            if (column === '14') { // STATUS T NOVO
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (spreadSheet[row][column] !== 'L' && spreadSheet[row][column] !== 'T') {
-                responseIfError[Number(column)]
-                  += responseGenericFactory((Number(column) + 1), row, spreadSheet[0][column], 'Valor só pode ser  "T" ou "L"');
-              }
-            }
-
-            if (column === '15') { // GENOTIPO NOVO
+            if (column === '14') { // GENOTIPO NOVO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
@@ -288,7 +273,15 @@ export class ImportExperimentGenotypeController {
                 }
               }
             }
-
+            if (column === '15') { // STATUS T NOVO
+              if (spreadSheet[row][column] === null) {
+                responseIfError[Number(column)]
+                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              } else if (spreadSheet[row][column] !== 'L' && spreadSheet[row][column] !== 'T') {
+                responseIfError[Number(column)]
+                  += responseGenericFactory((Number(column) + 1), row, spreadSheet[0][column], 'Valor só pode ser  "T" ou "L"');
+              }
+            }
             if (column === '16') { // NCA NOVO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -296,9 +289,11 @@ export class ImportExperimentGenotypeController {
               } else {
                 const { response: lote } = await loteController.getAll({
                   ncc: spreadSheet[row][16], // NEW NCA
-                  filterGenotipo: spreadSheet[row][15], // new geneticName
+                  filterGenotipo: spreadSheet[row][14], // new geneticName
                 });
 
+                console.log('spreadSheet[row][column]');
+                console.log(spreadSheet[row][column]);
                 if (lote.length == 0) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
@@ -311,13 +306,8 @@ export class ImportExperimentGenotypeController {
             }
           }
         }
-        // else if(row === '0'){
-        //   responseIfError[0]
-        //   += `<li style="text-align:left"> A ${row}ª Não há registros por favor verifique. </li> <br>`;
-        // }
       }
 
-      // return false;
       if (responseIfError.length === 0) {
         try {
           for (const row in spreadSheet) {
