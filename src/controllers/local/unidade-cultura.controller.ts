@@ -68,7 +68,7 @@ export class UnidadeCulturaController {
         name_unity_culture: true,
         year: true,
         local: true,
-        dt_import: true,
+        dt_export: true,
       };
 
       if (options.id_unity_culture) {
@@ -81,11 +81,6 @@ export class UnidadeCulturaController {
 
       if (options.id_local) {
         parameters.id_local = Number(options.id_local);
-      }
-
-      if (options.id_safra) {
-        const { response }: any = await this.safraController.getOne(Number(options.id_safra));
-        parameters.year = Number(response.year);
       }
 
       const take = (options.take) ? Number(options.take) : undefined;

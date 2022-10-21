@@ -24,7 +24,7 @@ export class ImportTechnologyController {
       'Nome da tecnologia (S1_C0190)',
       'Rótulo (S1_C0101)',
       'Cultura (C0002)',
-      'DT_IMPORT (SCRIPT0002)',
+      'DT_EXPORT (SCRIPT0002)',
     ];
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
@@ -131,10 +131,10 @@ export class ImportTechnologyController {
                   );
                 }
                 if (status === 200) {
-                  let lastDtImport = response[0]?.dt_import?.getTime();
+                  let lastDtImport = response[0]?.dt_export?.getTime();
                   response.forEach((item: any) => {
-                    lastDtImport = item.dt_import.getTime() > lastDtImport
-                      ? item.dt_import.getTime()
+                    lastDtImport = item.dt_export.getTime() > lastDtImport
+                      ? item.dt_export.getTime()
                       : lastDtImport;
                   });
                   if (
@@ -173,7 +173,7 @@ export class ImportTechnologyController {
                   name: spreadSheet[row][1],
                   desc: spreadSheet[row][2],
                   created_by: createdBy,
-                  dt_import: new Date(spreadSheet[row][4]),
+                  dt_export: new Date(spreadSheet[row][4]),
                 });
               } else {
                 await tecnologiaController.create({
@@ -182,7 +182,7 @@ export class ImportTechnologyController {
                   name: spreadSheet[row][1],
                   desc: spreadSheet[row][2],
                   created_by: createdBy,
-                  dt_import: new Date(spreadSheet[row][4]),
+                  dt_export: new Date(spreadSheet[row][4]),
                 });
               }
             }

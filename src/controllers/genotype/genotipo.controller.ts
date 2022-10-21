@@ -88,6 +88,12 @@ export class GenotipoController {
               cod_tec: true,
             },
           },
+          culture: {
+            select: {
+              name: true,
+              desc: true,
+            },
+          },
           numberLotes: true,
           type: true,
           gmr: true,
