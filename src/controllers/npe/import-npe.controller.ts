@@ -20,6 +20,7 @@ import { FocoController } from '../foco.controller';
 import { TypeAssayController } from '../tipo-ensaio.controller';
 import { UserCultureController } from '../user-culture.controller';
 import { CulturaController } from '../cultura.controller';
+import { validateHeaders } from '../../shared/utils/validateHeaders';
 
 export class ImportNpeController {
   static aux: any = {};
@@ -43,7 +44,21 @@ export class ImportNpeController {
 
     const npeTemp: Array<string> = [];
     const responseIfError: Array<string> = [];
+    const headers = [
+      'CULTURA',
+      'SAFRA',
+      'FOCO',
+      'ENSAIO',
+      'GGEN',
+      'CODLOCAL',
+      'NPEI',
+      'EP',
+    ];
     try {
+      const validate: any = await validateHeaders(spreadSheet, headers);
+      if (validate.length > 0) {
+        return { status: 400, message: validate };
+      }
       const configModule: object | any = await importController.getAll(14);
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
@@ -372,28 +387,30 @@ export class ImportNpeController {
       }
       if (responseIfError.length === 0) {
         try {
+          const createMany: any = [];
           for (const row in spreadSheet) {
             if (row !== '0') {
+              const npeDto: any = {};
               for (const column in spreadSheet[row]) {
-                this.aux.status = 1;
-                this.aux.created_by = createdBy;
+                npeDto.status = 1;
+                npeDto.created_by = createdBy;
 
                 if (configModule.response[0]?.fields[column] === 'Local') {
                   const local: any = await localController.getAll(
                     { name_local_culture: spreadSheet[row][column] },
                   );
-                  this.aux.localId = local.response[0]?.id;
+                  npeDto.localId = local.response[0]?.id;
                 }
 
                 if (configModule.response[0]?.fields[column] === 'Safra') {
-                  this.aux.safraId = Number(idSafra);
+                  npeDto.safraId = Number(idSafra);
                 }
 
                 if (configModule.response[0]?.fields[column] === 'OGM') {
                   const ogm: any = await tecnologiaController.getAll(
                     { cod_tec: String(spreadSheet[row][column]) },
                   );
-                  this.aux.tecnologiaId = ogm.response[0]?.id;
+                  npeDto.tecnologiaId = ogm.response[0]?.id;
                 }
 
                 if (configModule.response[0]?.fields[column] === 'Foco') {
@@ -404,37 +421,45 @@ export class ImportNpeController {
                       filterStatus: 1,
                     },
                   );
-                  this.aux.focoId = Number(foco.response[0]?.id);
+                  npeDto.focoId = Number(foco.response[0]?.id);
                 }
 
                 if (configModule.response[0]?.fields[column] === 'Ensaio') {
                   const ensaio: any = await typeAssayController.getAll(
                     { name: spreadSheet[row][column] },
                   );
-                  this.aux.typeAssayId = ensaio.response[0]?.id;
+                  npeDto.typeAssayId = ensaio.response[0]?.id;
                 }
 
                 if (configModule.response[0]?.fields[column] === 'Epoca') {
-                  this.aux.epoca = String(spreadSheet[row][column]);
+                  npeDto.epoca = String(spreadSheet[row][column]);
                 }
 
                 if (configModule.response[0]?.fields[column] === 'NPEI') {
-                  this.aux.npei = spreadSheet[row][column];
-                  this.aux.npef = spreadSheet[row][column];
-                  this.aux.prox_npe = spreadSheet[row][column];
-                  this.aux.npei_i = spreadSheet[row][column];
+                  npeDto.npei = spreadSheet[row][column];
+                  npeDto.npef = spreadSheet[row][column];
+                  npeDto.prox_npe = spreadSheet[row][column];
+                  npeDto.npei_i = spreadSheet[row][column];
                 }
 
                 if (spreadSheet[row].length === (Number(column) + 1)) {
                   const { response: groupResponse }: any = await groupController.getAll(
-                    { id_safra: idSafra, id_foco: this.aux.focoId },
+                    { id_safra: idSafra, id_foco: npeDto.focoId },
                   );
-                  this.aux.groupId = Number(groupResponse[0]?.id);
-                  await npeController.create(this.aux);
+                  npeDto.groupId = Number(groupResponse[0]?.id);
+                  console.log('npeDto');
+                  console.log(npeDto);
+                  createMany.push(npeDto);
+                  console.log('createMany');
+                  console.log(createMany);
                 }
               }
             }
           }
+          const npe = await npeController.create(createMany);
+
+          console.log('npe');
+          console.log(npe);
           await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
           return { status: 200, message: 'NPE importado com sucesso' };
         } catch (error: any) {
