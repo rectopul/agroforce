@@ -149,10 +149,10 @@ export default function Listagem({
       value: "name_main",
     },
     { name: "CamposGerenciados[]", title: "GMR", value: "gmr" },
-    { name: "CamposGerenciados[]", title: "BGM", value: "bgm" },
+    { name: "CamposGerenciados[]", title: "BGM ens.", value: "bgm" },
     {
       name: "CamposGerenciados[]",
-      title: "Nome tecnologia",
+      title: "Nome tec. ens.",
       value: "tecnologia",
     },
     { name: "CamposGerenciados[]", title: "Substituir", value: "action" },
@@ -387,11 +387,11 @@ export default function Listagem({
         tableFields.push(headerTableFactory("GMR", "genotipo.gmr"));
       }
       if (columnCampos[index] === "bgm") {
-        tableFields.push(headerTableFactory("BGM", "genotipo.bgm"));
+        tableFields.push(headerTableFactory("BGM ens.", "genotipo.bgm"));
       }
       if (columnCampos[index] === "tecnologia") {
         tableFields.push(
-          headerTableFactory("Nome tecnologia", "genotipo.tecnologia.name")
+          headerTableFactory("Nome tec. ens.", "genotipo.tecnologia.name")
         );
       }
       if (columnCampos[index] === "action") {
@@ -590,9 +590,9 @@ export default function Listagem({
 
                   {filterFieldFactory("filterGmr", "GMR", true)}
 
-                  {filterFieldFactory("filterBgm", "BGM", true)}
+                  {filterFieldFactory("filterBgm", "BGM ens.", true)}
 
-                  {filterFieldFactory("filterTecnologia", "Nome tecnologia")}
+                  {filterFieldFactory("filterTecnologia", "Nome tec. ens.")}
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 

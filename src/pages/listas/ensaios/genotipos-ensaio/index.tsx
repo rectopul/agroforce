@@ -918,11 +918,11 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cód. Tec. Ens.
+                      Cód. Tecnologia
                     </label>
                     <div className="flex">
                       <Input
-                        placeholder="Cód. Tec. Ens."
+                        placeholder="Cód. Tecnologia"
                         id="filterCodTec"
                         name="filterCodTec"
                         onChange={formik.handleChange}
@@ -930,7 +930,7 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory("filterTechnology", "Nome Tec. Ens.")}
+                  {filterFieldFactory("filterTechnology", "Nome Tecnologia")}
 
                   {filterFieldFactory("filterGli", "GLI")}
 
