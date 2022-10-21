@@ -177,15 +177,25 @@ export default function Listagem({
   const formik = useFormik<IFilter>({
     initialValues: {
       filterYear: '',
+      filterYearFrom: '',
+      filterYearTo: '',
       filterCodLote: '',
       filterNcc: '',
       filterFase: '',
+      filterPesoFrom: '',
+      filterPesoTo: '',
+      filterSeedsFrom: '',
+      filterSeedsTo: '',
       filterPeso: '',
       filterSeeds: '',
       filterGenotipo: '',
       filterMainName: '',
       filterGmr: '',
+      filterGmrFrom: '',
+      filterGmrTo: '',
       filterBgm: '',
+      filterBgmFrom: '',
+      filterBgmTo: '',
       filterTecnologia: '',
       orderBy: '',
       typeOrder: '',
@@ -483,12 +493,11 @@ export default function Listagem({
   }
 
   async function handlePagination(): Promise<void> {
-    await seperate();
+    let parametersFilter;
+    await seperate(parametersFilter);
   }
 
-  async function seperate() {
-    let parametersFilter;
-
+  async function seperate(parametersFilter: any) {
     const skip = currentPage * Number(take);
 
     const tempParams: any = [];
