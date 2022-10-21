@@ -544,7 +544,7 @@ export default function Listagem({
           delete row.label_region;
           delete row.name_locality;
           delete row.status;
-          delete row.dt_import;
+          delete row.dt_export;
           delete row.DT;
           delete row.id;
           delete row.cultureUnity;

@@ -15,14 +15,12 @@ export class ExperimentGenotipeRepository {
   }
 
   async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
-
     if (orderBy) {
       orderBy = JSON.parse(orderBy);
     }
 
     const count = await prisma.experiment_genotipe.count({ where });
 
-    
     const result: object | any = await prisma.experiment_genotipe.findMany({
       select,
       skip,
@@ -32,6 +30,15 @@ export class ExperimentGenotipeRepository {
     });
 
     result.total = count;
+    return result;
+  }
+
+  async deleteAll(idExperiment: number) {
+    const result = await prisma.experiment_genotipe.deleteMany({
+      where: {
+        idExperiment,
+      },
+    });
     return result;
   }
 

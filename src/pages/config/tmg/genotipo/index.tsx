@@ -669,7 +669,7 @@ export default function Listagem({
           delete row.id_tecnologia;
           delete row.tableData;
           delete row.lote;
-          delete row.dt_import;
+          delete row.dt_export;
 
           // row.DT = new Date();
 
