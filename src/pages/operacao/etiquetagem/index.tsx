@@ -2,33 +2,31 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import React, { useRef, useEffect, useState } from 'react';
-import { removeCookies, setCookies } from 'cookies-next';
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import getConfig from 'next/config';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
+import React, { useRef, useEffect, useState } from "react";
+import { removeCookies, setCookies } from "cookies-next";
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import Head from "next/head";
+import { useRouter } from "next/router";
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from 'react-beautiful-dnd';
-import {
-  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
-} from 'react-icons/bi';
-import { BsTrashFill } from 'react-icons/bs';
-import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import Modal from 'react-modal';
-import * as XLSX from 'xlsx';
-import Swal from 'sweetalert2';
-import { AiOutlinePrinter } from 'react-icons/ai';
-import { IGenerateProps } from '../../../interfaces/shared/generate-props.interface';
+} from "react-beautiful-dnd";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { BsTrashFill } from "react-icons/bs";
+import { RiCloseCircleFill, RiFileExcel2Line } from "react-icons/ri";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import Modal from "react-modal";
+import * as XLSX from "xlsx";
+import Swal from "sweetalert2";
+import { AiOutlinePrinter } from "react-icons/ai";
+import { IGenerateProps } from "../../../interfaces/shared/generate-props.interface";
 
 import {
   AccordionFilter,
@@ -40,20 +38,21 @@ import {
   ModalComponent,
   FieldItemsPerPage,
   SelectMultiple,
-} from '../../../components';
-import LoadingComponent from '../../../components/Loading';
-import { UserPreferenceController } from '../../../controllers/user-preference.controller';
+  ModalConfirmation,
+} from "../../../components";
+import LoadingComponent from "../../../components/Loading";
+import { UserPreferenceController } from "../../../controllers/user-preference.controller";
 import {
   experimentGroupService,
   userPreferencesService,
-} from '../../../services';
-import * as ITabs from '../../../shared/utils/dropdown';
+} from "../../../services";
+import * as ITabs from "../../../shared/utils/dropdown";
 import {
   IExperimentGroupFilter,
   IExperimentsGroup,
-} from '../../../interfaces/listas/operacao/etiquetagem/etiquetagem.interface';
-import { IReturnObject } from '../../../interfaces/shared/Import.interface';
-import { tableGlobalFunctions } from '../../../helpers';
+} from "../../../interfaces/listas/operacao/etiquetagem/etiquetagem.interface";
+import { IReturnObject } from "../../../interfaces/shared/Import.interface";
+import { tableGlobalFunctions } from "../../../helpers";
 
 export default function Listagem({
   allExperimentGroup,
@@ -70,25 +69,27 @@ export default function Listagem({
 InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
-  const tabsEtiquetagemMenu = tabsOperation.map((i) => (i.titleTab === 'ETIQUETAGEM'
-    ? { ...i, statusTab: true }
-    : { ...i, statubsTab: false }));
+  const tabsEtiquetagemMenu = tabsOperation.map((i) =>
+    i.titleTab === "ETIQUETAGEM"
+      ? { ...i, statusTab: true }
+      : { ...i, statubsTab: false }
+  );
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.etiquetagem || {
     id: 0,
     table_preferences:
-      'id,name,experimentAmount,tagsToPrint,tagsPrinted,totalTags,status,action',
+      "id,name,experimentAmount,tagsToPrint,tagsPrinted,totalTags,status,action",
   };
 
   const tableRef = useRef<any>(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+    preferences.table_preferences
   );
 
   const [experimentGroup, setExperimentGroup] = useState<IExperimentsGroup[]>(
-    () => allExperimentGroup,
+    () => allExperimentGroup
   );
   const [currentPage, setCurrentPage] = useState<number>(pageBeforeEdit);
   const [orderList, setOrder] = useState<number>(1);
@@ -97,74 +98,74 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
-      name: 'CamposGerenciados[]',
-      title: 'Nome do grupo de exp.',
-      value: 'name',
-      defaultChecked: () => camposGerenciados.includes('name'),
+      name: "CamposGerenciados[]",
+      title: "Nome do grupo de exp.",
+      value: "name",
+      defaultChecked: () => camposGerenciados.includes("name"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Qtde. exp.',
-      value: 'experimentAmount',
-      defaultChecked: () => camposGerenciados.includes('experimentAmount'),
+      name: "CamposGerenciados[]",
+      title: "Qtde. exp.",
+      value: "experimentAmount",
+      defaultChecked: () => camposGerenciados.includes("experimentAmount"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Etiq. a imprimir',
-      value: 'tagsToPrint',
-      defaultChecked: () => camposGerenciados.includes('tagsToPrint'),
+      name: "CamposGerenciados[]",
+      title: "Etiq. a imprimir",
+      value: "tagsToPrint",
+      defaultChecked: () => camposGerenciados.includes("tagsToPrint"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Etiq. impressas',
-      value: 'tagsPrinted',
-      defaultChecked: () => camposGerenciados.includes('tagsPrinted'),
+      name: "CamposGerenciados[]",
+      title: "Etiq. impressas",
+      value: "tagsPrinted",
+      defaultChecked: () => camposGerenciados.includes("tagsPrinted"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Total etiquetas',
-      value: 'totalTags',
-      defaultChecked: () => camposGerenciados.includes('totalTags'),
+      name: "CamposGerenciados[]",
+      title: "Total etiquetas",
+      value: "totalTags",
+      defaultChecked: () => camposGerenciados.includes("totalTags"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Status grupo exp.',
-      value: 'status',
-      defaultChecked: () => camposGerenciados.includes('status'),
+      name: "CamposGerenciados[]",
+      title: "Status grupo exp.",
+      value: "status",
+      defaultChecked: () => camposGerenciados.includes("status"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Ação',
-      value: 'action',
-      defaultChecked: () => camposGerenciados.includes('action'),
+      name: "CamposGerenciados[]",
+      title: "Ação",
+      value: "action",
+      defaultChecked: () => camposGerenciados.includes("action"),
     },
   ]);
 
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
     {
-      name: 'StatusCheckbox',
-      title: 'ETIQ. NÃO INICIADA',
-      value: 'ETIQ. NÃO INICIADA',
-      defaultChecked: () => camposGerenciados.includes('ETIQ. NÃO INICIADA'),
+      name: "StatusCheckbox",
+      title: "ETIQ. NÃO INICIADA",
+      value: "ETIQ. NÃO INICIADA",
+      defaultChecked: () => camposGerenciados.includes("ETIQ. NÃO INICIADA"),
     },
     {
-      name: 'StatusCheckbox',
-      title: 'ETIQ. EM ANDAMENTO',
-      value: 'ETIQ. EM ANDAMENTO',
-      defaultChecked: () => camposGerenciados.includes('ETIQ. EM ANDAMENTO'),
+      name: "StatusCheckbox",
+      title: "ETIQ. EM ANDAMENTO",
+      value: "ETIQ. EM ANDAMENTO",
+      defaultChecked: () => camposGerenciados.includes("ETIQ. EM ANDAMENTO"),
     },
     {
-      name: 'StatusCheckbox',
-      title: 'ETIQ. FINALIZADA',
-      value: 'ETIQ. FINALIZADA',
-      defaultChecked: () => camposGerenciados.includes('ETIQ. FINALIZADA'),
+      name: "StatusCheckbox",
+      title: "ETIQ. FINALIZADA",
+      value: "ETIQ. FINALIZADA",
+      defaultChecked: () => camposGerenciados.includes("ETIQ. FINALIZADA"),
     },
   ]);
   const [statusFilterSelected, setStatusFilterSelected] = useState<any>([]);
 
   // const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>('');
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [orderType, setOrderType] = useState<string>("");
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   // const take: number = itensPerPage;
@@ -180,6 +181,9 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const [isOpenModalConfirm, setIsOpenModalConfirm] = useState<boolean>(false);
+  const [itemSelectedDelete, setItemSelectedDelete] = useState<any>(null);
+
   // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}`;
 
   const formik = useFormik<IExperimentGroupFilter>({
@@ -190,20 +194,20 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       // filterTagsPrinted: checkValue('filterTagsPrinted'),
       // filterTotalTags: checkValue('filterTotalTags'),
       // filterStatus: checkValue('filterStatus'),
-      filterExperimentGroup: checkValue('filterExperimentGroup'),
-      filterQuantityExperiment: checkValue('filterQuantityExperiment'),
-      filterTagsToPrint: checkValue('filterTagsToPrint'),
-      filterTagsPrinted: checkValue('filterTagsPrinted'),
-      filterTotalTags: checkValue('filterTotalTags'),
-      filterStatus: checkValue('filterStatus'),
-      filterQtdExpFrom: checkValue('filterQtdExpFrom'),
-      filterQtdExpTo: checkValue('filterQtdExpTo'),
-      filterTotalEtiqImprimirFrom: checkValue('filterTotalEtiqImprimirFrom'),
-      filterTotalEtiqImprimirTo: checkValue('filterTotalEtiqImprimirTo'),
-      filterTotalEtiqImpressasFrom: checkValue('filterTotalEtiqImpressasFrom'),
-      filterTotalEtiqImpressasTo: checkValue('filterTotalEtiqImpressasTo'),
-      filterTotalEtiqFrom: checkValue('filterTotalEtiqFrom'),
-      filterTotalEtiqTo: checkValue('filterTotalEtiqTo'),
+      filterExperimentGroup: checkValue("filterExperimentGroup"),
+      filterQuantityExperiment: checkValue("filterQuantityExperiment"),
+      filterTagsToPrint: checkValue("filterTagsToPrint"),
+      filterTagsPrinted: checkValue("filterTagsPrinted"),
+      filterTotalTags: checkValue("filterTotalTags"),
+      filterStatus: checkValue("filterStatus"),
+      filterQtdExpFrom: checkValue("filterQtdExpFrom"),
+      filterQtdExpTo: checkValue("filterQtdExpTo"),
+      filterTotalEtiqImprimirFrom: checkValue("filterTotalEtiqImprimirFrom"),
+      filterTotalEtiqImprimirTo: checkValue("filterTotalEtiqImprimirTo"),
+      filterTotalEtiqImpressasFrom: checkValue("filterTotalEtiqImpressasFrom"),
+      filterTotalEtiqImpressasTo: checkValue("filterTotalEtiqImpressasTo"),
+      filterTotalEtiqFrom: checkValue("filterTotalEtiqFrom"),
+      filterTotalEtiqTo: checkValue("filterTotalEtiqTo"),
     },
     onSubmit: async ({
       filterExperimentGroup,
@@ -221,7 +225,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       filterTotalEtiqFrom,
       // filterStatus,
     }) => {
-      const filterStatus = statusFilterSelected?.join(',');
+      const filterStatus = statusFilterSelected?.join(",");
       const parametersFilter = `&filterExperimentGroup=${filterExperimentGroup}&filterQuantityExperiment=${filterQuantityExperiment}&filterTagsToPrint=${filterTagsToPrint}&filterTagsPrinted=${filterTagsPrinted}&filterTotalTags=${filterTotalTags}&filterStatus=${filterStatus}&safraId=${safraId}&id_culture=${cultureId}`;
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEditOperation', filtersParams);
@@ -243,14 +247,14 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
-    setCookies('filterBeforeEditOperation', parametersFilter);
-    setCookies('filterBeforeEditTypeOrderOperation', typeOrder);
-    setCookies('filterBeforeEditOrderByOperation', orderBy);
+    setCookies("filterBeforeEditOperation", parametersFilter);
+    setCookies("filterBeforeEditTypeOrderOperation", typeOrder);
+    setCookies("filterBeforeEditOrderByOperation", orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
     // setCookies("filtersParams", parametersFilter);
 
-    setCookies('filtersParamsOperation', parametersFilter);
+    setCookies("filtersParamsOperation", parametersFilter);
 
     await experimentGroupService.getAll(parametersFilter).then((response) => {
       if (response.status === 200 || response.status === 400) {
@@ -266,7 +270,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   }, [typeOrder]);
 
   useEffect(() => {
-    setCookies('filtersParams-test-rr', filtersParams);
+    setCookies("filtersParams-test-rr", filtersParams);
   }, [filtersParams]);
 
   async function handleOrder(column: string, order: number): Promise<void> {
@@ -308,9 +312,8 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     // }
 
     // Gobal manage orders
-    const {
-      typeOrderG, columnG, orderByG, arrowOrder,
-    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    const { typeOrderG, columnG, orderByG, arrowOrder } =
+      await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
@@ -318,16 +321,24 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     setArrowOrder(arrowOrder);
   }
 
-  async function deleteItem(id: number) {
-    setIsLoading(true);
+  async function deleteConfirmItem(item: any) {
+    setItemSelectedDelete(item);
+    setIsOpenModalConfirm(true);
+  }
 
-    const { status, message } = await experimentGroupService.deleted(id);
+  async function deleteItem() {
+    setIsLoading(true);
+    setIsOpenModalConfirm(false);
+
+    const { status, message } = await experimentGroupService.deleted(
+      itemSelectedDelete?.id
+    );
     if (status === 200) {
       router.reload();
     } else {
       Swal.fire({
         html: message,
-        width: '800',
+        width: "800",
       });
     }
 
@@ -355,7 +366,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   function actionTableFactory() {
     return {
       title: <div className="flex items-center">Ação</div>,
-      field: 'action',
+      field: "action",
       sorting: false,
       width: 0,
       render: (rowData: any) => (
@@ -365,12 +376,12 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
               title={`Editar ${rowData.name}`}
               type="button"
               onClick={() => {
-                setCookies('pageBeforeEditOperation', currentPage?.toString());
-                setCookies('filterBeforeEditOperation', filter);
-                setCookies('filterBeforeEditTypeOrderOperation', typeOrder);
-                setCookies('filterBeforeEditOrderByOperation', orderBy);
-                setCookies('filtersParamsOperation', filtersParams);
-                setCookies('lastPageOperation', 'atualizar');
+                setCookies("pageBeforeEditOperation", currentPage?.toString());
+                setCookies("filterBeforeEditOperation", filter);
+                setCookies("filterBeforeEditTypeOrderOperation", typeOrder);
+                setCookies("filterBeforeEditOrderByOperation", orderBy);
+                setCookies("filtersParamsOperation", filtersParams);
+                setCookies("lastPageOperation", "atualizar");
                 router.push(`/operacao/etiquetagem/atualizar?id=${rowData.id}`);
               }}
               rounder="rounded-full"
@@ -384,12 +395,12 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
               title=""
               type="button"
               onClick={() => {
-                setCookies('pageBeforeEditOperation', currentPage?.toString());
-                setCookies('filterBeforeEditOperation', filter);
-                setCookies('filterBeforeEditTypeOrderOperation', typeOrder);
-                setCookies('filterBeforeEditOrderByOperation', orderBy);
-                setCookies('filtersParamsOperation', filtersParams);
-                setCookies('lastPageOperation', 'parcelas');
+                setCookies("pageBeforeEditOperation", currentPage?.toString());
+                setCookies("filterBeforeEditOperation", filter);
+                setCookies("filterBeforeEditTypeOrderOperation", typeOrder);
+                setCookies("filterBeforeEditOrderByOperation", orderBy);
+                setCookies("filtersParamsOperation", filtersParams);
+                setCookies("lastPageOperation", "parcelas");
                 router.push(`/operacao/etiquetagem/parcelas?id=${rowData.id}`);
               }}
               rounder="rounded-full"
@@ -400,12 +411,20 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
           </div>
           <div className="h-10 w-10">
             <Button
-              disabled={rowData.status === 'ETIQ. EM ANDAMENTO' || rowData.status === 'ETIQ. FINALIZADA'}
+              disabled={
+                rowData.status === "ETIQ. EM ANDAMENTO" ||
+                rowData.status === "ETIQ. FINALIZADA"
+              }
               title={`Excluir ${rowData.name}`}
               type="button"
-              onClick={() => deleteItem(rowData.id)}
+              onClick={() => deleteConfirmItem(rowData)}
               rounder="rounded-full"
-              bgColor={rowData.status === 'ETIQ. EM ANDAMENTO' || rowData.status === 'ETIQ. FINALIZADA' ? 'bg-gray-600' : 'bg-red-600'}
+              bgColor={
+                rowData.status === "ETIQ. EM ANDAMENTO" ||
+                rowData.status === "ETIQ. FINALIZADA"
+                  ? "bg-gray-600"
+                  : "bg-red-600"
+              }
               textColor="white"
               icon={<BsTrashFill size={20} />}
             />
@@ -416,28 +435,28 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   }
 
   function orderColumns(columnsOrder: string): Array<object> {
-    const columnOrder: any = columnsOrder.split(',');
+    const columnOrder: any = columnsOrder.split(",");
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
-      if (columnOrder[item] === 'name') {
-        tableFields.push(headerTableFactory('Nome do grupo de exp.', 'name'));
+      if (columnOrder[item] === "name") {
+        tableFields.push(headerTableFactory("Nome do grupo de exp.", "name"));
       }
-      if (columnOrder[item] === 'experimentAmount') {
-        tableFields.push(headerTableFactory('Qtde. exp.', 'experimentAmount'));
+      if (columnOrder[item] === "experimentAmount") {
+        tableFields.push(headerTableFactory("Qtde. exp.", "experimentAmount"));
       }
-      if (columnOrder[item] === 'tagsToPrint') {
-        tableFields.push(headerTableFactory('Etiq. a imprimir', 'tagsToPrint'));
+      if (columnOrder[item] === "tagsToPrint") {
+        tableFields.push(headerTableFactory("Etiq. a imprimir", "tagsToPrint"));
       }
-      if (columnOrder[item] === 'tagsPrinted') {
-        tableFields.push(headerTableFactory('Etiq. impressas', 'tagsPrinted'));
+      if (columnOrder[item] === "tagsPrinted") {
+        tableFields.push(headerTableFactory("Etiq. impressas", "tagsPrinted"));
       }
-      if (columnOrder[item] === 'totalTags') {
-        tableFields.push(headerTableFactory('Total etiquetas', 'totalTags'));
+      if (columnOrder[item] === "totalTags") {
+        tableFields.push(headerTableFactory("Total etiquetas", "totalTags"));
       }
-      if (columnOrder[item] === 'status') {
-        tableFields.push(headerTableFactory('Status grupo exp.', 'status'));
+      if (columnOrder[item] === "status") {
+        tableFields.push(headerTableFactory("Status grupo exp.", "status"));
       }
-      if (columnOrder[item] === 'action') {
+      if (columnOrder[item] === "action") {
         tableFields.push(actionTableFactory());
       }
     });
@@ -448,7 +467,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
+    let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -471,7 +490,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
       userLogado.preferences.etiquetagem = {
         id: preferences.id,
@@ -482,7 +501,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -509,21 +528,21 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
         XLSX.utils.book_append_sheet(
           workBook,
           workSheet,
-          'Grupos do experimento',
+          "Grupos do experimento"
         );
 
         // Buffer
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
+          bookType: "xlsx", // xlsx
+          type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
+          bookType: "xlsx", // xlsx
+          type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, 'Grupos do experimento.xlsx');
+        XLSX.writeFile(workBook, "Grupos do experimento.xlsx");
       }
     });
   };
@@ -562,7 +581,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   function checkValue(value: any) {
     const parameter = tableGlobalFunctions.getValuesForFilter(
       value,
-      filtersParams,
+      filtersParams
     );
     return parameter;
   }
@@ -570,10 +589,10 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   function filterFieldFactory(
     title: string,
     name: string,
-    small: boolean = false,
+    small: boolean = false
   ) {
     return (
-      <div className={small ? 'h-7 w-1/3 ml-2' : 'h-7 w-1/2 ml-2'}>
+      <div className={small ? "h-7 w-1/3 ml-2" : "h-7 w-1/2 ml-2"}>
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -592,22 +611,23 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   async function handleSubmit(event: any) {
     event.preventDefault();
     const inputValue: any = (
-      document.getElementById('inputName') as HTMLInputElement
+      document.getElementById("inputName") as HTMLInputElement
     )?.value;
     const { response }: IReturnObject = await experimentGroupService.getAll({
       filterExperimentGroup: inputValue,
       safraId,
     });
     if (response?.length > 0) {
-      Swal.fire('Grupo já cadastrado');
+      Swal.fire("Grupo já cadastrado");
     } else {
-      const { status: createStatus, response: newGroup }: IReturnObject = await experimentGroupService.create({
-        name: inputValue,
-        safraId: Number(safraId),
-        createdBy: userLogado.id,
-      });
+      const { status: createStatus, response: newGroup }: IReturnObject =
+        await experimentGroupService.create({
+          name: inputValue,
+          safraId: Number(safraId),
+          createdBy: userLogado.id,
+        });
       if (createStatus !== 200) {
-        Swal.fire('Erro ao cadastrar grupo');
+        Swal.fire("Erro ao cadastrar grupo");
       } else {
         router.push(`/operacao/etiquetagem/atualizar?id=${newGroup.id}`);
       }
@@ -626,6 +646,13 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       </Head>
 
       {isLoading && <LoadingComponent />}
+
+      <ModalConfirmation
+        isOpen={isOpenModalConfirm}
+        text={`Tem certeza que deseja deletar o item ${itemSelectedDelete?.name}?`}
+        onPress={deleteItem}
+        onCancel={() => setIsOpenModalConfirm(false)}
+      />
 
       <ModalComponent
         isOpen={isOpenModal}
@@ -739,8 +766,8 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                 "
                 >
                   {filterFieldFactory(
-                    'filterExperimentGroup',
-                    'Nome do grupo de exp.',
+                    "filterExperimentGroup",
+                    "Nome do grupo de exp."
                   )}
                   {/* {filterFieldFactory(
                     "filterQuantityExperiment",
@@ -772,7 +799,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                         id="filterQtdExpFrom"
                         name="filterQtdExpFrom"
                         onChange={formik.handleChange}
-                        defaultValue={checkValue('filterQtdExpFrom')}
+                        defaultValue={checkValue("filterQtdExpFrom")}
                       />
                       <Input
                         style={{ marginLeft: 8 }}
@@ -780,7 +807,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                         id="filterQtdExpTo"
                         name="filterQtdExpTo"
                         onChange={formik.handleChange}
-                        defaultValue={checkValue('filterQtdExpTo')}
+                        defaultValue={checkValue("filterQtdExpTo")}
                       />
                     </div>
                   </div>
@@ -795,7 +822,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                         id="filterTotalEtiqImprimirFrom"
                         name="filterTotalEtiqImprimirFrom"
                         onChange={formik.handleChange}
-                        defaultValue={checkValue('filterTotalEtiqImprimirFrom')}
+                        defaultValue={checkValue("filterTotalEtiqImprimirFrom")}
                       />
                       <Input
                         style={{ marginLeft: 8 }}
@@ -803,7 +830,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                         id="filterTotalEtiqImprimirTo"
                         name="filterTotalEtiqImprimirTo"
                         onChange={formik.handleChange}
-                        defaultValue={checkValue('filterTotalEtiqImprimirTo')}
+                        defaultValue={checkValue("filterTotalEtiqImprimirTo")}
                       />
                     </div>
                   </div>
@@ -819,7 +846,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                         name="filterTotalEtiqImpressasFrom"
                         onChange={formik.handleChange}
                         defaultValue={checkValue(
-                          'filterTotalEtiqImpressasFrom',
+                          "filterTotalEtiqImpressasFrom"
                         )}
                       />
                       <Input
@@ -828,7 +855,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                         id="filterTotalEtiqImpressasTo"
                         name="filterTotalEtiqImpressasTo"
                         onChange={formik.handleChange}
-                        defaultValue={checkValue('filterTotalEtiqImpressasTo')}
+                        defaultValue={checkValue("filterTotalEtiqImpressasTo")}
                       />
                     </div>
                   </div>
@@ -843,7 +870,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                         id="filterTotalEtiqFrom"
                         name="filterTotalEtiqFrom"
                         onChange={formik.handleChange}
-                        defaultValue={checkValue('filterTotalEtiqFrom')}
+                        defaultValue={checkValue("filterTotalEtiqFrom")}
                       />
                       <Input
                         style={{ marginLeft: 8 }}
@@ -851,7 +878,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                         id="filterTotalEtiqTo"
                         name="filterTotalEtiqTo"
                         onChange={formik.handleChange}
-                        defaultValue={checkValue('filterTotalEtiqTo')}
+                        defaultValue={checkValue("filterTotalEtiqTo")}
                       />
                     </div>
                   </div>
@@ -932,16 +959,17 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
               tableRef={tableRef}
-              style={{ background: '#f9fafb' }}
+              style={{ background: "#f9fafb" }}
               columns={columns}
               data={experimentGroup}
               options={{
-                selectionProps: (rowData: any) => isOpenModal && { disabled: rowData },
+                selectionProps: (rowData: any) =>
+                  isOpenModal && { disabled: rowData },
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
                 },
-                rowStyle: { background: '#f9fafb', height: 35 },
+                rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: Number(take),
@@ -975,9 +1003,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
+                      Total registrado: {itemsTotal}
                     </strong>
 
                     <div
@@ -1024,7 +1050,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value,
+                                                generate.value
                                               )}
                                             />
                                           </li>
@@ -1053,58 +1079,59 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                     </div>
                   </div>
                 ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => setCurrentPage(0)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {Array(1)
-                      .fill('')
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(pages - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(0)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage < 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(pages - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                   ) as any,
               }}
             />
@@ -1187,9 +1214,10 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) ?? 10;
+  const itensPerPage =
+    (await (
+      await PreferencesControllers.getConfigGerais()
+    )?.response[0]?.itens_per_page) ?? 10;
 
   const { token } = req.cookies;
   const { cultureId } = req.cookies;
@@ -1202,14 +1230,14 @@ export const getServerSideProps: GetServerSideProps = async ({
   // Last page
   const lastPageServer = req.cookies.lastPageOperation
     ? req.cookies.lastPageOperation
-    : 'No';
+    : "No";
 
-  if (lastPageServer == undefined || lastPageServer == 'No') {
-    removeCookies('filterBeforeEditOperation', { req, res });
-    removeCookies('pageBeforeEditOperation', { req, res });
-    removeCookies('filterBeforeEditTypeOrderOperation', { req, res });
-    removeCookies('filterBeforeEditOrderByOperation', { req, res });
-    removeCookies('lastPageOperation', { req, res });
+  if (lastPageServer == undefined || lastPageServer == "No") {
+    removeCookies("filterBeforeEditOperation", { req, res });
+    removeCookies("pageBeforeEditOperation", { req, res });
+    removeCookies("filterBeforeEditTypeOrderOperation", { req, res });
+    removeCookies("filterBeforeEditOrderByOperation", { req, res });
+    removeCookies("lastPageOperation", { req, res });
   }
 
   const filterBeforeEdit = req.cookies.filterBeforeEditOperation
@@ -1222,11 +1250,11 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrderOperation
     ? req.cookies.filterBeforeEditTypeOrderOperation
-    : 'desc';
+    : "desc";
 
   const orderByserver = req.cookies.filterBeforeEditOrderByOperation
     ? req.cookies.filterBeforeEditOrderByOperation
-    : 'experimentAmount';
+    : "experimentAmount";
 
   // removeCookies("filterBeforeEditOperation", { req, res });
   // removeCookies("pageBeforeEditOperation", { req, res });
@@ -1242,11 +1270,14 @@ export const getServerSideProps: GetServerSideProps = async ({
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
-  const { response: allExperimentGroup = [], total: totalItems = 0 } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
+  const { response: allExperimentGroup = [], total: totalItems = 0 } =
+    await fetch(urlParameters.toString(), requestOptions).then((response) =>
+      response.json()
+    );
 
   const safraId = idSafra;
 

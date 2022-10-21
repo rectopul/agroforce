@@ -1,27 +1,27 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import React, { useState } from 'react';
-import { capitalize } from '@mui/material';
-import { MultiSelectComponent } from '@syncfusion/ej2-react-dropdowns';
-import { useFormik } from 'formik';
-import { GetServerSideProps } from 'next';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { IoMdArrowBack } from 'react-icons/io';
-import { RiUserSettingsLine } from 'react-icons/ri';
-import InputMask from 'react-input-mask';
-import Swal from 'sweetalert2';
-import { prisma } from '../../../api/db/db';
-import { userService } from '../../../../services';
-import { functionsUtils } from '../../../../shared/utils/functionsUtils';
+import React, { useState } from "react";
+import { capitalize } from "@mui/material";
+import { MultiSelectComponent } from "@syncfusion/ej2-react-dropdowns";
+import { useFormik } from "formik";
+import { GetServerSideProps } from "next";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { IoMdArrowBack } from "react-icons/io";
+import { RiUserSettingsLine } from "react-icons/ri";
+import InputMask from "react-input-mask";
+import Swal from "sweetalert2";
+import { prisma } from "../../../api/db/db";
+import { userService } from "../../../../services";
+import { functionsUtils } from "../../../../shared/utils/functionsUtils";
 import {
   Button,
   CheckBox,
   Content,
   Input,
   Select,
-} from '../../../../components';
-import * as ITabs from '../../../../shared/utils/dropdown';
+} from "../../../../components";
+import * as ITabs from "../../../../shared/utils/dropdown";
 
 interface IDepartment {
   id: number;
@@ -70,10 +70,12 @@ export default function AtualizarUsuario({
   const { TabsDropDowns } = ITabs.default;
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG'
-    && tab.data.map((i) => i.labelDropDown === 'Usuários')
-    ? (tab.statusTab = true)
-    : (tab.statusTab = false)));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === "TMG" &&
+    tab.data.map((i) => i.labelDropDown === "Usuários")
+      ? (tab.statusTab = true)
+      : (tab.statusTab = false)
+  );
 
   const router = useRouter();
 
@@ -87,7 +89,7 @@ export default function AtualizarUsuario({
         userPermissions[data.users_permissions[item].id_cultures] = [
           data.users_permissions[item].id_profiles,
           Number(
-            userPermissions[data.users_permissions[item].id_cultures].join(),
+            userPermissions[data.users_permissions[item].id_cultures].join()
           ),
         ];
       } else {
@@ -101,46 +103,48 @@ export default function AtualizarUsuario({
 
   function validateInputs(values: any) {
     if (!values.name) {
-      const inputName: any = document.getElementById('name');
-      inputName.style.borderColor = 'red';
+      const inputName: any = document.getElementById("name");
+      inputName.style.borderColor = "red";
     } else {
-      const inputName: any = document.getElementById('name');
-      inputName.style.borderColor = '';
+      const inputName: any = document.getElementById("name");
+      inputName.style.borderColor = "";
     }
     if (!values.login) {
-      const inputLogin: any = document.getElementById('login');
-      inputLogin.style.borderColor = 'red';
+      const inputLogin: any = document.getElementById("login");
+      inputLogin.style.borderColor = "red";
     } else {
-      const inputLogin: any = document.getElementById('login');
-      inputLogin.style.borderColor = '';
+      const inputLogin: any = document.getElementById("login");
+      inputLogin.style.borderColor = "";
     }
     if (!values.cpf) {
-      const inputCpf: any = document.getElementById('cpf');
-      inputCpf.style.borderColor = 'red';
+      const inputCpf: any = document.getElementById("cpf");
+      inputCpf.style.borderColor = "red";
     } else {
-      const inputCpf: any = document.getElementById('cpf');
-      inputCpf.style.borderColor = '';
+      const inputCpf: any = document.getElementById("cpf");
+      inputCpf.style.borderColor = "";
     }
     if (!values.departmentId) {
-      const inputDepartmentId: any = document.getElementById('departmentId');
-      inputDepartmentId.style.borderColor = 'red';
+      const inputDepartmentId: any = document.getElementById("departmentId");
+      inputDepartmentId.style.borderColor = "red";
     } else {
-      const inputDepartmentId: any = document.getElementById('departmentId');
-      inputDepartmentId.style.borderColor = '';
+      const inputDepartmentId: any = document.getElementById("departmentId");
+      inputDepartmentId.style.borderColor = "";
     }
     if (!values.password) {
-      const inputPassword: any = document.getElementById('password');
-      inputPassword.style.borderColor = 'red';
+      const inputPassword: any = document.getElementById("password");
+      inputPassword.style.borderColor = "red";
     } else {
-      const inputPassword: any = document.getElementById('password');
-      inputPassword.style.borderColor = '';
+      const inputPassword: any = document.getElementById("password");
+      inputPassword.style.borderColor = "";
     }
     if (!values.confirmPassword) {
-      const inputconfirmPassword: any = document.getElementById('confirmPassword');
-      inputconfirmPassword.style.borderColor = 'red';
+      const inputconfirmPassword: any =
+        document.getElementById("confirmPassword");
+      inputconfirmPassword.style.borderColor = "red";
     } else {
-      const inputconfirmPassword: any = document.getElementById('confirmPassword');
-      inputconfirmPassword.style.borderColor = '';
+      const inputconfirmPassword: any =
+        document.getElementById("confirmPassword");
+      inputconfirmPassword.style.borderColor = "";
     }
 
     if (values.password !== values.confirmPassword) {
@@ -157,8 +161,8 @@ export default function AtualizarUsuario({
       cpf: data.cpf,
       email: data.email,
       tel: data.tel,
-      password: functionsUtils.Crypto(data.password, 'decipher'),
-      confirmPassword: functionsUtils.Crypto(data.password, 'decipher'),
+      password: functionsUtils.Crypto(data.password, "decipher"),
+      confirmPassword: functionsUtils.Crypto(data.password, "decipher"),
       registration: data.registration,
       departmentId: data.departmentId,
       status: data.status,
@@ -168,22 +172,24 @@ export default function AtualizarUsuario({
     onSubmit: async (values) => {
       validateInputs(values);
       if (
-        !values.name
-        || !values.login
-        || !values.cpf
-        || !values.departmentId
-        || !values.password
-        || !values.confirmPassword
+        !values.name ||
+        !values.login ||
+        !values.cpf ||
+        !values.departmentId ||
+        !values.password ||
+        !values.confirmPassword
       ) {
-        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
+        Swal.fire(
+          "Preencha todos os campos obrigatórios destacados em vermelho."
+        );
         return;
       }
       if (values.password !== values.confirmPassword) {
-        Swal.fire('As senhas devem ser iguais');
+        Swal.fire("As senhas devem ser iguais");
         return;
       }
 
-      const checkbox: any = document.getElementsByName('cultures');
+      const checkbox: any = document.getElementsByName("cultures");
       values.cultures = [];
       for (let i = 0; i < checkbox.length; i += 1) {
         if (checkbox[i].checked) {
@@ -197,7 +203,7 @@ export default function AtualizarUsuario({
 
       Object.keys(values.cultures).forEach((item) => {
         input = document.querySelector(
-          `select[name="profiles_${values.cultures[item]}"]`,
+          `select[name="profiles_${values.cultures[item]}"]`
         );
         auxObject2 = [];
         for (let i = 0; i < input.options.length; i += 1) {
@@ -229,7 +235,7 @@ export default function AtualizarUsuario({
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire('Usuário atualizado com sucesso!');
+            Swal.fire("Usuário atualizado com sucesso!");
             router.back();
           } else {
             Swal.fire(response.message);
@@ -299,7 +305,7 @@ export default function AtualizarUsuario({
                 mask=""
                 required
                 disabled
-                style={{ background: '#e5e7eb' }}
+                style={{ background: "#e5e7eb" }}
                 placeholder="111.111.111-11"
                 maxLength={11}
                 minLength={11}
@@ -469,7 +475,7 @@ export default function AtualizarUsuario({
 
                   <div className="w-full">
                     <h4 className="block text-gray-900 text-sm font-bold mb-1">
-                      Permissões
+                      Perfil
                     </h4>
                     <div>
                       <MultiSelectComponent
@@ -479,12 +485,12 @@ export default function AtualizarUsuario({
                         onChange={(e: any) => defineProfiles(culture.id, e)}
                         mode="Box"
                         fields={{
-                          text: 'name',
-                          value: 'id',
+                          text: "name",
+                          value: "id",
                         }}
                         value={Permissions[culture.id]}
                         placeholder={`Permissões de culturas para ${
-                          !formik.values.name ? 'Usuário' : formik.values.name
+                          !formik.values.name ? "Usuário" : formik.values.name
                         }`}
                       />
                     </div>
@@ -598,7 +604,7 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
   if (!response?.id) {
     return {
       redirect: {
-        destination: '/',
+        destination: "/",
         permanent: false,
         statusCode: 404,
       },
