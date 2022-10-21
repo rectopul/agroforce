@@ -134,6 +134,8 @@ export class ReplaceTreatmentController {
     parameters.OR = [];
     parameters.AND = [];
     try {
+      console.log('options');
+      console.log(options);
       if (options.filterYear) {
         parameters.year = Number(options.filterYear);
       }
@@ -192,10 +194,6 @@ export class ReplaceTreatmentController {
           },
         },
       };
-
-      if (options.id_safra) {
-        parameters.id_safra = Number(options.id_safra);
-      }
 
       if (options.checkedTreatments) {
         // const checkedParams = options.checkedTreatments.split(',');

@@ -46,7 +46,7 @@ export class ImportLocalController {
       'ID do País (CNTR_COUNTRY_ID)',
       'Nome do país (CNTR_COUNTRY_NAME)',
       'Rótulo (CNTR_LIBELLE)',
-      'DT_IMPORT (SCRIPT0002)',
+      'DT_EXPORT (SCRIPT0002)',
     ];
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
@@ -254,7 +254,7 @@ export class ImportLocalController {
                 );
               }
               if (status === 200) {
-                const lastDtImport = response[0]?.dt_import?.getTime();
+                const lastDtImport = response[0]?.dt_export?.getTime();
                 if (
                   lastDtImport
                     > spreadSheet[row][column].getTime()
@@ -312,7 +312,7 @@ export class ImportLocalController {
                 } else if (spreadSheet[0][column].includes('CNTR_LIBELLE')) {
                   localCultureDTO.label_country = (spreadSheet[row][column]?.toString());
                 } else if (spreadSheet[0][column].includes('DT')) {
-                  unityCultureDTO.dt_import = spreadSheet[row][column];
+                  unityCultureDTO.dt_export = spreadSheet[row][column];
                 }
               }
               localCultureDTO.created_by = Number(createdBy);

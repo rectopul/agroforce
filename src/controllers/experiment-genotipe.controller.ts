@@ -186,7 +186,7 @@ export class ExperimentGenotipeController {
       // if (options.npe) {
       //   parameters.npe = Number(options.npe);
       // }
-      
+
       const select = {
         id: true,
         safra: { select: { safraName: true } },
@@ -392,6 +392,21 @@ export class ExperimentGenotipeController {
     } catch (error: any) {
       handleError('Parcelas controller', 'Update', error.message);
       throw new Error('[Controller] - Update Parcelas erro');
+    }
+  }
+
+  async deleteAll(idExperiment: number) {
+    try {
+      console.log('idExperiment');
+      console.log(idExperiment);
+      const response = await this.ExperimentGenotipeRepository.deleteAll(Number(idExperiment));
+      if (response) {
+        return { status: 200, message: 'Parcelas excluídos' };
+      }
+      return { status: 400, message: 'Parcelas não excluídos' };
+    } catch (error: any) {
+      handleError('Parcelas controller', 'DeleteAll', error.message);
+      throw new Error('[Controller] - DeleteAll Parcelas erro');
     }
   }
 

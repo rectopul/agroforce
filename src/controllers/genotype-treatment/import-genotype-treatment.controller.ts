@@ -194,12 +194,31 @@ export class ImportGenotypeTreatmentController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                const { status } = await loteController.getAll({
+                const { status: loteStatus } = await loteController.getAll({
                   ncc: Number(spreadSheet[row][column]),
                 });
-                if (status === 400) {
+                if (loteStatus === 400) {
                   responseIfError[Number(column)]
                     += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
+                } else {
+                  const { status, response } = await genotipoController.getAll({
+                    name_genotipo: spreadSheet[row][column],
+                  });
+                  if (status !== 400) {
+                    const validateNca = await response[0]?.lote.map((item: any) => {
+                      if (item?.nca === spreadSheet[row][column]) return true;
+                      return false;
+                    });
+                    if (!validateNca?.includes(true)) {
+                      responseIfError[Number(column)]
+                        += responseGenericFactory(
+                          (Number(column) + 1),
+                          row,
+                          spreadSheet[0][column],
+                          'o nca não pertence a esse genotipo',
+                        );
+                    }
+                  }
                 }
               }
             }

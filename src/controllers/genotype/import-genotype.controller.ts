@@ -73,7 +73,7 @@ export class ImportGenotypeController {
       'FASE (C0200)',
       'PESO',
       'SEMENTES',
-      'DT_IMPORT (SCRIPT0002)',
+      'DT_Export (SCRIPT0002)',
     ];
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
@@ -370,7 +370,7 @@ export class ImportGenotypeController {
                 });
               }
             }
-            if (configModule.response[0]?.fields[column] === 'DT_IMPORT') {
+            if (configModule.response[0]?.fields[column] === 'DT_EXPORT') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
@@ -402,7 +402,7 @@ export class ImportGenotypeController {
                   );
                 }
                 if (status === 200) {
-                  const lastDtImport = response[0]?.dt_import?.getTime();
+                  const lastDtImport = response[0]?.dt_export?.getTime();
                   if (
                     lastDtImport
                     > spreadSheet[row][column].getTime()
@@ -670,9 +670,9 @@ export class ImportGenotypeController {
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'DT_IMPORT') {
+                if (configModule.response[0]?.fields[column] === 'DT_EXPORT') {
                   if (spreadSheet[row][column] !== null) {
-                    this.aux.dt_import = spreadSheet[row][column];
+                    this.aux.dt_export = spreadSheet[row][column];
                   }
                 }
 
@@ -704,9 +704,9 @@ export class ImportGenotypeController {
                       progenitor_m_origem: this.aux.progenitor_m_origem,
                       progenitores_origem: this.aux.progenitores_origem,
                       parentesco_completo: this.aux.parentesco_completo,
-                      dt_import: this.aux.dt_import,
+                      dt_export: this.aux.dt_export,
                       created_by: createdBy,
-                    }
+                    };
                     this.aux.created_by = createdBy;
                     // console.log(genotipo_obj);
                     genotipeQueue.add({
@@ -735,7 +735,7 @@ export class ImportGenotypeController {
                     //   progenitor_m_origem: this.aux.progenitor_m_origem,
                     //   progenitores_origem: this.aux.progenitores_origem,
                     //   parentesco_completo: this.aux.parentesco_completo,
-                    //   dt_import: this.aux.dt_import,
+                    //   dt_export: this.aux.dt_export,
                     //   created_by: this.aux.created_by,
                     // });
                   } else {
@@ -762,7 +762,7 @@ export class ImportGenotypeController {
                       progenitor_m_origem: this.aux.progenitor_m_origem,
                       progenitores_origem: this.aux.progenitores_origem,
                       parentesco_completo: this.aux.parentesco_completo,
-                      dt_import: this.aux.dt_import,
+                      dt_export: this.aux.dt_export,
                       created_by: createdBy,
                     };
                     this.aux.created_by = createdBy;
@@ -793,7 +793,7 @@ export class ImportGenotypeController {
                     //   progenitor_m_origem: this.aux.progenitor_m_origem,
                     //   progenitores_origem: this.aux.progenitores_origem,
                     //   parentesco_completo: this.aux.parentesco_completo,
-                    //   dt_import: this.aux.dt_import,
+                    //   dt_export: this.aux.dt_export,
                     //   created_by: this.aux.created_by,
                     // });
                     // this.aux.id_genotipo = genotipo.response.id;
@@ -817,7 +817,7 @@ export class ImportGenotypeController {
                   //       fase: this.aux.fase,
                   //       peso: this.aux.peso,
                   //       quant_sementes: this.aux.quant_sementes,
-                  //       dt_import: this.aux.dt_import,
+                  //       dt_export: this.aux.dt_export,
                   //       created_by: this.aux.created_by,
                   //     };
                   //     loteQueue.add({
@@ -852,7 +852,7 @@ export class ImportGenotypeController {
                   //       fase: this.aux.fase,
                   //       peso: this.aux.peso,
                   //       quant_sementes: this.aux.quant_sementes,
-                  //       dt_import: this.aux.dt_import,
+                  //       dt_export: this.aux.dt_export,
                   //       created_by: this.aux.created_by,
                   //     };
                   //     loteQueue.add({

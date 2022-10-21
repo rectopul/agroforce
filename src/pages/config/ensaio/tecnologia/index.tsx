@@ -422,7 +422,7 @@ export default function Listagem({
 
             delete row.culture;
             delete row.id;
-            delete row.dt_import;
+            delete row.dt_export;
             delete row.name;
             delete row.desc;
             delete row.cod_tec;
