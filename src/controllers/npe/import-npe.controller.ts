@@ -271,9 +271,8 @@ export class ImportNpeController {
                       spreadSheet[0][column],
                       'o foco não existe no sistema',
                     );
-                  }
-                  // else {
-                  //   this.aux.focoId = response[0]?.id;
+                  } else {
+                    this.aux.focoId = response[0]?.id;
                   //   const { status: focoGroup }: IReturnObject = await groupController.getAll({
                   //     id_safra: idSafra,
                   //     id_foco: this.aux.focoId,
@@ -286,7 +285,7 @@ export class ImportNpeController {
                   //       'os focos precisam ter grupos cadastrados nessa safra',
                   //     );
                   //   }
-                  // }
+                  }
                 } else {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
