@@ -593,7 +593,6 @@ export default function Listagem({
   const downloadExcel = async (): Promise<void> => {
     await genotipoService.getAll(filter).then(({ response, status }) => {
       if (status === 200) {
-        console.log(response);
         const newData = response.map((row: any) => {
           const dataExp = new Date();
           let hours: string;

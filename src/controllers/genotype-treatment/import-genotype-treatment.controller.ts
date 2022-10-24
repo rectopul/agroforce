@@ -202,11 +202,11 @@ export class ImportGenotypeTreatmentController {
                     += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
                 } else {
                   const { status, response } = await genotipoController.getAll({
-                    name_genotipo: spreadSheet[row][column],
+                    name_genotipo: spreadSheet[row][10],
                   });
                   if (status !== 400) {
                     const validateNca = await response[0]?.lote.map((item: any) => {
-                      if (item?.nca === spreadSheet[row][column]) return true;
+                      if (Number(item?.ncc) == Number(spreadSheet[row][column])) return true;
                       return false;
                     });
                     if (!validateNca?.includes(true)) {
