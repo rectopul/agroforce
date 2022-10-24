@@ -75,6 +75,8 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       : { ...i, statubsTab: false }
   );
 
+  const tableRef = useRef<any>(null);
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.etiquetagem || {
     id: 0,
@@ -82,7 +84,6 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       "id,name,experimentAmount,tagsToPrint,tagsPrinted,totalTags,status,action",
   };
 
-  const tableRef = useRef<any>(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences
@@ -260,6 +261,9 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       if (response.status === 200 || response.status === 400) {
         setExperimentGroup(response.response);
         setTotalItems(response.total);
+        tableRef?.current?.dataManager?.changePageSize(
+          response.total >= take ? take : response.total
+        );
       }
     });
   }
