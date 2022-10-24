@@ -174,7 +174,7 @@ model cultureUnity {
   year               Int
   name_unity_culture String
   created_by         Int
-  dt_import          DateTime
+  dt_export          DateTime
   created_at         DateTime? @default(now())
   local              local     @relation(fields: [id_local], references: [id])
 }
@@ -282,7 +282,7 @@ model genotipo {
   progenitor_m_origem String?
   progenitores_origem String?
   type                String?
-  dt_import           DateTime?
+  dt_export           DateTime?
   safraId             Int?
   culture             culture               @relation(fields: [id_culture], references: [id])
   tecnologia          tecnologia            @relation(fields: [id_tecnologia], references: [id])
@@ -366,7 +366,7 @@ model tecnologia {
   created_at          DateTime?             @default(now())
   desc                String?
   cod_tec             String                @default("")
-  dt_import           DateTime
+  dt_export           DateTime
   culture             culture               @relation(fields: [id_culture], references: [id])
   assay_list          assay_list[]
   genotipo            genotipo[]
@@ -388,7 +388,7 @@ model lote {
   peso                Decimal?              @db.Decimal(5, 0)
   quant_sementes      Int?
   year                Int?
-  dt_import           DateTime?
+  dt_export           DateTime?
   genotipo            genotipo              @relation(fields: [id_genotipo], references: [id])
   safra               safra                 @relation(fields: [id_safra], references: [id])
   genotype_treatment  genotype_treatment[]

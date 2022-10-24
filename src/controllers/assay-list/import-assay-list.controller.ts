@@ -7,6 +7,7 @@ import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.in
 import handleError from '../../shared/utils/handleError';
 import { validateInteger } from '../../shared/utils/numberValidate';
 import { responseGenericFactory, responseNullFactory } from '../../shared/utils/responseErrorFactory';
+import { validateHeaders } from '../../shared/utils/validateHeaders';
 import { CulturaController } from '../cultura.controller';
 import { FocoController } from '../foco.controller';
 import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';
@@ -37,7 +38,26 @@ export class ImportAssayListController {
     const genotypeTreatmentController = new GenotypeTreatmentController();
 
     const responseIfError: any = [];
+    const headers = [
+      'CULTURA',
+      'SAFRA',
+      'FOCO',
+      'ENSAIO',
+      'GLI',
+      'GGEN',
+      'BGM',
+      'PROJETO',
+      'NT',
+      'STATUS',
+      'GENOTIPO',
+      'NCA',
+      'OBS',
+    ];
     try {
+      const validate: any = await validateHeaders(spreadSheet, headers);
+      if (validate.length > 0) {
+        return { status: 400, message: validate };
+      }
       for (const row in spreadSheet) {
         if (row !== '0') {
           for (const column in spreadSheet[row]) {

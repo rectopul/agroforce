@@ -22,6 +22,8 @@ export class ExperimentController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
+      console.log('options');
+      console.log(options);
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
         if (options.filterRepetitionFrom && options.filterRepetitionTo) {
           parameters.repetitionsNumber = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);
@@ -140,6 +142,10 @@ export class ExperimentController {
         parameters.idSafra = Number(options.id_safra);
       }
 
+      if (options.idLocal) {
+        parameters.idLocal = Number(options.idLocal);
+      }
+
       if (options.id) {
         parameters.id = Number(options.id);
       }
@@ -192,7 +198,7 @@ export class ExperimentController {
         newItem.countNT = functionsUtils
           .countChildrenForSafra(item.assay_list.genotype_treatment, Number(options.idSafra));
         newItem.npeQT = item.countNT * item.repetitionsNumber;
-        newItem.seq_delineamento = item.delineamento.sequencia_delineamento.filter((x: any) => x.nt == item.countNT);
+        newItem.seq_delineamento = item.delineamento.sequencia_delineamento.filter((x: any) => x.nt == item.countNT && x.repeticao <= item.repetitionsNumber);
         return newItem;
       });
       if (response.total <= 0) {
@@ -286,23 +292,26 @@ export class ExperimentController {
 
   async delete(data: any) {
     try {
+      const experimentGenotipeController = new ExperimentGenotipeController();
       const experimentExist: any = await this.getOne(Number(data.id));
       if (!experimentExist) return { status: 404, message: 'Experimento não encontrado' };
       if (experimentExist?.status === 'PARCIALMENTE ALOCADO' || experimentExist?.status === 'TOTALMENTE  ALOCADO') return { status: 400, message: 'Não é possível deletar.' };
+      const { status } = await experimentGenotipeController.deleteAll(data.id);
+      if (status === 200) {
+        const response = await this.experimentRepository.delete(Number(data.id));
+        const {
+          response: assayList,
+        } = await this.assayListController.getOne(Number(experimentExist?.idAssayList));
+        if (!assayList?.experiment.length) {
+          await this.assayListController.update({
+            id: experimentExist?.idAssayList,
+            status: 'IMPORTADO',
+          });
+        }
 
-      const response = await this.experimentRepository.delete(Number(data.id));
-      const {
-        response: assayList,
-      } = await this.assayListController.getOne(Number(experimentExist?.idAssayList));
-      if (!assayList?.experiment.length) {
-        await this.assayListController.update({
-          id: experimentExist?.idAssayList,
-          status: 'IMPORTADO',
-        });
-      }
-
-      if (response) {
-        return { status: 200, message: 'Experimento excluído' };
+        if (response) {
+          return { status: 200, message: 'Experimento excluído' };
+        }
       }
       return { status: 404, message: 'Experimento não excluído' };
     } catch (error: any) {

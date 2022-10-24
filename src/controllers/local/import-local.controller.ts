@@ -5,6 +5,7 @@
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
 import { responseGenericFactory, responseNullFactory, responsePositiveNumericFactory } from '../../shared/utils/responseErrorFactory';
+import { validateHeaders } from '../../shared/utils/validateHeaders';
 // eslint-disable-next-line import/no-cycle
 import { ImportController } from '../import.controller';
 import { LogImportController } from '../log-import.controller';
@@ -27,7 +28,31 @@ export class ImportLocalController {
 
     const localTemp: Array<string> = [];
     const responseIfError: Array<string> = [];
+
+    const headers = [
+      'ID da unidade de cultura (CULTURE_UNIT_ID)',
+      'Ano (YEAR)',
+      'Nome da unidade de cultura (CULTURE_UNIT_NAME)',
+      'ID do lugar de cultura (CP_CULTURE_PLACE_ID)',
+      'Nome do lugar de cultura (CP_CULTURE_PLACE_NAME)',
+      'Rótulo (CP_LIBELLE)',
+      'MLOC (CP_C3084)',
+      'Endereço (CP_ADRESS)',
+      'Identificador de localidade (CM_COMMUNE_ID)',
+      'Nome da localidade (CM_COMMUNE_NAME)',
+      'Identificador de região (REG_REGION_ID)',
+      'Nome da região (REG_REGION_NAME)',
+      'Rótulo (REG_LIBELLE)',
+      'ID do País (CNTR_COUNTRY_ID)',
+      'Nome do país (CNTR_COUNTRY_NAME)',
+      'Rótulo (CNTR_LIBELLE)',
+      'DT_EXPORT (SCRIPT0002)',
+    ];
     try {
+      const validate: any = await validateHeaders(spreadSheet, headers);
+      if (validate.length > 0) {
+        return { status: 400, message: validate };
+      }
       const configModule: object | any = await importController.getAll(4);
       configModule.response[0]?.fields.push('DT');
       for (const row in spreadSheet) {
@@ -229,7 +254,7 @@ export class ImportLocalController {
                 );
               }
               if (status === 200) {
-                const lastDtImport = response[0]?.dt_import?.getTime();
+                const lastDtImport = response[0]?.dt_export?.getTime();
                 if (
                   lastDtImport
                     > spreadSheet[row][column].getTime()
@@ -287,7 +312,7 @@ export class ImportLocalController {
                 } else if (spreadSheet[0][column].includes('CNTR_LIBELLE')) {
                   localCultureDTO.label_country = (spreadSheet[row][column]?.toString());
                 } else if (spreadSheet[0][column].includes('DT')) {
-                  unityCultureDTO.dt_import = spreadSheet[row][column];
+                  unityCultureDTO.dt_export = spreadSheet[row][column];
                 }
               }
               localCultureDTO.created_by = Number(createdBy);

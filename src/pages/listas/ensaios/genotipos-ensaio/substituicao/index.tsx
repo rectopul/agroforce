@@ -7,7 +7,7 @@ import MaterialTable from 'material-table';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -33,6 +33,7 @@ import {
   Content,
   Input,
   ModalConfirmation,
+  FieldItemsPerPage,
 } from '../../../../../components';
 import {
   loteService,
@@ -44,15 +45,25 @@ import ITabs from '../../../../../shared/utils/dropdown';
 
 interface IFilter {
   filterYear: string;
+  filterYearFrom: string;
+  filterYearTo: string;
   filterCodLote: string;
   filterNcc: string;
   filterFase: string;
+  filterPesoFrom: string;
+  filterPesoTo: string;
   filterPeso: string;
   filterSeeds: string;
+  filterSeedsFrom: string;
+  filterSeedsTo: string;
   filterGenotipo: string;
   filterMainName: string;
   filterGmr: string;
+  filterGmrFrom: string;
+  filterGmrTo: string;
   filterBgm: string;
+  filterBgmFrom: string;
+  filterBgmTo: string;
   filterTecnologia: string;
   orderBy: object | any;
   typeOrder: object | any;
@@ -89,6 +100,8 @@ export default function Listagem({
   filterApplication,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
+
+  const tableRef = useRef<any>(null);
 
   const tabsDropDowns = TabsDropDowns('listas');
 
@@ -144,10 +157,10 @@ export default function Listagem({
       value: 'name_main',
     },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
-    { name: 'CamposGerenciados[]', title: 'BGM', value: 'bgm' },
+    { name: 'CamposGerenciados[]', title: 'BGM ens.', value: 'bgm' },
     {
       name: 'CamposGerenciados[]',
-      title: 'Nome tecnologia',
+      title: 'Nome tec. ens.',
       value: 'tecnologia',
     },
     { name: 'CamposGerenciados[]', title: 'Substituir', value: 'action' },
@@ -157,37 +170,57 @@ export default function Listagem({
   const [orderType, setOrderType] = useState<string>('');
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isReplaceGenotypeId, setIsReplaceGenotypeId] = useState<any>(null);
-  const take: number = itensPerPage;
+  const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
   const formik = useFormik<IFilter>({
     initialValues: {
       filterYear: '',
+      filterYearFrom: '',
+      filterYearTo: '',
       filterCodLote: '',
       filterNcc: '',
       filterFase: '',
+      filterPesoFrom: '',
+      filterPesoTo: '',
+      filterSeedsFrom: '',
+      filterSeedsTo: '',
       filterPeso: '',
       filterSeeds: '',
       filterGenotipo: '',
       filterMainName: '',
       filterGmr: '',
+      filterGmrFrom: '',
+      filterGmrTo: '',
       filterBgm: '',
+      filterBgmFrom: '',
+      filterBgmTo: '',
       filterTecnologia: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: async ({
       filterYear,
+      filterYearFrom,
+      filterYearTo,
       filterCodLote,
       filterNcc,
       filterFase,
+      filterPesoFrom,
+      filterPesoTo,
+      filterSeedsFrom,
+      filterSeedsTo,
       filterPeso,
       filterSeeds,
       filterGenotipo,
       filterMainName,
       filterGmr,
+      filterGmrFrom,
+      filterGmrTo,
       filterBgm,
+      filterBgmFrom,
+      filterBgmTo,
       filterTecnologia,
     }) => {
       const tempParams: any = [];
@@ -198,7 +231,7 @@ export default function Listagem({
           }
         });
       }
-      const parametersFilter = `filterStatus=${1}&id_safra=${idSafra}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologia=${filterTecnologia}`;
+      const parametersFilter = `filterStatus=${1}&id_safra=${idSafra}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologia=${filterTecnologia}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterPesoTo=${filterPesoTo}&filterPesoFrom=${filterPesoFrom}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}`;
 
       await replaceTreatmentService
         .getAll(
@@ -209,6 +242,9 @@ export default function Listagem({
           setLotes(response);
           setTotalItems(allTotal);
           setCurrentPage(0);
+          tableRef.current.dataManager.changePageSize(
+            allTotal >= take ? take : allTotal,
+          );
         });
     },
   });
@@ -379,11 +415,11 @@ export default function Listagem({
         tableFields.push(headerTableFactory('GMR', 'genotipo.gmr'));
       }
       if (columnCampos[index] === 'bgm') {
-        tableFields.push(headerTableFactory('BGM', 'genotipo.bgm'));
+        tableFields.push(headerTableFactory('BGM ens.', 'genotipo.bgm'));
       }
       if (columnCampos[index] === 'tecnologia') {
         tableFields.push(
-          headerTableFactory('Nome tecnologia', 'genotipo.tecnologia.name'),
+          headerTableFactory('Nome tec. ens.', 'genotipo.tecnologia.name'),
         );
       }
       if (columnCampos[index] === 'action') {
@@ -457,13 +493,13 @@ export default function Listagem({
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
     let parametersFilter;
-
     await seperate(parametersFilter);
   }
 
   async function seperate(parametersFilter: any) {
+    const skip = currentPage * Number(take);
+
     const tempParams: any = [];
 
     if (treatmentsOptionSelected == 'nca') {
@@ -475,9 +511,9 @@ export default function Listagem({
     }
 
     if (orderType) {
-      parametersFilter = `skip=0&take=${take}&checkedTreatments=${tempParams}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&checkedTreatments=${tempParams}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=0&take=${take}&checkedTreatments=${tempParams}`;
+      parametersFilter = `skip=${skip}&take=${take}&checkedTreatments=${tempParams}`;
     }
 
     if (filter) {
@@ -496,7 +532,8 @@ export default function Listagem({
 
   function filterFieldFactory(title: any, name: any, small: boolean = false) {
     return (
-      <div className="h-10 w-full ml-2" style={small ? { maxWidth: 65 } : {}}>
+      // <div className="h-10 w-full ml-2" style={small ? { maxWidth: 65 } : {}}>
+      <div className={`h-10 w-${small ? '1/3' : 'full'} ml-2`}>
         <label className="block text-gray-900 text-sm mb-1">{name}</label>
         <Input
           type="text"
@@ -567,14 +604,25 @@ export default function Listagem({
                   {filterFieldFactory('filterSeeds', 'Qtd. sementes')}
 
                   {filterFieldFactory('filterGenotipo', 'Nome genótipo')}
+                </div>
 
+                <div
+                  className="w-full h-full
+                  flex
+                  justify-center
+                  pb-0
+                  mt-4
+                "
+                >
                   {filterFieldFactory('filterMainName', 'Nome principal')}
 
                   {filterFieldFactory('filterGmr', 'GMR', true)}
 
-                  {filterFieldFactory('filterBgm', 'BGM', true)}
+                  {filterFieldFactory('filterBgm', 'BGM ens.', true)}
 
-                  {filterFieldFactory('filterTecnologia', 'Nome tecnologia')}
+                  {filterFieldFactory('filterTecnologia', 'Nome tec. ens.')}
+
+                  <FieldItemsPerPage selected={take} onChange={setTake} />
 
                   <div className="h-7 w-32 mt-6 ml-2">
                     <Button
@@ -593,6 +641,7 @@ export default function Listagem({
 
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
+              tableRef={tableRef}
               style={{ background: '#f9fafb' }}
               columns={columns}
               data={lotes}
@@ -604,7 +653,7 @@ export default function Listagem({
                 rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
-                pageSize: itensPerPage,
+                pageSize: Number(take),
               }}
               components={{
                 Toolbar: () => (

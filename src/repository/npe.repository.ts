@@ -40,7 +40,9 @@ export class NpeRepository {
   }
 
   async create(data: object | any) {
-    const result = await prisma.npe.create({ data });
+    const result = await prisma.npe.createMany({ data });
+    console.log('result');
+    console.log(result);
     return result;
   }
 

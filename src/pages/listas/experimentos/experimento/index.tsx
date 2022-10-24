@@ -36,6 +36,7 @@ import {
   Content,
   Input,
   SelectMultiple,
+  ModalConfirmation,
 } from '../../../../components';
 import ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
@@ -149,6 +150,9 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'Status EXP.', value: 'status' },
     { name: 'CamposGerenciados[]', title: 'Ações', value: 'action' },
   ]);
+
+  const [isOpenModalConfirm, setIsOpenModalConfirm] = useState<boolean>(false);
+  const [itemSelectedDelete, setItemSelectedDelete] = useState<any>(null);
 
   // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
@@ -412,10 +416,17 @@ export default function Listagem({
   //   };
   // }
 
-  async function deleteItem(id: number) {
+  async function deleteConfirmItem(item: any) {
+    setItemSelectedDelete(item);
+    setIsOpenModalConfirm(true);
+  }
+
+  async function deleteItem() {
+    setIsOpenModalConfirm(false);
+
     // eslint-disable-next-line max-len
     const { status, message } = await await experimentService.deleted({
-      id,
+      id: itemSelectedDelete?.id,
       userId: userLogado.id,
     });
     if (status === 200) {
@@ -439,7 +450,7 @@ export default function Listagem({
           <div className="h-7">
             <Button
               icon={<BiEdit size={14} />}
-              title={`Atualizar ${rowData.experiment_name}`}
+              title={`Atualizar ${rowData.experimentName}`}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -458,9 +469,9 @@ export default function Listagem({
           <div style={{ width: 5 }} />
           <div>
             <Button
-              title={`Deletar ${rowData.experiment_name}`}
+              title={`Deletar ${rowData.experimentName}`}
               icon={<BsTrashFill size={14} />}
-              onClick={() => deleteItem(rowData.id)}
+              onClick={() => deleteConfirmItem(rowData)}
               disabled={
                 rowData.status != 'IMPORTADO' && rowData.status != 'SORTEADO'
               }
@@ -739,6 +750,13 @@ export default function Listagem({
         <title>Listagem de experimentos</title>
       </Head>
 
+      <ModalConfirmation
+        isOpen={isOpenModalConfirm}
+        text={`Tem certeza que deseja deletar o item ${itemSelectedDelete?.experimentName}?`}
+        onPress={deleteItem}
+        onCancel={() => setIsOpenModalConfirm(false)}
+      />
+
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <main
           className="h-full w-full
@@ -896,7 +914,7 @@ export default function Listagem({
               options={{
                 showTitle: false,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 0,
                 },
                 rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
