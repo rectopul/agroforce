@@ -530,7 +530,7 @@ export class ImportGenotypeController {
 
                 if (configModule.response[0]?.fields[column] === 'gmr') {
                   if (spreadSheet[row][column] !== null) {
-                    this.aux.gmr = spreadSheet[row][column];
+                    this.aux.gmr = Number(spreadSheet[row][column]).toFixed(1);
                   }
                 }
 
