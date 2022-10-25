@@ -41,6 +41,7 @@ import {
 import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
 import { cultureService, userPreferencesService } from "../../../../services";
 import ITabs from "../../../../shared/utils/dropdown";
+import headerTableFactory from "../../../../shared/utils/headerTableFactory";
 
 interface IFilter {
   filterStatus: object | any;
@@ -156,6 +157,7 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver); //RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); //RR
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; //RR
@@ -238,7 +240,8 @@ export default function Listagem({
 
   async function handleOrder(
     column: string,
-    order: string | any
+    order: string | any,
+    name: string | any
   ): Promise<void> {
     // // Manage orders of colunms
     // const parametersFilter = await tableGlobalFunctions.handleOrderGlobal(column, order, filter, 'safra');
@@ -270,6 +273,7 @@ export default function Listagem({
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
@@ -288,23 +292,34 @@ export default function Listagem({
     callingApi(filter);
   }, [filter]);
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList, name)}
+  //         >
+  //           {name}
+  //         </button>
+  //         {fieldOrder === name && (
+  //           <div className="pl-2">
+  //             {orderList !== 0 ? (
+  //               orderList === 1 ? (
+  //                 <AiOutlineArrowDown size={15} />
+  //               ) : (
+  //                 <AiOutlineArrowUp size={15} />
+  //               )
+  //             ) : null}
+  //           </div>
+  //         )}
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: false,
+  //   };
+  // }
 
   function idHeaderFactory() {
     return {
@@ -415,10 +430,26 @@ export default function Listagem({
       //   tableFields.push(idHeaderFactory());
       // }
       if (columnCampos[index] === "name") {
-        tableFields.push(headerTableFactory("Código reduzido", "name"));
+        tableFields.push(
+          headerTableFactory({
+            name: "Código reduzido",
+            title: "name",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "desc") {
-        tableFields.push(headerTableFactory("Nome", "desc"));
+        tableFields.push(
+          headerTableFactory({
+            name: "Nome",
+            title: "desc",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "status") {
         tableFields.push(statusHeaderFactory());
@@ -650,7 +681,7 @@ export default function Listagem({
               columns={columns}
               data={cultures}
               options={{
-                sorting: true,
+                sorting: false,
                 showTitle: true,
                 headerStyle: {
                   zIndex: 20,
