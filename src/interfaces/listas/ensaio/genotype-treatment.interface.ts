@@ -29,25 +29,19 @@ export interface ITreatmentFilter {
   filterFoco: string
   filterTypeAssay: string
   filterTechnology: string
-  filterCodGgen: string
-  filterNameGgen: string
   filterGli: string
   filterBgm: string
-  filterBgmGenotypeTo: string
-  filterBgmGenotypeFrom: string
-  filterGmrTo: string
-  filterGmrFrom: string
   filterTreatmentsNumber: string
+  filterStatus: string
   filterCodTec: string
   filterStatusAssay: string
   filterGenotypeName: string
   filterNca: string
+  orderBy: string
+  typeOrder: string
   filterBgmTo: string
   filterBgmFrom: string
   filterNtTo: string
   filterNtFrom: string
   filterStatusT: string
-  filterStatus: string
-  orderBy: string
-  typeOrder: string
 }
