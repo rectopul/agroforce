@@ -220,19 +220,15 @@ export class ImportNpeController {
 
             if (configModule.response[0]?.fields[column] === 'OGM') {
               if (spreadSheet[row][column] !== null) {
-                if (typeof spreadSheet[row][column] !== 'number') {
-                  responseIfError[Number(column)] += responseGenericFactory(
+                if (isNaN(spreadSheet[row][column])) {
+                  responseIfError[Number(column)] += responsePositiveNumericFactory(
                     Number(column) + 1,
                     row,
                     spreadSheet[0][column],
-                    'precisa ser numérico',
                   );
-                }
-                if (spreadSheet[row][column].toString().length < 2) {
-                  // eslint-disable-next-line no-param-reassign
-                  spreadSheet[row][column] = `0${spreadSheet[row][
-                    column
-                  ].toString()}`;
+                } else if (spreadSheet[row][column] < 10) {
+                // eslint-disable-next-line no-param-reassign
+                  spreadSheet[row][column] = `0${spreadSheet[row][column]}`;
                 }
                 const ogm: any = await tecnologiaController.getAll({
                   cod_tec: String(spreadSheet[row][column]),

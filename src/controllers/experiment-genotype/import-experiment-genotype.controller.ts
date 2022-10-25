@@ -292,8 +292,6 @@ export class ImportExperimentGenotypeController {
                   filterGenotipo: spreadSheet[row][14], // new geneticName
                 });
 
-                console.log('spreadSheet[row][column]');
-                console.log(spreadSheet[row][column]);
                 if (lote.length == 0) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
