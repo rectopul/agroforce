@@ -6,7 +6,7 @@
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
 import { validateInteger } from '../../shared/utils/numberValidate';
-import { responseGenericFactory, responseNullFactory } from '../../shared/utils/responseErrorFactory';
+import { responseGenericFactory, responseNullFactory, responsePositiveNumericFactory } from '../../shared/utils/responseErrorFactory';
 import { validateHeaders } from '../../shared/utils/validateHeaders';
 import { CulturaController } from '../cultura.controller';
 import { FocoController } from '../foco.controller';
@@ -162,10 +162,15 @@ export class ImportAssayListController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              }
-              if ((typeof (spreadSheet[row][column])) === 'number' && spreadSheet[row][column].toString().length < 2) {
+              } else if (isNaN(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responsePositiveNumericFactory(
+                  Number(column) + 1,
+                  row,
+                  spreadSheet[0][column],
+                );
+              } else if (spreadSheet[row][column] < 10) {
                 // eslint-disable-next-line no-param-reassign
-                spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+                spreadSheet[row][column] = `0${spreadSheet[row][column]}`;
               }
               const { response }: IReturnObject = await tecnologiaController.getAll({
                 cod_tec: String(spreadSheet[row][column]),
@@ -184,12 +189,11 @@ export class ImportAssayListController {
             // Validação do campo BGM
             if (column === '6') {
               if (spreadSheet[row][column] !== null) {
-                if (!validateInteger(spreadSheet[row][column])) {
-                  responseIfError[Number(column)] += responseGenericFactory(
-                    (Number(column) + 1),
+                if (isNaN(spreadSheet[row][column])) {
+                  responseIfError[Number(column)] += responsePositiveNumericFactory(
+                    Number(column) + 1,
                     row,
                     spreadSheet[0][column],
-                    'precisa ser um numero inteiro e positivo',
                   );
                 }
               }

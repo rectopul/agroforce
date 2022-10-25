@@ -10,9 +10,11 @@ export class GenotypeTreatmentController {
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
+    parameters.OR = [];
     try {
+      console.log('options');
+      console.log(options);
       if (options.filterStatus) {
-        parameters.OR = [];
         const statusParams = options.filterStatus.split(',');
         parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[0]}" } } }`));
         parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[1]}" } } }`));
@@ -160,6 +162,17 @@ export class GenotypeTreatmentController {
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
+      if (parameters.OR.length === 0) {
+        delete parameters.OR;
+      }
+
+      if (parameters.AND.length === 0) {
+        delete parameters.AND;
+      }
+
+      console.log('parameters');
+      console.log(parameters);
+
       const response: object | any = await this.genotypeTreatmentRepository.findAll(
         parameters,
         select,
@@ -167,6 +180,9 @@ export class GenotypeTreatmentController {
         skip,
         orderBy,
       );
+
+      console.log('response');
+      console.log(response.total);
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
