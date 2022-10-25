@@ -2,7 +2,6 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import React, { useRef } from "react";
 import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
@@ -11,7 +10,7 @@ import getConfig from "next/config";
 import { RequestInit } from "next/dist/server/web/spec-extension/request";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   DragDropContext,
   Draggable,
@@ -337,6 +336,9 @@ export default function Listagem({
         if (response.status === 200 || response.status === 400) {
           setTreatments(response.response);
           setTotalItems(response.total);
+          tableRef.current.dataManager.changePageSize(
+            response.total >= take ? take : response.total
+          );
         }
       });
   }
@@ -666,7 +668,7 @@ export default function Listagem({
             type: "binary",
           });
           // Download
-          XLSX.writeFile(workBook, 'Substituição-parcelas.xlsx');
+          XLSX.writeFile(workBook, "Substituição-parcelas.xlsx");
         }
       });
   };

@@ -9,7 +9,7 @@ import getConfig from "next/config";
 import { RequestInit } from "next/dist/server/web/spec-extension/request";
 import Head from "next/head";
 import router from "next/router";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState, useRef } from "react";
 import {
   DragDropContext,
   Draggable,
@@ -37,6 +37,7 @@ import {
   Content,
   Input,
   Select,
+  FieldItemsPerPage,
 } from "../../../../components";
 import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
 import { userPreferencesService } from "../../../../services";
@@ -92,6 +93,8 @@ export default function Listagem({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
+  const tableRef = useRef<any>(null);
+
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) =>
@@ -132,7 +135,7 @@ export default function Listagem({
     { id: 0, name: "Inativos" },
   ];
 
-  const take: number = itensPerPage;
+  const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
@@ -193,6 +196,9 @@ export default function Listagem({
     if (response) {
       setFocos(response?.response);
       setTotalItems(response?.total);
+      tableRef.current.dataManager.changePageSize(
+        response?.total >= take ? take : response?.total
+      );
     }
     // await focoService.getAll(parametersFilter).then((response) => {
     //   if (response.status === 200 || response.status === 400) {
@@ -637,7 +643,7 @@ export default function Listagem({
                 className="flex flex-col
                   w-full
                   items-center
-                  px-4
+                  px-2
                   bg-white
                 "
                 onSubmit={formik.handleSubmit}
@@ -646,10 +652,10 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-2
+                  pb-0
                 "
                 >
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status
                     </label>
@@ -662,7 +668,7 @@ export default function Listagem({
                       selected="1"
                     />
                   </div>
-                  <div className="h-6 w-1/2 ml-4">
+                  <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Nome
                     </label>
@@ -678,6 +684,8 @@ export default function Listagem({
                   </div>
 
                   {filterFieldFactoryGroup("Faixa de grupos")}
+
+                  <FieldItemsPerPage selected={take} onChange={setTake} />
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
@@ -695,6 +703,7 @@ export default function Listagem({
 
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
+              tableRef={tableRef}
               style={{ background: "#f9fafb" }}
               columns={columns}
               data={focos}
@@ -706,7 +715,7 @@ export default function Listagem({
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
-                pageSize: itensPerPage,
+                pageSize: Number(take),
               }}
               components={{
                 Toolbar: () => (

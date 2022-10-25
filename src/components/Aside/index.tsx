@@ -9,6 +9,8 @@ import { BsGear } from "react-icons/bs";
 import { useRouter } from "next/router";
 import { ButtonAside } from "./ButtonAside";
 
+const versionApp = "1.0.0";
+
 export function Aside({ moduloActive }: any) {
   return (
     <aside
@@ -88,6 +90,11 @@ export function Aside({ moduloActive }: any) {
           href='relatorios'
         /> */}
       </nav>
+      <div className="fixed bottom-2 left-7">
+        <span className="text-xs text-center text-gray-300">
+          Versão: {versionApp}
+        </span>
+      </div>
     </aside>
   );
 }

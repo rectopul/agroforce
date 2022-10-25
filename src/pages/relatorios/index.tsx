@@ -45,6 +45,7 @@ import {
   Content,
   Input,
   Select,
+  FieldItemsPerPage,
 } from "../../components";
 import { UserPreferenceController } from "../../controllers/user-preference.controller";
 import { reporteService, userPreferencesService } from "../../services";
@@ -64,11 +65,11 @@ export default function Listagem({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsReport } = ITabs.default;
 
-  const tableRef = useRef<any>(null);
-
   const tabsDropDowns = tabsReport.map((i) =>
     i.titleTab === "RELATORIOS" ? { ...i, statusTab: true } : i
   );
+
+  const tableRef = useRef<any>(null);
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.genotypeTreatment || {
@@ -192,6 +193,9 @@ export default function Listagem({
       if (response.status === 200 || response.status === 400) {
         setReportes(response.response);
         setTotalItems(response.total);
+        tableRef?.current?.dataManager?.changePageSize(
+          response.total >= take ? take : response.total
+        );
       }
     });
   }
@@ -486,22 +490,16 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-8
+                  pb-0
                 "
                 >
                   {filterFieldFactory("filterMadeBy", "Feito Por")}
                   {filterFieldFactory("filterMadeIn", "Feito Em")}
                   {filterFieldFactory("filterModule", "Módulo")}
                   {filterFieldFactory("filterOperation", "Operação")}
-                </div>
-                <div
-                  className="w-full h-full
-                  flex
-                  justify-center
-                  pt-2
-                  pb-3
-                  "
-                >
+
+                  <FieldItemsPerPage selected={take} onChange={setTake} />
+
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
@@ -521,6 +519,7 @@ export default function Listagem({
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
+              tableRef={tableRef}
               style={{ background: "#f9fafb" }}
               columns={columns}
               data={reportes}
