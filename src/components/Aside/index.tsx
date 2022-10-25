@@ -1,20 +1,20 @@
-import { HiOutlineClipboardList, HiOutlineMail } from "react-icons/hi";
-import { RiUserSettingsFill } from "react-icons/ri";
-import { FaBars } from "react-icons/fa";
-import { IoFingerPrintSharp } from "react-icons/io5";
-import { BiSearchAlt } from "react-icons/bi";
-import { GiThreeLeaves } from "react-icons/gi";
-import { VscGraph } from "react-icons/vsc";
-import { BsGear } from "react-icons/bs";
-import { useRouter } from "next/router";
-import { ButtonAside } from "./ButtonAside";
+import { HiOutlineClipboardList, HiOutlineMail } from 'react-icons/hi';
+import { RiUserSettingsFill } from 'react-icons/ri';
+import { FaBars } from 'react-icons/fa';
+import { IoFingerPrintSharp } from 'react-icons/io5';
+import { BiSearchAlt } from 'react-icons/bi';
+import { GiThreeLeaves } from 'react-icons/gi';
+import { VscGraph } from 'react-icons/vsc';
+import { BsGear } from 'react-icons/bs';
+import { useRouter } from 'next/router';
+import { ButtonAside } from './ButtonAside';
 
-const versionApp = "1.0.0";
+const versionApp = '1.0.1';
 
 export function Aside({ moduloActive }: any) {
   return (
     <aside
-      style={{ height: "auto" }}
+      style={{ height: 'auto' }}
       className="h-screen w-32
       bg-gray-450
     "
@@ -28,25 +28,25 @@ export function Aside({ moduloActive }: any) {
           title="Configurações"
           icon={<BsGear size={32} />}
           href="/config/tmg/usuarios"
-          active={moduloActive === "config"}
+          active={moduloActive === 'config'}
         />
         <ButtonAside
           title="Lista"
           icon={<HiOutlineClipboardList size={32} />}
           href="/listas/rd"
-          active={moduloActive === "listas"}
+          active={moduloActive === 'listas'}
         />
         <ButtonAside
           title="Operação"
           icon={<RiUserSettingsFill size={32} />}
           href="/operacao/ambiente"
-          active={moduloActive === "operacao"}
+          active={moduloActive === 'operacao'}
         />
         <ButtonAside
           title="Relatórios"
           icon={<FaBars size={32} />}
           href="/relatorios"
-          active={moduloActive === "relatorios"}
+          active={moduloActive === 'relatorios'}
         />
         {/*
 
@@ -92,7 +92,9 @@ export function Aside({ moduloActive }: any) {
       </nav>
       <div className="fixed bottom-2 left-7">
         <span className="text-xs text-center text-gray-300">
-          Versão: {versionApp}
+          Versão:
+          {' '}
+          {versionApp}
         </span>
       </div>
     </aside>

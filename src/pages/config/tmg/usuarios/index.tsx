@@ -29,6 +29,7 @@ import { removeCookies, setCookies } from "cookies-next";
 import { tableGlobalFunctions } from "src/helpers";
 import { userPreferencesService, userService } from "../../../../services";
 import { handleFormatTel } from "../../../../shared/utils/tel";
+import headerTableFactory from "../../../../shared/utils/headerTableFactory";
 import {
   AccordionFilter,
   Button,
@@ -162,6 +163,7 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
@@ -234,20 +236,60 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  function headerTableFactory(name: any, title: string) {
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList, name)}
+  //         >
+  //           {name}
+  //         </button>
+  //         {fieldOrder === name && (
+  //           <div className="pl-2">
+  //             {orderList !== 0 ? (
+  //               orderList === 1 ? (
+  //                 <AiOutlineArrowDown size={15} />
+  //               ) : (
+  //                 <AiOutlineArrowUp size={15} />
+  //               )
+  //             ) : null}
+  //           </div>
+  //         )}
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: false,
+  //   };
+  // }
+
+  function headerTableTelFactory(name: any, title: string) {
     return {
       title: (
         <div className="flex items-center">
           <button
             className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
+            onClick={() => handleOrder(title, orderList, name)}
           >
             {name}
           </button>
+          {fieldOrder === name && (
+            <div className="pl-2">
+              {orderList !== 0 ? (
+                orderList === 1 ? (
+                  <AiOutlineArrowDown size={15} />
+                ) : (
+                  <AiOutlineArrowUp size={15} />
+                )
+              ) : null}
+            </div>
+          )}
         </div>
       ),
       field: title,
-      sorting: true,
+      sorting: false,
+      render: (rowData: IUsers) => handleFormatTel(rowData.tel),
     };
   }
 
@@ -420,19 +462,45 @@ export default function Listagem({
         });
       }
       if (columnCampos[item] === "name") {
-        tableFields.push(headerTableFactory("Nome", "name"));
+        tableFields.push(
+          headerTableFactory({
+            name: "Nome",
+            title: "name",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
 
       if (columnCampos[item] === "login") {
-        tableFields.push(headerTableFactory("Login", "login"));
+        tableFields.push(
+          headerTableFactory({
+            name: "Login",
+            title: "login",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[item] === "tel") {
-        tableFields.push({
-          title: "Telefone",
-          field: "tel",
-          sorting: true,
-          render: (rowData: IUsers) => handleFormatTel(rowData.tel),
-        });
+        tableFields.push(
+          headerTableFactory({
+            name: "Telefone",
+            title: "tel",
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: IUsers) => handleFormatTel(rowData.tel),
+          })
+        );
+        // tableFields.push({
+        //   title: "Telefone",
+        //   field: "tel",
+        //   sorting: false,
+        //   render: (rowData: IUsers) => handleFormatTel(rowData.tel),
+        // });
       }
       if (columnCampos[item] === "status") {
         tableFields.push(statusHeaderFactory());
@@ -443,7 +511,8 @@ export default function Listagem({
 
   async function handleOrder(
     column: string,
-    order: string | any
+    order: string | any,
+    name: string
   ): Promise<void> {
     // // Manage orders of colunms
     // const parametersFilter = await tableGlobalFunctions.handleOrderGlobal(column, order, filter, 'safra');
@@ -474,6 +543,7 @@ export default function Listagem({
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
