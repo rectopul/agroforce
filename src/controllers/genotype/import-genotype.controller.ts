@@ -641,12 +641,6 @@ export class ImportGenotypeController {
                   }
                 }
 
-                if (configModule.response[0]?.fields[column] === 'Safra') {
-                  if (spreadSheet[row][column] !== null) {
-                    this.aux.id_safra = idSafra;
-                  }
-                }
-
                 if (
                   configModule.response[0]?.fields[column] === 'Código do lote'
                 ) {
@@ -767,7 +761,6 @@ export class ImportGenotypeController {
                     //   dt_export: this.aux.dt_export,
                     //   created_by: createdBy,
                     // };
-                    // this.aux.created_by = createdBy;
                     // // console.log(genotipo_obj);
                     // genotipeQueue.add({
                     //   instance: genotipo_obj,
@@ -801,16 +794,12 @@ export class ImportGenotypeController {
                     this.aux.id_genotipo = genotipo.response.id;
                   }
 
-                  console.log('this.aux.id_genotipo && this.aux.ncc  ', this.aux.id_genotipo && this.aux.ncc);
-                  console.log('this.aux.id_genotipo && this.aux.ncc  ', this.aux.id_genotipo);
-                  console.log('');
-
                   if (this.aux.id_genotipo && this.aux.ncc) {
                     if (this.aux.id_lote) {
                       // const lote_obj = {
                       //   id: Number(this.aux.id_lote),
                       //   id_genotipo: Number(this.aux.id_genotipo),
-                      //   id_safra: Number(this.aux.id_safra),
+                      //   id_safra: Number(idSafra),
                       //   cod_lote: String(this.aux.cod_lote),
                       //   id_s2: Number(this.aux.id_s2),
                       //   id_dados: Number(this.aux.id_dados_lote),
@@ -820,7 +809,7 @@ export class ImportGenotypeController {
                       //   peso: this.aux.peso,
                       //   quant_sementes: this.aux.quant_sementes,
                       //   dt_export: this.aux.dt_export,
-                      //   created_by: this.aux.created_by,
+                      //   created_by: createdBy,
                       // };
                       // loteQueue.add({
                       //   instance: lote_obj,
@@ -829,7 +818,7 @@ export class ImportGenotypeController {
                       await loteController.update({
                         id: Number(this.aux.id_lote),
                         id_genotipo: Number(this.aux.id_genotipo),
-                        id_safra: Number(this.aux.id_safra),
+                        id_safra: Number(idSafra),
                         cod_lote: String(this.aux.cod_lote),
                         id_s2: Number(this.aux.id_s2),
                         id_dados: Number(this.aux.id_dados_lote),
@@ -838,14 +827,14 @@ export class ImportGenotypeController {
                         fase: this.aux.fase,
                         peso: this.aux.peso,
                         quant_sementes: this.aux.quant_sementes,
-                        created_by: this.aux.created_by,
+                        created_by: createdBy,
                       });
                       delete this.aux.id_lote;
                       delete this.aux.id_genotipo;
                     } else {
                       // const lote_obj = {
                       //   id_genotipo: Number(this.aux.id_genotipo),
-                      //   id_safra: Number(this.aux.id_safra),
+                      //   id_safra: Number(idSafra),
                       //   cod_lote: String(this.aux.cod_lote),
                       //   id_s2: Number(this.aux.id_s2),
                       //   id_dados: Number(this.aux.id_dados_lote),
@@ -855,7 +844,7 @@ export class ImportGenotypeController {
                       //   peso: this.aux.peso,
                       //   quant_sementes: this.aux.quant_sementes,
                       //   dt_export: this.aux.dt_export,
-                      //   created_by: this.aux.created_by,
+                      //   created_by: createdBy,
                       // };
                       // loteQueue.add({
                       //   instance: lote_obj,
@@ -863,7 +852,7 @@ export class ImportGenotypeController {
                       // });
                       await loteController.create({
                         id_genotipo: Number(this.aux.id_genotipo),
-                        id_safra: Number(this.aux.id_safra),
+                        id_safra: Number(idSafra),
                         cod_lote: String(this.aux.cod_lote),
                         id_s2: Number(this.aux.id_s2),
                         id_dados: Number(this.aux.id_dados_lote),
@@ -872,7 +861,7 @@ export class ImportGenotypeController {
                         fase: this.aux.fase,
                         peso: this.aux.peso,
                         quant_sementes: this.aux.quant_sementes,
-                        created_by: this.aux.created_by,
+                        created_by: createdBy,
                       });
                       delete this.aux.id_genotipo;
                     }
