@@ -8,7 +8,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   DragDropContext,
   Draggable,
@@ -44,6 +44,7 @@ import {
   Content,
   Input,
   ModalConfirmation,
+  FieldItemsPerPage,
 } from "../../../../components";
 import * as ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
@@ -67,6 +68,8 @@ export default function TipoEnsaio({
   tabsDropDowns.map((tab) =>
     tab.titleTab === "ENSAIO" ? (tab.statusTab = true) : (tab.statusTab = false)
   );
+
+  const tableRef = useRef<any>(null);
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.assayList || {
@@ -148,7 +151,7 @@ export default function TipoEnsaio({
   const [colorStar, setColorStar] = useState<string>("");
   const [orderType, setOrderType] = useState<string>("");
   const router = useRouter();
-  const take: number = itensPerPage;
+  const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
@@ -213,6 +216,9 @@ export default function TipoEnsaio({
       if (response.status === 200 || response.status === 400) {
         setAssayList(response.response);
         setTotalItems(response.total);
+        tableRef.current.dataManager.changePageSize(
+          response.total >= take ? take : response.total
+        );
       }
     });
   }
@@ -611,7 +617,7 @@ export default function TipoEnsaio({
 
   function filterFieldFactory(title: string, name: string) {
     return (
-      <div className="h-7 w-1/2 ml-4">
+      <div className="h-7 w-1/3 ml-2">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
@@ -675,7 +681,8 @@ export default function TipoEnsaio({
                   {filterFieldFactory("filterGli", "GLI")}
                   {filterFieldFactory("filterCod", "Cód. Tecnologia")}
                   {filterFieldFactory("filterTechnology", "Nome Tecnologia")}
-                  <div className="h-6 w-1/2 ml-4">
+
+                  <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Nº de trat.
                     </label>
@@ -697,6 +704,8 @@ export default function TipoEnsaio({
                   </div>
                   {filterFieldFactory("filterStatusAssay", "Status do ensaio")}
 
+                  <FieldItemsPerPage selected={take} onChange={setTake} />
+
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
@@ -715,6 +724,7 @@ export default function TipoEnsaio({
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
+              tableRef={tableRef}
               style={{ background: "#f9fafb" }}
               columns={columns}
               data={assayList}
@@ -726,7 +736,7 @@ export default function TipoEnsaio({
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
-                pageSize: itensPerPage,
+                pageSize: Number(take),
               }}
               components={{
                 Toolbar: () => (

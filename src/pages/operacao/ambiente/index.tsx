@@ -33,6 +33,7 @@ import {
   Content,
   Input,
   Select,
+  FieldItemsPerPage,
 } from "../../../components";
 import * as ITabs from "../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../helpers";
@@ -108,6 +109,8 @@ export default function Listagem({
       ? { ...i, statusTab: true }
       : { ...i, statubsTab: false }
   );
+
+  const tableRef = useRef<any>(null);
 
   const router = useRouter();
 
@@ -193,7 +196,7 @@ export default function Listagem({
     },
   ]);
 
-  const take: number = itensPerPage;
+  const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
@@ -274,6 +277,9 @@ export default function Listagem({
       if (response.status === 200 || response.status === 400) {
         setNPE(response.response);
         setTotalItems(response.total);
+        tableRef?.current?.dataManager?.changePageSize(
+          response.total >= take ? take : response.total
+        );
       }
     });
   }
@@ -753,7 +759,15 @@ export default function Listagem({
                   {filterFieldFactory("filterCodTecnologia", "Cód. Tecnologia")}
 
                   {filterFieldFactory("filterTecnologia", "Tecnologia")}
+                </div>
 
+                <div
+                  className="w-full h-full
+                  flex
+                  justify-center
+                  pt-8
+                "
+                >
                   {filterFieldFactory("filterEpoca", "Época")}
 
                   <div className="h-6 w-1/3 ml-2">
@@ -819,6 +833,8 @@ export default function Listagem({
                     </div>
                   </div>
 
+                  <FieldItemsPerPage selected={take} onChange={setTake} />
+
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 15 }}>
                     <Button
                       onClick={() => {}}
@@ -836,6 +852,7 @@ export default function Listagem({
           {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
+              tableRef={tableRef}
               style={{ background: "#f9fafb" }}
               columns={columns}
               data={npe}
@@ -850,7 +867,7 @@ export default function Listagem({
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
-                pageSize: itensPerPage,
+                pageSize: Number(take),
                 selection: true,
                 showSelectAllCheckbox: false,
                 showTextRowsSelected: false,
