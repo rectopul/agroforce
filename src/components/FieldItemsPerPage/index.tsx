@@ -1,12 +1,14 @@
 import { Select } from "../";
 
 interface FieldItemsPerPageProps {
+  label?: string;
   selected: any;
   onChange: Function;
   widthClass?: string;
 }
 
 export function FieldItemsPerPage({
+  label = "Itens por página",
   selected,
   onChange,
   widthClass = "w-1/3",
@@ -14,7 +16,7 @@ export function FieldItemsPerPage({
   return (
     <div className={`h-7 ${widthClass} ml-2`}>
       <label className="block text-gray-900 text-sm font-bold mb-1">
-        Itens por página
+        {label}
       </label>
       <Select
         values={[

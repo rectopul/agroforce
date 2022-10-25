@@ -8,6 +8,7 @@ import {
   responseNullFactory,
   responseGenericFactory,
   responseDoesNotExist,
+  responsePositiveNumericFactory,
 } from '../../shared/utils/responseErrorFactory';
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import { SafraController } from '../safra.controller';
@@ -159,9 +160,15 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if ((typeof (spreadSheet[row][column])) === 'number' && spreadSheet[row][column].toString().length < 2) {
+              } else if (isNaN(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responsePositiveNumericFactory(
+                  Number(column) + 1,
+                  row,
+                  spreadSheet[0][column],
+                );
+              } else if (spreadSheet[row][column] < 10) {
                 // eslint-disable-next-line no-param-reassign
-                spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+                spreadSheet[row][column] = `0${spreadSheet[row][column]}`;
               }
               if (assayList?.tecnologia?.cod_tec !== (spreadSheet[row][column].toString())) {
                 responseIfError[Number(column)]
@@ -170,17 +177,15 @@ export class ImportExperimentController {
             }
             if (column === '6') { // GGM // BGM
               if (spreadSheet[row][column] !== null) {
-                if (!validateInteger(spreadSheet[row][column])) {
-                  responseIfError[Number(column)] += responseGenericFactory(
-                    (Number(column) + 1),
+                if (isNaN(spreadSheet[row][column])) {
+                  responseIfError[Number(column)] += responsePositiveNumericFactory(
+                    Number(column) + 1,
                     row,
                     spreadSheet[0][column],
-                    'precisa ser um numero inteiro e positivo',
                   );
-                }
-                if (Number(assayList?.bgm) !== Number(spreadSheet[row][column])) {
+                } else if (Number(assayList?.bgm) !== Number(spreadSheet[row][column])) {
                   responseIfError[Number(column)]
-                    += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                      += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
                 }
               }
             }
