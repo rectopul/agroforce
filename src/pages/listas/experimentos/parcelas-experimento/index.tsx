@@ -59,15 +59,15 @@ import * as ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
 
 export default function Listagem({
-  // assaySelect,
-  genotypeSelect,
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  filterBeforeEdit,
-  typeOrderServer,
-  orderByserver,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      // assaySelect,
+      genotypeSelect,
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      filterBeforeEdit,
+      typeOrderServer,
+      orderByserver,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const [isOpenModal, setIsOpenModal] = useState(false);
 
@@ -157,6 +157,12 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
+      title: "StatusT",
+      value: "status_t",
+      defaultChecked: () => camposGerenciados.includes("status_t"),
+    },
+    {
+      name: "CamposGerenciados[]",
       title: "NT",
       value: "nt",
       defaultChecked: () => camposGerenciados.includes("nt"),
@@ -230,9 +236,8 @@ export default function Listagem({
   //   orderBy == "tecnologia" ? "genotipo.tecnologia.cod_tec" : orderBy
   // }&typeOrder=${typeOrder}`; // RR
 
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const [nccIsValid, setNccIsValid] = useState<boolean>(false);
   const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
@@ -283,6 +288,7 @@ export default function Listagem({
       filterNpeFrom,
       filterRepTo,
       filterRepFrom,
+      filterStatusT,
       filterCodTec,
       filterExperimentName,
       filterPlacingPlace,
@@ -300,7 +306,7 @@ export default function Listagem({
       // const filterStatus = selecionados.substr(0, selecionados.length - 1);
       const filterStatus = statusFilterSelected?.join(",");
 
-      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterCodTec=${filterCodTec}&filterExperimentName=${filterExperimentName}&filterRepTo=${filterRepTo}&filterRepFrom=${filterRepFrom}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterPlacingPlace=${filterPlacingPlace}`;
+      const parametersFilter = `&filterStatusT=${filterStatusT}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterCodTec=${filterCodTec}&filterExperimentName=${filterExperimentName}&filterRepTo=${filterRepTo}&filterRepFrom=${filterRepFrom}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterPlacingPlace=${filterPlacingPlace}`;
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEdit', filtersParams);
       // await genotypeTreatmentService
@@ -502,6 +508,12 @@ export default function Listagem({
         tableFields.push(
           // headerTableFactory("Status EXP.", "experiment.status")
           headerTableFactory("Status EXP.", "status")
+        );
+      }
+      if (columnOrder[item] === "status_t") {
+        tableFields.push(
+          // headerTableFactory("Status EXP.", "experiment.status")
+          headerTableFactory("StatusT", "status_t")
         );
       }
       if (columnOrder[item] === "nt") {
@@ -1005,6 +1017,7 @@ export default function Listagem({
                   {filterFieldFactory("filterGli", "GLI")}
                   {filterFieldFactory("filterExperimentName", "Experimento")}
                   {filterFieldFactory("filterPlacingPlace", "Lugar plantio")}
+                  {filterFieldFactory("filterStatusT", "StatusT")}
                 </div>
                 <div
                   className="w-full h-full
@@ -1185,7 +1198,7 @@ export default function Listagem({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       type="submit"
                       bgColor="bg-blue-600"
@@ -1226,7 +1239,7 @@ export default function Listagem({
                     : "",
                 },
               }}
-              onChangeRowsPerPage={(e: any) => {}}
+              onChangeRowsPerPage={(e: any) => { }}
               onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (

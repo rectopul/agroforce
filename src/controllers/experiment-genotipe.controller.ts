@@ -44,6 +44,12 @@ export class ExperimentGenotipeController {
         );
       }
 
+      if (options.filterStatusT) {
+        parameters.status_t = JSON.parse(
+          `{ "contains": "${options.filterStatusT}" } `,
+        );
+      }
+
       if (options.filterCodTec) {
         parameters.AND.push(
           JSON.parse(
@@ -208,7 +214,7 @@ export class ExperimentGenotipeController {
                 gli: true,
                 bgm: true,
                 status: true,
-                genotype_treatment: { include: { genotipo: true } },
+                genotype_treatment: { select: { status: true, genotipo: true } },
                 tecnologia: {
                   select: {
                     name: true,
