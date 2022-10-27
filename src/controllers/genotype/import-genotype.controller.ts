@@ -760,7 +760,6 @@ export class ImportGenotypeController {
                     //   dt_export: this.aux.dt_export,
                     //   created_by: createdBy,
                     // };
-                    // // console.log(genotipo_obj);
                     // genotipeQueue.add({
                     //   instance: genotipo_obj,
                     //   request_type: 'create',

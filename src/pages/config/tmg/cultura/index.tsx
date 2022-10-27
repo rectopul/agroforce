@@ -281,7 +281,6 @@ export default function Listagem({
   }
 
   // useEffect(()=>{
-  //   // console.log("filterparams   -------------------",getCookies('lastPage'))
   //   removeCookies("filtersParams");
 
   //   setFilter('filterStatus=1')
@@ -563,7 +562,6 @@ export default function Listagem({
     }
     // else if (currentPage >= pages) {
     //   setCurrentPage(pages - 1);
-    //   console.log("inside....")
     // }
   }
 

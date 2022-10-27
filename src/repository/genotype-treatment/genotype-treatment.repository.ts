@@ -39,7 +39,7 @@ export class GenotypeTreatmentRepository {
     return result;
   }
 
-  async replaceGenotype(idList: any,idLote:any, idGenotype: number) {
+  async replaceGenotype(idList: any, idLote:any, idGenotype: number) {
     const result = await prisma.genotype_treatment.updateMany({
       where: {
         id: {
@@ -48,15 +48,20 @@ export class GenotypeTreatmentRepository {
       },
       data: {
         id_genotipo: idGenotype,
-        id_lote:idLote // for store both values
+        id_lote: idLote, // for store both values
       },
     });
     return result;
   }
 
   async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
-    if (orderBy) {
-      orderBy = JSON.parse(orderBy);
+    let order;
+    if (typeof orderBy === 'object') {
+      order = orderBy.map((item: any) => {
+        JSON.parse(item);
+      });
+    } else if (orderBy) {
+      order = JSON.parse(orderBy);
     }
 
     const count = await prisma.genotype_treatment.count({ where });
@@ -66,7 +71,7 @@ export class GenotypeTreatmentRepository {
       skip,
       take,
       where,
-      orderBy,
+      orderBy: order,
     });
     result.total = count;
     return result;

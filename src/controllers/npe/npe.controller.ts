@@ -256,12 +256,8 @@ export class NpeController {
 
   async create(data: object | any) {
     try {
-      console.log('data');
-      console.log(data);
       const response = await this.npeRepository.create(data);
 
-      console.log('response');
-      console.log(response);
       if (response) {
         return { status: 200, response, message: 'NPE criada' };
       }

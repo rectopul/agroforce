@@ -12,8 +12,6 @@ export class GenotypeTreatmentController {
     parameters.AND = [];
     parameters.OR = [];
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterStatus) {
         const statusParams = options.filterStatus.split(',');
         parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[0]}" } } }`));
@@ -184,8 +182,12 @@ export class GenotypeTreatmentController {
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
       if (options.orderBy) {
-        orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
-        orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+        if (options.orderBy[2] == '') {
+          orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `{"${options.orderBy[1]}":"${options.typeOrder[1]}"}`];       
+        } else {
+          orderBy = handleOrderForeign(options.orderBy[2], options.typeOrder[2]);
+          orderBy = orderBy || `{"${options.orderBy[2]}":"${options.typeOrder[2]}"}`;
+        }
       }
 
       if (parameters.OR.length === 0) {
@@ -229,7 +231,6 @@ export class GenotypeTreatmentController {
 
   // async create(data: any) {
   //   try {
-  //     console.log("herere   ");
   //     return false
   //     await this.genotypeTreatmentRepository.create(data);
   //     await countTreatmentsNumber(data.id_assay_list);
@@ -242,8 +243,6 @@ export class GenotypeTreatmentController {
 
   async create(data: any) {
     try {
-      // console.log("herere   ",data);
-      // return false
       await this.genotypeTreatmentRepository.create(data);
       await countTreatmentsNumber(data.id_assay_list);
       return { status: 200, message: 'Tratamentos do genótipo cadastrada' };
