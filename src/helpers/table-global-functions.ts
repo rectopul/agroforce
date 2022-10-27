@@ -13,7 +13,6 @@ async function handlePaginationGlobal(currentPages: any, take: any, filter: any)
 
   // if(localStorage.getItem('orderSorting')){
   //   filter = localStorage.getItem('orderSorting');
-  //   console.log("orderSorting ",filter)
   // }
 
   if (localStorage.getItem('pageBeforeEdit')) {

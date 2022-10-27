@@ -43,7 +43,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       userCulture.cultura_selecionada = cultureSelecionada || userCulture.culturas[0]?.cultureId;
 
       safras.safras = await safraController.getAll({
-        id_culture: userCulture.cultura_selecionada, filterStatus: 1, orderBy: 'year', typeOrder: 'desc',
+        id_culture: userCulture.cultura_selecionada, filterStatus: 1, orderBy: 'safraName', typeOrder: 'desc',
       });
       if (safras.safras.total > 0) {
         safras.safras = safras.safras.response;

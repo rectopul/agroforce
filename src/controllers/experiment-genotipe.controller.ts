@@ -340,7 +340,6 @@ export class ExperimentGenotipeController {
         orderBy,
       );
 
-      // console.log("response   ",response)
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }
@@ -397,8 +396,6 @@ export class ExperimentGenotipeController {
 
   async deleteAll(idExperiment: number) {
     try {
-      console.log('idExperiment');
-      console.log(idExperiment);
       const response = await this.ExperimentGenotipeRepository.deleteAll(Number(idExperiment));
       if (response) {
         return { status: 200, message: 'Parcelas excluídos' };

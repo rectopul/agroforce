@@ -134,8 +134,6 @@ export class ReplaceTreatmentController {
     parameters.OR = [];
     parameters.AND = [];
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterYear) {
         parameters.year = Number(options.filterYear);
       }

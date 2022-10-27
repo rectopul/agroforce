@@ -121,7 +121,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'GGEN',
+      title: 'Cod. GGEN',
       value: 'ggen',
       defaultChecked: () => camposGerenciados.includes('ggen'),
     },
@@ -133,19 +133,19 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'BGM',
+      title: 'BGM_Ens',
       value: 'bgm',
       defaultChecked: () => camposGerenciados.includes('bgm'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'BGM_Genótipo',
+      title: 'BGM_Gen',
       value: 'bgmGenotype',
       defaultChecked: () => camposGerenciados.includes('bgmGenotype'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'GMR_Genótipo',
+      title: 'GMR_Gen',
       value: 'gmr',
       defaultChecked: () => camposGerenciados.includes('gmr'),
     },
@@ -474,13 +474,13 @@ export default function Listagem({
         tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
       }
       if (columnOrder[item] === 'bgm') {
-        tableFields.push(headerTableFactory('BGM', 'assay_list.bgm'));
+        tableFields.push(headerTableFactory('BGM_Ens', 'assay_list.bgm'));
       }
       if (columnOrder[item] === 'bgmGenotype') {
-        tableFields.push(headerTableFactory('BGM_Genótipo', 'genotipo.bgm'));
+        tableFields.push(headerTableFactory('BGM_Gen', 'genotipo.bgm'));
       }
       if (columnOrder[item] === 'gmr') {
-        tableFields.push(headerTableFactory('GMR_Genótipo', 'genotipo.gmr'));
+        tableFields.push(headerTableFactory('GMR_Gen', 'genotipo.gmr'));
       }
       if (columnOrder[item] === 'treatments_number') {
         tableFields.push(headerTableFactory('NT', 'treatments_number'));
@@ -490,7 +490,7 @@ export default function Listagem({
       }
       if (columnOrder[item] === 'statusAssay') {
         tableFields.push(
-          headerTableFactory('Status do ensaio', 'assay_list.status'),
+          headerTableFactory('Status ens', 'assay_list.status'),
         );
       }
       if (columnOrder[item] === 'genotipoName') {
@@ -618,9 +618,7 @@ export default function Listagem({
             newItem.ensaio = item.assay_list?.type_assay.name;
             newItem.tecnologia = item.assay_list?.tecnologia.cod_tec;
             newItem.gli = item.assay_list?.gli;
-            console.log(item.assay_list?.bgm);
             newItem.bgm = item.assay_list?.bgm === null ? '' : Number(item.assay_list?.bgm);
-            console.log(newItem.bgm);
             newItem.nt = item.treatments_number;
             newItem.status_t = item.status;
             newItem.genotipo = item.genotipo.name_genotipo;
@@ -984,7 +982,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cód. Tecnologia
+                      Cód. Tecn
                     </label>
                     <div className="flex">
                       <Input
@@ -996,7 +994,7 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory('filterTechnology', 'Nome Tecnologia')}
+                  {filterFieldFactory('filterTechnology', 'Nome Tecn')}
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -1014,7 +1012,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      GGEN
+                      Nome GGEN
                     </label>
                     <div className="flex">
                       <Input
@@ -1056,7 +1054,7 @@ export default function Listagem({
                   {/* {filterFieldFactory('filterGli', 'GLI')} */}
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      BGM
+                      BGM_Ens
                     </label>
                     <div className="flex">
                       <Input
@@ -1077,7 +1075,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      BGM_Genótipo
+                      BGM_Gen
                     </label>
                     <div className="flex">
                       <Input
@@ -1098,7 +1096,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      GMR
+                      GMR_Gen
                     </label>
                     <div className="flex">
                       <Input
@@ -1512,19 +1510,19 @@ export const getServerSideProps: GetServerSideProps = async ({
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : 'desc';
+    : '';
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : 'assay_list.gli';
+    : '';
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrlTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
   const baseUrlAssay = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
   const filterApplication = req.cookies.filterBeforeEdit
-    || `&id_culture=${idCulture}&id_safra=${idSafra}&status_experiment=${'IMPORTADO'}`;
+    || `&id_culture=${idCulture}&id_safra=${idSafra}&status_experiment=${'IMPORTADO'}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });

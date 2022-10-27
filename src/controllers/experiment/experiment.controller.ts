@@ -22,8 +22,6 @@ export class ExperimentController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
         if (options.filterRepetitionFrom && options.filterRepetitionTo) {
           parameters.repetitionsNumber = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);
@@ -293,7 +291,7 @@ export class ExperimentController {
   async delete(data: any) {
     try {
       const experimentGenotipeController = new ExperimentGenotipeController();
-      const experimentExist: any = await this.getOne(Number(data.id));
+      const { response: experimentExist }: any = await this.getOne(Number(data.id));
       if (!experimentExist) return { status: 404, message: 'Experimento não encontrado' };
       if (experimentExist?.status === 'PARCIALMENTE ALOCADO' || experimentExist?.status === 'TOTALMENTE  ALOCADO') return { status: 400, message: 'Não é possível deletar.' };
       const { status } = await experimentGenotipeController.deleteAll(data.id);
