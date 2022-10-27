@@ -142,9 +142,9 @@ export class ExperimentController {
         parameters.idSafra = Number(options.id_safra);
       }
 
-      // if (options.idLocal) {
-      //   parameters.idLocal = Number(options.idLocal);
-      // }
+      if (options.idLocal) {
+        parameters.idLocal = Number(options.idLocal);
+      }
 
       if (options.id) {
         parameters.id = Number(options.id);
