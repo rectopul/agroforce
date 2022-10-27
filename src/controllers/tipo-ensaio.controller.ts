@@ -36,7 +36,13 @@ export class TypeAssayController {
         id: true,
         name: true,
         protocol_name: true,
-        envelope: true,
+        envelope: {
+          select: {
+            seeds: true,
+            id_safra: true,
+            safra: true,
+          },
+        },
         status: true,
       };
 
