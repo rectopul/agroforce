@@ -71,8 +71,8 @@ export class ImportGenotypeController {
       'Código do lote (C0050)',
       'NCC (C3107)',
       'FASE (C0200)',
-      'PESO',
-      'SEMENTES',
+      'Peso (C0065)',
+      'Quantidade (C0126)',
       'DT_Export (SCRIPT0002)',
     ];
     try {
@@ -704,7 +704,6 @@ export class ImportGenotypeController {
                     //   dt_export: this.aux.dt_export,
                     //   created_by: createdBy,
                     // };
-                    // // console.log(genotipo_obj);
                     // genotipeQueue.add({
                     //   instance: genotipo_obj,
                     //   request_type: 'update',

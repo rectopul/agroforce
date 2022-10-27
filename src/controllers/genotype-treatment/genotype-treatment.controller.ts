@@ -38,6 +38,26 @@ export class GenotypeTreatmentController {
         }
       }
 
+      if (options.filterGmrFrom || options.filterGmrTo) {
+        if (options.filterGmrFrom && options.filterGmrTo) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"gmr": {"gte": ${Number(options.filterGmrFrom)}, "lte": ${Number(options.filterGmrTo)} } } }`));
+        } else if (options.filterGmrFrom) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"gmr": {"gte": ${Number(options.filterGmrFrom)} } } }`));
+        } else if (options.filterGmrTo) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"gmr": {"lte": ${Number(options.filterGmrTo)} } } }`));
+        }
+      }
+
+      if (options.filterBgmGenotypeFrom || options.filterBgmGenotypeTo) {
+        if (options.filterBgmGenotypeFrom && options.filterBgmGenotypeTo) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"bgm": {"gte": ${Number(options.filterBgmGenotypeFrom)}, "lte": ${Number(options.filterBgmGenotypeTo)} } } }`));
+        } else if (options.filterBgmGenotypeFrom) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"bgm": {"gte": ${Number(options.filterBgmGenotypeFrom)} } } }`));
+        } else if (options.filterBgmGenotypeTo) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"bgm": {"lte": ${Number(options.filterBgmGenotypeTo)} } } }`));
+        }
+      }
+
       if (options.filterStatusT) {
         parameters.status = JSON.parse(`{ "contains":"${options.filterStatusT}" }`);
       }
@@ -61,6 +81,12 @@ export class GenotypeTreatmentController {
       }
       if (options.filterCodTec) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "cod_tec":  {"contains": "${options.filterCodTec}" } } } }`));
+      }
+      if (options.filterGgenName) {
+        parameters.AND.push(JSON.parse(`{ "genotipo": {"tecnologia": { "name":  {"contains": "${options.filterGgenName}" } } } }`));
+      }
+      if (options.filterGgenCod) {
+        parameters.AND.push(JSON.parse(`{ "genotipo": {"tecnologia": { "cod_tec":  {"contains": "${options.filterGgenCod}" } } } }`));
       }
       if (options.filterBgm) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm":  ${Number(options.filterBgm)}  } }`));
@@ -170,9 +196,6 @@ export class GenotypeTreatmentController {
         delete parameters.AND;
       }
 
-      console.log('parameters');
-      console.log(parameters);
-
       const response: object | any = await this.genotypeTreatmentRepository.findAll(
         parameters,
         select,
@@ -180,9 +203,6 @@ export class GenotypeTreatmentController {
         skip,
         orderBy,
       );
-
-      console.log('response');
-      console.log(response.total);
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
