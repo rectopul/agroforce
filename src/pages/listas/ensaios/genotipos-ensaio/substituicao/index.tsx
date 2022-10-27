@@ -44,29 +44,27 @@ import { UserPreferenceController } from '../../../../../controllers/user-prefer
 import ITabs from '../../../../../shared/utils/dropdown';
 
 interface IFilter {
-  filterYear: string;
-  filterYearFrom: string;
-  filterYearTo: string;
-  filterCodLote: string;
-  filterNcc: string;
-  filterFase: string;
-  filterPesoFrom: string;
-  filterPesoTo: string;
-  filterPeso: string;
-  filterSeeds: string;
-  filterSeedsFrom: string;
-  filterSeedsTo: string;
-  filterGenotipo: string;
-  filterMainName: string;
-  filterGmr: string;
-  filterGmrFrom: string;
-  filterGmrTo: string;
-  filterBgm: string;
-  filterBgmFrom: string;
-  filterBgmTo: string;
-  filterTecnologia: string;
-  orderBy: object | any;
-  typeOrder: object | any;
+  filterYear: string
+  filterYearFrom: string
+  filterYearTo: string
+  filterCodLote: string
+  filterNcc: string
+  filterFase: string
+  filterPesoFrom: string
+  filterPesoTo: string
+  filterSeedsFrom: string
+  filterSeedsTo: string
+  filterPeso: string
+  filterSeeds: string
+  filterGenotipo: string
+  filterMainName: string
+  filterGmrFrom: string
+  filterGmrTo: string
+  filterBgmFrom: string
+  filterBgmTo: string
+  filterTecnologia: string
+  orderBy: string
+  typeOrder: string
 }
 
 export interface LoteGenotipo {
