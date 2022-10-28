@@ -76,7 +76,7 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseNullFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                   );
               }
@@ -86,7 +86,7 @@ export class ImportAssayListController {
               if (response?.name !== spreadSheet[row][column]) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
-                  spreadSheet[row][13],
+                  spreadSheet[row][spreadSheet[row].length - 1],
                   spreadSheet[0][column],
                   'a cultura e diferente da selecionada',
                 );
@@ -98,7 +98,7 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseNullFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                   );
               }
@@ -107,7 +107,7 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                     'a safra informada e diferente da selecionada',
                   );
@@ -119,7 +119,7 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseNullFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                   );
               }
@@ -131,7 +131,7 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                     'o foco informado não existe no sistema',
                   );
@@ -143,7 +143,7 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseNullFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                   );
               }
@@ -155,7 +155,7 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                     'o tipo de ensaio informado não existe no sistema',
                   );
@@ -167,7 +167,7 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseNullFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                   );
               }
@@ -179,7 +179,7 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                     'o ensaio já foi utilizado, não e possível alterar',
                   );
@@ -191,13 +191,13 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseNullFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                   );
               } else if (isNaN(spreadSheet[row][column])) {
                 responseIfError[Number(column)] += responsePositiveNumericFactory(
                   Number(column) + 1,
-                  spreadSheet[row][13],
+                  spreadSheet[row][spreadSheet[row].length - 1],
                   spreadSheet[0][column],
                 );
               } else if (spreadSheet[row][column] < 10) {
@@ -212,7 +212,7 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                     'a tecnologia informado não existe no sistema',
                   );
@@ -224,7 +224,7 @@ export class ImportAssayListController {
                 if (isNaN(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responsePositiveNumericFactory(
                     Number(column) + 1,
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                   );
                 }
@@ -236,7 +236,7 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseNullFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                   );
               }
@@ -247,7 +247,7 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseNullFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                   );
               }
@@ -256,7 +256,7 @@ export class ImportAssayListController {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
-                      spreadSheet[row][13],
+                      spreadSheet[row][spreadSheet[row].length - 1],
                       spreadSheet[0][column],
                       'o numero de tratamentos precisa começar em 1',
                     );
@@ -268,7 +268,7 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                     'o número de tratamento não está sequencial',
                   );
@@ -277,7 +277,7 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                     'cada ensaio deve ter tratamentos sequenciais começados em 1',
                   );
@@ -289,7 +289,7 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseNullFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                   );
               }
@@ -297,7 +297,7 @@ export class ImportAssayListController {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][13],
+                    spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                     'o valor de status deve ser igual a T ou L',
                   );
@@ -338,7 +338,7 @@ export class ImportAssayListController {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),
-                      spreadSheet[row][13],
+                      spreadSheet[row][spreadSheet[row].length - 1],
                       spreadSheet[0][column],
                       'o valor de NCA não foi encontrado no cadastro de lotes relacionado ao genótipo',
                     );
