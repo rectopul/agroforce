@@ -60,7 +60,11 @@ export class GenotypeTreatmentController {
         parameters.status = JSON.parse(`{ "contains":"${options.filterStatusT}" }`);
       }
       if (options.filterNca) {
-        parameters.AND.push(JSON.parse(`{ "lote": {"ncc": "${options.filterNca}" } } `));
+        if (options.filterNca === 'vazio') {
+          parameters.AND.push(JSON.parse(`{"id_lote": ${null} }`));
+        } else {
+          parameters.AND.push(JSON.parse(`{ "lote": {"ncc": "${options.filterNca}" } } `));
+        }
       }
       if (options.filterTreatmentsNumber) {
         parameters.treatments_number = Number(options.filterTreatmentsNumber);
@@ -183,7 +187,7 @@ export class GenotypeTreatmentController {
 
       if (options.orderBy) {
         if (options.orderBy[2] == '') {
-          orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `{"${options.orderBy[1]}":"${options.typeOrder[1]}"}`];       
+          orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `{"${options.orderBy[1]}":"${options.typeOrder[1]}"}`];
         } else {
           orderBy = handleOrderForeign(options.orderBy[2], options.typeOrder[2]);
           orderBy = orderBy || `{"${options.orderBy[2]}":"${options.typeOrder[2]}"}`;
@@ -197,6 +201,8 @@ export class GenotypeTreatmentController {
       if (parameters.AND.length === 0) {
         delete parameters.AND;
       }
+      console.log('parameters');
+      console.log(parameters.AND);
 
       const response: object | any = await this.genotypeTreatmentRepository.findAll(
         parameters,

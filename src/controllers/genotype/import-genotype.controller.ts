@@ -96,22 +96,6 @@ export class ImportGenotypeController {
 
       for (const row in spreadSheet) {
         for (const column in spreadSheet[row]) {
-          if (row === '0') {
-            if (
-              !spreadSheet[row][column]
-                .toUpperCase()
-                .includes(
-                  configModule.response[0]?.fields[column]?.toUpperCase(),
-                )
-            ) {
-              responseIfError[Number(column)] += responseGenericFactory(
-                Number(column) + 1,
-                row,
-                spreadSheet[0][column],
-                'a sequencia de colunas da planilha esta incorreta',
-              );
-            }
-          }
           if (row !== '0') {
             // campos genotipo
             if (configModule.response[0]?.fields[column] === 'id_s1') {

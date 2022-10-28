@@ -59,6 +59,7 @@ import {
 } from '../../../../services';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
+import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 
 export default function Listagem({
   allTreatments,
@@ -199,6 +200,7 @@ export default function Listagem({
 
   // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
 
   const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -452,6 +454,10 @@ export default function Listagem({
     };
   }
 
+  function formatDecimal(num: number) {
+    return Number(num).toFixed(1);
+  }
+
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
@@ -480,7 +486,16 @@ export default function Listagem({
         tableFields.push(headerTableFactory('BGM_Gen', 'genotipo.bgm'));
       }
       if (columnOrder[item] === 'gmr') {
-        tableFields.push(headerTableFactory('GMR_Gen', 'genotipo.gmr'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'GMR',
+            title: 'gmr',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: any) => formatDecimal(rowData.genotipo.gmr),
+          }),
+        );
       }
       if (columnOrder[item] === 'treatments_number') {
         tableFields.push(headerTableFactory('NT', 'treatments_number'));
