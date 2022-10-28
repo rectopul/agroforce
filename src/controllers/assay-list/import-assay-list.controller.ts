@@ -67,6 +67,7 @@ export class ImportAssayListController {
       spreadSheet = await this.orderByGLI(spreadSheet);
 
       spreadSheet.unshift(header);
+      console.log(spreadSheet);
       for (const row in spreadSheet) {
         if (row !== '0') {
           for (const column in spreadSheet[row]) {
@@ -389,7 +390,7 @@ export class ImportAssayListController {
                   id_type_assay: typeAssay[0]?.id,
                   id_tecnologia: technology[0]?.id,
                   gli: spreadSheet[row][4],
-                  bgm: spreadSheet[row][6],
+                  bgm: Number(spreadSheet[row][6]),
                   project: String(spreadSheet[row][7]),
                   created_by: createdBy,
                 });
@@ -414,7 +415,7 @@ export class ImportAssayListController {
                   id_type_assay: typeAssay[0]?.id,
                   id_tecnologia: technology[0]?.id,
                   gli: spreadSheet[row][4],
-                  bgm: spreadSheet[row][6],
+                  bgm: Number(spreadSheet[row][6]),
                   project: String(spreadSheet[row][7]),
                   created_by: createdBy,
                 });
@@ -480,7 +481,8 @@ export class ImportAssayListController {
       return (item[8] < next[8]) ? -1 : 1;
     }
 
-    ordenanteSpreadSheet.sort(orderGLI || orderNt);
+    // ordenanteSpreadSheet.sort(orderGLI || orderNt);
+    ordenanteSpreadSheet.sort((a: any, b: any) => a[4].localeCompare(b[4]) || a[8] - b[8]);
     return ordenanteSpreadSheet;
   }
 }
