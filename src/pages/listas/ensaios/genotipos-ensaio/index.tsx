@@ -84,7 +84,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.genotypeTreatment || {
     id: 0,
     table_preferences:
-      'id,foco,type_assay,tecnologia,gli,bgm,treatments_number,status,statusAssay,genotipoName,nca',
+      'id,foco,type_assay,tecnologia,ggen,gli,bgm,bgmGenotype,gmr,treatments_number,status,statusAssay,genotipoName,nca',
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
@@ -121,15 +121,33 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
+      title: 'Cod. GGEN',
+      value: 'ggen',
+      defaultChecked: () => camposGerenciados.includes('ggen'),
+    },
+    {
+      name: 'CamposGerenciados[]',
       title: 'GLI',
       value: 'gli',
       defaultChecked: () => camposGerenciados.includes('gli'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'BGM',
+      title: 'BGM_Ens',
       value: 'bgm',
       defaultChecked: () => camposGerenciados.includes('bgm'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'BGM_Gen',
+      value: 'bgmGenotype',
+      defaultChecked: () => camposGerenciados.includes('bgmGenotype'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'GMR_Gen',
+      value: 'gmr',
+      defaultChecked: () => camposGerenciados.includes('gmr'),
     },
     {
       name: 'CamposGerenciados[]',
@@ -203,11 +221,13 @@ export default function Listagem({
       filterFoco: checkValue('filterFoco'),
       filterTypeAssay: checkValue('filterTypeAssay'),
       filterTechnology: checkValue('filterTechnology'),
+      filterCodTec: checkValue('filterCodTec'),
+      filterGgenCod: checkValue('filterGgenCod'),
+      filterGgenName: checkValue('filterGgenName'),
       filterGli: checkValue('filterGli'),
       filterBgm: checkValue('filterBgm'),
       filterTreatmentsNumber: checkValue('filterTreatmentsNumber'),
       filterStatus: checkValue('filterStatus'),
-      filterCodTec: checkValue('filterCodTec'),
       filterStatusAssay: checkValue('filterStatusAssay'),
       filterGenotypeName: checkValue('filterGenotypeName'),
       filterNca: checkValue('filterNca'),
@@ -215,6 +235,10 @@ export default function Listagem({
       typeOrder: '',
       filterBgmTo: checkValue('filterBgmTo'),
       filterBgmFrom: checkValue('filterBgmFrom'),
+      filterBgmGenotypeTo: checkValue('filterBgmGenotypeTo'),
+      filterBgmGenotypeFrom: checkValue('filterBgmGenotypeFrom'), //
+      filterGmrTo: checkValue('filterGmrTo'),
+      filterGmrFrom: checkValue('filterGmrFrom'),
       filterNtTo: checkValue('filterNtTo'),
       filterNtFrom: checkValue('filterNtFrom'),
       filterStatusT: checkValue('filterStatusT'),
@@ -231,6 +255,12 @@ export default function Listagem({
       filterNca,
       filterBgmTo,
       filterBgmFrom,
+      filterGgenCod,
+      filterGgenName,
+      filterBgmGenotypeTo,
+      filterBgmGenotypeFrom,
+      filterGmrTo,
+      filterGmrFrom,
       filterNtTo,
       filterNtFrom,
       filterStatusT,
@@ -249,7 +279,7 @@ export default function Listagem({
 
       // const filterStatus = selecionados.substr(0, selecionados.length - 1);
       const filterStatus = statusFilterSelected?.join(',')?.toLowerCase();
-      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}&status_experiment=${'IMPORTADO'}`;
+      const parametersFilter = `filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmGenotypeTo=${filterBgmGenotypeTo}&filterBgmGenotypeFrom=${filterBgmGenotypeFrom}&filterGgenCod=${filterGgenCod}&filterGgenName=${filterGgenName}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}&status_experiment=${'IMPORTADO'}`;
 
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEdit', filtersParams);
@@ -396,6 +426,32 @@ export default function Listagem({
     };
   }
 
+  function ggenHeaderFactory(name: string, title: string) {
+    return {
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: 'ggen',
+      width: 0,
+      sorting: true,
+      render: (rowData: any) => (
+        <div className="h-10 flex">
+          <div>
+            {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.name}`}
+          </div>
+        </div>
+      ),
+    };
+  }
+
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
@@ -411,11 +467,20 @@ export default function Listagem({
       if (columnOrder[item] === 'tecnologia') {
         tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
       }
+      if (columnOrder[item] === 'ggen') {
+        tableFields.push(ggenHeaderFactory('GGEN', 'tecnologia'));
+      }
       if (columnOrder[item] === 'gli') {
         tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
       }
       if (columnOrder[item] === 'bgm') {
-        tableFields.push(headerTableFactory('BGM', 'assay_list.bgm'));
+        tableFields.push(headerTableFactory('BGM_Ens', 'assay_list.bgm'));
+      }
+      if (columnOrder[item] === 'bgmGenotype') {
+        tableFields.push(headerTableFactory('BGM_Gen', 'genotipo.bgm'));
+      }
+      if (columnOrder[item] === 'gmr') {
+        tableFields.push(headerTableFactory('GMR_Gen', 'genotipo.gmr'));
       }
       if (columnOrder[item] === 'treatments_number') {
         tableFields.push(headerTableFactory('NT', 'treatments_number'));
@@ -425,7 +490,7 @@ export default function Listagem({
       }
       if (columnOrder[item] === 'statusAssay') {
         tableFields.push(
-          headerTableFactory('Status do ensaio', 'assay_list.status'),
+          headerTableFactory('Status ens', 'assay_list.status'),
         );
       }
       if (columnOrder[item] === 'genotipoName') {
@@ -509,8 +574,11 @@ export default function Listagem({
             newItem.FOCO = item.assay_list.foco.name;
             newItem.ENSAIO = item.assay_list.type_assay.name;
             newItem.TECNOLOGIA = `${item.assay_list.tecnologia.cod_tec} ${item.assay_list.tecnologia.name}`;
+            newItem.GGEN = `${item.genotipo.tecnologia.cod_tec} ${item.genotipo.tecnologia.name}`;
             newItem.GLI = item.assay_list.gli;
             newItem.BGM = item.assay_list.bgm;
+            newItem.BGM_Genótipo = item.genotipo.bgm;
+            newItem.GMT = item.genotipo.gmr;
             newItem.NT = item.treatments_number;
             newItem.STATUS_T = item.status;
             newItem.STATUS_ENSAIO = item.assay_list.status;
@@ -550,9 +618,7 @@ export default function Listagem({
             newItem.ensaio = item.assay_list?.type_assay.name;
             newItem.tecnologia = item.assay_list?.tecnologia.cod_tec;
             newItem.gli = item.assay_list?.gli;
-            console.log(item.assay_list?.bgm);
             newItem.bgm = item.assay_list?.bgm === null ? '' : Number(item.assay_list?.bgm);
-            console.log(newItem.bgm);
             newItem.nt = item.treatments_number;
             newItem.status_t = item.status;
             newItem.genotipo = item.genotipo.name_genotipo;
@@ -916,7 +982,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cód. Tecnologia
+                      Cód. Tecn
                     </label>
                     <div className="flex">
                       <Input
@@ -928,7 +994,35 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory('filterTechnology', 'Nome Tecnologia')}
+                  {filterFieldFactory('filterTechnology', 'Nome Tecn')}
+
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Cód. GGEN
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="Cód. GGEN"
+                        id="filterGgenCod"
+                        name="filterGgenCod"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Nome GGEN
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="Nome GGEN"
+                        id="filterGgenName"
+                        name="filterGgenName"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   {filterFieldFactory('filterGli', 'GLI')}
 
@@ -960,7 +1054,7 @@ export default function Listagem({
                   {/* {filterFieldFactory('filterGli', 'GLI')} */}
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      BGM
+                      BGM_Ens
                     </label>
                     <div className="flex">
                       <Input
@@ -978,7 +1072,51 @@ export default function Listagem({
                       />
                     </div>
                   </div>
+
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      BGM_Gen
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterBgmGenotypeFrom"
+                        name="filterBgmGenotypeFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterBgmGenotypeTo"
+                        name="filterBgmGenotypeTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      GMR_Gen
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterGmrFrom"
+                        name="filterGmrFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterGmrTo"
+                        name="filterGmrTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
                 </div>
+
                 <div
                   className="w-full h-full
                   flex
@@ -1372,19 +1510,19 @@ export const getServerSideProps: GetServerSideProps = async ({
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : 'desc';
+    : '';
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : 'assay_list.foco.name';
+    : '';
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrlTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
   const baseUrlAssay = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
   const filterApplication = req.cookies.filterBeforeEdit
-    || `&id_culture=${idCulture}&id_safra=${idSafra}&status_experiment=${'IMPORTADO'}`;
+    || `&id_culture=${idCulture}&id_safra=${idSafra}&status_experiment=${'IMPORTADO'}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });

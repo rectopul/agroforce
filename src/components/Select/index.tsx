@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { SelectHTMLAttributes } from "react";
+import { SelectHTMLAttributes } from 'react';
 
 type ITypeSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   values: Array<string | object>;
@@ -26,7 +26,7 @@ export function Select({ selected, values, ...rest }: ITypeSelectProps) {
     "
     >
       {values.map((value: string | object | any, index) => {
-        const itemSelected: any = selected === value.id ? "selected" : "";
+        const itemSelected: any = selected === value.id ? 'selected' : '';
         return (
           <option selected={itemSelected} key={index} value={value.id}>
             {value.desc ? value.desc : value.name}

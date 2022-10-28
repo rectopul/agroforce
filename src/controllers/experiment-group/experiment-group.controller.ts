@@ -237,16 +237,6 @@ export class ExperimentGroupController {
       }
     });
 
-    console.log('toPrint');
-    console.log(toPrint);
-    console.log('printed');
-    console.log(printed);
-
-    console.log('initial');
-    console.log(initial);
-    console.log('allExperiments');
-    console.log(allExperiments);
-
     if (toPrint >= 1) {
       status = 'ETIQ. EM ANDAMENTO';
     } else if (printed === allExperiments) {

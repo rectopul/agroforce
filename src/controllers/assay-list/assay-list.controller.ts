@@ -158,7 +158,7 @@ export class AssayListController {
     try {
       const { status: statusAssay, response } = await this.getOne(Number(data.id));
       if (statusAssay !== 200) return { status: 400, message: 'Lista de ensaio não encontrada' };
-      if (response?.status === 'UTILIZADO') return { status: 400, message: 'Ensaio já relacionado com um experimento ' };
+      if (response?.status === 'EXP IMP.') return { status: 400, message: 'Ensaio já relacionado com um experimento ' };
 
       const { status } = await this.genotypeTreatmentController.deleteAll(data.id);
       const operation = data.status === 1 ? 'Ativação' : 'Inativação';

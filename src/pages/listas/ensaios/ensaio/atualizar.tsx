@@ -704,8 +704,6 @@ export default function AtualizarTipoEnsaio({
   }
 
   async function handlePaginationExperiments(): Promise<void> {
-    console.log('table');
-    console.log(table);
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {

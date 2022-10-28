@@ -755,7 +755,6 @@ export default function Listagem({
           repititions++;
         }
       });
-      // console.log(experiment_genotipo);
       createExperimentGenotipe({
         data: experiment_genotipo,
         total_consumed: experiment_genotipo.length,

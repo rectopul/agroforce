@@ -12,8 +12,6 @@ export class GenotypeTreatmentController {
     parameters.AND = [];
     parameters.OR = [];
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterStatus) {
         const statusParams = options.filterStatus.split(',');
         parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[0]}" } } }`));
@@ -35,6 +33,26 @@ export class GenotypeTreatmentController {
           parameters.treatments_number = JSON.parse(`{"gte": ${Number(options.filterNtFrom)} }`);
         } else if (options.filterNtTo) {
           parameters.treatments_number = JSON.parse(`{"lte": ${Number(options.filterNtTo)} }`);
+        }
+      }
+
+      if (options.filterGmrFrom || options.filterGmrTo) {
+        if (options.filterGmrFrom && options.filterGmrTo) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"gmr": {"gte": ${Number(options.filterGmrFrom)}, "lte": ${Number(options.filterGmrTo)} } } }`));
+        } else if (options.filterGmrFrom) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"gmr": {"gte": ${Number(options.filterGmrFrom)} } } }`));
+        } else if (options.filterGmrTo) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"gmr": {"lte": ${Number(options.filterGmrTo)} } } }`));
+        }
+      }
+
+      if (options.filterBgmGenotypeFrom || options.filterBgmGenotypeTo) {
+        if (options.filterBgmGenotypeFrom && options.filterBgmGenotypeTo) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"bgm": {"gte": ${Number(options.filterBgmGenotypeFrom)}, "lte": ${Number(options.filterBgmGenotypeTo)} } } }`));
+        } else if (options.filterBgmGenotypeFrom) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"bgm": {"gte": ${Number(options.filterBgmGenotypeFrom)} } } }`));
+        } else if (options.filterBgmGenotypeTo) {
+          parameters.AND.push(JSON.parse(`{ "genotipo": {"bgm": {"lte": ${Number(options.filterBgmGenotypeTo)} } } }`));
         }
       }
 
@@ -61,6 +79,12 @@ export class GenotypeTreatmentController {
       }
       if (options.filterCodTec) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "cod_tec":  {"contains": "${options.filterCodTec}" } } } }`));
+      }
+      if (options.filterGgenName) {
+        parameters.AND.push(JSON.parse(`{ "genotipo": {"tecnologia": { "name":  {"contains": "${options.filterGgenName}" } } } }`));
+      }
+      if (options.filterGgenCod) {
+        parameters.AND.push(JSON.parse(`{ "genotipo": {"tecnologia": { "cod_tec":  {"contains": "${options.filterGgenCod}" } } } }`));
       }
       if (options.filterBgm) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm":  ${Number(options.filterBgm)}  } }`));
@@ -158,8 +182,12 @@ export class GenotypeTreatmentController {
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
       if (options.orderBy) {
-        orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
-        orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+        if (options.orderBy[2] == '') {
+          orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `{"${options.orderBy[1]}":"${options.typeOrder[1]}"}`];       
+        } else {
+          orderBy = handleOrderForeign(options.orderBy[2], options.typeOrder[2]);
+          orderBy = orderBy || `{"${options.orderBy[2]}":"${options.typeOrder[2]}"}`;
+        }
       }
 
       if (parameters.OR.length === 0) {
@@ -170,9 +198,6 @@ export class GenotypeTreatmentController {
         delete parameters.AND;
       }
 
-      console.log('parameters');
-      console.log(parameters);
-
       const response: object | any = await this.genotypeTreatmentRepository.findAll(
         parameters,
         select,
@@ -180,9 +205,6 @@ export class GenotypeTreatmentController {
         skip,
         orderBy,
       );
-
-      console.log('response');
-      console.log(response.total);
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
@@ -209,7 +231,6 @@ export class GenotypeTreatmentController {
 
   // async create(data: any) {
   //   try {
-  //     console.log("herere   ");
   //     return false
   //     await this.genotypeTreatmentRepository.create(data);
   //     await countTreatmentsNumber(data.id_assay_list);
@@ -222,8 +243,6 @@ export class GenotypeTreatmentController {
 
   async create(data: any) {
     try {
-      // console.log("herere   ",data);
-      // return false
       await this.genotypeTreatmentRepository.create(data);
       await countTreatmentsNumber(data.id_assay_list);
       return { status: 200, message: 'Tratamentos do genótipo cadastrada' };
