@@ -9,7 +9,7 @@ interface IHeaderTableFactory {
   [x: string]: any;
 }
 
-export default function headerTableFactory({
+export default function headerTableFactoryGlobal({
   name,
   title,
   orderList,

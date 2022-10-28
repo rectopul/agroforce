@@ -63,7 +63,7 @@ export interface IUpdateGenotipo {
   cod_tec: string;
   tecnologia?: object | any;
   status: number;
-  gmr: number;
+  gmr: any;
   bgm: number;
   progenitor_f_direto: string;
   progenitor_m_direto: string;
@@ -129,7 +129,7 @@ export default function Atualizargenotipo({
       name_alter: genotipo.name_alter,
       elit_name: genotipo.elit_name,
       type: genotipo.type,
-      gmr: genotipo.gmr,
+      gmr: Number(genotipo.gmr).toFixed(1),
       bgm: genotipo.bgm,
       progenitor_f_direto: genotipo.progenitor_f_direto,
       progenitor_m_direto: genotipo.progenitor_m_direto,
