@@ -580,7 +580,7 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     await genotypeTreatmentService
-      .getAll(filter)
+      .getAll(`${filter}&excel=true`)
       .then(({ status, response }) => {
         if (status === 200) {
           const newData = response.map((item: any) => {
@@ -622,8 +622,10 @@ export default function Listagem({
   };
 
   const replacementExcel = async (): Promise<void> => {
+    console.log('filter');
+    console.log(filter);
     await genotypeTreatmentService
-      .getAll(filter)
+      .getAll(`${filter}&excel=true`)
       .then(({ status, response }) => {
         if (status === 200) {
           const newData = response.map((item: any) => {
