@@ -1,6 +1,4 @@
 export default function handleOrderForeign(orderBy: any, orderType: any) {
-  console.log('orderBy');
-  console.log(orderBy);
   const orderColumnForeign = orderBy.split('.');
   const foreignKey = orderColumnForeign[0];
   const foreignColumn = orderColumnForeign[1];

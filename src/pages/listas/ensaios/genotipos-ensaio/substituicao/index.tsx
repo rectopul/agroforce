@@ -715,9 +715,9 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory('filterNameTec', 'Nome tec. ens.')}
-
                   {filterFieldFactory('filterCodTec', 'Cod tec. ens.')}
+
+                  {filterFieldFactory('filterNameTec', 'Nome tec. ens.')}
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
