@@ -123,7 +123,6 @@ export default function Listagem({
     Number(pageBeforeEdit),
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
   const [orderList, setOrder] = useState<number>(1);
   const [arrowOrder, setArrowOrder] = useState<any>('');
@@ -208,6 +207,7 @@ export default function Listagem({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
   const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
     orderBy == 'Tecnologia' ? 'tecnologia.cod_tec' : orderBy
   }&typeOrder=${typeOrder}`;
@@ -305,6 +305,7 @@ export default function Listagem({
   async function handleOrder(
     column: string,
     order: string | any,
+    name: string | any,
   ): Promise<void> {
     // // Manage orders of colunms
     // const parametersFilter = await tableGlobalFunctions.handleOrderGlobal(
@@ -340,29 +341,30 @@ export default function Listagem({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
   }
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
   function idHeaderFactory() {
     return {
@@ -405,7 +407,7 @@ export default function Listagem({
           <button
             type="button"
             className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
+            onClick={() => handleOrder(title, orderList, 'tecnologia')}
           >
             {title}
           </button>
@@ -476,16 +478,40 @@ export default function Listagem({
       //   tableFields.push(idHeaderFactory());
       // }
       if (columnCampos[index] === 'name_genotipo') {
-        tableFields.push(headerTableFactory('Nome genótipo', 'name_genotipo'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Nome genótipo',
+            title: 'name_genotipo',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'name_main') {
-        tableFields.push(headerTableFactory('Nome principal', 'name_main'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Nome principal',
+            title: 'name_main',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'tecnologia') {
         tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
       }
       if (columnCampos[index] === 'cruza') {
-        tableFields.push(headerTableFactory('Cruzamento origem', 'cruza'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Cruzamento origem',
+            title: 'cruza',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'gmr') {
         tableFields.push(
@@ -500,53 +526,135 @@ export default function Listagem({
         );
       }
       if (columnCampos[index] === 'numberLotes') {
-        tableFields.push(headerTableFactory('Nº Lotes', 'numberLotes'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Nº Lotes',
+            title: 'numberLotes',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'name_public') {
-        tableFields.push(headerTableFactory('Nome publico', 'name_public'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Nome público',
+            title: 'name_public',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'name_experiment') {
         tableFields.push(
-          headerTableFactory('Nome experimental', 'name_experiment'),
+          headerTableFactoryGlobal({
+            name: 'Nome experimental',
+            title: 'name_experiment',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnCampos[index] === 'name_alter') {
-        tableFields.push(headerTableFactory('Nome alternativo', 'name_alter'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Nome alternativo',
+            title: 'name_alter',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'elit_name') {
-        tableFields.push(headerTableFactory('Elite nome', 'elit_name'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Elite nome',
+            title: 'elit_name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'type') {
-        tableFields.push(headerTableFactory('Tipo', 'type'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Tipo',
+            title: 'type',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'progenitor_f_direto') {
         tableFields.push(
-          headerTableFactory('Progenitor f direto', 'progenitor_f_direto'),
+          headerTableFactoryGlobal({
+            name: 'Progenitor f direto',
+            title: 'progenitor_f_direto',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnCampos[index] === 'progenitor_m_direto') {
         tableFields.push(
-          headerTableFactory('Progenitor m direto', 'progenitor_m_direto'),
+          headerTableFactoryGlobal({
+            name: 'Progenitor m direto',
+            title: 'progenitor_m_direto',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnCampos[index] === 'progenitor_f_origem') {
         tableFields.push(
-          headerTableFactory('Progenitor f origem', 'progenitor_f_origem'),
+          headerTableFactoryGlobal({
+            name: 'Progenitor f origem',
+            title: 'progenitor_f_origem',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnCampos[index] === 'progenitor_m_origem') {
         tableFields.push(
-          headerTableFactory('Progenitor m origem', 'progenitor_m_origem'),
+          headerTableFactoryGlobal({
+            name: 'Progenitor m origem',
+            title: 'progenitor_m_origem',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnCampos[index] === 'progenitores_origem') {
         tableFields.push(
-          headerTableFactory('Progenitores origem', 'progenitores_origem'),
+          headerTableFactoryGlobal({
+            name: 'Progenitores origem',
+            title: 'Progenitores origem',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnCampos[index] === 'parentesco_completo') {
         tableFields.push(
-          headerTableFactory('Parentesco', 'parentesco_completo'),
+          headerTableFactoryGlobal({
+            name: 'Parentesco',
+            title: 'parentesco_completo',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnCampos[index] === 'action') {
