@@ -12,8 +12,10 @@ export class GenotypeTreatmentController {
     parameters.AND = [];
     parameters.OR = [];
     try {
+      console.log('options');
+      console.log(options);
       if (options.filterStatus) {
-        const statusParams = options.filterStatus.split(',');
+        const statusParams = options.filterStatus?.split(',');
         parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[0]}" } } }`));
         parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[1]}" } } }`));
       }
@@ -186,11 +188,13 @@ export class GenotypeTreatmentController {
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
       if (options.orderBy) {
-        if (options.orderBy[2] == '') {
-          orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `{"${options.orderBy[1]}":"${options.typeOrder[1]}"}`];
-        } else {
-          orderBy = handleOrderForeign(options.orderBy[2], options.typeOrder[2]);
-          orderBy = orderBy || `{"${options.orderBy[2]}":"${options.typeOrder[2]}"}`;
+        if (!options.excel) {
+          if (options.orderBy[2] == '') {
+            orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `{"${options.orderBy[1]}":"${options.typeOrder[1]}"}`];
+          } else {
+            orderBy = handleOrderForeign(options.orderBy[2], options.typeOrder[2]);
+            orderBy = orderBy || `{"${options.orderBy[2]}":"${options.typeOrder[2]}"}`;
+          }
         }
       }
 
@@ -201,8 +205,6 @@ export class GenotypeTreatmentController {
       if (parameters.AND.length === 0) {
         delete parameters.AND;
       }
-      console.log('parameters');
-      console.log(parameters.AND);
 
       const response: object | any = await this.genotypeTreatmentRepository.findAll(
         parameters,

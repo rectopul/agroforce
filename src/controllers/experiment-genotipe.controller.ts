@@ -108,7 +108,11 @@ export class ExperimentGenotipeController {
       }
 
       if (options.filterNca) {
-        parameters.nca = JSON.parse(`{ "contains": "${options.filterNca}" }`);
+        if (options.filterNca === 'vazio') {
+          parameters.nca = null;
+        } else {
+          parameters.nca = JSON.parse(`{ "contains": "${options.filterNca}" }`);
+        }
       }
 
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {

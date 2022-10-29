@@ -50,6 +50,7 @@ import {
   Content,
   Input,
 } from '../../../../components';
+import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 
 type IAssayListUpdate = Omit<IAssayList, 'id_safra' | 'period'>;
 
@@ -99,6 +100,7 @@ export default function AtualizarTipoEnsaio({
   const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: 'CamposGerenciados[]', title: 'Safra', value: 'safra' },
@@ -368,6 +370,10 @@ export default function AtualizarTipoEnsaio({
     };
   }
 
+  function formatDecimal(num: number) {
+    return Number(num).toFixed(1);
+  }
+
   function columnsOrder(columnCampos: string) {
     const columnOrder: string[] = columnCampos.split(',');
     const tableFields: any = [];
@@ -396,7 +402,16 @@ export default function AtualizarTipoEnsaio({
         );
       }
       if (columnOrder[index] === 'genotipoGmr') {
-        tableFields.push(headerTableFactory('GMR', 'genotipo.gmr'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'GMR',
+            title: 'gmr',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: any) => formatDecimal(rowData.genotipo.gmr),
+          }),
+        );
       }
       if (columnOrder[index] === 'genotipoBgm') {
         tableFields.push(headerTableFactory('BGM', 'genotipo.bgm'));

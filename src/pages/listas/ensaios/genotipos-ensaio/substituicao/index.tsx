@@ -44,27 +44,28 @@ import { UserPreferenceController } from "../../../../../controllers/user-prefer
 import ITabs from "../../../../../shared/utils/dropdown";
 
 interface IFilter {
-  filterYear: string;
-  filterYearFrom: string;
-  filterYearTo: string;
-  filterCodLote: string;
-  filterNcc: string;
-  filterFase: string;
-  filterPesoFrom: string;
-  filterPesoTo: string;
-  filterSeedsFrom: string;
-  filterSeedsTo: string;
-  filterPeso: string;
-  filterSeeds: string;
-  filterGenotipo: string;
-  filterMainName: string;
-  filterGmrFrom: string;
-  filterGmrTo: string;
-  filterBgmFrom: string;
-  filterBgmTo: string;
-  filterTecnologia: string;
-  orderBy: string;
-  typeOrder: string;
+  filterYear: string
+  filterYearFrom: string
+  filterYearTo: string
+  filterCodLote: string
+  filterNcc: string
+  filterFase: string
+  filterPesoFrom: string
+  filterPesoTo: string
+  filterSeedsFrom: string
+  filterSeedsTo: string
+  filterPeso: string
+  filterSeeds: string
+  filterGenotipo: string
+  filterMainName: string
+  filterGmrFrom: string
+  filterGmrTo: string
+  filterBgmFrom: string
+  filterBgmTo: string
+  filterCodTec: string
+  filterNameTec: string
+  orderBy: string
+  typeOrder: string
 }
 
 export interface LoteGenotipo {
@@ -156,12 +157,12 @@ export default function Listagem({
       title: "Nome principal",
       value: "name_main",
     },
-    { name: "CamposGerenciados[]", title: "GMR", value: "gmr" },
-    { name: "CamposGerenciados[]", title: "BGM ens.", value: "bgm" },
+    { name: 'CamposGerenciados[]', title: 'GMR Ens.', value: 'gmr' },
+    { name: 'CamposGerenciados[]', title: 'BGM Ens.', value: 'bgm' },
     {
-      name: "CamposGerenciados[]",
-      title: "Nome tec. ens.",
-      value: "tecnologia",
+      name: 'CamposGerenciados[]',
+      title: 'Tec Ens.',
+      value: 'tecnologia',
     },
     { name: "CamposGerenciados[]", title: "Substituir", value: "action" },
   ]);
@@ -176,27 +177,28 @@ export default function Listagem({
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterYear: "",
-      filterYearFrom: "",
-      filterYearTo: "",
-      filterCodLote: "",
-      filterNcc: "",
-      filterFase: "",
-      filterPesoFrom: "",
-      filterPesoTo: "",
-      filterSeedsFrom: "",
-      filterSeedsTo: "",
-      filterPeso: "",
-      filterSeeds: "",
-      filterGenotipo: "",
-      filterMainName: "",
-      filterGmrFrom: "",
-      filterGmrTo: "",
-      filterBgmFrom: "",
-      filterBgmTo: "",
-      filterTecnologia: "",
-      orderBy: "",
-      typeOrder: "",
+      filterYear: '',
+      filterYearFrom: '',
+      filterYearTo: '',
+      filterCodLote: '',
+      filterNcc: '',
+      filterFase: '',
+      filterPesoFrom: '',
+      filterPesoTo: '',
+      filterSeedsFrom: '',
+      filterSeedsTo: '',
+      filterPeso: '',
+      filterSeeds: '',
+      filterGenotipo: '',
+      filterMainName: '',
+      filterGmrFrom: '',
+      filterGmrTo: '',
+      filterBgmFrom: '',
+      filterBgmTo: '',
+      filterCodTec: '',
+      filterNameTec: '',
+      orderBy: '',
+      typeOrder: '',
     },
     onSubmit: async ({
       filterYear,
@@ -215,7 +217,8 @@ export default function Listagem({
       filterGmrTo,
       filterBgmFrom,
       filterBgmTo,
-      filterTecnologia,
+      filterCodTec,
+      filterNameTec,
     }) => {
       const tempParams: any = [];
       if (treatmentsOptionSelected == "nca") {
@@ -225,7 +228,7 @@ export default function Listagem({
           }
         });
       }
-      const parametersFilter = `filterStatus=${1}&id_safra=${idSafra}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterTecnologia=${filterTecnologia}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterPesoTo=${filterPesoTo}&filterPesoFrom=${filterPesoFrom}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}`;
+      const parametersFilter = `filterStatus=${1}&id_safra=${idSafra}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCodTec=${filterCodTec}&filterNameTec=${filterNameTec}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterPesoTo=${filterPesoTo}&filterPesoFrom=${filterPesoFrom}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}`;
 
       await replaceTreatmentService
         .getAll(
@@ -369,6 +372,32 @@ export default function Listagem({
     };
   }
 
+  function tecnologiaHeaderFactory(name: string, title: string) {
+    return {
+      title: (
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="font-medium text-gray-900"
+            onClick={() => handleOrder(title, orderList)}
+          >
+            {name}
+          </button>
+        </div>
+      ),
+      field: 'tecnologia',
+      width: 0,
+      sorting: true,
+      render: (rowData: any) => (
+        <div className="h-10 flex">
+          <div>
+            {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.name}`}
+          </div>
+        </div>
+      ),
+    };
+  }
+
   function columnsOrder(columnsCampos: string) {
     const columnCampos: string[] = columnsCampos.split(",");
     const tableFields: any = [];
@@ -405,16 +434,14 @@ export default function Listagem({
           headerTableFactory("Nome principal", "genotipo.name_main")
         );
       }
-      if (columnCampos[index] === "gmr") {
-        tableFields.push(headerTableFactory("GMR", "genotipo.gmr"));
+      if (columnCampos[index] === 'gmr') {
+        tableFields.push(headerTableFactory('GMR Ens.', 'genotipo.gmr'));
       }
-      if (columnCampos[index] === "bgm") {
-        tableFields.push(headerTableFactory("BGM ens.", "genotipo.bgm"));
+      if (columnCampos[index] === 'bgm') {
+        tableFields.push(headerTableFactory('BGM Ens.', 'genotipo.bgm'));
       }
-      if (columnCampos[index] === "tecnologia") {
-        tableFields.push(
-          headerTableFactory("Nome tec. ens.", "genotipo.tecnologia.name")
-        );
+      if (columnCampos[item] === 'tecnologia') {
+        tableFields.push(tecnologiaHeaderFactory('Tec ens.', 'tecnologia'));
       }
       if (columnCampos[index] === "action") {
         tableFields.push(replaceFactory("Substituir", "action"));
@@ -690,7 +717,9 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory("filterTecnologia", "Nome tec. ens.")}
+                  {filterFieldFactory('filterNameTec', 'Nome tec. ens.')}
+
+                  {filterFieldFactory('filterCodTec', 'Cod tec. ens.')}
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 

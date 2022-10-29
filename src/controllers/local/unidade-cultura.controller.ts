@@ -71,6 +71,11 @@ export class UnidadeCulturaController {
         dt_export: true,
       };
 
+      if (options.id_safra) {
+        const { response }: any = await this.safraController.getOne(Number(options.id_safra));
+        parameters.year = response.year;
+      }
+
       if (options.id_unity_culture) {
         parameters.id_unity_culture = options.id_unity_culture;
       }

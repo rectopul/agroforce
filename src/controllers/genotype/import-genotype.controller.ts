@@ -266,26 +266,29 @@ export class ImportGenotypeController {
                     spreadSheet[0][column],
                   );
                 } else {
-                  const { response }: IReturnObject = await safraController.getOne(idSafra);
-                  if (response.safraName !== spreadSheet[row][column]) {
-                    responseIfError[Number(column)] += responseGenericFactory(
-                      Number(column) + 1,
-                      row,
-                      spreadSheet[0][column],
-                      'safra e diferente da selecionada',
-                    );
-                  }
                   const { response: safras }: IReturnObject = await safraController.getAll({
                     id_culture: idCulture,
                     safraName: String(spreadSheet[row][column]),
                   });
                   if (safras.total <= 0) {
-                    responseIfError[Number(column)] += responseGenericFactory(
-                      Number(column) + 1,
-                      row,
-                      spreadSheet[0][column],
-                      'safra não cadastrada nessa cultura',
-                    );
+                    if (safras?.safraName !== spreadSheet[row][column]) {
+                      responseIfError[Number(column)] += responseGenericFactory(
+                        Number(column) + 1,
+                        row,
+                        spreadSheet[0][column],
+                        'safra não cadastrada nessa cultura',
+                      );
+                    }
+                  } else {
+                    const { response }: IReturnObject = await safraController.getOne(idSafra);
+                    if (response.safraName !== spreadSheet[row][column]) {
+                      responseIfError[Number(column)] += responseGenericFactory(
+                        Number(column) + 1,
+                        row,
+                        spreadSheet[0][column],
+                        'safra e diferente da selecionada',
+                      );
+                    }
                   }
                 }
               }
@@ -656,7 +659,6 @@ export class ImportGenotypeController {
                     this.aux.dt_export = spreadSheet[row][column];
                   }
                 }
-
                 if (
                   spreadSheet[row].length === Number(column) + 1
                   && this.aux !== []
@@ -714,7 +716,6 @@ export class ImportGenotypeController {
                       progenitor_m_origem: this.aux.progenitor_m_origem,
                       progenitores_origem: this.aux.progenitores_origem,
                       parentesco_completo: this.aux.parentesco_completo,
-                      dt_export: this.aux.dt_export,
                       created_by: createdBy,
                     });
                   } else {
@@ -770,7 +771,6 @@ export class ImportGenotypeController {
                       progenitor_m_origem: this.aux.progenitor_m_origem,
                       progenitores_origem: this.aux.progenitores_origem,
                       parentesco_completo: this.aux.parentesco_completo,
-                      dt_export: this.aux.dt_export,
                       created_by: createdBy,
                     });
                     this.aux.id_genotipo = genotipo.response.id;
@@ -809,6 +809,7 @@ export class ImportGenotypeController {
                         fase: this.aux.fase,
                         peso: this.aux.peso,
                         quant_sementes: this.aux.quant_sementes,
+                        dt_export: this.aux.dt_export,
                         created_by: createdBy,
                       });
                       delete this.aux.id_lote;
@@ -843,10 +844,12 @@ export class ImportGenotypeController {
                         fase: this.aux.fase,
                         peso: this.aux.peso,
                         quant_sementes: this.aux.quant_sementes,
+                        dt_export: this.aux.dt_export,
                         created_by: createdBy,
                       });
                       delete this.aux.id_genotipo;
                     }
+                    this.aux = [];
                   }
                 }
               }
