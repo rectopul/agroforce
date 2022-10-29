@@ -52,7 +52,6 @@ export class ImportGenotypeTreatmentController {
             treatments_number: spreadSheet[row][6],
             name_genotipo: spreadSheet[row][8],
           });
-
           if (treatmentsStatus === 400) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tratamento de genótipo não encontrado </li> <br>`;
@@ -75,7 +74,11 @@ export class ImportGenotypeTreatmentController {
             // eslint-disable-next-line no-param-reassign
             spreadSheet[row][3] = `0${spreadSheet[row][3]}`;
           }
-          if (treatments[0]?.assay_list.tecnologia.cod_tec !== spreadSheet[row][3]) {
+
+          console.log('spreadSheet[row][3]');
+          console.log(spreadSheet[row][3]);
+          if (String(treatments[0]?.assay_list.tecnologia.cod_tec)
+              !== String(spreadSheet[row][3])) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a tecnologia e diferente da cadastrada no ensaio. </li> <br>`;
           }

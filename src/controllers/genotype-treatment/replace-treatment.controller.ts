@@ -209,8 +209,12 @@ export class ReplaceTreatmentController {
           parameters.AND.push(JSON.parse(`{ "genotipo": {"bgm": {"lte": ${Number(options.filterBgmTo)} }}}`));
         }
       }
-      if (options.filterTecnologia) {
-        parameters.AND.push(JSON.parse(`{ "genotipo": { "name": {"contains": "${options.filterTecnologia}" } } }`));
+      if (options.filterCodTec) {
+        parameters.genotipo = JSON.parse(`{ "tecnologia": { "cod_tec": {"contains": "${options.filterCodTec}" } } }`);
+      }
+
+      if (options.filterNameTec) {
+        parameters.genotipo = JSON.parse(`{ "tecnologia": { "desc": {"contains": "${options.filterNameTec}" } } }`);
       }
 
       const select = {
@@ -233,7 +237,7 @@ export class ReplaceTreatmentController {
             name_main: true,
             gmr: true,
             bgm: true,
-            tecnologia: { select: { name: true } },
+            tecnologia: { select: { name: true, cod_tec: true } },
           },
         },
       };
