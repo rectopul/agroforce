@@ -67,7 +67,6 @@ export class ImportAssayListController {
       spreadSheet = await this.orderByGLI(spreadSheet);
 
       spreadSheet.unshift(header);
-      console.log(spreadSheet);
       for (const row in spreadSheet) {
         if (row !== '0') {
           for (const column in spreadSheet[row]) {

@@ -19,7 +19,7 @@ import { HistoryGenotypeTreatmentController } from './history-genotype-treatment
 export class ImportGenotypeTreatmentController {
   static async validate(
     idLog: number,
-    { spreadSheet, created_by: createdBy }: ImportValidate,
+    { spreadSheet, idCulture, created_by: createdBy }: ImportValidate,
   ): Promise<IReturnObject> {
     const loteController = new LoteController();
     const genotipoController = new GenotipoController();
@@ -75,8 +75,6 @@ export class ImportGenotypeTreatmentController {
             spreadSheet[row][3] = `0${spreadSheet[row][3]}`;
           }
 
-          console.log('spreadSheet[row][3]');
-          console.log(spreadSheet[row][3]);
           if (String(treatments[0]?.assay_list.tecnologia.cod_tec)
               !== String(spreadSheet[row][3])) {
             responseIfError[0]
@@ -206,12 +204,18 @@ export class ImportGenotypeTreatmentController {
                 } else {
                   const { status, response } = await genotipoController.getAll({
                     name_genotipo: spreadSheet[row][10],
+                    id_culture: idCulture,
                   });
+                  console.log('response');
+                  console.log(response);
                   if (status !== 400) {
                     const validateNca = await response[0]?.lote.map((item: any) => {
                       if (Number(item?.ncc) == Number(spreadSheet[row][column])) return true;
                       return false;
                     });
+
+                    console.log('validateNca');
+                    console.log(validateNca);
                     if (!validateNca?.includes(true)) {
                       responseIfError[Number(column)]
                         += responseGenericFactory(

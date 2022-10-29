@@ -488,7 +488,7 @@ export default function Listagem({
       if (columnOrder[item] === 'gmr') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'GMR',
+            name: 'GMR_Gen',
             title: 'gmr',
             orderList,
             fieldOrder,
@@ -505,7 +505,7 @@ export default function Listagem({
       }
       if (columnOrder[item] === 'statusAssay') {
         tableFields.push(
-          headerTableFactory('Status ens', 'assay_list.status'),
+          headerTableFactory('Status Ensaio', 'assay_list.status'),
         );
       }
       if (columnOrder[item] === 'genotipoName') {
@@ -622,8 +622,6 @@ export default function Listagem({
   };
 
   const replacementExcel = async (): Promise<void> => {
-    console.log('filter');
-    console.log(filter);
     await genotypeTreatmentService
       .getAll(`${filter}&excel=true`)
       .then(({ status, response }) => {
