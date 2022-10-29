@@ -37,6 +37,7 @@ import { departmentService, userPreferencesService } from "src/services";
 import * as XLSX from "xlsx";
 import { tableGlobalFunctions } from "src/helpers";
 import ITabs from "../../../../shared/utils/dropdown";
+import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
 
 interface IFilter {
   filterStatus: object | any;
@@ -128,6 +129,8 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver); //RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); //RR
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; //RR
@@ -219,22 +222,22 @@ export default function Listagem({
     await departmentService.update({ id, name, status });
   }
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
   function idHeaderFactory() {
     return {
@@ -341,7 +344,16 @@ export default function Listagem({
       //   tableFields.push(idHeaderFactory());
       // }
       if (columnCampos[index] === "name") {
-        tableFields.push(headerTableFactory("Nome", "name"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Nomeggg",
+            title: "name",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
+        // tableFields.push(headerTableFactory("Nome", "name"));
       }
       if (columnCampos[index] === "status") {
         tableFields.push(statusHeaderFactory());
@@ -352,7 +364,8 @@ export default function Listagem({
 
   async function handleOrder(
     column: string,
-    order: string | any
+    order: string | any,
+    name: string | any
   ): Promise<void> {
     // // Manage orders of colunms
     // const parametersFilter = await tableGlobalFunctions.handleOrderGlobal(column, order, filter, 'setor');
@@ -384,6 +397,7 @@ export default function Listagem({
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
