@@ -40,7 +40,6 @@ export class ImportExperimentGenotypeController {
       }
 
       for (const row in spreadSheet) {
-        // console.log("row ",row);
 
         if (row !== '0') {
           // experiments
@@ -167,7 +166,6 @@ export class ImportExperimentGenotypeController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                //     console.log("dsfsd  ",
                 //  {   nt: Number(spreadSheet[row][9]),
                 //     gli: spreadSheet[row][4],
                 //     // treatments_number: spreadSheet[row][8], //Nt Value
@@ -340,7 +338,6 @@ export class ImportExperimentGenotypeController {
                 nca: spreadSheet[row][16].toString(),
               });
 
-              // console.log("response---- ",{
               //   id: treatment[0]?.id,
               //   gli: spreadSheet[row][4],
               //   idExperiment : value_hold.idExperiment,
@@ -351,7 +348,6 @@ export class ImportExperimentGenotypeController {
               //   idLote : lote[0]?.id,
               //   nca :  spreadSheet[row][16].toString()
               //   });
-              // console.log("response12   ",response12);
             }
           }
           return { status: 200, message: 'Sub. de parcelas importado com sucesso' };

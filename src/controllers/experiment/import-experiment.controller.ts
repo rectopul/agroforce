@@ -401,7 +401,7 @@ export class ImportExperimentController {
                 if (status === 200) {
                   await assayListController.update({
                     id: assayList[0]?.id,
-                    status: 'UTILIZADO',
+                    status: 'EXP IMP.',
                   });
                 }
               }

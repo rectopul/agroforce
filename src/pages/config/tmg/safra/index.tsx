@@ -36,6 +36,7 @@ import { UserPreferenceController } from "../../../../controllers/user-preferenc
 import { safraService, userPreferencesService } from "../../../../services";
 import { tableGlobalFunctions } from "../../../../helpers";
 import ITabs from "../../../../shared/utils/dropdown";
+import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
 
 interface IFilter {
   filterStatus: object | any;
@@ -149,6 +150,7 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
@@ -309,23 +311,23 @@ export default function Listagem({
   //   }
   // }
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
   function idHeaderFactory() {
     return {
@@ -436,22 +438,47 @@ export default function Listagem({
       //   tableFields.push(idHeaderFactory());
       // }
       if (columnCampos[index] === "safraName") {
-        tableFields.push(headerTableFactory("Safra", "safraName"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Safra",
+            title: "safraName",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "year") {
-        tableFields.push(headerTableFactory("Ano", "year"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Ano",
+            title: "year",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "plantingStartTime") {
         tableFields.push(
-          headerTableFactory(
-            "Período ideal início de plantio",
-            "plantingStartTime"
-          )
+          headerTableFactoryGlobal({
+            name: "Período ideal início de plantio",
+            title: "plantingStartTime",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
         );
       }
       if (columnCampos[index] === "plantingEndTime") {
         tableFields.push(
-          headerTableFactory("Período ideal fim do plantio", "plantingEndTime")
+          headerTableFactoryGlobal({
+            name: "Período ideal fim do plantio",
+            title: "plantingEndTime",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
         );
       }
       if (columnCampos[index] === "status") {
@@ -465,12 +492,14 @@ export default function Listagem({
 
   async function handleOrder(
     column: string,
-    order: string | any
+    order: string | any,
+    name: string | any
   ): Promise<void> {
     // Gobal manage orders
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);

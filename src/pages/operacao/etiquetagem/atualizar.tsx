@@ -480,10 +480,8 @@ export default function Listagem({
   }
 
   async function deleteMultipleItems() {
-    console.log({ selectedCheckBox });
     // pegar os ids selecionados no estado selectedCheckBox
     const selectedCheckBoxIds = selectedCheckBox.map((i: any) => i.id);
-    console.log({ selectedCheckBoxIds });
 
     if (selectedCheckBox?.length <= 0) {
       return Swal.fire("Selecione os experimentos para excluir.");
@@ -796,13 +794,11 @@ export const getServerSideProps: GetServerSideProps = async ({
     `experimentGroupId=${experimentGroupId}&safraId=${safraId}` ||
     `&experimentGroupId=${experimentGroupId}&safraId=${safraId}`;
 
-  // console.log("server  ----- ",filterApplication);
   // removeCookies("filterBeforeEdit", { req, res });
   // removeCookies("pageBeforeEdit", { req, res });
 
   const param = `&experimentGroupId=${experimentGroupId}&safraId=${safraId}`;
 
-  // console.log("parama ---  ",param);
   const urlParametersExperiments: any = new URL(baseUrlExperiments);
   urlParametersExperiments.search = new URLSearchParams(param).toString();
   const requestOptions = {

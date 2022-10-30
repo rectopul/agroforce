@@ -19,7 +19,7 @@ import { HistoryGenotypeTreatmentController } from './history-genotype-treatment
 export class ImportGenotypeTreatmentController {
   static async validate(
     idLog: number,
-    { spreadSheet, created_by: createdBy }: ImportValidate,
+    { spreadSheet, idCulture, created_by: createdBy }: ImportValidate,
   ): Promise<IReturnObject> {
     const loteController = new LoteController();
     const genotipoController = new GenotipoController();
@@ -52,7 +52,6 @@ export class ImportGenotypeTreatmentController {
             treatments_number: spreadSheet[row][6],
             name_genotipo: spreadSheet[row][8],
           });
-
           if (treatmentsStatus === 400) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tratamento de genótipo não encontrado </li> <br>`;
@@ -75,7 +74,9 @@ export class ImportGenotypeTreatmentController {
             // eslint-disable-next-line no-param-reassign
             spreadSheet[row][3] = `0${spreadSheet[row][3]}`;
           }
-          if (treatments[0]?.assay_list.tecnologia.cod_tec !== spreadSheet[row][3]) {
+
+          if (String(treatments[0]?.assay_list.tecnologia.cod_tec)
+              !== String(spreadSheet[row][3])) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a tecnologia e diferente da cadastrada no ensaio. </li> <br>`;
           }
@@ -203,12 +204,18 @@ export class ImportGenotypeTreatmentController {
                 } else {
                   const { status, response } = await genotipoController.getAll({
                     name_genotipo: spreadSheet[row][10],
+                    id_culture: idCulture,
                   });
+                  console.log('response');
+                  console.log(response);
                   if (status !== 400) {
                     const validateNca = await response[0]?.lote.map((item: any) => {
                       if (Number(item?.ncc) == Number(spreadSheet[row][column])) return true;
                       return false;
                     });
+
+                    console.log('validateNca');
+                    console.log(validateNca);
                     if (!validateNca?.includes(true)) {
                       responseIfError[Number(column)]
                         += responseGenericFactory(

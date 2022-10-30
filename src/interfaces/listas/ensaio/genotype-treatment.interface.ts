@@ -44,4 +44,10 @@ export interface ITreatmentFilter {
   filterNtTo: string
   filterNtFrom: string
   filterStatusT: string
+  filterGgenCod: string
+  filterGgenName: string
+  filterBgmGenotypeTo: string
+  filterBgmGenotypeFrom: string
+  filterGmrTo: string
+  filterGmrFrom: string
 }

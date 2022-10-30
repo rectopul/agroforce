@@ -11,7 +11,7 @@ export default function handleOrderForeign(orderBy: any, orderType: any) {
       case 'genotipo':
         return `{ "${foreignKey}": { "${foreignColumn}": {"${foreignNextKey}": "${orderType}"} } }`;
       case 'experiment':
-          return `{ "${foreignKey}": { "${foreignColumn}": {"${foreignNextKey}": "${orderType}"} } }`;
+        return `{ "${foreignKey}": { "${foreignColumn}": {"${foreignNextKey}": "${orderType}"} } }`;
       default:
         return '';
     }

@@ -116,7 +116,11 @@ export class LoteController {
         parameters.cod_lote = JSON.parse(`{ "contains":"${options.filterCodLote}" }`);
       }
       if (options.filterNcc) {
-        parameters.ncc = Number(options.filterNcc);
+        if (options.filterNca === 'vazio') {
+          parameters.ncc = null;
+        } else {
+          parameters.ncc = Number(options.filterNcc);
+        }
       }
       if (options.filterPeso) {
         parameters.peso = Number(options.filterPeso);

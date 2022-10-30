@@ -1,4 +1,4 @@
-import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai';
 
 interface IHeaderTableFactory {
   name?: any;
@@ -9,7 +9,7 @@ interface IHeaderTableFactory {
   [x: string]: any;
 }
 
-export default function headerTableFactory({
+export default function headerTableFactoryGlobal({
   name,
   title,
   orderList,
@@ -17,8 +17,6 @@ export default function headerTableFactory({
   handleOrder,
   ...rest
 }: IHeaderTableFactory) {
-  console.log({ name, title, orderList, fieldOrder, handleOrder });
-
   return {
     title: (
       <div className="flex items-center">

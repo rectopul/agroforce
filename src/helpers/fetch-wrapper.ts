@@ -91,7 +91,6 @@ async function handlePaginationGlobal(currentPages: any, take: any, filter: any)
 
   // if(localStorage.getItem('orderSorting')){
   //   filter = localStorage.getItem('orderSorting');
-  //   console.log("orderSorting ",filter)
   // }
 
   if (localStorage.getItem('pageBeforeEdit')) {
@@ -125,7 +124,6 @@ async function handlePaginationGlobal(currentPages: any, take: any, filter: any)
 //   const myArray = await parametersFilter.split("&id_culture");
 
 //   if(myArray.length > 2){
-//     console.log(RemoveExtraCultureId)
 
 //     parametersFilter = "";
 //     parametersFilter = myArray[0]+"&id_culture"+myArray[1]

@@ -69,8 +69,6 @@ export class SequenciaDelineamentoController {
     parameters.AND = [];
     let orderBy: object | any;
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
         if (options.filterRepetitionFrom && options.filterRepetitionTo) {
           parameters.repeticao = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);

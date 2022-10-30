@@ -466,21 +466,14 @@ export class ImportNpeController {
                     { id_safra: idSafra, id_foco: npeDto.focoId },
                   );
                   npeDto.groupId = Number(groupResponse[0]?.id);
-                  console.log('npeDto');
-                  console.log(npeDto);
                   createMany.push(npeDto);
-                  console.log('createMany');
-                  console.log(createMany);
                 }
               }
             }
           }
           const npe = await npeController.create(createMany);
-
-          console.log('npe');
-          console.log(npe);
           await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
-          return { status: 200, message: 'NPE importado com sucesso' };
+          return { status: 200, message: 'Ambiente importado com sucesso' };
         } catch (error: any) {
           await logImportController.update({
             id: idLog,

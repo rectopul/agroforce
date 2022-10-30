@@ -2,33 +2,37 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
 
-import { useFormik } from "formik";
-import MaterialTable from "material-table";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import getConfig from "next/config";
-import { RequestInit } from "next/dist/server/web/spec-extension/request";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { ReactNode, useEffect, useState, useRef } from "react";
+import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import {
+  ReactNode, useEffect, useState, useRef,
+} from 'react';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from "react-beautiful-dnd";
-import { removeCookies, setCookies, getCookies } from "cookies-next";
+} from 'react-beautiful-dnd';
+import { removeCookies, setCookies, getCookies } from 'cookies-next';
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiTwotoneStar,
-} from "react-icons/ai";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line, RiPlantLine } from "react-icons/ri";
-import * as XLSX from "xlsx";
-import { tableGlobalFunctions } from "src/helpers";
+} from 'react-icons/ai';
+import {
+  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+} from 'react-icons/bi';
+import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RiFileExcel2Line, RiPlantLine } from 'react-icons/ri';
+import * as XLSX from 'xlsx';
+import { tableGlobalFunctions } from 'src/helpers';
 import {
   AccordionFilter,
   Button,
@@ -37,11 +41,11 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
-} from "../../../../components";
-import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
-import { cultureService, userPreferencesService } from "../../../../services";
-import ITabs from "../../../../shared/utils/dropdown";
-import headerTableFactory from "../../../../shared/utils/headerTableFactory";
+} from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { cultureService, userPreferencesService } from '../../../../services';
+import ITabs from '../../../../shared/utils/dropdown';
+import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 
 interface IFilter {
   filterStatus: object | any;
@@ -71,8 +75,8 @@ interface IData {
   filterApplication: object | any;
   pageBeforeEdit: string | any;
   filterBeforeEdit: string | any;
-  typeOrderServer: any | string; //RR
-  orderByserver: any | string; //RR
+  typeOrderServer: any | string; // RR
+  orderByserver: any | string; // RR
 }
 
 export default function Listagem({
@@ -82,8 +86,8 @@ export default function Listagem({
   filterApplication,
   pageBeforeEdit,
   filterBeforeEdit,
-  typeOrderServer, //RR
-  orderByserver, //RR
+  typeOrderServer, // RR
+  orderByserver, // RR
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
@@ -91,28 +95,26 @@ export default function Listagem({
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "TMG" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.cultura || {
     id: 0,
-    table_preferences: "id,name,desc,status",
+    table_preferences: 'id,name,desc,status',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences
+    preferences.table_preferences,
   );
 
   const [cultures, setCultures] = useState<ICulture[]>(() => allCultures);
   const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit)
+    Number(pageBeforeEdit),
   );
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [orderList, setOrder] = useState<number>(1);
-  const [arrowOrder, setArrowOrder] = useState<any>("");
+  const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // {
@@ -122,52 +124,52 @@ export default function Listagem({
     //   defaultChecked: () => camposGerenciados.includes('id'),
     // },
     {
-      name: "CamposGerenciados[]",
-      title: "Código Reduzido",
-      value: "name",
-      defaultChecked: () => camposGerenciados.includes("name"),
+      name: 'CamposGerenciados[]',
+      title: 'Código Reduzido',
+      value: 'name',
+      defaultChecked: () => camposGerenciados.includes('name'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Nome",
-      value: "desc",
-      defaultChecked: () => camposGerenciados.includes("desc"),
+      name: 'CamposGerenciados[]',
+      title: 'Nome',
+      value: 'desc',
+      defaultChecked: () => camposGerenciados.includes('desc'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Status",
-      value: "status",
-      defaultChecked: () => camposGerenciados.includes("status"),
+      name: 'CamposGerenciados[]',
+      title: 'Status',
+      value: 'status',
+      defaultChecked: () => camposGerenciados.includes('status'),
     },
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [colorStar, setColorStar] = useState<string>("");
+  const [colorStar, setColorStar] = useState<string>('');
   // const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>("");
+  const [orderType, setOrderType] = useState<string>('');
   const filtersStatusItem = [
-    { id: 2, name: "Todos" },
-    { id: 1, name: "Ativos" },
-    { id: 0, name: "Inativos" },
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
   ];
 
-  const filterStatusBeforeEdit = filterBeforeEdit.split("");
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
-  const [orderBy, setOrderBy] = useState<string>(orderByserver); //RR
-  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); //RR
+  const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
   const [fieldOrder, setFieldOrder] = useState<any>(null);
   const pathExtra = `skip=${
     currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; //RR
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: filterStatusBeforeEdit[13],
-      filterSearch: checkValue("filterSearch"),
-      orderBy: "",
-      typeOrder: "",
+      filterSearch: checkValue('filterSearch'),
+      orderBy: '',
+      typeOrder: '',
     },
     onSubmit: async ({ filterStatus, filterSearch }) => {
       const parametersFilter = `filterStatus=${filterStatus}&filterSearch=${filterSearch}`;
@@ -179,35 +181,35 @@ export default function Listagem({
     },
   });
 
-  //Calling common API
+  // Calling common API
   async function callingApi(parametersFilter: any) {
-    setCookies("filterBeforeEdit", parametersFilter);
-    setCookies("filterBeforeEditTypeOrder", typeOrder);
-    setCookies("filterBeforeEditOrderBy", orderBy);
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
 
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies("filtersParams", parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
     await cultureService.getAll(parametersFilter).then((response) => {
       if (response.status === 200 || response.status === 400) {
         setCultures(response.response);
         setTotalItems(response.total);
         tableRef.current.dataManager.changePageSize(
-          response.total >= take ? take : response.total
+          response.total >= take ? take : response.total,
         );
       }
     });
   }
 
-  //Call that function when change type order value.
+  // Call that function when change type order value.
   useEffect(() => {
     callingApi(filter);
   }, [typeOrder]);
 
   async function handleStatusCulture(
     idCulture: number,
-    data: ICulture
+    data: ICulture,
   ): Promise<void> {
     if (data.status === 0) {
       data.status = 1;
@@ -227,7 +229,9 @@ export default function Listagem({
       return copy;
     });
 
-    const { id, name, desc, status } = cultures[index];
+    const {
+      id, name, desc, status,
+    } = cultures[index];
 
     await cultureService.updateCulture({
       id,
@@ -241,7 +245,7 @@ export default function Listagem({
   async function handleOrder(
     column: string,
     order: string | any,
-    name: string | any
+    name: string | any,
   ): Promise<void> {
     // // Manage orders of colunms
     // const parametersFilter = await tableGlobalFunctions.handleOrderGlobal(column, order, filter, 'safra');
@@ -269,9 +273,10 @@ export default function Listagem({
     //   }
     // }
 
-    //Gobal manage orders
-    const { typeOrderG, columnG, orderByG, arrowOrder } =
-      await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setFieldOrder(name);
     setTypeOrder(typeOrderG);
@@ -281,7 +286,6 @@ export default function Listagem({
   }
 
   // useEffect(()=>{
-  //   // console.log("filterparams   -------------------",getCookies('lastPage'))
   //   removeCookies("filtersParams");
 
   //   setFilter('filterStatus=1')
@@ -324,45 +328,44 @@ export default function Listagem({
   function idHeaderFactory() {
     return {
       title: <div className="flex items-center">{arrowOrder}</div>,
-      field: "id",
+      field: 'id',
       width: 0,
       sorting: false,
-      render: () =>
-        colorStar === "#eba417" ? (
-          <div className="h-9 flex">
-            <div>
-              <button
-                type="button"
-                className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar("")}
-              >
-                <AiTwotoneStar size={20} color="#eba417" />
-              </button>
-            </div>
+      render: () => (colorStar === '#eba417' ? (
+        <div className="h-9 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('')}
+            >
+              <AiTwotoneStar size={20} color="#eba417" />
+            </button>
           </div>
-        ) : (
-          <div className="h-9 flex">
-            <div>
-              <button
-                type="button"
-                className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar("#eba417")}
-              >
-                <AiTwotoneStar size={20} />
-              </button>
-            </div>
+        </div>
+      ) : (
+        <div className="h-9 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('#eba417')}
+            >
+              <AiTwotoneStar size={20} />
+            </button>
           </div>
-        ),
+        </div>
+      )),
     };
   }
 
   function statusHeaderFactory() {
     return {
-      title: "Status",
-      field: "status",
+      title: 'Status',
+      field: 'status',
       sorting: false,
       searchable: false,
-      filterPlaceholder: "Filtrar por status",
+      filterPlaceholder: 'Filtrar por status',
       render: (rowData: ICulture) => (
         <div className="h-7 flex">
           <div className="h-7">
@@ -370,14 +373,14 @@ export default function Listagem({
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
               onClick={() => {
-                setCookies("pageBeforeEdit", currentPage?.toString());
-                setCookies("filterBeforeEdit", filter);
-                setCookies("filterBeforeEditTypeOrder", typeOrder);
-                setCookies("filterBeforeEditOrderBy", orderBy);
-                setCookies("filtersParams", filtersParams);
-                setCookies("lastPage", "atualizar");
-                localStorage.setItem("filterValueEdit", filtersParams);
-                localStorage.setItem("pageBeforeEdit", currentPage?.toString());
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('lastPage', 'atualizar');
+                localStorage.setItem('filterValueEdit', filtersParams);
+                localStorage.setItem('pageBeforeEdit', currentPage?.toString());
                 router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
@@ -390,12 +393,10 @@ export default function Listagem({
               <Button
                 title="Ativo"
                 icon={<FaRegThumbsUp size={14} />}
-                onClick={async () =>
-                  handleStatusCulture(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })
-                }
+                onClick={async () => handleStatusCulture(rowData.id, {
+                  status: rowData.status,
+                  ...rowData,
+                })}
                 bgColor="bg-green-600"
                 textColor="white"
               />
@@ -405,12 +406,10 @@ export default function Listagem({
               <Button
                 title="Inativo"
                 icon={<FaRegThumbsDown size={14} />}
-                onClick={async () =>
-                  handleStatusCulture(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })
-                }
+                onClick={async () => handleStatusCulture(rowData.id, {
+                  status: rowData.status,
+                  ...rowData,
+                })}
                 bgColor="bg-red-800"
                 textColor="white"
               />
@@ -422,36 +421,36 @@ export default function Listagem({
   }
 
   function columnsOrder(camposGerenciados: string) {
-    const columnCampos: string[] = camposGerenciados.split(",");
+    const columnCampos: string[] = camposGerenciados.split(',');
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
       // if (columnCampos[index] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
-      if (columnCampos[index] === "name") {
+      if (columnCampos[index] === 'name') {
         tableFields.push(
-          headerTableFactory({
-            name: "Código reduzido",
-            title: "name",
+          headerTableFactoryGlobal({
+            name: 'Código reduzido',
+            title: 'name',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "desc") {
+      if (columnCampos[index] === 'desc') {
         tableFields.push(
-          headerTableFactory({
-            name: "Nome",
-            title: "desc",
+          headerTableFactoryGlobal({
+            name: 'Nome',
+            title: 'desc',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "status") {
+      if (columnCampos[index] === 'status') {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -463,7 +462,7 @@ export default function Listagem({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = "";
+    let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -486,7 +485,7 @@ export default function Listagem({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
       userLogado.preferences.cultura = {
         id: preferences.id,
@@ -497,7 +496,7 @@ export default function Listagem({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -521,9 +520,9 @@ export default function Listagem({
       if (status === 200) {
         const newData = response.map((row: any) => {
           if (row.status === 0) {
-            row.status = "Inativo" as any;
+            row.status = 'Inativo' as any;
           } else {
-            row.status = "Ativo" as any;
+            row.status = 'Ativo' as any;
           }
           row.COD_REDUZIDO = row.name;
           row.NOME = row.desc;
@@ -538,32 +537,31 @@ export default function Listagem({
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "cultures");
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'cultures');
 
         // Buffer
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "buffer",
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "binary",
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, "Culturas.xlsx");
+        XLSX.writeFile(workBook, 'Culturas.xlsx');
       }
     });
   };
 
-  //manage total pages
+  // manage total pages
   async function handleTotalPages() {
     if (currentPage < 0) {
       setCurrentPage(0);
     }
     // else if (currentPage >= pages) {
     //   setCurrentPage(pages - 1);
-    //   console.log("inside....")
     // }
   }
 
@@ -580,14 +578,14 @@ export default function Listagem({
     //   }
     // });
 
-    await callingApi(filter); //handle pagination globly
+    await callingApi(filter); // handle pagination globly
   }
 
   // Checking defualt values
   function checkValue(value: any) {
     const parameter = tableGlobalFunctions.getValuesForFilter(
       value,
-      filtersParams
+      filtersParams,
     );
     return parameter;
   }
@@ -650,7 +648,7 @@ export default function Listagem({
                       type="text"
                       placeholder="cultura"
                       max="40"
-                      defaultValue={checkValue("filterSearch")}
+                      defaultValue={checkValue('filterSearch')}
                       id="filterSearch"
                       name="filterSearch"
                       onChange={formik.handleChange}
@@ -677,7 +675,7 @@ export default function Listagem({
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
               tableRef={tableRef}
-              style={{ background: "#f9fafb" }}
+              style={{ background: '#f9fafb' }}
               columns={columns}
               data={cultures}
               options={{
@@ -686,7 +684,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: "#f9fafb", height: 35 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: Number(take),
@@ -713,7 +711,7 @@ export default function Listagem({
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {
-                          router.push("cultura/cadastro");
+                          router.push('cultura/cadastro');
                         }}
                         href="cultura/cadastro"
                         icon={<RiPlantLine size={20} />}
@@ -721,7 +719,9 @@ export default function Listagem({
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado: {itemsTotal}
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
@@ -765,7 +765,7 @@ export default function Listagem({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value
+                                                generate.value,
                                               )}
                                             />
                                           </li>
@@ -794,59 +794,58 @@ export default function Listagem({
                     </div>
                   </div>
                 ),
-                Pagination: (props) =>
-                  (
-                    <div
-                      className="flex
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(0)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage <= 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill("")
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setCurrentPage(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(pages - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(0)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage <= 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(pages - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
                   ) as any,
               }}
             />
@@ -862,22 +861,21 @@ export const getServerSideProps: GetServerSideProps = async ({
   res,
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage =
-    (await (
-      await PreferencesControllers.getConfigGerais()
-    )?.response[0]?.itens_per_page) ?? 10;
+  const itensPerPage = (await (
+    await PreferencesControllers.getConfigGerais()
+  )?.response[0]?.itens_per_page) ?? 10;
 
   const { token } = req.cookies;
-  //Last page
-  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
+  // Last page
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
-  if (lastPageServer == undefined || lastPageServer == "No") {
-    removeCookies("filterBeforeEdit", { req, res });
-    removeCookies("pageBeforeEdit", { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("filtersParams", { req, res });
-    removeCookies("lastPage", { req, res });
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('filtersParams', { req, res });
+    removeCookies('lastPage', { req, res });
     // setCookies('filterParams','');
   }
 
@@ -886,31 +884,31 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : "filterStatus=1";
+    : 'filterStatus=1';
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : "filterStatus=1";
+    : 'filterStatus=1';
 
-  //RR
+  // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : "desc";
+    : 'desc';
 
-  //RR
+  // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : "name";
+    : 'name';
 
-  removeCookies("pageBeforeEdit", { req, res });
-  removeCookies("filterBeforeEdit", { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies('filterBeforeEdit', { req, res });
 
-  //RR
-  removeCookies("filterBeforeEditTypeOrder", { req, res });
-  removeCookies("filterBeforeEditOrderBy", { req, res });
-  removeCookies("lastPage", { req, res });
-  removeCookies("filtersParams", { req, res });
-  setCookies("filterParams", "");
+  // RR
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
+  removeCookies('filtersParams', { req, res });
+  setCookies('filterParams', '');
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
@@ -918,8 +916,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
@@ -934,8 +932,8 @@ export const getServerSideProps: GetServerSideProps = async ({
       filterApplication,
       pageBeforeEdit,
       filterBeforeEdit,
-      orderByserver, //RR
-      typeOrderServer, //RR
+      orderByserver, // RR
+      typeOrderServer, // RR
     },
   };
 };
