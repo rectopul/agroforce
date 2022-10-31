@@ -212,6 +212,9 @@ export class GenotypeTreatmentController {
         orderBy,
       );
 
+      console.log('response');
+      console.log(response);
+
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }
