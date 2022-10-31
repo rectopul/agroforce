@@ -53,6 +53,7 @@ import {
 } from "../../../interfaces/listas/operacao/etiquetagem/etiquetagem.interface";
 import { IReturnObject } from "../../../interfaces/shared/Import.interface";
 import { tableGlobalFunctions } from "../../../helpers";
+import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
 
 export default function Listagem({
   allExperimentGroup,
@@ -176,6 +177,8 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
@@ -277,7 +280,11 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     setCookies("filtersParams-test-rr", filtersParams);
   }, [filtersParams]);
 
-  async function handleOrder(column: string, order: number): Promise<void> {
+  async function handleOrder(
+    column: string,
+    order: number,
+    name: any
+  ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
     // if (order === 1) {
@@ -319,6 +326,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
@@ -349,23 +357,23 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     setIsLoading(false);
   }
 
-  function headerTableFactory(name: string, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: string, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
   function actionTableFactory() {
     return {
@@ -443,22 +451,70 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
       if (columnOrder[item] === "name") {
-        tableFields.push(headerTableFactory("Nome do grupo de exp.", "name"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Nome do grupo de exp.",
+            title: "name",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnOrder[item] === "experimentAmount") {
-        tableFields.push(headerTableFactory("Qtde. exp.", "experimentAmount"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Qtde. exp.",
+            title: "experimentAmount",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnOrder[item] === "tagsToPrint") {
-        tableFields.push(headerTableFactory("Etiq. a imprimir", "tagsToPrint"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Etiq. a imprimir",
+            title: "tagsToPrint",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnOrder[item] === "tagsPrinted") {
-        tableFields.push(headerTableFactory("Etiq. impressas", "tagsPrinted"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Etiq. impressas",
+            title: "tagsPrinted",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnOrder[item] === "totalTags") {
-        tableFields.push(headerTableFactory("Total etiquetas", "totalTags"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Total etiquetas",
+            title: "totalTags",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnOrder[item] === "status") {
-        tableFields.push(headerTableFactory("Status grupo exp.", "status"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Status grupo exp.",
+            title: "status",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnOrder[item] === "action") {
         tableFields.push(actionTableFactory());

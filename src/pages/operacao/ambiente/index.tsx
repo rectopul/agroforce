@@ -37,6 +37,7 @@ import {
 } from "../../../components";
 import * as ITabs from "../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../helpers";
+import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
 
 interface INpeProps {
   id: number | any;
@@ -201,6 +202,8 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
   // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
   const pathExtra = `skip=${currentPage * Number(take)}&take=${take}`;
 
@@ -336,23 +339,23 @@ export default function Listagem({
   //   }
   // }
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
   function tecnologiaHeaderFactory(title: string, name: string) {
     return {
@@ -386,32 +389,107 @@ export default function Listagem({
     Object.keys(columnCampos).forEach((item) => {
       if (columnCampos[item] === "local") {
         tableFields.push(
-          headerTableFactory("Lugar de cultura", "local.name_local_culture")
+          headerTableFactoryGlobal({
+            name: "Lugar de cultura",
+            title: "local.name_local_culture",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
         );
       }
       if (columnCampos[item] === "safra") {
-        tableFields.push(headerTableFactory("Safra", "safra.safraName"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Safra",
+            title: "safra.safraName",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[item] === "foco") {
-        tableFields.push(headerTableFactory("Foco", "foco.name"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Foco",
+            title: "foco.name",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[item] === "ensaio") {
-        tableFields.push(headerTableFactory("Ensaio", "type_assay.name"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Ensaio",
+            title: "type_assay.name",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[item] === "tecnologia") {
-        tableFields.push(tecnologiaHeaderFactory("Tecnologia", "tecnologia"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Tecnologia",
+            title: "tecnologia",
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: any) => (
+              <div>
+                {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
+              </div>
+            ),
+          })
+        );
       }
       if (columnCampos[item] === "epoca") {
-        tableFields.push(headerTableFactory("Época", "epoca"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Época",
+            title: "epoca",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[item] === "npei") {
-        tableFields.push(headerTableFactory("NPE Inicial", "npei_i"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "NPE Inicial",
+            title: "npe_i",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[item] === "npef") {
-        tableFields.push(headerTableFactory("NPE Final", "npef"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "NPE Final",
+            title: "npef",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[item] === "grp") {
-        tableFields.push(headerTableFactory("GRP", "group.group"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "GRP",
+            title: "group.group",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
     });
     return tableFields;
@@ -421,7 +499,8 @@ export default function Listagem({
 
   async function handleOrder(
     column: string,
-    order: string | any
+    order: string | any,
+    name: any
   ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
@@ -469,6 +548,7 @@ export default function Listagem({
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
