@@ -38,6 +38,12 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma/BaltimoreCyberTrustRoot.crt.pem /tmp/BaltimoreCyberTrustRoot.crt.pem
 
+# Essentials
+RUN apk add -U tzdata
+ENV TZ=America/Fortaleza
+RUN cp /usr/share/zoneinfo/America/Fortaleza /etc/localtime
+
+
 USER nextjs
 
 EXPOSE 3000
