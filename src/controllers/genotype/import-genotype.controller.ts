@@ -270,7 +270,7 @@ export class ImportGenotypeController {
                     id_culture: idCulture,
                     safraName: String(spreadSheet[row][column]),
                   });
-                  if (safras.total <= 0) {
+                  if (safras.length <= 0) {
                     if (safras?.safraName !== spreadSheet[row][column]) {
                       responseIfError[Number(column)] += responseGenericFactory(
                         Number(column) + 1,

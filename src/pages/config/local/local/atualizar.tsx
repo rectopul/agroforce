@@ -31,7 +31,6 @@ export interface IData {
   itensPerPage: number;
   filterApplication: object | any;
   id_local: number;
-  id_safra: number;
   local: object | any,
   pageBeforeEdit: string | any
 }
@@ -55,7 +54,7 @@ interface IUpdateLocal {
 }
 
 export default function AtualizarLocal({
-  local, allCultureUnity, totalItems, itensPerPage, filterApplication, id_local, id_safra, pageBeforeEdit,
+  local, allCultureUnity, totalItems, itensPerPage, filterApplication, id_local, pageBeforeEdit,
 }: IData) {
   const { TabsDropDowns } = ITabs.default;
 
@@ -218,7 +217,7 @@ export default function AtualizarLocal({
         parametersFilter = filter;
       }
     } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_safra=${id_safra}&id_local=${id_local}`;
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_local=${id_local}`;
     } else {
       parametersFilter = filter;
     }
@@ -291,7 +290,6 @@ export default function AtualizarLocal({
           delete row.safra;
           delete row.name_unity_culture;
           delete row.year;
-          delete row.id_safra;
           delete row.id;
           delete row.id_unity_culture;
           delete row.id_local;
@@ -648,7 +646,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query }
 
   const { token } = req.cookies;
   const id_local = query.id;
-  const id_safra = req.cookies.safraId;
   const pageBeforeEdit = req.cookies.pageBeforeEdit ? req.cookies.pageBeforeEdit : 0;
 
   const { publicRuntimeConfig } = getConfig();
@@ -665,7 +662,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query }
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/local`;
   const responseLocal = await fetch(`${baseUrlShow}/${query.id}`, requestOptions);
 
-  const filterApplication = `filterStatus=1&id_safra=${id_safra}&id_local=${id_local}`;
+  const filterApplication = `filterStatus=1&&id_local=${id_local}`;
 
   const { response: allCultureUnity, total: totalItems }: any = await responseUnidadeCultura.json();
 
@@ -678,7 +675,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query }
       itensPerPage,
       filterApplication,
       id_local,
-      id_safra,
       local,
       pageBeforeEdit,
     },

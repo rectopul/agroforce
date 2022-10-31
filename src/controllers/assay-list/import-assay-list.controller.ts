@@ -389,7 +389,7 @@ export class ImportAssayListController {
                   id_type_assay: typeAssay[0]?.id,
                   id_tecnologia: technology[0]?.id,
                   gli: spreadSheet[row][4],
-                  bgm: Number(spreadSheet[row][6]),
+                  bgm: (spreadSheet[row][6]) ? Number(spreadSheet[row][6]) : null,
                   project: String(spreadSheet[row][7]),
                   created_by: createdBy,
                 });
@@ -414,7 +414,7 @@ export class ImportAssayListController {
                   id_type_assay: typeAssay[0]?.id,
                   id_tecnologia: technology[0]?.id,
                   gli: spreadSheet[row][4],
-                  bgm: Number(spreadSheet[row][6]),
+                  bgm: (spreadSheet[row][6]) ? Number(spreadSheet[row][6]) : null,
                   project: String(spreadSheet[row][7]),
                   created_by: createdBy,
                 });

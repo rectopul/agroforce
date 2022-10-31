@@ -158,6 +158,11 @@ export class ImportController {
       }
       const protocolMessage = validateProtocolLevel(data.spreadSheet);
       if (protocolMessage.length > 0) {
+        await this.logImportController.update({
+          id: responseLog?.id,
+          status: 1,
+          state: 'INVALIDA',
+        });
         return { status: 400, message: protocolMessage };
       }
 
@@ -175,6 +180,11 @@ export class ImportController {
           return { status: 400, response: [], message: 'Nenhum protocol_level configurado ' };
       }
     } catch (error: any) {
+      await this.logImportController.update({
+        id: responseLog?.id,
+        status: 1,
+        state: 'FALHA',
+      });
       handleError('Validate protocol controller', 'Validate protocol', error.message);
       throw new Error('[Controller] - Validate protocol erro');
     } finally {
