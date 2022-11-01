@@ -38,6 +38,7 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
+  ButtonToogleConfirmation,
 } from "../../../components";
 import { quadraService, userPreferencesService } from "../../../services";
 import { UserPreferenceController } from "../../../controllers/user-preference.controller";
@@ -232,15 +233,10 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
+  async function handleStatus(data: IQuadra): Promise<void> {
     const parametersFilter = `filterStatus=${1}&cod_quadra=${
       data.cod_quadra
     }&local_preparo=${data.local.name_local_culture}`;
-    if (data.status === 0) {
-      data.status = 1;
-    } else {
-      data.status = 0;
-    }
 
     await quadraService.getAll(parametersFilter).then(async ({ status }) => {
       if (status === 200 && data.status === 1) {
@@ -248,22 +244,20 @@ export default function Listagem({
         return;
       }
       await quadraService.update({
-        id: idQuadra,
-        status: data.status,
+        id: data?.id,
+        status: data.status === 0 ? 1 : 0,
       });
     });
 
     const index = quadra.findIndex(
-      (quadraIndex) => quadraIndex.id === idQuadra
+      (quadraIndex) => quadraIndex.id === data?.id
     );
 
-    if (index === -1) {
-      return;
-    }
+    if (index === -1) return;
 
     setQuadra((oldSafra) => {
       const copy = [...oldSafra];
-      copy[index].status = data.status;
+      copy[index].status = data.status === 0 ? 1 : 0;
       return copy;
     });
   }
@@ -407,37 +401,12 @@ export default function Listagem({
             />
           </div>
           <div style={{ width: 5 }} />
-          {rowData.status === 1 ? (
-            <div className="h-7">
-              <Button
-                icon={<FaRegThumbsUp size={14} />}
-                onClick={async () =>
-                  handleStatus(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })
-                }
-                title="Ativo"
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          ) : (
-            <div className="h-7">
-              <Button
-                icon={<FaRegThumbsDown size={14} />}
-                onClick={async () =>
-                  handleStatus(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })
-                }
-                title="Inativo"
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          )}
+          <ButtonToogleConfirmation
+            data={rowData}
+            text="a quadra"
+            keyName="name"
+            onPress={handleStatus}
+          />
         </div>
       ),
     };
