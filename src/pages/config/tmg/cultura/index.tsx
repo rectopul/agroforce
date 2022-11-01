@@ -207,33 +207,33 @@ export default function Listagem({
   }, [typeOrder]);
 
   async function handleStatusCulture(data: any): Promise<void> {
-    if (data.status === 0) {
-      data.status = 1;
-    } else {
-      data.status = 0;
-    }
+    // if (data.status === 0) {
+    //   data.status = 1;
+    // } else {
+    //   data.status = 0;
+    // }
 
-    const index = cultures.findIndex((culture) => culture.id === data?.id);
+    // const index = cultures.findIndex((culture) => culture.id === data?.id);
 
-    if (index === -1) {
-      return;
-    }
+    // if (index === -1) return;
 
-    setCultures((oldCulture) => {
-      const copy = [...oldCulture];
-      copy[index].status = data.status;
-      return copy;
-    });
+    // setCultures((oldCulture) => {
+    //   const copy = [...oldCulture];
+    //   copy[index].status = data.status;
+    //   return copy;
+    // });
 
-    const { id, name, desc, status } = cultures[index];
+    // const { id, name, desc, status } = cultures[index];
 
     await cultureService.updateCulture({
-      id,
-      name,
-      desc,
-      status,
+      id: data?.id,
+      name: data?.name,
+      desc: data?.desc,
+      status: data?.status == 0 ? 1 : 0,
       created_by: Number(userLogado.id),
     });
+
+    handlePagination();
   }
 
   async function handleOrder(

@@ -317,30 +317,35 @@ export default function TipoEnsaio({
     setArrowOrder(arrowOrder);
   }
 
-  async function handleStatus({ id, status }: any): Promise<void> {
-    console.log({ id, status });
+  async function handleStatus(data: any): Promise<void> {
+    // console.log({ id, status });
 
-    if (status) {
-      status = 1;
-    } else {
-      status = 0;
-    }
+    // if (status) {
+    //   status = 1;
+    // } else {
+    //   status = 0;
+    // }
 
-    await typeAssayService.update({ id, status });
-
-    const index = typeAssay.findIndex(
-      (typeAssayIndex) => typeAssayIndex.id == id
-    );
-
-    if (index === -1) {
-      return;
-    }
-
-    setTypeAssay((oldUser) => {
-      const copy = [...oldUser];
-      copy[index].status = status;
-      return copy;
+    await typeAssayService.update({
+      id: data?.id,
+      status: data?.status === 1 ? 0 : 1,
     });
+
+    // const index = typeAssay.findIndex(
+    //   (typeAssayIndex) => typeAssayIndex.id == id
+    // );
+
+    // if (index === -1) {
+    //   return;
+    // }
+
+    // setTypeAssay((oldUser) => {
+    //   const copy = [...oldUser];
+    //   copy[index].status = status;
+    //   return copy;
+    // });
+
+    handlePagination();
   }
 
   // function headerTableFactory(name: any, title: string) {

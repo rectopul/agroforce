@@ -534,21 +534,24 @@ export default function Listagem({
           id: data?.id,
           status: data?.status === 0 ? 1 : 0,
         });
-        const index = delineamento.findIndex(
-          (delineamento) => delineamento.id === data?.id
-        );
 
-        if (index === -1) {
-          return;
-        }
+        handlePagination();
 
-        setDelineamento((oldSafra) => {
-          const copy = [...oldSafra];
-          copy[index].status = data?.status === 0 ? 1 : 0;
-          return copy;
-        });
+        // const index = delineamento.findIndex(
+        //   (delineamento) => delineamento.id === data?.id
+        // );
 
-        const { id, status } = delineamento[index];
+        // if (index === -1) {
+        //   return;
+        // }
+
+        // setDelineamento((oldSafra) => {
+        //   const copy = [...oldSafra];
+        //   copy[index].status = data?.status === 0 ? 1 : 0;
+        //   return copy;
+        // });
+
+        // const { id, status } = delineamento[index];
       }
     });
     // } else {

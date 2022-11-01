@@ -200,7 +200,7 @@ export default function Listagem({
     if (response) {
       setFocos(response?.response);
       setTotalItems(response?.total);
-      tableRef.current.dataManager.changePageSize(
+      tableRef?.current?.dataManager?.changePageSize(
         response?.total >= take ? take : response?.total
       );
     }
@@ -221,7 +221,8 @@ export default function Listagem({
     const params = `filterStatus=${1}&id_culture=${cultureId}&id_safra=${safraId}&filterSearch=${
       data.name
     }`;
-    const index: any = await handleStatusGlobal({
+
+    await handleStatusGlobal({
       id: data?.id,
       status: data.status,
       service: focoService,
@@ -229,6 +230,7 @@ export default function Listagem({
       table: "foco",
       data: focos,
     });
+
     // if (!index || index === -1) {
     //   return;
     // }

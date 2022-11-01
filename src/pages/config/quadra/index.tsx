@@ -247,19 +247,21 @@ export default function Listagem({
         id: data?.id,
         status: data.status === 0 ? 1 : 0,
       });
+
+      handlePagination();
     });
 
-    const index = quadra.findIndex(
-      (quadraIndex) => quadraIndex.id === data?.id
-    );
+    // const index = quadra.findIndex(
+    //   (quadraIndex) => quadraIndex.id === data?.id
+    // );
 
-    if (index === -1) return;
+    // if (index === -1) return;
 
-    setQuadra((oldSafra) => {
-      const copy = [...oldSafra];
-      copy[index].status = data.status === 0 ? 1 : 0;
-      return copy;
-    });
+    // setQuadra((oldSafra) => {
+    //   const copy = [...oldSafra];
+    //   copy[index].status = data.status === 0 ? 1 : 0;
+    //   return copy;
+    // });
   }
 
   async function handleOrder(

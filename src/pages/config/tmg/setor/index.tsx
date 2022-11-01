@@ -197,27 +197,33 @@ export default function Listagem({
   }, [typeOrder]);
 
   async function handleStatusItem(data: IDepartment): Promise<void> {
-    if (data.status === 1) {
-      data.status = 0;
-    } else {
-      data.status = 1;
-    }
+    // if (data.status === 1) {
+    //   data.status = 0;
+    // } else {
+    //   data.status = 1;
+    // }
 
-    const index = items.findIndex((item) => item.id === data?.id);
+    // const index = items.findIndex((item) => item.id === data?.id);
 
-    if (index === -1) {
-      return;
-    }
+    // if (index === -1) {
+    //   return;
+    // }
 
-    setItems((oldItem) => {
-      const copy = [...oldItem];
-      copy[index].status = data.status;
-      return copy;
+    // setItems((oldItem) => {
+    //   const copy = [...oldItem];
+    //   copy[index].status = data.status;
+    //   return copy;
+    // });
+
+    // const { id, status, name } = items[index];
+
+    await departmentService.update({
+      id: data?.id,
+      name: data?.name,
+      status: data?.status === 0 ? 1 : 0,
     });
 
-    const { id, status, name } = items[index];
-
-    await departmentService.update({ id, name, status });
+    handlePagination();
   }
 
   // function headerTableFactory(name: any, title: string) {

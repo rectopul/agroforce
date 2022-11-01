@@ -604,19 +604,21 @@ export default function Listagem({
           status: data?.status == 1 ? 0 : 1,
         });
 
-        const index = quadras.findIndex(
-          (layout: any) => layout.id === data?.id
-        );
+        handlePagination();
 
-        if (index === -1) return;
+        // const index = quadras.findIndex(
+        //   (layout: any) => layout.id === data?.id
+        // );
 
-        setQuadra((oldSafra: any) => {
-          const copy = [...oldSafra];
-          copy[index].status = data?.status == 1 ? 0 : 1;
-          return copy;
-        });
+        // if (index === -1) return;
 
-        const { id, status } = quadras[index];
+        // setQuadra((oldSafra: any) => {
+        //   const copy = [...oldSafra];
+        //   copy[index].status = data?.status == 1 ? 0 : 1;
+        //   return copy;
+        // });
+
+        // const { id, status } = quadras[index];
       }
     });
     // } else {

@@ -225,40 +225,42 @@ export default function Listagem({
   }, [typeOrder]);
 
   async function handleStatusSafra(data: ISafra): Promise<void> {
-    if (data.status === 1) {
-      data.status = 0;
-    } else {
-      data.status = 1;
-    }
+    // if (data.status === 1) {
+    //   data.status = 0;
+    // } else {
+    //   data.status = 1;
+    // }
 
-    const index = safras.findIndex((safra) => safra.id === data?.id);
+    // const index = safras.findIndex((safra) => safra.id === data?.id);
 
-    if (index === -1) {
-      return;
-    }
+    // if (index === -1) {
+    //   return;
+    // }
 
     await safraService.updateSafras({
       id: data?.id,
-      status: data.status,
+      status: data?.status === 1 ? 0 : 1,
     });
 
-    setSafras((oldSafra) => {
-      const copy = [...oldSafra];
-      copy[index].status = data.status;
-      return copy;
-    });
+    // setSafras((oldSafra) => {
+    //   const copy = [...oldSafra];
+    //   copy[index].status = data.status;
+    //   return copy;
+    // });
 
-    const { id, safraName, year, plantingStartTime, plantingEndTime, status } =
-      safras[index];
+    // const { id, safraName, year, plantingStartTime, plantingEndTime, status } =
+    //   safras[index];
 
-    await safraService.updateSafras({
-      id,
-      safraName,
-      year,
-      plantingStartTime,
-      plantingEndTime,
-      status,
-    });
+    // await safraService.updateSafras({
+    //   id,
+    //   safraName,
+    //   year,
+    //   plantingStartTime,
+    //   plantingEndTime,
+    //   status,
+    // });
+
+    handlePagination();
   }
 
   // async function handleOrder(
