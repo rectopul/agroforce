@@ -306,7 +306,7 @@ export default function Listagem({
           <div className="h-7">
             <ButtonToogleConfirmation
               data={rowData}
-              text="a cultura"
+              text="o setor"
               keyName="name"
               onPress={handleStatusItem}
             />
@@ -607,7 +607,7 @@ export default function Listagem({
                 sorting: true,
                 showTitle: false,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 0,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
