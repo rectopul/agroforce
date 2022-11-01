@@ -1,4 +1,4 @@
-import Modal from 'react-modal';
+import Modal from "react-modal";
 
 interface IModalConfirmationProps {
   isOpen: boolean;
@@ -18,20 +18,26 @@ export function ModalConfirmation({
       isOpen={isOpen}
       shouldCloseOnOverlayClick={false}
       shouldCloseOnEsc={false}
-      onRequestClose={() => { onCancel(); }}
+      onRequestClose={() => {
+        onCancel();
+      }}
       overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
       className="flex flex-col w-full h-44 max-w-xl bg-white rounded-3xl pt-2 pb-4 px-8 relative shadow-lg shadow-gray-900/50"
     >
       <div className="flex-1 flex-col font-bold text-center">
-        <div className="flex-1 text-xl mt-2">
-          {text}
-        </div>
-        <div className="flex justify-center" style={{ bottom: 20, left: 160, position: 'absolute' }}>
+        <div className="flex-1 text-xl mt-2">{text}</div>
+        <div
+          className="flex justify-center"
+          style={{ bottom: 20, left: 160, position: "absolute" }}
+        >
           <div className="w-28 h-9 rounded-full flex justify-center items-center bg-blue-900 text-base text-white font-normal">
             <button
               className="flex-1"
               type="button"
-              onClick={() => onPress()}
+              onClick={() => {
+                onPress();
+                onCancel();
+              }}
             >
               SIM
             </button>

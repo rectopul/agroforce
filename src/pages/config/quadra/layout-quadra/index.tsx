@@ -39,6 +39,7 @@ import {
 } from "../../../../components";
 import * as ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
+import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
 
 interface ILayoultProps {
   id: number | any;
@@ -193,6 +194,8 @@ export default function Listagem({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
@@ -280,22 +283,22 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
   function idHeaderFactory() {
     return {
@@ -422,29 +425,74 @@ export default function Listagem({
       //   tableFields.push(idHeaderFactory());
       // }
       if (columnCampos[item] === "esquema") {
-        tableFields.push(headerTableFactory("Esquema", "esquema"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Esquema",
+            title: "esquema",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
 
       if (columnCampos[item] === "local") {
-        tableFields.push(headerTableFactory("Local", "local"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Local",
+            title: "local",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
 
       if (columnCampos[item] === "plantadeira") {
-        tableFields.push(headerTableFactory("Plantadeiras", "plantadeira"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Plantadeiras",
+            title: "plantadeira",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
 
       if (columnCampos[item] === "tiros") {
-        tableFields.push(headerTableFactory("Tiros", "tiros"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Tiros",
+            title: "tiros",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
-
       if (columnCampos[item] === "disparos") {
-        tableFields.push(headerTableFactory("Disparos", "disparos"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Disparos",
+            title: "disparos",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
-
       if (columnCampos[item] === "parcelas") {
-        tableFields.push(headerTableFactory("Parcelas", "parcelas"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Parcelas",
+            title: "parcelas",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
-
       if (columnCampos[item] === "status") {
         tableFields.push(statusHeaderFactory());
       }
@@ -454,7 +502,8 @@ export default function Listagem({
 
   async function handleOrder(
     column: string,
-    order: string | any
+    order: string | any,
+    name: any
   ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
@@ -503,6 +552,7 @@ export default function Listagem({
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);

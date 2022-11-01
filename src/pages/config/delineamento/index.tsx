@@ -40,6 +40,7 @@ import {
 } from "../../../components";
 import * as ITabs from "../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../helpers";
+import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
 
 interface IDelineamentoProps {
   id: number | any;
@@ -172,6 +173,8 @@ export default function Listagem({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
@@ -253,22 +256,22 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
   function idHeaderFactory() {
     return {
@@ -347,16 +350,38 @@ export default function Listagem({
       //   tableFields.push(idHeaderFactory());
       // }
       if (columnCampos[item] === "name") {
-        tableFields.push(headerTableFactory("Nome", "name"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Nome",
+            title: "name",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
 
       if (columnCampos[item] === "repeticao") {
-        tableFields.push(headerTableFactory("Repetição", "repeticao"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Repetição",
+            title: "repeticao",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
 
       if (columnCampos[item] === "trat_repeticao") {
         tableFields.push(
-          headerTableFactory("Trat. Repetição", "trat_repeticao")
+          headerTableFactoryGlobal({
+            name: "Trat. Repetição",
+            title: "trat_repeticao",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
         );
       }
 
@@ -364,40 +389,43 @@ export default function Listagem({
         tableFields.push(statusHeaderFactory());
       }
       if (columnCampos[item] === "sequencia") {
-        tableFields.push({
-          title: "Sequência",
-          field: "sequencia",
-          sorting: false,
-          searchable: false,
-          filterPlaceholder: "Filtrar por status",
-          render: (rowData: IDelineamentoProps) => (
-            <div className="h-7 flex">
-              <div
-                className="
-                  h-7
-                "
-              >
-                <Button
-                  icon={<AiOutlineTable size={14} />}
-                  onClick={() => {
-                    setCookies("pageBeforeEdit", currentPage?.toString());
-                    setCookies("filterBeforeEdit", filter);
-                    setCookies("filterBeforeEditTypeOrder", typeOrder);
-                    setCookies("filterBeforeEditOrderBy", orderBy);
-                    setCookies("filtersParams", filtersParams);
-                    setCookies("lastPage", "sequencia-delineamento");
-                    router.push(
-                      `delineamento/sequencia-delineamento?id_delineamento=${rowData.id}`
-                    );
-                  }}
-                  bgColor="bg-yellow-500"
-                  textColor="white"
-                  title={`Sequência de ${rowData.name}`}
-                />
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Sequência",
+            title: "sequencia",
+            orderList,
+            fieldOrder,
+            handleOrder,
+            filterPlaceholder: "Filtrar por status",
+            render: (rowData: IDelineamentoProps) => (
+              <div className="h-7 flex">
+                <div
+                  className="
+                    h-7
+                  "
+                >
+                  <Button
+                    icon={<AiOutlineTable size={14} />}
+                    onClick={() => {
+                      setCookies("pageBeforeEdit", currentPage?.toString());
+                      setCookies("filterBeforeEdit", filter);
+                      setCookies("filterBeforeEditTypeOrder", typeOrder);
+                      setCookies("filterBeforeEditOrderBy", orderBy);
+                      setCookies("filtersParams", filtersParams);
+                      setCookies("lastPage", "sequencia-delineamento");
+                      router.push(
+                        `delineamento/sequencia-delineamento?id_delineamento=${rowData.id}`
+                      );
+                    }}
+                    bgColor="bg-yellow-500"
+                    textColor="white"
+                    title={`Sequência de ${rowData.name}`}
+                  />
+                </div>
               </div>
-            </div>
-          ),
-        });
+            ),
+          })
+        );
       }
     });
     return tableFields;
@@ -405,7 +433,8 @@ export default function Listagem({
 
   async function handleOrder(
     column: string,
-    order: string | any
+    order: string | any,
+    name: any
   ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
@@ -454,6 +483,7 @@ export default function Listagem({
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);

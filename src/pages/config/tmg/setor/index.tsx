@@ -346,7 +346,7 @@ export default function Listagem({
       if (columnCampos[index] === "name") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Nomeggg",
+            name: "Nome",
             title: "name",
             orderList,
             fieldOrder,
