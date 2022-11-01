@@ -43,6 +43,7 @@ import { quadraService, userPreferencesService } from "../../../services";
 import { UserPreferenceController } from "../../../controllers/user-preference.controller";
 import ITabs from "../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../helpers";
+import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
 
 interface IFilter {
   filterStatus: object | any;
@@ -163,6 +164,8 @@ export default function Listagem({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
@@ -267,7 +270,8 @@ export default function Listagem({
 
   async function handleOrder(
     column: string,
-    order: string | any
+    order: string | any,
+    name: any
   ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
@@ -316,29 +320,30 @@ export default function Listagem({
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
   }
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
   function idHeaderFactory() {
     return {
@@ -447,30 +452,92 @@ export default function Listagem({
       //   tableFields.push(idHeaderFactory());
       // }
       if (columnCampos[index] === "cod_quadra") {
-        tableFields.push(headerTableFactory("Código quadra", "cod_quadra"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Código quadra",
+            title: "cod_quadra",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "comp_p") {
-        tableFields.push(headerTableFactory("Comp P", "comp_p"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Comp P",
+            title: "comp_p",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "linha_p") {
-        tableFields.push(headerTableFactory("Linha P", "linha_p"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Linha P",
+            title: "linha_p",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "esquema") {
-        tableFields.push(headerTableFactory("Esquema", "esquema"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Esquema",
+            title: "esquema",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "divisor") {
-        tableFields.push(headerTableFactory("Divisor", "divisor"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Divisor",
+            title: "divisor",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "local_plantio") {
-        tableFields.push(headerTableFactory("Local plantio", "local_plantio"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Local plantio",
+            title: "local_plantio",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "local_preparo") {
         tableFields.push(
-          headerTableFactory("Local preparo", "local.name_local_culture")
+          headerTableFactoryGlobal({
+            name: "Local preparo",
+            title: "local.name_local_culture",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
         );
       }
       if (columnCampos[index] === "allocation") {
-        tableFields.push(headerTableFactory("Status", "allocation"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Status",
+            title: "allocation",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "action") {
         tableFields.push(statusHeaderFactory());

@@ -46,6 +46,7 @@ import {
 } from "../../../services";
 import * as ITabs from "../../../shared/utils/dropdown";
 import { IExperiments } from "../../../interfaces/listas/experimento/experimento.interface";
+import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
 
 export default function Listagem({
   experimentGroup,
@@ -102,6 +103,8 @@ export default function Listagem({
   ]);
   const [orderBy, setOrderBy] = useState<string>("");
   const [orderType, setOrderType] = useState<string>("");
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
   const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   // const take: number = itensPerPage;
@@ -114,7 +117,11 @@ export default function Listagem({
   const [isOpenModalConfirm, setIsOpenModalConfirm] = useState<boolean>(false);
   const [itemSelectedDelete, setItemSelectedDelete] = useState<any>(null);
 
-  async function handleOrder(column: string, order: number): Promise<void> {
+  async function handleOrder(
+    column: string,
+    order: number,
+    name: any
+  ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
@@ -151,51 +158,53 @@ export default function Listagem({
     } else {
       setOrder(orderList + 1);
     }
+
+    setFieldOrder(name);
   }
 
-  function headerTableFactory(name: string, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: string, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
-  function tecnologiaHeaderFactory(name: string, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: "tecnologia",
-      width: 0,
-      sorting: true,
-      render: (rowData: any) => (
-        <div className="h-10 flex">
-          <div>
-            {`${rowData?.assay_list?.tecnologia?.cod_tec} ${rowData?.assay_list?.tecnologia?.name}`}
-          </div>
-        </div>
-      ),
-    };
-  }
+  // function tecnologiaHeaderFactory(name: string, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: "tecnologia",
+  //     width: 0,
+  //     sorting: true,
+  //     render: (rowData: any) => (
+  //       <div className="h-10 flex">
+  //         <div>
+  //           {`${rowData?.assay_list?.tecnologia?.cod_tec} ${rowData?.assay_list?.tecnologia?.name}`}
+  //         </div>
+  //       </div>
+  //     ),
+  //   };
+  // }
 
   function actionTableFactory() {
     return {
@@ -235,37 +244,108 @@ export default function Listagem({
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((_, index) => {
       if (columnOrder[index] === "foco") {
-        tableFields.push(headerTableFactory("Foco", "assay_list.foco.name"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Foco",
+            title: "assay_list.foco.name",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnOrder[index] === "type_assay") {
         tableFields.push(
-          headerTableFactory("Ensaio", "assay_list.type_assay.name")
+          headerTableFactoryGlobal({
+            name: "Ensaio",
+            title: "assay_list.type_assay.name",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
         );
       }
       if (columnOrder[index] === "gli") {
-        tableFields.push(headerTableFactory("GLI", "assay_list.gli"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "GLI",
+            title: "assay_list.gli",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnOrder[index] === "tecnologia") {
-        tableFields.push(tecnologiaHeaderFactory("Tecnologia", "tecnologia"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Tecnologia",
+            title: "tecnologia",
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: any) => (
+              <div>
+                {`${rowData?.assay_list?.tecnologia?.cod_tec} ${rowData?.assay_list?.tecnologia?.name}`}
+              </div>
+            ),
+          })
+        );
       }
       if (columnOrder[index] === "experimentName") {
         tableFields.push(
-          headerTableFactory("Nome experimento", "experimentName")
+          headerTableFactoryGlobal({
+            name: "Nome experimento",
+            title: "experimentName",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
         );
       }
       if (columnOrder[index] === "period") {
-        tableFields.push(headerTableFactory("Época", "period"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Época",
+            title: "period",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnOrder[index] === "delineamento") {
         tableFields.push(
-          headerTableFactory("Delineamento", "delineamento.name")
+          headerTableFactoryGlobal({
+            name: "Delineamento",
+            title: "delineamento.name",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
         );
       }
       if (columnOrder[index] === "repetitionsNumber") {
-        tableFields.push(headerTableFactory("Rep.", "repetitionsNumber"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Rep.",
+            title: "repetitionsNumber",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnOrder[index] === "status") {
-        tableFields.push(headerTableFactory("Status EXP.", "status"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Status EXP.",
+            title: "status",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnOrder[index] === "action") {
         tableFields.push(actionTableFactory());
