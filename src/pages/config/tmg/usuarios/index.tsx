@@ -295,41 +295,41 @@ export default function Listagem({
   }
 
   async function handleStatus(data: any): Promise<void> {
-    if (data.status === 1) {
-      data.status = 0;
-    } else {
-      data.status = 1;
-    }
+    // if (data.status === 1) {
+    //   data.status = 0;
+    // } else {
+    //   data.status = 1;
+    // }
 
-    const index = users.findIndex((user) => user.id === data?.id);
+    // const index = users.findIndex((user) => user.id === data?.id);
 
     await userService.update({
       id: data?.id,
-      status: data.status,
+      status: data.status == 1 ? 0 : 1,
       created_by: userLogado.id,
     });
 
-    if (index === -1) {
-      return;
-    }
+    // if (index === -1) return;
 
-    setUsers((oldUser) => {
-      const copy = [...oldUser];
-      copy[index].status = data.status;
-      return copy;
-    });
+    // setUsers((oldUser) => {
+    //   const copy = [...oldUser];
+    //   copy[index].status = data.status;
+    //   return copy;
+    // });
 
-    const { id, name, login, tel, status, avatar } = users[index];
+    // const { id, name, login, tel, status, avatar } = users[index];
 
-    await userService.update({
-      id,
-      name,
-      login,
-      tel,
-      status,
-      avatar,
-      created_by: userLogado.id,
-    });
+    // await userService.update({
+    //   id,
+    //   name,
+    //   login,
+    //   tel,
+    //   status,
+    //   avatar,
+    //   created_by: userLogado.id,
+    // });
+
+    handlePagination();
   }
 
   function idHeaderFactory() {
