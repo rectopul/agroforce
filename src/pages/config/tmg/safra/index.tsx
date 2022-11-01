@@ -31,6 +31,7 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
+  ModalConfirmation,
 } from "../../../../components";
 import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
 import { safraService, userPreferencesService } from "../../../../services";
@@ -154,6 +155,9 @@ export default function Listagem({
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [selectedModal, setSelectedModal] = useState<any>(null);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -393,37 +397,30 @@ export default function Listagem({
             />
           </div>
           <div style={{ width: 5 }} />
-          {rowData.status ? (
-            <div className="h-7">
-              <Button
-                title="Ativo"
-                icon={<FaRegThumbsUp size={14} />}
-                onClick={async () =>
-                  handleStatusSafra(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })
-                }
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          ) : (
-            <div className="h-7">
-              <Button
-                title="Inativo"
-                icon={<FaRegThumbsDown size={14} />}
-                onClick={async () =>
-                  handleStatusSafra(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })
-                }
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          )}
+          <div className="h-7">
+            <Button
+              title={rowData.status ? "Ativo" : "Inativo"}
+              icon={
+                rowData.status ? (
+                  <FaRegThumbsUp size={14} />
+                ) : (
+                  <FaRegThumbsDown size={14} />
+                )
+              }
+              onClick={() => {
+                setSelectedModal(rowData);
+                setIsOpenModal(true);
+              }}
+              // onClick={async () =>
+              //   handleStatusSafra(rowData.id, {
+              //     status: rowData.status,
+              //     ...rowData,
+              //   })
+              // }
+              bgColor={rowData.status ? "bg-green-600" : "bg-red-800"}
+              textColor="white"
+            />
+          </div>
         </div>
       ),
     };
@@ -633,11 +630,24 @@ export default function Listagem({
     handleTotalPages();
   }, [currentPage]);
 
+  console.log({ selectedModal });
+
   return (
     <>
       <Head>
         <title>Listagem de safras</title>
       </Head>
+
+      <ModalConfirmation
+        isOpen={isOpenModal}
+        text={`Você tem certeza que deseja ${
+          selectedModal?.status == 1 ? "inativar" : "ativar"
+        } a safra ${selectedModal?.safraName}?`}
+        onCancel={() => setIsOpenModal(false)}
+        onPress={() => {
+          handleStatusSafra(selectedModal?.id, selectedModal);
+        }}
+      />
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main
