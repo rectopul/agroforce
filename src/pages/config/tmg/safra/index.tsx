@@ -31,6 +31,7 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
+  ButtonToogleConfirmation,
 } from "../../../../components";
 import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
 import { safraService, userPreferencesService } from "../../../../services";
@@ -223,44 +224,43 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleStatusSafra(
-    idItem: number,
-    data: ISafra
-  ): Promise<void> {
-    if (data.status === 1) {
-      data.status = 0;
-    } else {
-      data.status = 1;
-    }
+  async function handleStatusSafra(data: ISafra): Promise<void> {
+    // if (data.status === 1) {
+    //   data.status = 0;
+    // } else {
+    //   data.status = 1;
+    // }
 
-    const index = safras.findIndex((safra) => safra.id === idItem);
+    // const index = safras.findIndex((safra) => safra.id === data?.id);
 
-    if (index === -1) {
-      return;
-    }
+    // if (index === -1) {
+    //   return;
+    // }
 
     await safraService.updateSafras({
-      id: idItem,
-      status: data.status,
+      id: data?.id,
+      status: data?.status === 1 ? 0 : 1,
     });
 
-    setSafras((oldSafra) => {
-      const copy = [...oldSafra];
-      copy[index].status = data.status;
-      return copy;
-    });
+    // setSafras((oldSafra) => {
+    //   const copy = [...oldSafra];
+    //   copy[index].status = data.status;
+    //   return copy;
+    // });
 
-    const { id, safraName, year, plantingStartTime, plantingEndTime, status } =
-      safras[index];
+    // const { id, safraName, year, plantingStartTime, plantingEndTime, status } =
+    //   safras[index];
 
-    await safraService.updateSafras({
-      id,
-      safraName,
-      year,
-      plantingStartTime,
-      plantingEndTime,
-      status,
-    });
+    // await safraService.updateSafras({
+    //   id,
+    //   safraName,
+    //   year,
+    //   plantingStartTime,
+    //   plantingEndTime,
+    //   status,
+    // });
+
+    handlePagination();
   }
 
   // async function handleOrder(
@@ -393,37 +393,14 @@ export default function Listagem({
             />
           </div>
           <div style={{ width: 5 }} />
-          {rowData.status ? (
-            <div className="h-7">
-              <Button
-                title="Ativo"
-                icon={<FaRegThumbsUp size={14} />}
-                onClick={async () =>
-                  handleStatusSafra(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })
-                }
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          ) : (
-            <div className="h-7">
-              <Button
-                title="Inativo"
-                icon={<FaRegThumbsDown size={14} />}
-                onClick={async () =>
-                  handleStatusSafra(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })
-                }
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          )}
+          <div className="h-7">
+            <ButtonToogleConfirmation
+              data={rowData}
+              text="a safra"
+              keyName="safraName"
+              onPress={handleStatusSafra}
+            />
+          </div>
         </div>
       ),
     };
@@ -790,7 +767,7 @@ export default function Listagem({
                 sorting: true,
                 showTitle: false,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 0,
                 },
                 search: false,
                 filtering: false,

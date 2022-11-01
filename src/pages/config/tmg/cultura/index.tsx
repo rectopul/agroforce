@@ -37,7 +37,7 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
-  ModalConfirmation,
+  ButtonToogleConfirmation,
 } from "../../../../components";
 import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
 import { cultureService, userPreferencesService } from "../../../../services";
@@ -163,9 +163,6 @@ export default function Listagem({
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
-  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-  const [selectedModal, setSelectedModal] = useState<any>(null);
-
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: filterStatusBeforeEdit[13],
@@ -209,37 +206,34 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleStatusCulture(
-    idCulture: number,
-    data: ICulture
-  ): Promise<void> {
-    if (data.status === 0) {
-      data.status = 1;
-    } else {
-      data.status = 0;
-    }
+  async function handleStatusCulture(data: any): Promise<void> {
+    // if (data.status === 0) {
+    //   data.status = 1;
+    // } else {
+    //   data.status = 0;
+    // }
 
-    const index = cultures.findIndex((culture) => culture.id === idCulture);
+    // const index = cultures.findIndex((culture) => culture.id === data?.id);
 
-    if (index === -1) {
-      return;
-    }
+    // if (index === -1) return;
 
-    setCultures((oldCulture) => {
-      const copy = [...oldCulture];
-      copy[index].status = data.status;
-      return copy;
-    });
+    // setCultures((oldCulture) => {
+    //   const copy = [...oldCulture];
+    //   copy[index].status = data.status;
+    //   return copy;
+    // });
 
-    const { id, name, desc, status } = cultures[index];
+    // const { id, name, desc, status } = cultures[index];
 
     await cultureService.updateCulture({
-      id,
-      name,
-      desc,
-      status,
+      id: data?.id,
+      name: data?.name,
+      desc: data?.desc,
+      status: data?.status == 0 ? 1 : 0,
       created_by: Number(userLogado.id),
     });
+
+    handlePagination();
   }
 
   async function handleOrder(
@@ -389,27 +383,11 @@ export default function Listagem({
           </div>
           <div style={{ width: 5 }} />
           <div className="h-7">
-            <Button
-              title={rowData.status ? "Ativo" : "Inativo"}
-              icon={
-                rowData.status ? (
-                  <FaRegThumbsUp size={14} />
-                ) : (
-                  <FaRegThumbsDown size={14} />
-                )
-              }
-              onClick={() => {
-                setSelectedModal(rowData);
-                setIsOpenModal(true);
-              }}
-              // onClick={() =>
-              //   handleStatusCulture(rowData.id, {
-              //     status: rowData.status,
-              //     ...rowData,
-              //   })
-              // }
-              bgColor={rowData.status ? "bg-green-600" : "bg-red-800"}
-              textColor="white"
+            <ButtonToogleConfirmation
+              data={rowData}
+              text="a cultura"
+              keyName="name"
+              onPress={handleStatusCulture}
             />
           </div>
         </div>
@@ -598,17 +576,6 @@ export default function Listagem({
         <title>Listagem de culturas</title>
       </Head>
 
-      <ModalConfirmation
-        isOpen={isOpenModal}
-        text={`Você tem certeza que deseja ${
-          selectedModal?.status == 1 ? "inativar" : "ativar"
-        } a cultura ${selectedModal?.desc}?`}
-        onCancel={() => setIsOpenModal(false)}
-        onPress={() => {
-          handleStatusCulture(selectedModal?.id, selectedModal);
-        }}
-      />
-
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main
           className="h-full w-full
@@ -690,7 +657,7 @@ export default function Listagem({
                 sorting: false,
                 showTitle: true,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 0,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
