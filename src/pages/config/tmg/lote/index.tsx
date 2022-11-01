@@ -329,7 +329,7 @@ export default function Listagem({
           <button
             type="button"
             className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
+            onClick={() => handleOrder(title, orderList, 'tecnologia')}
           >
             {name}
           </button>
