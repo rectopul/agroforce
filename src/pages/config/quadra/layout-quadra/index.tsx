@@ -36,6 +36,7 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
+  ButtonToogleConfirmation,
 } from "../../../../components";
 import * as ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
@@ -340,80 +341,62 @@ export default function Listagem({
       sorting: false,
       searchable: false,
       filterPlaceholder: "Filtrar por status",
-      render: (rowData: ILayoultProps) =>
-        rowData.status ? (
-          <div className="h-7 flex">
-            <div
-              className="
-							h-7
-						"
-            >
-              <Button
-                title={`Atualizar ${rowData.esquema}`}
-                icon={<BiEdit size={14} />}
-                bgColor="bg-blue-600"
-                textColor="white"
-                onClick={() => {
-                  setCookies("pageBeforeEdit", currentPage?.toString());
-                  setCookies("filterBeforeEdit", filter);
-                  setCookies("filterBeforeEditTypeOrder", typeOrder);
-                  setCookies("filterBeforeEditOrderBy", orderBy);
-                  setCookies("filtersParams", filtersParams);
-                  setCookies("lastPage", "atualizar");
-                  router.push(
-                    `/config/quadra/layout-quadra/atualizar?id=${rowData.id}`
-                  );
-                }}
-              />
+      render: (rowData: ILayoultProps) => (
+        <div className="flex">
+          {rowData.status ? (
+            <div className="h-7 flex">
+              <div className="h-7">
+                <Button
+                  title={`Atualizar ${rowData.esquema}`}
+                  icon={<BiEdit size={14} />}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  onClick={() => {
+                    setCookies("pageBeforeEdit", currentPage?.toString());
+                    setCookies("filterBeforeEdit", filter);
+                    setCookies("filterBeforeEditTypeOrder", typeOrder);
+                    setCookies("filterBeforeEditOrderBy", orderBy);
+                    setCookies("filtersParams", filtersParams);
+                    setCookies("lastPage", "atualizar");
+                    router.push(
+                      `/config/quadra/layout-quadra/atualizar?id=${rowData.id}`
+                    );
+                  }}
+                />
+              </div>
             </div>
-            <div style={{ width: 5 }} />
-            <div>
-              <Button
-                title="Ativo"
-                icon={<FaRegThumbsUp size={14} />}
-                onClick={() => handleStatus(rowData.id, { ...rowData })}
-                bgColor="bg-green-600"
-                textColor="white"
-              />
+          ) : (
+            <div className="h-7 flex">
+              <div className="h-7">
+                <Button
+                  title={`Atualizar ${rowData.esquema}`}
+                  icon={<BiEdit size={14} />}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  onClick={() => {
+                    setCookies("pageBeforeEdit", currentPage?.toString());
+                    setCookies("filterBeforeEdit", filter);
+                    setCookies("filterBeforeEditTypeOrder", typeOrder);
+                    setCookies("filterBeforeEditOrderBy", orderBy);
+                    setCookies("filtersParams", filtersParams);
+                    setCookies("lastPage", "atualizar");
+                    router.push(
+                      `/config/quadra/layout-quadra/atualizar?id=${rowData.id}`
+                    );
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="h-7 flex">
-            <div
-              className="
-							h-7
-						"
-            >
-              <Button
-                title={`Atualizar ${rowData.esquema}`}
-                icon={<BiEdit size={14} />}
-                bgColor="bg-blue-600"
-                textColor="white"
-                onClick={() => {
-                  setCookies("pageBeforeEdit", currentPage?.toString());
-                  setCookies("filterBeforeEdit", filter);
-                  setCookies("filterBeforeEditTypeOrder", typeOrder);
-                  setCookies("filterBeforeEditOrderBy", orderBy);
-                  setCookies("filtersParams", filtersParams);
-                  setCookies("lastPage", "atualizar");
-                  router.push(
-                    `/config/quadra/layout-quadra/atualizar?id=${rowData.id}`
-                  );
-                }}
-              />
-            </div>
-            <div style={{ width: 5 }} />
-            <div>
-              <Button
-                title="Inativo"
-                icon={<FaRegThumbsDown size={14} />}
-                onClick={() => handleStatus(rowData.id, { ...rowData })}
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          </div>
-        ),
+          )}
+          <div className="ml-1" />
+          <ButtonToogleConfirmation
+            data={rowData}
+            text="a quadra"
+            keyName="name"
+            onPress={handleStatus}
+          />
+        </div>
+      ),
     };
   }
 
@@ -602,72 +585,67 @@ export default function Listagem({
     setCamposGerenciados(campos);
   }
 
-  async function handleStatus(
-    idLayoutQuadra: number,
-    data: any
-  ): Promise<void> {
+  async function handleStatus(data: any): Promise<void> {
     const parametersFilter = `filterStatus=${1}&id_culture=${
       userLogado.userCulture.cultura_selecionada
     }&esquema=${data.esquema}&status=${1}`;
-    if (data.status == 0) {
-      await layoutQuadraService.getAll(parametersFilter).then((response) => {
-        if (response.total > 0) {
-          Swal.fire(
-            "Layout não pode ser atualizada pois já existe um layout cadastrada com essas informações ativo"
-          );
-          router.push("");
-        } else {
-          data.status = 1;
+    // if (data.status == 0) {
 
-          layoutQuadraService.update({
-            id: idLayoutQuadra,
-            status: data.status,
-          });
-
-          const index = quadras.findIndex(
-            (layout: any) => layout.id === idLayoutQuadra
-          );
-
-          if (index === -1) {
-            return;
-          }
-
-          setQuadra((oldSafra: any) => {
-            const copy = [...oldSafra];
-            copy[index].status = data.status;
-            return copy;
-          });
-
-          const { id, status } = quadras[index];
-        }
-      });
-    } else {
-      if (data.status === 0) {
-        data.status = 1;
-      } else {
-        data.status = 0;
-      }
-      await layoutQuadraService.update({
-        id: idLayoutQuadra,
-        status: data.status,
-      });
-
-      const index = quadras.findIndex(
-        (layout: any) => layout.id === idLayoutQuadra
-      );
-
-      if (index === -1) {
+    await layoutQuadraService.getAll(parametersFilter).then((response) => {
+      if (response.total > 0) {
+        Swal.fire(
+          "Layout não pode ser atualizada pois já existe um layout cadastrada com essas informações ativo"
+        );
+        router.push("");
         return;
+      } else {
+        layoutQuadraService.update({
+          id: data?.id,
+          status: data?.status == 1 ? 0 : 1,
+        });
+
+        const index = quadras.findIndex(
+          (layout: any) => layout.id === data?.id
+        );
+
+        if (index === -1) return;
+
+        setQuadra((oldSafra: any) => {
+          const copy = [...oldSafra];
+          copy[index].status = data?.status == 1 ? 0 : 1;
+          return copy;
+        });
+
+        const { id, status } = quadras[index];
       }
+    });
+    // } else {
+    //   if (data.status === 0) {
+    //     data.status = 1;
+    //   } else {
+    //     data.status = 0;
+    //   }
+    //   await layoutQuadraService.update({
+    //     id: idLayoutQuadra,
+    //     status: data.status,
+    //   });
 
-      setQuadra((oldSafra: any) => {
-        const copy = [...oldSafra];
-        copy[index].status = data.status;
-        return copy;
-      });
+    //   const index = quadras.findIndex(
+    //     (layout: any) => layout.id === idLayoutQuadra
+    //   );
 
-      const { id, status } = quadras[index];
-    }
+    //   if (index === -1) {
+    //     return;
+    //   }
+
+    //   setQuadra((oldSafra: any) => {
+    //     const copy = [...oldSafra];
+    //     copy[index].status = data.status;
+    //     return copy;
+    //   });
+
+    //   const { id, status } = quadras[index];
+    // }
   }
 
   function handleOnDragEnd(result: DropResult) {
