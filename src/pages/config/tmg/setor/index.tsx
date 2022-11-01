@@ -31,7 +31,7 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
-  ModalConfirmation,
+  ButtonToogleConfirmation,
 } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { departmentService, userPreferencesService } from "src/services";
@@ -132,9 +132,6 @@ export default function Listagem({
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); //RR
   const [fieldOrder, setFieldOrder] = useState<any>(null);
 
-  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-  const [selectedModal, setSelectedModal] = useState<any>(null);
-
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; //RR
@@ -199,17 +196,14 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleStatusItem(
-    idItem: number,
-    data: IDepartment
-  ): Promise<void> {
+  async function handleStatusItem(data: IDepartment): Promise<void> {
     if (data.status === 1) {
       data.status = 0;
     } else {
       data.status = 1;
     }
 
-    const index = items.findIndex((item) => item.id === idItem);
+    const index = items.findIndex((item) => item.id === data?.id);
 
     if (index === -1) {
       return;
@@ -276,8 +270,6 @@ export default function Listagem({
     };
   }
 
-  console.log({ selectedModal });
-
   function statusHeaderFactory() {
     return {
       title: "Status",
@@ -306,27 +298,11 @@ export default function Listagem({
           </div>
           <div style={{ width: 5 }} />
           <div className="h-7">
-            <Button
-              title={rowData.status == 1 ? "Ativo" : "Inativo"}
-              icon={
-                rowData.status == 1 ? (
-                  <FaRegThumbsUp size={14} />
-                ) : (
-                  <FaRegThumbsDown size={14} />
-                )
-              }
-              onClick={() => {
-                setSelectedModal(rowData);
-                setIsOpenModal(true);
-              }}
-              // onClick={async () =>
-              //   await handleStatusItem(rowData.id, {
-              //     status: rowData.status,
-              //     ...rowData,
-              //   })
-              // }
-              bgColor={rowData.status == 1 ? "bg-green-600" : "bg-red-800"}
-              textColor="white"
+            <ButtonToogleConfirmation
+              data={rowData}
+              text="a cultura"
+              keyName="name"
+              onPress={handleStatusItem}
             />
           </div>
         </div>
@@ -544,17 +520,6 @@ export default function Listagem({
       <Head>
         <title>Listagem de setores</title>
       </Head>
-
-      <ModalConfirmation
-        isOpen={isOpenModal}
-        text={`Você tem certeza que deseja ${
-          selectedModal?.status == 1 ? "inativar" : "ativar"
-        } o setor ${selectedModal?.name}?`}
-        onCancel={() => setIsOpenModal(false)}
-        onPress={() => {
-          handleStatusItem(selectedModal?.id, selectedModal);
-        }}
-      />
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main

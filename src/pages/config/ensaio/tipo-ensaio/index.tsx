@@ -39,6 +39,7 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
+  ButtonToogleConfirmation,
 } from "../../../../components";
 
 import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
@@ -167,6 +168,9 @@ export default function TipoEnsaio({
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
   const [fieldOrder, setFieldOrder] = useState<any>(null);
+
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [selectedModal, setSelectedModal] = useState<any>(null);
 
   const pathExtra = `skip=${
     currentPage * Number(take)
@@ -313,7 +317,9 @@ export default function TipoEnsaio({
     setArrowOrder(arrowOrder);
   }
 
-  async function handleStatus(id: number, status: any): Promise<void> {
+  async function handleStatus({ id, status }: any): Promise<void> {
+    console.log({ id, status });
+
     if (status) {
       status = 1;
     } else {
@@ -323,7 +329,7 @@ export default function TipoEnsaio({
     await typeAssayService.update({ id, status });
 
     const index = typeAssay.findIndex(
-      (typeAssayIndex) => typeAssayIndex.id === id
+      (typeAssayIndex) => typeAssayIndex.id == id
     );
 
     if (index === -1) {
@@ -332,9 +338,7 @@ export default function TipoEnsaio({
 
     setTypeAssay((oldUser) => {
       const copy = [...oldUser];
-
       copy[index].status = status;
-
       return copy;
     });
   }
@@ -405,65 +409,53 @@ export default function TipoEnsaio({
       sorting: false,
       searchable: false,
       filterPlaceholder: "Filtrar por status",
-      render: (rowData: ITypeAssayProps) =>
-        rowData.status ? (
-          <div className="h-7 flex">
-            <div className="h-7">
-              <Button
-                icon={<BiEdit size={14} />}
-                title={`Atualizar ${rowData.name}`}
-                onClick={() => {
-                  setCookies("pageBeforeEdit", currentPage?.toString());
-                  setCookies("filterBeforeEdit", filter);
-                  setCookies("filterBeforeEditTypeOrder", typeOrder);
-                  setCookies("filterBeforeEditOrderBy", orderBy);
-                  setCookies("filtersParams", filtersParams);
-                  setCookies("lastPage", "atualizar");
-                  router.push(
-                    `/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`
-                  );
-                }}
-                bgColor="bg-blue-600"
-                textColor="white"
-              />
+      render: (rowData: ITypeAssayProps) => (
+        <div className="flex">
+          {rowData.status ? (
+            <div className="h-7 flex">
+              <div className="h-7">
+                <Button
+                  icon={<BiEdit size={14} />}
+                  title={`Atualizar ${rowData.name}`}
+                  onClick={() => {
+                    setCookies("pageBeforeEdit", currentPage?.toString());
+                    setCookies("filterBeforeEdit", filter);
+                    setCookies("filterBeforeEditTypeOrder", typeOrder);
+                    setCookies("filterBeforeEditOrderBy", orderBy);
+                    setCookies("filtersParams", filtersParams);
+                    setCookies("lastPage", "atualizar");
+                    router.push(
+                      `/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`
+                    );
+                  }}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                />
+              </div>
             </div>
-
-            <div style={{ width: 5 }} />
-            <div>
-              <Button
-                title="Ativo"
-                icon={<FaRegThumbsUp size={14} />}
-                onClick={() => handleStatus(rowData.id, !rowData.status)}
-                bgColor="bg-green-600"
-                textColor="white"
-              />
+          ) : (
+            <div className="h-7 flex">
+              <div className="h-7">
+                <Button
+                  title={`Atualizar ${rowData.name}`}
+                  icon={<BiEdit size={14} />}
+                  onClick={() => {}}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  href={`/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`}
+                />
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="h-7 flex">
-            <div className="h-7">
-              <Button
-                title={`Atualizar ${rowData.name}`}
-                icon={<BiEdit size={14} />}
-                onClick={() => {}}
-                bgColor="bg-blue-600"
-                textColor="white"
-                href={`/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`}
-              />
-            </div>
-
-            <div style={{ width: 5 }} />
-            <div>
-              <Button
-                title="Inativo"
-                icon={<FaRegThumbsDown size={14} />}
-                onClick={() => handleStatus(rowData.id, !rowData.status)}
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          </div>
-        ),
+          )}
+          <div className="ml-1" />
+          <ButtonToogleConfirmation
+            data={rowData}
+            text="o tipo ensaio"
+            keyName="name"
+            onPress={handleStatus}
+          />
+        </div>
+      ),
     };
   }
 

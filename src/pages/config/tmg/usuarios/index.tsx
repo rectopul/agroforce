@@ -38,7 +38,7 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
-  ModalConfirmation,
+  ButtonToogleConfirmation,
 } from "../../../../components";
 import * as ITabs from "../../../../shared/utils/dropdown";
 import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
@@ -169,9 +169,6 @@ export default function Listagem({
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
-  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-  const [selectedModal, setSelectedModal] = useState<any>(null);
-
   const filters = [
     { id: 2, name: "Todos" },
     { id: 1, name: "Ativos" },
@@ -297,17 +294,17 @@ export default function Listagem({
     };
   }
 
-  async function handleStatus(idItem: number, data: any): Promise<void> {
+  async function handleStatus(data: any): Promise<void> {
     if (data.status === 1) {
       data.status = 0;
     } else {
       data.status = 1;
     }
 
-    const index = users.findIndex((user) => user.id === idItem);
+    const index = users.findIndex((user) => user.id === data?.id);
 
     await userService.update({
-      id: idItem,
+      id: data?.id,
       status: data.status,
       created_by: userLogado.id,
     });
@@ -398,26 +395,11 @@ export default function Listagem({
           </div>
           <div style={{ width: 5 }} />
           <div className="h-7">
-            <Button
-              title={rowData?.status ? "Ativo" : "Inativo"}
-              icon={
-                rowData.status ? (
-                  <FaRegThumbsUp size={14} />
-                ) : (
-                  <FaRegThumbsDown size={14} />
-                )
-              }
-              onClick={() => {
-                setSelectedModal(rowData);
-                setIsOpenModal(true);
-              }}
-              // onClick={async () =>
-              //   handleStatus(rowData.id, {
-              //     status: rowData.status,
-              //   })
-              // }
-              bgColor={rowData?.status ? "bg-green-600" : "bg-red-800"}
-              textColor="white"
+            <ButtonToogleConfirmation
+              data={rowData}
+              text="o usuário"
+              keyName="name"
+              onPress={handleStatus}
             />
           </div>
         </div>
@@ -718,24 +700,11 @@ export default function Listagem({
     handleTotalPages();
   }, [currentPage]);
 
-  console.log({ selectedModal });
-
   return (
     <>
       <Head>
         <title>Listagem de usuários</title>
       </Head>
-
-      <ModalConfirmation
-        isOpen={isOpenModal}
-        text={`Você tem certeza que deseja ${
-          selectedModal?.status == 1 ? "inativar" : "ativar"
-        } o usuário ${selectedModal?.name}?`}
-        onCancel={() => setIsOpenModal(false)}
-        onPress={() => {
-          handleStatus(selectedModal?.id, selectedModal);
-        }}
-      />
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main

@@ -31,7 +31,7 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
-  ModalConfirmation,
+  ButtonToogleConfirmation,
 } from "../../../../components";
 import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
 import { safraService, userPreferencesService } from "../../../../services";
@@ -156,9 +156,6 @@ export default function Listagem({
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
-  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-  const [selectedModal, setSelectedModal] = useState<any>(null);
-
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: filterStatusBeforeEdit[13],
@@ -227,24 +224,21 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleStatusSafra(
-    idItem: number,
-    data: ISafra
-  ): Promise<void> {
+  async function handleStatusSafra(data: ISafra): Promise<void> {
     if (data.status === 1) {
       data.status = 0;
     } else {
       data.status = 1;
     }
 
-    const index = safras.findIndex((safra) => safra.id === idItem);
+    const index = safras.findIndex((safra) => safra.id === data?.id);
 
     if (index === -1) {
       return;
     }
 
     await safraService.updateSafras({
-      id: idItem,
+      id: data?.id,
       status: data.status,
     });
 
@@ -398,27 +392,11 @@ export default function Listagem({
           </div>
           <div style={{ width: 5 }} />
           <div className="h-7">
-            <Button
-              title={rowData.status ? "Ativo" : "Inativo"}
-              icon={
-                rowData.status ? (
-                  <FaRegThumbsUp size={14} />
-                ) : (
-                  <FaRegThumbsDown size={14} />
-                )
-              }
-              onClick={() => {
-                setSelectedModal(rowData);
-                setIsOpenModal(true);
-              }}
-              // onClick={async () =>
-              //   handleStatusSafra(rowData.id, {
-              //     status: rowData.status,
-              //     ...rowData,
-              //   })
-              // }
-              bgColor={rowData.status ? "bg-green-600" : "bg-red-800"}
-              textColor="white"
+            <ButtonToogleConfirmation
+              data={rowData}
+              text="a safra"
+              keyName="safraName"
+              onPress={handleStatusSafra}
             />
           </div>
         </div>
@@ -630,24 +608,11 @@ export default function Listagem({
     handleTotalPages();
   }, [currentPage]);
 
-  console.log({ selectedModal });
-
   return (
     <>
       <Head>
         <title>Listagem de safras</title>
       </Head>
-
-      <ModalConfirmation
-        isOpen={isOpenModal}
-        text={`Você tem certeza que deseja ${
-          selectedModal?.status == 1 ? "inativar" : "ativar"
-        } a safra ${selectedModal?.safraName}?`}
-        onCancel={() => setIsOpenModal(false)}
-        onPress={() => {
-          handleStatusSafra(selectedModal?.id, selectedModal);
-        }}
-      />
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main
