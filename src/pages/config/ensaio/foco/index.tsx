@@ -38,6 +38,7 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
+  ButtonToogleConfirmation,
 } from "../../../../components";
 import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
 import { userPreferencesService } from "../../../../services";
@@ -216,12 +217,12 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleStatus(id: number, data: any) {
+  async function handleStatus(data: any) {
     const params = `filterStatus=${1}&id_culture=${cultureId}&id_safra=${safraId}&filterSearch=${
       data.name
     }`;
     const index: any = await handleStatusGlobal({
-      id,
+      id: data?.id,
       status: data.status,
       service: focoService,
       params,
@@ -357,11 +358,10 @@ export default function Listagem({
       sorting: false,
       searchable: false,
       filterPlaceholder: "Filtrar por status",
-      render: (rowData: any) =>
-        rowData.status ? (
-          <div className="h-7 flex">
-            <div className="h-7" />
-            <div className="h-7">
+      render: (rowData: any) => (
+        <div className="flex">
+          {rowData.status ? (
+            <div className="h-7 flex">
               <Button
                 icon={<BiEdit size={14} />}
                 title={`Atualizar ${rowData.name}`}
@@ -378,26 +378,8 @@ export default function Listagem({
                 textColor="white"
               />
             </div>
-            <div style={{ width: 5 }} />
-            <div>
-              <Button
-                icon={<FaRegThumbsUp size={14} />}
-                title="Ativo"
-                onClick={async () =>
-                  handleStatus(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })
-                }
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="h-7 flex">
-            <div className="h-7" />
-            <div className="h-7">
+          ) : (
+            <div className="h-7 flex">
               <Button
                 icon={<BiEdit size={14} />}
                 title={`Atualizar ${rowData.name}`}
@@ -410,23 +392,16 @@ export default function Listagem({
                 textColor="white"
               />
             </div>
-            <div style={{ width: 5 }} />
-            <div>
-              <Button
-                icon={<FaRegThumbsDown size={14} />}
-                title="Inativo"
-                onClick={async () =>
-                  handleStatus(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })
-                }
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          </div>
-        ),
+          )}
+          <div className="ml-1" />
+          <ButtonToogleConfirmation
+            data={rowData}
+            text="o tipo ensaio"
+            keyName="name"
+            onPress={handleStatus}
+          />
+        </div>
+      ),
     };
   }
 

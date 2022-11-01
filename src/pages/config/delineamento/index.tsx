@@ -37,6 +37,7 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
+  ButtonToogleConfirmation,
 } from "../../../components";
 import * as ITabs from "../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../helpers";
@@ -313,32 +314,17 @@ export default function Listagem({
       sorting: false,
       searchable: false,
       filterPlaceholder: "Filtrar por status",
-      render: (rowData: IDelineamentoProps) =>
-        rowData.status ? (
-          <div className="h-7 flex">
-            <div>
-              <Button
-                icon={<FaRegThumbsUp size={14} />}
-                title="Ativo"
-                onClick={async () => await handleStatus(rowData.id, rowData)}
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="h-7 flex">
-            <div>
-              <Button
-                icon={<FaRegThumbsDown size={14} />}
-                title="Inativo"
-                onClick={async () => await handleStatus(rowData.id, rowData)}
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          </div>
-        ),
+      render: (rowData: IDelineamentoProps) => (
+        <div className="h-7 flex">
+          <div className="ml-1" />
+          <ButtonToogleConfirmation
+            data={rowData}
+            text="o delineamento"
+            keyName="name"
+            onPress={handleStatus}
+          />
+        </div>
+      ),
     };
   }
 
@@ -533,75 +519,66 @@ export default function Listagem({
     setCamposGerenciados(campos);
   }
 
-  async function handleStatus(
-    idDelineamento: number,
-    data: IDelineamentoProps
-  ): Promise<void> {
+  async function handleStatus(data: IDelineamentoProps): Promise<void> {
     const parametersFilter = `filterStatus=${1}&id_culture=${cultureId}&name=${
-      data.name
+      data?.name
     }`;
 
-    if (data.status === 0) {
-      await delineamentoService.getAll(parametersFilter).then((response) => {
-        if (data.status === 0) {
-          data.status = 1;
-        } else {
-          data.status = 0;
-        }
-        if (response.total > 0) {
-          Swal.fire(
-            "Delineamento não pode ser atualizado pois já existe uma delineamento com esse nome ativo!"
-          );
-        } else {
-          delineamentoService.update({
-            id: idDelineamento,
-            status: data.status,
-          });
-          const index = delineamento.findIndex(
-            (delineamento) => delineamento.id === idDelineamento
-          );
-
-          if (index === -1) {
-            return;
-          }
-
-          setDelineamento((oldSafra) => {
-            const copy = [...oldSafra];
-            copy[index].status = data.status;
-            return copy;
-          });
-
-          const { id, status } = delineamento[index];
-        }
-      });
-    } else {
-      if (data.status === 0) {
-        data.status = 1;
+    await delineamentoService.getAll(parametersFilter).then((response) => {
+      if (response.total > 0) {
+        return Swal.fire(
+          "Delineamento não pode ser atualizado pois já existe uma delineamento com esse nome ativo!"
+        );
       } else {
-        data.status = 0;
+        delineamentoService.update({
+          id: data?.id,
+          status: data?.status === 0 ? 1 : 0,
+        });
+        const index = delineamento.findIndex(
+          (delineamento) => delineamento.id === data?.id
+        );
+
+        if (index === -1) {
+          return;
+        }
+
+        setDelineamento((oldSafra) => {
+          const copy = [...oldSafra];
+          copy[index].status = data?.status === 0 ? 1 : 0;
+          return copy;
+        });
+
+        const { id, status } = delineamento[index];
       }
+    });
+    // } else {
+    //   if (data.status === 0) {
+    //     data.status = 1;
+    //   } else {
+    //     data.status = 0;
+    //   }
 
-      delineamentoService.update({
-        id: idDelineamento,
-        status: data.status,
-      });
+    //   delineamentoService.update({
+    //     id: data?.id,
+    //     status: data.status,
+    //   });
 
-      const index = delineamento.findIndex(
-        (delineamento) => delineamento.id === idDelineamento
-      );
+    //   const index = delineamento.findIndex(
+    //     (delineamento) => delineamento.id === data?.id
+    //   );
 
-      if (index === -1) {
-        return;
-      }
+    //   if (index === -1) {
+    //     return;
+    //   }
 
-      setDelineamento((oldSafra) => {
-        const copy = [...oldSafra];
-        copy[index].status = data.status;
-        return copy;
-      });
+    //   setDelineamento((oldSafra) => {
+    //     const copy = [...oldSafra];
+    //     copy[index].status = data.status;
+    //     return copy;
+    //   });
 
-      const { id, status } = delineamento[index];
-    }
+    //   const { id, status } = delineamento[index];
+    // }
   }
 
   function handleOnDragEnd(result: DropResult) {
