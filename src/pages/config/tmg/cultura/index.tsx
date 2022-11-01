@@ -657,7 +657,7 @@ export default function Listagem({
                 sorting: false,
                 showTitle: true,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 0,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
