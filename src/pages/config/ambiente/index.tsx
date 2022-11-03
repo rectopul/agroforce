@@ -40,6 +40,7 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
+  ButtonDeleteConfirmation,
 } from "../../../components";
 import * as ITabs from "../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../helpers";
@@ -316,13 +317,14 @@ export default function Listagem({
   //   };
   // }
 
-  async function deleteItem(id: number) {
+  async function deleteItem(data: any) {
     const { status, message } = await npeService.deleted({
-      id,
+      id: data?.id,
       userId: userLogado.id,
     });
     if (status === 200) {
-      router.reload();
+      //router.reload();
+      handlePagination();
     } else {
       Swal.fire({
         html: message,
@@ -358,7 +360,13 @@ export default function Listagem({
             />
           </div>
           <div style={{ width: 5 }} />
-          {rowData.status === 1 || rowData.status === 3 ? (
+          <ButtonDeleteConfirmation
+            data={rowData}
+            keyName={rowData?.local?.name_local_culture}
+            onPress={deleteItem}
+            disabled={rowData.status === 3}
+          />
+          {/* {rowData.status === 1 || rowData.status === 3 ? (
             <div>
               <Button
                 title={rowData.status === 3 ? "" : "Ativo"}
@@ -382,37 +390,37 @@ export default function Listagem({
                 />
               </div>
             </div>
-          )}
+          )} */}
         </div>
       ),
     };
   }
 
-  function tecnologiaHeaderFactory(title: string, name: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {title}
-          </button>
-        </div>
-      ),
-      field: "tecnologia",
-      width: 0,
-      sorting: true,
-      render: (rowData: any) => (
-        <div className="h-10 flex">
-          <div>
-            {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
-          </div>
-        </div>
-      ),
-    };
-  }
+  // function tecnologiaHeaderFactory(title: string, name: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {title}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: "tecnologia",
+  //     width: 0,
+  //     sorting: true,
+  //     render: (rowData: any) => (
+  //       <div className="h-10 flex">
+  //         <div>
+  //           {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
+  //         </div>
+  //       </div>
+  //     ),
+  //   };
+  // }
 
   function colums(camposGerenciados: any): any {
     const columnCampos: any = camposGerenciados.split(",");
@@ -935,7 +943,7 @@ export default function Listagem({
               options={{
                 showTitle: false,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 0,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
