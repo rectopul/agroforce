@@ -8,7 +8,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState, useRef } from "react";
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
@@ -49,6 +49,7 @@ import {
   CheckBox,
   Content,
   Input,
+  FieldItemsPerPage,
 } from "../../../../components";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
 
@@ -66,6 +67,8 @@ export default function AtualizarTipoEnsaio({
   totalExperiments,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
+
+  const tableRef = useRef();
 
   const tabsDropDowns = TabsDropDowns("listas");
 
@@ -164,7 +167,7 @@ export default function AtualizarTipoEnsaio({
   const [colorStar, setColorStar] = useState<string>("");
   const [orderBy, setOrderBy] = useState<string>("");
   const [orderType, setOrderType] = useState<string>("");
-  const take: number = itensPerPage;
+  const [take, setTake] = useState<any>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
@@ -886,6 +889,10 @@ export default function AtualizarTipoEnsaio({
       .then(({ status, response }) => {
         if (status === 200) {
           setGenotypeTreatments(response);
+          console.log({ response });
+          tableRef?.current?.dataManager?.changePageSize(
+            response?.length >= take ? take : response?.length
+          );
         }
       });
   }
@@ -932,7 +939,19 @@ export default function AtualizarTipoEnsaio({
   useEffect(() => {
     table === "genotipo" ? handlePagination() : handlePaginationExperiments();
     table === "genotipo" ? handleTotalPages() : handleTotalPagesExperiments();
-  }, [currentPage]);
+  }, [currentPage, take]);
+
+  function getItensPerPage() {
+    return (
+      <div className="w-1/4">
+        <FieldItemsPerPage
+          //label="Itens por página"
+          selected={take}
+          onChange={setTake}
+        />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -1071,6 +1090,7 @@ export default function AtualizarTipoEnsaio({
         >
           <div style={{ marginTop: "1%" }} className="w-full h-auto">
             <MaterialTable
+              tableRef={tableRef}
               style={{ background: "#f9fafb" }}
               columns={table === "genotipo" ? columns : experimentColumns}
               data={table === "genotipo" ? genotypeTreatments : experiments}
@@ -1082,7 +1102,7 @@ export default function AtualizarTipoEnsaio({
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
-                pageSize: itensPerPage,
+                pageSize: Number(take),
               }}
               components={{
                 Toolbar: () => (
@@ -1136,6 +1156,10 @@ export default function AtualizarTipoEnsaio({
                       Total registrado:{" "}
                       {table === "genotipo" ? itemsTotal : experimentsTotal}
                     </strong>
+
+                    <div className="w-1/4">
+                      <FieldItemsPerPage selected={take} onChange={setTake} />
+                    </div>
 
                     <div className="h-full flex items-center gap-2">
                       <div className="border-solid border-2 border-blue-600 rounded">
