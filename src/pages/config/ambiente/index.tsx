@@ -369,10 +369,10 @@ export default function Listagem({
           {/* {rowData.status === 1 || rowData.status === 3 ? (
             <div>
               <Button
-                title={rowData.status === 3 ? "" : "Ativo"}
+                title={rowData.status === 3 ? '' : 'Ativo'}
                 icon={<BsTrashFill size={14} />}
                 onClick={() => deleteItem(rowData.id)}
-                bgColor={rowData.status === 3 ? "bg-gray-400" : "bg-red-600"}
+                bgColor={rowData.status === 3 ? 'bg-gray-400' : 'bg-red-600'}
                 textColor="white"
                 disabled={rowData.status === 3}
               />
