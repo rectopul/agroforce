@@ -262,7 +262,7 @@ export class ImportController {
 
       // Validação do modulo Genotipo
       if (data.moduleId === 10) {
-        return await ImportGenotypeController.validate(responseLog?.id, data);
+        return await ImportGenotypeController.validate(responseLog?.id, false, data);
       }
 
       // Validação do modulo NPE

@@ -23,7 +23,6 @@ import { SafraController } from '../safra.controller';
 import { TecnologiaController } from '../technology/tecnologia.controller';
 import { GenotipoController } from './genotipo.controller';
 import { genotipeQueue } from './genotipeQueue';
-import { loteQueue } from './loteQueue';
 
 /* eslint-disable no-restricted-syntax */
 export class ImportGenotypeController {

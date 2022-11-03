@@ -2,7 +2,6 @@ import Bull from 'bull';
 import handleError from 'src/shared/utils/handleError';
 import { GenotipoController } from './genotipo.controller';
 import { ImportGenotypeController } from './import-genotype.controller';
-import { loteQueue } from './loteQueue';
 
 const genotipoController = new GenotipoController();
 
