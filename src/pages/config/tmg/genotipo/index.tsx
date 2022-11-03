@@ -90,17 +90,17 @@ interface IData {
 }
 
 export default function Listagem({
-  allGenotipos,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idCulture,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer,
-  orderByserver,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allGenotipos,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idCulture,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      typeOrderServer,
+      orderByserver,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
   const tabsDropDowns = TabsDropDowns();
 
@@ -208,9 +208,8 @@ export default function Listagem({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == 'Tecnologia' ? 'tecnologia.cod_tec' : orderBy
-  }&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == 'Tecnologia' ? 'tecnologia.cod_tec' : orderBy
+    }&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -909,7 +908,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -1103,7 +1102,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

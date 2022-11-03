@@ -68,14 +68,14 @@ interface TabPanelProps {
 }
 
 export default function Import({
-  allLogs,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  uploadInProcess,
-  idSafra,
-  idCulture,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allLogs,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      uploadInProcess,
+      idSafra,
+      idCulture,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns("listas");
@@ -185,9 +185,8 @@ export default function Import({
 
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
   const pages = Math.ceil(total / take);
   const formik = useFormik<any>({
     initialValues: {
@@ -298,6 +297,40 @@ export default function Import({
     };
   }
 
+  function headerTableStatusFactory() {
+    return {
+      title: 'Status',
+      field: 'state',
+      sorting: false,
+      render: (rowData: any) => (
+        <div className="h-7 flex">
+          <div className="h-7">
+            {rowData.state}
+          </div>
+          <div style={{ width: 5 }} />
+          {rowData.invalid_data != "" ? (
+            <div className="h-7">
+              <Button
+                value='Details'
+                title={rowData.state}
+                onClick={() => {
+                  Swal.fire({
+                    html: rowData.invalid_data,
+                    width: "800",
+                  });
+                }}
+                bgColor="bg-blue-600"
+                textColor="white"
+              />
+            </div>
+          ) : ""
+          }
+
+        </div>
+      )
+    };
+  }
+
   function idHeaderFactory() {
     return {
       title: <div className="flex items-center">{arrowOrder}</div>,
@@ -351,7 +384,7 @@ export default function Import({
         tableFields.push(headerTableFactory("Importado em", "created_at"));
       }
       if (columnCampos[index] === "state") {
-        tableFields.push(headerTableFactory("Status", "state"));
+        tableFields.push(headerTableStatusFactory());
       }
     });
     return tableFields;
@@ -961,7 +994,7 @@ export default function Import({
                     <div style={{ width: 40 }} />
                     <div className="h-7 w-32 mt-6">
                       <Button
-                        onClick={() => {}}
+                        onClick={() => { }}
                         value="Filtrar"
                         bgColor="bg-blue-600"
                         textColor="white"
