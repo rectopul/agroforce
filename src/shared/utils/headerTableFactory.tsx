@@ -21,6 +21,7 @@ export default function headerTableFactoryGlobal({
     title: (
       <div className="flex items-center">
         <button
+          type="button"
           className="font-medium text-gray-900"
           onClick={() => handleOrder(title, orderList, name)}
         >
