@@ -64,7 +64,7 @@ export class ImportNpeController {
         if (row !== '0') {
           // LINHA COM TITULO DAS COLUNAS
           const npeName = `${spreadSheet[row][1]}_${spreadSheet[row][2]}_${spreadSheet[row][3]}_${spreadSheet[row][4]}_${spreadSheet[row][5]}_${spreadSheet[row][7]}`;
-          const { status, response: npee }: IReturnObject = await npeController.getAll({
+          const { status }: IReturnObject = await npeController.getAll({
             safraId: idSafra,
             filterFoco: spreadSheet[row][2],
             filterEnsaio: spreadSheet[row][3],
@@ -74,11 +74,6 @@ export class ImportNpeController {
             filterStatus: 1,
           });
 
-          console.log('npee');
-          console.log(npee);
-
-          console.log('status');
-          console.log(status);
           if (status === 200) {
             return {
               status: 400,
@@ -409,6 +404,7 @@ export class ImportNpeController {
           }
         }
       }
+
       if (responseIfError.length === 0) {
         try {
           const createMany: any = [];
