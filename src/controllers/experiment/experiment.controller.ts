@@ -22,6 +22,8 @@ export class ExperimentController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
+      console.log('options');
+      console.log(options);
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
         if (options.filterRepetitionFrom && options.filterRepetitionTo) {
           parameters.repetitionsNumber = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);

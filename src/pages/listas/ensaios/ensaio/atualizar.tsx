@@ -202,7 +202,7 @@ export default function AtualizarTipoEnsaio({
         })
         .then(({ status, message }) => {
           if (status === 200) {
-            Swal.fire('Experimento atualizado com sucesso!');
+            Swal.fire('Ensaio atualizado com sucesso!');
             router.back();
           } else {
             Swal.fire(message);

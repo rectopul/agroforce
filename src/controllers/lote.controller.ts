@@ -90,6 +90,24 @@ export class LoteController {
           parameters.peso = JSON.parse(`{"lte": "${Number(options.filterWeightTo)}" }`);
         }
       }
+      if (options.filterNccFrom || options.filterNccTo) {
+        if (options.filterNccFrom && options.filterNccTo) {
+          parameters.ncc = JSON.parse(`{"gte": "${Number(options.filterNccFrom)}", "lte": "${Number(options.filterNccTo)}" }`);
+        } else if (options.filterNccFrom) {
+          parameters.ncc = JSON.parse(`{"gte": "${Number(options.filterNccFrom)}" }`);
+        } else if (options.filterNccTo) {
+          parameters.ncc = JSON.parse(`{"lte": "${Number(options.filterNccTo)}" }`);
+        }
+      }
+      if (options.filterCodLoteFrom || options.filterCodLoteTo) {
+        if (options.filterCodLoteFrom && options.filterCodLoteTo) {
+          parameters.cod_lote = JSON.parse(`{"gte": "${Number(options.filterCodLoteFrom)}", "lte": "${Number(options.filterCodLoteTo)}" }`);
+        } else if (options.filterCodLoteFrom) {
+          parameters.cod_lote = JSON.parse(`{"gte": "${Number(options.filterCodLoteFrom)}" }`);
+        } else if (options.filterCodLoteTo) {
+          parameters.cod_lote = JSON.parse(`{"lte": "${Number(options.filterCodLoteTo)}" }`);
+        }
+      }
       if (options.filterGmrFrom || options.filterGmrTo) {
         if (options.filterGmrFrom && options.filterGmrTo) {
           parameters.AND.push(JSON.parse(`{ "genotipo": {"gmr": {"gte": "${Number(options.filterGmrFrom)}", "lte": "${Number(options.filterGmrTo)}" }}}`));

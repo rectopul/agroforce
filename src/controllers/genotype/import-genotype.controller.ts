@@ -1318,7 +1318,7 @@ export class ImportGenotypeController {
                     id: Number(this.aux.id_lote),
                     id_genotipo: Number(this.aux.id_genotipo),
                     id_safra: Number(idSafra),
-                    cod_lote: String(this.aux.cod_lote),
+                    cod_lote: Number(this.aux.cod_lote),
                     id_s2: Number(this.aux.id_s2),
                     id_dados: Number(this.aux.id_dados_lote),
                     year: Number(this.aux.year),
@@ -1352,7 +1352,7 @@ export class ImportGenotypeController {
                   await loteController.create({
                     id_genotipo: Number(this.aux.id_genotipo),
                     id_safra: Number(idSafra),
-                    cod_lote: String(this.aux.cod_lote),
+                    cod_lote: Number(this.aux.cod_lote),
                     id_s2: Number(this.aux.id_s2),
                     id_dados: Number(this.aux.id_dados_lote),
                     year: Number(this.aux.year),
