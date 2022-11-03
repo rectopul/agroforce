@@ -124,7 +124,7 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
-      title: "Cod. GGEN",
+      title: "GGEN",
       value: "ggen",
       defaultChecked: () => camposGerenciados.includes("ggen"),
     },
@@ -313,6 +313,8 @@ export default function Listagem({
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
+
+    console.log({ parametersFilter });
 
     await genotypeTreatmentService.getAll(parametersFilter).then((response) => {
       if (response.status === 200 || response.status === 400) {
@@ -1646,7 +1648,10 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const filterApplication =
     req.cookies.filterBeforeEdit ||
-    `&id_culture=${idCulture}&id_safra=${idSafra}&status_experiment=${"IMPORTADO"}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
+    `&id_culture=${idCulture}&id_safra=${idSafra}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
+  // const filterApplication =
+  //   req.cookies.filterBeforeEdit ||
+  //   `&id_culture=${idCulture}&id_safra=${idSafra}&status_experiment=${"IMPORTADO"}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
 
   removeCookies("filterBeforeEdit", { req, res });
   removeCookies("pageBeforeEdit", { req, res });

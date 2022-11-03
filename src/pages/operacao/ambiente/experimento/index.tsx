@@ -794,7 +794,7 @@ export default function Listagem({
         setLoading(false);
       }
     } else {
-      Swal.fire("Nenhum experimento para desenhar");
+      Swal.fire("Nenhum experimento para sortear.");
     }
   }
 
@@ -898,7 +898,7 @@ export default function Listagem({
   return (
     <>
       <Head>
-        <title>Listagem de experimentos</title>
+        <title>Listagem de sorteios</title>
       </Head>
 
       {loading && <LoadingComponent />}
