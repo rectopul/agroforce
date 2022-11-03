@@ -51,8 +51,10 @@ interface IFilter {
   filterGmrTo: string | any;
   filterBgmFrom: string | any;
   filterBgmTo: string | any;
-  filterCodLote: string;
-  filterNcc: string;
+  filterCodLoteFrom: string;
+  filterCodLoteTo: string;
+  filterNccFrom: string;
+  filterNccTo: string;
   filterFase: string;
   filterPeso: string;
   filterSeeds: string;
@@ -182,8 +184,10 @@ export default function Listagem({
       filterGmrTo: '',
       filterBgmTo: '',
       filterBgmFrom: '',
-      filterCodLote: '',
-      filterNcc: '',
+      filterCodLoteFrom: '',
+      filterCodLoteTo: '',
+      filterNccFrom: '',
+      filterNccTo: '',
       filterFase: '',
       filterPeso: '',
       filterSeeds: '',
@@ -207,8 +211,10 @@ export default function Listagem({
       filterGmrTo,
       filterBgmTo,
       filterBgmFrom,
-      filterCodLote,
-      filterNcc,
+      filterCodLoteFrom,
+      filterCodLoteTo,
+      filterNccFrom,
+      filterNccTo,
       filterFase,
       filterPeso,
       filterSeeds,
@@ -230,7 +236,7 @@ export default function Listagem({
       //   setCurrentPage(0);
       // });
 
-      const parametersFilter = `&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterWeightTo=${filterWeightTo}&filterWeightFrom=${filterWeightFrom}&filterSeedTo=${filterSeedTo}&filterSeedFrom=${filterSeedFrom}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterGmrFrom=${filterGmrFrom}&filterGmrTo=${filterGmrTo}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&id_culture=${idCulture}&id_safra=${idSafra}`;
+      const parametersFilter = `&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterWeightTo=${filterWeightTo}&filterWeightFrom=${filterWeightFrom}&filterSeedTo=${filterSeedTo}&filterSeedFrom=${filterSeedFrom}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterGmrFrom=${filterGmrFrom}&filterGmrTo=${filterGmrTo}&filterCodLoteFrom=${filterCodLoteFrom}&filterCodLoteTo=${filterCodLoteTo}&filterNccFrom=${filterNccFrom}&filterNccTo=${filterNccTo}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&id_culture=${idCulture}&id_safra=${idSafra}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -731,9 +737,47 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory('filterCodLote', 'Cód. lote')}
+                  <div className="h-6 w-full ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Cód. Lote
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterCodLoteFrom"
+                        name="filterCodLoteFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 5 }}
+                        placeholder="Até"
+                        id="filterCodLoteTo"
+                        name="filterCodLoteTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
-                  {filterFieldFactory('filterNcc', 'NCC')}
+                  <div className="h-6 w-full ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NCC
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterNccFrom"
+                        name="filterNccFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 5 }}
+                        placeholder="Até"
+                        id="filterNccTo"
+                        name="filterNccTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   {filterFieldFactory('filterFase', 'Fase', true)}
 

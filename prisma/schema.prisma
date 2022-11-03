@@ -379,7 +379,7 @@ model lote {
   created_by          Int
   created_at          DateTime              @default(now())
   id_genotipo         Int
-  cod_lote            String
+  cod_lote            Decimal               @db.Decimal(15, 0)
   fase                String?
   id_dados            Int                   @unique
   id_s2               Int
@@ -489,7 +489,7 @@ model log_import {
   created_at   DateTime? @default(now())
   updated_at   DateTime? @default(now())
   state        String?
-  invalid_data String?   @default("") 
+  invalid_data String?   @default("")
   executeTime  String?
   totalRecords Int?
   user         user      @relation(fields: [user_id], references: [id])
