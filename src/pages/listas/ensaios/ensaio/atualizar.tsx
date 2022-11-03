@@ -3,14 +3,12 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { useFormik } from 'formik';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import getConfig from 'next/config';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import {
-  ReactNode, useEffect, useRef, useState,
-} from 'react';
+import { useFormik } from "formik";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { ReactNode, useEffect, useState, useRef } from "react";
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
@@ -52,9 +50,9 @@ import {
   CheckBox,
   Content,
   Input,
-} from '../../../../components';
-import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
-import { tableGlobalFunctions } from '../../../../helpers';
+  FieldItemsPerPage,
+} from "../../../../components";
+import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
 
 type IAssayListUpdate = Omit<IAssayList, 'id_safra' | 'period'>;
 
@@ -75,7 +73,10 @@ export default function AtualizarTipoEnsaio({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
-  const tabsDropDowns = TabsDropDowns('listas');
+  const tableRef = useRef();
+
+  const tabsDropDowns = TabsDropDowns("listas");
+
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
@@ -170,14 +171,10 @@ export default function AtualizarTipoEnsaio({
     { name: 'CamposGerenciados[]', title: 'Densidade', value: 'density' },
     { name: 'CamposGerenciados[]', title: 'Status EXP.', value: 'status' },
   ]);
-  const [take, setTake] = useState<number>(itensPerPage);
-  const [orderBy, setOrderBy] = useState<string>(orderByserver);
-  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy
-
-  }&typeOrder=${typeOrder}`;
-  const [orderType, setOrderType] = useState<string>('');
+  const [colorStar, setColorStar] = useState<string>("");
+  const [orderBy, setOrderBy] = useState<string>("");
+  const [orderType, setOrderType] = useState<string>("");
+  const [take, setTake] = useState<any>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
@@ -876,16 +873,20 @@ export default function AtualizarTipoEnsaio({
       parametersFilter = `skip=${skip}&take=${take}`;
     }
 
-    // if (filter) {
-    //   parametersFilter = `${parametersFilter}&${filter}`;
-    // }
-    // await assayListService.getAll(parametersFilter).then(({ status, response }) => {
-    //   if (status === 200) {
-    //     setAssayList(response);
-    //   }
-    // });
-
-    await callingApi(filter); // handle pagination globly
+    if (filter) {
+      parametersFilter = `${parametersFilter}&${filter}`;
+    }
+    await genotypeTreatmentService
+      .getAll(parametersFilter)
+      .then(({ status, response }) => {
+        if (status === 200) {
+          setGenotypeTreatments(response);
+          console.log({ response });
+          tableRef?.current?.dataManager?.changePageSize(
+            response?.length >= take ? take : response?.length
+          );
+        }
+      });
   }
 
   async function handlePaginationExperiments(): Promise<void> {
@@ -928,9 +929,21 @@ export default function AtualizarTipoEnsaio({
   }
 
   useEffect(() => {
-    table === 'genotipo' ? handlePagination() : handlePaginationExperiments();
-    table === 'genotipo' ? handleTotalPages() : handleTotalPagesExperiments();
-  }, [currentPage]);
+    table === "genotipo" ? handlePagination() : handlePaginationExperiments();
+    table === "genotipo" ? handleTotalPages() : handleTotalPagesExperiments();
+  }, [currentPage, take]);
+
+  function getItensPerPage() {
+    return (
+      <div className="w-1/4">
+        <FieldItemsPerPage
+          //label="Itens por página"
+          selected={take}
+          onChange={setTake}
+        />
+      </div>
+    );
+  }
 
   // Call that function when change type order value.
   useEffect(() => {
@@ -1075,9 +1088,9 @@ export default function AtualizarTipoEnsaio({
           <div style={{ marginTop: '1%' }} className="w-full h-auto">
             <MaterialTable
               tableRef={tableRef}
-              style={{ background: '#f9fafb' }}
-              columns={table === 'genotipo' ? columns : experimentColumns}
-              data={table === 'genotipo' ? genotypeTreatments : experiments}
+              style={{ background: "#f9fafb" }}
+              columns={table === "genotipo" ? columns : experimentColumns}
+              data={table === "genotipo" ? genotypeTreatments : experiments}
               options={{
                 showTitle: false,
                 headerStyle: {
@@ -1086,7 +1099,7 @@ export default function AtualizarTipoEnsaio({
                 rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
-                pageSize: itensPerPage,
+                pageSize: Number(take),
               }}
               components={{
                 Toolbar: () => (
@@ -1141,6 +1154,10 @@ export default function AtualizarTipoEnsaio({
                       {' '}
                       {table === 'genotipo' ? itemsTotal : experimentsTotal}
                     </strong>
+
+                    <div className="w-1/4">
+                      <FieldItemsPerPage selected={take} onChange={setTake} />
+                    </div>
 
                     <div className="h-full flex items-center gap-2">
                       <div className="border-solid border-2 border-blue-600 rounded">
