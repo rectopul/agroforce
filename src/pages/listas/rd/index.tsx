@@ -97,66 +97,73 @@ export default function Import({
   const [loading, setLoading] = useState<boolean>(false);
 
   async function readExcel(moduleId: number, table: string) {
-    const value: any = document.getElementById(`inputFile-${moduleId}`);
-    if (!value.files[0]) {
-      Swal.fire('Insira um arquivo');
-      return;
-    }
-
-    const fileExtension: any = functionsUtils.getFileExtension(
-      value?.files[0]?.name,
-    );
-
-    if (fileExtension !== 'xlsx') {
-      Swal.fire('Apenas arquivos .xlsx são aceitos.');
-      (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
-      return;
-    }
-
-    const userLogado = JSON.parse(localStorage.getItem('user') as string);
-    setExecuteUpload(1);
-
-    readXlsxFile(value.files[0]).then(async (rows) => {
-      setLoading(true);
-
-      if (moduleId) {
-        const { message } = await importService.validate({
-          spreadSheet: rows,
-          moduleId,
-          created_by: userLogado.id,
-          idSafra,
-          idCulture,
-          table,
-          disabledButton,
-        });
-        setLoading(false);
-        handlePagination();
-        Swal.fire({
-          html: message,
-          width: '800',
-        });
-        setExecuteUpload(0);
-      } else {
-        const { message } = await importService.validateProtocol({
-          spreadSheet: rows,
-          moduleId,
-          created_by: userLogado.id,
-          idSafra,
-          idCulture,
-          table,
-          disabledButton,
-        });
-        setLoading(false);
-        handlePagination();
-        Swal.fire({
-          html: message,
-          width: '800',
-        });
-        setExecuteUpload(0);
+    try {
+      const value: any = document.getElementById(`inputFile-${moduleId}`);
+      if (!value.files[0]) {
+        Swal.fire('Insira um arquivo');
+        return;
       }
-    });
 
-    (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
+      const fileExtension: any = functionsUtils.getFileExtension(
+        value?.files[0]?.name,
+      );
+
+      if (fileExtension !== 'xlsx') {
+        Swal.fire('Apenas arquivos .xlsx são aceitos.');
+        (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
+        return;
+      }
+
+      const userLogado = JSON.parse(localStorage.getItem('user') as string);
+      setExecuteUpload(1);
+
+      readXlsxFile(value.files[0]).then(async (rows) => {
+        setLoading(true);
+
+        if (moduleId) {
+          const { message } = await importService.validate({
+            spreadSheet: rows,
+            moduleId,
+            created_by: userLogado.id,
+            idSafra,
+            idCulture,
+            table,
+            disabledButton,
+          });
+          setLoading(false);
+          handlePagination();
+          Swal.fire({
+            html: message,
+            width: '800',
+          });
+          setExecuteUpload(0);
+        } else {
+          const { message } = await importService.validateProtocol({
+            spreadSheet: rows,
+            moduleId,
+            created_by: userLogado.id,
+            idSafra,
+            idCulture,
+            table,
+            disabledButton,
+          });
+          setLoading(false);
+          handlePagination();
+          Swal.fire({
+            html: message,
+            width: '800',
+          });
+          setExecuteUpload(0);
+        }
+      });
+
+      (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
+    } catch (e) {
+      Swal.fire({
+        html: e,
+        width: '800',
+      });
+    }
   }
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
