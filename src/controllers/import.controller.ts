@@ -174,7 +174,7 @@ export class ImportController {
         case 'CULTURE_UNIT':
           return await ImportLocalController.validate(responseLog?.id, newData);
         case 'GENOTYPE_S2':
-          return await ImportGenotypeController.validate(responseLog?.id, newData);
+          return await ImportGenotypeController.validate(responseLog?.id, false, newData);
         default:
           await this.logImportController.update({ id: responseLog?.id, status: 1, state: 'FALHA' });
           return { status: 400, response: [], message: 'Nenhum protocol_level configurado ' };
@@ -262,7 +262,7 @@ export class ImportController {
 
       // Validação do modulo Genotipo
       if (data.moduleId === 10) {
-        return await ImportGenotypeController.validate(responseLog?.id, data);
+        return await ImportGenotypeController.validate(responseLog?.id, false, data);
       }
 
       // Validação do modulo NPE

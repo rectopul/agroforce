@@ -76,7 +76,6 @@ interface IUpdateExperimento {
   density: number;
   drawOrder: number;
   status: string;
-  eel: any;
   nlp: number;
   clp: any;
   comments: string;
@@ -185,7 +184,6 @@ export default function AtualizarLocal({
       drawOrder: experimento.drawOrder,
       status: experimento.status,
       nlp: experimento.nlp,
-      eel: parseFloat(experimento.eel)?.toFixed(2),
       clp: parseFloat(experimento.clp)?.toFixed(2),
       comments: experimento.comments,
     },
@@ -194,7 +192,6 @@ export default function AtualizarLocal({
         .update({
           id: Number(values.id),
           nlp: Number(values.nlp),
-          eel: values.eel,
           clp: values.clp,
           comments: values.comments,
         })

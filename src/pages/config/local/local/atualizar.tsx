@@ -771,7 +771,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     requestOptions,
   );
 
-  const filterApplication = `filterStatus=1&&id_local=${id_local}`;
+  const filterApplication = `filterStatus=1&&id_local=${id_local}&orderBy=year&typeOrder=desc`;
 
   const { response: allCultureUnity, total: totalItems }: any = await responseUnidadeCultura.json();
 

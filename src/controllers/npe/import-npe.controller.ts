@@ -43,6 +43,7 @@ export class ImportNpeController {
     const tecnologiaController = new TecnologiaController();
 
     const npeTemp: Array<string> = [];
+    const npeiTemp: Array<number> = [];
     const responseIfError: Array<string> = [];
     const headers = [
       'CULTURA',
@@ -63,8 +64,13 @@ export class ImportNpeController {
       for (const row in spreadSheet) {
         if (row !== '0') {
           // LINHA COM TITULO DAS COLUNAS
+          if (spreadSheet[row][4] < 10) {
+            // eslint-disable-next-line no-param-reassign
+            spreadSheet[row][4] = `0${spreadSheet[row][4]}`;
+          }
+          const npeInicial = spreadSheet[row][6];
           const npeName = `${spreadSheet[row][1]}_${spreadSheet[row][2]}_${spreadSheet[row][3]}_${spreadSheet[row][4]}_${spreadSheet[row][5]}_${spreadSheet[row][7]}`;
-          const { status, response: npee }: IReturnObject = await npeController.getAll({
+          const { status }: IReturnObject = await npeController.getAll({
             safraId: idSafra,
             filterFoco: spreadSheet[row][2],
             filterEnsaio: spreadSheet[row][3],
@@ -74,11 +80,6 @@ export class ImportNpeController {
             filterStatus: 1,
           });
 
-          console.log('npee');
-          console.log(npee);
-
-          console.log('status');
-          console.log(status);
           if (status === 200) {
             return {
               status: 400,
@@ -101,7 +102,22 @@ export class ImportNpeController {
               }. Ambiente duplicados na tabela`,
             };
           }
+          if (npeiTemp.includes(npeInicial)) {
+            await logImportController.update({
+              id: idLog,
+              status: 1,
+              state: 'INVALIDA',
+            });
+            npeiTemp[row] = npeInicial;
+            return {
+              status: 400,
+              message: `Erro na linha ${
+                Number(row) + 1
+              }. NPEI duplicadas na tabela`,
+            };
+          }
           npeTemp[row] = npeName;
+          npeiTemp[row] = npeInicial;
           for (const column in spreadSheet[row]) {
             this.aux.status = 1;
             this.aux.created_by = createdBy;
@@ -231,9 +247,6 @@ export class ImportNpeController {
                     row,
                     spreadSheet[0][column],
                   );
-                } else if (spreadSheet[row][column] < 10) {
-                // eslint-disable-next-line no-param-reassign
-                  spreadSheet[row][column] = `0${spreadSheet[row][column]}`;
                 }
                 const ogm: any = await tecnologiaController.getAll({
                   cod_tec: String(spreadSheet[row][column]),
@@ -409,6 +422,7 @@ export class ImportNpeController {
           }
         }
       }
+
       if (responseIfError.length === 0) {
         try {
           const createMany: any = [];
