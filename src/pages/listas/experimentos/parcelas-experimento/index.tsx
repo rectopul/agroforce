@@ -1297,7 +1297,7 @@ export default function Listagem({
                   </div>
                 </div>
               </form>
-              {removeLoader && <Loader />}
+                              {removeLoader && <Loader />}
             </div>
           </AccordionFilter>
 
