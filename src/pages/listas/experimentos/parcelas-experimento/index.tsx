@@ -943,8 +943,6 @@ export default function Listagem({
         <title>Listagem de parcelas do experimento</title>
       </Head>
 
-      {removeLoader && <Loader />}
-
       <Modal
         isOpen={isOpenModal}
         shouldCloseOnOverlayClick={false}
@@ -1108,7 +1106,6 @@ export default function Listagem({
                   {filterFieldFactory("filterPlacingPlace", "Lugar plantio")}
                   {filterFieldFactory("filterStatusT", "StatusT")}
                 </div>
-                <Loader />
                 <div
                   className="w-full h-full
                   flex
@@ -1300,6 +1297,7 @@ export default function Listagem({
                   </div>
                 </div>
               </form>
+              {removeLoader && <Loader />}
             </div>
           </AccordionFilter>
 

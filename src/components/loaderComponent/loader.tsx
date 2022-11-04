@@ -11,7 +11,6 @@ export default function Loader(){
       width="50%"
       height="50%"
     />
-    TESTE
     </div>
   )
 }
