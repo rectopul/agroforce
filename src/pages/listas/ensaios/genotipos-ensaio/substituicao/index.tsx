@@ -158,11 +158,11 @@ export default function Listagem({
       title: "Nome principal",
       value: "name_main",
     },
-    { name: "CamposGerenciados[]", title: "GMR Ens.", value: "gmr" },
-    { name: "CamposGerenciados[]", title: "BGM Ens.", value: "bgm" },
+    { name: "CamposGerenciados[]", title: "GMR_Gen", value: "gmr" },
+    { name: "CamposGerenciados[]", title: "BGM_Gen", value: "bgm" },
     {
       name: "CamposGerenciados[]",
-      title: "Tec Ens.",
+      title: "Tec_Gen",
       value: "tecnologia",
     },
     { name: "CamposGerenciados[]", title: "Substituir", value: "action" },
@@ -511,7 +511,7 @@ export default function Listagem({
       if (columnCampos[index] === "gmr") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "GMR Ens.",
+            name: "GMR_Gen",
             title: "genotipo.gmr",
             orderList,
             fieldOrder,
@@ -522,7 +522,7 @@ export default function Listagem({
       if (columnCampos[index] === "bgm") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "BGM Ens.",
+            name: "BGM_Gen",
             title: "genotipo.bgm",
             orderList,
             fieldOrder,
@@ -533,7 +533,7 @@ export default function Listagem({
       if (columnCampos[index] === "tecnologia") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Tec ens.",
+            name: "Tec_Gen",
             title: "tecnologia",
             orderList,
             fieldOrder,
@@ -780,7 +780,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      GMR
+                      GMR_Gen
                     </label>
                     <div className="flex">
                       <Input
@@ -801,7 +801,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      BGM
+                      BGM_Gen
                     </label>
                     <div className="flex">
                       <Input
@@ -820,9 +820,9 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory("filterCodTec", "Cod tec. ens.")}
+                  {filterFieldFactory("filterCodTec", "Cod tec_Gen")}
 
-                  {filterFieldFactory("filterNameTec", "Nome tec. ens.")}
+                  {filterFieldFactory("filterNameTec", "Nome tec_Gen")}
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 

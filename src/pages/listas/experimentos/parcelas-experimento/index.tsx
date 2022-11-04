@@ -932,7 +932,7 @@ export default function Listagem({
   return (
     <>
       <Head>
-        <title>Listagem de genótipos do ensaio</title>
+        <title>Listagem de parcelas do experimento</title>
       </Head>
 
       <Modal
