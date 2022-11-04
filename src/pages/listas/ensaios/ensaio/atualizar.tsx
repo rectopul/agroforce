@@ -50,6 +50,7 @@ import {
   Content,
   Input,
   FieldItemsPerPage,
+  Select,
 } from "../../../../components";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
 
@@ -893,6 +894,7 @@ export default function AtualizarTipoEnsaio({
           tableRef?.current?.dataManager?.changePageSize(
             response?.length >= take ? take : response?.length
           );
+          tableRef?.current?.dataManager?.getRenderState();
         }
       });
   }
@@ -940,18 +942,6 @@ export default function AtualizarTipoEnsaio({
     table === "genotipo" ? handlePagination() : handlePaginationExperiments();
     table === "genotipo" ? handleTotalPages() : handleTotalPagesExperiments();
   }, [currentPage, take]);
-
-  function getItensPerPage() {
-    return (
-      <div className="w-1/4">
-        <FieldItemsPerPage
-          //label="Itens por página"
-          selected={take}
-          onChange={setTake}
-        />
-      </div>
-    );
-  }
 
   return (
     <>
@@ -1152,13 +1142,20 @@ export default function AtualizarTipoEnsaio({
                       </div>
                     </div>
 
-                    <strong className="text-blue-600">
-                      Total registrado:{" "}
-                      {table === "genotipo" ? itemsTotal : experimentsTotal}
-                    </strong>
-
-                    <div className="w-1/4">
-                      <FieldItemsPerPage selected={take} onChange={setTake} />
+                    <div className="flex flex-row items-center w-full">
+                      <div className="flex flex-1 justify-center">
+                        <strong className="text-blue-600">
+                          Total registrado:
+                          {table === "genotipo" ? itemsTotal : experimentsTotal}
+                        </strong>
+                      </div>
+                      <div className="flex flex-1 mb-6 justify-end">
+                        <FieldItemsPerPage
+                          widthClass="w-1/2"
+                          selected={take}
+                          onChange={setTake}
+                        />
+                      </div>
                     </div>
 
                     <div className="h-full flex items-center gap-2">
