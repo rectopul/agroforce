@@ -158,7 +158,7 @@ export default function Import({
       });
 
       (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
-    } catch (e) {
+    } catch (e: any) {
       Swal.fire({
         html: e,
         width: '800',
