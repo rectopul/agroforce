@@ -57,6 +57,7 @@ import {
 } from "../../../../services";
 import * as ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
+import   Loader   from '../../../../components/loaderComponent/loader';
 
 export default function Listagem({
   // assaySelect,
@@ -68,6 +69,7 @@ export default function Listagem({
   typeOrderServer,
   orderByserver,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const [removeLoader, setremoveLoader] = useState(false);
   const { TabsDropDowns } = ITabs.default;
   const [isOpenModal, setIsOpenModal] = useState(false);
 
@@ -214,6 +216,7 @@ export default function Listagem({
     },
   ]);
   const [statusFilterSelected, setStatusFilterSelected] = useState<any>([]);
+  
 
   // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>("");
@@ -318,6 +321,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setremoveLoader(false);
     },
   });
 
@@ -844,6 +848,7 @@ export default function Listagem({
         <title>Listagem de genótipos do ensaio</title>
       </Head>
 
+
       <Modal
         isOpen={isOpenModal}
         shouldCloseOnOverlayClick={false}
@@ -994,7 +999,7 @@ export default function Listagem({
                 <div
                   className="w-full h-full
                   flex
-                  justify-center
+                  
                   pb-8
                 "
                 >
@@ -1006,6 +1011,7 @@ export default function Listagem({
                   {filterFieldFactory("filterExperimentName", "Experimento")}
                   {filterFieldFactory("filterPlacingPlace", "Lugar plantio")}
                 </div>
+                <Loader />
                 <div
                   className="w-full h-full
                   flex
@@ -1185,7 +1191,7 @@ export default function Listagem({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => {setremoveLoader(true)}}
                       value="Filtrar"
                       type="submit"
                       bgColor="bg-blue-600"
