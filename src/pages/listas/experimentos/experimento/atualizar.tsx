@@ -7,7 +7,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   DragDropContext,
   Draggable,
@@ -38,6 +38,7 @@ import {
   Content,
   Input,
   InputMoney,
+  FieldItemsPerPage,
 } from "../../../../components";
 import * as ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
@@ -104,6 +105,8 @@ export default function AtualizarLocal({
 
   const router = useRouter();
 
+  const tableRef = useRef();
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.materiais || {
     id: 0,
@@ -152,7 +155,7 @@ export default function AtualizarLocal({
     { name: "CamposGerenciados[]", title: "Status parc.", value: "experiment" },
   ]);
 
-  const take: number = itensPerPage;
+  const [take, setTake] = useState<any>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
@@ -221,6 +224,9 @@ export default function AtualizarLocal({
         if (response.status === 200 || response.status === 400) {
           setTreatments(response.response);
           setTotaItems(response.total);
+          tableRef?.current?.dataManager?.changePageSize(
+            response.total >= take ? take : response.total
+          );
         }
       });
   }
@@ -615,7 +621,7 @@ export default function AtualizarLocal({
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-  }, [currentPage]);
+  }, [currentPage, take]);
 
   function fieldsFactory(name: string, title: string, values: any) {
     return (
@@ -886,6 +892,7 @@ export default function AtualizarLocal({
             className="w-full h-auto overflow-y-scroll"
           >
             <MaterialTable
+              tableRef={tableRef}
               style={{ background: "#f9fafb" }}
               columns={columns}
               data={treatments}
@@ -896,7 +903,7 @@ export default function AtualizarLocal({
                 },
                 search: false,
                 filtering: false,
-                pageSize: itensPerPage,
+                pageSize: Number(take),
               }}
               components={{
                 Toolbar: () => (
@@ -913,9 +920,20 @@ export default function AtualizarLocal({
                     border-gray-200
                   "
                   >
-                    <strong className="text-blue-600">
-                      Total registrado: {itemsTotal}
-                    </strong>
+                    <div className="flex flex-row items-center w-full">
+                      <div className="flex flex-1 justify-center">
+                        <strong className="text-blue-600">
+                          Total registrado: {itemsTotal}
+                        </strong>
+                      </div>
+                      <div className="flex flex-1 mb-6 justify-end">
+                        <FieldItemsPerPage
+                          widthClass="w-1/3"
+                          selected={take}
+                          onChange={setTake}
+                        />
+                      </div>
+                    </div>
 
                     <div className="h-full flex items-center gap-2">
                       <div className="border-solid border-2 border-blue-600 rounded">

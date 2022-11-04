@@ -894,7 +894,6 @@ export default function AtualizarTipoEnsaio({
           tableRef?.current?.dataManager?.changePageSize(
             response?.length >= take ? take : response?.length
           );
-          tableRef?.current?.dataManager?.getRenderState();
         }
       });
   }
