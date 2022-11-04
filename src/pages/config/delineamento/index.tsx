@@ -37,9 +37,11 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
+  ButtonToogleConfirmation,
 } from "../../../components";
 import * as ITabs from "../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../helpers";
+import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
 
 interface IDelineamentoProps {
   id: number | any;
@@ -172,6 +174,8 @@ export default function Listagem({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
@@ -253,22 +257,22 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
   function idHeaderFactory() {
     return {
@@ -310,32 +314,17 @@ export default function Listagem({
       sorting: false,
       searchable: false,
       filterPlaceholder: "Filtrar por status",
-      render: (rowData: IDelineamentoProps) =>
-        rowData.status ? (
-          <div className="h-7 flex">
-            <div>
-              <Button
-                icon={<FaRegThumbsUp size={14} />}
-                title="Ativo"
-                onClick={async () => await handleStatus(rowData.id, rowData)}
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="h-7 flex">
-            <div>
-              <Button
-                icon={<FaRegThumbsDown size={14} />}
-                title="Inativo"
-                onClick={async () => await handleStatus(rowData.id, rowData)}
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          </div>
-        ),
+      render: (rowData: IDelineamentoProps) => (
+        <div className="h-7 flex">
+          <div className="ml-1" />
+          <ButtonToogleConfirmation
+            data={rowData}
+            text="o delineamento"
+            keyName="name"
+            onPress={handleStatus}
+          />
+        </div>
+      ),
     };
   }
 
@@ -347,16 +336,38 @@ export default function Listagem({
       //   tableFields.push(idHeaderFactory());
       // }
       if (columnCampos[item] === "name") {
-        tableFields.push(headerTableFactory("Nome", "name"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Nome",
+            title: "name",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
 
       if (columnCampos[item] === "repeticao") {
-        tableFields.push(headerTableFactory("Repetição", "repeticao"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Repetição",
+            title: "repeticao",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
 
       if (columnCampos[item] === "trat_repeticao") {
         tableFields.push(
-          headerTableFactory("Trat. Repetição", "trat_repeticao")
+          headerTableFactoryGlobal({
+            name: "Trat. Repetição",
+            title: "trat_repeticao",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
         );
       }
 
@@ -364,40 +375,43 @@ export default function Listagem({
         tableFields.push(statusHeaderFactory());
       }
       if (columnCampos[item] === "sequencia") {
-        tableFields.push({
-          title: "Sequência",
-          field: "sequencia",
-          sorting: false,
-          searchable: false,
-          filterPlaceholder: "Filtrar por status",
-          render: (rowData: IDelineamentoProps) => (
-            <div className="h-7 flex">
-              <div
-                className="
-                  h-7
-                "
-              >
-                <Button
-                  icon={<AiOutlineTable size={14} />}
-                  onClick={() => {
-                    setCookies("pageBeforeEdit", currentPage?.toString());
-                    setCookies("filterBeforeEdit", filter);
-                    setCookies("filterBeforeEditTypeOrder", typeOrder);
-                    setCookies("filterBeforeEditOrderBy", orderBy);
-                    setCookies("filtersParams", filtersParams);
-                    setCookies("lastPage", "sequencia-delineamento");
-                    router.push(
-                      `delineamento/sequencia-delineamento?id_delineamento=${rowData.id}`
-                    );
-                  }}
-                  bgColor="bg-yellow-500"
-                  textColor="white"
-                  title={`Sequência de ${rowData.name}`}
-                />
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Sequência",
+            title: "sequencia",
+            orderList,
+            fieldOrder,
+            handleOrder,
+            filterPlaceholder: "Filtrar por status",
+            render: (rowData: IDelineamentoProps) => (
+              <div className="h-7 flex">
+                <div
+                  className="
+                    h-7
+                  "
+                >
+                  <Button
+                    icon={<AiOutlineTable size={14} />}
+                    onClick={() => {
+                      setCookies("pageBeforeEdit", currentPage?.toString());
+                      setCookies("filterBeforeEdit", filter);
+                      setCookies("filterBeforeEditTypeOrder", typeOrder);
+                      setCookies("filterBeforeEditOrderBy", orderBy);
+                      setCookies("filtersParams", filtersParams);
+                      setCookies("lastPage", "sequencia-delineamento");
+                      router.push(
+                        `delineamento/sequencia-delineamento?id_delineamento=${rowData.id}`
+                      );
+                    }}
+                    bgColor="bg-yellow-500"
+                    textColor="white"
+                    title={`Sequência de ${rowData.name}`}
+                  />
+                </div>
               </div>
-            </div>
-          ),
-        });
+            ),
+          })
+        );
       }
     });
     return tableFields;
@@ -405,7 +419,8 @@ export default function Listagem({
 
   async function handleOrder(
     column: string,
-    order: string | any
+    order: string | any,
+    name: any
   ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
@@ -454,6 +469,7 @@ export default function Listagem({
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
@@ -503,75 +519,69 @@ export default function Listagem({
     setCamposGerenciados(campos);
   }
 
-  async function handleStatus(
-    idDelineamento: number,
-    data: IDelineamentoProps
-  ): Promise<void> {
+  async function handleStatus(data: IDelineamentoProps): Promise<void> {
     const parametersFilter = `filterStatus=${1}&id_culture=${cultureId}&name=${
-      data.name
+      data?.name
     }`;
 
-    if (data.status === 0) {
-      await delineamentoService.getAll(parametersFilter).then((response) => {
-        if (data.status === 0) {
-          data.status = 1;
-        } else {
-          data.status = 0;
-        }
-        if (response.total > 0) {
-          Swal.fire(
-            "Delineamento não pode ser atualizado pois já existe uma delineamento com esse nome ativo!"
-          );
-        } else {
-          delineamentoService.update({
-            id: idDelineamento,
-            status: data.status,
-          });
-          const index = delineamento.findIndex(
-            (delineamento) => delineamento.id === idDelineamento
-          );
-
-          if (index === -1) {
-            return;
-          }
-
-          setDelineamento((oldSafra) => {
-            const copy = [...oldSafra];
-            copy[index].status = data.status;
-            return copy;
-          });
-
-          const { id, status } = delineamento[index];
-        }
-      });
-    } else {
-      if (data.status === 0) {
-        data.status = 1;
+    await delineamentoService.getAll(parametersFilter).then((response) => {
+      if (response.total > 0) {
+        return Swal.fire(
+          "Delineamento não pode ser atualizado pois já existe uma delineamento com esse nome ativo!"
+        );
       } else {
-        data.status = 0;
+        delineamentoService.update({
+          id: data?.id,
+          status: data?.status === 0 ? 1 : 0,
+        });
+
+        handlePagination();
+
+        // const index = delineamento.findIndex(
+        //   (delineamento) => delineamento.id === data?.id
+        // );
+
+        // if (index === -1) {
+        //   return;
+        // }
+
+        // setDelineamento((oldSafra) => {
+        //   const copy = [...oldSafra];
+        //   copy[index].status = data?.status === 0 ? 1 : 0;
+        //   return copy;
+        // });
+
+        // const { id, status } = delineamento[index];
       }
+    });
+    // } else {
+    //   if (data.status === 0) {
+    //     data.status = 1;
+    //   } else {
+    //     data.status = 0;
+    //   }
 
-      delineamentoService.update({
-        id: idDelineamento,
-        status: data.status,
-      });
+    //   delineamentoService.update({
+    //     id: data?.id,
+    //     status: data.status,
+    //   });
 
-      const index = delineamento.findIndex(
-        (delineamento) => delineamento.id === idDelineamento
-      );
+    //   const index = delineamento.findIndex(
+    //     (delineamento) => delineamento.id === data?.id
+    //   );
 
-      if (index === -1) {
-        return;
-      }
+    //   if (index === -1) {
+    //     return;
+    //   }
 
-      setDelineamento((oldSafra) => {
-        const copy = [...oldSafra];
-        copy[index].status = data.status;
-        return copy;
-      });
+    //   setDelineamento((oldSafra) => {
+    //     const copy = [...oldSafra];
+    //     copy[index].status = data.status;
+    //     return copy;
+    //   });
 
-      const { id, status } = delineamento[index];
-    }
+    //   const { id, status } = delineamento[index];
+    // }
   }
 
   function handleOnDragEnd(result: DropResult) {
@@ -802,7 +812,7 @@ export default function Listagem({
               options={{
                 showTitle: false,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 0,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,

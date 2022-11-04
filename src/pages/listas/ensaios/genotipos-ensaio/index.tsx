@@ -330,7 +330,11 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleOrder(column: string, order: number): Promise<void> {
+  async function handleOrder(
+    column: string,
+    order: number,
+    name: any,
+  ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
     // if (order === 1) {
@@ -373,86 +377,87 @@ export default function Listagem({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
   }
 
-  function headerTableFactory(
-    name: string,
-    title: string,
-    style: boolean = false,
-  ) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-      cellStyle: style ? { color: '#039be5', fontWeight: 'bold' } : {},
-    };
-  }
+  // function headerTableFactory(
+  //   name: string,
+  //   title: string,
+  //   style: boolean = false
+  // ) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //     cellStyle: style ? { color: "#039be5", fontWeight: "bold" } : {},
+  //   };
+  // }
 
-  function tecnologiaHeaderFactory(name: string, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: 'tecnologia',
-      width: 0,
-      sorting: true,
-      render: (rowData: any) => (
-        <div className="h-10 flex">
-          <div>
-            {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
-          </div>
-        </div>
-      ),
-    };
-  }
+  // function tecnologiaHeaderFactory(name: string, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: "tecnologia",
+  //     width: 0,
+  //     sorting: true,
+  //     render: (rowData: any) => (
+  //       <div className="h-10 flex">
+  //         <div>
+  //           {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
+  //         </div>
+  //       </div>
+  //     ),
+  //   };
+  // }
 
-  function ggenHeaderFactory(name: string, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: 'ggen',
-      width: 0,
-      sorting: true,
-      render: (rowData: any) => (
-        <div className="h-10 flex">
-          <div>
-            {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.name}`}
-          </div>
-        </div>
-      ),
-    };
-  }
+  // function ggenHeaderFactory(name: string, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: "ggen",
+  //     width: 0,
+  //     sorting: true,
+  //     render: (rowData: any) => (
+  //       <div className="h-10 flex">
+  //         <div>
+  //           {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.name}`}
+  //         </div>
+  //       </div>
+  //     ),
+  //   };
+  // }
 
   function formatDecimal(num: number) {
     return Number(num).toFixed(1);
@@ -463,27 +468,91 @@ export default function Listagem({
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
       if (columnOrder[item] === 'foco') {
-        tableFields.push(headerTableFactory('Foco', 'assay_list.foco.name'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Foco',
+            title: 'assay_list.foco.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'type_assay') {
         tableFields.push(
-          headerTableFactory('Ensaio', 'assay_list.type_assay.name'),
+          headerTableFactoryGlobal({
+            name: 'Ensaio',
+            title: 'assay_list.type_assay.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnOrder[item] === 'tecnologia') {
-        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Tecnologia',
+            title: 'tecnologia',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: any) => (
+              <div>
+                {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
+              </div>
+            ),
+          }),
+        );
       }
       if (columnOrder[item] === 'ggen') {
-        tableFields.push(ggenHeaderFactory('GGEN', 'tecnologia'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'GGEN',
+            title: 'tecnologia',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: any) => (
+              <div>
+                {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.name}`}
+              </div>
+            ),
+          }),
+        );
       }
       if (columnOrder[item] === 'gli') {
-        tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'GLI',
+            title: 'assay_list.gli',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'bgm') {
-        tableFields.push(headerTableFactory('BGM_Ens', 'assay_list.bgm'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'BGM_ens',
+            title: 'assay_list.bgm',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'bgmGenotype') {
-        tableFields.push(headerTableFactory('BGM_Gen', 'genotipo.bgm'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'BGM_Gen',
+            title: 'genotipo.bgm',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'gmr') {
         tableFields.push(
@@ -498,23 +567,61 @@ export default function Listagem({
         );
       }
       if (columnOrder[item] === 'treatments_number') {
-        tableFields.push(headerTableFactory('NT', 'treatments_number'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'NT',
+            title: 'treatments_number',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'status') {
-        tableFields.push(headerTableFactory('Status T', 'status'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Status T',
+            title: 'status',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'statusAssay') {
         tableFields.push(
-          headerTableFactory('Status Ensaio', 'assay_list.status'),
+          headerTableFactoryGlobal({
+            name: 'Status Ensaio',
+            title: 'assay_list.status',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnOrder[item] === 'genotipoName') {
         tableFields.push(
-          headerTableFactory('Nome do genótipo', 'genotipo.name_genotipo', true),
+          headerTableFactoryGlobal({
+            name: 'Nome do genótipo',
+            title: 'genotipo.name_genotipo',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            cellStyle: { color: '#039be5', fontWeight: 'bold' },
+          }),
         );
       }
       if (columnOrder[item] === 'nca') {
-        tableFields.push(headerTableFactory('NCA', 'lote.ncc', true));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'NCA',
+            title: 'lote.ncc',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            cellStyle: { color: '#039be5', fontWeight: 'bold' },
+          }),
+        );
       }
     });
 
@@ -1129,7 +1236,6 @@ export default function Listagem({
                       />
                     </div>
                   </div>
-
                 </div>
 
                 <div

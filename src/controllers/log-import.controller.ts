@@ -22,7 +22,7 @@ export class LogImportController {
   }
 
   async create(data: any) {
-    
+
     try {
       const LogsAlreadyExists = await this.logImportRepository.validateImportInExecuting();
 
@@ -88,6 +88,7 @@ export class LogImportController {
         table: true,
         state: true,
         status: true,
+        invalid_data: true,
         created_at: true,
       };
 

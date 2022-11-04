@@ -53,6 +53,7 @@ import {
 } from '../../../../components';
 import LoadingComponent from '../../../../components/Loading';
 import ITabs from '../../../../shared/utils/dropdown';
+import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 
 interface IFilter {
   filterFoco: string;
@@ -189,6 +190,8 @@ export default function Listagem({
 
   const [loading, setLoading] = useState<boolean>(false);
 
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
@@ -237,6 +240,7 @@ export default function Listagem({
   async function handleOrder(
     column: string,
     order: string | any,
+    name: any,
   ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
@@ -279,25 +283,27 @@ export default function Listagem({
         setArrowOrder('');
       }
     }
+
+    setFieldOrder(name);
   }
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: false,
-    };
-  }
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: false,
+  //   };
+  // }
 
   function idHeaderFactory() {
     return {
@@ -381,26 +387,26 @@ export default function Listagem({
     };
   }
 
-  function tecnologiaTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: false,
-      render: (rowData: any) => (
-        <div>{`${rowData?.assay_list?.tecnologia?.cod_tec} ${rowData?.assay_list?.tecnologia?.name}`}</div>
-      ),
-    };
-  }
+  // function tecnologiaTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: false,
+  //     render: (rowData: any) => (
+  //       <div>{`${rowData?.assay_list?.tecnologia?.cod_tec} ${rowData?.assay_list?.tecnologia?.name}`}</div>
+  //     ),
+  //   };
+  // }
 
   function columnsOrder(columnsCampos: any): any {
     const columnCampos: any = columnsCampos.split(',');
@@ -411,38 +417,115 @@ export default function Listagem({
       //   tableFields.push(idHeaderFactory());
       // }
       if (columnCampos[index] === 'gli') {
-        tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'GLI',
+            title: 'assay_list.gli',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'tecnologia') {
         tableFields.push(
-          tecnologiaTableFactory('Tecnologia', 'assay_list.tecnologia.name'),
+          headerTableFactoryGlobal({
+            name: 'Tecnologia',
+            title: 'assay_list.tecnologia.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: any) => (
+              <div>{`${rowData?.assay_list?.tecnologia?.cod_tec} ${rowData?.assay_list?.tecnologia?.name}`}</div>
+            ),
+          }),
         );
       }
       if (columnCampos[index] === 'experimentName') {
         tableFields.push(
-          headerTableFactory('Nome experimento', 'experimentName'),
+          headerTableFactoryGlobal({
+            name: 'Nome experimento',
+            title: 'experimentName',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnCampos[index] === 'period') {
-        tableFields.push(headerTableFactory('Época', 'period'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Época',
+            title: 'period',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'delineamento') {
         tableFields.push(
-          headerTableFactory('Delineamento', 'delineamento.name'),
+          headerTableFactoryGlobal({
+            name: 'Delineamento',
+            title: 'delineamento.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnCampos[index] === 'repetitionsNumber') {
-        tableFields.push(headerTableFactory('Rep.', 'repetitionsNumber'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Rep.',
+            title: 'repetitionsNumber',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
     });
 
-    tableFields.push(headerTableFactory('Qtd Genótipos', 'countNT'));
+    tableFields.push(
+      headerTableFactoryGlobal({
+        name: 'Qtd Genótipos',
+        title: 'countNT',
+        orderList,
+        fieldOrder,
+        handleOrder,
+      }),
+    );
 
-    tableFields.push(headerTableFactory('NPE Inicial', 'npei'));
+    tableFields.push(
+      headerTableFactoryGlobal({
+        name: 'NPE Inicial',
+        title: 'npei',
+        orderList,
+        fieldOrder,
+        handleOrder,
+      }),
+    );
 
-    tableFields.push(headerTableFactory('NPE Final', 'npef'));
+    tableFields.push(
+      headerTableFactoryGlobal({
+        name: 'NPE Final',
+        title: 'npef',
+        orderList,
+        fieldOrder,
+        handleOrder,
+      }),
+    );
 
-    tableFields.push(headerTableFactory('QT. NPE', 'npeQT'));
+    tableFields.push(
+      headerTableFactoryGlobal({
+        name: 'QT. NPE',
+        title: 'npeQT',
+        orderList,
+        fieldOrder,
+        handleOrder,
+      }),
+    );
 
     return tableFields;
   }
@@ -671,7 +754,7 @@ export default function Listagem({
         NPESelectedRow?.npeQT == 'N/A'
           ? true
           : NPESelectedRow?.npeQT - total_consumed > 0
-            && lastNpe < NPESelectedRow?.nextNPE.npei_i
+          && lastNpe < NPESelectedRow?.nextNPE.npei_i
       ) {
         setLoading(true);
 
@@ -682,12 +765,12 @@ export default function Listagem({
               genotipo_treatment.map(async (gt: any) => {
                 genotypeTreatmentService
                   .update(gt)
-                  .then(({ status, message }: any) => {});
+                  .then(({ status, message }: any) => { });
               });
               experimentObj.map(async (x: any) => {
                 await experimentService
                   .update(x)
-                  .then(({ status, response }: any) => {});
+                  .then(({ status, response }: any) => { });
               });
 
               await npeService
@@ -743,6 +826,7 @@ export default function Listagem({
               data.gli = item.assay_list?.gli;
               data.id_seq_delineamento = sd.id;
               data.nca = gt.lote?.ncc;
+              data.status_t = gt.status;
               experiment_genotipo.push(data);
               npei++;
             });
@@ -766,8 +850,7 @@ export default function Listagem({
         html:
           `Existem NPE usados ​​entre <b>${npeUsedFrom}</b> e <b>${temp.npef}</b><br><br>`
           + `Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : ${temp.nextNPE.foco.name}</b><br><b> Ensaio : ${temp.nextNPE.type_assay.name}</b><br><b> Local : ${temp.nextNPE.local.name_local_culture}</b><br><b>Epoca : ${temp.nextNPE.epoca}</b><br><b>Tecnologia : ${temp.nextNPE.tecnologia.name}</b></p><br>`
-          + `O próximo NPE disponível é <strong>${
-            Number(temp.nextAvailableNPE) + 1
+          + `O próximo NPE disponível é <strong>${Number(temp.nextAvailableNPE) + 1
           }</strong></div>`,
         icon: 'warning',
         showCloseButton: true,
@@ -798,8 +881,8 @@ export default function Listagem({
     let count = 0;
     experimentos.map((item: any) => {
       item.npei <= NPESelectedRow?.nextNPE.npei_i
-      && item.npef >= NPESelectedRow?.nextNPE.npei_i
-      && NPESelectedRow?.nextNPE != 0
+        && item.npef >= NPESelectedRow?.nextNPE.npei_i
+        && NPESelectedRow?.nextNPE != 0
         ? count++
         : '';
     });
@@ -861,6 +944,7 @@ export default function Listagem({
                 search: false,
                 filtering: false,
                 selection: false,
+                sorting: false,
                 showSelectAllCheckbox: false,
                 showTextRowsSelected: false,
                 paging: false,
@@ -886,7 +970,7 @@ export default function Listagem({
                   rowStyle: (rowData) => ({
                     backgroundColor:
                       rowData.npef >= NPESelectedRow?.nextNPE.npei_i
-                      && SortearDisable
+                        && SortearDisable
                         ? '#FF5349'
                         : '#f9fafb',
                     height: 40,
@@ -1063,7 +1147,7 @@ export default function Listagem({
                         disabled={currentPage + 1 >= pages}
                       />
                     </div>
-                  ) as any,
+                    ) as any,
                 }}
               />
             </div>

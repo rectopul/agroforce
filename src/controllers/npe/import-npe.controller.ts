@@ -66,14 +66,14 @@ export class ImportNpeController {
           const npeName = `${spreadSheet[row][1]}_${spreadSheet[row][2]}_${spreadSheet[row][3]}_${spreadSheet[row][4]}_${spreadSheet[row][5]}_${spreadSheet[row][7]}`;
           const { status }: IReturnObject = await npeController.getAll({
             safraId: idSafra,
-            filterFoco: spreadSheet[row][1],
-            filterEnsaio: spreadSheet[row][2],
-            filterCodTec: spreadSheet[row][3],
-            filterLocal: spreadSheet[row][4],
-            filterEpoca: spreadSheet[row][6],
+            filterFoco: spreadSheet[row][2],
+            filterEnsaio: spreadSheet[row][3],
+            filterCodTec: spreadSheet[row][4],
+            filterLocal: spreadSheet[row][5],
+            filterEpoca: spreadSheet[row][7],
             filterStatus: 1,
-            idCulture,
           });
+
           if (status === 200) {
             return {
               status: 400,
@@ -404,6 +404,7 @@ export class ImportNpeController {
           }
         }
       }
+
       if (responseIfError.length === 0) {
         try {
           const createMany: any = [];
@@ -445,7 +446,7 @@ export class ImportNpeController {
 
                 if (configModule.response[0]?.fields[column] === 'Ensaio') {
                   const ensaio: any = await typeAssayController.getAll(
-                    { name: spreadSheet[row][column] },
+                    { name: spreadSheet[row][column], filterStatus: 1 },
                   );
                   npeDto.typeAssayId = ensaio.response[0]?.id;
                 }

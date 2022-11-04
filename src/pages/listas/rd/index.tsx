@@ -51,6 +51,7 @@ import {
 import * as ITabs from '../../../shared/utils/dropdown';
 import ComponentLoading from '../../../components/Loading';
 import { functionsUtils } from '../../../shared/utils/functionsUtils';
+import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
 
 export interface LogData {
   id: number;
@@ -184,11 +185,11 @@ export default function Import({
   const [colorStar, setColorStar] = useState<string>('');
   const [orderBy, setOrderBy] = useState<string>('');
   const [typeOrder, setTypeOrder] = useState<string>('');
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
 
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
-  const pathExtra = `skip=${
-    currentPage * Number(take)
+  const pathExtra = `skip=${currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
   const pages = Math.ceil(total / take);
   const formik = useFormik<any>({
@@ -282,21 +283,54 @@ export default function Import({
   //   }
   // }
 
-  function headerTableFactory(name: any, title: string) {
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
+
+  function headerTableStatusFactory() {
     return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
+      title: 'Status',
+      field: 'state',
+      sorting: false,
+      render: (rowData: any) => (
+        <div className="h-7 flex">
+          <div className="h-7">
+            {rowData.state}
+          </div>
+          <div style={{ width: 5 }} />
+          {rowData.invalid_data != '' ? (
+            <div className="h-7">
+              <Button
+                value="Details"
+                title={rowData.state}
+                onClick={() => {
+                  Swal.fire({
+                    html: rowData.invalid_data,
+                    width: '800',
+                  });
+                }}
+                bgColor="bg-blue-600"
+                textColor="white"
+              />
+            </div>
+          ) : ''}
+
         </div>
       ),
-      field: title,
-      sorting: true,
     };
   }
 
@@ -343,16 +377,40 @@ export default function Import({
       //   tableFields.push(idHeaderFactory());
       // }
       if (columnCampos[index] === 'user_id') {
-        tableFields.push(headerTableFactory('Usuário', 'user.name'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Usuário',
+            title: 'user.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'table') {
-        tableFields.push(headerTableFactory('Tabela', 'table'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Tabela',
+            title: 'table',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'created_at') {
-        tableFields.push(headerTableFactory('Importado em', 'created_at'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Importado em',
+            title: 'created_at',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'state') {
-        tableFields.push(headerTableFactory('Status', 'state'));
+        tableFields.push(headerTableStatusFactory());
       }
     });
     return tableFields;
@@ -363,12 +421,14 @@ export default function Import({
   async function handleOrder(
     column: string,
     order: string | any,
+    name: any,
   ): Promise<void> {
     // Gobal manage orders
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await fetchWrapper.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
@@ -964,7 +1024,7 @@ export default function Import({
                     <div style={{ width: 40 }} />
                     <div className="h-7 w-32 mt-6">
                       <Button
-                        onClick={() => {}}
+                        onClick={() => { }}
                         value="Filtrar"
                         bgColor="bg-blue-600"
                         textColor="white"

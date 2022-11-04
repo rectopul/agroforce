@@ -141,8 +141,6 @@ export class AssayListController {
 
   async update(data: any) {
     try {
-      console.log('data');
-      console.log(data);
       const assayList: any = await this.assayListRepository.findById(data.id);
 
       if (!assayList) return { status: 404, message: 'Lista de ensaio não existente' };
