@@ -249,30 +249,31 @@ export default function Listagem({
 
   const formik = useFormik<any>({
     initialValues: {
-      filterFoco: '',
-      filterTypeAssay: '',
-      filterTechnology: '',
-      filterGli: '',
-      filterBgm: '',
-      filterTreatmentsNumber: '',
-      filterStatus: '',
-      filterStatusAssay: '',
-      filterGenotypeName: '',
-      filterNca: '',
-      orderBy: '',
-      typeOrder: '',
-      filterBgmTo: '',
-      filterBgmFrom: '',
-      filterNtTo: '',
-      filterNtFrom: '',
-      filterNpeTo: '',
-      filterNpeFrom: '',
-      filterRepTo: '',
-      filterRepFrom: '',
-      filterStatusT: '',
-      filterCodTec: '',
-      filterExperimentName: '',
-      filterPlacingPlace: '',
+      filterFoco: "",
+      filterTypeAssay: "",
+      filterTechnology: "",
+      filterGli: "",
+      filterBgm: "",
+      filterTreatmentsNumber: "",
+      filterStatus: "",
+      filterStatusAssay: "",
+      filterGenotypeName: "",
+      filterNcaTo: "",
+      filterNcaFrom: "",
+      orderBy: "",
+      typeOrder: "",
+      filterBgmTo: "",
+      filterBgmFrom: "",
+      filterNtTo: "",
+      filterNtFrom: "",
+      filterNpeTo: "",
+      filterNpeFrom: "",
+      filterRepTo: "",
+      filterRepFrom: "",
+      filterStatusT: "",
+      filterCodTec: "",
+      filterExperimentName: "",
+      filterPlacingPlace: "",
     },
     onSubmit: async ({
       filterFoco,
@@ -283,7 +284,8 @@ export default function Listagem({
       filterTreatmentsNumber,
       filterStatusAssay,
       filterGenotypeName,
-      filterNca,
+      filterNcaTo,
+      filterNcaFrom,
       filterBgmTo,
       filterBgmFrom,
       filterNtTo,
@@ -310,7 +312,7 @@ export default function Listagem({
       // const filterStatus = selecionados.substr(0, selecionados.length - 1);
       const filterStatus = statusFilterSelected?.join(',');
 
-      const parametersFilter = `&filterStatusT=${filterStatusT}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterCodTec=${filterCodTec}&filterExperimentName=${filterExperimentName}&filterRepTo=${filterRepTo}&filterRepFrom=${filterRepFrom}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterPlacingPlace=${filterPlacingPlace}`;
+      const parametersFilter = `&filterStatusT=${filterStatusT}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNcaTo=${filterNcaTo}&filterNcaFrom=${filterNcaFrom}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterCodTec=${filterCodTec}&filterExperimentName=${filterExperimentName}&filterRepTo=${filterRepTo}&filterRepFrom=${filterRepFrom}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterPlacingPlace=${filterPlacingPlace}`;
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEdit', filtersParams);
       // await genotypeTreatmentService
@@ -1272,8 +1274,40 @@ export default function Listagem({
                     />
                   </div> */}
 
-                  {filterFieldFactory('filterGenotypeName', 'Nome do genótipo')}
-                  {filterFieldFactory('filterNca', 'NCA')}
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                     Nome do genótipo
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="Nome do genótipo"
+                        id="filterGenotypeName"
+                        name="filterGenotypeName"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NCA.
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterNcaFrom"
+                        name="filterNcaFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterNcaTo"
+                        name="filterNcaTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   <FieldItemsPerPage
                     selected={take}
@@ -1296,7 +1330,6 @@ export default function Listagem({
                   </div>
                 </div>
               </form>
-
             </div>
           </AccordionFilter>
 
@@ -1358,12 +1391,18 @@ export default function Listagem({
                       />
                     </div>
 
+                    {removeLoader && <Div></Div>}
+
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
                       {itemsTotal}
                     </strong>
+
+                    <div>
                     {removeLoader && <Loader />}
+                    <div/>
+                    
                     <div
                       className="h-full flex items-center gap-2
                     "
