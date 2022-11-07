@@ -113,11 +113,23 @@ export class ExperimentGenotipeController {
         );
       }
 
-      if (options.filterNca) {
-        if (options.filterNca === 'vazio') {
+      if (options.filterNcaFrom || options.filterNcaTo) {
+        if (options.filterNcaFrom && options.filterNcaTo) {
+          parameters.nce = JSON.parse(
+            `{"gte": ${Number(options.filterNpeFrom)}, "lte": ${Number(
+              options.filterNcaTo,
+            )} }`,
+          );
+        } else if (options.filterNcaFrom) {
+          parameters.nce = JSON.parse(
+            `{"gte": ${Number(options.filterNcaFrom)} }`,
+          );
+        } else if (options.filterNcaTo) {
+          parameters.nce = JSON.parse(
+            `{"lte": ${Number(options.filterNcaTo)} }`,
+          );
+        } else if (options.filterNcaFrom === 'vazio' || options.filterNcato === 'vazio') {
           parameters.nca = null;
-        } else {
-          parameters.nca = JSON.parse(`{ "contains": "${options.filterNca}" }`);
         }
       }
 

@@ -54,21 +54,12 @@ import {
   genotypeTreatmentService,
   importService,
   userPreferencesService,
-<<<<<<< HEAD
 } from "../../../../services";
 import * as ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
 import ComponentLoading from '../../../../components/Loading';
 
-=======
-} from '../../../../services';
-import * as ITabs from '../../../../shared/utils/dropdown';
-import { tableGlobalFunctions } from '../../../../helpers';
-import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
-
-import Loader from '../../../../components/loaderComponent/loader';
->>>>>>> 123a7e8557abea6a2ffd908e1ef82b8d42e06930
 
 export default function Listagem({
   // assaySelect,
@@ -199,21 +190,12 @@ export default function Listagem({
   ]);
 
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
-<<<<<<< HEAD
     // {
     //   name: "StatusCheckbox",
     //   title: "IMPORTADO ",
     //   value: "importado",
     //   defaultChecked: () => camposGerenciados.includes("importado"),
     // },
-=======
-    {
-      name: 'StatusCheckbox',
-      title: 'IMPORTADO ',
-      value: 'importado',
-      defaultChecked: () => camposGerenciados.includes('importado'),
-    },
->>>>>>> 123a7e8557abea6a2ffd908e1ef82b8d42e06930
     {
       name: 'StatusCheckbox',
       title: 'SORTEADO',
@@ -1631,17 +1613,10 @@ export const getServerSideProps: GetServerSideProps = async ({
     (response) => response.json(),
   );
 
-<<<<<<< HEAD
   // const { response: allAssay } = await fetch(
   //   urlParametersAssay.toString(),
   //   requestOptions
   // ).then((response) => response.json());
-=======
-  const { response: allAssay } = await fetch(
-    urlParametersAssay.toString(),
-    requestOptions,
-  ).then((response) => response.json());
->>>>>>> 123a7e8557abea6a2ffd908e1ef82b8d42e06930
 
   // const assaySelect = allAssay.map((item: any) => {
   //   const newItem: any = {};
