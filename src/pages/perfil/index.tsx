@@ -1,4 +1,4 @@
-yarnimport { useFormik } from 'formik';
+import { useFormik } from 'formik';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';

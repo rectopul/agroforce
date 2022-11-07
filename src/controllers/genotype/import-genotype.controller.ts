@@ -44,7 +44,7 @@ export class ImportGenotypeController {
       });
       return {
         status: 400,
-        message: 'Os dados são validados e carregados em backgroung',
+        message: 'Os dados são validados e carregados em background',
       };
     }
 

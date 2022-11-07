@@ -34,6 +34,7 @@ import {
   Box, Tab, Tabs, Typography,
 } from '@mui/material';
 import { fetchWrapper } from 'src/helpers';
+import { useRouter } from 'next/router';
 import {
   AccordionFilter,
   CheckBox,
@@ -92,6 +93,7 @@ export default function Import({
   const [executeUpload, setExecuteUpload] = useState<any>(
     Number(uploadInProcess),
   );
+  const router = useRouter();
   const disabledButton = executeUpload === 1;
   const bgColor = executeUpload === 1 ? 'bg-red-600' : 'bg-blue-600';
   const [loading, setLoading] = useState<boolean>(false);
@@ -155,13 +157,24 @@ export default function Import({
           });
           setExecuteUpload(0);
         }
+      }).catch((e: any) => {
+        Swal.fire({
+          html: 'Erro ao ler planilha',
+          width: '800',
+          didClose: () => {
+            router.reload();
+          },
+        });
       });
 
       (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
     } catch (e: any) {
       Swal.fire({
-        html: e,
+        html: 'Erro ao ler planilha',
         width: '800',
+        didClose: () => {
+          router.reload();
+        },
       });
     }
   }
