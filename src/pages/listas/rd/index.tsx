@@ -34,6 +34,7 @@ import {
   Box, Tab, Tabs, Typography,
 } from '@mui/material';
 import { fetchWrapper } from 'src/helpers';
+import { useRouter } from 'next/router';
 import {
   AccordionFilter,
   CheckBox,
@@ -92,71 +93,90 @@ export default function Import({
   const [executeUpload, setExecuteUpload] = useState<any>(
     Number(uploadInProcess),
   );
+  const router = useRouter();
   const disabledButton = executeUpload === 1;
   const bgColor = executeUpload === 1 ? 'bg-red-600' : 'bg-blue-600';
   const [loading, setLoading] = useState<boolean>(false);
 
   async function readExcel(moduleId: number, table: string) {
-    const value: any = document.getElementById(`inputFile-${moduleId}`);
-    if (!value.files[0]) {
-      Swal.fire('Insira um arquivo');
-      return;
-    }
-
-    const fileExtension: any = functionsUtils.getFileExtension(
-      value?.files[0]?.name,
-    );
-
-    if (fileExtension !== 'xlsx') {
-      Swal.fire('Apenas arquivos .xlsx são aceitos.');
-      (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
-      return;
-    }
-
-    const userLogado = JSON.parse(localStorage.getItem('user') as string);
-    setExecuteUpload(1);
-
-    readXlsxFile(value.files[0]).then(async (rows) => {
-      setLoading(true);
-
-      if (moduleId) {
-        const { message } = await importService.validate({
-          spreadSheet: rows,
-          moduleId,
-          created_by: userLogado.id,
-          idSafra,
-          idCulture,
-          table,
-          disabledButton,
-        });
-        setLoading(false);
-        handlePagination();
-        Swal.fire({
-          html: message,
-          width: '800',
-        });
-        setExecuteUpload(0);
-      } else {
-        const { message } = await importService.validateProtocol({
-          spreadSheet: rows,
-          moduleId,
-          created_by: userLogado.id,
-          idSafra,
-          idCulture,
-          table,
-          disabledButton,
-        });
-        setLoading(false);
-        handlePagination();
-        Swal.fire({
-          html: message,
-          width: '800',
-        });
-        setExecuteUpload(0);
+    try {
+      const value: any = document.getElementById(`inputFile-${moduleId}`);
+      if (!value.files[0]) {
+        Swal.fire('Insira um arquivo');
+        return;
       }
-    });
 
-    (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
+      const fileExtension: any = functionsUtils.getFileExtension(
+        value?.files[0]?.name,
+      );
+
+      if (fileExtension !== 'xlsx') {
+        Swal.fire('Apenas arquivos .xlsx são aceitos.');
+        (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
+        return;
+      }
+
+      const userLogado = JSON.parse(localStorage.getItem('user') as string);
+      setExecuteUpload(1);
+
+      readXlsxFile(value.files[0]).then(async (rows) => {
+        setLoading(true);
+
+        if (moduleId) {
+          const { message } = await importService.validate({
+            spreadSheet: rows,
+            moduleId,
+            created_by: userLogado.id,
+            idSafra,
+            idCulture,
+            table,
+            disabledButton,
+          });
+          setLoading(false);
+          handlePagination();
+          Swal.fire({
+            html: message,
+            width: '800',
+          });
+          setExecuteUpload(0);
+        } else {
+          const { message } = await importService.validateProtocol({
+            spreadSheet: rows,
+            moduleId,
+            created_by: userLogado.id,
+            idSafra,
+            idCulture,
+            table,
+            disabledButton,
+          });
+          setLoading(false);
+          handlePagination();
+          Swal.fire({
+            html: message,
+            width: '800',
+          });
+          setExecuteUpload(0);
+        }
+      }).catch((e: any) => {
+        Swal.fire({
+          html: 'Erro ao ler planilha',
+          width: '800',
+          didClose: () => {
+            router.reload();
+          },
+        });
+      });
+
+      (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
+    } catch (e: any) {
+      Swal.fire({
+        html: 'Erro ao ler planilha',
+        width: '800',
+        didClose: () => {
+          router.reload();
+        },
+      });
+    }
   }
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
