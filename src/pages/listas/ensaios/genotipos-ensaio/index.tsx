@@ -121,10 +121,10 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "GGEN",
-      value: "ggen",
-      defaultChecked: () => camposGerenciados.includes("ggen"),
+      name: 'CamposGerenciados[]',
+      title: 'GGEN',
+      value: 'ggen',
+      defaultChecked: () => camposGerenciados.includes('ggen'),
     },
     {
       name: 'CamposGerenciados[]',
@@ -232,7 +232,8 @@ export default function Listagem({
       filterStatus: checkValue('filterStatus'),
       filterStatusAssay: checkValue('filterStatusAssay'),
       filterGenotypeName: checkValue('filterGenotypeName'),
-      filterNca: checkValue('filterNca'),
+      filterNcaTo: checkValue('filterNcaTo'),
+      filterNcaFrom: checkValue('filterNcaFrom'),
       orderBy: '',
       typeOrder: '',
       filterBgmTo: checkValue('filterBgmTo'),
@@ -254,7 +255,8 @@ export default function Listagem({
       filterTreatmentsNumber,
       filterStatusAssay,
       filterGenotypeName,
-      filterNca,
+      filterNcaFrom,
+      filterNcaTo,
       filterBgmTo,
       filterBgmFrom,
       filterGgenCod,
@@ -280,8 +282,8 @@ export default function Listagem({
       }
 
       // const filterStatus = selecionados.substr(0, selecionados.length - 1);
-      const filterStatus = statusFilterSelected?.join(",")?.toLowerCase();
-      const parametersFilter = `filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmGenotypeTo=${filterBgmGenotypeTo}&filterBgmGenotypeFrom=${filterBgmGenotypeFrom}&filterGgenCod=${filterGgenCod}&filterGgenName=${filterGgenName}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}&status_experiment=${filterStatus}`;
+      const filterStatus = statusFilterSelected?.join(',')?.toLowerCase();
+      const parametersFilter = `filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmGenotypeTo=${filterBgmGenotypeTo}&filterBgmGenotypeFrom=${filterBgmGenotypeFrom}&filterGgenCod=${filterGgenCod}&filterGgenName=${filterGgenName}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNcaFrom=${filterNcaFrom}&filterNcaTo=${filterNcaTo}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}&status_experiment=${filterStatus}`;
 
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEdit', filtersParams);
@@ -1361,8 +1363,40 @@ export default function Listagem({
                     /> */}
                   {/* </div> */}
 
-                  {filterFieldFactory('filterGenotypeName', 'Nome do genótipo')}
-                  {filterFieldFactory('filterNca', 'NCA')}
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Nome do genótipo
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="Nome do genótipo"
+                        id="filterGenotypeName"
+                        name="filterGenotypeName"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NCA.
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterNcaFrom"
+                        name="filterNcaFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterNcaTo"
+                        name="filterNcaTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
@@ -1392,10 +1426,9 @@ export default function Listagem({
               data={treatments}
               options={{
                 selection: true,
-                selectionProps: (rowData: any) =>
-                  isOpenModal
-                    ? { disabled: rowData }
-                    : { disabled: rowData?.status_experiment == "SORTEADO" },
+                selectionProps: (rowData: any) => (isOpenModal
+                  ? { disabled: rowData }
+                  : { disabled: rowData?.status_experiment == 'SORTEADO' }),
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
@@ -1645,9 +1678,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   const baseUrlTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
   const baseUrlAssay = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
-  const filterApplication =
-    req.cookies.filterBeforeEdit ||
-    `&id_culture=${idCulture}&id_safra=${idSafra}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
+  const filterApplication = req.cookies.filterBeforeEdit
+    || `&id_culture=${idCulture}&id_safra=${idSafra}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
   // const filterApplication =
   //   req.cookies.filterBeforeEdit ||
   //   `&id_culture=${idCulture}&id_safra=${idSafra}&status_experiment=${"IMPORTADO"}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
