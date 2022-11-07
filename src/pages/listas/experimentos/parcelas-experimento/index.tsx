@@ -249,31 +249,31 @@ export default function Listagem({
 
   const formik = useFormik<any>({
     initialValues: {
-      filterFoco: "",
-      filterTypeAssay: "",
-      filterTechnology: "",
-      filterGli: "",
-      filterBgm: "",
-      filterTreatmentsNumber: "",
-      filterStatus: "",
-      filterStatusAssay: "",
-      filterGenotypeName: "",
-      filterNcaTo: "",
-      filterNcaFrom: "",
-      orderBy: "",
-      typeOrder: "",
-      filterBgmTo: "",
-      filterBgmFrom: "",
-      filterNtTo: "",
-      filterNtFrom: "",
-      filterNpeTo: "",
-      filterNpeFrom: "",
-      filterRepTo: "",
-      filterRepFrom: "",
-      filterStatusT: "",
-      filterCodTec: "",
-      filterExperimentName: "",
-      filterPlacingPlace: "",
+      filterFoco: '',
+      filterTypeAssay: '',
+      filterTechnology: '',
+      filterGli: '',
+      filterBgm: '',
+      filterTreatmentsNumber: '',
+      filterStatus: '',
+      filterStatusAssay: '',
+      filterGenotypeName: '',
+      filterNcaTo: '',
+      filterNcaFrom: '',
+      orderBy: '',
+      typeOrder: '',
+      filterBgmTo: '',
+      filterBgmFrom: '',
+      filterNtTo: '',
+      filterNtFrom: '',
+      filterNpeTo: '',
+      filterNpeFrom: '',
+      filterRepTo: '',
+      filterRepFrom: '',
+      filterStatusT: '',
+      filterCodTec: '',
+      filterExperimentName: '',
+      filterPlacingPlace: '',
     },
     onSubmit: async ({
       filterFoco,
@@ -1276,7 +1276,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                     Nome do genótipo
+                      Nome do genótipo
                     </label>
                     <div className="flex">
                       <Input
@@ -1390,9 +1390,6 @@ export default function Listagem({
                         icon={<RiArrowUpDownLine size={20} />}
                       />
                     </div>
-
-                    {removeLoader && <Div></Div>}
-
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
@@ -1400,9 +1397,9 @@ export default function Listagem({
                     </strong>
 
                     <div>
-                    {removeLoader && <Loader />}
-                    <div/>
-                    
+                      {removeLoader && <Loader />}
+                    </div>
+
                     <div
                       className="h-full flex items-center gap-2
                     "
