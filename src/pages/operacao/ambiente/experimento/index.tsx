@@ -711,20 +711,21 @@ export default function Listagem({
             response.length > 0
               ? (i = NPESelectedRow.prox_npe)
               : (i = NPESelectedRow.npef);
+            let ntQT = 1;
             response.map(async (item: any) => {
-              let repititions = 0;
+              let repititions = 1;
               item.npei = i;
-              while (repititions < item.repetitionsNumber) {
+              while (repititions <= item.repetitionsNumber) {
                 repititions++;
-                item.seq_delineamento.map((it: any) => {
-                  item.npef = i + item.countNT - 1;
-                  i = item.npef + 1;
-                  i >= NPESelectedRow.nextNPE.npei_i && npeUsedFrom == 0
-                    ? setNpeUsedFrom(NPESelectedRow.nextNPE.npei_i)
-                    : '';
-                });
+                let temp_seq = item.seq_delineamento.filter((x: any) => (x.repeticao == repititions) && (x.nt == ntQT))
+                item.npef = i + item.countNT - 1;
+                i = item.npef + 1;
+                i >= NPESelectedRow.nextNPE.npei_i && npeUsedFrom == 0
+                  ? setNpeUsedFrom(NPESelectedRow.nextNPE.npei_i)
+                  : '';
               }
               item.npeQT = item.npef - item.npei + 1;
+              ntQT++;
             });
             setExperimento(response);
             setTotalItems(total);
@@ -807,36 +808,37 @@ export default function Listagem({
       let npei = Number(NPESelectedRow?.npei_i);
 
       experimentos?.map((item: any) => {
-        let repititions = 0;
-        while (repititions < item.repetitionsNumber) {
+        let ntQT = 1;
+        let repititions = 1;
+        while (repititions <= item.repetitionsNumber) {
           item.assay_list?.genotype_treatment.map((gt: any) => {
-            item.seq_delineamento?.map((sd: any) => {
-              const data: any = {};
-              data.idSafra = gt.id_safra;
-              data.idFoco = item.assay_list?.foco.id;
-              data.idTypeAssay = item.assay_list?.type_assay.id;
-              data.idTecnologia = item.assay_list?.tecnologia.id;
-              data.idExperiment = item.id;
-              data.gli = item.assay_list?.gli;
-              // data.rep = item.delineamento?.repeticao;
-              data.rep = repititions + 1;
-              data.nt = gt.treatments_number;
-              data.npe = npei;
-              data.idLote = gt.genotipo?.id_lote;
-              data.idGenotipo = gt.genotipo?.id; // Added new field
-              data.gli = item.assay_list?.gli;
-              data.id_seq_delineamento = sd.id;
-              data.nca = gt.lote?.ncc;
-              data.status_t = gt.status;
-              experiment_genotipo.push(data);
-              npei++;
-            });
+            let sd = item.seq_delineamento.filter((x: any) => (x.repeticao == repititions) && (x.nt == ntQT))[0];
+            const data: any = {};
+            data.idSafra = gt.id_safra;
+            data.idFoco = item.assay_list?.foco.id;
+            data.idTypeAssay = item.assay_list?.type_assay.id;
+            data.idTecnologia = item.assay_list?.tecnologia.id;
+            data.idExperiment = item.id;
+            data.gli = item.assay_list?.gli;
+            data.rep = repititions;
+            data.nt = gt.treatments_number;
+            data.npe = npei;
+            data.idLote = gt.genotipo?.id_lote;
+            data.idGenotipo = gt.genotipo?.id; // Added new field
+            data.gli = item.assay_list?.gli;
+            data.id_seq_delineamento = sd.id;
+            data.nca = gt.lote?.ncc;
+            data.status_t = gt.status;
+            experiment_genotipo.push(data);
+            npei++;
+            // });
             const gt_new: any = {};
             gt_new.id = gt.id;
             gt_new.status_experiment = 'EXP. SORTEADO';
             genotipo_treatment.push(gt_new);
           });
           repititions++;
+          ntQT++;
         }
       });
       createExperimentGenotipe({
