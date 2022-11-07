@@ -1394,6 +1394,8 @@ export default function Listagem({
                       />
                     </div>
 
+                    {removeLoader && <Div></Div>}
+
                     <strong className="text-blue-600">
                       Total registrado: {itemsTotal}
                     </strong>
