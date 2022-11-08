@@ -46,7 +46,7 @@ import { focoService } from "../../../../services/foco.service";
 import ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
-import ComponentLoading from '../../../../components/Loading';
+import ComponentLoading from "../../../../components/Loading";
 
 interface IFilter {
   filterStatus: object | any;
@@ -120,7 +120,7 @@ export default function Listagem({
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -626,7 +626,7 @@ export default function Listagem({
 
   return (
     <>
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de focos</title>
       </Head>

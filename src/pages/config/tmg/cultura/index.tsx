@@ -112,7 +112,7 @@ export default function Listagem({
   );
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [

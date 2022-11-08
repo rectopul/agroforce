@@ -93,16 +93,16 @@ interface IData {
 }
 
 export default function Listagem({
-      allNpe,
-      itensPerPage,
-      filterApplication,
-      totalItems,
-      filterBeforeEdit,
-      id_safra,
-      cultureId,
-      orderByserver,
-      typeOrderServer,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allNpe,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+  filterBeforeEdit,
+  id_safra,
+  cultureId,
+  orderByserver,
+  typeOrderServer,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
   const tabsOperationMenu = tabsOperation.map((i) =>
@@ -128,7 +128,7 @@ export default function Listagem({
   const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
   const [npe, setNPE] = useState(allNpe);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
@@ -599,9 +599,11 @@ export default function Listagem({
   }
 
   async function handleStatus(idNPE: number, data: any): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&id_safra=${data.id_safra
-      }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
-      }&epoca=${String(data.epoca)}`;
+    const parametersFilter = `filterStatus=${1}&id_safra=${
+      data.id_safra
+    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${
+      data.id_type_assay
+    }&epoca=${String(data.epoca)}`;
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {
         if (response.total > 0) {
@@ -915,7 +917,7 @@ export default function Listagem({
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 15 }}>
                     <Button
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

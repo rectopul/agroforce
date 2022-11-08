@@ -132,7 +132,7 @@ export default function Listagem({
   const [nameReplace, setNameReplace] = useState<any>("");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>("");
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [

@@ -123,7 +123,7 @@ export default function TipoEnsaio({
     Number(pageBeforeEdit)
   );
 
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);

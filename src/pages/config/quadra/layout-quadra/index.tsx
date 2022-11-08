@@ -136,7 +136,7 @@ export default function Listagem({
     Number(pageBeforeEdit)
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
