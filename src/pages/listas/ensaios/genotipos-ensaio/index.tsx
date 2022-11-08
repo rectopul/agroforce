@@ -189,15 +189,15 @@ export default function Listagem({
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
     {
       name: "StatusCheckbox",
-      title: "IMPORTADO ",
+      title: "IMPORTADO",
       value: "importado",
       defaultChecked: () => camposGerenciados.includes("importado"),
     },
     {
       name: "StatusCheckbox",
-      title: "SORTEADO",
-      value: "sorteado",
-      defaultChecked: () => camposGerenciados.includes("sorteado"),
+      title: "	EXP IMP.",
+      value: "	EXP IMP.",
+      defaultChecked: () => camposGerenciados.includes("	EXP IMP."),
     },
   ]);
   const [statusFilterSelected, setStatusFilterSelected] = useState<any>([]);
