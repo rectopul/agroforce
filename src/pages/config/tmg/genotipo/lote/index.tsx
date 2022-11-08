@@ -23,7 +23,7 @@ import { UserPreferenceController } from 'src/controllers/user-preference.contro
 import { loteService, userPreferencesService } from 'src/services';
 import * as XLSX from 'xlsx';
 import ITabs from '../../../../../shared/utils/dropdown';
-import ComponentLoading from '../../../../components/Loading';
+import ComponentLoading from '../../../../../components/Loading';
 
 interface IFilter {
   filterStatus: object | any;
