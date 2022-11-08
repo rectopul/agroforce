@@ -42,6 +42,7 @@ import {
 import * as ITabs from "../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../helpers";
 import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
+import ComponentLoading from '../../../../components/Loading';
 
 interface IDelineamentoProps {
   id: number | any;
@@ -93,6 +94,7 @@ export default function Listagem({
   typeOrderServer, // RR
   orderByserver, // RR
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const [loading, setLoading] = useState<boolean>(false);
   const { TabsDropDowns } = ITabs.default;
 
   const tableRef = useRef<any>(null);
@@ -229,6 +231,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -685,6 +688,7 @@ export default function Listagem({
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem dos Layout</title>
       </Head>
@@ -790,7 +794,9 @@ export default function Listagem({
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
