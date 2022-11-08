@@ -28,7 +28,7 @@ assayListQueue
 
 assayListQueue.process(async (job, done) => {
   try {
-    await ImportAssayListController.validate(job.data.logId, true, job.data.instance);
+    await ImportAssayListController.validate(job.data.logId, job.data.instance);
     done();
   } catch (error: any) {
     handleError('Assay List controller', 'Queue', error.message);
