@@ -36,7 +36,8 @@ export interface ITreatmentFilter {
   filterCodTec: string
   filterStatusAssay: string
   filterGenotypeName: string
-  filterNca: string
+  filterNcaFrom: string
+  filterNcaTo: string
   orderBy: string
   typeOrder: string
   filterBgmTo: string

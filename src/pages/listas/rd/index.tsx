@@ -10,6 +10,8 @@ import React, {
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { IoIosCloudUpload } from 'react-icons/io';
+
+import { AiFillInfoCircle } from 'react-icons/ai';
 import MaterialTable from 'material-table';
 import {
   DragDropContext,
@@ -25,6 +27,7 @@ import {
 } from 'react-icons/ai';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
+
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
@@ -74,14 +77,14 @@ interface TabPanelProps {
 }
 
 export default function Import({
-  allLogs,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  uploadInProcess,
-  idSafra,
-  idCulture,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allLogs,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      uploadInProcess,
+      idSafra,
+      idCulture,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -210,7 +213,7 @@ export default function Import({
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pathExtra = `skip=${currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
   const pages = Math.ceil(total / take);
   const formik = useFormik<any>({
     initialValues: {
@@ -335,7 +338,7 @@ export default function Import({
           {rowData.invalid_data != '' ? (
             <div className="h-7">
               <Button
-                value="Details"
+
                 title={rowData.state}
                 onClick={() => {
                   Swal.fire({
@@ -343,6 +346,7 @@ export default function Import({
                     width: '800',
                   });
                 }}
+                icon={<AiFillInfoCircle size={20} />}
                 bgColor="bg-blue-600"
                 textColor="white"
               />
@@ -1205,7 +1209,7 @@ export default function Import({
                         disabled={currentPage + 1 >= pages}
                       />
                     </div>
-                    ) as any,
+                  ) as any,
                 }}
               />
             </div>

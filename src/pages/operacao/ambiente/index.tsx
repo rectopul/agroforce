@@ -182,7 +182,7 @@ export default function Listagem({
     {
       name: "CamposGerenciados[]",
       title: "NPE Inicial ",
-      value: "npei",
+      value: "npei_i",
       defaultChecked: () => camposGerenciados.includes("npei_i"),
     },
     {
@@ -461,11 +461,11 @@ export default function Listagem({
           })
         );
       }
-      if (columnCampos[item] === "npei") {
+      if (columnCampos[item] === "npei_i") {
         tableFields.push(
           headerTableFactoryGlobal({
             name: "NPE Inicial",
-            title: "npe_i",
+            title: "npei_i",
             orderList,
             fieldOrder,
             handleOrder,

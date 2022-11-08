@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next'; Ensaio
+import { NextApiRequest, NextApiResponse } from 'next';
 import { ImportExperimentController } from '../../../controllers/experiment/import-experiment.controller';
 import { ExperimentController } from '../../../controllers/experiment/experiment.controller';
 import { apiHandler } from '../../../helpers/api';
