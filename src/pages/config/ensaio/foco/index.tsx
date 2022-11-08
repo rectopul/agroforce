@@ -401,7 +401,7 @@ export default function Listagem({
           <div className="ml-1" />
           <ButtonToogleConfirmation
             data={rowData}
-            text="o tipo ensaio"
+            text="o foco"
             keyName="name"
             onPress={handleStatus}
           />
