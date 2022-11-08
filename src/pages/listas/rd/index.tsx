@@ -1044,7 +1044,9 @@ export default function Import({
                     <div style={{ width: 40 }} />
                     <div className="h-7 w-32 mt-6">
                       <Button
-                        onClick={() => { }}
+                        onClick={() => {
+                          setLoading(true);
+                        }}
                         value="Filtrar"
                         bgColor="bg-blue-600"
                         textColor="white"

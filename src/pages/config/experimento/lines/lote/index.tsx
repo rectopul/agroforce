@@ -23,6 +23,7 @@ import { UserPreferenceController } from 'src/controllers/user-preference.contro
 import { loteService, userPreferencesService } from 'src/services';
 import * as XLSX from 'xlsx';
 import ITabs from '../../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 interface IFilter {
   filterStatus: object | any;
@@ -59,6 +60,7 @@ export default function Listagem({
   allLote, totalItems, itensPerPage, filterApplication, id_genotipo,
 }: IData) {
   const { TabsDropDowns } = ITabs;
+  const [loading, setLoading] = useState<boolean>(false);
 
   const tabsDropDowns = TabsDropDowns();
 
@@ -116,6 +118,7 @@ export default function Listagem({
         setTotalItems(response.total);
         setCurrentPage(0);
       });
+      setLoading(false);
     },
   });
 
@@ -416,6 +419,7 @@ export default function Listagem({
 
   return (
     <>
+      {loading && <ComponentLoading text="" />}
       <Head><title>Listagem de Lotes</title></Head>
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
@@ -466,7 +470,9 @@ export default function Listagem({
                 <div className="h-16 w-32 mt-3">
                   <Button
                     type="submit"
-                    onClick={() => { }}
+                    onClick={() => {
+                      setLoading(true);
+                    }}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"

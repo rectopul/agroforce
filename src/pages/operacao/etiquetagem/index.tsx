@@ -54,6 +54,7 @@ import {
 import { IReturnObject } from "../../../interfaces/shared/Import.interface";
 import { tableGlobalFunctions } from "../../../helpers";
 import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
+import ComponentLoading from '../../../../components/Loading';
 
 export default function Listagem({
   allExperimentGroup,
@@ -77,6 +78,8 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   );
 
   const tableRef = useRef<any>(null);
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.etiquetagem || {
@@ -246,6 +249,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -701,6 +705,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
   return (
     <>
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de grupos de experimento</title>
       </Head>
@@ -1002,7 +1007,9 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       type="submit"
                       bgColor="bg-blue-600"
