@@ -28,6 +28,7 @@ import { genotipoService, userPreferencesService } from 'src/services';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 interface IFilter {
   filterStatus: object | any;
@@ -67,6 +68,7 @@ export default function Listagem({
       allGenotipos, totalItems, itensPerPage, filterApplication, cultureId, pageBeforeEdit, filterBeforeEdit,
     }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
+  const [loading, setLoading] = useState<boolean>(false);
 
   const tabsDropDowns = TabsDropDowns();
 
@@ -150,6 +152,7 @@ export default function Listagem({
         setTotalItems(response.total);
         setCurrentPage(0);
       });
+      setLoading(false);
     },
   });
 
@@ -536,6 +539,8 @@ export default function Listagem({
 
   return (
     <>
+
+      {loading && <ComponentLoading text="" />}
       <Head><title>Listagem de genótipos</title></Head>
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
@@ -600,7 +605,9 @@ export default function Listagem({
                 <div className="h-16 w-32 mt-3">
                   <Button
                     type="submit"
-                    onClick={() => { }}
+                    onClick={() => {
+                      setLoading(true);
+                    }}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"

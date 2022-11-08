@@ -37,6 +37,7 @@ import {
   ITreatmentGrid,
 } from "../../interfaces/listas/ensaio/genotype-treatment.interface";
 import { IGenerateProps } from "../../interfaces/shared/generate-props.interface";
+import ComponentLoading from '../../../../components/Loading';
 
 import {
   AccordionFilter,
@@ -71,6 +72,8 @@ export default function Listagem({
   );
 
   const tableRef = useRef<any>(null);
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.genotypeTreatment || {
@@ -180,6 +183,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -514,6 +518,7 @@ export default function Listagem({
 
   return (
     <>
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de genótipos do ensaio</title>
       </Head>
@@ -554,7 +559,9 @@ export default function Listagem({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       type="submit"
                       bgColor="bg-blue-600"

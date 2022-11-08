@@ -24,6 +24,7 @@ import {
   AccordionFilter, Button, CheckBox, Content, Input, Select,
 } from '../../../components';
 import * as ITabs from '../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 interface ILayoultProps {
   id: number | any;
@@ -72,6 +73,7 @@ export default function Listagem({
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
+  const [loading, setLoading] = useState<boolean>(false);
 
   tabsDropDowns.map((tab) => (
     tab.titleTab === 'QUADRAS'
@@ -165,6 +167,7 @@ export default function Listagem({
         setTotalItems(response.total);
         setCurrentPage(0);
       });
+      setLoading(false);
     },
   });
 
@@ -572,6 +575,9 @@ export default function Listagem({
 
   return (
     <>
+
+      {loading && <ComponentLoading text="" />}
+
       <Head>
         <title>Listagem dos Layout</title>
       </Head>
@@ -623,7 +629,9 @@ export default function Listagem({
 
                 <div className="h-16 w-32 mt-3">
                   <Button
-                    onClick={() => { }}
+                    onClick={() => {
+                      setLoading(true);
+                    }}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"
