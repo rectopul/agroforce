@@ -54,12 +54,12 @@ import {
   genotypeTreatmentService,
   importService,
   userPreferencesService,
-} from '../../../../services';
-import * as ITabs from '../../../../shared/utils/dropdown';
-import { tableGlobalFunctions } from '../../../../helpers';
-import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+} from "../../../../services";
+import * as ITabs from "../../../../shared/utils/dropdown";
+import { tableGlobalFunctions } from "../../../../helpers";
+import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
+import ComponentLoading from '../../../../components/Loading';
 
-import Loader from '../../../../components/loaderComponent/loader';
 
 export default function Listagem({
   // assaySelect,
@@ -71,7 +71,7 @@ export default function Listagem({
   typeOrderServer,
   orderByserver,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const [removeLoader, setremoveLoader] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const { TabsDropDowns } = ITabs.default;
   const [isOpenModal, setIsOpenModal] = useState(false);
 
@@ -190,12 +190,12 @@ export default function Listagem({
   ]);
 
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'StatusCheckbox',
-      title: 'IMPORTADO ',
-      value: 'importado',
-      defaultChecked: () => camposGerenciados.includes('importado'),
-    },
+    // {
+    //   name: "StatusCheckbox",
+    //   title: "IMPORTADO ",
+    //   value: "importado",
+    //   defaultChecked: () => camposGerenciados.includes("importado"),
+    // },
     {
       name: 'StatusCheckbox',
       title: 'SORTEADO',
@@ -330,7 +330,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
-      setremoveLoader(false);
+      setLoading(false);
     },
   });
 
@@ -938,6 +938,8 @@ export default function Listagem({
 
   return (
     <>
+     {loading && <ComponentLoading text="" />}
+
       <Head>
         <title>Listagem de parcelas do experimento</title>
       </Head>
@@ -1319,7 +1321,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       onClick={() => {
-                        setremoveLoader(true);
+                        setLoading(true);
                       }}
                       value="Filtrar"
                       type="submit"
@@ -1390,15 +1392,12 @@ export default function Listagem({
                         icon={<RiArrowUpDownLine size={20} />}
                       />
                     </div>
+
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
                       {itemsTotal}
                     </strong>
-
-                    <div>
-                      {removeLoader && <Loader />}
-                    </div>
 
                     <div
                       className="h-full flex items-center gap-2
@@ -1614,10 +1613,10 @@ export const getServerSideProps: GetServerSideProps = async ({
     (response) => response.json(),
   );
 
-  const { response: allAssay } = await fetch(
-    urlParametersAssay.toString(),
-    requestOptions,
-  ).then((response) => response.json());
+  // const { response: allAssay } = await fetch(
+  //   urlParametersAssay.toString(),
+  //   requestOptions
+  // ).then((response) => response.json());
 
   // const assaySelect = allAssay.map((item: any) => {
   //   const newItem: any = {};

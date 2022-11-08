@@ -12,8 +12,6 @@ export class GenotypeTreatmentController {
     parameters.AND = [];
     parameters.OR = [];
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterStatus) {
         const statusParams = options.filterStatus?.split(',');
         parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[0]}" } } }`));
@@ -189,7 +187,7 @@ export class GenotypeTreatmentController {
 
       if (options.orderBy) {
         if (!options.excel) {
-          if (options.orderBy[2] == '') {
+          if (options.orderBy[2] == '' || !options.orderBy[2]) {
             orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `{"${options.orderBy[1]}":"${options.typeOrder[1]}"}`];
           } else {
             orderBy = handleOrderForeign(options.orderBy[2], options.typeOrder[2]);

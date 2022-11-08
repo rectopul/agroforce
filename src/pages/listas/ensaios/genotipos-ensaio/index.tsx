@@ -60,6 +60,8 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+import ComponentLoading from '../../../../components/Loading';
+
 
 export default function Listagem({
   allTreatments,
@@ -73,6 +75,7 @@ export default function Listagem({
   orderByserver,
 }: ITreatmentGrid) {
   const { TabsDropDowns } = ITabs.default;
+  const [loading, setLoading] = useState<boolean>(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
 
   const tableRef = useRef<any>(null);
@@ -302,6 +305,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -943,6 +947,9 @@ export default function Listagem({
 
   return (
     <>
+    
+      {loading && <ComponentLoading text="" />}
+
       <Head>
         <title>Listagem de genótipos do ensaio</title>
       </Head>
@@ -1403,7 +1410,9 @@ export default function Listagem({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       type="submit"
                       bgColor="bg-blue-600"

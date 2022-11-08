@@ -165,7 +165,6 @@ export class ImportController {
         });
         return { status: 400, message: protocolMessage };
       }
-
       const protocolLevel = String(data.spreadSheet[1][0]);
       const newData = removeProtocolLevel(data);
       switch (protocolLevel) {

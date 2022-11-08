@@ -23,6 +23,7 @@ import {
   AccordionFilter, Button, CheckBox, Content, Input, Select,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 interface IEpoca {
   id: number;
@@ -65,6 +66,7 @@ export default function Listagem({
   ));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const [loading, setLoading] = useState<boolean>(false);
   const preferences = userLogado.preferences.tipo_epoca || { id: 0, table_preferences: 'id,name,status' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
@@ -109,6 +111,7 @@ export default function Listagem({
         setTotalItems(response.total);
         setCurrentPage(0);
       });
+      setLoading(false);
     },
   });
 
@@ -405,6 +408,7 @@ export default function Listagem({
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de Épocas</title>
       </Head>
@@ -457,7 +461,9 @@ export default function Listagem({
                 <div className="h-16 w-32 mt-3">
                   <Button
                     type="submit"
-                    onClick={() => { }}
+                    onClick={() => { 
+                      setLoading(true);
+                    }}
                     value="Filtrar"
                     bgColor="bg-blue-600"
                     textColor="white"
