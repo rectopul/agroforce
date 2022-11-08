@@ -588,6 +588,17 @@ export default function Listagem({
     handleTotalPages();
   }, [currentPage]);
 
+  function selectableFilter(rowData: any) {
+    if (
+      rowData?.status === "ETIQ. EM ANDAMENTO" ||
+      rowData?.status === "ETIQ. FINALIZADA"
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
   return (
     <>
       <Head>
@@ -649,11 +660,18 @@ export default function Listagem({
                 },
                 showSelectAllCheckbox: false,
                 selection: true,
-                selectionProps: (rowData: any) => ({
-                  disabled:
-                    rowData.status === "ETIQ. EM ANDAMENTO" ||
-                    rowData.status === "ETIQ. FINALIZADA",
-                }),
+                selectionProps: (rowData: any) => {
+                  const selectable = selectableFilter(rowData);
+                  rowData.tableData.disabled = !selectable;
+                  return {
+                    disabled: !selectable,
+                  };
+                },
+                // selectionProps: (rowData: any) => ({
+                //   disabled:
+                //     rowData.status === "ETIQ. EM ANDAMENTO" ||
+                //     rowData.status === "ETIQ. FINALIZADA",
+                // }),
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
