@@ -188,7 +188,7 @@ export default function AtualizarTipoEnsaio({
     { name: "CamposGerenciados[]", title: "CLP", value: "clp" },
     // { name: "CamposGerenciados[]", title: "EEL", value: "eel" },
     { name: "CamposGerenciados[]", title: "Densidade", value: "density" },
-    { name: "CamposGerenciados[]", title: "Status EXP.", value: "status" },
+    { name: "CamposGerenciados[]", title: "Status EXP", value: "status" },
   ]);
   const [colorStar, setColorStar] = useState<string>("");
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -646,7 +646,7 @@ export default function AtualizarTipoEnsaio({
       if (columnOrder[index] === "status") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Status EXP.",
+            name: "Status EXP",
             title: "status",
             orderList,
             fieldOrder,

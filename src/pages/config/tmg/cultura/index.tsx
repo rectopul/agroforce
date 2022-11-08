@@ -43,7 +43,7 @@ import { UserPreferenceController } from "../../../../controllers/user-preferenc
 import { cultureService, userPreferencesService } from "../../../../services";
 import ITabs from "../../../../shared/utils/dropdown";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
-import ComponentLoading from '../../../../components/Loading';
+import ComponentLoading from "../../../../components/Loading";
 
 interface IFilter {
   filterStatus: object | any;
@@ -138,7 +138,7 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
-      title: "Status",
+      title: "Ação",
       value: "status",
       defaultChecked: () => camposGerenciados.includes("status"),
     },
@@ -358,7 +358,7 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: "Status",
+      title: "Ação",
       field: "status",
       sorting: false,
       searchable: false,

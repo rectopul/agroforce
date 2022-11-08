@@ -161,7 +161,7 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
-      title: "Status",
+      title: "Ação",
       value: "status",
       defaultChecked: () => camposGerenciados.includes("status"),
     },
@@ -312,7 +312,7 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: "Status",
+      title: "Ação",
       field: "status",
       sorting: false,
       searchable: false,

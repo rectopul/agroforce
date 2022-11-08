@@ -127,7 +127,7 @@ export default function Listagem({
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: "CamposGerenciados[]", title: "Nome", value: "name" },
     { name: "CamposGerenciados[]", title: "Grupo", value: "group" },
-    { name: "CamposGerenciados[]", title: "Status", value: "status" },
+    { name: "CamposGerenciados[]", title: "Ação", value: "status" },
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>("");
@@ -358,7 +358,7 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: "Status",
+      title: "Ação",
       field: "status",
       sorting: false,
       searchable: false,

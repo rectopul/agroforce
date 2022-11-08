@@ -199,7 +199,7 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
-      title: "Status",
+      title: "Ação",
       value: "status",
       defaultChecked: () => camposGerenciados.includes("status"),
     },

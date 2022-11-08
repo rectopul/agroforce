@@ -317,7 +317,7 @@ export default function TipoEnsaio({
 
   function statusHeaderFactory() {
     return {
-      title: "Ações",
+      title: "Ação",
       field: "action",
       sorting: false,
       searchable: false,

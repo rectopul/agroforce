@@ -38,7 +38,7 @@ import {
 import * as ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
-import ComponentLoading from '../../../../components/Loading';
+import ComponentLoading from "../../../../components/Loading";
 
 interface ILocalProps {
   id: number | any;
@@ -326,7 +326,7 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: "Status",
+      title: "Ação",
       field: "status",
       sorting: false,
       searchable: false,

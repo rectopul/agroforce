@@ -136,8 +136,8 @@ export default function Listagem({
       value: "delineamento",
     },
     { name: "CamposGerenciados[]", title: "Rep.", value: "repetitionsNumber" },
-    { name: "CamposGerenciados[]", title: "Status EXP.", value: "status" },
-    { name: "CamposGerenciados[]", title: "Ações", value: "action" },
+    { name: "CamposGerenciados[]", title: "Status EXP", value: "status" },
+    // { name: "CamposGerenciados[]", title: "Ação", value: "action" },
   ]);
 
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
@@ -476,7 +476,7 @@ export default function Listagem({
       if (columnOrder[index] === "status") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Status EXP.",
+            name: "Status EXP",
             title: "status",
             orderList,
             fieldOrder,
