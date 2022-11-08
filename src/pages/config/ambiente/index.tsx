@@ -169,7 +169,7 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
-      title: "Nome tec.",
+      title: "Tecnologia",
       value: "tecnologia",
       defaultChecked: () => camposGerenciados.includes("tecnologia"),
     },
@@ -488,6 +488,11 @@ export default function Listagem({
             orderList,
             fieldOrder,
             handleOrder,
+            render: (rowData: any) => (
+              <div>
+                {`${rowData?.tecnologia?.cod_tec} ${rowData?.tecnologia?.name}`}
+              </div>
+            ),
           })
         );
       }
