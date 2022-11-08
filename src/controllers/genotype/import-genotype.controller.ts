@@ -1323,8 +1323,8 @@ export class ImportGenotypeController {
                     id_dados: Number(this.aux.id_dados_lote),
                     year: Number(this.aux.year),
                     ncc: Number(this.aux.ncc),
-                    fase: String(this.aux.fase),
-                    peso: this.aux.peso,
+                    fase: this.aux.fase ? String(this.aux.fase) : null,
+                    peso: this.aux.peso ? Number(this.aux.peso) : null,
                     quant_sementes: this.aux.quant_sementes,
                     created_by: createdBy,
                   });
@@ -1357,14 +1357,15 @@ export class ImportGenotypeController {
                     id_dados: Number(this.aux.id_dados_lote),
                     year: Number(this.aux.year),
                     ncc: Number(this.aux.ncc),
-                    fase: String(this.aux.fase),
-                    peso: this.aux.peso,
+                    fase: this.aux.fase ? String(this.aux.fase) : null,
+                    peso: this.aux.peso ? Number(this.aux.peso) : null,
                     quant_sementes: this.aux.quant_sementes,
                     created_by: createdBy,
                   });
                   delete this.aux.id_genotipo;
                 }
               }
+              this.aux = [];
             }
           }
         }

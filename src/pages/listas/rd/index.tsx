@@ -11,7 +11,12 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { IoIosCloudUpload } from 'react-icons/io';
 
-import { AiFillInfoCircle } from 'react-icons/ai';
+import {
+  AiFillInfoCircle,
+  AiOutlineArrowDown,
+  AiOutlineArrowUp,
+  AiTwotoneStar,
+} from 'react-icons/ai';
 import MaterialTable from 'material-table';
 import {
   DragDropContext,
@@ -20,11 +25,6 @@ import {
   DropResult,
 } from 'react-beautiful-dnd';
 import Spinner from 'react-bootstrap/Spinner';
-import {
-  AiOutlineArrowDown,
-  AiOutlineArrowUp,
-  AiTwotoneStar,
-} from 'react-icons/ai';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 
@@ -77,14 +77,14 @@ interface TabPanelProps {
 }
 
 export default function Import({
-      allLogs,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      uploadInProcess,
-      idSafra,
-      idCulture,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allLogs,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  uploadInProcess,
+  idSafra,
+  idCulture,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -213,7 +213,7 @@ export default function Import({
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pathExtra = `skip=${currentPage * Number(take)
-    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
   const pages = Math.ceil(total / take);
   const formik = useFormik<any>({
     initialValues: {
@@ -335,10 +335,9 @@ export default function Import({
             {rowData.state}
           </div>
           <div style={{ width: 5 }} />
-          {rowData.invalid_data != '' ? (
+          {rowData.invalid_data ? (
             <div className="h-7">
               <Button
-
                 title={rowData.state}
                 onClick={() => {
                   Swal.fire({
@@ -355,40 +354,6 @@ export default function Import({
 
         </div>
       ),
-    };
-  }
-
-  function idHeaderFactory() {
-    return {
-      title: <div className="flex items-center">{arrowOrder}</div>,
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-7 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="h-7 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
-          </div>
-        </div>
-      )),
     };
   }
 
