@@ -63,8 +63,6 @@ export class LoteController {
     let orderBy: object | any = '';
     parameters.AND = [];
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterYearFrom || options.filterYearTo) {
         if (options.filterYearFrom && options.filterYearTo) {
           parameters.year = JSON.parse(`{"gte": ${Number(options.filterYearFrom)}, "lte": ${Number(options.filterYearTo)} }`);
