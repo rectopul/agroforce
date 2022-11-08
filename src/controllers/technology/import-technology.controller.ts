@@ -176,11 +176,6 @@ export class ImportTechnologyController {
               const { status, response }: IReturnObject = await tecnologiaController.getAll(
                 { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
               );
-              console.log('spreadSheet[row][0]');
-              console.log(spreadSheet[row][0]);
-
-              console.log('response');
-              console.log(response);
 
               if (status === 200) {
                 await tecnologiaController.update({

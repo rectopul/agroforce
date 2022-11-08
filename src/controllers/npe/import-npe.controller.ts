@@ -81,12 +81,7 @@ export class ImportNpeController {
           });
 
           if (status === 200) {
-            return {
-              status: 400,
-              message: `Erro na linha ${
-                Number(row) + 1
-              }. Ambiente já cadastrada no sistema`,
-            };
+            responseIfError[0] += `<li style="text-align:left"> Erro na linha ${Number(row)}. Ambiente já cadastrada no sistema. </li> <br>`;
           }
           if (npeTemp.includes(npeName)) {
             await logImportController.update({
@@ -95,12 +90,7 @@ export class ImportNpeController {
               state: 'INVALIDA',
             });
             npeTemp[row] = npeName;
-            return {
-              status: 400,
-              message: `Erro na linha ${
-                Number(row) + 1
-              }. Ambiente duplicados na tabela`,
-            };
+            responseIfError[0] += `<li style="text-align:left"> Erro na linha ${Number(row)}. Ambiente duplicados na tabela. </li> <br>`;
           }
           if (npeiTemp.includes(npeInicial)) {
             await logImportController.update({
@@ -109,12 +99,7 @@ export class ImportNpeController {
               state: 'INVALIDA',
             });
             npeiTemp[row] = npeInicial;
-            return {
-              status: 400,
-              message: `Erro na linha ${
-                Number(row) + 1
-              }. NPEI duplicadas na tabela`,
-            };
+            responseIfError[0] += `<li style="text-align:left"> Erro na linha ${Number(row)}. NPEI duplicadas na tabela. </li> <br>`;
           }
           npeTemp[row] = npeName;
           npeiTemp[row] = npeInicial;
@@ -323,6 +308,7 @@ export class ImportNpeController {
                   const ensaio: any = await typeAssayController.getAll({
                     name: spreadSheet[row][column],
                     id_culture: idCulture,
+                    filterStatus: 1,
                   });
                   if (ensaio.total === 0) {
                     responseIfError[Number(column)] += responseGenericFactory(
