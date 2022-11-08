@@ -175,15 +175,24 @@ export class ImportAssayListController {
                 filterGli: spreadSheet[row][4],
                 id_safra: idSafra,
               });
-              if (response[0]?.status === 'EXP IMP.') {
+              if (response?.length > 0) {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
                     (Number(column) + 1),
                     spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
-                    'o ensaio já foi utilizado, não e possível alterar',
+                    'o ensaio já foi cadastrado, e preciso excluir para inserir de novo',
                   );
               }
+              // if (response[0]?.status === 'EXP IMP.') {
+              //   responseIfError[Number(column)]
+              //     += responseGenericFactory(
+              //       (Number(column) + 1),
+              //       spreadSheet[row][spreadSheet[row].length - 1],
+              //       spreadSheet[0][column],
+              //       'o ensaio já foi utilizado, não e possível alterar',
+              //     );
+              // }
             }
             // Validação do campo código da tecnologia
             if (column === '5') {

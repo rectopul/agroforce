@@ -46,6 +46,7 @@ import { IReturnObject } from "../../../../interfaces/shared/Import.interface";
 import ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
+import ComponentLoading from '../../../../components/Loading';
 
 interface IFilter {
   filterStatus: object | any;

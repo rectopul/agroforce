@@ -44,7 +44,7 @@ export class ImportGenotypeController {
       });
       return {
         status: 400,
-        message: 'Os dados são validados e carregados em backgroung',
+        message: 'Os dados são validados e carregados em background',
       };
     }
 
@@ -888,7 +888,7 @@ export class ImportGenotypeController {
         //     message: 'Erro ao salvar planilha de Genótipo',
         //   };
         // }
-        this.storeRecords(idLog, {
+        return this.storeRecords(idLog, {
           spreadSheet, idSafra, idCulture, created_by: createdBy,
         });
       }
@@ -1323,7 +1323,7 @@ export class ImportGenotypeController {
                     id_dados: Number(this.aux.id_dados_lote),
                     year: Number(this.aux.year),
                     ncc: Number(this.aux.ncc),
-                    fase: this.aux.fase,
+                    fase: String(this.aux.fase),
                     peso: this.aux.peso,
                     quant_sementes: this.aux.quant_sementes,
                     created_by: createdBy,
@@ -1357,7 +1357,7 @@ export class ImportGenotypeController {
                     id_dados: Number(this.aux.id_dados_lote),
                     year: Number(this.aux.year),
                     ncc: Number(this.aux.ncc),
-                    fase: this.aux.fase,
+                    fase: String(this.aux.fase),
                     peso: this.aux.peso,
                     quant_sementes: this.aux.quant_sementes,
                     created_by: createdBy,

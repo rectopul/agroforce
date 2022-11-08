@@ -43,10 +43,11 @@ import {
   Select,
   FieldItemsPerPage,
   ButtonDeleteConfirmation,
-} from '../../../components';
-import * as ITabs from '../../../shared/utils/dropdown';
-import { tableGlobalFunctions } from '../../../helpers';
-import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
+} from "../../../components";
+import * as ITabs from "../../../shared/utils/dropdown";
+import { tableGlobalFunctions } from "../../../helpers";
+import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
+import ComponentLoading from '../../../components/Loading';
 
 interface INpeProps {
   id: any;
@@ -110,6 +111,8 @@ export default function Listagem({
   safraId,
   idCulture,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const [loading, setLoading] = useState<boolean>(false);
+
   const { TabsDropDowns } = ITabs.default;
 
   const tableRef = useRef<any>(null);
@@ -271,6 +274,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -822,6 +826,9 @@ export default function Listagem({
 
   return (
     <>
+
+    {loading && <ComponentLoading text="" />}
+
       <Head>
         <title>Listagem dos Ambientes</title>
       </Head>
@@ -922,7 +929,9 @@ export default function Listagem({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
