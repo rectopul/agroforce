@@ -153,8 +153,8 @@ export default function Listagem({
       value: "delineamento",
     },
     { name: "CamposGerenciados[]", title: "Rep.", value: "repetitionsNumber" },
-    { name: "CamposGerenciados[]", title: "Status EXP.", value: "status" },
-    { name: "CamposGerenciados[]", title: "Ações", value: "action" },
+    { name: "CamposGerenciados[]", title: "Status EXP", value: "status" },
+    { name: "CamposGerenciados[]", title: "Ação", value: "action" },
   ]);
 
   const [isOpenModalConfirm, setIsOpenModalConfirm] = useState<boolean>(false);
@@ -453,7 +453,7 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: "Ações",
+      title: "Ação",
       field: "action",
       sorting: false,
       searchable: false,
@@ -627,7 +627,7 @@ export default function Listagem({
       if (columnCampos[index] === "status") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Status Exp.",
+            name: "Status EXP",
             title: "status",
             orderList,
             fieldOrder,
@@ -912,7 +912,7 @@ export default function Listagem({
 
                   <div className="h-10 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status do Ensaio
+                      Status EXP
                     </label>
                     <SelectMultiple
                       data={statusFilter.map((i: any) => i.title)}
