@@ -88,7 +88,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.genotypeTreatment || {
     id: 0,
     table_preferences:
-      "id,foco,type_assay,tecnologia,gli,experiment,culture,rep,status,nt,npe,genotipo,nca",
+      "id,foco,type_assay,tecnologia,gli,experiment,culture,rep,status,status_t,nt,npe,genotipo,nca",
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
@@ -154,7 +154,7 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
-      title: "Status EXP.",
+      title: "Status EXP",
       value: "status",
       defaultChecked: () => camposGerenciados.includes("status"),
     },
@@ -553,7 +553,7 @@ export default function Listagem({
       if (columnOrder[item] === "status") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Status EXP.",
+            name: "Status EXP",
             title: "status",
             orderList,
             fieldOrder,
@@ -1140,7 +1140,7 @@ export default function Listagem({
 
                   <div className="h-10 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status EXP.
+                      Status EXP
                     </label>
                     <SelectMultiple
                       data={statusFilter.map((i: any) => i.title)}
@@ -1225,7 +1225,7 @@ export default function Listagem({
                   </div>
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      NPE.
+                      NPE
                     </label>
                     <div className="flex">
                       <Input
@@ -1292,7 +1292,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      NCA.
+                      NCA
                     </label>
                     <div className="flex">
                       <Input
