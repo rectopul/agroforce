@@ -114,22 +114,22 @@ export class ExperimentGenotipeController {
       }
 
       if (options.filterNcaFrom || options.filterNcaTo) {
-        if (options.filterNcaFrom && options.filterNcaTo) {
-          parameters.nce = JSON.parse(
-            `{"gte": ${Number(options.filterNpeFrom)}, "lte": ${Number(
+        if (options.filterNcaFrom === 'vazio' || options.filterNcaTo === 'vazio') {
+          parameters.nca = null;
+        } else if (options.filterNcaFrom && options.filterNcaTo) {
+          parameters.nca = JSON.parse(
+            `{"gte": ${Number(options.filterNcaFrom)}, "lte": ${Number(
               options.filterNcaTo,
             )} }`,
           );
         } else if (options.filterNcaFrom) {
-          parameters.nce = JSON.parse(
+          parameters.nca = JSON.parse(
             `{"gte": ${Number(options.filterNcaFrom)} }`,
           );
         } else if (options.filterNcaTo) {
-          parameters.nce = JSON.parse(
+          parameters.nca = JSON.parse(
             `{"lte": ${Number(options.filterNcaTo)} }`,
           );
-        } else if (options.filterNcaFrom === 'vazio' || options.filterNcato === 'vazio') {
-          parameters.nca = null;
         }
       }
 
