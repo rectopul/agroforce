@@ -42,6 +42,7 @@ import {
 } from "../../../../components";
 import * as ITabs from "../../../../shared/utils/dropdown";
 import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
+import ComponentLoading from "../../../../components/Loading";
 
 interface IUsers {
   id: number;
@@ -89,6 +90,7 @@ export default function Listagem({
   const { TabsDropDowns } = ITabs.default;
 
   const tableRef = useRef<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const tabsDropDowns = TabsDropDowns("config");
 
@@ -209,6 +211,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -702,6 +705,7 @@ export default function Listagem({
 
   return (
     <>
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de usuários</title>
       </Head>
@@ -755,7 +759,9 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => formik.handleChange}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

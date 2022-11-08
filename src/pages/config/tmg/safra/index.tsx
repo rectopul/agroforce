@@ -38,6 +38,7 @@ import { safraService, userPreferencesService } from "../../../../services";
 import { tableGlobalFunctions } from "../../../../helpers";
 import ITabs from "../../../../shared/utils/dropdown";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
+import ComponentLoading from "../../../../components/Loading";
 
 interface IFilter {
   filterStatus: object | any;
@@ -91,6 +92,7 @@ export default function Listagem({
   orderByserver, // RR
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
+  const [loading, setLoading] = useState<boolean>(false);
 
   const tableRef = useRef<any>(null);
 
@@ -196,6 +198,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -612,6 +615,7 @@ export default function Listagem({
 
   return (
     <>
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de safras</title>
       </Head>
@@ -745,7 +749,9 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

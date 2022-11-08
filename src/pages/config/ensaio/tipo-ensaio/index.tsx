@@ -10,6 +10,7 @@ import { RequestInit } from "next/dist/server/web/spec-extension/request";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState, useRef } from "react";
+import ComponentLoading from '../../../../components/Loading';
 
 import {
   DragDropContext,
@@ -98,6 +99,7 @@ export default function TipoEnsaio({
   typeOrderServer, // RR
   orderByserver, // RR
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const [loading, setLoading] = useState<boolean>(false);
   const { TabsDropDowns } = ITabs.default;
 
   const tableRef = useRef<any>(null);
@@ -209,6 +211,7 @@ export default function TipoEnsaio({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
       // await typeAssayService
       //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
       //   .then((response) => {
@@ -757,6 +760,9 @@ export default function TipoEnsaio({
 
   return (
     <>
+
+      {loading && <ComponentLoading text="" />}
+
       <Head>
         <title>Listagem Tipos de Ensaio</title>
       </Head>
@@ -807,7 +813,9 @@ export default function TipoEnsaio({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
