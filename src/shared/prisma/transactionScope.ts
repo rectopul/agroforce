@@ -1,3 +1,3 @@
 export interface TransactionScope {
-  run(fn: () => Promise<void>): Promise<void>;
+  run(fn: () => Promise<any>): Promise<any>;
 }

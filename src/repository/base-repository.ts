@@ -13,11 +13,11 @@ export class BaseRepository {
   }
 
   async create(data: object | any){
-    return true;
+    return data;
   }
 
   async update(id: number, data: object | any){
-    return true;
+    return data;
   }
 
   getPrisma() {
@@ -26,8 +26,8 @@ export class BaseRepository {
 
   async createTransaction(data: object | any){
     if (this.clientManager && this.transactionScope){
-      await this.transactionScope.run(async () => {
-        this.create(data);
+      return await this.transactionScope.run(async () => {
+        return this.create(data);
       } );
     } else {
       throw new Error("Transação não encontrada!");
@@ -36,8 +36,8 @@ export class BaseRepository {
 
   async updateTransaction(id: number, data: object | any){
     if (this.clientManager && this.transactionScope){
-      await this.transactionScope.run(async () => {
-        this.update(id, data);
+      return await this.transactionScope.run(async () => {
+        return this.update(id, data);
       } );
     } else {
       throw new Error("Transação não encontrada!");

@@ -1,11 +1,12 @@
 import { prisma } from '../pages/api/db/db';
 import { GenotipoRepository } from './genotipo.repository';
+import { BaseRepository } from './base-repository';
 
-export class LoteRepository {
+export class LoteRepository extends BaseRepository {
   genotipoRepository = new GenotipoRepository();
 
   async create(data: any) {
-    const lote = await prisma.lote.create({ data });
+    const lote = await this.getPrisma().lote.create({ data });
 
     return lote;
   }
@@ -22,7 +23,7 @@ export class LoteRepository {
     const lote = await this.findById(id);
 
     if (lote !== null) {
-      const result = await prisma.lote.update({
+      const result = await this.getPrisma().lote.update({
         where: { id },
         data,
       });

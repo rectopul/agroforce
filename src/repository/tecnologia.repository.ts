@@ -1,5 +1,5 @@
 import { prisma } from '../pages/api/db/db';
-import {BaseRepository} from './base-repository';
+import { BaseRepository } from './base-repository';
 
 export class TecnologiaRepository extends BaseRepository {
   async findOne(id: number) {
@@ -26,7 +26,7 @@ export class TecnologiaRepository extends BaseRepository {
 
   async create(data: object | any) {
     const result = await this.getPrisma().tecnologia.create({ data });
-    return true;
+    return result;
   }
 
   async update(id: number, data: Object) {
@@ -36,6 +36,6 @@ export class TecnologiaRepository extends BaseRepository {
       },
       data,
     });
-    return true;
+    return result;
   }
 }
