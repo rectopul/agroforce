@@ -210,7 +210,7 @@ export default function Listagem({
           selecionados += `${allCheckBox[i].value},`;
         }
       }
-      //const filterStatus = selecionados.substr(0, selecionados.length - 1);
+      // const filterStatus = selecionados.substr(0, selecionados.length - 1);
       // const filterStatus = statusFilterSelected?.join(",");
 
       // // Call filter with there parameter
@@ -417,7 +417,7 @@ export default function Listagem({
         tableFields.push(
           headerTableFactoryGlobal({
             name: "Tecnologia",
-            title: "tecnologia",
+            title: "assay_list.tecnologia.name",
             orderList,
             fieldOrder,
             handleOrder,
@@ -455,7 +455,7 @@ export default function Listagem({
         tableFields.push(
           headerTableFactoryGlobal({
             name: "Delineamento",
-            title: "delineamento",
+            title: "delineamento.name",
             orderList,
             fieldOrder,
             handleOrder,

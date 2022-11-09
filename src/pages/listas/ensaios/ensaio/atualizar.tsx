@@ -89,7 +89,7 @@ export default function AtualizarTipoEnsaio({
   const preferences = userLogado.preferences.genotypeTreatment || {
     id: 0,
     table_preferences:
-      "safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments",
+      "safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment",
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences

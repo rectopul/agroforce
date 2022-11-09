@@ -49,7 +49,8 @@ interface IFilter {
   filterYearFrom: string;
   filterYearTo: string;
   filterCodLote: string;
-  filterNcc: string;
+  filterNcaTo: string;
+  filterNcaFrom: string;
   filterFase: string;
   filterPesoFrom: string;
   filterPesoTo: string;
@@ -184,7 +185,8 @@ export default function Listagem({
       filterYearFrom: "",
       filterYearTo: "",
       filterCodLote: "",
-      filterNcc: "",
+      filterNcaTo: "",
+      filterNcaFrom: "",
       filterFase: "",
       filterPesoFrom: "",
       filterPesoTo: "",
@@ -208,7 +210,8 @@ export default function Listagem({
       filterYearFrom,
       filterYearTo,
       filterCodLote,
-      filterNcc,
+      filterNcaFrom,
+      filterNcaTo,
       filterFase,
       filterPesoFrom,
       filterPesoTo,
@@ -231,7 +234,7 @@ export default function Listagem({
           }
         });
       }
-      const parametersFilter = `filterStatus=${1}&id_safra=${idSafra}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcc=${filterNcc}&filterFase=${filterFase}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCodTec=${filterCodTec}&filterNameTec=${filterNameTec}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterPesoTo=${filterPesoTo}&filterPesoFrom=${filterPesoFrom}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}`;
+      const parametersFilter = `filterStatus=${1}&id_safra=${idSafra}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcaFrom=${filterNcaFrom}&filterNcaTo=${filterNcaTo}&filterFase=${filterFase}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCodTec=${filterCodTec}&filterNameTec=${filterNameTec}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterPesoTo=${filterPesoTo}&filterPesoFrom=${filterPesoFrom}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}`;
 
       await replaceTreatmentService
         .getAll(
@@ -719,7 +722,26 @@ export default function Listagem({
 
                   {filterFieldFactory("filterCodLote", "Cód. lote")}
 
-                  {filterFieldFactory("filterNcc", "NCA")}
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NCA
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterNcaFrom"
+                        name="filterNcaFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterNcaTo"
+                        name="filterNcaTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   {filterFieldFactory("filterFase", "Fase", true)}
 
