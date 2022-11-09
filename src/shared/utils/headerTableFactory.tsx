@@ -10,6 +10,7 @@ interface IHeaderTableFactory {
 }
 
 export default function headerTableFactoryGlobal({
+  setloading,
   name,
   title,
   orderList,
@@ -23,7 +24,9 @@ export default function headerTableFactoryGlobal({
         <button
           type="button"
           className="font-medium text-gray-900"
-          onClick={() => handleOrder(title, orderList, name)}
+          onClick={() =>{
+            handleOrder(title, orderList, name);
+          }}
         >
           {name}
         </button>
