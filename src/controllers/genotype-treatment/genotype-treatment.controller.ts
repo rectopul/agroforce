@@ -59,11 +59,30 @@ export class GenotypeTreatmentController {
       if (options.filterStatusT) {
         parameters.status = JSON.parse(`{ "contains":"${options.filterStatusT}" }`);
       }
-      if (options.filterNca) {
-        if (options.filterNca === 'vazio') {
-          parameters.AND.push(JSON.parse(`{"id_lote": ${null} }`));
-        } else {
-          parameters.AND.push(JSON.parse(`{ "lote": {"ncc": "${options.filterNca}" } } `));
+      // if (options.filterNca) {
+      //   if (options.filterNca === 'vazio') {
+      //     parameters.AND.push(JSON.parse(`{"id_lote": ${null} }`));
+      //   } else {
+      //     parameters.AND.push(JSON.parse(`{ "lote": {"ncc": "${options.filterNca}" } } `));
+      //   }
+      // }
+      if (options.filterNcaFrom || options.filterNcaTo) {
+        if (options.filterNcaFrom.toUpperCase() === 'VAZIO' || options.filterNcaTo.toUpperCase() === 'VAZIO') {
+          parameters.id_lote = null;
+        } else if (options.filterNcaFrom && options.filterNcaTo) {
+          parameters.AND.push(JSON.parse(
+            `{"gte": ${Number(options.filterNcaFrom)}, "lte": ${Number(
+              options.filterNcaTo,
+            )} }`,
+          ));
+        } else if (options.filterNcaFrom) {
+          parameters.AND.push(JSON.parse(
+            `{"gte": ${Number(options.filterNcaFrom)} }`,
+          ));
+        } else if (options.filterNcaTo) {
+          parameters.AND.push(JSON.parse(
+            `{"lte": ${Number(options.filterNcaTo)} }`,
+          ));
         }
       }
       if (options.filterTreatmentsNumber) {
@@ -103,7 +122,7 @@ export class GenotypeTreatmentController {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
       }
       if (options.status_experiment) {
-        parameters.status_experiment = JSON.parse(`{"contains": "${options.status_experiment}" }`);
+        parameters.AND.push(JSON.parse(`{"assay_list": { "status": {"contains": "${options.status_experiment}" } } }`));
       }
       const select = {
         id: true,
