@@ -176,7 +176,6 @@ export class ImportTechnologyController {
 
       if (responseIfError.length === 0) {
         try {
-<<<<<<< HEAD
           spreadSheet.forEach(async (item: any, row: number) => {
             if (row !== 0) {
               const {
@@ -185,11 +184,6 @@ export class ImportTechnologyController {
               const { status, response }: IReturnObject = await tecnologiaController.getAll(
                 { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
               );
-=======
-          const {
-            response: responseCulture,
-          }: IReturnObject = await culturaController.getOneCulture(idCulture);
->>>>>>> 5776bdcecff17086cf1c879292b9f2c6a9a0093d
 
           await transactionConfig.transactionScope.run(async () => {
             for (let row in spreadSheet) {
