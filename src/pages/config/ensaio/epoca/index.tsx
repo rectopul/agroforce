@@ -328,6 +328,10 @@ export default function Listagem({
         setArrowName('');
       }
     }
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   function handleOnDragEnd(result: DropResult) {
