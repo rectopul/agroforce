@@ -1,13 +1,14 @@
 import { prisma } from '../pages/api/db/db';
+import {BaseRepository} from './base-repository';
 
-export class SafraRepository {
+export class SafraRepository extends BaseRepository {
   async create(data: any) {
-    const result = await prisma.safra.create({ data });
+    const result = await this.getPrisma().safra.create({ data });
     return result;
   }
 
   async update(id: number, data: any) {
-    const result = await prisma.safra.update({
+    const result = await this.getPrisma().safra.update({
       where: { id },
       data,
     });
