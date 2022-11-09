@@ -48,8 +48,8 @@ export class NpeController {
         parameters.tecnologia = JSON.parse(`{ "name": {"contains": "${options.filterTecnologia}" } }`);
       }
 
-      if (options.filterCodTecnologia) {
-        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterCodTecnologia}" } }`);
+      if (options.filterCodTec) {
+        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterCodTec}" } }`);
       }
 
       if (options.filterEpoca) {

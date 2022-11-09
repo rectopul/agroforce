@@ -40,9 +40,11 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
+  ButtonToogleConfirmation,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import ComponentLoading from '../../../../components/Loading';
 
 interface IUsers {
   id: number;
@@ -90,6 +92,7 @@ export default function Listagem({
   const { TabsDropDowns } = ITabs.default;
 
   const tableRef = useRef<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const tabsDropDowns = TabsDropDowns('config');
 
@@ -208,6 +211,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -293,44 +297,42 @@ export default function Listagem({
     };
   }
 
-  async function handleStatus(idItem: number, data: any): Promise<void> {
-    if (data.status === 1) {
-      data.status = 0;
-    } else {
-      data.status = 1;
-    }
+  async function handleStatus(data: any): Promise<void> {
+    // if (data.status === 1) {
+    //   data.status = 0;
+    // } else {
+    //   data.status = 1;
+    // }
 
-    const index = users.findIndex((user) => user.id === idItem);
+    // const index = users.findIndex((user) => user.id === data?.id);
 
     await userService.update({
-      id: idItem,
-      status: data.status,
+      id: data?.id,
+      status: data.status == 1 ? 0 : 1,
       created_by: userLogado.id,
     });
 
-    if (index === -1) {
-      return;
-    }
+    // if (index === -1) return;
 
-    setUsers((oldUser) => {
-      const copy = [...oldUser];
-      copy[index].status = data.status;
-      return copy;
-    });
+    // setUsers((oldUser) => {
+    //   const copy = [...oldUser];
+    //   copy[index].status = data.status;
+    //   return copy;
+    // });
 
-    const {
-      id, name, login, tel, status, avatar,
-    } = users[index];
+    // const { id, name, login, tel, status, avatar } = users[index];
 
-    await userService.update({
-      id,
-      name,
-      login,
-      tel,
-      status,
-      avatar,
-      created_by: userLogado.id,
-    });
+    // await userService.update({
+    //   id,
+    //   name,
+    //   login,
+    //   tel,
+    //   status,
+    //   avatar,
+    //   created_by: userLogado.id,
+    // });
+
+    handlePagination();
   }
 
   function idHeaderFactory() {
@@ -394,31 +396,14 @@ export default function Listagem({
             />
           </div>
           <div style={{ width: 5 }} />
-          {rowData.status ? (
-            <div className="h-7">
-              <Button
-                title="Ativo"
-                icon={<FaRegThumbsUp size={14} />}
-                onClick={async () => handleStatus(rowData.id, {
-                  status: rowData.status,
-                })}
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          ) : (
-            <div className="h-7">
-              <Button
-                title="Inativo"
-                icon={<FaRegThumbsDown size={14} />}
-                onClick={async () => handleStatus(rowData.id, {
-                  status: rowData.status,
-                })}
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          )}
+          <div className="h-7">
+            <ButtonToogleConfirmation
+              data={rowData}
+              text="o usuário"
+              keyName="name"
+              onPress={handleStatus}
+            />
+          </div>
         </div>
       ),
     };
@@ -719,9 +704,11 @@ export default function Listagem({
 
   return (
     <>
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de usuários</title>
       </Head>
+
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main
           className="h-full w-full
@@ -771,7 +758,9 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => formik.handleChange}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -794,7 +783,7 @@ export default function Listagem({
                 sorting: true,
                 showTitle: false,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 0,
                 },
                 rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,

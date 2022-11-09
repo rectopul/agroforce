@@ -60,6 +60,7 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+import ComponentLoading from '../../../../components/Loading';
 
 export default function Listagem({
   allTreatments,
@@ -73,6 +74,7 @@ export default function Listagem({
   orderByserver,
 }: ITreatmentGrid) {
   const { TabsDropDowns } = ITabs.default;
+  const [loading, setLoading] = useState<boolean>(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
 
   const tableRef = useRef<any>(null);
@@ -122,7 +124,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Cod. GGEN',
+      title: 'GGEN',
       value: 'ggen',
       defaultChecked: () => camposGerenciados.includes('ggen'),
     },
@@ -185,15 +187,15 @@ export default function Listagem({
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
     {
       name: 'StatusCheckbox',
-      title: 'IMPORTADO ',
+      title: 'IMPORTADO',
       value: 'importado',
       defaultChecked: () => camposGerenciados.includes('importado'),
     },
     {
       name: 'StatusCheckbox',
-      title: 'SORTEADO',
-      value: 'sorteado',
-      defaultChecked: () => camposGerenciados.includes('sorteado'),
+      title: 'EXP IMP.',
+      value: 'EXP IMP.',
+      defaultChecked: () => camposGerenciados.includes('EXP IMP.'),
     },
   ]);
   const [statusFilterSelected, setStatusFilterSelected] = useState<any>([]);
@@ -232,7 +234,8 @@ export default function Listagem({
       filterStatus: checkValue('filterStatus'),
       filterStatusAssay: checkValue('filterStatusAssay'),
       filterGenotypeName: checkValue('filterGenotypeName'),
-      filterNca: checkValue('filterNca'),
+      filterNcaTo: checkValue('filterNcaTo'),
+      filterNcaFrom: checkValue('filterNcaFrom'),
       orderBy: '',
       typeOrder: '',
       filterBgmTo: checkValue('filterBgmTo'),
@@ -254,7 +257,8 @@ export default function Listagem({
       filterTreatmentsNumber,
       filterStatusAssay,
       filterGenotypeName,
-      filterNca,
+      filterNcaFrom,
+      filterNcaTo,
       filterBgmTo,
       filterBgmFrom,
       filterGgenCod,
@@ -281,7 +285,7 @@ export default function Listagem({
 
       // const filterStatus = selecionados.substr(0, selecionados.length - 1);
       const filterStatus = statusFilterSelected?.join(',')?.toLowerCase();
-      const parametersFilter = `filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmGenotypeTo=${filterBgmGenotypeTo}&filterBgmGenotypeFrom=${filterBgmGenotypeFrom}&filterGgenCod=${filterGgenCod}&filterGgenName=${filterGgenName}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}&status_experiment=${'IMPORTADO'}`;
+      const parametersFilter = `filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmGenotypeTo=${filterBgmGenotypeTo}&filterBgmGenotypeFrom=${filterBgmGenotypeFrom}&filterGgenCod=${filterGgenCod}&filterGgenName=${filterGgenName}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNcaFrom=${filterNcaFrom}&filterNcaTo=${filterNcaTo}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}&status_experiment=${filterStatus}`;
 
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEdit', filtersParams);
@@ -300,6 +304,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -330,7 +335,11 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleOrder(column: string, order: number): Promise<void> {
+  async function handleOrder(
+    column: string,
+    order: number,
+    name: any,
+  ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
     // if (order === 1) {
@@ -373,86 +382,87 @@ export default function Listagem({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
   }
 
-  function headerTableFactory(
-    name: string,
-    title: string,
-    style: boolean = false,
-  ) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-      cellStyle: style ? { color: '#039be5', fontWeight: 'bold' } : {},
-    };
-  }
+  // function headerTableFactory(
+  //   name: string,
+  //   title: string,
+  //   style: boolean = false
+  // ) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //     cellStyle: style ? { color: "#039be5", fontWeight: "bold" } : {},
+  //   };
+  // }
 
-  function tecnologiaHeaderFactory(name: string, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: 'tecnologia',
-      width: 0,
-      sorting: true,
-      render: (rowData: any) => (
-        <div className="h-10 flex">
-          <div>
-            {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
-          </div>
-        </div>
-      ),
-    };
-  }
+  // function tecnologiaHeaderFactory(name: string, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: "tecnologia",
+  //     width: 0,
+  //     sorting: true,
+  //     render: (rowData: any) => (
+  //       <div className="h-10 flex">
+  //         <div>
+  //           {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
+  //         </div>
+  //       </div>
+  //     ),
+  //   };
+  // }
 
-  function ggenHeaderFactory(name: string, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: 'ggen',
-      width: 0,
-      sorting: true,
-      render: (rowData: any) => (
-        <div className="h-10 flex">
-          <div>
-            {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.name}`}
-          </div>
-        </div>
-      ),
-    };
-  }
+  // function ggenHeaderFactory(name: string, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: "ggen",
+  //     width: 0,
+  //     sorting: true,
+  //     render: (rowData: any) => (
+  //       <div className="h-10 flex">
+  //         <div>
+  //           {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.name}`}
+  //         </div>
+  //       </div>
+  //     ),
+  //   };
+  // }
 
   function formatDecimal(num: number) {
     return Number(num).toFixed(1);
@@ -463,27 +473,91 @@ export default function Listagem({
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
       if (columnOrder[item] === 'foco') {
-        tableFields.push(headerTableFactory('Foco', 'assay_list.foco.name'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Foco',
+            title: 'assay_list.foco.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'type_assay') {
         tableFields.push(
-          headerTableFactory('Ensaio', 'assay_list.type_assay.name'),
+          headerTableFactoryGlobal({
+            name: 'Ensaio',
+            title: 'assay_list.type_assay.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnOrder[item] === 'tecnologia') {
-        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Tecnologia',
+            title: 'tecnologia',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: any) => (
+              <div>
+                {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
+              </div>
+            ),
+          }),
+        );
       }
       if (columnOrder[item] === 'ggen') {
-        tableFields.push(ggenHeaderFactory('GGEN', 'tecnologia'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'GGEN',
+            title: 'tecnologia',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: any) => (
+              <div>
+                {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.name}`}
+              </div>
+            ),
+          }),
+        );
       }
       if (columnOrder[item] === 'gli') {
-        tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'GLI',
+            title: 'assay_list.gli',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'bgm') {
-        tableFields.push(headerTableFactory('BGM_Ens', 'assay_list.bgm'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'BGM_ens',
+            title: 'assay_list.bgm',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'bgmGenotype') {
-        tableFields.push(headerTableFactory('BGM_Gen', 'genotipo.bgm'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'BGM_Gen',
+            title: 'genotipo.bgm',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'gmr') {
         tableFields.push(
@@ -498,23 +572,61 @@ export default function Listagem({
         );
       }
       if (columnOrder[item] === 'treatments_number') {
-        tableFields.push(headerTableFactory('NT', 'treatments_number'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'NT',
+            title: 'treatments_number',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'status') {
-        tableFields.push(headerTableFactory('Status T', 'status'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Status T',
+            title: 'status',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'statusAssay') {
         tableFields.push(
-          headerTableFactory('Status Ensaio', 'assay_list.status'),
+          headerTableFactoryGlobal({
+            name: 'Status Ensaio',
+            title: 'assay_list.status',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnOrder[item] === 'genotipoName') {
         tableFields.push(
-          headerTableFactory('Nome do genótipo', 'genotipo.name_genotipo', true),
+          headerTableFactoryGlobal({
+            name: 'Nome do genótipo',
+            title: 'genotipo.name_genotipo',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            cellStyle: { color: '#039be5', fontWeight: 'bold' },
+          }),
         );
       }
       if (columnOrder[item] === 'nca') {
-        tableFields.push(headerTableFactory('NCA', 'lote.ncc', true));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'NCA',
+            title: 'lote.ncc',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            cellStyle: { color: '#039be5', fontWeight: 'bold' },
+          }),
+        );
       }
     });
 
@@ -832,11 +944,21 @@ export default function Listagem({
     return sortList;
   }
 
+  function selectableFilter(rowData: any) {
+    if (isOpenModal || rowData?.status_experiment == 'SORTEADO') {
+      return false;
+    }
+
+    return true;
+  }
+
   return (
     <>
       <Head>
         <title>Listagem de genótipos do ensaio</title>
       </Head>
+
+      {loading && <ComponentLoading text="" />}
 
       <Modal
         isOpen={isOpenModal}
@@ -1129,7 +1251,6 @@ export default function Listagem({
                       />
                     </div>
                   </div>
-
                 </div>
 
                 <div
@@ -1255,15 +1376,49 @@ export default function Listagem({
                     /> */}
                   {/* </div> */}
 
-                  {filterFieldFactory('filterGenotypeName', 'Nome do genótipo')}
-                  {filterFieldFactory('filterNca', 'NCA')}
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Nome do genótipo
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="Nome do genótipo"
+                        id="filterGenotypeName"
+                        name="filterGenotypeName"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NCA
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterNcaFrom"
+                        name="filterNcaFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterNcaTo"
+                        name="filterNcaTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       type="submit"
                       bgColor="bg-blue-600"
@@ -1286,7 +1441,17 @@ export default function Listagem({
               data={treatments}
               options={{
                 selection: true,
-                selectionProps: (rowData: any) => isOpenModal && { disabled: rowData },
+                selectionProps: (rowData: any) => {
+                  const selectable = selectableFilter(rowData);
+                  rowData.tableData.disabled = !selectable;
+                  return {
+                    disabled: !selectable,
+                  };
+                },
+                // selectionProps: (rowData: any) =>
+                //   isOpenModal
+                //     ? { disabled: rowData }
+                //     : { disabled: rowData?.status_experiment == "SORTEADO" },
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
@@ -1537,7 +1702,10 @@ export const getServerSideProps: GetServerSideProps = async ({
   const baseUrlAssay = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
   const filterApplication = req.cookies.filterBeforeEdit
-    || `&id_culture=${idCulture}&id_safra=${idSafra}&status_experiment=${'IMPORTADO'}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
+    || `&id_culture=${idCulture}&id_safra=${idSafra}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
+  // const filterApplication =
+  //   req.cookies.filterBeforeEdit ||
+  //   `&id_culture=${idCulture}&id_safra=${idSafra}&status_experiment=${"IMPORTADO"}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });

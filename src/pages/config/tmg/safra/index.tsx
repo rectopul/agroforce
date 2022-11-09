@@ -1,28 +1,30 @@
-import { useFormik } from "formik";
-import MaterialTable from "material-table";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import getConfig from "next/config";
-import Head from "next/head";
-import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/router";
+import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import getConfig from 'next/config';
+import Head from 'next/head';
+import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/router';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from "react-beautiful-dnd";
+} from 'react-beautiful-dnd';
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiTwotoneStar,
-} from "react-icons/ai";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdDateRange, MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line } from "react-icons/ri";
-import * as XLSX from "xlsx";
-import { removeCookies, setCookies } from "cookies-next";
+} from 'react-icons/ai';
+import {
+  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+} from 'react-icons/bi';
+import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdDateRange, MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RiFileExcel2Line } from 'react-icons/ri';
+import * as XLSX from 'xlsx';
+import { removeCookies, setCookies } from 'cookies-next';
 import {
   AccordionFilter,
   Button,
@@ -31,12 +33,14 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
-} from "../../../../components";
-import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
-import { safraService, userPreferencesService } from "../../../../services";
-import { tableGlobalFunctions } from "../../../../helpers";
-import ITabs from "../../../../shared/utils/dropdown";
-import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
+  ButtonToogleConfirmation,
+} from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { safraService, userPreferencesService } from '../../../../services';
+import { tableGlobalFunctions } from '../../../../helpers';
+import ITabs from '../../../../shared/utils/dropdown';
+import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+import ComponentLoading from '../../../../components/Loading';
 
 interface IFilter {
   filterStatus: object | any;
@@ -90,61 +94,60 @@ export default function Listagem({
   orderByserver, // RR
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
+  const [loading, setLoading] = useState<boolean>(false);
 
   const tableRef = useRef<any>(null);
 
   const tabsDropDowns = TabsDropDowns();
   // eslint-disable-next-line no-return-assign, no-param-reassign
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "TMG" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.safra || {
     id: 0,
     table_preferences:
-      "id,safraName,year,plantingStartTime,plantingEndTime,status",
+      'id,safraName,year,plantingStartTime,plantingEndTime,status',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences
+    preferences.table_preferences,
   );
   const [safras, setSafras] = useState<ISafra[]>(() => allSafras);
   const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit)
+    Number(pageBeforeEdit),
   );
   const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [orderList, setOrder] = useState<number>(1);
-  const [arrowOrder, setArrowOrder] = useState<any>("");
+  const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
 
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: "CamposGerenciados[]", title: "Safra", value: "safraName" },
-    { name: "CamposGerenciados[]", title: "Ano", value: "year" },
+    { name: 'CamposGerenciados[]', title: 'Safra', value: 'safraName' },
+    { name: 'CamposGerenciados[]', title: 'Ano', value: 'year' },
     {
-      name: "CamposGerenciados[]",
-      title: "Período ideal de início de plantio",
-      value: "plantingStartTime",
+      name: 'CamposGerenciados[]',
+      title: 'Período ideal de início de plantio',
+      value: 'plantingStartTime',
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Período ideal do fim do plantio",
-      value: "plantingEndTime",
+      name: 'CamposGerenciados[]',
+      title: 'Período ideal do fim do plantio',
+      value: 'plantingEndTime',
     },
-    { name: "CamposGerenciados[]", title: "Status", value: "status" },
+    { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [colorStar, setColorStar] = useState<string>("");
+  const [colorStar, setColorStar] = useState<string>('');
   // const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>("");
+  const [orderType, setOrderType] = useState<string>('');
   const filtersStatusItem = [
-    { id: 2, name: "Todos" },
-    { id: 1, name: "Ativos" },
-    { id: 0, name: "Inativos" },
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
   ];
-  const filterStatusBeforeEdit = filterBeforeEdit.split("");
+  const filterStatusBeforeEdit = filterBeforeEdit.split('');
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
@@ -158,14 +161,14 @@ export default function Listagem({
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: filterStatusBeforeEdit[13],
-      filterSafra: checkValue("filterSafra"),
-      filterYear: checkValue("filterYear"),
-      filterYearTo: "",
-      filterYearFrom: "",
-      filterStartDate: "",
-      filterEndDate: "",
-      orderBy: "",
-      typeOrder: "",
+      filterSafra: checkValue('filterSafra'),
+      filterYear: checkValue('filterYear'),
+      filterYearTo: '',
+      filterYearFrom: '',
+      filterStartDate: '',
+      filterEndDate: '',
+      orderBy: '',
+      typeOrder: '',
     },
     onSubmit: async ({
       filterStatus,
@@ -195,24 +198,25 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
-    setCookies("filterBeforeEdit", parametersFilter);
-    setCookies("filterBeforeEditTypeOrder", typeOrder);
-    setCookies("filterBeforeEditOrderBy", orderBy);
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies("filtersParams", parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
     await safraService.getAll(parametersFilter).then((response) => {
       if (response.status === 200 || response.status === 400) {
         setSafras(response.response);
         setTotalItems(response.total);
         tableRef.current.dataManager.changePageSize(
-          response.total >= take ? take : response.total
+          response.total >= take ? take : response.total,
         );
       }
     });
@@ -223,44 +227,43 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleStatusSafra(
-    idItem: number,
-    data: ISafra
-  ): Promise<void> {
-    if (data.status === 1) {
-      data.status = 0;
-    } else {
-      data.status = 1;
-    }
+  async function handleStatusSafra(data: ISafra): Promise<void> {
+    // if (data.status === 1) {
+    //   data.status = 0;
+    // } else {
+    //   data.status = 1;
+    // }
 
-    const index = safras.findIndex((safra) => safra.id === idItem);
+    // const index = safras.findIndex((safra) => safra.id === data?.id);
 
-    if (index === -1) {
-      return;
-    }
+    // if (index === -1) {
+    //   return;
+    // }
 
     await safraService.updateSafras({
-      id: idItem,
-      status: data.status,
+      id: data?.id,
+      status: data?.status === 1 ? 0 : 1,
     });
 
-    setSafras((oldSafra) => {
-      const copy = [...oldSafra];
-      copy[index].status = data.status;
-      return copy;
-    });
+    // setSafras((oldSafra) => {
+    //   const copy = [...oldSafra];
+    //   copy[index].status = data.status;
+    //   return copy;
+    // });
 
-    const { id, safraName, year, plantingStartTime, plantingEndTime, status } =
-      safras[index];
+    // const { id, safraName, year, plantingStartTime, plantingEndTime, status } =
+    //   safras[index];
 
-    await safraService.updateSafras({
-      id,
-      safraName,
-      year,
-      plantingStartTime,
-      plantingEndTime,
-      status,
-    });
+    // await safraService.updateSafras({
+    //   id,
+    //   safraName,
+    //   year,
+    //   plantingStartTime,
+    //   plantingEndTime,
+    //   status,
+    // });
+
+    handlePagination();
   }
 
   // async function handleOrder(
@@ -332,45 +335,44 @@ export default function Listagem({
   function idHeaderFactory() {
     return {
       title: <div className="flex items-center">{arrowOrder}</div>,
-      field: "id",
+      field: 'id',
       width: 0,
       sorting: false,
-      render: () =>
-        colorStar === "#eba417" ? (
-          <div className="h-9 flex">
-            <div>
-              <button
-                type="button"
-                className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar("")}
-              >
-                <AiTwotoneStar size={20} color="#eba417" />
-              </button>
-            </div>
+      render: () => (colorStar === '#eba417' ? (
+        <div className="h-9 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('')}
+            >
+              <AiTwotoneStar size={20} color="#eba417" />
+            </button>
           </div>
-        ) : (
-          <div className="h-9 flex">
-            <div>
-              <button
-                type="button"
-                className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar("#eba417")}
-              >
-                <AiTwotoneStar size={20} />
-              </button>
-            </div>
+        </div>
+      ) : (
+        <div className="h-9 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('#eba417')}
+            >
+              <AiTwotoneStar size={20} />
+            </button>
           </div>
-        ),
+        </div>
+      )),
     };
   }
 
   function statusHeaderFactory() {
     return {
-      title: "Status",
-      field: "status",
+      title: 'Status',
+      field: 'status',
       sorting: false,
       searchable: false,
-      filterPlaceholder: "Filtrar por status",
+      filterPlaceholder: 'Filtrar por status',
       render: (rowData: ISafra) => (
         <div className="h-8 flex">
           <div className="h-7">
@@ -378,14 +380,14 @@ export default function Listagem({
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.safraName}`}
               onClick={() => {
-                setCookies("pageBeforeEdit", currentPage?.toString());
-                setCookies("filterBeforeEdit", filter);
-                setCookies("filterBeforeEditTypeOrder", typeOrder);
-                setCookies("filterBeforeEditOrderBy", orderBy);
-                setCookies("filtersParams", filtersParams);
-                setCookies("lastPage", "atualizar");
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('lastPage', 'atualizar');
                 router.push(
-                  `/config/tmg/safra/atualizar?id=${rowData.id}&currentPage=${currentPage}&${filtersParams}`
+                  `/config/tmg/safra/atualizar?id=${rowData.id}&currentPage=${currentPage}&${filtersParams}`,
                 );
               }}
               bgColor="bg-blue-600"
@@ -393,95 +395,72 @@ export default function Listagem({
             />
           </div>
           <div style={{ width: 5 }} />
-          {rowData.status ? (
-            <div className="h-7">
-              <Button
-                title="Ativo"
-                icon={<FaRegThumbsUp size={14} />}
-                onClick={async () =>
-                  handleStatusSafra(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })
-                }
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          ) : (
-            <div className="h-7">
-              <Button
-                title="Inativo"
-                icon={<FaRegThumbsDown size={14} />}
-                onClick={async () =>
-                  handleStatusSafra(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })
-                }
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          )}
+          <div className="h-7">
+            <ButtonToogleConfirmation
+              data={rowData}
+              text="a safra"
+              keyName="safraName"
+              onPress={handleStatusSafra}
+            />
+          </div>
         </div>
       ),
     };
   }
 
   function columnsOrder(camposGerenciados: string) {
-    const columnCampos: string[] = camposGerenciados.split(",");
+    const columnCampos: string[] = camposGerenciados.split(',');
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
       // if (columnCampos[index] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
-      if (columnCampos[index] === "safraName") {
+      if (columnCampos[index] === 'safraName') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Safra",
-            title: "safraName",
+            name: 'Safra',
+            title: 'safraName',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "year") {
+      if (columnCampos[index] === 'year') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Ano",
-            title: "year",
+            name: 'Ano',
+            title: 'year',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "plantingStartTime") {
+      if (columnCampos[index] === 'plantingStartTime') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Período ideal início de plantio",
-            title: "plantingStartTime",
+            name: 'Período ideal início de plantio',
+            title: 'plantingStartTime',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "plantingEndTime") {
+      if (columnCampos[index] === 'plantingEndTime') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Período ideal fim do plantio",
-            title: "plantingEndTime",
+            name: 'Período ideal fim do plantio',
+            title: 'plantingEndTime',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "status") {
+      if (columnCampos[index] === 'status') {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -493,11 +472,12 @@ export default function Listagem({
   async function handleOrder(
     column: string,
     order: string | any,
-    name: string | any
+    name: string | any,
   ): Promise<void> {
     // Gobal manage orders
-    const { typeOrderG, columnG, orderByG, arrowOrder } =
-      await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setFieldOrder(name);
     setTypeOrder(typeOrderG);
@@ -508,7 +488,7 @@ export default function Listagem({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = "";
+    let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -531,7 +511,7 @@ export default function Listagem({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
       userLogado.preferences.safra = {
         id: preferences.id,
@@ -542,7 +522,7 @@ export default function Listagem({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -566,9 +546,9 @@ export default function Listagem({
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           if (row.status === 0) {
-            row.status = "Inativos" as any;
+            row.status = 'Inativos' as any;
           } else {
-            row.status = "Ativos" as any;
+            row.status = 'Ativos' as any;
           }
           row.Nome = row.safraName;
           row.Ano = row.year;
@@ -589,21 +569,21 @@ export default function Listagem({
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "safras");
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'safras');
 
         // Buffer
 
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "buffer",
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "binary",
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, "Safras.xlsx");
+        XLSX.writeFile(workBook, 'Safras.xlsx');
       }
     });
   };
@@ -623,7 +603,7 @@ export default function Listagem({
   function checkValue(value: any) {
     const parameter = tableGlobalFunctions.getValuesForFilter(
       value,
-      filtersParams
+      filtersParams,
     );
     return parameter;
   }
@@ -635,6 +615,7 @@ export default function Listagem({
 
   return (
     <>
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de safras</title>
       </Head>
@@ -672,7 +653,7 @@ export default function Listagem({
                       name="filterStatus"
                       id="filterStatus"
                       onChange={formik.handleChange}
-                      defaultValue={checkValue("filterStatus")}
+                      defaultValue={checkValue('filterStatus')}
                       // defaultValue={filterStatusBeforeEdit[13]}
                       values={filtersStatusItem.map((id) => id)}
                       selected="2"
@@ -687,7 +668,7 @@ export default function Listagem({
                       placeholder="Nome da Safra"
                       id="filterSafra"
                       name="filterSafra"
-                      defaultValue={checkValue("filterSafra")}
+                      defaultValue={checkValue('filterSafra')}
                       onChange={formik.handleChange}
                     />
                   </div>
@@ -768,7 +749,9 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -783,14 +766,14 @@ export default function Listagem({
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
               tableRef={tableRef}
-              style={{ background: "#f9fafb" }}
+              style={{ background: '#f9fafb' }}
               columns={columns}
               data={safras}
               options={{
                 sorting: true,
                 showTitle: false,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 0,
                 },
                 search: false,
                 filtering: false,
@@ -818,14 +801,16 @@ export default function Listagem({
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {
-                          router.push("safra/cadastro");
+                          router.push('safra/cadastro');
                         }}
                         icon={<MdDateRange size={20} />}
                       />
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado: {itemsTotal}
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
@@ -869,7 +854,7 @@ export default function Listagem({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value
+                                                generate.value,
                                               )}
                                             />
                                           </li>
@@ -898,59 +883,58 @@ export default function Listagem({
                     </div>
                   </div>
                 ),
-                Pagination: (props) =>
-                  (
-                    <div
-                      className="flex
+                Pagination: (props) => (
+                  <div
+                    className="flex
                         h-20
                         gap-2
                         pr-2
                         py-5
                         bg-gray-50
                       "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(0)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage <= 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill("")
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setCurrentPage(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(pages - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(0)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage <= 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(pages - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
                   ) as any,
               }}
             />
@@ -973,14 +957,14 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { cultureId } = req.cookies;
 
   // Last page
-  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
-  if (lastPageServer == undefined || lastPageServer == "No") {
-    removeCookies("filterBeforeEdit", { req, res });
-    removeCookies("pageBeforeEdit", { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
   }
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
@@ -993,12 +977,12 @@ export const getServerSideProps: GetServerSideProps = async ({
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : "desc";
+    : 'desc';
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : "safraName";
+    : 'safraName';
 
   const { token } = req.cookies;
   // const { cultureId } = req.cookies;
@@ -1011,25 +995,25 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? `${req.cookies.filterBeforeEdit}`
     : `filterStatus=1&id_culture=${cultureId}`;
 
-  removeCookies("filterBeforeEdit", { req, res });
-  removeCookies("pageBeforeEdit", { req, res });
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   // RR
-  removeCookies("filterBeforeEditTypeOrder", { req, res });
-  removeCookies("filterBeforeEditOrderBy", { req, res });
-  removeCookies("lastPage", { req, res });
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
   const { response: allSafras, total: totalItems } = await fetch(
     urlParameters.toString(),
-    requestOptions
+    requestOptions,
   ).then((response) => response.json());
 
   return {

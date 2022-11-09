@@ -149,8 +149,24 @@ export class ReplaceTreatmentController {
       if (options.filterCodLote) {
         parameters.cod_lote = JSON.parse(`{ "contains":"${options.filterCodLote}" }`);
       }
-      if (options.filterNcc) {
-        parameters.ncc = Number(options.filterNcc);
+      if (options.filterNcaFrom || options.filterNcaTo) {
+        if (options.filterNcaFrom === 'vazio' || options.filterNcaTo === 'vazio') {
+          parameters.ncc = null;
+        } else if (options.filterNcaFrom && options.filterNcaTo) {
+          parameters.nca = JSON.parse(
+            `{"gte": ${Number(options.filterNcaFrom)}, "lte": ${Number(
+              options.filterNcaTo,
+            )} }`,
+          );
+        } else if (options.filterNcaFrom) {
+          parameters.ncc = JSON.parse(
+            `{"gte": ${Number(options.filterNcaFrom)} }`,
+          );
+        } else if (options.filterNcaTo) {
+          parameters.ncc = JSON.parse(
+            `{"lte": ${Number(options.filterNcaTo)} }`,
+          );
+        }
       }
       if (options.filterPeso) {
         parameters.peso = Number(options.filterPeso);

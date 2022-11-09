@@ -37,6 +37,8 @@ import {
 } from "../../../../components";
 import * as ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
+import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
+import ComponentLoading from '../../../../components/Loading';
 
 interface ILocalProps {
   id: number | any;
@@ -97,6 +99,7 @@ export default function Listagem({
   const { TabsDropDowns } = ITabs.default;
 
   const tableRef = useRef<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const tabsDropDowns = TabsDropDowns("config");
   tabsDropDowns.map((tab) =>
@@ -189,6 +192,8 @@ export default function Listagem({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
@@ -240,6 +245,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -268,22 +274,22 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
   function idHeaderFactory() {
     return {
@@ -362,26 +368,80 @@ export default function Listagem({
       // }
       if (objectCampos[item] === "name_local_culture") {
         arrOb.push(
-          headerTableFactory("Nome do L. de cult.", "name_local_culture")
+          headerTableFactoryGlobal({
+            name: "Nome do L. de cult.",
+            title: "name_local_culture",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
         );
       }
       if (objectCampos[item] === "label") {
-        arrOb.push(headerTableFactory("Rótulo", "label"));
+        arrOb.push(
+          headerTableFactoryGlobal({
+            name: "Rótulo",
+            title: "label",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (objectCampos[item] === "adress") {
-        arrOb.push(headerTableFactory("Nome da fazenda", "adress"));
+        arrOb.push(
+          headerTableFactoryGlobal({
+            name: "Nome da fazenda",
+            title: "adress",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (objectCampos[item] === "mloc") {
-        arrOb.push(headerTableFactory("MLOC", "mloc"));
+        arrOb.push(
+          headerTableFactoryGlobal({
+            name: "MLOC",
+            title: "mloc",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (objectCampos[item] === "label_country") {
-        arrOb.push(headerTableFactory("País", "label_country"));
+        arrOb.push(
+          headerTableFactoryGlobal({
+            name: "País",
+            title: "label_country",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (objectCampos[item] === "label_region") {
-        arrOb.push(headerTableFactory("Região", "label_region"));
+        arrOb.push(
+          headerTableFactoryGlobal({
+            name: "Região",
+            title: "label_region",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (objectCampos[item] === "name_locality") {
-        arrOb.push(headerTableFactory("Localidade", "name_locality"));
+        arrOb.push(
+          headerTableFactoryGlobal({
+            name: "Localidade",
+            title: "name_locality",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (objectCampos[item] === "action") {
         arrOb.push(statusHeaderFactory());
@@ -392,7 +452,8 @@ export default function Listagem({
 
   async function handleOrder(
     column: string,
-    order: string | any
+    order: string | any,
+    name: any
   ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
@@ -441,6 +502,7 @@ export default function Listagem({
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
@@ -638,6 +700,7 @@ export default function Listagem({
 
   return (
     <>
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de Lugares de Cultura</title>
       </Head>
@@ -682,7 +745,9 @@ export default function Listagem({
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

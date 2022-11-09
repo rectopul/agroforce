@@ -31,6 +31,7 @@ export class ImportTechnologyController {
       if (validate.length > 0) {
         return { status: 400, message: validate };
       }
+      const duplicateCode: any = [];
       for (const row in spreadSheet) {
         if (row !== '0') {
           for (const column in spreadSheet[row]) {
@@ -53,6 +54,16 @@ export class ImportTechnologyController {
               } else if ((typeof (spreadSheet[row][column])) === 'number' && spreadSheet[row][column].toString().length < 2) {
                 // eslint-disable-next-line no-param-reassign
                 spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+                if(duplicateCode.includes(spreadSheet[row][column])) {
+                  responseIfError[column]
+                      += responseGenericFactory(
+                      (Number(column) + 1),
+                      row,
+                      spreadSheet[0][column],
+                      'existem códigos duplicados na tabela',
+                    );
+                }
+                duplicateCode.push(spreadSheet[row][column]);
               }
             } else if (column === '1') {
               if (spreadSheet[row][column] === null) {
@@ -165,6 +176,7 @@ export class ImportTechnologyController {
               const { status, response }: IReturnObject = await tecnologiaController.getAll(
                 { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
               );
+
               if (status === 200) {
                 await tecnologiaController.update({
                   id: response[0]?.id,

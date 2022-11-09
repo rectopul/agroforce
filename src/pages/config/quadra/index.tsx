@@ -38,11 +38,14 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
+  ButtonToogleConfirmation,
 } from "../../../components";
 import { quadraService, userPreferencesService } from "../../../services";
 import { UserPreferenceController } from "../../../controllers/user-preference.controller";
 import ITabs from "../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../helpers";
+import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
+import ComponentLoading from '../../../components/Loading';
 
 interface IFilter {
   filterStatus: object | any;
@@ -100,6 +103,7 @@ export default function Listagem({
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
+  const [loading, setLoading] = useState<boolean>(false);
 
   tabsDropDowns.map((tab) =>
     tab.titleTab === "QUADRAS"
@@ -163,6 +167,8 @@ export default function Listagem({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
@@ -201,6 +207,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -229,15 +236,10 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleStatus(idQuadra: number, data: IQuadra): Promise<void> {
+  async function handleStatus(data: IQuadra): Promise<void> {
     const parametersFilter = `filterStatus=${1}&cod_quadra=${
       data.cod_quadra
     }&local_preparo=${data.local.name_local_culture}`;
-    if (data.status === 0) {
-      data.status = 1;
-    } else {
-      data.status = 0;
-    }
 
     await quadraService.getAll(parametersFilter).then(async ({ status }) => {
       if (status === 200 && data.status === 1) {
@@ -245,29 +247,30 @@ export default function Listagem({
         return;
       }
       await quadraService.update({
-        id: idQuadra,
-        status: data.status,
+        id: data?.id,
+        status: data.status === 0 ? 1 : 0,
       });
+
+      handlePagination();
     });
 
-    const index = quadra.findIndex(
-      (quadraIndex) => quadraIndex.id === idQuadra
-    );
+    // const index = quadra.findIndex(
+    //   (quadraIndex) => quadraIndex.id === data?.id
+    // );
 
-    if (index === -1) {
-      return;
-    }
+    // if (index === -1) return;
 
-    setQuadra((oldSafra) => {
-      const copy = [...oldSafra];
-      copy[index].status = data.status;
-      return copy;
-    });
+    // setQuadra((oldSafra) => {
+    //   const copy = [...oldSafra];
+    //   copy[index].status = data.status === 0 ? 1 : 0;
+    //   return copy;
+    // });
   }
 
   async function handleOrder(
     column: string,
-    order: string | any
+    order: string | any,
+    name: any
   ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
@@ -316,29 +319,30 @@ export default function Listagem({
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
   }
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
   function idHeaderFactory() {
     return {
@@ -402,37 +406,12 @@ export default function Listagem({
             />
           </div>
           <div style={{ width: 5 }} />
-          {rowData.status === 1 ? (
-            <div className="h-7">
-              <Button
-                icon={<FaRegThumbsUp size={14} />}
-                onClick={async () =>
-                  handleStatus(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })
-                }
-                title="Ativo"
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          ) : (
-            <div className="h-7">
-              <Button
-                icon={<FaRegThumbsDown size={14} />}
-                onClick={async () =>
-                  handleStatus(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })
-                }
-                title="Inativo"
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          )}
+          <ButtonToogleConfirmation
+            data={rowData}
+            text="a quadra"
+            keyName="name"
+            onPress={handleStatus}
+          />
         </div>
       ),
     };
@@ -447,30 +426,92 @@ export default function Listagem({
       //   tableFields.push(idHeaderFactory());
       // }
       if (columnCampos[index] === "cod_quadra") {
-        tableFields.push(headerTableFactory("Código quadra", "cod_quadra"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Código quadra",
+            title: "cod_quadra",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "comp_p") {
-        tableFields.push(headerTableFactory("Comp P", "comp_p"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Comp P",
+            title: "comp_p",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "linha_p") {
-        tableFields.push(headerTableFactory("Linha P", "linha_p"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Linha P",
+            title: "linha_p",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "esquema") {
-        tableFields.push(headerTableFactory("Esquema", "esquema"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Esquema",
+            title: "esquema",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "divisor") {
-        tableFields.push(headerTableFactory("Divisor", "divisor"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Divisor",
+            title: "divisor",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "local_plantio") {
-        tableFields.push(headerTableFactory("Local plantio", "local_plantio"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Local plantio",
+            title: "local_plantio",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "local_preparo") {
         tableFields.push(
-          headerTableFactory("Local preparo", "local.name_local_culture")
+          headerTableFactoryGlobal({
+            name: "Local preparo",
+            title: "local.name_local_culture",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
         );
       }
       if (columnCampos[index] === "allocation") {
-        tableFields.push(headerTableFactory("Status", "allocation"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Status",
+            title: "allocation",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
       if (columnCampos[index] === "action") {
         tableFields.push(statusHeaderFactory());
@@ -770,6 +811,7 @@ export default function Listagem({
 
   return (
     <>
+       {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de quadras</title>
       </Head>
@@ -881,7 +923,9 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -902,7 +946,7 @@ export default function Listagem({
               options={{
                 showTitle: false,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 0,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,

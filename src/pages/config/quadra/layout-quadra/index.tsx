@@ -36,9 +36,12 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
+  ButtonToogleConfirmation,
 } from "../../../../components";
 import * as ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
+import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
+import ComponentLoading from '../../../../components/Loading';
 
 interface ILayoultProps {
   id: number | any;
@@ -111,6 +114,7 @@ export default function Listagem({
   const { TabsDropDowns } = ITabs.default;
 
   const tableRef = useRef<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const tabsDropDowns = TabsDropDowns();
 
@@ -193,6 +197,8 @@ export default function Listagem({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
@@ -252,6 +258,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -280,22 +287,22 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
   function idHeaderFactory() {
     return {
@@ -337,80 +344,62 @@ export default function Listagem({
       sorting: false,
       searchable: false,
       filterPlaceholder: "Filtrar por status",
-      render: (rowData: ILayoultProps) =>
-        rowData.status ? (
-          <div className="h-7 flex">
-            <div
-              className="
-							h-7
-						"
-            >
-              <Button
-                title={`Atualizar ${rowData.esquema}`}
-                icon={<BiEdit size={14} />}
-                bgColor="bg-blue-600"
-                textColor="white"
-                onClick={() => {
-                  setCookies("pageBeforeEdit", currentPage?.toString());
-                  setCookies("filterBeforeEdit", filter);
-                  setCookies("filterBeforeEditTypeOrder", typeOrder);
-                  setCookies("filterBeforeEditOrderBy", orderBy);
-                  setCookies("filtersParams", filtersParams);
-                  setCookies("lastPage", "atualizar");
-                  router.push(
-                    `/config/quadra/layout-quadra/atualizar?id=${rowData.id}`
-                  );
-                }}
-              />
+      render: (rowData: ILayoultProps) => (
+        <div className="flex">
+          {rowData.status ? (
+            <div className="h-7 flex">
+              <div className="h-7">
+                <Button
+                  title={`Atualizar ${rowData.esquema}`}
+                  icon={<BiEdit size={14} />}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  onClick={() => {
+                    setCookies("pageBeforeEdit", currentPage?.toString());
+                    setCookies("filterBeforeEdit", filter);
+                    setCookies("filterBeforeEditTypeOrder", typeOrder);
+                    setCookies("filterBeforeEditOrderBy", orderBy);
+                    setCookies("filtersParams", filtersParams);
+                    setCookies("lastPage", "atualizar");
+                    router.push(
+                      `/config/quadra/layout-quadra/atualizar?id=${rowData.id}`
+                    );
+                  }}
+                />
+              </div>
             </div>
-            <div style={{ width: 5 }} />
-            <div>
-              <Button
-                title="Ativo"
-                icon={<FaRegThumbsUp size={14} />}
-                onClick={() => handleStatus(rowData.id, { ...rowData })}
-                bgColor="bg-green-600"
-                textColor="white"
-              />
+          ) : (
+            <div className="h-7 flex">
+              <div className="h-7">
+                <Button
+                  title={`Atualizar ${rowData.esquema}`}
+                  icon={<BiEdit size={14} />}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  onClick={() => {
+                    setCookies("pageBeforeEdit", currentPage?.toString());
+                    setCookies("filterBeforeEdit", filter);
+                    setCookies("filterBeforeEditTypeOrder", typeOrder);
+                    setCookies("filterBeforeEditOrderBy", orderBy);
+                    setCookies("filtersParams", filtersParams);
+                    setCookies("lastPage", "atualizar");
+                    router.push(
+                      `/config/quadra/layout-quadra/atualizar?id=${rowData.id}`
+                    );
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="h-7 flex">
-            <div
-              className="
-							h-7
-						"
-            >
-              <Button
-                title={`Atualizar ${rowData.esquema}`}
-                icon={<BiEdit size={14} />}
-                bgColor="bg-blue-600"
-                textColor="white"
-                onClick={() => {
-                  setCookies("pageBeforeEdit", currentPage?.toString());
-                  setCookies("filterBeforeEdit", filter);
-                  setCookies("filterBeforeEditTypeOrder", typeOrder);
-                  setCookies("filterBeforeEditOrderBy", orderBy);
-                  setCookies("filtersParams", filtersParams);
-                  setCookies("lastPage", "atualizar");
-                  router.push(
-                    `/config/quadra/layout-quadra/atualizar?id=${rowData.id}`
-                  );
-                }}
-              />
-            </div>
-            <div style={{ width: 5 }} />
-            <div>
-              <Button
-                title="Inativo"
-                icon={<FaRegThumbsDown size={14} />}
-                onClick={() => handleStatus(rowData.id, { ...rowData })}
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          </div>
-        ),
+          )}
+          <div className="ml-1" />
+          <ButtonToogleConfirmation
+            data={rowData}
+            text="a quadra"
+            keyName="name"
+            onPress={handleStatus}
+          />
+        </div>
+      ),
     };
   }
 
@@ -422,29 +411,74 @@ export default function Listagem({
       //   tableFields.push(idHeaderFactory());
       // }
       if (columnCampos[item] === "esquema") {
-        tableFields.push(headerTableFactory("Esquema", "esquema"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Esquema",
+            title: "esquema",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
 
       if (columnCampos[item] === "local") {
-        tableFields.push(headerTableFactory("Local", "local"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Local",
+            title: "local",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
 
       if (columnCampos[item] === "plantadeira") {
-        tableFields.push(headerTableFactory("Plantadeiras", "plantadeira"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Plantadeiras",
+            title: "plantadeira",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
 
       if (columnCampos[item] === "tiros") {
-        tableFields.push(headerTableFactory("Tiros", "tiros"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Tiros",
+            title: "tiros",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
-
       if (columnCampos[item] === "disparos") {
-        tableFields.push(headerTableFactory("Disparos", "disparos"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Disparos",
+            title: "disparos",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
-
       if (columnCampos[item] === "parcelas") {
-        tableFields.push(headerTableFactory("Parcelas", "parcelas"));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Parcelas",
+            title: "parcelas",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
       }
-
       if (columnCampos[item] === "status") {
         tableFields.push(statusHeaderFactory());
       }
@@ -454,7 +488,8 @@ export default function Listagem({
 
   async function handleOrder(
     column: string,
-    order: string | any
+    order: string | any,
+    name: any
   ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
@@ -503,6 +538,7 @@ export default function Listagem({
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
@@ -552,72 +588,69 @@ export default function Listagem({
     setCamposGerenciados(campos);
   }
 
-  async function handleStatus(
-    idLayoutQuadra: number,
-    data: any
-  ): Promise<void> {
+  async function handleStatus(data: any): Promise<void> {
     const parametersFilter = `filterStatus=${1}&id_culture=${
       userLogado.userCulture.cultura_selecionada
     }&esquema=${data.esquema}&status=${1}`;
-    if (data.status == 0) {
-      await layoutQuadraService.getAll(parametersFilter).then((response) => {
-        if (response.total > 0) {
-          Swal.fire(
-            "Layout não pode ser atualizada pois já existe um layout cadastrada com essas informações ativo"
-          );
-          router.push("");
-        } else {
-          data.status = 1;
+    // if (data.status == 0) {
 
-          layoutQuadraService.update({
-            id: idLayoutQuadra,
-            status: data.status,
-          });
-
-          const index = quadras.findIndex(
-            (layout: any) => layout.id === idLayoutQuadra
-          );
-
-          if (index === -1) {
-            return;
-          }
-
-          setQuadra((oldSafra: any) => {
-            const copy = [...oldSafra];
-            copy[index].status = data.status;
-            return copy;
-          });
-
-          const { id, status } = quadras[index];
-        }
-      });
-    } else {
-      if (data.status === 0) {
-        data.status = 1;
-      } else {
-        data.status = 0;
-      }
-      await layoutQuadraService.update({
-        id: idLayoutQuadra,
-        status: data.status,
-      });
-
-      const index = quadras.findIndex(
-        (layout: any) => layout.id === idLayoutQuadra
-      );
-
-      if (index === -1) {
+    await layoutQuadraService.getAll(parametersFilter).then((response) => {
+      if (response.total > 0) {
+        Swal.fire(
+          "Layout não pode ser atualizada pois já existe um layout cadastrada com essas informações ativo"
+        );
+        router.push("");
         return;
+      } else {
+        layoutQuadraService.update({
+          id: data?.id,
+          status: data?.status == 1 ? 0 : 1,
+        });
+
+        handlePagination();
+
+        // const index = quadras.findIndex(
+        //   (layout: any) => layout.id === data?.id
+        // );
+
+        // if (index === -1) return;
+
+        // setQuadra((oldSafra: any) => {
+        //   const copy = [...oldSafra];
+        //   copy[index].status = data?.status == 1 ? 0 : 1;
+        //   return copy;
+        // });
+
+        // const { id, status } = quadras[index];
       }
+    });
+    // } else {
+    //   if (data.status === 0) {
+    //     data.status = 1;
+    //   } else {
+    //     data.status = 0;
+    //   }
+    //   await layoutQuadraService.update({
+    //     id: idLayoutQuadra,
+    //     status: data.status,
+    //   });
 
-      setQuadra((oldSafra: any) => {
-        const copy = [...oldSafra];
-        copy[index].status = data.status;
-        return copy;
-      });
+    //   const index = quadras.findIndex(
+    //     (layout: any) => layout.id === idLayoutQuadra
+    //   );
 
-      const { id, status } = quadras[index];
-    }
+    //   if (index === -1) {
+    //     return;
+    //   }
+
+    //   setQuadra((oldSafra: any) => {
+    //     const copy = [...oldSafra];
+    //     copy[index].status = data.status;
+    //     return copy;
+    //   });
+
+    //   const { id, status } = quadras[index];
+    // }
   }
 
   function handleOnDragEnd(result: DropResult) {
@@ -745,6 +778,7 @@ export default function Listagem({
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem dos Layout</title>
       </Head>
@@ -861,7 +895,9 @@ export default function Listagem({
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -883,7 +919,7 @@ export default function Listagem({
               options={{
                 showTitle: false,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 0,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,

@@ -31,6 +31,7 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
+  ButtonToogleConfirmation,
 } from "src/components";
 import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import { departmentService, userPreferencesService } from "src/services";
@@ -38,6 +39,7 @@ import * as XLSX from "xlsx";
 import { tableGlobalFunctions } from "src/helpers";
 import ITabs from "../../../../shared/utils/dropdown";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
+import ComponentLoading from '../../../../components/Loading';
 
 interface IFilter {
   filterStatus: object | any;
@@ -81,6 +83,7 @@ export default function Listagem({
   const { TabsDropDowns } = ITabs;
 
   const tableRef = useRef<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const tabsDropDowns = TabsDropDowns();
 
@@ -167,6 +170,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -195,31 +199,34 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleStatusItem(
-    idItem: number,
-    data: IDepartment
-  ): Promise<void> {
-    if (data.status === 1) {
-      data.status = 0;
-    } else {
-      data.status = 1;
-    }
+  async function handleStatusItem(data: IDepartment): Promise<void> {
+    // if (data.status === 1) {
+    //   data.status = 0;
+    // } else {
+    //   data.status = 1;
+    // }
 
-    const index = items.findIndex((item) => item.id === idItem);
+    // const index = items.findIndex((item) => item.id === data?.id);
 
-    if (index === -1) {
-      return;
-    }
+    // if (index === -1) {
+    //   return;
+    // }
 
-    setItems((oldItem) => {
-      const copy = [...oldItem];
-      copy[index].status = data.status;
-      return copy;
+    // setItems((oldItem) => {
+    //   const copy = [...oldItem];
+    //   copy[index].status = data.status;
+    //   return copy;
+    // });
+
+    // const { id, status, name } = items[index];
+
+    await departmentService.update({
+      id: data?.id,
+      name: data?.name,
+      status: data?.status === 0 ? 1 : 0,
     });
 
-    const { id, status, name } = items[index];
-
-    await departmentService.update({ id, name, status });
+    handlePagination();
   }
 
   // function headerTableFactory(name: any, title: string) {
@@ -299,37 +306,14 @@ export default function Listagem({
             />
           </div>
           <div style={{ width: 5 }} />
-          {rowData.status === 1 ? (
-            <div className="h-7">
-              <Button
-                title="Ativo"
-                icon={<FaRegThumbsUp size={14} />}
-                onClick={async () =>
-                  await handleStatusItem(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })
-                }
-                bgColor="bg-green-600"
-                textColor="white"
-              />
-            </div>
-          ) : (
-            <div className="h-7">
-              <Button
-                title="Inativo"
-                icon={<FaRegThumbsDown size={14} />}
-                onClick={async () =>
-                  await handleStatusItem(rowData.id, {
-                    status: rowData.status,
-                    ...rowData,
-                  })
-                }
-                bgColor="bg-red-800"
-                textColor="white"
-              />
-            </div>
-          )}
+          <div className="h-7">
+            <ButtonToogleConfirmation
+              data={rowData}
+              text="o setor"
+              keyName="name"
+              onPress={handleStatusItem}
+            />
+          </div>
         </div>
       ),
     };
@@ -346,7 +330,7 @@ export default function Listagem({
       if (columnCampos[index] === "name") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Nomeggg",
+            name: "Nome",
             title: "name",
             orderList,
             fieldOrder,
@@ -542,6 +526,7 @@ export default function Listagem({
 
   return (
     <>
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de setores</title>
       </Head>
@@ -604,7 +589,9 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -626,7 +613,7 @@ export default function Listagem({
                 sorting: true,
                 showTitle: false,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 0,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,

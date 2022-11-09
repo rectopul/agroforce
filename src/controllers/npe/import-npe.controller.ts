@@ -43,6 +43,7 @@ export class ImportNpeController {
     const tecnologiaController = new TecnologiaController();
 
     const npeTemp: Array<string> = [];
+    const npeiTemp: Array<number> = [];
     const responseIfError: Array<string> = [];
     const headers = [
       'CULTURA',
@@ -63,24 +64,24 @@ export class ImportNpeController {
       for (const row in spreadSheet) {
         if (row !== '0') {
           // LINHA COM TITULO DAS COLUNAS
+          if (spreadSheet[row][4] < 10) {
+            // eslint-disable-next-line no-param-reassign
+            spreadSheet[row][4] = `0${spreadSheet[row][4]}`;
+          }
+          const npeInicial = spreadSheet[row][6];
           const npeName = `${spreadSheet[row][1]}_${spreadSheet[row][2]}_${spreadSheet[row][3]}_${spreadSheet[row][4]}_${spreadSheet[row][5]}_${spreadSheet[row][7]}`;
           const { status }: IReturnObject = await npeController.getAll({
             safraId: idSafra,
-            filterFoco: spreadSheet[row][1],
-            filterEnsaio: spreadSheet[row][2],
-            filterCodTec: spreadSheet[row][3],
-            filterLocal: spreadSheet[row][4],
-            filterEpoca: spreadSheet[row][6],
+            filterFoco: spreadSheet[row][2],
+            filterEnsaio: spreadSheet[row][3],
+            filterCodTec: spreadSheet[row][4],
+            filterLocal: spreadSheet[row][5],
+            filterEpoca: spreadSheet[row][7],
             filterStatus: 1,
-            idCulture,
           });
+
           if (status === 200) {
-            return {
-              status: 400,
-              message: `Erro na linha ${
-                Number(row) + 1
-              }. Ambiente já cadastrada no sistema`,
-            };
+            responseIfError[0] += `<li style="text-align:left"> Erro na linha ${Number(row)}. Ambiente já cadastrada no sistema. </li> <br>`;
           }
           if (npeTemp.includes(npeName)) {
             await logImportController.update({
@@ -89,14 +90,19 @@ export class ImportNpeController {
               state: 'INVALIDA',
             });
             npeTemp[row] = npeName;
-            return {
-              status: 400,
-              message: `Erro na linha ${
-                Number(row) + 1
-              }. Ambiente duplicados na tabela`,
-            };
+            responseIfError[0] += `<li style="text-align:left"> Erro na linha ${Number(row)}. Ambiente duplicados na tabela. </li> <br>`;
+          }
+          if (npeiTemp.includes(npeInicial)) {
+            await logImportController.update({
+              id: idLog,
+              status: 1,
+              state: 'INVALIDA',
+            });
+            npeiTemp[row] = npeInicial;
+            responseIfError[0] += `<li style="text-align:left"> Erro na linha ${Number(row)}. NPEI duplicadas na tabela. </li> <br>`;
           }
           npeTemp[row] = npeName;
+          npeiTemp[row] = npeInicial;
           for (const column in spreadSheet[row]) {
             this.aux.status = 1;
             this.aux.created_by = createdBy;
@@ -226,9 +232,6 @@ export class ImportNpeController {
                     row,
                     spreadSheet[0][column],
                   );
-                } else if (spreadSheet[row][column] < 10) {
-                // eslint-disable-next-line no-param-reassign
-                  spreadSheet[row][column] = `0${spreadSheet[row][column]}`;
                 }
                 const ogm: any = await tecnologiaController.getAll({
                   cod_tec: String(spreadSheet[row][column]),
@@ -305,6 +308,7 @@ export class ImportNpeController {
                   const ensaio: any = await typeAssayController.getAll({
                     name: spreadSheet[row][column],
                     id_culture: idCulture,
+                    filterStatus: 1,
                   });
                   if (ensaio.total === 0) {
                     responseIfError[Number(column)] += responseGenericFactory(
@@ -404,6 +408,7 @@ export class ImportNpeController {
           }
         }
       }
+
       if (responseIfError.length === 0) {
         try {
           const createMany: any = [];
@@ -445,7 +450,7 @@ export class ImportNpeController {
 
                 if (configModule.response[0]?.fields[column] === 'Ensaio') {
                   const ensaio: any = await typeAssayController.getAll(
-                    { name: spreadSheet[row][column] },
+                    { name: spreadSheet[row][column], filterStatus: 1 },
                   );
                   npeDto.typeAssayId = ensaio.response[0]?.id;
                 }

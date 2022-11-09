@@ -41,6 +41,8 @@ import {
 } from '../../../../components';
 import ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
+import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+import ComponentLoading from '../../../../components/Loading';
 
 interface IFilter {
   filterFoco: string;
@@ -101,6 +103,7 @@ export default function Listagem({
   orderByserver,
   cultureId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const [loading, setLoading] = useState<boolean>(false);
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -167,6 +170,7 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
 
   const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
     orderBy == 'tecnologia' ? 'assay_list.tecnologia.cod_tec' : orderBy
@@ -285,6 +289,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -304,7 +309,7 @@ export default function Listagem({
       ) {
         setExperimento(response.response);
         setTotalItems(response.total);
-        tableRef.current.dataManager.changePageSize(
+        tableRef.current?.dataManager.changePageSize(
           response.total >= take ? take : response.total,
         );
       }
@@ -319,6 +324,7 @@ export default function Listagem({
   async function handleOrder(
     column: string,
     order: string | any,
+    name: any,
   ): Promise<void> {
     // // Manage orders of colunms
     // const parametersFilter = await fetchWrapper.handleOrderGlobal(
@@ -356,29 +362,30 @@ export default function Listagem({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
   }
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
   // function idHeaderFactory() {
   //   return {
@@ -494,31 +501,31 @@ export default function Listagem({
     };
   }
 
-  function tecnologiaHeaderFactory(name: string, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: 'tecnologia',
-      width: 0,
-      sorting: true,
-      render: (rowData: any) => (
-        <div className="h-10 flex">
-          <div>
-            {`${rowData?.assay_list?.tecnologia?.cod_tec} ${rowData?.assay_list?.tecnologia?.name}`}
-          </div>
-        </div>
-      ),
-    };
-  }
+  // function tecnologiaHeaderFactory(name: string, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: 'tecnologia',
+  //     width: 0,
+  //     sorting: true,
+  //     render: (rowData: any) => (
+  //       <div className="h-10 flex">
+  //         <div>
+  //           {`${rowData?.assay_list?.tecnologia?.cod_tec} ${rowData?.assay_list?.tecnologia?.name}`}
+  //         </div>
+  //       </div>
+  //     ),
+  //   };
+  // }
 
   function columnsOrder(columnsCampos: any): any {
     const columnCampos: any = columnsCampos.split(',');
@@ -526,37 +533,108 @@ export default function Listagem({
 
     Object.keys(columnCampos).forEach((_, index) => {
       if (columnCampos[index] === 'foco') {
-        tableFields.push(headerTableFactory('Foco', 'assay_list.foco.name'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Foco',
+            title: 'assay_list.foco.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'type_assay') {
         tableFields.push(
-          headerTableFactory('Ensaio', 'assay_list.type_assay.name'),
+          headerTableFactoryGlobal({
+            name: 'Ensaio',
+            title: 'assay_list.type_assay.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnCampos[index] === 'gli') {
-        tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'GLI',
+            title: 'assay_list.gli',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'tecnologia') {
-        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Tecnologia',
+            title: 'tecnologia',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: any) => (
+              <div>
+                {`${rowData?.assay_list?.tecnologia?.cod_tec} ${rowData?.assay_list?.tecnologia?.name}`}
+              </div>
+            ),
+          }),
+        );
       }
       if (columnCampos[index] === 'experimentName') {
         tableFields.push(
-          headerTableFactory('Nome experimento', 'experimentName'),
+          headerTableFactoryGlobal({
+            name: 'Nome experimento',
+            title: 'experimentName',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnCampos[index] === 'period') {
-        tableFields.push(headerTableFactory('Época', 'period'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Época',
+            title: 'period',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'delineamento') {
         tableFields.push(
-          headerTableFactory('Delineamento', 'delineamento.name'),
+          headerTableFactoryGlobal({
+            name: 'Delineamento',
+            title: 'delineamento.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnCampos[index] === 'repetitionsNumber') {
-        tableFields.push(headerTableFactory('Rep.', 'repetitionsNumber'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Rep.',
+            title: 'repetitionsNumber',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'status') {
-        tableFields.push(headerTableFactory('Status EXP.', 'status'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Status Exp.',
+            title: 'status',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'action') {
         tableFields.push(statusHeaderFactory());
@@ -752,6 +830,9 @@ export default function Listagem({
 
   return (
     <>
+
+      {loading && <ComponentLoading text="" />}
+
       <Head>
         <title>Listagem de experimentos</title>
       </Head>
@@ -902,7 +983,9 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

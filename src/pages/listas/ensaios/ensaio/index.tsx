@@ -50,6 +50,7 @@ import {
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
+import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 
 export default function TipoEnsaio({
   allAssay,
@@ -149,6 +150,8 @@ export default function TipoEnsaio({
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
   const router = useRouter();
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -226,7 +229,11 @@ export default function TipoEnsaio({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleOrder(column: string, order: number): Promise<void> {
+  async function handleOrder(
+    column: string,
+    order: number,
+    name: any,
+  ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
@@ -258,46 +265,34 @@ export default function TipoEnsaio({
         }
       });
 
-    // if (orderList === 2) {
-    //   setOrder(0);
-    //   setArrowOrder(<AiOutlineArrowDown />);
-    // } else {
-    //   setOrder(orderList + 1);
-    //   if (orderList === 1) {
-    //     setArrowOrder(<AiOutlineArrowUp />);
-    //   } else {
-    //     setArrowOrder('');
-    //   }
-    // }
-
-    // Gobal manage orders
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
   }
 
-  function headerTableFactory(name: string, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: string, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
   async function deleteConfirmItem(item: any) {
     setItemSelectedDelete(item);
@@ -396,31 +391,31 @@ export default function TipoEnsaio({
     };
   }
 
-  function tecnologiaHeaderFactory(name: string, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: 'tecnologia',
-      width: 0,
-      sorting: true,
-      render: (rowData: any) => (
-        <div className="h-10 flex">
-          <div>
-            {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
-          </div>
-        </div>
-      ),
-    };
-  }
+  // function tecnologiaHeaderFactory(name: string, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: 'tecnologia',
+  //     width: 0,
+  //     sorting: true,
+  //     render: (rowData: any) => (
+  //       <div className="h-10 flex">
+  //         <div>
+  //           {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
+  //         </div>
+  //       </div>
+  //     ),
+  //   };
+  // }
 
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
@@ -430,25 +425,86 @@ export default function TipoEnsaio({
       //   tableFields.push(idHeaderFactory());
       // }
       if (columnOrder[item] === 'protocol_name') {
-        tableFields.push(headerTableFactory('Protocolo', 'protocol_name'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Protocolo',
+            title: 'protocol_name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'foco') {
-        tableFields.push(headerTableFactory('Foco', 'foco.name'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Foco',
+            title: 'foco.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'type_assay') {
-        tableFields.push(headerTableFactory('Ensaio', 'type_assay.name'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Ensaio',
+            title: 'type_assay.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'gli') {
-        tableFields.push(headerTableFactory('GLI', 'gli'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'GLI',
+            title: 'gli',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'tecnologia') {
-        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Tecnologia',
+            title: 'tecnologia',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: any) => (
+              <div>
+                {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
+              </div>
+            ),
+          }),
+        );
       }
       if (columnOrder[item] === 'treatmentsNumber') {
-        tableFields.push(headerTableFactory('Nº de trat.', 'treatmentsNumber'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Nº de trat.',
+            title: 'treatmentsNumber',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'status') {
-        tableFields.push(headerTableFactory('Status do ensaio', 'status'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Status do ensaio',
+            title: 'status',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'action') {
         tableFields.push(statusHeaderFactory());

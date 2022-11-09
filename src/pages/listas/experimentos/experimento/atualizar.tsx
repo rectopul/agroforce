@@ -7,7 +7,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -38,9 +38,11 @@ import {
   Content,
   Input,
   InputMoney,
+  FieldItemsPerPage,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
+import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 
 export interface IData {
   // allItens: any;
@@ -50,8 +52,8 @@ export interface IData {
   // idExperiment: number;
   experimento: object | any;
   // pageBeforeEdit: string | any
-  typeOrderServer :any| string, // RR
-  orderByserver : any |string // RR
+  typeOrderServer: any | string; // RR
+  orderByserver: any | string; // RR
 }
 
 interface IGenerateProps {
@@ -74,7 +76,6 @@ interface IUpdateExperimento {
   density: number;
   drawOrder: number;
   status: string;
-  eel: any;
   nlp: number;
   clp: any;
   comments: string;
@@ -100,6 +101,8 @@ export default function AtualizarLocal({
     : (tab.statusTab = false)));
 
   const router = useRouter();
+
+  const tableRef = useRef<any>();
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.materiais || {
@@ -149,20 +152,26 @@ export default function AtualizarLocal({
     { name: 'CamposGerenciados[]', title: 'Status parc.', value: 'experiment' },
   ]);
 
-  const take: number = itensPerPage;
+  const [take, setTake] = useState<any>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
+  const pathExtra = `skip=${
+    currentPage * Number(take)
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IUpdateExperimento>({
     initialValues: {
       id: experimento.id,
       foco: experimento.assay_list?.foco.name,
       ensaio: experimento.assay_list?.type_assay.name,
-      tecnologia: `${experimento?.assay_list?.tecnologia?.cod_tec || ''} ${experimento?.assay_list?.tecnologia?.name || ''}`,
+      tecnologia: `${experimento?.assay_list?.tecnologia?.cod_tec || ''} ${
+        experimento?.assay_list?.tecnologia?.name || ''
+      }`,
       gli: experimento.assay_list?.gli,
       experimentName: experimento?.experimentName,
       bgm: experimento.assay_list?.bgm || '',
@@ -173,7 +182,6 @@ export default function AtualizarLocal({
       drawOrder: experimento.drawOrder,
       status: experimento.status,
       nlp: experimento.nlp,
-      eel: parseFloat(experimento.eel)?.toFixed(2),
       clp: parseFloat(experimento.clp)?.toFixed(2),
       comments: experimento.comments,
     },
@@ -182,7 +190,6 @@ export default function AtualizarLocal({
         .update({
           id: Number(values.id),
           nlp: Number(values.nlp),
-          eel: values.eel,
           clp: values.clp,
           comments: values.comments,
         })
@@ -198,7 +205,7 @@ export default function AtualizarLocal({
   });
 
   // Calling common API
-  async function getTreatments(parametersFilter : any) {
+  async function getTreatments(parametersFilter: any) {
     setCookies('filterBeforeEdit', parametersFilter);
     setCookies('filterBeforeEditTypeOrder', typeOrder);
     setCookies('filterBeforeEditOrderBy', orderBy);
@@ -206,12 +213,17 @@ export default function AtualizarLocal({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await experimentGenotipeService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400) {
-        setTreatments(response.response);
-        setTotaItems(response.total);
-      }
-    });
+    await experimentGenotipeService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          setTreatments(response.response);
+          setTotaItems(response.total);
+          tableRef?.current?.dataManager?.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+        }
+      });
   }
 
   useEffect(() => {
@@ -235,6 +247,7 @@ export default function AtualizarLocal({
   async function handleOrder(
     column: string,
     order: string | any,
+    name: any,
   ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
@@ -282,34 +295,35 @@ export default function AtualizarLocal({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
   }
 
-  function headerTableFactory(
-    name: any,
-    title: string,
-    style: boolean = false,
-  ) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: false,
-      cellStyle: style ? { color: '#039be5', fontWeight: 'bold' } : {},
-    };
-  }
+  // function headerTableFactory(
+  //   name: any,
+  //   title: string,
+  //   style: boolean = false,
+  // ) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: false,
+  //     cellStyle: style ? { color: '#039be5', fontWeight: 'bold' } : {},
+  //   };
+  // }
 
   function columnsOrder(columnsCampos: string) {
     const columnCampos: string[] = columnsCampos.split(',');
@@ -317,42 +331,126 @@ export default function AtualizarLocal({
     Object.keys(columnCampos).forEach((item, index) => {
       if (columnCampos[index] === 'repetitionExperience') {
         tableFields.push(
-          headerTableFactory('Rep. Exp', 'rep'),
+          headerTableFactoryGlobal({
+            name: 'Reg. Exp',
+            title: 'rep',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnCampos[index] === 'genotipo') {
         tableFields.push(
-          headerTableFactory('Nome do genotipo', 'genotipo.name_genotipo', true),
+          headerTableFactoryGlobal({
+            name: 'Nome do genotipo',
+            title: 'genotipo.name_genotipo',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            cellStyle: { color: '#039be5', fontWeight: 'bold' },
+          }),
         );
       }
       if (columnCampos[index] === 'gmr') {
-        tableFields.push(headerTableFactory('GMR', 'genotipo.gmr'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'GMR',
+            title: 'genotipo.gmr',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'bgm') {
-        tableFields.push(headerTableFactory('BGM', 'genotipo.bgm'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'BGM',
+            title: 'genotipo.bgm',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'fase') {
-        tableFields.push(headerTableFactory('Fase', 'genotipo.lote[0].fase'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Fase',
+            title: 'genotipo.lote[0].fase',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'tecnologia') {
         tableFields.push(
-          headerTableFactory('Tecnologia', 'tecnologia.cod_tec'),
+          headerTableFactoryGlobal({
+            name: 'Tecnologia',
+            title: 'tecnologia.cod_tec',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnCampos[index] === 'nt') {
-        tableFields.push(headerTableFactory('NT', 'nt'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'NT',
+            title: 'nt',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'treatments_number') {
-        tableFields.push(headerTableFactory('Rep. trat.', 'rep'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Rep. trat',
+            title: 'rep',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'status') {
-        tableFields.push(headerTableFactory('T', 'status'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'T',
+            title: 'status',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'nca') {
-        tableFields.push(headerTableFactory('NCA', 'nca', true));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'NCA',
+            title: 'nca',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            cellStyle: { color: '#039be5', fontWeight: 'bold' },
+          }),
+        );
       }
       if (columnCampos[index] === 'npe') {
-        tableFields.push(headerTableFactory('NPE', 'npe'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'NPE',
+            title: 'npe',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       // if (columnCampos[index] === "sequence") {
       //   tableFields.push(
@@ -361,12 +459,24 @@ export default function AtualizarLocal({
       // }
       if (columnCampos[index] === 'block') {
         tableFields.push(
-          headerTableFactory('Bloco', 'sequencia_delineamento.bloco'),
+          headerTableFactoryGlobal({
+            name: 'Bloco',
+            title: 'sequencia_delineamento.bloco',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnCampos[index] === 'experiment') {
         tableFields.push(
-          headerTableFactory('Status parc.', 'experiment.status'),
+          headerTableFactoryGlobal({
+            name: 'Status parc.',
+            title: 'experiment.status',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
     });
@@ -507,7 +617,7 @@ export default function AtualizarLocal({
   useEffect(() => {
     handlePagination();
     handleTotalPages();
-  }, [currentPage]);
+  }, [currentPage, take]);
 
   function fieldsFactory(name: string, title: string, values: any) {
     return (
@@ -759,7 +869,7 @@ export default function AtualizarLocal({
                     bgColor="bg-blue-600"
                     textColor="white"
                     icon={<RiOrganizationChart size={18} />}
-                    onClick={() => { }}
+                    onClick={() => {}}
                   />
                 </div>
               </div>
@@ -778,6 +888,7 @@ export default function AtualizarLocal({
             className="w-full h-auto overflow-y-scroll"
           >
             <MaterialTable
+              tableRef={tableRef}
               style={{ background: '#f9fafb' }}
               columns={columns}
               data={treatments}
@@ -788,7 +899,7 @@ export default function AtualizarLocal({
                 },
                 search: false,
                 filtering: false,
-                pageSize: itensPerPage,
+                pageSize: Number(take),
               }}
               components={{
                 Toolbar: () => (
@@ -805,11 +916,22 @@ export default function AtualizarLocal({
                     border-gray-200
                   "
                   >
-                    <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
-                    </strong>
+                    <div className="flex flex-row items-center w-full">
+                      <div className="flex flex-1 justify-center">
+                        <strong className="text-blue-600">
+                          Total registrado:
+                          {' '}
+                          {itemsTotal}
+                        </strong>
+                      </div>
+                      <div className="flex flex-1 mb-6 justify-end">
+                        <FieldItemsPerPage
+                          widthClass="w-1/3"
+                          selected={take}
+                          onChange={setTake}
+                        />
+                      </div>
+                    </div>
 
                     <div className="h-full flex items-center gap-2">
                       <div className="border-solid border-2 border-blue-600 rounded">
@@ -944,7 +1066,11 @@ export default function AtualizarLocal({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res, query }: any) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  res,
+  query,
+}: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = (await (

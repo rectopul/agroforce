@@ -37,6 +37,7 @@ import {
   ITreatmentGrid,
 } from '../../interfaces/listas/ensaio/genotype-treatment.interface';
 import { IGenerateProps } from '../../interfaces/shared/generate-props.interface';
+import ComponentLoading from '../../components/Loading';
 
 import {
   AccordionFilter,
@@ -52,6 +53,7 @@ import { reporteService, userPreferencesService } from '../../services';
 import * as ITabs from '../../shared/utils/dropdown';
 import { functionsUtils } from '../../shared/utils/functionsUtils';
 import { tableGlobalFunctions } from '../../helpers';
+import headerTableFactoryGlobal from '../../shared/utils/headerTableFactory';
 
 export default function Listagem({
   totalItems,
@@ -68,6 +70,8 @@ export default function Listagem({
   const tabsDropDowns = tabsReport.map((i) => (i.titleTab === 'RELATORIOS' ? { ...i, statusTab: true } : i));
 
   const tableRef = useRef<any>(null);
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.genotypeTreatment || {
@@ -117,6 +121,8 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
@@ -175,6 +181,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -203,7 +210,11 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleOrder(column: string, order: number): Promise<void> {
+  async function handleOrder(
+    column: string,
+    order: number,
+    name: any,
+  ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
     // if (order === 1) {
@@ -245,73 +256,114 @@ export default function Listagem({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
   }
 
-  function headerTableFactory(name: string, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: string, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
-  function dateTableFactory(name: string, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: 'madeIn',
-      width: 0,
-      sorting: true,
-      render: (rowData: any) => (
-        <div>
-          {`${
-            rowData.madeIn
-              ? functionsUtils?.formatDate(new Date(rowData.madeIn))
-              : null
-          }`}
-
-        </div>
-      ),
-    };
-  }
+  // function dateTableFactory(name: string, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: "madeIn",
+  //     width: 0,
+  //     sorting: true,
+  //     render: (rowData: any) => (
+  //       <div>
+  //         {`${
+  //           rowData.madeIn
+  //             ? functionsUtils?.formatDate(new Date(rowData.madeIn))
+  //             : null
+  //         }`}
+  //       </div>
+  //     ),
+  //   };
+  // }
 
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item) => {
       if (columnOrder[item] === 'madeBy') {
-        tableFields.push(headerTableFactory('Feito Por', 'user.name'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Feito Por',
+            title: 'user.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'madeIn') {
-        tableFields.push(dateTableFactory('Feito Em', 'madeIn'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Feito Em',
+            title: 'madeIn',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: any) => (
+              <div>
+                {`${
+                  rowData.madeIn
+                    ? functionsUtils?.formatDate(new Date(rowData.madeIn))
+                    : null
+                }`}
+              </div>
+            ),
+          }),
+        );
       }
       if (columnOrder[item] === 'module') {
-        tableFields.push(headerTableFactory('Módulo', 'module'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Módulo',
+            title: 'module',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[item] === 'operation') {
-        tableFields.push(headerTableFactory('Operação', 'operation'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Operação',
+            title: 'operation',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
     });
     return tableFields;
@@ -465,6 +517,7 @@ export default function Listagem({
 
   return (
     <>
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de genótipos do ensaio</title>
       </Head>
@@ -505,7 +558,9 @@ export default function Listagem({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       type="submit"
                       bgColor="bg-blue-600"

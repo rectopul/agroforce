@@ -34,12 +34,12 @@ export class ExperimentController {
       // if (options.filterRepetition) {
       //   parameters.repetitionsNumber = Number(options.filterRepetition);
       // }
-      // if (options.filterStatus) {
-      //   parameters.OR = [];
-      //   const statusParams = options.filterStatus.split(',');
-      //   parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
-      //   parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
-      // }
+      if (options.experimentStatus) {
+        parameters.OR = [];
+        const statusParams = options.experimentStatus.split(',');
+        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
+        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
+      }
 
       if (options.filterExperimentName) {
         parameters.experimentName = JSON.parse(`{ "contains":"${options.filterExperimentName}" }`);
@@ -180,8 +180,19 @@ export class ExperimentController {
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
       if (options.orderBy) {
-        orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
-        orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+        if (!options.excel) {
+          if (typeof options.orderBy !== 'string' || typeof options.typeOrder !== 'string') {
+            if (options.orderBy[2] == '' || !options.orderBy[2]) {
+              orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `{"${options.orderBy[1]}":"${options.typeOrder[1]}"}`];
+            } else {
+              orderBy = handleOrderForeign(options.orderBy[2], options.typeOrder[2]);
+              orderBy = orderBy || `{"${options.orderBy[2]}":"${options.typeOrder[2]}"}`;
+            }
+          } else {
+            orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
+            orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+          }
+        }
       }
       const response: object | any = await this.experimentRepository.findAll(
         parameters,
@@ -196,7 +207,7 @@ export class ExperimentController {
         newItem.countNT = functionsUtils
           .countChildrenForSafra(item.assay_list.genotype_treatment, Number(options.idSafra));
         newItem.npeQT = item.countNT * item.repetitionsNumber;
-        newItem.seq_delineamento = item.delineamento.sequencia_delineamento.filter((x: any) => x.nt == item.countNT && x.repeticao <= item.repetitionsNumber);
+        newItem.seq_delineamento = item.delineamento.sequencia_delineamento.filter((x: any) => x.nt <= item.countNT && x.repeticao <= item.repetitionsNumber);
         return newItem;
       });
       if (response.total <= 0) {
@@ -264,19 +275,23 @@ export class ExperimentController {
       const experimento: any = await this.experimentRepository.findOne(data.id);
       if (!experimento) return { status: 404, message: 'Experimento não encontrado' };
       if (data.experimentGroupId === null) {
-        const parcelasId: any = [];
-        await experimento.experiment_genotipe.forEach(async (parcela: any) => {
-          parcelasId.push(parcela.id);
-        });
-        await experimentGenotipeController.update({ idList: parcelasId, status: 'SORTEADO', userId: data.userId });
-        delete data.userId;
+        if (!(data.nlp || data.clp || data.comments)) {
+          const parcelasId: any = [];
+          await experimento.experiment_genotipe.forEach(async (parcela: any) => {
+            parcelasId.push(parcela.id);
+          });
+          await experimentGenotipeController.update({ idList: parcelasId, status: 'SORTEADO', userId: data.userId });
+          delete data.userId;
+        }
       }
       const response = await this.experimentRepository.update(experimento.id, data);
       if (experimento.experimentGroupId) {
         await this.countExperimentGroupChildren(experimento.experimentGroupId);
       }
       if (!response.experimentGroupId) {
-        await this.experimentRepository.update(response.id, { status: 'SORTEADO' });
+        if (!(data.nlp || data.clp || data.comments)) {
+          await this.experimentRepository.update(response.id, { status: 'SORTEADO' });
+        }
       }
       if (response) {
         return { status: 200, message: 'Experimento atualizado' };

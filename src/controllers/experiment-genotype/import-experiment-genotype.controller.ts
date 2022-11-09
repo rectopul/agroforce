@@ -34,13 +34,12 @@ export class ImportExperimentGenotypeController {
     try {
       const value_hold: any = {};
 
-      if (spreadSheet.length == 0) {
+      if (spreadSheet.length === 0) {
         responseIfError[0]
           += '<li style="text-align:left"> Não há registros por favor verifique. </li> <br>';
       }
 
       for (const row in spreadSheet) {
-
         if (row !== '0') {
           // experiments
           if (spreadSheet[row][5] != null) {

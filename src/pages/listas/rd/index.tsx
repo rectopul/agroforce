@@ -10,6 +10,13 @@ import React, {
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { IoIosCloudUpload } from 'react-icons/io';
+
+import {
+  AiFillInfoCircle,
+  AiOutlineArrowDown,
+  AiOutlineArrowUp,
+  AiTwotoneStar,
+} from 'react-icons/ai';
 import MaterialTable from 'material-table';
 import {
   DragDropContext,
@@ -18,13 +25,9 @@ import {
   DropResult,
 } from 'react-beautiful-dnd';
 import Spinner from 'react-bootstrap/Spinner';
-import {
-  AiOutlineArrowDown,
-  AiOutlineArrowUp,
-  AiTwotoneStar,
-} from 'react-icons/ai';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
+
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
@@ -34,6 +37,7 @@ import {
   Box, Tab, Tabs, Typography,
 } from '@mui/material';
 import { fetchWrapper } from 'src/helpers';
+import { useRouter } from 'next/router';
 import {
   AccordionFilter,
   CheckBox,
@@ -51,6 +55,7 @@ import {
 import * as ITabs from '../../../shared/utils/dropdown';
 import ComponentLoading from '../../../components/Loading';
 import { functionsUtils } from '../../../shared/utils/functionsUtils';
+import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
 
 export interface LogData {
   id: number;
@@ -91,71 +96,90 @@ export default function Import({
   const [executeUpload, setExecuteUpload] = useState<any>(
     Number(uploadInProcess),
   );
+  const router = useRouter();
   const disabledButton = executeUpload === 1;
   const bgColor = executeUpload === 1 ? 'bg-red-600' : 'bg-blue-600';
   const [loading, setLoading] = useState<boolean>(false);
 
   async function readExcel(moduleId: number, table: string) {
-    const value: any = document.getElementById(`inputFile-${moduleId}`);
-    if (!value.files[0]) {
-      Swal.fire('Insira um arquivo');
-      return;
-    }
-
-    const fileExtension: any = functionsUtils.getFileExtension(
-      value?.files[0]?.name,
-    );
-
-    if (fileExtension !== 'xlsx') {
-      Swal.fire('Apenas arquivos .xlsx são aceitos.');
-      (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
-      return;
-    }
-
-    const userLogado = JSON.parse(localStorage.getItem('user') as string);
-    setExecuteUpload(1);
-
-    readXlsxFile(value.files[0]).then(async (rows) => {
-      setLoading(true);
-
-      if (moduleId) {
-        const { message } = await importService.validate({
-          spreadSheet: rows,
-          moduleId,
-          created_by: userLogado.id,
-          idSafra,
-          idCulture,
-          table,
-          disabledButton,
-        });
-        setLoading(false);
-        handlePagination();
-        Swal.fire({
-          html: message,
-          width: '800',
-        });
-        setExecuteUpload(0);
-      } else {
-        const { message } = await importService.validateProtocol({
-          spreadSheet: rows,
-          moduleId,
-          created_by: userLogado.id,
-          idSafra,
-          idCulture,
-          table,
-          disabledButton,
-        });
-        setLoading(false);
-        handlePagination();
-        Swal.fire({
-          html: message,
-          width: '800',
-        });
-        setExecuteUpload(0);
+    try {
+      const value: any = document.getElementById(`inputFile-${moduleId}`);
+      if (!value.files[0]) {
+        Swal.fire('Insira um arquivo');
+        return;
       }
-    });
 
-    (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
+      const fileExtension: any = functionsUtils.getFileExtension(
+        value?.files[0]?.name,
+      );
+
+      if (fileExtension !== 'xlsx') {
+        Swal.fire('Apenas arquivos .xlsx são aceitos.');
+        (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
+        return;
+      }
+
+      const userLogado = JSON.parse(localStorage.getItem('user') as string);
+      setExecuteUpload(1);
+
+      readXlsxFile(value.files[0]).then(async (rows) => {
+        setLoading(true);
+
+        if (moduleId) {
+          const { message } = await importService.validate({
+            spreadSheet: rows,
+            moduleId,
+            created_by: userLogado.id,
+            idSafra,
+            idCulture,
+            table,
+            disabledButton,
+          });
+          setLoading(false);
+          handlePagination();
+          Swal.fire({
+            html: message,
+            width: '800',
+          });
+          setExecuteUpload(0);
+        } else {
+          const { message } = await importService.validateProtocol({
+            spreadSheet: rows,
+            moduleId,
+            created_by: userLogado.id,
+            idSafra,
+            idCulture,
+            table,
+            disabledButton,
+          });
+          setLoading(false);
+          handlePagination();
+          Swal.fire({
+            html: message,
+            width: '800',
+          });
+          setExecuteUpload(0);
+        }
+      }).catch((e: any) => {
+        Swal.fire({
+          html: 'Erro ao ler planilha',
+          width: '800',
+          didClose: () => {
+            router.reload();
+          },
+        });
+      });
+
+      (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
+    } catch (e: any) {
+      Swal.fire({
+        html: 'Erro ao ler planilha',
+        width: '800',
+        didClose: () => {
+          router.reload();
+        },
+      });
+    }
   }
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
@@ -184,11 +208,11 @@ export default function Import({
   const [colorStar, setColorStar] = useState<string>('');
   const [orderBy, setOrderBy] = useState<string>('');
   const [typeOrder, setTypeOrder] = useState<string>('');
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
 
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
-  const pathExtra = `skip=${
-    currentPage * Number(take)
+  const pathExtra = `skip=${currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
   const pages = Math.ceil(total / take);
   const formik = useFormik<any>({
@@ -282,55 +306,54 @@ export default function Import({
   //   }
   // }
 
-  function headerTableFactory(name: any, title: string) {
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
+
+  function headerTableStatusFactory() {
     return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
+      title: 'Status',
+      field: 'state',
+      sorting: false,
+      render: (rowData: any) => (
+        <div className="h-7 flex">
+          <div className="h-7">
+            {rowData.state}
+          </div>
+          <div style={{ width: 5 }} />
+          {rowData.invalid_data ? (
+            <div className="h-7">
+              <Button
+                title={rowData.state}
+                onClick={() => {
+                  Swal.fire({
+                    html: rowData.invalid_data,
+                    width: '800',
+                  });
+                }}
+                icon={<AiFillInfoCircle size={20} />}
+                bgColor="bg-blue-600"
+                textColor="white"
+              />
+            </div>
+          ) : ''}
+
         </div>
       ),
-      field: title,
-      sorting: true,
-    };
-  }
-
-  function idHeaderFactory() {
-    return {
-      title: <div className="flex items-center">{arrowOrder}</div>,
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-7 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="h-7 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
-          </div>
-        </div>
-      )),
     };
   }
 
@@ -343,16 +366,40 @@ export default function Import({
       //   tableFields.push(idHeaderFactory());
       // }
       if (columnCampos[index] === 'user_id') {
-        tableFields.push(headerTableFactory('Usuário', 'user.name'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Usuário',
+            title: 'user.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'table') {
-        tableFields.push(headerTableFactory('Tabela', 'table'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Tabela',
+            title: 'table',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'created_at') {
-        tableFields.push(headerTableFactory('Importado em', 'created_at'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Importado em',
+            title: 'created_at',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnCampos[index] === 'state') {
-        tableFields.push(headerTableFactory('Status', 'state'));
+        tableFields.push(headerTableStatusFactory());
       }
     });
     return tableFields;
@@ -363,12 +410,14 @@ export default function Import({
   async function handleOrder(
     column: string,
     order: string | any,
+    name: any,
   ): Promise<void> {
     // Gobal manage orders
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await fetchWrapper.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
@@ -964,7 +1013,9 @@ export default function Import({
                     <div style={{ width: 40 }} />
                     <div className="h-7 w-32 mt-6">
                       <Button
-                        onClick={() => {}}
+                        onClick={() => {
+                          setLoading(true);
+                        }}
                         value="Filtrar"
                         bgColor="bg-blue-600"
                         textColor="white"
@@ -1123,7 +1174,7 @@ export default function Import({
                         disabled={currentPage + 1 >= pages}
                       />
                     </div>
-                    ) as any,
+                  ) as any,
                 }}
               />
             </div>

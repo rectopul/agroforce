@@ -206,16 +206,12 @@ export class ImportGenotypeTreatmentController {
                     name_genotipo: spreadSheet[row][10],
                     id_culture: idCulture,
                   });
-                  console.log('response');
-                  console.log(response);
                   if (status !== 400) {
                     const validateNca = await response[0]?.lote.map((item: any) => {
                       if (Number(item?.ncc) == Number(spreadSheet[row][column])) return true;
                       return false;
                     });
 
-                    console.log('validateNca');
-                    console.log(validateNca);
                     if (!validateNca?.includes(true)) {
                       responseIfError[Number(column)]
                         += responseGenericFactory(

@@ -158,9 +158,13 @@ export class ImportController {
       }
       const protocolMessage = validateProtocolLevel(data.spreadSheet);
       if (protocolMessage.length > 0) {
+        await this.logImportController.update({
+          id: responseLog?.id,
+          status: 1,
+          state: 'INVALIDA',
+        });
         return { status: 400, message: protocolMessage };
       }
-
       const protocolLevel = String(data.spreadSheet[1][0]);
       const newData = removeProtocolLevel(data);
       switch (protocolLevel) {
@@ -169,12 +173,17 @@ export class ImportController {
         case 'CULTURE_UNIT':
           return await ImportLocalController.validate(responseLog?.id, newData);
         case 'GENOTYPE_S2':
-          return await ImportGenotypeController.validate(responseLog?.id, newData);
+          return await ImportGenotypeController.validate(responseLog?.id, false, newData);
         default:
           await this.logImportController.update({ id: responseLog?.id, status: 1, state: 'FALHA' });
           return { status: 400, response: [], message: 'Nenhum protocol_level configurado ' };
       }
     } catch (error: any) {
+      await this.logImportController.update({
+        id: responseLog?.id,
+        status: 1,
+        state: 'FALHA',
+      });
       handleError('Validate protocol controller', 'Validate protocol', error.message);
       throw new Error('[Controller] - Validate protocol erro');
     } finally {
@@ -252,7 +261,7 @@ export class ImportController {
 
       // Validação do modulo Genotipo
       if (data.moduleId === 10) {
-        return await ImportGenotypeController.validate(responseLog?.id, data);
+        return await ImportGenotypeController.validate(responseLog?.id, false, data);
       }
 
       // Validação do modulo NPE

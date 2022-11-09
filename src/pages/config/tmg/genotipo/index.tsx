@@ -42,6 +42,7 @@ import { UserPreferenceController } from '../../../../controllers/user-preferenc
 import { genotipoService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+import ComponentLoading from '../../../../components/Loading';
 
 interface IFilter {
   filterGenotipo: string | any;
@@ -105,6 +106,7 @@ export default function Listagem({
   const tabsDropDowns = TabsDropDowns();
 
   const tableRef = useRef<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
@@ -208,8 +210,7 @@ export default function Listagem({
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
   const [fieldOrder, setFieldOrder] = useState<any>(null);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == 'Tecnologia' ? 'tecnologia.cod_tec' : orderBy
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == 'Tecnologia' ? 'tecnologia.cod_tec' : orderBy
   }&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IFilter>({
@@ -273,6 +274,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -500,7 +502,20 @@ export default function Listagem({
         );
       }
       if (columnCampos[index] === 'tecnologia') {
-        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'tecnologia'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Tecnologia',
+            title: 'tecnologia',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: any) => (
+              <div>
+                {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
+              </div>
+            ),
+          }),
+        );
       }
       if (columnCampos[index] === 'cruza') {
         tableFields.push(
@@ -957,6 +972,7 @@ export default function Listagem({
 
   return (
     <>
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de genótipos</title>
       </Head>
@@ -1017,7 +1033,9 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -1211,7 +1229,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

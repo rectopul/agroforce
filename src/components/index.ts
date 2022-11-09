@@ -17,6 +17,8 @@ export { Select2 } from "./Select/index2";
 export { ToolTip } from "./ToolTip";
 export { ModalComponent } from "./ModalComponent";
 export { ModalConfirmation } from "./ModalConfirmation";
+export { ButtonToogleConfirmation } from "./ButtonToogleConfirmation";
+export { ButtonDeleteConfirmation } from "./ButtonDeleteConfirmation";
 export { FieldItemsPerPage } from "./FieldItemsPerPage";
 export { SelectAutoComplete } from "./SelectAutoComplete";
 export { SelectAutoCompleteMaterial } from "./SelectAutoCompleteMaterial";

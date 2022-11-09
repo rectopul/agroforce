@@ -60,6 +60,7 @@ import { IReturnObject } from '../../../interfaces/shared/Import.interface';
 // import { fetchWrapper } from "../../../helpers";
 import { IExperiments } from '../../../interfaces/listas/experimento/experimento.interface';
 import { tableGlobalFunctions } from '../../../helpers';
+import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
 
 interface IFilter {
   filterFoco: string;
@@ -162,7 +163,11 @@ export default function Listagem({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
+  const pathExtra = `skip=${
+    currentPage * Number(take)
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
   const [rowsSelected, setRowsSelected] = useState([]);
   const router = useRouter();
@@ -203,9 +208,8 @@ export default function Listagem({
           selecionados += `${allCheckBox[i].value},`;
         }
       }
-      //const filterStatus = selecionados.substr(0, selecionados.length - 1);
+      // const filterStatus = selecionados.substr(0, selecionados.length - 1);
       // const filterStatus = statusFilterSelected?.join(",");
-           
 
       // // Call filter with there parameter
       // const parametersFilter = await fetchWrapper.handleFilterParameter(
@@ -239,7 +243,7 @@ export default function Listagem({
       //     );
       //   });
 
-      const filterStatus ="SORTEADO";
+      const filterStatus = 'SORTEADO';
       const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterCod=${filterCod}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterStatus=SORTEADO`;
 
       setFilter(parametersFilter);
@@ -249,7 +253,7 @@ export default function Listagem({
   });
 
   // Calling common API
-  async function callingApi(parametersFilter : any) {
+  async function callingApi(parametersFilter: any) {
     setCookies('filterBeforeEdit', parametersFilter);
     setCookies('filterBeforeEditTypeOrder', typeOrder);
     setCookies('filterBeforeEditOrderBy', orderBy);
@@ -273,7 +277,11 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleOrder(column: string, order: number): Promise<void> {
+  async function handleOrder(
+    column: string,
+    order: number,
+    name: any,
+  ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
     // if (order === 1) {
@@ -316,92 +324,164 @@ export default function Listagem({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
   }
 
-  function headerTableFactory(name: string, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: true,
-    };
-  }
+  // function headerTableFactory(name: string, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
-  function tecnologiaHeaderFactory(name: string, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: 'tecnologia',
-      width: 0,
-      sorting: true,
-      render: (rowData: any) => (
-        <div className="h-10 flex">
-          <div>
-            {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
-          </div>
-        </div>
-      ),
-    };
-  }
+  // function tecnologiaHeaderFactory(name: string, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: "tecnologia",
+  //     width: 0,
+  //     sorting: true,
+  //     render: (rowData: any) => (
+  //       <div className="h-10 flex">
+  //         <div>
+  //           {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
+  //         </div>
+  //       </div>
+  //     ),
+  //   };
+  // }
 
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((index: any) => {
       if (columnOrder[index] === 'foco') {
-        tableFields.push(headerTableFactory('Foco', 'assay_list.foco.name'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Foco',
+            title: 'assay_list.foco.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[index] === 'type_assay') {
         tableFields.push(
-          headerTableFactory('Ensaio', 'assay_list.type_assay.name'),
+          headerTableFactoryGlobal({
+            name: 'Ensaio',
+            title: 'assay_list.type_assay.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnOrder[index] === 'gli') {
-        tableFields.push(headerTableFactory('GLI', 'assay_list.gli'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'GLI',
+            title: 'assay_list.gli',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[index] === 'tecnologia') {
-        tableFields.push(tecnologiaHeaderFactory('Tecnologia', 'assay_list.tecnologia.cod_tec'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Tecnologia',
+            title: 'assay_list.tecnologia.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: any) => (
+              <div>
+                {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
+              </div>
+            ),
+          }),
+        );
       }
       if (columnOrder[index] === 'experimentName') {
         tableFields.push(
-          headerTableFactory('Nome experimento', 'experimentName'),
+          headerTableFactoryGlobal({
+            name: 'Nome experimento',
+            title: 'experimentName',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnOrder[index] === 'period') {
-        tableFields.push(headerTableFactory('Época', 'period'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Época',
+            title: 'period',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[index] === 'delineamento') {
         tableFields.push(
-          headerTableFactory('Delineamento', 'delineamento.name'),
+          headerTableFactoryGlobal({
+            name: 'Delineamento',
+            title: 'delineamento.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnOrder[index] === 'repetitionsNumber') {
-        tableFields.push(headerTableFactory('Rep.', 'repetitionsNumber'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Rep.',
+            title: 'repetitionsNumber',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[index] === 'status') {
-        tableFields.push(headerTableFactory('Status EXP.', 'status'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Status EXP.',
+            title: 'status',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
     });
     return tableFields;
@@ -960,9 +1040,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   )?.response[0]?.itens_per_page;
 
   // Last page
-  const lastPageServer = req.cookies.lastPage
-    ? req.cookies.lastPage
-    : 'No';
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
   if (lastPageServer == undefined || lastPageServer == 'No') {
     removeCookies('filterBeforeEdit', { req, res });
@@ -997,9 +1075,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { publicRuntimeConfig } = getConfig();
   const baseUrlExperimento = `${publicRuntimeConfig.apiUrl}/experiment`;
 
-  const filterApplication =
-    req.cookies.filterBeforeEdit ||
-    `&id_culture=${idCulture}&id_safra=${idSafra}&filterStatus=SORTEADO`;
+  const filterApplication = req.cookies.filterBeforeEdit
+    || `&id_culture=${idCulture}&id_safra=${idSafra}&filterStatus=SORTEADO`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });

@@ -8,7 +8,9 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { ReactNode, useEffect, useState } from 'react';
+import {
+  ReactNode, useEffect, useState, useRef,
+} from 'react';
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
@@ -30,6 +32,7 @@ import { FaSortAmountUpAlt } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { removeCookies, setCookies } from 'cookies-next';
 import {
   userPreferencesService,
   assayListService,
@@ -49,25 +52,36 @@ import {
   CheckBox,
   Content,
   Input,
+  FieldItemsPerPage,
+  Select,
 } from '../../../../components';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+import { tableGlobalFunctions } from '../../../../helpers';
 
 type IAssayListUpdate = Omit<IAssayList, 'id_safra' | 'period'>;
 
 export default function AtualizarTipoEnsaio({
   allGenotypeTreatment,
-  assayList,
   totalItens,
+  itensPerPage,
+  treatmentsFilterApplication,
+  experimentFilterApplication,
   idAssayList,
   idSafra,
-  itensPerPage,
-  filterApplication,
+  assayList,
   allExperiments,
   totalExperiments,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  orderByserver,
+  typeOrderServer,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
+
+  console.log({ allGenotypeTreatment });
+  console.log({ allExperiments });
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
@@ -75,11 +89,13 @@ export default function AtualizarTipoEnsaio({
   const preferences = userLogado.preferences.genotypeTreatment || {
     id: 0,
     table_preferences:
-      'safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments',
+      'safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
+
+  const tableRef = useRef<any>(null);
 
   const preferencesExperiments = userLogado.preferences.experimento || {
     id: 0,
@@ -88,9 +104,16 @@ export default function AtualizarTipoEnsaio({
   };
   const [experimentsCamposGerenciados, setExperimentsCamposGerenciados] = useState<any>(preferencesExperiments.table_preferences);
 
-  const itemsTotal = totalItens;
-  const experimentsTotal = totalExperiments;
-  const filter = filterApplication;
+  const [itemsTotal, setItemsTotal] = useState<any>(totalItens);
+  const [experimentsTotal, setExperimentsTotal] = useState<any>(totalExperiments);
+  const [experimentFilter, setExperimentFilter] = useState<any>(
+    experimentFilterApplication,
+  );
+  const [treatmentsFilter, setTreatmentsFilter] = useState<any>(
+    treatmentsFilterApplication,
+  );
+  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
+
   const [table, setTable] = useState<string>('genotipo');
   const [genotypeTreatments, setGenotypeTreatments] = useState<any>(
     () => allGenotypeTreatment,
@@ -101,6 +124,13 @@ export default function AtualizarTipoEnsaio({
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [take, setTake] = useState<number>(itensPerPage);
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
+    orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy
+  }&typeOrder=${typeOrder}`;
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: 'CamposGerenciados[]', title: 'Safra', value: 'safra' },
@@ -159,9 +189,6 @@ export default function AtualizarTipoEnsaio({
     { name: 'CamposGerenciados[]', title: 'Status EXP.', value: 'status' },
   ]);
   const [colorStar, setColorStar] = useState<string>('');
-  const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>('');
-  const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
@@ -171,7 +198,9 @@ export default function AtualizarTipoEnsaio({
       id: assayList?.id,
       foco: assayList?.foco?.name,
       type_assay: assayList?.type_assay?.name,
-      tecnologia: `${assayList?.tecnologia?.cod_tec || ''} ${assayList?.tecnologia?.name || ''}`,
+      tecnologia: `${assayList?.tecnologia?.cod_tec || ''} ${
+        assayList?.tecnologia?.name || ''
+      }`,
       gli: assayList?.gli,
       bgm: assayList?.bgm || '',
       status: assayList?.status,
@@ -187,7 +216,7 @@ export default function AtualizarTipoEnsaio({
         })
         .then(({ status, message }) => {
           if (status === 200) {
-            Swal.fire('Experimento atualizado com sucesso!');
+            Swal.fire('Ensaio atualizado com sucesso!');
             router.back();
           } else {
             Swal.fire(message);
@@ -196,57 +225,133 @@ export default function AtualizarTipoEnsaio({
     },
   });
 
+  // async function handleOrder(
+  //   column: string,
+  //   order: string | any,
+  //   name: any,
+  // ): Promise<void> {
+  //   if (table !== 'genotipo') {
+  //     handleOrderExperiments(column, order, name);
+  //     return;
+  //   }
+
+  //   let typeOrder: any;
+  //   let parametersFilter: any;
+  //   if (order === 1) {
+  //     typeOrder = 'asc';
+  //   } else if (order === 2) {
+  //     typeOrder = 'desc';
+  //   } else {
+  //     typeOrder = '';
+  //   }
+  //   setOrderBy(column);
+  //   setOrderType(typeOrder);
+  //   if (filter && typeof filter !== 'undefined') {
+  //     if (typeOrder !== '') {
+  //       parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+  //     } else {
+  //       parametersFilter = filter;
+  //     }
+  //   } else if (typeOrder !== '') {
+  //     parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_safra=${idSafra}`;
+  //   } else {
+  //     parametersFilter = filter;
+  //   }
+
+  //   await genotypeTreatmentService
+  //     .getAll(`${parametersFilter}&skip=0&take=${take}`)
+  //     .then(({ status, response }) => {
+  //       if (status === 200) {
+  //         setGenotypeTreatments(response);
+  //       }
+  //     });
+
+  //   if (orderList === 2) {
+  //     setOrder(0);
+  //     setArrowOrder(<AiOutlineArrowDown />);
+  //   } else {
+  //     setOrder(orderList + 1);
+  //     if (orderList === 1) {
+  //       setArrowOrder(<AiOutlineArrowUp />);
+  //     } else {
+  //       setArrowOrder('');
+  //     }
+  //   }
+
+  //   setFieldOrder(name);
+  // }
+
+  async function callingApi(parametersFilter: any) {
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
+    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    setFiltersParams(parametersFilter);
+    setCookies('filtersParams', parametersFilter);
+
+    await genotypeTreatmentService.getAll(parametersFilter).then((response) => {
+      if (response.status === 200 || response.status === 400) {
+        setGenotypeTreatments(response.response);
+        setItemsTotal(response.total);
+        tableRef.current.dataManager.changePageSize(
+          response.total >= take ? take : response.total,
+        );
+      }
+    });
+  }
+
   async function handleOrder(
     column: string,
-    order: string | any,
+    order: number,
+    name: any,
   ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_safra=${idSafra}`;
-    } else {
-      parametersFilter = filter;
-    }
+    // let typeOrder: any;
+    // let parametersFilter: any;
+    // if (order === 1) {
+    //   typeOrder = 'asc';
+    // } else if (order === 2) {
+    //   typeOrder = 'desc';
+    // } else {
+    //   typeOrder = '';
+    // }
+    // setOrderBy(column);
+    // setOrderType(typeOrder);
+    // if (filter && typeof filter !== 'undefined') {
+    //   if (typeOrder !== '') {
+    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+    //   } else {
+    //     parametersFilter = filter;
+    //   }
+    // } else if (typeOrder !== '') {
+    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    // } else {
+    //   parametersFilter = filter;
+    // }
+    // console.log('parametersFilter');
+    // console.log(parametersFilter);
+    // await genotypeTreatmentService
+    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
+    //   .then(({ status, response }) => {
+    //     if (status === 200) {
+    //       setGenotypeTreatments(response);
+    //     }
+    //   });
 
-    await genotypeTreatmentService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          setGenotypeTreatments(response);
-        }
-      });
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
+    setFieldOrder(name);
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
   }
 
   async function handleOrderExperiments(
     column: string,
     order: string | any,
+    name: any,
   ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
@@ -258,16 +363,16 @@ export default function AtualizarTipoEnsaio({
       typeOrder = '';
     }
 
-    if (filter && typeof filter !== 'undefined') {
+    if (experimentFilter && typeof experimentFilter !== 'undefined') {
       if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+        parametersFilter = `${experimentFilter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
-        parametersFilter = filter;
+        parametersFilter = experimentFilter;
       }
     } else if (typeOrder !== '') {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_safra=${idSafra}`;
     } else {
-      parametersFilter = filter;
+      parametersFilter = experimentFilter;
     }
 
     await experimentService
@@ -289,85 +394,8 @@ export default function AtualizarTipoEnsaio({
         setArrowOrder('');
       }
     }
-  }
 
-  function headerTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => (table === 'genotipo'
-              ? handleOrder(title, orderList)
-              : handleOrderExperiments(title, orderList))}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: false,
-    };
-  }
-
-  function commentsTableFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList)}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: title,
-      sorting: false,
-      render: (rowData: any) => (
-        <div className="flex" title={rowData?.comments}>
-          {rowData?.comments?.length > 11
-            ? `${rowData?.comments?.slice(0, 11)}...`
-            : rowData?.comments}
-        </div>
-      ),
-    };
-  }
-
-  function idHeaderFactory() {
-    return {
-      title: <div className="flex items-center">{arrowOrder}</div>,
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-7 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="h-7 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
-          </div>
-        </div>
-      )),
-    };
+    setFieldOrder(name);
   }
 
   function formatDecimal(num: number) {
@@ -383,29 +411,65 @@ export default function AtualizarTipoEnsaio({
       //   tableFields.push(idHeaderFactory());
       // }
       if (columnOrder[index] === 'safra') {
-        tableFields.push(headerTableFactory('Safra', 'safra.safraName'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Safra',
+            title: 'safra.safraName',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[index] === 'fase') {
-        tableFields.push(headerTableFactory('Fase', 'lote.fase'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Fase',
+            title: 'lote.fase',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[index] === 'cod_tec') {
         tableFields.push(
-          headerTableFactory('GGEN', 'genotipo.tecnologia.cod_tec'),
+          headerTableFactoryGlobal({
+            name: 'GGEN',
+            title: 'genotipo.tecnologia.cod_tec',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnOrder[index] === 'treatments_number') {
-        tableFields.push(headerTableFactory('NT', 'treatments_number'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'NT',
+            title: 'treatments_number',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[index] === 'genotipoName') {
         tableFields.push(
-          headerTableFactory('Nome do genotipo', 'genotipo.name_genotipo'),
+          headerTableFactoryGlobal({
+            name: 'Nome do genótipo',
+            title: 'genotipo.name_genotipo',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnOrder[index] === 'genotipoGmr') {
         tableFields.push(
           headerTableFactoryGlobal({
             name: 'GMR',
-            title: 'gmr',
+            title: 'genotipo.gmr',
             orderList,
             fieldOrder,
             handleOrder,
@@ -414,23 +478,76 @@ export default function AtualizarTipoEnsaio({
         );
       }
       if (columnOrder[index] === 'genotipoBgm') {
-        tableFields.push(headerTableFactory('BGM', 'genotipo.bgm'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'BGM',
+            title: 'genotipo.bgm',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[index] === 'status') {
-        tableFields.push(headerTableFactory('T', 'status'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'T',
+            title: 'status',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[index] === 'nca') {
-        tableFields.push(headerTableFactory('NCA', 'lote.ncc'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'NCA',
+            title: 'lote.ncc',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[index] === 'cod_lote') {
-        tableFields.push(headerTableFactory('Cód. lote', 'lote.cod_lote'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Cód lote',
+            title: 'lote.cod_lote',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[index] === 'comments') {
-        tableFields.push(commentsTableFactory('OBS', 'comments'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'OBS',
+            title: 'comments',
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: any) => (
+              <div className="flex" title={rowData?.comments}>
+                {rowData?.comments?.length > 11
+                  ? `${rowData?.comments?.slice(0, 11)}...`
+                  : rowData?.comments}
+              </div>
+            ),
+          }),
+        );
       }
       if (columnOrder[index] === 'status_experiment') {
         tableFields.push(
-          headerTableFactory('Status Trat.', 'status_experiment'),
+          headerTableFactoryGlobal({
+            name: 'Status Trat.',
+            title: 'status_experiment',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
     });
@@ -447,36 +564,94 @@ export default function AtualizarTipoEnsaio({
       // }
       if (columnOrder[index] === 'experimentName') {
         tableFields.push(
-          headerTableFactory('Experimento Planejado', 'experimentName'),
+          headerTableFactoryGlobal({
+            name: 'Experimento Planejado',
+            title: 'experimentName',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnOrder[index] === 'local') {
         tableFields.push(
-          headerTableFactory('Lugar de cultura', 'local.name_local_culture'),
+          headerTableFactoryGlobal({
+            name: 'Lugar de cultura',
+            title: 'local.name_local_culture',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnOrder[index] === 'delineamento') {
         tableFields.push(
-          headerTableFactory('Delineamento', 'delineamento.name'),
+          headerTableFactoryGlobal({
+            name: 'Delineamento',
+            title: 'delineamento.name',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
       if (columnOrder[index] === 'repetitionsNumber') {
-        tableFields.push(headerTableFactory('Rep.', 'repetitionsNumber'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Rep',
+            title: 'repetitionsNumber',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[index] === 'nlp') {
-        tableFields.push(headerTableFactory('NLP', 'nlp'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'NLP',
+            title: 'nlp',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[index] === 'clp') {
-        tableFields.push(headerTableFactory('CLP', 'clp'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'CLP',
+            title: 'clp',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       // if (columnOrder[index] === "eel") {
       //   tableFields.push(headerTableFactory("EEL", "eel"));
       // }
       if (columnOrder[index] === 'density') {
-        tableFields.push(headerTableFactory('Densidade', 'density'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Densidade',
+            title: 'density',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
       if (columnOrder[index] === 'status') {
-        tableFields.push(headerTableFactory('Status EXP.', 'status'));
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Status EXP.',
+            title: 'status',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
       }
     });
     return tableFields;
@@ -597,60 +772,66 @@ export default function AtualizarTipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    await genotypeTreatmentService.getAll(filterApplication).then(({ status, response }) => {
-      if (status === 200) {
-        const newData = response.map((row: any) => {
-          const newRow = row;
-          newRow.SAFRA = row.safra.safraName;
-          newRow.FASE = newRow.lote?.fase;
-          newRow.COD_TEC = newRow.genotipo?.tecnologia?.cod_tec;
-          newRow.NT = newRow.treatments_number;
-          newRow.NOME_GENOTIPO = newRow.genotipo?.name_genotipo;
-          newRow.GMR_GENOTIPO = newRow.genotipo?.gmr;
-          newRow.BGM_GENOTIPO = newRow.genotipo?.bgm;
-          newRow.STATUS_T = newRow.status;
-          newRow.STATUS_EXPERIMENTO = newRow.status_experiment;
-          newRow.NCA = newRow.lote?.ncc;
-          newRow.COD_LOTE = newRow.lote?.cod_lote;
-          newRow.COMENTÁRIOS = newRow.comments;
+    await genotypeTreatmentService
+      .getAll(treatmentsFilterApplication)
+      .then(({ status, response }) => {
+        if (status === 200) {
+          const newData = response.map((row: any) => {
+            const newRow = row;
+            newRow.SAFRA = row.safra.safraName;
+            newRow.FASE = newRow.lote?.fase;
+            newRow.COD_TEC = newRow.genotipo?.tecnologia?.cod_tec;
+            newRow.NT = newRow.treatments_number;
+            newRow.NOME_GENOTIPO = newRow.genotipo?.name_genotipo;
+            newRow.GMR_GENOTIPO = newRow.genotipo?.gmr;
+            newRow.BGM_GENOTIPO = newRow.genotipo?.bgm;
+            newRow.STATUS_T = newRow.status;
+            newRow.STATUS_EXPERIMENTO = newRow.status_experiment;
+            newRow.NCA = newRow.lote?.ncc;
+            newRow.COD_LOTE = newRow.lote?.cod_lote;
+            newRow.COMENTÁRIOS = newRow.comments;
 
-          delete row.id_lote;
-          delete row.id_genotipo;
-          delete row.safra;
-          delete row.treatments_number;
-          delete row.status;
-          delete row.status_experiment;
-          delete row.comments;
-          delete row.genotipo;
-          delete row.lote;
-          delete row.id;
-          delete row.id_safra;
-          delete row.assay_list;
-          return newRow;
-        });
-        const workSheet = XLSX.utils.json_to_sheet(newData);
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'genotypeTreatments');
+            delete row.id_lote;
+            delete row.id_genotipo;
+            delete row.safra;
+            delete row.treatments_number;
+            delete row.status;
+            delete row.status_experiment;
+            delete row.comments;
+            delete row.genotipo;
+            delete row.lote;
+            delete row.id;
+            delete row.id_safra;
+            delete row.assay_list;
+            return newRow;
+          });
+          const workSheet = XLSX.utils.json_to_sheet(newData);
+          const workBook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(
+            workBook,
+            workSheet,
+            'genotypeTreatments',
+          );
 
-        // Buffer
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
-        });
-        // Download
-        XLSX.writeFile(workBook, 'Tratamentos-genótipos.xlsx');
-      }
-    });
+          // Buffer
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
+          });
+          // Binary
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
+          });
+          // Download
+          XLSX.writeFile(workBook, 'Tratamentos-genótipos.xlsx');
+        }
+      });
   };
 
   const downloadExcelExperiments = async (): Promise<void> => {
     await experimentService
-      .getAll(filterApplication)
+      .getAll(experimentFilterApplication)
       .then(({ status, response }) => {
         if (status === 200) {
           const newData = response.map((row: any) => {
@@ -706,14 +887,17 @@ export default function AtualizarTipoEnsaio({
       parametersFilter = `skip=${skip}&take=${take}`;
     }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
+    if (treatmentsFilter) {
+      parametersFilter = `${parametersFilter}&${treatmentsFilter}`;
     }
     await genotypeTreatmentService
       .getAll(parametersFilter)
       .then(({ status, response }) => {
         if (status === 200) {
           setGenotypeTreatments(response);
+          tableRef?.current?.dataManager?.changePageSize(
+            response?.length >= take ? take : response?.length,
+          );
         }
       });
   }
@@ -727,14 +911,18 @@ export default function AtualizarTipoEnsaio({
       parametersFilter = `skip=${skip}&take=${take}`;
     }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
+    if (experimentFilter) {
+      parametersFilter = `${parametersFilter}&${experimentFilter}`;
     }
     await experimentService
       .getAll(parametersFilter)
       .then(({ status, response }) => {
         if (status === 200) {
+          console.log({ response });
           setExperiments(response);
+          tableRef?.current?.dataManager?.changePageSize(
+            response?.length >= take ? take : response?.length,
+          );
         }
       });
   }
@@ -760,7 +948,7 @@ export default function AtualizarTipoEnsaio({
   useEffect(() => {
     table === 'genotipo' ? handlePagination() : handlePaginationExperiments();
     table === 'genotipo' ? handleTotalPages() : handleTotalPagesExperiments();
-  }, [currentPage]);
+  }, [currentPage, take]);
 
   return (
     <>
@@ -899,6 +1087,7 @@ export default function AtualizarTipoEnsaio({
         >
           <div style={{ marginTop: '1%' }} className="w-full h-auto">
             <MaterialTable
+              tableRef={tableRef}
               style={{ background: '#f9fafb' }}
               columns={table === 'genotipo' ? columns : experimentColumns}
               data={table === 'genotipo' ? genotypeTreatments : experiments}
@@ -910,7 +1099,7 @@ export default function AtualizarTipoEnsaio({
                 rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
-                pageSize: itensPerPage,
+                pageSize: Number(take),
               }}
               components={{
                 Toolbar: () => (
@@ -960,11 +1149,21 @@ export default function AtualizarTipoEnsaio({
                       </div>
                     </div>
 
-                    <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {table === 'genotipo' ? itemsTotal : experimentsTotal}
-                    </strong>
+                    <div className="flex flex-row items-center w-full">
+                      <div className="flex flex-1 justify-center">
+                        <strong className="text-blue-600">
+                          Total registrado:
+                          {table === 'genotipo' ? itemsTotal : experimentsTotal}
+                        </strong>
+                      </div>
+                      <div className="flex flex-1 mb-6 justify-end">
+                        <FieldItemsPerPage
+                          widthClass="w-1/2"
+                          selected={take}
+                          onChange={setTake}
+                        />
+                      </div>
+                    </div>
 
                     <div className="h-full flex items-center gap-2">
                       <div className="border-solid border-2 border-blue-600 rounded">
@@ -1144,15 +1343,27 @@ export default function AtualizarTipoEnsaio({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context: any) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  res,
+  query,
+}: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()
   )?.response[0]?.itens_per_page) ?? 5;
 
-  const { token } = context.req.cookies;
-  const idSafra = context.req.cookies.safraId;
+  const { token } = req.cookies;
+  const idSafra = req.cookies.safraId;
+  const pageBeforeEdit = req.cookies.pageBeforeEdit
+    ? req.cookies.pageBeforeEdit
+    : 0;
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : '';
+
+  const idAssay = query.id;
 
   const { publicRuntimeConfig } = getConfig();
   const requestOptions: RequestInit | undefined = {
@@ -1161,24 +1372,51 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
     headers: { Authorization: `Bearer ${token}` },
   };
 
-  const idAssayList = Number(context.query.id);
-  const filterApplication = `id_safra=${idSafra}&id_assay_list=${idAssayList}`;
+  // Last page
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
+  }
+
+  // RR
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+    ? req.cookies.filterBeforeEditTypeOrder
+    : '';
+
+  // RR
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : '';
+
+  const treatmentsFilterApplication = `&id_safra=${idSafra}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
+  const experimentFilterApplication = `&id_safra=${idSafra}&id_assay_list=${idAssay}`;
+
+  // RR
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
+
+  const idAssayList = Number(query.id);
   const baseUrlExperiment = `${publicRuntimeConfig.apiUrl}/experiment`;
   const { response: allExperiments = [], total: totalExperiments = 0 } = await fetch(
-    `${baseUrlExperiment}?${filterApplication}`,
+    `${baseUrlExperiment}?${experimentFilterApplication}`,
     requestOptions,
   ).then((response) => response.json());
 
   const baseUrlGenotypeTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
   const { response: allGenotypeTreatment = [], total: totalItens = 0 } = await fetch(
-    `${baseUrlGenotypeTreatment}?${filterApplication}`,
+    `${baseUrlGenotypeTreatment}?${treatmentsFilterApplication}`,
     requestOptions,
   ).then((response) => response.json());
 
   const baseUrlAssayList = `${publicRuntimeConfig.apiUrl}/assay-list`;
   const assayList = await fetch(
-    `${baseUrlAssayList}/${context.query.id}`,
+    `${baseUrlAssayList}/${query.id}`,
     requestOptions,
   ).then((response) => response.json());
 
@@ -1187,12 +1425,17 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
       allGenotypeTreatment,
       totalItens,
       itensPerPage,
-      filterApplication,
+      treatmentsFilterApplication,
+      experimentFilterApplication,
       idAssayList,
       idSafra,
       assayList,
       allExperiments,
       totalExperiments,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      orderByserver,
+      typeOrderServer,
     },
   };
 };
