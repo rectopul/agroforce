@@ -2,8 +2,8 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
-import { experimentgenotipeRepository } from 'src/repository/experiment-genotipe.repository';
-import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
+import { TransactionConfig } from '../../shared/prisma/transactionConfig';
+import { ExperimentGenotipeRepository } from '../../repository/experiment-genotipe.repository';
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
 import { validateInteger } from '../../shared/utils/numberValidate';
@@ -31,8 +31,11 @@ export class ImportGenotypeTreatmentController {
 
     /* --------- Transcation Context --------- */
     const transactionConfig = new TransactionConfig();
-    const experimentgenotipeRepository = new experimentgenotipeRepository();
-    genotipoRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+    const experimentgenotipeRepository = new ExperimentGenotipeRepository();
+    experimentgenotipeRepository.setTransaction(
+      transactionConfig.clientManager,
+      transactionConfig.transactionScope,
+    );
     /* --------------------------------------- */
 
     const responseIfError: Array<string> = [];

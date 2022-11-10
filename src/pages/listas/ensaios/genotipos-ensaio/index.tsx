@@ -386,7 +386,9 @@ export default function Listagem({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    console.log({ typeOrderG, columnG, orderByG, arrowOrder });
+    console.log({
+      typeOrderG, columnG, orderByG, arrowOrder,
+    });
 
     setFieldOrder(name);
     setTypeOrder(typeOrderG);
@@ -1395,7 +1397,7 @@ export default function Listagem({
                         placeholder="Nome do genótipo"
                         id="filterGenotypeName"
                         name="filterGenotypeName"
-                        onChange={formik.handleChange.trim()}
+                        onChange={formik.handleChange}
                       />
                     </div>
                   </div>
