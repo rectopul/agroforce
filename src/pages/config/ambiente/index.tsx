@@ -1,39 +1,37 @@
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import getConfig from 'next/config';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useEffect, useState, useRef } from 'react';
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useEffect, useState, useRef } from "react";
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from 'react-beautiful-dnd';
+} from "react-beautiful-dnd";
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiTwotoneStar,
-} from 'react-icons/ai';
-import {
-  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
-} from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
-import Swal from 'sweetalert2';
-import * as XLSX from 'xlsx';
-import { removeCookies, setCookies } from 'cookies-next';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { BsTrashFill } from 'react-icons/bs';
-import { UserPreferenceController } from '../../../controllers/user-preference.controller';
+} from "react-icons/ai";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
+import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
+import { removeCookies, setCookies } from "cookies-next";
+import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import { BsTrashFill } from "react-icons/bs";
+import { UserPreferenceController } from "../../../controllers/user-preference.controller";
 import {
   experimentService,
   npeService,
   userPreferencesService,
-} from '../../../services';
+} from "../../../services";
 import {
   AccordionFilter,
   Button,
@@ -47,7 +45,7 @@ import {
 import * as ITabs from "../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../helpers";
 import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
-import ComponentLoading from '../../../components/Loading';
+import ComponentLoading from "../../../components/Loading";
 
 interface INpeProps {
   id: any;
@@ -121,27 +119,29 @@ export default function Listagem({
   const router = useRouter();
 
   // eslint-disable-next-line no-return-assign, no-param-reassign
-  tabsDropDowns.map((tab) => (tab.titleTab === 'AMBIENTE'
-    ? (tab.statusTab = true)
-    : (tab.statusTab = false)));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === "AMBIENTE"
+      ? (tab.statusTab = true)
+      : (tab.statusTab = false)
+  );
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.npe || {
     id: 0,
     table_preferences:
-      'id,safra,foco,ensaio,tecnologia,local,npei,epoca,prox_npe,status',
+      "id,safra,foco,ensaio,tecnologia,local,npei,epoca,prox_npe,status",
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+    preferences.table_preferences
   );
   const [npe, setNPE] = useState(allNpe);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(1);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [orderList, setOrder] = useState<number>(0);
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [colorStar, setColorStar] = useState<string>('');
+  const [colorStar, setColorStar] = useState<string>("");
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // {
     //   name: 'CamposGerenciados[]',
@@ -150,63 +150,63 @@ export default function Listagem({
     //   defaultChecked: () => camposGerenciados.includes('id'),
     // },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Safra ',
-      value: 'safra',
-      defaultChecked: () => camposGerenciados.includes('safra'),
+      name: "CamposGerenciados[]",
+      title: "Safra ",
+      value: "safra",
+      defaultChecked: () => camposGerenciados.includes("safra"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Foco ',
-      value: 'foco',
-      defaultChecked: () => camposGerenciados.includes('foco'),
+      name: "CamposGerenciados[]",
+      title: "Foco ",
+      value: "foco",
+      defaultChecked: () => camposGerenciados.includes("foco"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Ensaio ',
-      value: 'ensaio',
-      defaultChecked: () => camposGerenciados.includes('ensaio'),
+      name: "CamposGerenciados[]",
+      title: "Ensaio ",
+      value: "ensaio",
+      defaultChecked: () => camposGerenciados.includes("ensaio"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Nome tec.',
-      value: 'tecnologia',
-      defaultChecked: () => camposGerenciados.includes('tecnologia'),
+      name: "CamposGerenciados[]",
+      title: "Tecnologia",
+      value: "tecnologia",
+      defaultChecked: () => camposGerenciados.includes("tecnologia"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Lugar cultura',
-      value: 'local',
-      defaultChecked: () => camposGerenciados.includes('local'),
+      name: "CamposGerenciados[]",
+      title: "Lugar cultura",
+      value: "local",
+      defaultChecked: () => camposGerenciados.includes("local"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Epoca ',
-      value: 'epoca',
-      defaultChecked: () => camposGerenciados.includes('epoca'),
+      name: "CamposGerenciados[]",
+      title: "Epoca ",
+      value: "epoca",
+      defaultChecked: () => camposGerenciados.includes("epoca"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'NPE Inicial ',
-      value: 'npei',
-      defaultChecked: () => camposGerenciados.includes('npei'),
+      name: "CamposGerenciados[]",
+      title: "NPE Inicial ",
+      value: "npei",
+      defaultChecked: () => camposGerenciados.includes("npei"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Prox NPE ',
-      value: 'prox_npe',
-      defaultChecked: () => camposGerenciados.includes('prox_npe'),
+      name: "CamposGerenciados[]",
+      title: "Prox NPE ",
+      value: "prox_npe",
+      defaultChecked: () => camposGerenciados.includes("prox_npe"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Status',
-      value: 'status',
-      defaultChecked: () => camposGerenciados.includes('status'),
+      name: "CamposGerenciados[]",
+      title: "Ação",
+      value: "status",
+      defaultChecked: () => camposGerenciados.includes("status"),
     },
   ]);
 
   // const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>("");
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
@@ -216,32 +216,32 @@ export default function Listagem({
   const [fieldOrder, setFieldOrder] = useState<any>(null);
 
   const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == 'Tecnologia' ? 'tecnologia.cod_tec' : orderBy
+    orderBy == "Tecnologia" ? "tecnologia.cod_tec" : orderBy
   }&typeOrder=${typeOrder}`;
 
   const filters = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
+    { id: 2, name: "Todos" },
+    { id: 1, name: "Ativos" },
+    { id: 0, name: "Inativos" },
   ];
 
-  const filterStatusBeforeEdit = filterApplication.split('');
+  const filterStatusBeforeEdit = filterApplication.split("");
 
   const formik = useFormik<any>({
     initialValues: {
       filterStatus: filterStatusBeforeEdit[13],
-      filterLocal: checkValue('filterLocal'),
-      filterSafra: checkValue('filterSafra'),
-      filterFoco: checkValue('filterFoco'),
-      filterEnsaio: checkValue('filterEnsaio'),
-      filterTecnologia: checkValue('filterTecnologia'),
-      filterCodTecnologia: checkValue('filterCodTecnologia'),
-      filterEpoca: checkValue('filterEpoca'),
-      filterNPE: checkValue('filterNPE'),
-      filterNpeTo: checkValue('filterNpeTo'),
-      filterNpeFrom: checkValue('filterNpeFrom'),
-      orderBy: '',
-      typeOrder: '',
+      filterLocal: checkValue("filterLocal"),
+      filterSafra: checkValue("filterSafra"),
+      filterFoco: checkValue("filterFoco"),
+      filterEnsaio: checkValue("filterEnsaio"),
+      filterTecnologia: checkValue("filterTecnologia"),
+      filterCodTecnologia: checkValue("filterCodTecnologia"),
+      filterEpoca: checkValue("filterEpoca"),
+      filterNPE: checkValue("filterNPE"),
+      filterNpeTo: checkValue("filterNpeTo"),
+      filterNpeFrom: checkValue("filterNpeFrom"),
+      orderBy: "",
+      typeOrder: "",
     },
     onSubmit: async ({
       filterStatus,
@@ -280,19 +280,19 @@ export default function Listagem({
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
-    setCookies('filterBeforeEdit', parametersFilter);
-    setCookies('filterBeforeEditTypeOrder', typeOrder);
-    setCookies('filterBeforeEditOrderBy', orderBy);
+    setCookies("filterBeforeEdit", parametersFilter);
+    setCookies("filterBeforeEditTypeOrder", typeOrder);
+    setCookies("filterBeforeEditOrderBy", orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies('filtersParams', parametersFilter);
+    setCookies("filtersParams", parametersFilter);
 
     await npeService.getAll(parametersFilter).then((response) => {
       if (response.status === 200 || response.status === 400) {
         setNPE(response.response);
         setTotalItems(response.total);
         tableRef.current.dataManager.changePageSize(
-          response.total >= take ? take : response.total,
+          response.total >= take ? take : response.total
         );
       }
     });
@@ -332,33 +332,33 @@ export default function Listagem({
     } else {
       Swal.fire({
         html: message,
-        width: '800',
+        width: "800",
       });
     }
   }
 
   function statusHeaderFactory() {
     return {
-      title: 'Ação',
-      field: 'status',
+      title: "Ação",
+      field: "status",
       sorting: false,
       searchable: false,
-      filterPlaceholder: 'Filtrar por status',
+      filterPlaceholder: "Filtrar por status",
       render: (rowData: INpeProps) => (
         <div className="h-7 flex">
           <div className="h-7">
             <Button
               icon={<BiEdit size={14} />}
-              bgColor={rowData.edited === 1 ? 'bg-blue-900' : 'bg-blue-600'}
+              bgColor={rowData.edited === 1 ? "bg-blue-900" : "bg-blue-600"}
               textColor="white"
               title="Editar"
               onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filter);
-                setCookies('filterBeforeEditTypeOrder', typeOrder);
-                setCookies('filterBeforeEditOrderBy', orderBy);
-                setCookies('filtersParams', filtersParams);
-                setCookies('lastPage', 'atualizar');
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filter);
+                setCookies("filterBeforeEditTypeOrder", typeOrder);
+                setCookies("filterBeforeEditOrderBy", orderBy);
+                setCookies("filtersParams", filtersParams);
+                setCookies("lastPage", "atualizar");
                 router.push(`/config/ambiente/atualizar?id=${rowData.id}`);
               }}
             />
@@ -427,115 +427,120 @@ export default function Listagem({
   // }
 
   function colums(camposGerenciados: any): any {
-    const columnCampos: any = camposGerenciados.split(',');
+    const columnCampos: any = camposGerenciados.split(",");
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item) => {
       // if (columnCampos[item] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
-      if (columnCampos[item] === 'local') {
+      if (columnCampos[item] === "local") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Lugar cultura',
-            title: 'local.name_local_culture',
+            name: "Lugar cultura",
+            title: "local.name_local_culture",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[item] === 'safra') {
+      if (columnCampos[item] === "safra") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Safra',
-            title: 'safra.safraName',
+            name: "Safra",
+            title: "safra.safraName",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[item] === 'foco') {
+      if (columnCampos[item] === "foco") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Foco',
-            title: 'foco.name',
+            name: "Foco",
+            title: "foco.name",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[item] === 'ensaio') {
+      if (columnCampos[item] === "ensaio") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Ensaio',
-            title: 'type_assay.name',
+            name: "Ensaio",
+            title: "type_assay.name",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
       // if (columnCampos[item] === 'tecnologia') {
       //   tableFields.push(headerTableFactory('Nome tec.', 'tecnologia.name'));
       // }
-      if (columnCampos[item] === 'tecnologia') {
+      if (columnCampos[item] === "tecnologia") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Tecnologia',
-            title: 'tecnologia.cod_tec',
+            name: "Tecnologia",
+            title: "tecnologia.cod_tec",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+            render: (rowData: any) => (
+              <div>
+                {`${rowData?.tecnologia?.cod_tec} ${rowData?.tecnologia?.name}`}
+              </div>
+            ),
+          })
         );
       }
-      if (columnCampos[item] === 'epoca') {
+      if (columnCampos[item] === "epoca") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Epoca',
-            title: 'epoca',
+            name: "Epoca",
+            title: "epoca",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[item] === 'npei') {
+      if (columnCampos[item] === "npei") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'NPE Inicial',
-            title: 'npei',
+            name: "NPE Inicial",
+            title: "npei",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[item] === 'group') {
+      if (columnCampos[item] === "group") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Grupo',
-            title: 'group.group',
+            name: "Grupo",
+            title: "group.group",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[item] === 'prox_npe') {
+      if (columnCampos[item] === "prox_npe") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Prox NPE',
-            title: 'prox_npe',
+            name: "Prox NPE",
+            title: "prox_npe",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[item] === 'status') {
+      if (columnCampos[item] === "status") {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -547,7 +552,7 @@ export default function Listagem({
   async function handleOrder(
     column: string,
     order: string | any,
-    name: any,
+    name: any
   ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
@@ -593,9 +598,8 @@ export default function Listagem({
     // }
 
     // Gobal manage orders
-    const {
-      typeOrderG, columnG, orderByG, arrowOrder,
-    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    const { typeOrderG, columnG, orderByG, arrowOrder } =
+      await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setFieldOrder(name);
     setTypeOrder(typeOrderG);
@@ -606,7 +610,7 @@ export default function Listagem({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
+    let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -629,7 +633,7 @@ export default function Listagem({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
       userLogado.preferences.layout_quadra = {
         id: preferences.id,
@@ -640,7 +644,7 @@ export default function Listagem({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -657,9 +661,9 @@ export default function Listagem({
       await npeService.getAll(parametersFilter).then((response) => {
         if (response.total > 0) {
           Swal.fire(
-            'NPE não pode ser atualizada pois já existe uma npei cadastrada com essas informações',
+            "NPE não pode ser atualizada pois já existe uma npei cadastrada com essas informações"
           );
-          router.push('');
+          router.push("");
         }
       });
     } else {
@@ -702,9 +706,9 @@ export default function Listagem({
         const newData = response.map((row: any) => {
           delete row.avatar;
           if (row.status === 0) {
-            row.status = 'Inativo';
+            row.status = "Inativo";
           } else {
-            row.status = 'Ativo';
+            row.status = "Ativo";
           }
 
           row.SAFRA = row.safra?.safraName;
@@ -743,22 +747,22 @@ export default function Listagem({
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'npe');
+        XLSX.utils.book_append_sheet(workBook, workSheet, "npe");
 
         // Buffer
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
+          bookType: "xlsx", // xlsx
+          type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
+          bookType: "xlsx", // xlsx
+          type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, 'NPE.xlsx');
+        XLSX.writeFile(workBook, "NPE.xlsx");
       } else {
-        Swal.fire('Não existem registros para serem exportados, favor checar.');
+        Swal.fire("Não existem registros para serem exportados, favor checar.");
       }
     });
   };
@@ -814,7 +818,7 @@ export default function Listagem({
   function checkValue(value: any) {
     const parameter = tableGlobalFunctions.getValuesForFilter(
       value,
-      filtersParams,
+      filtersParams
     );
     return parameter;
   }
@@ -826,8 +830,7 @@ export default function Listagem({
 
   return (
     <>
-
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
 
       <Head>
         <title>Listagem dos Ambientes</title>
@@ -866,19 +869,19 @@ export default function Listagem({
                     />
                   </div> */}
 
-                  {filterFieldFactory('filterSafra', 'Safra')}
+                  {filterFieldFactory("filterSafra", "Safra")}
 
-                  {filterFieldFactory('filterFoco', 'Foco')}
+                  {filterFieldFactory("filterFoco", "Foco")}
 
-                  {filterFieldFactory('filterEnsaio', 'Ensaio')}
+                  {filterFieldFactory("filterEnsaio", "Ensaio")}
 
-                  {filterFieldFactory('filterCodTecnologia', 'Cód. Tec.')}
+                  {filterFieldFactory("filterCodTecnologia", "Cód. Tec.")}
 
-                  {filterFieldFactory('filterTecnologia', 'Nome Tec.')}
+                  {filterFieldFactory("filterTecnologia", "Nome Tec.")}
 
-                  {filterFieldFactory('filterLocal', 'Lugar cultura')}
+                  {filterFieldFactory("filterLocal", "Lugar cultura")}
 
-                  {filterFieldFactory('filterEpoca', 'Epoca')}
+                  {filterFieldFactory("filterEpoca", "Epoca")}
 
                   <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -890,14 +893,14 @@ export default function Listagem({
                         id="filterNpeFrom"
                         name="filterNpeFrom"
                         onChange={formik.handleChange}
-                        defaultValue={checkValue('filterNpeFrom')}
+                        defaultValue={checkValue("filterNpeFrom")}
                       />
                       <Input
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNpeTo"
                         name="filterNpeTo"
-                        defaultValue={checkValue('filterNpeTo')}
+                        defaultValue={checkValue("filterNpeTo")}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -947,7 +950,7 @@ export default function Listagem({
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
               tableRef={tableRef}
-              style={{ background: '#f9fafb' }}
+              style={{ background: "#f9fafb" }}
               columns={columns}
               data={npe}
               options={{
@@ -955,7 +958,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 0,
                 },
-                rowStyle: { background: '#f9fafb', height: 35 },
+                rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: Number(take),
@@ -989,9 +992,7 @@ export default function Listagem({
 
                     <div />
                     <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
+                      Total registrado: {itemsTotal}
                     </strong>
 
                     <div
@@ -1038,7 +1039,7 @@ export default function Listagem({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value,
+                                                generate.value
                                               )}
                                             />
                                           </li>
@@ -1077,58 +1078,59 @@ export default function Listagem({
                     </div>
                   </div>
                 ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => setCurrentPage(0)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {Array(1)
-                      .fill('')
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(pages - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(0)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage < 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(pages - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                   ) as any,
               }}
             />
@@ -1144,34 +1146,35 @@ export const getServerSideProps: GetServerSideProps = async ({
   res,
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) || 10;
+  const itensPerPage =
+    (await (
+      await PreferencesControllers.getConfigGerais()
+    )?.response[0]?.itens_per_page) || 10;
 
   const { safraId } = req.cookies;
   const idCulture = req.cookies.cultureId;
   const { token } = req.cookies;
 
   // Last page
-  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
 
-  if (lastPageServer == undefined || lastPageServer == 'No') {
-    removeCookies('filterBeforeEdit', { req, res });
-    removeCookies('pageBeforeEdit', { req, res });
-    removeCookies('filterBeforeEditTypeOrder', { req, res });
-    removeCookies('filterBeforeEditOrderBy', { req, res });
-    removeCookies('lastPage', { req, res });
+  if (lastPageServer == undefined || lastPageServer == "No") {
+    removeCookies("filterBeforeEdit", { req, res });
+    removeCookies("pageBeforeEdit", { req, res });
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("lastPage", { req, res });
   }
 
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : '';
+    : "";
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : '';
+    : "";
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
@@ -1185,24 +1188,24 @@ export const getServerSideProps: GetServerSideProps = async ({
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
   // id_culture=${idCulture}&id_safra=${safraId}
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-  removeCookies('filterBeforeEditTypeOrder', { req, res });
-  removeCookies('filterBeforeEditOrderBy', { req, res });
-  removeCookies('lastPage', { req, res });
+  removeCookies("filterBeforeEdit", { req, res });
+  removeCookies("pageBeforeEdit", { req, res });
+  removeCookies("filterBeforeEditTypeOrder", { req, res });
+  removeCookies("filterBeforeEditOrderBy", { req, res });
+  removeCookies("lastPage", { req, res });
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
   const { response: allNpe = [], total: totalItems = 0 } = await fetch(
     urlParameters.toString(),
-    requestOptions,
+    requestOptions
   ).then((response) => response.json());
 
   return {

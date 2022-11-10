@@ -10,7 +10,7 @@ import { RequestInit } from "next/dist/server/web/spec-extension/request";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState, useRef } from "react";
-import ComponentLoading from '../../../../components/Loading';
+import ComponentLoading from "../../../../components/Loading";
 
 import {
   DragDropContext,
@@ -125,7 +125,7 @@ export default function TipoEnsaio({
     Number(pageBeforeEdit)
   );
 
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -151,7 +151,7 @@ export default function TipoEnsaio({
     },
     {
       name: "CamposGerenciados[]",
-      title: "Status",
+      title: "Ação",
       value: "status",
       defaultChecked: () => camposGerenciados.includes("status"),
     },
@@ -412,7 +412,7 @@ export default function TipoEnsaio({
 
   function statusHeaderFactory() {
     return {
-      title: "Status",
+      title: "Ação",
       field: "status",
       sorting: false,
       searchable: false,
@@ -760,7 +760,6 @@ export default function TipoEnsaio({
 
   return (
     <>
-
       {loading && <ComponentLoading text="" />}
 
       <Head>
