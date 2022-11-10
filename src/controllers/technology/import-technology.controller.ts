@@ -176,17 +176,8 @@ export class ImportTechnologyController {
 
       if (responseIfError.length === 0) {
         try {
-          spreadSheet.forEach(async (item: any, row: number) => {
-            if (row !== 0) {
-              const {
-                response: responseCulture,
-              }: IReturnObject = await culturaController.getOneCulture(idCulture);
-              const { status, response }: IReturnObject = await tecnologiaController.getAll(
-                { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
-              );
-
           await transactionConfig.transactionScope.run(async () => {
-            for (let row in spreadSheet) {
+            for (const row in spreadSheet) {
               if (row !== '0') {
                 const { status, response }: IReturnObject = await tecnologiaController.getAll(
                   { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
@@ -194,7 +185,7 @@ export class ImportTechnologyController {
                 if (status === 200 && response[0]?.id) {
                   await tecnologiaRepository.updateTransaction(response[0]?.id, {
                     id: response[0]?.id,
-                    id_culture: responseCulture?.id,
+                    id_culture: idCulture,
                     cod_tec: String(spreadSheet[row][0]),
                     name: spreadSheet[row][1],
                     desc: spreadSheet[row][2],
@@ -203,18 +194,18 @@ export class ImportTechnologyController {
                   });
                 } else {
                   await tecnologiaRepository.createTransaction({
-                    id_culture: responseCulture?.id,
+                    id_culture: idCulture,
                     cod_tec: String(spreadSheet[row][0]),
                     name: spreadSheet[row][1],
                     desc: spreadSheet[row][2],
                     created_by: createdBy,
                     dt_export: new Date(spreadSheet[row][4]),
                   });
-                } 
+                }
               }
             }
           });
-                    
+
           await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
           return { status: 200, message: 'Tecnologia importado com sucesso' };
         } catch (error: any) {
