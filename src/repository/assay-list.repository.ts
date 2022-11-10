@@ -1,8 +1,9 @@
 import { prisma } from '../pages/api/db/db';
+import {BaseRepository} from './base-repository';
 
-export class AssayListRepository {
+export class AssayListRepository extends BaseRepository {
   async create(data: any) {
-    const result = await prisma.assay_list.create({
+    const result = await this.getPrisma().assay_list.create({
       data,
     });
 
@@ -33,7 +34,7 @@ export class AssayListRepository {
   }
 
   async update(id: number, data: any) {
-    const result = await prisma.assay_list.update({
+    const result = await this.getPrisma().assay_list.update({
       where: { id },
       data,
     });

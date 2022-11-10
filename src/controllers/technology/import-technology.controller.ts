@@ -1,6 +1,8 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable keyword-spacing */
+import { TecnologiaRepository } from 'src/repository/tecnologia.repository';
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
 import { responseGenericFactory, responseNullFactory } from '../../shared/utils/responseErrorFactory';
@@ -17,6 +19,12 @@ export class ImportTechnologyController {
     const culturaController = new CulturaController();
     const logImportController = new LogImportController();
     const tecnologiaController = new TecnologiaController();
+
+    /* --------- Transcation Context --------- */
+    const transactionConfig = new TransactionConfig();
+    const tecnologiaRepository = new TecnologiaRepository();
+    tecnologiaRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+    /* --------------------------------------- */
 
     const responseIfError: any = [];
     const headers = [
@@ -177,28 +185,71 @@ export class ImportTechnologyController {
                 { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
               );
 
-              if (status === 200) {
-                await tecnologiaController.update({
-                  id: response[0]?.id,
-                  id_culture: responseCulture?.id,
-                  cod_tec: String(spreadSheet[row][0]),
-                  name: spreadSheet[row][1],
-                  desc: spreadSheet[row][2],
-                  created_by: createdBy,
-                  dt_export: new Date(spreadSheet[row][4]),
-                });
-              } else {
-                await tecnologiaController.create({
-                  id_culture: responseCulture?.id,
-                  cod_tec: String(spreadSheet[row][0]),
-                  name: spreadSheet[row][1],
-                  desc: spreadSheet[row][2],
-                  created_by: createdBy,
-                  dt_export: new Date(spreadSheet[row][4]),
-                });
+          await transactionConfig.transactionScope.run(async () => {
+            for (let row in spreadSheet) {
+              if (row !== '0') {
+                const { status, response }: IReturnObject = await tecnologiaController.getAll(
+                  { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
+                );
+                if (status === 200 && response[0]?.id) {
+                  await tecnologiaRepository.updateTransaction(response[0]?.id, {
+                    id: response[0]?.id,
+                    id_culture: responseCulture?.id,
+                    cod_tec: String(spreadSheet[row][0]),
+                    name: spreadSheet[row][1],
+                    desc: spreadSheet[row][2],
+                    created_by: createdBy,
+                    dt_export: new Date(spreadSheet[row][4]),
+                  });
+                } else {
+                  await tecnologiaRepository.createTransaction({
+                    id_culture: responseCulture?.id,
+                    cod_tec: String(spreadSheet[row][0]),
+                    name: spreadSheet[row][1],
+                    desc: spreadSheet[row][2],
+                    created_by: createdBy,
+                    dt_export: new Date(spreadSheet[row][4]),
+                  });
+                } 
               }
             }
           });
+          // spreadSheet.forEach(async (item: any, row: number) => {
+          //   if (row !== 0) {
+          //     const {
+          //       response: responseCulture,
+          //     }: IReturnObject = await culturaController.getOneCulture(idCulture);
+          //     const { status, response }: IReturnObject = await tecnologiaController.getAll(
+          //       { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
+          //     );
+          //     console.log('spreadSheet[row][0]');
+          //     console.log(spreadSheet[row][0]);
+
+          //     console.log('response');
+          //     console.log(response);
+
+          //     if (status === 200) {
+          //       await tecnologiaController.update({
+          //         id: response[0]?.id,
+          //         id_culture: responseCulture?.id,
+          //         cod_tec: String(spreadSheet[row][0]),
+          //         name: spreadSheet[row][1],
+          //         desc: spreadSheet[row][2],
+          //         created_by: createdBy,
+          //         dt_export: new Date(spreadSheet[row][4]),
+          //       });
+          //     } else {
+          //       await tecnologiaController.create({
+          //         id_culture: responseCulture?.id,
+          //         cod_tec: String(spreadSheet[row][0]),
+          //         name: spreadSheet[row][1],
+          //         desc: spreadSheet[row][2],
+          //         created_by: createdBy,
+          //         dt_export: new Date(spreadSheet[row][4]),
+          //       });
+          //     }
+          //   }
+          // });
           await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
           return { status: 200, message: 'Tecnologia importado com sucesso' };
         } catch (error: any) {

@@ -15,6 +15,8 @@ import { LogImportController } from '../log-import.controller';
 import { LoteController } from '../lote.controller';
 import { GenotypeTreatmentController } from './genotype-treatment.controller';
 import { HistoryGenotypeTreatmentController } from './history-genotype-treatment.controller';
+import { experimentgenotipeRepository } from 'src/repository/experiment-genotipe.repository';
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 
 export class ImportGenotypeTreatmentController {
   static async validate(
@@ -26,6 +28,12 @@ export class ImportGenotypeTreatmentController {
     const logImportController = new LogImportController();
     const genotypeTreatmentController = new GenotypeTreatmentController();
     const historyGenotypeTreatmentController = new HistoryGenotypeTreatmentController();
+
+    /* --------- Transcation Context --------- */
+    const transactionConfig = new TransactionConfig();
+    const experimentgenotipeRepository = new experimentgenotipeRepository();
+    genotipoRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+    /* --------------------------------------- */
 
     const responseIfError: Array<string> = [];
 
@@ -229,45 +237,75 @@ export class ImportGenotypeTreatmentController {
         }
       }
 
-      if (responseIfError.length === 0) {
-        try {
-          for (const row in spreadSheet) {
-            if (row !== '0') {
-              const { response: treatment } = await genotypeTreatmentController.getAll({
-                gli: spreadSheet[row][4],
-                treatments_number: spreadSheet[row][6],
-                name_genotipo: spreadSheet[row][8],
-                nca: spreadSheet[row][9],
-              });
-              const { response: genotipo } = await genotipoController.getAll({
-                name_genotipo: spreadSheet[row][10],
-              });
-              const { response: lote } = await loteController.getAll({
-                ncc: spreadSheet[row][12],
-              });
-              await genotypeTreatmentController.update(
-                {
-                  id: treatment[0]?.id,
-                  id_genotipo: genotipo[0]?.id,
-                  id_lote: lote[0]?.id,
-                  status: spreadSheet[row][11],
-                },
-              );
-              await historyGenotypeTreatmentController.create({
-                gli: spreadSheet[row][4],
-                safra: spreadSheet[row][0],
-                foco: spreadSheet[row][1],
-                ensaio: spreadSheet[row][2],
-                tecnologia: spreadSheet[row][3],
-                bgm: Number(spreadSheet[row][5]),
-                nt: Number(spreadSheet[row][6]),
-                status: spreadSheet[row][7],
-                genotipo: spreadSheet[row][8],
-                nca: Number(spreadSheet[row][9]),
+      await transactionConfig.transactionScope.run(async () => {
+        for (let row in spreadSheet) {
+          if (row !== '0') {
+            const { status, response }: IReturnObject = await experimentgenotipeController.getAll(
+              { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
+            );
+            if (status === 200 && response[0]?.id) {
+              await experimentgenotipeRepository.updateTransaction(response[0]?.id, {
+                id: response[0]?.id,
+                id_culture: responseCulture?.id,
+                cod_tec: String(spreadSheet[row][0]),
+                name: spreadSheet[row][1],
+                desc: spreadSheet[row][2],
                 created_by: createdBy,
+                dt_export: new Date(spreadSheet[row][4]),
               });
-            }
+            } else {
+              await experimentgenotipeRepository.createTransaction({
+                id_culture: responseCulture?.id,
+                cod_tec: String(spreadSheet[row][0]),
+                name: spreadSheet[row][1],
+                desc: spreadSheet[row][2],
+                created_by: createdBy,
+                dt_export: new Date(spreadSheet[row][4]),
+              });
+            } 
           }
+        }
+      });
+
+      // if (responseIfError.length === 0) {
+      //   try {
+      //     for (const row in spreadSheet) {
+      //       if (row !== '0') {
+      //         const { response: treatment } = await genotypeTreatmentController.getAll({
+      //           gli: spreadSheet[row][4],
+      //           treatments_number: spreadSheet[row][6],
+      //           name_genotipo: spreadSheet[row][8],
+      //           nca: spreadSheet[row][9],
+      //         });
+      //         const { response: genotipo } = await genotipoController.getAll({
+      //           name_genotipo: spreadSheet[row][10],
+      //         });
+      //         const { response: lote } = await loteController.getAll({
+      //           ncc: spreadSheet[row][12],
+      //         });
+      //         await genotypeTreatmentController.update(
+      //           {
+      //             id: treatment[0]?.id,
+      //             id_genotipo: genotipo[0]?.id,
+      //             id_lote: lote[0]?.id,
+      //             status: spreadSheet[row][11],
+      //           },
+      //         );
+      //         await historyGenotypeTreatmentController.create({
+      //           gli: spreadSheet[row][4],
+      //           safra: spreadSheet[row][0],
+      //           foco: spreadSheet[row][1],
+      //           ensaio: spreadSheet[row][2],
+      //           tecnologia: spreadSheet[row][3],
+      //           bgm: Number(spreadSheet[row][5]),
+      //           nt: Number(spreadSheet[row][6]),
+      //           status: spreadSheet[row][7],
+      //           genotipo: spreadSheet[row][8],
+      //           nca: Number(spreadSheet[row][9]),
+      //           created_by: createdBy,
+      //         });
+      //       }
+      //     }
           await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
           return { status: 200, message: 'Tratamento de genótipo importado com sucesso' };
         } catch (error: any) {

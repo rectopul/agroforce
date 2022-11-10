@@ -1,6 +1,7 @@
 import { prisma } from '../pages/api/db/db';
+import {BaseRepository} from './base-repository';
 
-export class TecnologiaRepository {
+export class TecnologiaRepository extends BaseRepository {
   async findOne(id: number) {
     const result = await prisma.tecnologia.findUnique({
       where: {
@@ -24,17 +25,17 @@ export class TecnologiaRepository {
   }
 
   async create(data: object | any) {
-    const result = await prisma.tecnologia.create({ data });
-    return result;
+    const result = await this.getPrisma().tecnologia.create({ data });
+    return true;
   }
 
   async update(id: number, data: Object) {
-    const result = await prisma.tecnologia.update({
+    const result = await this.getPrisma().tecnologia.update({
       where: {
         id,
       },
       data,
     });
-    return result;
+    return true;
   }
 }
