@@ -98,7 +98,7 @@ export default function Listagem({
   );
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -330,6 +330,8 @@ export default function Listagem({
     });
   }
 
+  console.log({ orderList, orderBy, typeOrder });
+
   // Call that function when change type order value.
   useEffect(() => {
     callingApi(filter);
@@ -377,10 +379,14 @@ export default function Listagem({
     //   setOrder(orderList + 1);
     // }
 
+    console.log({ column, order, orderList });
+
     // Gobal manage orders
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+
+    console.log({ typeOrderG, columnG, orderByG, arrowOrder });
 
     setFieldOrder(name);
     setTypeOrder(typeOrderG);

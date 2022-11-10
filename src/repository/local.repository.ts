@@ -1,6 +1,7 @@
 import { prisma } from '../pages/api/db/db';
+import {BaseRepository} from '../repository/base-repository'
 
-export class LocalRepository {
+export class LocalRepository extends BaseRepository {
   async findOne(id: number) {
     const result = await prisma.local.findUnique({
       where: {
@@ -24,12 +25,12 @@ export class LocalRepository {
   }
 
   async create(data: object | any) {
-    const result = await prisma.local.create({ data });
+    const result = await this.getPrisma().local.create({ data });
     return result;
   }
 
   async update(id: number, data: Object) {
-    const result = await prisma.local.update({
+    const result = await this.getPrisma().local.update({
       where: { id },
       data,
     });

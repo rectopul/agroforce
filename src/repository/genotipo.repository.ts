@@ -1,5 +1,9 @@
 import { prisma } from '../pages/api/db/db';
+<<<<<<< HEAD
 import {BaseRepository} from './base-repository';
+=======
+import { BaseRepository } from './base-repository';
+>>>>>>> 5ea1339586d9634901095e4354f116b7f53a3460
 
 export class GenotipoRepository extends BaseRepository {
   async create(data: any) {

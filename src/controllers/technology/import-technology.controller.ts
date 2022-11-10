@@ -214,42 +214,7 @@ export class ImportTechnologyController {
               }
             }
           });
-          // spreadSheet.forEach(async (item: any, row: number) => {
-          //   if (row !== 0) {
-          //     const {
-          //       response: responseCulture,
-          //     }: IReturnObject = await culturaController.getOneCulture(idCulture);
-          //     const { status, response }: IReturnObject = await tecnologiaController.getAll(
-          //       { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
-          //     );
-          //     console.log('spreadSheet[row][0]');
-          //     console.log(spreadSheet[row][0]);
-
-          //     console.log('response');
-          //     console.log(response);
-
-          //     if (status === 200) {
-          //       await tecnologiaController.update({
-          //         id: response[0]?.id,
-          //         id_culture: responseCulture?.id,
-          //         cod_tec: String(spreadSheet[row][0]),
-          //         name: spreadSheet[row][1],
-          //         desc: spreadSheet[row][2],
-          //         created_by: createdBy,
-          //         dt_export: new Date(spreadSheet[row][4]),
-          //       });
-          //     } else {
-          //       await tecnologiaController.create({
-          //         id_culture: responseCulture?.id,
-          //         cod_tec: String(spreadSheet[row][0]),
-          //         name: spreadSheet[row][1],
-          //         desc: spreadSheet[row][2],
-          //         created_by: createdBy,
-          //         dt_export: new Date(spreadSheet[row][4]),
-          //       });
-          //     }
-          //   }
-          // });
+                    
           await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
           return { status: 200, message: 'Tecnologia importado com sucesso' };
         } catch (error: any) {

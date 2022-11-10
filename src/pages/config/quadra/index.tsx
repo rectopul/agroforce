@@ -45,7 +45,7 @@ import { UserPreferenceController } from "../../../controllers/user-preference.c
 import ITabs from "../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../helpers";
 import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
-import ComponentLoading from '../../../components/Loading';
+import ComponentLoading from "../../../components/Loading";
 
 interface IFilter {
   filterStatus: object | any;
@@ -130,7 +130,7 @@ export default function Listagem({
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
@@ -385,8 +385,8 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: "Status",
-      field: "status",
+      title: "Ação",
+      field: "action",
       sorting: false,
       searchable: false,
       filterPlaceholder: "Filtrar por status",
@@ -815,7 +815,7 @@ export default function Listagem({
 
   return (
     <>
-       {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de quadras</title>
       </Head>

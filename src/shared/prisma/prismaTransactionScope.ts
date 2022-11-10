@@ -16,16 +16,16 @@ export class PrismaTransactionScope implements TransactionScope {
     this.transactionContext = transactionContext;
   }
 
-  async run(fn: () => Promise<void>): Promise<void> {
+  async run(fn: () => Promise<any>): Promise<any> {
     // attempt to get the Transaction Client
     const prisma = this.transactionContext.get(
       PRISMA_CLIENT_KEY
     ) as Prisma.TransactionClient;
 
     // if the Transaction Client
-    if (prisma) {
+    if (prisma) {     
       // exists, there is no need to create a transaction and you just execute the callback
-      await fn();
+      return await fn();
     } else {
       // does not exist, create a Prisma transaction 
       await this.prisma.$transaction(async (prisma) => {
@@ -35,7 +35,7 @@ export class PrismaTransactionScope implements TransactionScope {
 
           try {
             // execute the transaction callback
-            await fn();
+            return await fn();
           } catch (err) {
             // unset the transaction client when something goes wrong
             this.transactionContext.set(PRISMA_CLIENT_KEY, null);

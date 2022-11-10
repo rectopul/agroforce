@@ -40,7 +40,7 @@ import {
 import * as ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
-import ComponentLoading from '../../../../components/Loading';
+import ComponentLoading from "../../../../components/Loading";
 
 interface ITecnologiaProps {
   id: number | any;
@@ -113,7 +113,7 @@ export default function Listagem({
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit)
   );
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
@@ -538,7 +538,7 @@ export default function Listagem({
 
   return (
     <>
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de Tecnologias</title>
       </Head>

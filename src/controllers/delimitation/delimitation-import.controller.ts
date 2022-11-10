@@ -18,12 +18,14 @@ import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import { delineamentoRepository } from 'src/repository/delineamento.repository;
 import { CulturaController } from '../cultura.controller';
 import { validateHeaders } from '../../shared/utils/validateHeaders';
+import { delimitationQueue } from './delimitation-queue';
 
 export class ImportDelimitationController {
   static async validate(
     idLog: number,
+    queueProcessing: boolean,
     {
-      spreadSheet, idCulture, created_by: createdBy,
+      spreadSheet, idSafra, idCulture, created_by: createdBy,
     }: ImportValidate,
   ): Promise<IReturnObject> {
     const importController = new ImportController();
@@ -53,6 +55,19 @@ export class ImportDelimitationController {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
         return { status: 400, message: validate };
+      }
+      if ((spreadSheet.length > Number(process.env.MAX_DIRECT_UPLOAD_ALLOWED))
+      && !queueProcessing) {
+        delimitationQueue.add({
+          instance: {
+            spreadSheet, idSafra, idCulture, created_by: createdBy,
+          },
+          logId: idLog,
+        });
+        return {
+          status: 400,
+          message: 'Os dados são validados e carregados em background',
+        };
       }
       const configModule: object | any = await importController.getAll(7);
       for (const row in spreadSheet) {
@@ -270,13 +285,81 @@ export class ImportDelimitationController {
           return { status: 500, message: 'Erro ao salvar planilha de Delineamento' };
         }
       }
-      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
+      await logImportController.update({
+        id: idLog,
+        status: 1,
+        state: 'INVALIDA',
+        invalid_data: responseStringError,
+      });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
       await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       handleError('Delineamento controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Delineamento' };
+    }
+  }
+
+  static async storeRecords(idLog: number, {
+    spreadSheet, idSafra, idCulture, created_by: createdBy,
+  }: ImportValidate) {
+    const delineamentoController = new DelineamentoController();
+    const sequenciaDelineamentoController = new SequenciaDelineamentoController();
+    const logImportController = new LogImportController();
+
+    try {
+      for (const row in spreadSheet) {
+        if (row !== '0') {
+          const {
+            status,
+            response: delineamento,
+          }: IReturnObject = await delineamentoController.getAll({
+            name: spreadSheet[row][1],
+            id_culture: idCulture,
+            status: 1,
+          });
+          if (status === 200) {
+            await delineamentoController.update({
+              id: delineamento[0]?.id,
+              name: spreadSheet[row][1],
+              id_culture: idCulture,
+              repeticao: 1,
+              trat_repeticao: 1,
+              created_by: createdBy,
+            });
+            await sequenciaDelineamentoController.create({
+              id_delineamento: delineamento[0]?.id,
+              repeticao: spreadSheet[row][2],
+              sorteio: spreadSheet[row][3],
+              nt: spreadSheet[row][4],
+              bloco: spreadSheet[row][5],
+              created_by: createdBy,
+            });
+          } else {
+            const { response }: IReturnObject = await delineamentoController.create({
+              name: spreadSheet[row][1],
+              id_culture: idCulture,
+              repeticao: 1,
+              trat_repeticao: 1,
+              created_by: createdBy,
+            });
+            await sequenciaDelineamentoController.create({
+              id_delineamento: response?.id,
+              repeticao: spreadSheet[row][2],
+              sorteio: spreadSheet[row][3],
+              nt: spreadSheet[row][4],
+              bloco: spreadSheet[row][5],
+              created_by: createdBy,
+            });
+          }
+        }
+      }
+      await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
+      return { status: 200, message: 'Delineamento importado com sucesso' };
+    } catch (error: any) {
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+      handleError('Delineamento controller', 'Save Import', error.message);
+      return { status: 500, message: 'Erro ao salvar planilha de Delineamento' };
     }
   }
 }
