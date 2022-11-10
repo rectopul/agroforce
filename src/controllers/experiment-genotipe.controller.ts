@@ -108,16 +108,28 @@ export class ExperimentGenotipeController {
       }
 
       if (options.filterGenotypeName) {
-        parameters.name_genotipo = JSON.parse(
-          `{ "contains": "${options.filterGenotypeName}" }`,
+        parameters.genotipo = JSON.parse(
+          `{ "name_genotipo": { "contains": "${options.filterGenotypeName}" } }`,
         );
       }
 
-      if (options.filterNca) {
-        if (options.filterNca === 'vazio') {
+      if (options.filterNcaFrom || options.filterNcaTo) {
+        if (options.filterNcaFrom === 'vazio' || options.filterNcaTo === 'vazio') {
           parameters.nca = null;
-        } else {
-          parameters.nca = JSON.parse(`{ "contains": "${options.filterNca}" }`);
+        } else if (options.filterNcaFrom && options.filterNcaTo) {
+          parameters.nca = JSON.parse(
+            `{"gte": ${Number(options.filterNcaFrom)}, "lte": ${Number(
+              options.filterNcaTo,
+            )} }`,
+          );
+        } else if (options.filterNcaFrom) {
+          parameters.nca = JSON.parse(
+            `{"gte": ${Number(options.filterNcaFrom)} }`,
+          );
+        } else if (options.filterNcaTo) {
+          parameters.nca = JSON.parse(
+            `{"lte": ${Number(options.filterNcaTo)} }`,
+          );
         }
       }
 

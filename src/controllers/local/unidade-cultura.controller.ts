@@ -15,8 +15,6 @@ export class UnidadeCulturaController {
     const parameters: object | any = {};
     let orderBy: object | any;
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterNameUnityCulture) {
         parameters.name_unity_culture = JSON.parse(`{ "contains": "${options.filterNameUnityCulture}" }`);
       }

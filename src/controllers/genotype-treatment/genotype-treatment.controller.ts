@@ -12,8 +12,6 @@ export class GenotypeTreatmentController {
     parameters.AND = [];
     parameters.OR = [];
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterStatus) {
         const statusParams = options.filterStatus?.split(',');
         parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[0]}" } } }`));
@@ -61,11 +59,30 @@ export class GenotypeTreatmentController {
       if (options.filterStatusT) {
         parameters.status = JSON.parse(`{ "contains":"${options.filterStatusT}" }`);
       }
-      if (options.filterNca) {
-        if (options.filterNca === 'vazio') {
-          parameters.AND.push(JSON.parse(`{"id_lote": ${null} }`));
-        } else {
-          parameters.AND.push(JSON.parse(`{ "lote": {"ncc": "${options.filterNca}" } } `));
+      // if (options.filterNca) {
+      //   if (options.filterNca === 'vazio') {
+      //     parameters.AND.push(JSON.parse(`{"id_lote": ${null} }`));
+      //   } else {
+      //     parameters.AND.push(JSON.parse(`{ "lote": {"ncc": "${options.filterNca}" } } `));
+      //   }
+      // }
+      if (options.filterNcaFrom || options.filterNcaTo) {
+        if (options.filterNcaFrom.toUpperCase() === 'VAZIO' || options.filterNcaTo.toUpperCase() === 'VAZIO') {
+          parameters.id_lote = null;
+        } else if (options.filterNcaFrom && options.filterNcaTo) {
+          parameters.AND.push(JSON.parse(
+            `{"gte": ${Number(options.filterNcaFrom)}, "lte": ${Number(
+              options.filterNcaTo,
+            )} }`,
+          ));
+        } else if (options.filterNcaFrom) {
+          parameters.AND.push(JSON.parse(
+            `{"gte": ${Number(options.filterNcaFrom)} }`,
+          ));
+        } else if (options.filterNcaTo) {
+          parameters.AND.push(JSON.parse(
+            `{"lte": ${Number(options.filterNcaTo)} }`,
+          ));
         }
       }
       if (options.filterTreatmentsNumber) {
@@ -105,7 +122,7 @@ export class GenotypeTreatmentController {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
       }
       if (options.status_experiment) {
-        parameters.status_experiment = JSON.parse(`{"contains": "${options.status_experiment}" }`);
+        parameters.AND.push(JSON.parse(`{"assay_list": { "status": {"contains": "${options.status_experiment}" } } }`));
       }
       const select = {
         id: true,
@@ -189,7 +206,7 @@ export class GenotypeTreatmentController {
 
       if (options.orderBy) {
         if (!options.excel) {
-          if (options.orderBy[2] == '') {
+          if (options.orderBy[2] == '' || !options.orderBy[2]) {
             orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `{"${options.orderBy[1]}":"${options.typeOrder[1]}"}`];
           } else {
             orderBy = handleOrderForeign(options.orderBy[2], options.typeOrder[2]);

@@ -60,6 +60,7 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+import ComponentLoading from '../../../../components/Loading';
 
 export default function Listagem({
   allTreatments,
@@ -73,6 +74,7 @@ export default function Listagem({
   orderByserver,
 }: ITreatmentGrid) {
   const { TabsDropDowns } = ITabs.default;
+  const [loading, setLoading] = useState<boolean>(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
 
   const tableRef = useRef<any>(null);
@@ -185,15 +187,15 @@ export default function Listagem({
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
     {
       name: 'StatusCheckbox',
-      title: 'IMPORTADO ',
+      title: 'IMPORTADO',
       value: 'importado',
       defaultChecked: () => camposGerenciados.includes('importado'),
     },
     {
       name: 'StatusCheckbox',
-      title: 'SORTEADO',
-      value: 'sorteado',
-      defaultChecked: () => camposGerenciados.includes('sorteado'),
+      title: 'EXP IMP.',
+      value: 'EXP IMP.',
+      defaultChecked: () => camposGerenciados.includes('EXP IMP.'),
     },
   ]);
   const [statusFilterSelected, setStatusFilterSelected] = useState<any>([]);
@@ -302,6 +304,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -941,11 +944,21 @@ export default function Listagem({
     return sortList;
   }
 
+  function selectableFilter(rowData: any) {
+    if (isOpenModal || rowData?.status_experiment == 'SORTEADO') {
+      return false;
+    }
+
+    return true;
+  }
+
   return (
     <>
       <Head>
         <title>Listagem de genótipos do ensaio</title>
       </Head>
+
+      {loading && <ComponentLoading text="" />}
 
       <Modal
         isOpen={isOpenModal}
@@ -1379,7 +1392,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      NCA.
+                      NCA
                     </label>
                     <div className="flex">
                       <Input
@@ -1403,7 +1416,9 @@ export default function Listagem({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       type="submit"
                       bgColor="bg-blue-600"
@@ -1426,9 +1441,17 @@ export default function Listagem({
               data={treatments}
               options={{
                 selection: true,
-                selectionProps: (rowData: any) => (isOpenModal
-                  ? { disabled: rowData }
-                  : { disabled: rowData?.status_experiment == 'SORTEADO' }),
+                selectionProps: (rowData: any) => {
+                  const selectable = selectableFilter(rowData);
+                  rowData.tableData.disabled = !selectable;
+                  return {
+                    disabled: !selectable,
+                  };
+                },
+                // selectionProps: (rowData: any) =>
+                //   isOpenModal
+                //     ? { disabled: rowData }
+                //     : { disabled: rowData?.status_experiment == "SORTEADO" },
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,

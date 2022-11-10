@@ -22,7 +22,6 @@ export class LogImportController {
   }
 
   async create(data: any) {
-
     try {
       const LogsAlreadyExists = await this.logImportRepository.validateImportInExecuting();
 

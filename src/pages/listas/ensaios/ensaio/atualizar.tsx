@@ -64,7 +64,8 @@ export default function AtualizarTipoEnsaio({
   allGenotypeTreatment,
   totalItens,
   itensPerPage,
-  filterApplication,
+  treatmentsFilterApplication,
+  experimentFilterApplication,
   idAssayList,
   idSafra,
   assayList,
@@ -79,13 +80,16 @@ export default function AtualizarTipoEnsaio({
 
   const tabsDropDowns = TabsDropDowns('listas');
 
+  console.log({ allGenotypeTreatment });
+  console.log({ allExperiments });
+
   tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.genotypeTreatment || {
     id: 0,
     table_preferences:
-      'safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments',
+      'safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -102,7 +106,12 @@ export default function AtualizarTipoEnsaio({
 
   const [itemsTotal, setItemsTotal] = useState<any>(totalItens);
   const [experimentsTotal, setExperimentsTotal] = useState<any>(totalExperiments);
-  const [filter, setFilter] = useState<any>(filterApplication);
+  const [experimentFilter, setExperimentFilter] = useState<any>(
+    experimentFilterApplication,
+  );
+  const [treatmentsFilter, setTreatmentsFilter] = useState<any>(
+    treatmentsFilterApplication,
+  );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
 
   const [table, setTable] = useState<string>('genotipo');
@@ -354,16 +363,16 @@ export default function AtualizarTipoEnsaio({
       typeOrder = '';
     }
 
-    if (filter && typeof filter !== 'undefined') {
+    if (experimentFilter && typeof experimentFilter !== 'undefined') {
       if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+        parametersFilter = `${experimentFilter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
-        parametersFilter = filter;
+        parametersFilter = experimentFilter;
       }
     } else if (typeOrder !== '') {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_safra=${idSafra}`;
     } else {
-      parametersFilter = filter;
+      parametersFilter = experimentFilter;
     }
 
     await experimentService
@@ -764,7 +773,7 @@ export default function AtualizarTipoEnsaio({
 
   const downloadExcel = async (): Promise<void> => {
     await genotypeTreatmentService
-      .getAll(filterApplication)
+      .getAll(treatmentsFilterApplication)
       .then(({ status, response }) => {
         if (status === 200) {
           const newData = response.map((row: any) => {
@@ -822,7 +831,7 @@ export default function AtualizarTipoEnsaio({
 
   const downloadExcelExperiments = async (): Promise<void> => {
     await experimentService
-      .getAll(filterApplication)
+      .getAll(experimentFilterApplication)
       .then(({ status, response }) => {
         if (status === 200) {
           const newData = response.map((row: any) => {
@@ -878,15 +887,14 @@ export default function AtualizarTipoEnsaio({
       parametersFilter = `skip=${skip}&take=${take}`;
     }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
+    if (treatmentsFilter) {
+      parametersFilter = `${parametersFilter}&${treatmentsFilter}`;
     }
     await genotypeTreatmentService
       .getAll(parametersFilter)
       .then(({ status, response }) => {
         if (status === 200) {
           setGenotypeTreatments(response);
-          console.log({ response });
           tableRef?.current?.dataManager?.changePageSize(
             response?.length >= take ? take : response?.length,
           );
@@ -903,14 +911,18 @@ export default function AtualizarTipoEnsaio({
       parametersFilter = `skip=${skip}&take=${take}`;
     }
 
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
+    if (experimentFilter) {
+      parametersFilter = `${parametersFilter}&${experimentFilter}`;
     }
     await experimentService
       .getAll(parametersFilter)
       .then(({ status, response }) => {
         if (status === 200) {
+          console.log({ response });
           setExperiments(response);
+          tableRef?.current?.dataManager?.changePageSize(
+            response?.length >= take ? take : response?.length,
+          );
         }
       });
   }
@@ -1351,6 +1363,8 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? req.cookies.filterBeforeEdit
     : '';
 
+  const idAssay = query.id;
+
   const { publicRuntimeConfig } = getConfig();
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
@@ -1379,7 +1393,8 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? req.cookies.filterBeforeEditOrderBy
     : '';
 
-  const filterApplication = `&id_safra=${idSafra}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
+  const treatmentsFilterApplication = `&id_safra=${idSafra}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
+  const experimentFilterApplication = `&id_safra=${idSafra}&id_assay_list=${idAssay}`;
 
   // RR
   removeCookies('filterBeforeEditTypeOrder', { req, res });
@@ -1389,13 +1404,13 @@ export const getServerSideProps: GetServerSideProps = async ({
   const idAssayList = Number(query.id);
   const baseUrlExperiment = `${publicRuntimeConfig.apiUrl}/experiment`;
   const { response: allExperiments = [], total: totalExperiments = 0 } = await fetch(
-    `${baseUrlExperiment}?${filterApplication}`,
+    `${baseUrlExperiment}?${experimentFilterApplication}`,
     requestOptions,
   ).then((response) => response.json());
 
   const baseUrlGenotypeTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
   const { response: allGenotypeTreatment = [], total: totalItens = 0 } = await fetch(
-    `${baseUrlGenotypeTreatment}?${filterApplication}`,
+    `${baseUrlGenotypeTreatment}?${treatmentsFilterApplication}`,
     requestOptions,
   ).then((response) => response.json());
 
@@ -1405,15 +1420,13 @@ export const getServerSideProps: GetServerSideProps = async ({
     requestOptions,
   ).then((response) => response.json());
 
-  console.log('filterApplication');
-  console.log(filterApplication);
-
   return {
     props: {
       allGenotypeTreatment,
       totalItens,
       itensPerPage,
-      filterApplication,
+      treatmentsFilterApplication,
+      experimentFilterApplication,
       idAssayList,
       idSafra,
       assayList,

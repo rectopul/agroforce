@@ -490,7 +490,7 @@ model log_import {
   created_at   DateTime? @default(now())
   updated_at   DateTime? @default(now())
   state        String?
-  invalid_data String?   @default("")
+  invalid_data String?   @db.LongText
   executeTime  String?
   totalRecords Int?
   user         user      @relation(fields: [user_id], references: [id])

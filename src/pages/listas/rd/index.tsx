@@ -10,6 +10,13 @@ import React, {
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { IoIosCloudUpload } from 'react-icons/io';
+
+import {
+  AiFillInfoCircle,
+  AiOutlineArrowDown,
+  AiOutlineArrowUp,
+  AiTwotoneStar,
+} from 'react-icons/ai';
 import MaterialTable from 'material-table';
 import {
   DragDropContext,
@@ -18,13 +25,9 @@ import {
   DropResult,
 } from 'react-beautiful-dnd';
 import Spinner from 'react-bootstrap/Spinner';
-import {
-  AiOutlineArrowDown,
-  AiOutlineArrowUp,
-  AiTwotoneStar,
-} from 'react-icons/ai';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
+
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
@@ -332,10 +335,9 @@ export default function Import({
             {rowData.state}
           </div>
           <div style={{ width: 5 }} />
-          {rowData.invalid_data != '' ? (
+          {rowData.invalid_data ? (
             <div className="h-7">
               <Button
-                value="Details"
                 title={rowData.state}
                 onClick={() => {
                   Swal.fire({
@@ -343,6 +345,7 @@ export default function Import({
                     width: '800',
                   });
                 }}
+                icon={<AiFillInfoCircle size={20} />}
                 bgColor="bg-blue-600"
                 textColor="white"
               />
@@ -351,40 +354,6 @@ export default function Import({
 
         </div>
       ),
-    };
-  }
-
-  function idHeaderFactory() {
-    return {
-      title: <div className="flex items-center">{arrowOrder}</div>,
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-7 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="h-7 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
-          </div>
-        </div>
-      )),
     };
   }
 
@@ -1044,7 +1013,9 @@ export default function Import({
                     <div style={{ width: 40 }} />
                     <div className="h-7 w-32 mt-6">
                       <Button
-                        onClick={() => { }}
+                        onClick={() => {
+                          setLoading(true);
+                        }}
                         value="Filtrar"
                         bgColor="bg-blue-600"
                         textColor="white"
@@ -1203,7 +1174,7 @@ export default function Import({
                         disabled={currentPage + 1 >= pages}
                       />
                     </div>
-                    ) as any,
+                  ) as any,
                 }}
               />
             </div>
