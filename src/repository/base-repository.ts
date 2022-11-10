@@ -26,8 +26,6 @@ export class BaseRepository {
   }
 
   async createTransaction(data: object | any) {
-    console.log('create');
-    console.log(data);
     if (this.clientManager && this.transactionScope) {
       return await this.transactionScope.run(
         async () => await this.create(data),
@@ -37,8 +35,6 @@ export class BaseRepository {
   }
 
   async updateTransaction(id: number, data: object | any) {
-    console.log('update');
-    console.log(data);
     if (this.clientManager && this.transactionScope) {
       return await this.transactionScope.run(
         async () => await this.update(id, data),
