@@ -393,6 +393,10 @@ export default function Listagem({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   // function headerTableFactory(
@@ -1391,7 +1395,7 @@ export default function Listagem({
                         placeholder="Nome do genótipo"
                         id="filterGenotypeName"
                         name="filterGenotypeName"
-                        onChange={formik.handleChange}
+                        onChange={formik.handleChange.trim()}
                       />
                     </div>
                   </div>

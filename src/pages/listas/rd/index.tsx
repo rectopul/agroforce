@@ -237,6 +237,7 @@ export default function Import({
       const parametersFilter = `filterUser=${filterUser}&filterTable=${filterTable}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&filterState=${filterState}`;
       setFilter(parametersFilter);
       await getAllLogs(`${parametersFilter}`);
+      setLoading(false);
     },
   });
 
@@ -466,6 +467,10 @@ export default function Import({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   async function getValuesColumns(): Promise<void> {

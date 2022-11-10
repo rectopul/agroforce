@@ -416,7 +416,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 3000);
   }
 
   // function headerTableFactory(
@@ -667,7 +667,7 @@ export default function Listagem({
       localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
-    setStatusAccordion(false);
+    setStatusAccordion(false);status
     setCamposGerenciados(campos);
   }
 

@@ -2,7 +2,7 @@
 /* eslint-disable no-loop-func */
 /* eslint-disable import/no-cycle */
 /* eslint-disable no-await-in-loop */
-
+import { genotipoRepository } from 'src/repository/genotipo.repository';
 import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import {
   ImportValidate,
@@ -59,6 +59,12 @@ export class ImportGenotypeController {
     const genotipoController = new GenotipoController();
     const logImportController = new LogImportController();
     const tecnologiaController = new TecnologiaController();
+
+      /* --------- Transcation Context --------- */
+      const transactionConfig = new TransactionConfig();
+      const genotipoRepository = new genotipoRepository();
+      genotipoRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+      /* --------------------------------------- */
 
     const responseIfError: any = [];
     const headers = [
@@ -730,11 +736,152 @@ export class ImportGenotypeController {
                 }
               }
 
-              if (configModule.response[0]?.fields[column] === 'DT_EXPORT') {
-                if (spreadSheet[row][column] !== null) {
-                  this.aux.dt_export = spreadSheet[row][column];
+            ) {
+              await transactionConfig.transactionScope.run(async () => {
+                for (let row in spreadSheet) {
+                  if (row !== '0') {
+                    const { status, response }: IReturnObject = await genotipoController.getAll(
+                      { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
+                    );
+                    if (status === 200 && response[0]?.id) {
+                      await genotipoRepository.updateTransaction(response[0]?.id, {
+                        id: response[0]?.id,
+                        id_culture: responseCulture?.id,
+                        cod_tec: String(spreadSheet[row][0]),
+                        name: spreadSheet[row][1],
+                        desc: spreadSheet[row][2],
+                        created_by: createdBy,
+                        dt_export: new Date(spreadSheet[row][4]),
+                      });
+                    } else {
+                      await genotipoRepository.createTransaction({
+                        id_culture: responseCulture?.id,
+                        cod_tec: String(spreadSheet[row][0]),
+                        name: spreadSheet[row][1],
+                        desc: spreadSheet[row][2],
+                        created_by: createdBy,
+                        dt_export: new Date(spreadSheet[row][4]),
+                      });
+                    } 
+                  }
                 }
-              }
+              });
+              // // this.aux.id_safra = idSafra;
+              // if (this.aux.id_genotipo) {
+              //   // const genotipo_obj = {
+              //   //   id: this.aux.id_genotipo,
+              //   //   id_tecnologia: Number(this.aux.id_tecnologia),
+              //   //   id_culture: idCulture,
+              //   //   id_s1: this.aux.id_s1,
+              //   //   id_dados: String(this.aux.id_dados_geno),
+              //   //   name_genotipo: this.aux.name_genotipo,
+              //   //   name_main: this.aux.name_main,
+              //   //   name_public: this.aux.name_public,
+              //   //   name_experiment: this.aux.name_experiment,
+              //   //   name_alter: this.aux.name_alter,
+              //   //   elit_name: this.aux.elit_name,
+              //   //   type: this.aux.type,
+              //   //   gmr: this.aux.gmr,
+              //   //   bgm: this.aux.bgm,
+              //   //   cruza: this.aux.cruza,
+              //   //   progenitor_f_direto: this.aux.progenitor_f_direto,
+              //   //   progenitor_m_direto: this.aux.progenitor_m_direto,
+              //   //   progenitor_f_origem: this.aux.progenitor_f_origem,
+              //   //   progenitor_m_origem: this.aux.progenitor_m_origem,
+              //   //   progenitores_origem: this.aux.progenitores_origem,
+              //   //   parentesco_completo: this.aux.parentesco_completo,
+              //   //   dt_export: this.aux.dt_export,
+              //   //   created_by: createdBy,
+              //   // };
+              //   // console.log(genotipo_obj);
+              //   // genotipeQueue.add({
+              //   //   instance: genotipo_obj,
+              //   //   request_type: 'update',
+              //   //   aux: this.aux,
+              //   // });
+              //   await genotipoController.update({
+              //     id: this.aux.id_genotipo,
+              //     id_tecnologia: Number(this.aux.id_tecnologia),
+              //     id_s1: this.aux.id_s1,
+              //     id_dados: String(this.aux.id_dados_geno),
+              //     name_genotipo: this.aux.name_genotipo,
+              //     name_main: this.aux.name_main,
+              //     name_public: this.aux.name_public,
+              //     name_experiment: this.aux.name_experiment,
+              //     name_alter: this.aux.name_alter,
+              //     elit_name: this.aux.elit_name,
+              //     type: this.aux.type,
+              //     gmr: this.aux.gmr,
+              //     bgm: this.aux.bgm,
+              //     cruza: this.aux.cruza,
+              //     progenitor_f_direto: this.aux.progenitor_f_direto,
+              //     progenitor_m_direto: this.aux.progenitor_m_direto,
+              //     progenitor_f_origem: this.aux.progenitor_f_origem,
+              //     progenitor_m_origem: this.aux.progenitor_m_origem,
+              //     progenitores_origem: this.aux.progenitores_origem,
+              //     parentesco_completo: this.aux.parentesco_completo,
+              //     dt_export: this.aux.dt_export,
+              //     created_by: createdBy,
+              //   });
+              // } else {
+              //   delete this.aux.id_genotipo;
+              //   // const genotipo_obj = {
+              //   //   // id_culture: this.aux.id_culture,
+              //   //   id_tecnologia: this.aux.id_tecnologia,
+              //   //   id_culture: idCulture,
+              //   //   id_s1: this.aux.id_s1,
+              //   //   id_dados: String(this.aux.id_dados_geno),
+              //   //   name_genotipo: this.aux.name_genotipo,
+              //   //   name_main: this.aux.name_main,
+              //   //   name_public: this.aux.name_public,
+              //   //   name_experiment: this.aux.name_experiment,
+              //   //   name_alter: this.aux.name_alter,
+              //   //   elit_name: this.aux.elit_name,
+              //   //   type: this.aux.type,
+              //   //   gmr: this.aux.gmr,
+              //   //   bgm: this.aux.bgm,
+              //   //   cruza: this.aux.cruza,
+              //   //   progenitor_f_direto: this.aux.progenitor_f_direto,
+              //   //   progenitor_m_direto: this.aux.progenitor_m_direto,
+              //   //   progenitor_f_origem: this.aux.progenitor_f_origem,
+              //   //   progenitor_m_origem: this.aux.progenitor_m_origem,
+              //   //   progenitores_origem: this.aux.progenitores_origem,
+              //   //   parentesco_completo: this.aux.parentesco_completo,
+              //   //   dt_export: this.aux.dt_export,
+              //   //   created_by: createdBy,
+              //   // };
+              //   // console.log(genotipo_obj);
+              //   // genotipeQueue.add({
+              //   //   instance: genotipo_obj,
+              //   //   request_type: 'create',
+              //   //   aux: this.aux,
+              //   // });
+              //   const genotipo: any = await genotipoController.create({
+              //     id_culture: idCulture,
+              //     id_tecnologia: this.aux.id_tecnologia,
+              //     id_s1: this.aux.id_s1,
+              //     id_dados: String(this.aux.id_dados_geno),
+              //     name_genotipo: this.aux.name_genotipo,
+              //     name_main: this.aux.name_main,
+              //     name_public: this.aux.name_public,
+              //     name_experiment: this.aux.name_experiment,
+              //     name_alter: this.aux.name_alter,
+              //     elit_name: this.aux.elit_name,
+              //     type: this.aux.type,
+              //     gmr: this.aux.gmr,
+              //     bgm: this.aux.bgm,
+              //     cruza: this.aux.cruza,
+              //     progenitor_f_direto: this.aux.progenitor_f_direto,
+              //     progenitor_m_direto: this.aux.progenitor_m_direto,
+              //     progenitor_f_origem: this.aux.progenitor_f_origem,
+              //     progenitor_m_origem: this.aux.progenitor_m_origem,
+              //     progenitores_origem: this.aux.progenitores_origem,
+              //     parentesco_completo: this.aux.parentesco_completo,
+              //     dt_export: this.aux.dt_export,
+              //     created_by: createdBy,
+              //   });
+              //   this.aux.id_genotipo = genotipo.response.id;
+              // }
 
               if (
                 spreadSheet[row].length === Number(column) + 1

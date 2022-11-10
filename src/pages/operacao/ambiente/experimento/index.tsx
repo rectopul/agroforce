@@ -281,7 +281,10 @@ export default function Listagem({
         setArrowOrder("");
       }
     }
-
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
     setFieldOrder(name);
   }
 

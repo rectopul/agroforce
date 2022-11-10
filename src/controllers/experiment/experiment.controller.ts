@@ -53,6 +53,9 @@ export class ExperimentController {
       if (options.filterFoco) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"foco": {"name": {"contains": "${options.filterFoco}" } } } }`));
       }
+      if (options.name_genotipo) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"name_genotipo": {"name": {"contains": "${options.filterFoco}" } } } }`));
+      }
       if (options.filterTypeAssay) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"type_assay": {"name": {"contains": "${options.filterTypeAssay}" } } } }`));
       }

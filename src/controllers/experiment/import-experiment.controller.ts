@@ -2,6 +2,8 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
+import { experimentRepository } from 'src/repository/experiment.repository';
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import handleError from '../../shared/utils/handleError';
 import {
   responseDiffFactory,
@@ -35,6 +37,12 @@ export class ImportExperimentController {
     const assayListController = new AssayListController();
     const experimentController = new ExperimentController();
     const delineamentoController = new DelineamentoController();
+
+    /* --------- Transcation Context --------- */
+    const transactionConfig = new TransactionConfig();
+    const genotipoRepository = new genotipoRepository();
+    genotipoRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+    /* --------------------------------------- */
 
     const experimentNameTemp: Array<string> = [];
     const responseIfError: Array<string> = [];
@@ -361,43 +369,74 @@ export class ImportExperimentController {
                 filterExperimentName: experimentName,
                 idSafra,
               });
-              if (experiment.total > 0) {
-                await experimentController.update(
-                  {
-                    id: experiment[0]?.id,
-                    idAssayList: assayList[0]?.id,
-                    idLocal: local[0]?.id,
-                    idDelineamento: delineamento[0]?.id,
-                    idSafra,
-                    experimentName,
-                    density: spreadSheet[row][8],
-                    period: spreadSheet[row][9],
-                    repetitionsNumber: spreadSheet[row][11],
-                    nlp: spreadSheet[row][12],
-                    clp: spreadSheet[row][13],
-                    comments,
-                    orderDraw: spreadSheet[row][15],
-                    created_by: createdBy,
-                  },
-                );
-              } else {
-                const { status }: IReturnObject = await experimentController.create(
-                  {
-                    idAssayList: assayList[0]?.id,
-                    idLocal: local[0]?.id,
-                    idDelineamento: delineamento[0]?.id,
-                    idSafra,
-                    experimentName,
-                    density: spreadSheet[row][8],
-                    period: spreadSheet[row][9],
-                    repetitionsNumber: spreadSheet[row][11],
-                    nlp: spreadSheet[row][12],
-                    clp: spreadSheet[row][13],
-                    comments,
-                    orderDraw: spreadSheet[row][15],
-                    created_by: createdBy,
-                  },
-                );
+
+              await transactionConfig.transactionScope.run(async () => {
+                for (let row in spreadSheet) {
+                  if (row !== '0') {
+                    const { status, response }: IReturnObject = await experimentController.getAll(
+                      { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
+                    );
+                    if (status === 200 && response[0]?.id) {
+                      await experimentRepository.updateTransaction(response[0]?.id, {
+                        id: response[0]?.id,
+                        id_culture: responseCulture?.id,
+                        cod_tec: String(spreadSheet[row][0]),
+                        name: spreadSheet[row][1],
+                        desc: spreadSheet[row][2],
+                        created_by: createdBy,
+                        dt_export: new Date(spreadSheet[row][4]),
+                      });
+                    } else {
+                      await experimentRepository.createTransaction({
+                        id_culture: responseCulture?.id,
+                        cod_tec: String(spreadSheet[row][0]),
+                        name: spreadSheet[row][1],
+                        desc: spreadSheet[row][2],
+                        created_by: createdBy,
+                        dt_export: new Date(spreadSheet[row][4]),
+                      });
+                    } 
+                  }
+                }
+              });
+
+              // if (experiment.total > 0) {
+              //   await experimentController.update(
+              //     {
+              //       id: experiment[0]?.id,
+              //       idAssayList: assayList[0]?.id,
+              //       idLocal: local[0]?.id,
+              //       idDelineamento: delineamento[0]?.id,
+              //       idSafra,
+              //       experimentName,
+              //       density: spreadSheet[row][8],
+              //       period: spreadSheet[row][9],
+              //       repetitionsNumber: spreadSheet[row][11],
+              //       nlp: spreadSheet[row][12],
+              //       clp: spreadSheet[row][13],
+              //       comments,
+              //       orderDraw: spreadSheet[row][15],
+              //       created_by: createdBy,
+              //     },
+              //   );
+              // } else {
+              //   const { status }: IReturnObject = await experimentController.create(
+              //     {
+              //       idAssayList: assayList[0]?.id,
+              //       idLocal: local[0]?.id,
+              //       idDelineamento: delineamento[0]?.id,
+              //       idSafra,
+              //       experimentName,
+              //       density: spreadSheet[row][8],
+              //       period: spreadSheet[row][9],
+              //       repetitionsNumber: spreadSheet[row][11],
+              //       nlp: spreadSheet[row][12],
+              //       clp: spreadSheet[row][13],
+              //       comments,
+              //       orderDraw: spreadSheet[row][15],
+              //       created_by: createdBy,
+              //     },
+              //   );
                 if (status === 200) {
                   await assayListController.update({
                     id: assayList[0]?.id,

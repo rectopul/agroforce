@@ -1,8 +1,9 @@
 import { prisma } from '../pages/api/db/db';
+import {BaseRepository} from './base-repository';
 
-export class QuadraRepository {
+export class QuadraRepository extends BaseRepository {
   async create(data: any) {
-    const quadra = await prisma.quadra.create({ data });
+    const quadra = await this.getPrisma().quadra.create({ data });
     return quadra;
   }
 
@@ -34,7 +35,7 @@ export class QuadraRepository {
     const quadra = await this.findOne(id);
 
     if (quadra !== null) {
-      const result = await prisma.quadra.update({
+      const result = await this.getPrisma().quadra.update({
         where: { id },
         data,
       });

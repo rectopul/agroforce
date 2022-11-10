@@ -1,10 +1,10 @@
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { ReactNode, useEffect, useState } from 'react';
+import router from 'next/router';
+import { useEffect, useState } from 'react';
 import {
   DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
@@ -12,109 +12,158 @@ import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons
 import {
   BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from 'react-icons/fa';
+import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
+import { FiUserPlus } from 'react-icons/fi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
+import { UserPreferenceController } from 'src/controllers/user-preference.controller';
+import { layoutQuadraService, userPreferencesService } from 'src/services';
+import * as XLSX from 'xlsx';
 import {
   AccordionFilter, Button, CheckBox, Content, Input, Select,
-} from 'src/components';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { loteService, userPreferencesService } from 'src/services';
-import * as XLSX from 'xlsx';
-import ITabs from '../../../../../shared/utils/dropdown';
-import ComponentLoading from '../../../../../components/Loading';
+} from '../../../components';
+import * as ITabs from '../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
+
+interface ILayoultProps {
+  id: number | any;
+  esquema: string | any;
+  semente_metros: number | any;
+  disparos: number | any;
+  divisor: number | any;
+  largura: number | any;
+  comp_fisico: number | any;
+  comp_parcela: number | any;
+  comp_corredor: number | any;
+  t4_inicial: number | any;
+  t4_final: number | any;
+  df_inicial: number | any;
+  df_final: number | any;
+  created_by: number;
+  local: string | any;
+  status: number;
+}
 
 interface IFilter {
   filterStatus: object | any;
   filterSearch: string | any;
+  filterUF: string | any;
+  filterCity: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
-
-export interface LoteGenotipo {
-  id: number;
-  id_culture: number;
-  id_genotipo: number;
-  genealogy: string;
-  name: string;
-  volume: number;
-  status?: number;
-}
-
 interface IGenerateProps {
   name: string | undefined;
   title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
-
-interface IData {
-  allLote: LoteGenotipo[];
+interface Idata {
+  allItems: ILayoultProps[];
   totalItems: number;
-  itensPerPage: number;
+  filter: string | any;
+  itensPerPage: number | any;
   filterApplication: object | any;
-  id_genotipo: number;
+  local: object | any;
 }
 
 export default function Listagem({
-  allLote, totalItems, itensPerPage, filterApplication, id_genotipo,
-}: IData) {
-  const { TabsDropDowns } = ITabs;
-  const [loading, setLoading] = useState<boolean>(false);
+      allItems, itensPerPage, filterApplication, totalItems, local,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
+  const [loading, setLoading] = useState<boolean>(false);
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'TMG'
+    tab.titleTab === 'QUADRAS'
       ? tab.statusTab = true
       : tab.statusTab = false
   ));
 
-  const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.lote || { id: 0, table_preferences: 'id,genealogy,name,volume,status' };
+  const preferences = userLogado.preferences.layout_quadra || { id: 0, table_preferences: 'id,esquema,local,semente_metros,semente_metros,disparos,divisor,largura,comp_fisico,comp_parcela,comp_corredor,t4_inicial,t4_final,df_inicial,df_final,status' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-  const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
+  const [quadras, setQuadra] = useState<ILayoultProps[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [orderName, setOrderName] = useState<number>(0);
-  const [arrowName, setArrowName] = useState<ReactNode>('');
-  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Genealógia', value: 'genealogy' },
-    { name: 'CamposGerenciados[]', title: 'Nome', value: 'name' },
-    { name: 'CamposGerenciados[]', title: 'Volume', value: 'volume' },
-    { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
-  ]);
+  const [orderAddress, setOrderAddress] = useState<number>(0);
+  const [arrowName, setArrowName] = useState<any>('');
+  const [arrowAddress, setArrowAddress] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [colorStar, setColorStar] = useState<string>('');
+  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
 
-  const filtersStatusItem = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
-  ];
+  const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
+    {
+      name: 'CamposGerenciados[]', title: 'Favorito ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Esquema ', value: 'esquema', defaultChecked: () => camposGerenciados.includes('esquema'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Local ', value: 'local', defaultChecked: () => camposGerenciados.includes('local'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Sementer por Metros', value: 'semente_metros', defaultChecked: () => camposGerenciados.includes('semente_metros'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Disparos', value: 'disparos', defaultChecked: () => camposGerenciados.includes('disparos'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Divisor', value: 'divisor', defaultChecked: () => camposGerenciados.includes('divisor'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Largura', value: 'largura', defaultChecked: () => camposGerenciados.includes('largura'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Comp. Físico', value: 'comp_fisico', defaultChecked: () => camposGerenciados.includes('comp_fisico'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Comp. Parcela', value: 'comp_parcela', defaultChecked: () => camposGerenciados.includes('comp_parcela'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Comp Corredor', value: 'comp_corredor', defaultChecked: () => camposGerenciados.includes('comp_corredor'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'T4 Inicial', value: 't4_inicial', defaultChecked: () => camposGerenciados.includes('t4_inicial'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'T4 Final', value: 't4_final', defaultChecked: () => camposGerenciados.includes('t4_final'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'DF Inicial', value: 'df_inicial', defaultChecked: () => camposGerenciados.includes('df_inicial'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'DF Final', value: 'df_final', defaultChecked: () => camposGerenciados.includes('df_final'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Status', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
+    },
+  ]);
+  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [colorStar, setColorStar] = useState<string>('');
 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
-  const columns = columnsOrder(camposGerenciados);
+  const columns = colums(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: '',
       filterSearch: '',
+      filterUF: '',
+      filterCity: '',
       orderBy: '',
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      const parametersFilter = `filterStatus=${values.filterStatus}&filterSearch=${values.filterSearch}&id_portfolio=${id_genotipo}`;
-      await loteService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
+      const parametersFilter = `filterStatus=${values.filterStatus}&filterSearch=${values.filterSearch}&filterUF=${values.filterUF}&filterCity=${values.filterCity}`;
+      await layoutQuadraService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
-        setLotes(response);
+        setQuadra(response.response);
         setTotalItems(response.total);
         setCurrentPage(0);
       });
@@ -122,36 +171,17 @@ export default function Listagem({
     },
   });
 
-  async function handleStatusLote(idItem: number, data: LoteGenotipo): Promise<void> {
-    if (data.status === 1) {
-      data.status = 0;
-    } else {
-      data.status = 1;
-    }
+  const filters = [
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
+  ];
 
-    const index = lotes.findIndex((lote) => lote.id === idItem);
-
-    if (index === -1) {
-      return;
-    }
-
-    setLotes((oldLote) => {
-      const copy = [...oldLote];
-      copy[index].status = data.status;
-      return copy;
-    });
-
-    const { id, status } = lotes[index];
-
-    await loteService.update({ id, status });
-  }
-
-  function columnsOrder(camposGerenciados: string) {
-    const ObjetCampos: string[] = camposGerenciados.split(',');
+  function colums(camposGerenciados: any): any {
+    const ObjetCampos: any = camposGerenciados.split(',');
     const arrOb: any = [];
-
-    Object.keys(ObjetCampos).forEach((item, index) => {
-      if (ObjetCampos[index] === 'id') {
+    Object.keys(ObjetCampos).forEach((item) => {
+      if (ObjetCampos[item] === 'id') {
         arrOb.push({
           title: '',
           field: 'id',
@@ -184,87 +214,153 @@ export default function Listagem({
         });
       }
 
-      if (ObjetCampos[index] === 'id') {
-        arrOb.push({
-          title: 'Favorito',
-          field: 'id',
-          sorting: false,
-        });
+      if (ObjetCampos[item] === 'id') {
+        arrOb.push({ title: 'Código', field: 'id', sorting: false });
       }
-      if (ObjetCampos[index] === 'genealogy') {
+      if (ObjetCampos[item] === 'esquema') {
         arrOb.push({
           title: (
             <div className="flex items-center">
               {arrowName}
-              <button className="font-medium text-gray-900" onClick={() => handleOrderName('genealogy', orderName)}>
-                Genealógia
+              <button className="font-medium text-gray-900" onClick={() => handleOrderName('esquema', orderName)}>
+                Esquema
               </button>
             </div>
           ),
-          field: 'genealogy',
+          field: 'esquema',
           sorting: false,
         });
       }
-      if (ObjetCampos[index] === 'name') {
+
+      if (ObjetCampos[item] === 'local') {
+        arrOb.push({ title: 'Local', field: 'local', sorting: false });
+      }
+
+      if (ObjetCampos[item] === 'semente_metros') {
+        arrOb.push({ title: 'Sementes por Metros', field: 'semente_metros', sorting: false });
+      }
+
+      if (ObjetCampos[item] === 'disparos') {
+        arrOb.push({ title: 'Disparos', field: 'disparos', sorting: false });
+      }
+
+      if (ObjetCampos[item] === 'divisor') {
+        arrOb.push({ title: 'Divisor', field: 'divisor', sorting: false });
+      }
+
+      // if (ObjetCampos[item] === 'largura') {
+      //   arrOb.push({ title: "Largura", field: "largura", sorting: false })
+      // }
+
+      if (ObjetCampos[item] === 'comp_fisico') {
+        arrOb.push({ title: 'Comp. Fisico', field: 'comp_fisico', sorting: false });
+      }
+
+      if (ObjetCampos[item] === 'comp_parcela') {
+        arrOb.push({ title: 'Comp. Parcel', field: 'comp_parcela', sorting: false });
+      }
+
+      if (ObjetCampos[item] === 'comp_corredor') {
+        arrOb.push({ title: 'Comp. Corretor', field: 'comp_corredor', sorting: false });
+      }
+
+      if (ObjetCampos[item] === 't4_inicial') {
+        arrOb.push({ title: 'T4 Inicial', field: 't4_inicial', sorting: false });
+      }
+
+      if (ObjetCampos[item] === 't4_final') {
+        arrOb.push({ title: 'T4 Final', field: 't4_final', sorting: false });
+      }
+
+      if (ObjetCampos[item] === 'df_inicial') {
+        arrOb.push({ title: 'DF Inicial', field: 'df_inicial', sorting: false });
+      }
+
+      if (ObjetCampos[item] === 'df_final') {
+        arrOb.push({ title: 'DF Final', field: 'df_final', sorting: false });
+      }
+      if (ObjetCampos[item] === 'largura') {
         arrOb.push({
-          title: 'Nome',
-          field: 'name',
+          title: (
+            <div className="flex items-center">
+              {arrowAddress}
+              <button className="font-medium text-gray-900" onClick={() => handleOrderAddress('largura', orderAddress)}>
+                Largura
+              </button>
+            </div>
+          ),
+          field: 'largura',
           sorting: false,
         });
       }
-      if (ObjetCampos[index] === 'volume') {
-        arrOb.push({
-          title: 'Volume',
-          field: 'volume',
-          sorting: false,
-        });
+
+      if (ObjetCampos[item] === 'latitude') {
+        arrOb.push({ title: 'Latitude', field: 'latitude', sorting: false });
       }
-      if (ObjetCampos[index] === 'status') {
+
+      if (ObjetCampos[item] === 'longitude') {
+        arrOb.push({ title: 'Longitude', field: 'longitude', sorting: false });
+      }
+
+      if (ObjetCampos[item] === 'altitude') {
+        arrOb.push({ title: 'Altitude', field: 'altitude', sorting: false });
+      }
+
+      if (ObjetCampos[item] === 'status') {
         arrOb.push({
           title: 'Status',
           field: 'status',
           sorting: false,
           searchable: false,
           filterPlaceholder: 'Filtrar por status',
-          render: (rowData: LoteGenotipo) => (
-            <div className="h-10 flex">
-              <div className="h-10">
-                <Button
-                  icon={<BiEdit size={16} />}
-                  onClick={() => { router.push(`lote/atualizar?id=${rowData.id}`); }}
-                  bgColor="bg-blue-600"
-                  textColor="white"
-                // href={`/config/npe/lote/atualizar?id=${rowData.id}`}
-                />
-              </div>
-              {rowData.status === 1 ? (
-                <div className="h-10">
+          render: (rowData: ILayoultProps) => (
+            rowData.status ? (
+              <div className="h-10 flex">
+                <div className="
+                  h-10
+                "
+                >
                   <Button
-                    type="submit"
+                    icon={<BiEdit size={16} />}
+                    onClick={() => { }}
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    href={`/config/layout-quadra/atualizar?id=${rowData.id}`}
+                  />
+                </div>
+                <div>
+                  <Button
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={async () => await handleStatusLote(rowData.id, {
-                      status: rowData.status,
-                      ...rowData,
-                    })}
+                    onClick={() => handleStatus(rowData.id, !rowData.status)}
                     bgColor="bg-green-600"
                     textColor="white"
                   />
                 </div>
-              ) : (
-                <div className="h-10">
+              </div>
+            ) : (
+              <div className="h-10 flex">
+                <div className="
+                  h-10
+                "
+                >
                   <Button
-                    type="submit"
+                    icon={<BiEdit size={16} />}
+                    onClick={() => { }}
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    href={`/config/layout-quadra/atualizar?id=${rowData.id}`}
+                  />
+                </div>
+                <div>
+                  <Button
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={async () => await handleStatusLote(rowData.id, {
-                      status: rowData.status,
-                      ...rowData,
-                    })}
+                    onClick={() => handleStatus(rowData.id, !rowData.status)}
                     bgColor="bg-red-800"
                     textColor="white"
                   />
                 </div>
-              )}
-            </div>
+              </div>
+            )
           ),
         });
       }
@@ -283,19 +379,80 @@ export default function Listagem({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 12 }).then((response) => {
-        userLogado.preferences.lote = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 5 }).then((response) => {
+        userLogado.preferences.layout_quadra = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.lote = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+      userLogado.preferences.layout_quadra = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
       await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
     setCamposGerenciados(campos);
+  }
+
+  async function handleStatus(id: number, status: any): Promise<void> {
+    if (status) {
+      status = 1;
+    } else {
+      status = 0;
+    }
+    await layoutQuadraService.update({ id, status });
+    const index = quadras.findIndex((quadras) => quadras.id === id);
+
+    if (index === -1) {
+      return;
+    }
+
+    setQuadra((oldUser) => {
+      const copy = [...oldUser];
+      copy[index].status = status;
+      return copy;
+    });
+  }
+
+  async function handleOrderAddress(column: string, order: string | any): Promise<void> {
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+
+    if (filter && typeof (filter) !== undefined) {
+      if (typeOrder !== '') {
+        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+      } else {
+        parametersFilter = filter;
+      }
+    } else if (typeOrder !== '') {
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    } else {
+      parametersFilter = filter;
+    }
+
+    await layoutQuadraService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+      if (response.status === 200) {
+        setQuadra(response.response);
+      }
+    });
+    if (orderAddress === 2) {
+      setOrderAddress(0);
+      setArrowAddress(<AiOutlineArrowDown />);
+    } else {
+      setOrderAddress(orderAddress + 1);
+      if (orderAddress === 1) {
+        setArrowAddress(<AiOutlineArrowUp />);
+      } else {
+        setArrowAddress('');
+      }
+    }
   }
 
   async function handleOrderName(column: string, order: string | any): Promise<void> {
@@ -321,9 +478,9 @@ export default function Listagem({
       parametersFilter = filter;
     }
 
-    await loteService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+    await layoutQuadraService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
       if (response.status === 200) {
-        setOrderName(response.response);
+        setQuadra(response.response);
       }
     });
 
@@ -344,7 +501,7 @@ export default function Listagem({
     }, 2000);
   }
 
-  function handleOnDragEnd(result: DropResult): void {
+  function handleOnDragEnd(result: DropResult) {
     setStatusAccordion(true);
     if (!result) return;
 
@@ -358,26 +515,24 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_portfolio=${id_genotipo}`;
+      filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
-    await loteService.getAll(filterApplication).then((response) => {
+    await layoutQuadraService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           if (row.status === 0) {
-            row.status = 'Inativo';
+            row.status = 'Inativo' as any;
           } else {
-            row.status = 'Ativo';
+            row.status = 'Ativo' as any;
           }
-          delete row.id;
-          delete row.genotipo;
 
           return row;
         });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'lotes');
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'quadras');
 
         // Buffer
         const buf = XLSX.write(workBook, {
@@ -390,7 +545,7 @@ export default function Listagem({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'Lotes.xlsx');
+        XLSX.writeFile(workBook, 'Layout_Quadra.xlsx');
       }
     });
   };
@@ -405,15 +560,14 @@ export default function Listagem({
 
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
-
-    let parametersFilter = `skip=${skip}&take=${take}&id_portfolio=${id_genotipo}`;
+    let parametersFilter = `skip=${skip}&take=${take}`;
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    await loteService.getAll(parametersFilter).then((response) => {
+    await layoutQuadraService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
-        setLotes(response.response);
+        setQuadra(response.response);
       }
     });
   }
@@ -425,9 +579,12 @@ export default function Listagem({
 
   return (
     <>
-      {loading && <ComponentLoading text="" />}
-      <Head><title>Listagem de Lotes</title></Head>
 
+      {loading && <ComponentLoading text="" />}
+
+      <Head>
+        <title>Listagem dos Layout</title>
+      </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main className="h-full w-full
           flex flex-col
@@ -435,7 +592,7 @@ export default function Listagem({
           gap-8
         "
         >
-          <AccordionFilter title="Filtrar lotes">
+          <AccordionFilter title="Filtrar layouts de quadra">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -456,15 +613,16 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map((id) => id)} selected="1" />
+                    <Select name="filterStatus" onChange={formik.handleChange} values={filters.map((id) => id)} selected="1" />
                   </div>
+
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Nome
                     </label>
                     <Input
                       type="text"
-                      placeholder="Nome"
+                      placeholder="esquema"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
@@ -475,7 +633,6 @@ export default function Listagem({
 
                 <div className="h-16 w-32 mt-3">
                   <Button
-                    type="submit"
                     onClick={() => {
                       setLoading(true);
                     }}
@@ -489,16 +646,18 @@ export default function Listagem({
             </div>
           </AccordionFilter>
 
+          {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={lotes}
+              data={quadras}
               options={{
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb' },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -506,7 +665,7 @@ export default function Listagem({
               components={{
                 Toolbar: () => (
                   <div
-                    className="w-full max-h-96
+                    className="w-full max-h-max
                     flex
                     items-center
                     justify-between
@@ -520,12 +679,13 @@ export default function Listagem({
                   >
                     <div className="h-12">
                       <Button
-                        title="Cadastrar lote"
-                        value="Cadastrar lote"
+                        title="Cadastrar Layout"
+                        value="Cadastrar Layout"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => { router.push(`lote/cadastro/${id_genotipo}`); }}
-                        icon={<FaSortAmountUpAlt size={20} />}
+                        onClick={() => { }}
+                        href="layout-quadra/cadastro"
+                        icon={<FiUserPlus size={20} />}
                       />
                     </div>
 
@@ -535,9 +695,11 @@ export default function Listagem({
                       {itemsTotal}
                     </strong>
 
-                    <div className="h-full flex items-center gap-2">
+                    <div className="h-full flex items-center gap-2
+                    "
+                    >
                       <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-72">
+                        <div className="w-64">
                           <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                               <Droppable droppableId="characters">
@@ -562,7 +724,7 @@ export default function Listagem({
                                                   name={generate.name}
                                                   title={generate.title?.toString()}
                                                   value={generate.value}
-                                                  defaultChecked={camposGerenciados.includes(generate.value as string)}
+                                                  defaultChecked={camposGerenciados.includes(generate.value)}
                                                 />
                                               </li>
                                             )}
@@ -578,8 +740,12 @@ export default function Listagem({
                           </AccordionFilter>
                         </div>
                       </div>
+
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha de lotes" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                        <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { router.push('layout-quadra/importacao'); }} />
+                      </div>
+                      <div className="h-12 flex items-center justify-center w-full">
+                        <Button title="Exportar planilha de layout quadra" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
                       </div>
                     </div>
                   </div>
@@ -646,42 +812,38 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context: any) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (
     await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
-
-  const { token } = context.req.cookies;
+  const { token } = req.cookies;
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/lote-genotipo`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/layout-quadra`;
+  const baseUrlLocal = `${publicRuntimeConfig.apiUrl}/local`;
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   const filterApplication = 'filterStatus=1';
   const urlParameters: any = new URL(baseUrl);
-
   urlParameters.search = new URLSearchParams(param).toString();
-
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const id_genotipo = Number(context.query.id_genotipo);
-
-  const api = await fetch(`${baseUrl}?id_genotipo=${id_genotipo}`, requestOptions);
-
-  const allLote: LoteGenotipo[] = await api.json();
-
-  const totalItems = allLote.length || 0;
-
+  const local = await fetch(urlParameters.toString(), requestOptions);
+  const apiUF = await fetch(`${baseUrlLocal}/uf`, requestOptions);
+  const uf = await apiUF.json();
+  const Response = await local.json();
+  const allItems = Response.response;
+  const totalItems = Response.total;
   return {
     props: {
-      allLote,
+      allItems,
       totalItems,
       itensPerPage,
       filterApplication,
-      id_genotipo,
+      uf,
     },
   };
 };
