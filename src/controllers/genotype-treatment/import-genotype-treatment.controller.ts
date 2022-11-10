@@ -2,8 +2,8 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
-import { ExperimentGenotipeRepository } from 'src/repository/experiment-genotipe.repository';
-import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
+import { TransactionConfig } from '../../shared/prisma/transactionConfig';
+import { ExperimentGenotipeRepository } from '../../repository/experiment-genotipe.repository';
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
 import { validateInteger } from '../../shared/utils/numberValidate';
