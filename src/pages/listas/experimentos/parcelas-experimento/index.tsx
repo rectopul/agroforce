@@ -667,7 +667,7 @@ export default function Listagem({
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
-    setStatusAccordion(false);
+    setStatusAccordion(false);status
     setCamposGerenciados(campos);
   }
 
@@ -1289,7 +1289,7 @@ export default function Listagem({
                         placeholder="Nome do genótipo"
                         id="filterGenotypeName"
                         name="filterGenotypeName"
-                        onChange={formik.handleChange}
+                        onChange={formik.handleChange.trim()}
                       />
                     </div>
                   </div>
