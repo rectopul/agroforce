@@ -130,7 +130,7 @@ export default function Listagem({
     Number(pageBeforeEdit)
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
@@ -348,6 +348,10 @@ export default function Listagem({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   async function deleteItem(id: number) {

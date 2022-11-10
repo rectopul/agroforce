@@ -1,6 +1,7 @@
 import { prisma } from '../pages/api/db/db';
+import {BaseRepository} from './base-repository';
 
-export class LayoutQuadraRepository {
+export class LayoutQuadraRepository extends BaseRepository {
   async findOne(id: number) {
     const result = await prisma.layout_quadra.findUnique({
       where: {
@@ -24,12 +25,12 @@ export class LayoutQuadraRepository {
   }
 
   async create(Local: object | any) {
-    const result = await prisma.layout_quadra.create({ data: Local });
+    const result = await this.getPrisma().layout_quadra.create({ data: Local });
     return result;
   }
 
   async update(id: number, data: any) {
-    const result = await prisma.layout_quadra.update({
+    const result = await this.getPrisma().layout_quadra.update({
       where: {
         id,
       },

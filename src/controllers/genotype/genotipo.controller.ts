@@ -164,7 +164,7 @@ export class GenotipoController {
 
       const response = await this.genotipoRepository.findOne(id);
 
-      if (!response) throw new Error('Item não encontrado');
+      if (!response) return { status: 400, response };
 
       return { status: 200, response };
     } catch (error: any) {

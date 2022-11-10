@@ -104,6 +104,7 @@ export default function Listagem({
   const { TabsDropDowns } = ITabs;
 
   const tableRef = useRef<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -209,6 +210,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -319,6 +321,10 @@ export default function Listagem({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   // function headerTableFactory(name: any, title: string) {
@@ -646,6 +652,7 @@ export default function Listagem({
 
   return (
     <>
+        {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de sequência de delineamento</title>
       </Head>
@@ -795,7 +802,9 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

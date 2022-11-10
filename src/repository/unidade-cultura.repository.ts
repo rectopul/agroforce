@@ -1,8 +1,9 @@
 import { prisma } from '../pages/api/db/db';
+import { BaseRepository } from '../repository/base-repository'
 
-export class UnidadeCulturaRepository {
+export class UnidadeCulturaRepository extends BaseRepository {
   async create(data: any) {
-    const result = await prisma.cultureUnity.create({
+    const result = await this.getPrisma().cultureUnity.create({
       data,
     });
 
@@ -18,7 +19,7 @@ export class UnidadeCulturaRepository {
   }
 
   async update(id: number, data: any) {
-    const result = await prisma.cultureUnity.update({
+    const result = await this.getPrisma().cultureUnity.update({
       where: { id },
       data,
     });

@@ -46,7 +46,7 @@ import { focoService } from "../../../../services/foco.service";
 import ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
-import ComponentLoading from '../../../../components/Loading';
+import ComponentLoading from "../../../../components/Loading";
 
 interface IFilter {
   filterStatus: object | any;
@@ -120,14 +120,14 @@ export default function Listagem({
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: "CamposGerenciados[]", title: "Nome", value: "name" },
     { name: "CamposGerenciados[]", title: "Grupo", value: "group" },
-    { name: "CamposGerenciados[]", title: "Status", value: "status" },
+    { name: "CamposGerenciados[]", title: "Ação", value: "status" },
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>("");
@@ -301,6 +301,10 @@ export default function Listagem({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   // function headerTableFactory(name: any, title: string) {
@@ -358,7 +362,7 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: "Status",
+      title: "Ação",
       field: "status",
       sorting: false,
       searchable: false,
@@ -401,7 +405,7 @@ export default function Listagem({
           <div className="ml-1" />
           <ButtonToogleConfirmation
             data={rowData}
-            text="o tipo ensaio"
+            text="o foco"
             keyName="name"
             onPress={handleStatus}
           />
@@ -626,7 +630,7 @@ export default function Listagem({
 
   return (
     <>
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de focos</title>
       </Head>

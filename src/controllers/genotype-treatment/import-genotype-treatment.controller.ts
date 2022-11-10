@@ -2,6 +2,8 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
+import { experimentgenotipeRepository } from 'src/repository/experiment-genotipe.repository';
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
 import { validateInteger } from '../../shared/utils/numberValidate';
@@ -26,6 +28,12 @@ export class ImportGenotypeTreatmentController {
     const logImportController = new LogImportController();
     const genotypeTreatmentController = new GenotypeTreatmentController();
     const historyGenotypeTreatmentController = new HistoryGenotypeTreatmentController();
+
+    /* --------- Transcation Context --------- */
+    const transactionConfig = new TransactionConfig();
+    const experimentgenotipeRepository = new experimentgenotipeRepository();
+    genotipoRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+    /* --------------------------------------- */
 
     const responseIfError: Array<string> = [];
 
@@ -231,45 +239,47 @@ export class ImportGenotypeTreatmentController {
 
       if (responseIfError.length === 0) {
         try {
-          for (const row in spreadSheet) {
-            if (row !== '0') {
-              const { response: treatment } = await genotypeTreatmentController.getAll({
-                gli: spreadSheet[row][4],
-                treatments_number: spreadSheet[row][6],
-                name_genotipo: spreadSheet[row][8],
-                nca: spreadSheet[row][9],
-              });
-              const { response: genotipo } = await genotipoController.getAll({
-                name_genotipo: spreadSheet[row][10],
-              });
-              const { response: lote } = await loteController.getAll({
-                ncc: spreadSheet[row][12],
-              });
-              await genotypeTreatmentController.update(
-                {
-                  id: treatment[0]?.id,
-                  id_genotipo: genotipo[0]?.id,
-                  id_lote: lote[0]?.id,
-                  status: spreadSheet[row][11],
-                },
-              );
-              await historyGenotypeTreatmentController.create({
-                gli: spreadSheet[row][4],
-                safra: spreadSheet[row][0],
-                foco: spreadSheet[row][1],
-                ensaio: spreadSheet[row][2],
-                tecnologia: spreadSheet[row][3],
-                bgm: Number(spreadSheet[row][5]),
-                nt: Number(spreadSheet[row][6]),
-                status: spreadSheet[row][7],
-                genotipo: spreadSheet[row][8],
-                nca: Number(spreadSheet[row][9]),
-                created_by: createdBy,
-              });
+          await transactionConfig.transactionScope.run(async () => {
+            for (const row in spreadSheet) {
+              if (row !== '0') {
+                const { response: treatment } = await genotypeTreatmentController.getAll({
+                  gli: spreadSheet[row][4],
+                  treatments_number: spreadSheet[row][6],
+                  name_genotipo: spreadSheet[row][8],
+                  nca: spreadSheet[row][9],
+                });
+                const { response: genotipo } = await genotipoController.getAll({
+                  name_genotipo: spreadSheet[row][10],
+                });
+                const { response: lote } = await loteController.getAll({
+                  ncc: spreadSheet[row][12],
+                });
+                await genotypeTreatmentController.update(
+                  {
+                    id: treatment[0]?.id,
+                    id_genotipo: genotipo[0]?.id,
+                    id_lote: lote[0]?.id,
+                    status: spreadSheet[row][11],
+                  },
+                );
+                await historyGenotypeTreatmentController.create({
+                  gli: spreadSheet[row][4],
+                  safra: spreadSheet[row][0],
+                  foco: spreadSheet[row][1],
+                  ensaio: spreadSheet[row][2],
+                  tecnologia: spreadSheet[row][3],
+                  bgm: Number(spreadSheet[row][5]),
+                  nt: Number(spreadSheet[row][6]),
+                  status: spreadSheet[row][7],
+                  genotipo: spreadSheet[row][8],
+                  nca: Number(spreadSheet[row][9]),
+                  created_by: createdBy,
+                });
+              }
             }
-          }
-          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
-          return { status: 200, message: 'Tratamento de genótipo importado com sucesso' };
+            await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
+            return { status: 200, message: 'Tratamento de genótipo importado com sucesso' };
+          });
         } catch (error: any) {
           await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
           handleError('Tratamento de genótipo controller', 'Save Import', error.message);

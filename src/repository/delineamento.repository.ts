@@ -1,6 +1,7 @@
 import { prisma } from '../pages/api/db/db';
+import {BaseRepository} from './base-repository';
 
-export class DelineamentoRepository {
+export class DelineamentoRepository extends BaseRepository {
   async findOne(id: number) {
     const Result = await prisma.delineamento.findUnique({
       where: {
@@ -25,14 +26,14 @@ export class DelineamentoRepository {
 
   async create(Local: object | any) {
     Local.created_at = new Date();
-    const Result = await prisma.delineamento.create({ data: Local });
+    const Result = await this.getPrisma().delineamento.create({ data: Local });
     return Result;
   }
 
   async update(id: number, Local: Object) {
     const ExisLocal = await this.findOne(id);
     if (ExisLocal !== null) {
-      const Result = await prisma.delineamento.update({
+      const Result = await this.getPrisma().delineamento.update({
         where: {
           id,
         },

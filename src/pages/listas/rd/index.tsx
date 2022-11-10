@@ -122,53 +122,55 @@ export default function Import({
       const userLogado = JSON.parse(localStorage.getItem('user') as string);
       setExecuteUpload(1);
 
-      readXlsxFile(value.files[0]).then(async (rows) => {
-        setLoading(true);
+      readXlsxFile(value.files[0])
+        .then(async (rows) => {
+          setLoading(true);
 
-        if (moduleId) {
-          const { message } = await importService.validate({
-            spreadSheet: rows,
-            moduleId,
-            created_by: userLogado.id,
-            idSafra,
-            idCulture,
-            table,
-            disabledButton,
-          });
-          setLoading(false);
-          handlePagination();
+          if (moduleId) {
+            const { message } = await importService.validate({
+              spreadSheet: rows,
+              moduleId,
+              created_by: userLogado.id,
+              idSafra,
+              idCulture,
+              table,
+              disabledButton,
+            });
+            setLoading(false);
+            handlePagination();
+            Swal.fire({
+              html: message,
+              width: '800',
+            });
+            setExecuteUpload(0);
+          } else {
+            const { message } = await importService.validateProtocol({
+              spreadSheet: rows,
+              moduleId,
+              created_by: userLogado.id,
+              idSafra,
+              idCulture,
+              table,
+              disabledButton,
+            });
+            setLoading(false);
+            handlePagination();
+            Swal.fire({
+              html: message,
+              width: '800',
+            });
+            setExecuteUpload(0);
+          }
+        })
+        .catch((e: any) => {
           Swal.fire({
-            html: message,
+            html: 'Erro ao ler planilha',
             width: '800',
+            didClose: () => {
+              router.reload();
+            },
           });
-          setExecuteUpload(0);
-        } else {
-          const { message } = await importService.validateProtocol({
-            spreadSheet: rows,
-            moduleId,
-            created_by: userLogado.id,
-            idSafra,
-            idCulture,
-            table,
-            disabledButton,
-          });
-          setLoading(false);
-          handlePagination();
-          Swal.fire({
-            html: message,
-            width: '800',
-          });
-          setExecuteUpload(0);
-        }
-      }).catch((e: any) => {
-        Swal.fire({
-          html: 'Erro ao ler planilha',
-          width: '800',
-          didClose: () => {
-            router.reload();
-          },
         });
-      });
 
       (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
     } catch (e: any) {
@@ -202,8 +204,9 @@ export default function Import({
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Usuário', value: 'user_id' },
     { name: 'CamposGerenciados[]', title: 'Tabela', value: 'table' },
-    { name: 'CamposGerenciados[]', title: 'Status', value: 'state' },
     { name: 'CamposGerenciados[]', title: 'Importado em', value: 'created_at' },
+    { name: 'CamposGerenciados[]', title: 'Status', value: 'state' },
+    { name: 'CamposGerenciados[]', title: 'Ação', value: 'action' },
   ]);
   const [colorStar, setColorStar] = useState<string>('');
   const [orderBy, setOrderBy] = useState<string>('');
@@ -212,7 +215,8 @@ export default function Import({
 
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
-  const pathExtra = `skip=${currentPage * Number(take)
+  const pathExtra = `skip=${
+    currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
   const pages = Math.ceil(total / take);
   const formik = useFormik<any>({
@@ -235,6 +239,7 @@ export default function Import({
       const parametersFilter = `filterUser=${filterUser}&filterTable=${filterTable}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&filterState=${filterState}`;
       setFilter(parametersFilter);
       await getAllLogs(`${parametersFilter}`);
+      setLoading(false);
     },
   });
 
@@ -324,17 +329,13 @@ export default function Import({
   //   };
   // }
 
-  function headerTableStatusFactory() {
+  function headerTableActionFactory() {
     return {
-      title: 'Status',
-      field: 'state',
+      title: 'Ação',
+      field: 'action',
       sorting: false,
       render: (rowData: any) => (
         <div className="h-7 flex">
-          <div className="h-7">
-            {rowData.state}
-          </div>
-          <div style={{ width: 5 }} />
           {rowData.invalid_data ? (
             <div className="h-7">
               <Button
@@ -350,8 +351,9 @@ export default function Import({
                 textColor="white"
               />
             </div>
-          ) : ''}
-
+          ) : (
+            ''
+          )}
         </div>
       ),
     };
@@ -399,7 +401,18 @@ export default function Import({
         );
       }
       if (columnCampos[index] === 'state') {
-        tableFields.push(headerTableStatusFactory());
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Status',
+            title: 'state',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
+      }
+      if (columnCampos[index] === 'action') {
+        tableFields.push(headerTableActionFactory());
       }
     });
     return tableFields;
@@ -422,6 +435,10 @@ export default function Import({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   async function getValuesColumns(): Promise<void> {
@@ -1174,7 +1191,7 @@ export default function Import({
                         disabled={currentPage + 1 >= pages}
                       />
                     </div>
-                  ) as any,
+                    ) as any,
                 }}
               />
             </div>

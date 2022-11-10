@@ -43,7 +43,7 @@ import { UserPreferenceController } from "../../../../controllers/user-preferenc
 import { cultureService, userPreferencesService } from "../../../../services";
 import ITabs from "../../../../shared/utils/dropdown";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
-import ComponentLoading from '../../../../components/Loading';
+import ComponentLoading from "../../../../components/Loading";
 
 interface IFilter {
   filterStatus: object | any;
@@ -114,7 +114,7 @@ export default function Listagem({
   );
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -138,7 +138,7 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
-      title: "Status",
+      title: "Ação",
       value: "status",
       defaultChecked: () => camposGerenciados.includes("status"),
     },
@@ -279,6 +279,10 @@ export default function Listagem({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   // useEffect(()=>{
@@ -358,7 +362,7 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: "Status",
+      title: "Ação",
       field: "status",
       sorting: false,
       searchable: false,

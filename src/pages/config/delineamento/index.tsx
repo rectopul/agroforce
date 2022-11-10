@@ -124,7 +124,7 @@ export default function Listagem({
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
 
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
@@ -161,7 +161,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Status',
+      title: 'Ação',
       value: 'status',
       defaultChecked: () => camposGerenciados.includes('status'),
     },
@@ -277,41 +277,9 @@ export default function Listagem({
   //   };
   // }
 
-  function idHeaderFactory() {
-    return {
-      title: <div className="flex items-center">{arrowOrder}</div>,
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-9 flex">
-          <div>
-            <button
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="h-9 flex">
-          <div>
-            <button
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
-          </div>
-        </div>
-      )),
-    };
-  }
-
   function statusHeaderFactory() {
     return {
-      title: 'Status',
+      title: 'Ação',
       field: 'status',
       sorting: false,
       searchable: false,
@@ -477,6 +445,10 @@ export default function Listagem({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   async function getValuesColumns(): Promise<void> {
@@ -528,11 +500,11 @@ export default function Listagem({
     }`;
 
     await delineamentoService.getAll(parametersFilter).then((response) => {
-      if (response.total > 0) {
-        return Swal.fire(
-          'Delineamento não pode ser atualizado pois já existe uma delineamento com esse nome ativo!',
-        );
-      }
+      // if (response.total > 0) {
+      //   return Swal.fire(
+      //     'Delineamento não pode ser atualizado pois já existe uma delineamento com esse nome ativo!',
+      //   );
+      // }
       delineamentoService.update({
         id: data?.id,
         status: data?.status === 0 ? 1 : 0,

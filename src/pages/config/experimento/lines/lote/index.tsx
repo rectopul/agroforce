@@ -23,7 +23,7 @@ import { UserPreferenceController } from 'src/controllers/user-preference.contro
 import { loteService, userPreferencesService } from 'src/services';
 import * as XLSX from 'xlsx';
 import ITabs from '../../../../../shared/utils/dropdown';
-import ComponentLoading from '../../../../../components/Loading';
+import ComponentLoading from '../../../../components/Loading';
 
 interface IFilter {
   filterStatus: object | any;
@@ -363,14 +363,12 @@ export default function Listagem({
 
     await loteService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
-        const newData = response.response.map((row: any) => {
+        const newData = response.response.map((row: { status: any }) => {
           if (row.status === 0) {
             row.status = 'Inativo';
           } else {
             row.status = 'Ativo';
           }
-          delete row.id;
-          delete row.genotipo;
 
           return row;
         });
