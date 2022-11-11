@@ -65,6 +65,10 @@ export class PrismaTransactionScope implements TransactionScope {
           throw err;
         }
       });
+    },
+    {
+      maxWait: 3600000,
+      timeout: 3600000
     });
   }
 }
