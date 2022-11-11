@@ -111,12 +111,12 @@ interface IData {
 }
 
 export default function Listagem({
-      itensPerPage,
-      filterApplication,
-      idSafra,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  itensPerPage,
+  filterApplication,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs;
 
   const tableRef = useRef<any>(null);
@@ -162,7 +162,7 @@ export default function Listagem({
       title: "Delineamento",
       value: "delineamento",
     },
-    { name: "CamposGerenciados[]", title: "Rep.", value: "repetitionsNumber" },
+    { name: "CamposGerenciados[]", title: "Rep", value: "repetitionsNumber" },
     {
       name: "CamposGerenciados[]",
       title: "Qtd Genótipos",
@@ -178,7 +178,7 @@ export default function Listagem({
       title: "NPE Final",
       value: "repetitionsNumber",
     },
-    { name: "CamposGerenciados[]", title: "QT. NPE", value: "npeQT" },
+    { name: "CamposGerenciados[]", title: "QT NPE", value: "npeQT" },
   ]);
 
   const [colorStar, setColorStar] = useState<string>("");
@@ -479,7 +479,7 @@ export default function Listagem({
       if (columnCampos[index] === "repetitionsNumber") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Rep.",
+            name: "Rep",
             title: "repetitionsNumber",
             orderList,
             fieldOrder,
@@ -521,7 +521,7 @@ export default function Listagem({
 
     tableFields.push(
       headerTableFactoryGlobal({
-        name: "QT. NPE",
+        name: "QT NPE",
         title: "npeQT",
         orderList,
         fieldOrder,
@@ -680,7 +680,7 @@ export default function Listagem({
     { title: "Foco", field: "foco.name" },
     { title: "Ensaio", field: "type_assay.name" },
     { title: "Tecnologia", field: "tecnologia.name" },
-    { title: "Epoca", field: "epoca" },
+    { title: "Época", field: "epoca" },
     { title: "NPE Inicial", field: "prox_npe" },
     { title: "NPE Final", field: "npef" },
     { title: "NPE Quantity", field: "npeQT" },
@@ -759,7 +759,7 @@ export default function Listagem({
         NPESelectedRow?.npeQT == "N/A"
           ? true
           : NPESelectedRow?.npeQT - total_consumed > 0 &&
-          lastNpe < NPESelectedRow?.nextNPE.npei_i
+            lastNpe < NPESelectedRow?.nextNPE.npei_i
       ) {
         setLoading(true);
 
@@ -770,12 +770,12 @@ export default function Listagem({
               genotipo_treatment.map(async (gt: any) => {
                 genotypeTreatmentService
                   .update(gt)
-                  .then(({ status, message }: any) => { });
+                  .then(({ status, message }: any) => {});
               });
               experimentObj.map(async (x: any) => {
                 await experimentService
                   .update(x)
-                  .then(({ status, response }: any) => { });
+                  .then(({ status, response }: any) => {});
               });
 
               await npeService
@@ -812,7 +812,9 @@ export default function Listagem({
 
       experimentos?.map((item: any) => {
         item.seq_delineamento.map((sd: any) => {
-          let gt = item.assay_list.genotype_treatment.filter((x: any) => x.treatments_number == sd.nt)[0];
+          let gt = item.assay_list.genotype_treatment.filter(
+            (x: any) => x.treatments_number == sd.nt
+          )[0];
 
           const data: any = {};
           data.idSafra = gt.id_safra;
@@ -837,7 +839,7 @@ export default function Listagem({
           gt_new.id = gt.id;
           gt_new.status_experiment = "EXP. SORTEADO";
           genotipo_treatment.push(gt_new);
-        })
+        });
       });
       createExperimentGenotipe({
         data: experiment_genotipo,
@@ -851,7 +853,8 @@ export default function Listagem({
         html:
           `Existem NPE usados ​​entre <b>${npeUsedFrom}</b> e <b>${temp.npef}</b><br><br>` +
           `Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : ${temp.nextNPE.foco.name}</b><br><b> Ensaio : ${temp.nextNPE.type_assay.name}</b><br><b> Local : ${temp.nextNPE.local.name_local_culture}</b><br><b>Epoca : ${temp.nextNPE.epoca}</b><br><b>Tecnologia : ${temp.nextNPE.tecnologia.name}</b></p><br>` +
-          `O próximo NPE disponível é <strong>${Number(temp.nextAvailableNPE) + 1
+          `O próximo NPE disponível é <strong>${
+            Number(temp.nextAvailableNPE) + 1
           }</strong></div>`,
         icon: "warning",
         showCloseButton: true,
@@ -882,8 +885,8 @@ export default function Listagem({
     let count = 0;
     experimentos.map((item: any) => {
       item.npei <= NPESelectedRow?.nextNPE.npei_i &&
-        item.npef >= NPESelectedRow?.nextNPE.npei_i &&
-        NPESelectedRow?.nextNPE != 0
+      item.npef >= NPESelectedRow?.nextNPE.npei_i &&
+      NPESelectedRow?.nextNPE != 0
         ? count++
         : "";
     });
@@ -914,8 +917,9 @@ export default function Listagem({
                         "
         >
           <div
-            className={`w-full ${selectedNPE?.length > 3 && "max-h-40 overflow-y-scroll"
-              } mb-4`}
+            className={`w-full ${
+              selectedNPE?.length > 3 && "max-h-40 overflow-y-scroll"
+            } mb-4`}
           >
             <MaterialTable
               style={{
@@ -972,7 +976,7 @@ export default function Listagem({
                   rowStyle: (rowData) => ({
                     backgroundColor:
                       rowData.npef >= NPESelectedRow?.nextNPE.npei_i &&
-                        SortearDisable
+                      SortearDisable
                         ? "#FF5349"
                         : "#f9fafb",
                     height: 40,
