@@ -137,7 +137,7 @@ export default function Listagem({
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: "CamposGerenciados[]", title: "Ano", value: "year" },
-    { name: "CamposGerenciados[]", title: "Cód lote", value: "cod_lote" },
+    { name: "CamposGerenciados[]", title: "Cod lote", value: "cod_lote" },
     { name: "CamposGerenciados[]", title: "NCC", value: "ncc" },
     { name: "CamposGerenciados[]", title: "Fase", value: "fase" },
     { name: "CamposGerenciados[]", title: "Peso (kg)", value: "peso" },
@@ -387,7 +387,7 @@ export default function Listagem({
       if (columnCampos[index] === "cod_lote") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Cód lote",
+            name: "Cod lote",
             title: "cod_lote",
             orderList,
             fieldOrder,
@@ -431,7 +431,7 @@ export default function Listagem({
       if (columnCampos[index] === "quant_sementes") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Quant. sementes",
+            name: "Quant sementes",
             title: "quant_sementes",
             orderList,
             fieldOrder,
@@ -745,7 +745,7 @@ export default function Listagem({
 
                   <div className="h-6 w-full ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cód. Lote
+                      Cod Lote
                     </label>
                     <div className="flex">
                       <Input
@@ -810,7 +810,7 @@ export default function Listagem({
 
                   <div className="h-6 w-full ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Quant. sementes
+                      Quant sementes
                     </label>
                     <div className="flex">
                       <Input
@@ -881,11 +881,7 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory(
-                    "filterTecnologiaCod",
-                    "Cód. Tecnologia",
-                    true
-                  )}
+                  {filterFieldFactory("filterTecnologiaCod", "Cod Tec", true)}
 
                   {filterFieldFactory(
                     "filterTecnologiaDesc",

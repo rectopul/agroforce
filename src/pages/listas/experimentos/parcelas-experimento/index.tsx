@@ -88,7 +88,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.genotypeTreatment || {
     id: 0,
     table_preferences:
-      "id,foco,type_assay,tecnologia,gli,experiment,culture,rep,status,status_t,nt,npe,genotipo,nca",
+      "id,foco,type_assay,tecnologia,gli,experiment,culture,status_t,rep,status,nt,npe,genotipo,nca",
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
@@ -148,7 +148,13 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
-      title: "REP.",
+      title: "StatusT",
+      value: "status_t",
+      defaultChecked: () => camposGerenciados.includes("status_t"),
+    },
+    {
+      name: "CamposGerenciados[]",
+      title: "REP",
       value: "rep",
       defaultChecked: () => camposGerenciados.includes("rep"),
     },
@@ -157,12 +163,6 @@ export default function Listagem({
       title: "Status EXP",
       value: "status",
       defaultChecked: () => camposGerenciados.includes("status"),
-    },
-    {
-      name: "CamposGerenciados[]",
-      title: "StatusT",
-      value: "status_t",
-      defaultChecked: () => camposGerenciados.includes("status_t"),
     },
     {
       name: "CamposGerenciados[]",
@@ -543,6 +543,17 @@ export default function Listagem({
           })
         );
       }
+      if (columnOrder[item] === "status_t") {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "StatusT",
+            title: "status_t",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
+      }
       if (columnOrder[item] === "rep") {
         tableFields.push(
           headerTableFactoryGlobal({
@@ -559,17 +570,6 @@ export default function Listagem({
           headerTableFactoryGlobal({
             name: "Status EXP",
             title: "status",
-            orderList,
-            fieldOrder,
-            handleOrder,
-          })
-        );
-      }
-      if (columnOrder[item] === "status_t") {
-        tableFields.push(
-          headerTableFactoryGlobal({
-            name: "StatusT",
-            title: "status_t",
             orderList,
             fieldOrder,
             handleOrder,
@@ -667,7 +667,8 @@ export default function Listagem({
       localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
-    setStatusAccordion(false);status
+    setStatusAccordion(false);
+    status;
     setCamposGerenciados(campos);
   }
 
@@ -1106,7 +1107,7 @@ export default function Listagem({
                 >
                   {filterFieldFactory("filterFoco", "Foco")}
                   {filterFieldFactory("filterTypeAssay", "Ensaio")}
-                  {filterFieldFactory("filterCodTec", "Cód. Tecnologia")}
+                  {filterFieldFactory("filterCodTec", "Cod Tec")}
                   {filterFieldFactory("filterTechnology", "Nome da Tecnologia")}
                   {filterFieldFactory("filterGli", "GLI")}
                   {filterFieldFactory("filterExperimentName", "Experimento")}

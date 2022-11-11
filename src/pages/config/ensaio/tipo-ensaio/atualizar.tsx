@@ -110,7 +110,7 @@ export default function AtualizarTipoEnsaio({
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     {
       name: "CamposGerenciados[]",
-      title: "Quant. de sementes por envelope",
+      title: "Quant de sementes por envelope",
       value: "seeds",
     },
     { name: "CamposGerenciados[]", title: "Safra", value: "safra" },
@@ -307,7 +307,7 @@ export default function AtualizarTipoEnsaio({
       if (columnOrder[index] === "seeds") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Quant. de sementes por envelope",
+            name: "Quant de sementes por envelope",
             title: "seeds",
             orderList,
             fieldOrder,
@@ -574,8 +574,8 @@ export default function AtualizarTipoEnsaio({
                   >
                     <div className="h-12">
                       <Button
-                        title="Cadastrar Quant. de sementes por envelope"
-                        value="Cadastrar Quant. de sementes por envelope"
+                        title="Cadastrar Quant de sementes por envelope"
+                        value="Cadastrar Quant de sementes por envelope"
                         bgColor={seeds.length ? "bg-gray-400" : "bg-blue-600"}
                         textColor="white"
                         disabled={seeds.length}

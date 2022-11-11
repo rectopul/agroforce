@@ -844,7 +844,7 @@ export default function Listagem({
 
                   {filterFieldFactory("filterEnsaio", "Ensaio")}
 
-                  {filterFieldFactory("filterCodTecnologia", "Cód. Tecnologia")}
+                  {filterFieldFactory("filterCodTecnologia", "Cod Tec")}
 
                   {filterFieldFactory("filterTecnologia", "Tecnologia")}
                 </div>

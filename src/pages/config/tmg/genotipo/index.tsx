@@ -1011,7 +1011,7 @@ export default function Listagem({
 
                   {filterFieldFactory("filterMainName", "Nome principal")}
 
-                  {filterFieldFactory("filterTecnologiaCod", "Cód. Tecnologia")}
+                  {filterFieldFactory("filterTecnologiaCod", "Cod Tec")}
 
                   {filterFieldFactory(
                     "filterTecnologiaDesc",
