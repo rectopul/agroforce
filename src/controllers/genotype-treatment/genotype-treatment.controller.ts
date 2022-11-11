@@ -72,19 +72,19 @@ export class GenotypeTreatmentController {
         if (options.filterNcaFrom.toUpperCase() === 'VAZIO' || options.filterNcaTo.toUpperCase() === 'VAZIO') {
           parameters.id_lote = null;
         } else if (options.filterNcaFrom && options.filterNcaTo) {
-          parameters.AND.push(JSON.parse(
-            `{"gte": ${Number(options.filterNcaFrom)}, "lte": ${Number(
+          parameters.lote = JSON.parse(
+            `{ "ncc": {"gte": "${Number(options.filterNcaFrom)}", "lte": "${Number(
               options.filterNcaTo,
-            )} }`,
-          ));
+            )}" } }`,
+          );
         } else if (options.filterNcaFrom) {
-          parameters.AND.push(JSON.parse(
-            `{"gte": ${Number(options.filterNcaFrom)} }`,
-          ));
+          parameters.lote = JSON.parse(
+            `{ "ncc": {"gte": "${Number(options.filterNcaFrom)}" } }`,
+          );
         } else if (options.filterNcaTo) {
-          parameters.AND.push(JSON.parse(
-            `{"lte": ${Number(options.filterNcaTo)} }`,
-          ));
+          parameters.lote = JSON.parse(
+            `{ "ncc": {"lte": "${Number(options.filterNcaTo)}" } }`,
+          );
         }
       }
       if (options.filterTreatmentsNumber) {
