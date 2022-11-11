@@ -39,7 +39,6 @@ export class GenotipoRepository extends BaseRepository {
     return result;
   }
 
-
   async findOneByName(name: any) {
     const result = await prisma.genotipo.findMany({
       where: { name_genotipo: name },
@@ -71,7 +70,6 @@ export class GenotipoRepository extends BaseRepository {
     });
     return result;
   }
-
 
   async update(id: number, data: any) {
     const result = await this.getPrisma().genotipo.update({

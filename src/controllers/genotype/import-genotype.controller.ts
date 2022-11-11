@@ -3,6 +3,7 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable no-await-in-loop */
 
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import {
   ImportValidate,
   IReturnObject,
@@ -26,7 +27,6 @@ import { genotipeQueue } from './genotipeQueue';
 
 import { GenotipoRepository } from '../../repository/genotipo.repository';
 import { LoteRepository } from '../../repository/lote.repository';
-import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 
 /* eslint-disable no-restricted-syntax */
 export class ImportGenotypeController {
@@ -469,8 +469,14 @@ export class ImportGenotypeController {
     const transactionConfig = new TransactionConfig();
     const genotipoRepository = new GenotipoRepository();
     const loteRepository = new LoteRepository();
-    loteRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
-    genotipoRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+    loteRepository.setTransaction(
+      transactionConfig.clientManager,
+      transactionConfig.transactionScope,
+    );
+    genotipoRepository.setTransaction(
+      transactionConfig.clientManager,
+      transactionConfig.transactionScope,
+    );
     /* --------------------------------------- */
 
     try {
@@ -776,7 +782,9 @@ export class ImportGenotypeController {
                     dt_export: this.aux.dt_export,
                     created_by: createdBy,
                   });
+
                   this.aux.id_genotipo = await genotipo.id;
+
                 }
 
                 if (this.aux.id_genotipo && this.aux.ncc) {                  
@@ -798,7 +806,6 @@ export class ImportGenotypeController {
 
                     const genotype: any = await genotipoRepository.findOne(this.aux.id_genotipo);
                     const genotypeUpdated:any = await genotipoRepository.updateTransaction(this.aux.id_genotipo, { numberLotes: genotype?.lote?.length });
-
                   } else {
                     const lote = await loteRepository.createTransaction({
                       id_genotipo: Number(this.aux.id_genotipo),
@@ -813,6 +820,7 @@ export class ImportGenotypeController {
                       quant_sementes: this.aux.quant_sementes,
                       created_by: createdBy,
                     });
+                    
                     const genotype: any = await genotipoRepository.findOne(this.aux.id_genotipo);
                     const genotypeUpdated:any = await genotipoRepository.updateTransaction(this.aux.id_genotipo, { numberLotes: genotype?.lote?.length });
                   }
