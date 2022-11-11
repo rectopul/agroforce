@@ -326,6 +326,10 @@ export default function AtualizarLocal({
   //   };
   // }
 
+  function formatDecimal(num: number) {
+    return Number(num).toFixed(1);
+  }
+
   function columnsOrder(columnsCampos: string) {
     const columnCampos: string[] = columnsCampos.split(",");
     const tableFields: any = [];
@@ -361,7 +365,8 @@ export default function AtualizarLocal({
             orderList,
             fieldOrder,
             handleOrder,
-          })
+            render: (rowData: any) => formatDecimal(rowData.genotipo.gmr),
+          }),
         );
       }
       if (columnCampos[index] === "bgm") {
