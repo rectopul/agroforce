@@ -111,12 +111,12 @@ interface IData {
 }
 
 export default function Listagem({
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs;
 
   const tableRef = useRef<any>(null);
@@ -759,7 +759,7 @@ export default function Listagem({
         NPESelectedRow?.npeQT == "N/A"
           ? true
           : NPESelectedRow?.npeQT - total_consumed > 0 &&
-            lastNpe < NPESelectedRow?.nextNPE.npei_i
+          lastNpe < NPESelectedRow?.nextNPE.npei_i
       ) {
         setLoading(true);
 
@@ -770,12 +770,12 @@ export default function Listagem({
               genotipo_treatment.map(async (gt: any) => {
                 genotypeTreatmentService
                   .update(gt)
-                  .then(({ status, message }: any) => {});
+                  .then(({ status, message }: any) => { });
               });
               experimentObj.map(async (x: any) => {
                 await experimentService
                   .update(x)
-                  .then(({ status, response }: any) => {});
+                  .then(({ status, response }: any) => { });
               });
 
               await npeService
@@ -811,40 +811,33 @@ export default function Listagem({
       let npei = Number(NPESelectedRow?.npei_i);
 
       experimentos?.map((item: any) => {
-        let ntQT = 1;
-        let repititions = 1;
-        while (repititions <= item.repetitionsNumber) {
-          item.assay_list?.genotype_treatment.map((gt: any) => {
-            let sd = item.seq_delineamento.filter(
-              (x: any) => x.repeticao == repititions && x.nt == ntQT
-            )[0];
-            const data: any = {};
-            data.idSafra = gt.id_safra;
-            data.idFoco = item.assay_list?.foco.id;
-            data.idTypeAssay = item.assay_list?.type_assay.id;
-            data.idTecnologia = item.assay_list?.tecnologia.id;
-            data.idExperiment = item.id;
-            data.gli = item.assay_list?.gli;
-            data.rep = repititions;
-            data.nt = gt.treatments_number;
-            data.npe = npei;
-            data.idLote = gt.genotipo?.id_lote;
-            data.idGenotipo = gt.genotipo?.id; // Added new field
-            data.gli = item.assay_list?.gli;
-            data.id_seq_delineamento = sd.id;
-            data.nca = gt.lote?.ncc;
-            data.status_t = gt.status;
-            experiment_genotipo.push(data);
-            npei++;
-            // });
-            const gt_new: any = {};
-            gt_new.id = gt.id;
-            gt_new.status_experiment = "EXP. SORTEADO";
-            genotipo_treatment.push(gt_new);
-          });
-          repititions++;
-          ntQT++;
-        }
+        item.seq_delineamento.map((sd: any) => {
+          let gt = item.assay_list.genotype_treatment.filter((x: any) => x.treatments_number == sd.nt)[0];
+
+          const data: any = {};
+          data.idSafra = gt.id_safra;
+          data.idFoco = item.assay_list?.foco.id;
+          data.idTypeAssay = item.assay_list?.type_assay.id;
+          data.idTecnologia = item.assay_list?.tecnologia.id;
+          data.idExperiment = item.id;
+          data.gli = item.assay_list?.gli;
+          data.rep = sd.repeticao;
+          data.nt = sd.nt;
+          data.npe = npei;
+          data.idLote = gt.genotipo?.id_lote;
+          data.idGenotipo = gt.genotipo?.id; // Added new field
+          data.gli = item.assay_list?.gli;
+          data.id_seq_delineamento = sd.id;
+          data.nca = gt.lote?.ncc;
+          data.status_t = gt.status;
+          experiment_genotipo.push(data);
+          npei++;
+          // });
+          const gt_new: any = {};
+          gt_new.id = gt.id;
+          gt_new.status_experiment = "EXP. SORTEADO";
+          genotipo_treatment.push(gt_new);
+        })
       });
       createExperimentGenotipe({
         data: experiment_genotipo,
@@ -858,8 +851,7 @@ export default function Listagem({
         html:
           `Existem NPE usados ​​entre <b>${npeUsedFrom}</b> e <b>${temp.npef}</b><br><br>` +
           `Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : ${temp.nextNPE.foco.name}</b><br><b> Ensaio : ${temp.nextNPE.type_assay.name}</b><br><b> Local : ${temp.nextNPE.local.name_local_culture}</b><br><b>Epoca : ${temp.nextNPE.epoca}</b><br><b>Tecnologia : ${temp.nextNPE.tecnologia.name}</b></p><br>` +
-          `O próximo NPE disponível é <strong>${
-            Number(temp.nextAvailableNPE) + 1
+          `O próximo NPE disponível é <strong>${Number(temp.nextAvailableNPE) + 1
           }</strong></div>`,
         icon: "warning",
         showCloseButton: true,
@@ -890,8 +882,8 @@ export default function Listagem({
     let count = 0;
     experimentos.map((item: any) => {
       item.npei <= NPESelectedRow?.nextNPE.npei_i &&
-      item.npef >= NPESelectedRow?.nextNPE.npei_i &&
-      NPESelectedRow?.nextNPE != 0
+        item.npef >= NPESelectedRow?.nextNPE.npei_i &&
+        NPESelectedRow?.nextNPE != 0
         ? count++
         : "";
     });
@@ -922,9 +914,8 @@ export default function Listagem({
                         "
         >
           <div
-            className={`w-full ${
-              selectedNPE?.length > 3 && "max-h-40 overflow-y-scroll"
-            } mb-4`}
+            className={`w-full ${selectedNPE?.length > 3 && "max-h-40 overflow-y-scroll"
+              } mb-4`}
           >
             <MaterialTable
               style={{
@@ -981,7 +972,7 @@ export default function Listagem({
                   rowStyle: (rowData) => ({
                     backgroundColor:
                       rowData.npef >= NPESelectedRow?.nextNPE.npei_i &&
-                      SortearDisable
+                        SortearDisable
                         ? "#FF5349"
                         : "#f9fafb",
                     height: 40,
