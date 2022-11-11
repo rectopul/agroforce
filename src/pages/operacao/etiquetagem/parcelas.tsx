@@ -153,7 +153,7 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
-      title: "REP.",
+      title: "REP",
       value: "rep",
       defaultChecked: () => camposGerenciados.includes("rep"),
     },
@@ -541,7 +541,7 @@ export default function Listagem({
       if (columnOrder[index] === "rep") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "REP.",
+            name: "REP",
             title: "rep",
             orderList,
             fieldOrder,
@@ -1049,7 +1049,7 @@ export default function Listagem({
                 <p className="h-4 font-bold text-xs text-gray-300">
                   {genotypeNameOne}
                 </p>
-                <p className="font-bold text-xs mt-1">Nome do grupo de exp.</p>
+                <p className="font-bold text-xs mt-1">Nome do grupo de exp</p>
                 <p className="h-4 font-bold text-xs text-gray-300">
                   {groupNameOne}
                 </p>
@@ -1065,7 +1065,7 @@ export default function Listagem({
                 <p className="h-4 font-bold text-xs text-gray-300">
                   {genotypeNameTwo}
                 </p>
-                <p className="font-bold text-xs mt-1">Nome do grupo de exp.</p>
+                <p className="font-bold text-xs mt-1">Nome do grupo de exp</p>
                 <p className="h-4 font-bold text-xs text-gray-300">
                   {groupNameTwo}
                 </p>
@@ -1130,7 +1130,7 @@ export default function Listagem({
                 >
                   {filterFieldFactory("filterFoco", "Foco")}
                   {filterFieldFactory("filterTypeAssay", "Ensaio")}
-                  {filterFieldFactory("filterCod", "Cód. Tecnologia")}
+                  {filterFieldFactory("filterCod", "Cod Tec")}
                   {filterFieldFactory("filterTecnologia", "Nome Tecnologia")}
                   {filterFieldFactory("filterGli", "GLI")}
                   {filterFieldFactory(

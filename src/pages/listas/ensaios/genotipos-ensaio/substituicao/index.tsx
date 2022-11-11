@@ -139,13 +139,13 @@ export default function Listagem({
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Safra', value: 'safra' },
     { name: 'CamposGerenciados[]', title: 'Ano lote', value: 'year' },
-    { name: 'CamposGerenciados[]', title: 'Cód. lote', value: 'cod_lote' },
+    { name: 'CamposGerenciados[]', title: 'Cod lote', value: 'cod_lote' },
     { name: 'CamposGerenciados[]', title: 'NCA', value: 'ncc' },
     { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
     { name: 'CamposGerenciados[]', title: 'Peso', value: 'peso' },
     {
       name: 'CamposGerenciados[]',
-      title: 'Qtd. sementes',
+      title: 'Qtd sementes',
       value: 'quant_sementes',
     },
     {
@@ -438,7 +438,7 @@ export default function Listagem({
       if (columnCampos[index] === 'cod_lote') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Cód. lote',
+            name: 'Cod lote',
             title: 'cod_lote',
             orderList,
             fieldOrder,
@@ -482,7 +482,7 @@ export default function Listagem({
       if (columnCampos[index] === 'quant_sementes') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Qtd. sementes',
+            name: 'Qtd sementes',
             title: 'quant_sementes',
             orderList,
             fieldOrder,
@@ -720,7 +720,6 @@ export default function Listagem({
                 "
                 >
                   {filterFieldFactory('filterYear', 'Ano lote', true)}
-
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Cod. Lote
@@ -741,7 +740,6 @@ export default function Listagem({
                       />
                     </div>
                   </div>
-
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       NCA
@@ -788,7 +786,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Qnt. Sementes
+                      Qnt Sementes
                     </label>
                     <div className="flex">
                       <Input

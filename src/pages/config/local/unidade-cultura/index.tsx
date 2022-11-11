@@ -43,7 +43,7 @@ import {
 import * as ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
-import ComponentLoading from '../../../../components/Loading';
+import ComponentLoading from "../../../../components/Loading";
 
 interface IUnityCultureProps {
   id: number;
@@ -143,7 +143,7 @@ export default function Listagem({
     // },
     {
       name: "CamposGerenciados[]",
-      title: "Nome un. cultura",
+      title: "Unidade de cultura",
       value: "name_unity_culture",
       defaultChecked: () => camposGerenciados.includes("name_unity_culture"),
     },
@@ -155,7 +155,7 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
-      title: "Nome do L. de Cult.",
+      title: "Lugar de cultura",
       value: "name_local_culture",
       defaultChecked: () => camposGerenciados.includes("name_local_culture"),
     },
@@ -173,7 +173,7 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
-      title: "Nome Fazenda",
+      title: "Endereço",
       value: "adress",
       defaultChecked: () => camposGerenciados.includes("adress"),
     },
@@ -416,7 +416,7 @@ export default function Listagem({
       if (columnCampos[item] === "name_unity_culture") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Nome un. cultura",
+            name: "Unidade de cultura",
             title: "name_unity_culture",
             orderList,
             fieldOrder,
@@ -438,7 +438,7 @@ export default function Listagem({
       if (columnCampos[item] === "name_local_culture") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Nome do l. de cult.",
+            name: "Lugar de cultura",
             title: "local.name_local_culture",
             orderList,
             fieldOrder,
@@ -460,7 +460,7 @@ export default function Listagem({
       if (columnCampos[item] === "adress") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Nome da fazenda",
+            name: "Endereço",
             title: "local.adress",
             orderList,
             fieldOrder,
@@ -741,7 +741,7 @@ export default function Listagem({
                 >
                   {filterFieldFactory(
                     "filterNameUnityCulture",
-                    "Nome Un. de Cult."
+                    "Unidade de cultura"
                   )}
 
                   <div className="h-6 w-1/2 ml-2">
@@ -766,7 +766,7 @@ export default function Listagem({
 
                   {filterFieldFactory(
                     "filterNameLocalCulture",
-                    "Nome do L. de Cult."
+                    "Lugar de cultura"
                   )}
 
                   {filterFieldFactory("filterLabel", "Rótulo")}
@@ -782,7 +782,7 @@ export default function Listagem({
                   pb-0
                   "
                 >
-                  {filterFieldFactory("filterAdress", "Nome da Fazenda")}
+                  {filterFieldFactory("filterAdress", "Endereço")}
 
                   {filterFieldFactory("filterLabelCountry", "País")}
 

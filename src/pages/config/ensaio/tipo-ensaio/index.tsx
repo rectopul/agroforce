@@ -139,7 +139,7 @@ export default function TipoEnsaio({
     },
     {
       name: "CamposGerenciados[]",
-      title: "Quant. de sementes por envelope",
+      title: "Quant de sementes por envelope",
       value: "envelope",
       defaultChecked: () => camposGerenciados.includes("envelope"),
     },
@@ -495,7 +495,7 @@ export default function TipoEnsaio({
       if (columnOrder[item] === "envelope") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Quant. de sementes por envelope",
+            name: "Quant de sementes por envelope",
             title: "envelope.seeds",
             orderList,
             fieldOrder,
@@ -809,7 +809,7 @@ export default function TipoEnsaio({
                     />
                   </div>
 
-                  {filterFieldFactorySeeds("Quant. de sementes por envelope")}
+                  {filterFieldFactorySeeds("Quant de sementes por envelope")}
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 

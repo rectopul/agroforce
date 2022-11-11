@@ -152,7 +152,7 @@ export default function Listagem({
       title: "Delineamento",
       value: "delineamento",
     },
-    { name: "CamposGerenciados[]", title: "Rep.", value: "repetitionsNumber" },
+    { name: "CamposGerenciados[]", title: "Rep", value: "repetitionsNumber" },
     { name: "CamposGerenciados[]", title: "Status EXP", value: "status" },
     { name: "CamposGerenciados[]", title: "Ação", value: "action" },
   ]);
@@ -620,7 +620,7 @@ export default function Listagem({
       if (columnCampos[index] === "repetitionsNumber") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Rep.",
+            name: "Rep",
             title: "repetitionsNumber",
             orderList,
             fieldOrder,
@@ -879,7 +879,7 @@ export default function Listagem({
                     "filterExperimentName",
                     "Nome Experimento"
                   )}
-                  {filterFieldFactory("filterCod", "Cód. Tecnologia")}
+                  {filterFieldFactory("filterCod", "Cod Tec")}
                 </div>
 
                 <div
@@ -890,7 +890,7 @@ export default function Listagem({
                                         "
                 >
                   {filterFieldFactory("filterTecnologia", "Nome Tecnologia")}
-                  {filterFieldFactory("filterPeriod", "Epoca")}
+                  {filterFieldFactory("filterPeriod", "Época")}
                   {filterFieldFactory("filterDelineamento", "Delineamento")}
 
                   <div className="h-6 w-1/2 ml-2">

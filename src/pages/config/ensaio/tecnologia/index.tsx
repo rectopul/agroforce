@@ -139,7 +139,7 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
-      title: "Cod. tec.",
+      title: "Cod Tec.",
       value: "cod_tec",
       defaultChecked: () => camposGerenciados.includes("cod_tec"),
     },
@@ -362,7 +362,7 @@ export default function Listagem({
       if (columnCampos[item] === "cod_tec") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Cod tec.",
+            name: "Cod Tec",
             title: "cod_tec",
             orderList,
             fieldOrder,
@@ -600,7 +600,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cod. tec.
+                      Cod Tec
                     </label>
                     <Input
                       type="text"

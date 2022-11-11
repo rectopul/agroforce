@@ -97,7 +97,7 @@ export default function Listagem({
       title: "Delineamento",
       value: "delineamento",
     },
-    { name: "CamposGerenciados[]", title: "Rep.", value: "repetitionsNumber" },
+    { name: "CamposGerenciados[]", title: "Rep", value: "repetitionsNumber" },
     { name: "CamposGerenciados[]", title: "Status EXP", value: "status" },
     { name: "CamposGerenciados[]", title: "Ação", value: "action" },
   ]);
@@ -328,7 +328,7 @@ export default function Listagem({
       if (columnOrder[index] === "repetitionsNumber") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Rep.",
+            name: "Rep",
             title: "repetitionsNumber",
             orderList,
             fieldOrder,
@@ -625,10 +625,10 @@ export default function Listagem({
             onSubmit={() => {}}
           >
             <div className="w-full flex justify-between items-start gap-5 mt-1">
-              {nameGroupFieldFactory("name", "Nome do grupo de exp.")}
-              {updateFieldFactory("experimentAmount", "Qtde. exp.")}
-              {updateFieldFactory("tagsToPrint", "Total etiq. a imp.")}
-              {updateFieldFactory("tagsPrinted", "Total etiq. imp.")}
+              {nameGroupFieldFactory("name", "Nome do grupo de exp")}
+              {updateFieldFactory("experimentAmount", "Qtde exp")}
+              {updateFieldFactory("tagsToPrint", "Total etiq a imp")}
+              {updateFieldFactory("tagsPrinted", "Total etiq imp")}
               {updateFieldFactory("totalTags", "Total etiq")}
               {updateFieldFactory("status", "Status")}
 
