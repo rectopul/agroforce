@@ -27,6 +27,7 @@ export class PrismaTransactionScope implements TransactionScope {
       // exists, there is no need to create a transaction and you just execute the callback
       return await fn();
     } else {
+      await this.prisma.$executeRaw`SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED`; 
       // does not exist, create a Prisma transaction 
       await this.prisma.$transaction(async (prisma) => {
         await this.transactionContext.runPromise(async () => {

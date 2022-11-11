@@ -430,469 +430,6 @@ export class ImportGenotypeController {
       }
 
       if (responseIfError.length === 0) {
-        // try {
-        //   for (const row in spreadSheet) {
-        //     if (row !== '0') {
-        //       for (const column in spreadSheet[row]) {
-        //         this.aux.genealogy = '';
-        //         // campos genotipo
-        //         if (configModule.response[0]?.fields[column] === 'id_s1') {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.id_s1 = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (configModule.response[0]?.fields[column] === 'S1_DATA_ID') {
-        //           if (spreadSheet[row][column] !== null) {
-        //             const geno: any = await genotipoController.getAll({
-        //               id_culture: idCulture,
-        //               id_dados: spreadSheet[row][column],
-        //             });
-        //             if (geno.total > 0) {
-        //               this.aux.id_genotipo = geno.response[0]?.id;
-        //             } else {
-        //               this.aux.id_genotipo = null;
-        //             }
-        //             this.aux.id_dados_geno = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (
-        //           configModule.response[0]?.fields[column]
-        //           === 'Nome do genótipo'
-        //         ) {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.name_genotipo = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (
-        //           configModule.response[0]?.fields[column] === 'Nome principal'
-        //         ) {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.name_main = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (
-        //           configModule.response[0]?.fields[column] === 'Nome público'
-        //         ) {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.name_public = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (
-        //           configModule.response[0]?.fields[column]
-        //           === 'Nome experimental'
-        //         ) {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.name_experiment = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (
-        //           configModule.response[0]?.fields[column]
-        //           === 'Nome alternativo'
-        //         ) {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.name_alter = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (configModule.response[0]?.fields[column] === 'Elite_Nome') {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.elite_name = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (
-        //           configModule.response[0]?.fields[column]
-        //           === 'Código da tecnologia'
-        //         ) {
-        //           if (spreadSheet[row][column] !== null) {
-        //             if (
-        //               typeof spreadSheet[row][column] === 'number'
-        //               && spreadSheet[row][column].toString().length < 2
-        //             ) {
-        //               // eslint-disable-next-line no-param-reassign
-        //               spreadSheet[row][column] = `0${spreadSheet[row][
-        //                 column
-        //               ].toString()}`;
-        //             }
-        //             const tec: any = await tecnologiaController.getAll({
-        //               id_culture: idCulture,
-        //               cod_tec: String(spreadSheet[row][column]),
-        //             });
-        //             if (tec.total > 0) {
-        //               this.aux.id_tecnologia = tec.response[0]?.id;
-        //             }
-        //           }
-        //         }
-
-        //         if (configModule.response[0]?.fields[column] === 'Tipo') {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.type = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (configModule.response[0]?.fields[column] === 'gmr') {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.gmr = Number(spreadSheet[row][column]).toFixed(1);
-        //           }
-        //         }
-
-        //         if (configModule.response[0]?.fields[column] === 'bgm') {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.bgm = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (
-        //           configModule.response[0]?.fields[column]
-        //           === 'Cruzamento de origem'
-        //         ) {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.cruza = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (
-        //           configModule.response[0]?.fields[column]
-        //           === 'Progenitor F direto'
-        //         ) {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.progenitor_f_direto = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (
-        //           configModule.response[0]?.fields[column]
-        //           === 'Progenitor M direto'
-        //         ) {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.progenitor_m_direto = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (
-        //           configModule.response[0]?.fields[column]
-        //           === 'Progenitor F de origem'
-        //         ) {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.progenitor_f_origem = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (
-        //           configModule.response[0]?.fields[column]
-        //           === 'Progenitor M de origem'
-        //         ) {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.progenitor_m_origem = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (
-        //           configModule.response[0]?.fields[column]
-        //           === 'Progenitores de origem'
-        //         ) {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.progenitores_origem = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (
-        //           configModule.response[0]?.fields[column]
-        //           === 'Parentesco Completo'
-        //         ) {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.parentesco_completo = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         // Campos lote
-        //         if (configModule.response[0]?.fields[column] === 'id_s2') {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.id_s2 = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (configModule.response[0]?.fields[column] === 'DATA_ID') {
-        //           if (spreadSheet[row][column] !== null) {
-        //             const lote: any = await loteController.getAll({
-        //               id_dados: spreadSheet[row][column],
-        //             });
-        //             if (lote.total > 0) {
-        //               this.aux.id_lote = lote.response[0]?.id;
-        //             }
-        //             this.aux.id_dados_lote = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (
-        //           configModule.response[0]?.fields[column] === 'Ano do lote'
-        //         ) {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.year = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (configModule.response[0]?.fields[column] === 'NCC') {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.ncc = spreadSheet[row][column];
-        //           } else {
-        //             this.aux.ncc = null;
-        //           }
-        //         }
-
-        //         if (
-        //           configModule.response[0]?.fields[column] === 'Código do lote'
-        //         ) {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.cod_lote = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (configModule.response[0]?.fields[column] === 'Fase') {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.fase = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (configModule.response[0]?.fields[column] === 'Peso') {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.peso = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (configModule.response[0]?.fields[column] === 'SEMENTES') {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.quant_sementes = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (configModule.response[0]?.fields[column] === 'DT_EXPORT') {
-        //           if (spreadSheet[row][column] !== null) {
-        //             this.aux.dt_export = spreadSheet[row][column];
-        //           }
-        //         }
-
-        //         if (
-        //           spreadSheet[row].length === Number(column) + 1
-        //           && this.aux !== []
-
-        //         ) {
-        //           if (this.aux.id_genotipo) {
-        //             const genotipo_obj = {
-        //               id: this.aux.id_genotipo,
-        //               id_tecnologia: Number(this.aux.id_tecnologia),
-        //               id_culture: idCulture,
-        //               id_s1: this.aux.id_s1,
-        //               id_dados: String(this.aux.id_dados_geno),
-        //               name_genotipo: this.aux.name_genotipo,
-        //               name_main: this.aux.name_main,
-        //               name_public: this.aux.name_public,
-        //               name_experiment: this.aux.name_experiment,
-        //               name_alter: this.aux.name_alter,
-        //               elit_name: this.aux.elit_name,
-        //               type: this.aux.type,
-        //               gmr: this.aux.gmr,
-        //               bgm: this.aux.bgm,
-        //               cruza: this.aux.cruza,
-        //               progenitor_f_direto: this.aux.progenitor_f_direto,
-        //               progenitor_m_direto: this.aux.progenitor_m_direto,
-        //               progenitor_f_origem: this.aux.progenitor_f_origem,
-        //               progenitor_m_origem: this.aux.progenitor_m_origem,
-        //               progenitores_origem: this.aux.progenitores_origem,
-        //               parentesco_completo: this.aux.parentesco_completo,
-        //               dt_export: this.aux.dt_export,
-        //               created_by: createdBy,
-        //             };
-        //             // console.log(genotipo_obj);
-        //             genotipeQueue.add({
-        //               instance: genotipo_obj,
-        //               request_type: 'update',
-        //               aux: this.aux,
-        //             });
-        //             // await genotipoController.update({
-        //             //   id: this.aux.id_genotipo,
-        //             //   id_tecnologia: Number(this.aux.id_tecnologia),
-        //             //   id_s1: this.aux.id_s1,
-        //             //   id_dados: String(this.aux.id_dados_geno),
-        //             //   name_genotipo: this.aux.name_genotipo,
-        //             //   name_main: this.aux.name_main,
-        //             //   name_public: this.aux.name_public,
-        //             //   name_experiment: this.aux.name_experiment,
-        //             //   name_alter: this.aux.name_alter,
-        //             //   elit_name: this.aux.elit_name,
-        //             //   type: this.aux.type,
-        //             //   gmr: this.aux.gmr,
-        //             //   bgm: this.aux.bgm,
-        //             //   cruza: this.aux.cruza,
-        //             //   progenitor_f_direto: this.aux.progenitor_f_direto,
-        //             //   progenitor_m_direto: this.aux.progenitor_m_direto,
-        //             //   progenitor_f_origem: this.aux.progenitor_f_origem,
-        //             //   progenitor_m_origem: this.aux.progenitor_m_origem,
-        //             //   progenitores_origem: this.aux.progenitores_origem,
-        //             //   parentesco_completo: this.aux.parentesco_completo,
-        //             //   dt_export: this.aux.dt_export,
-        //             //   created_by: createdBy,
-        //             // });
-        //           } else {
-        //             delete this.aux.id_genotipo;
-        //             const genotipo_obj = {
-        //               // id_culture: this.aux.id_culture,
-        //               id_tecnologia: this.aux.id_tecnologia,
-        //               id_culture: idCulture,
-        //               id_s1: this.aux.id_s1,
-        //               id_dados: String(this.aux.id_dados_geno),
-        //               name_genotipo: this.aux.name_genotipo,
-        //               name_main: this.aux.name_main,
-        //               name_public: this.aux.name_public,
-        //               name_experiment: this.aux.name_experiment,
-        //               name_alter: this.aux.name_alter,
-        //               elit_name: this.aux.elit_name,
-        //               type: this.aux.type,
-        //               gmr: this.aux.gmr,
-        //               bgm: this.aux.bgm,
-        //               cruza: this.aux.cruza,
-        //               progenitor_f_direto: this.aux.progenitor_f_direto,
-        //               progenitor_m_direto: this.aux.progenitor_m_direto,
-        //               progenitor_f_origem: this.aux.progenitor_f_origem,
-        //               progenitor_m_origem: this.aux.progenitor_m_origem,
-        //               progenitores_origem: this.aux.progenitores_origem,
-        //               parentesco_completo: this.aux.parentesco_completo,
-        //               dt_export: this.aux.dt_export,
-        //               created_by: createdBy,
-        //             };
-        //             // console.log(genotipo_obj);
-        //             genotipeQueue.add({
-        //               instance: genotipo_obj,
-        //               request_type: 'create',
-        //               aux: this.aux,
-        //             });
-        //             // const genotipo: any = await genotipoController.create({
-        //             //   id_culture: idCulture,
-        //             //   id_tecnologia: this.aux.id_tecnologia,
-        //             //   id_s1: this.aux.id_s1,
-        //             //   id_dados: String(this.aux.id_dados_geno),
-        //             //   name_genotipo: this.aux.name_genotipo,
-        //             //   name_main: this.aux.name_main,
-        //             //   name_public: this.aux.name_public,
-        //             //   name_experiment: this.aux.name_experiment,
-        //             //   name_alter: this.aux.name_alter,
-        //             //   elit_name: this.aux.elit_name,
-        //             //   type: this.aux.type,
-        //             //   gmr: this.aux.gmr,
-        //             //   bgm: this.aux.bgm,
-        //             //   cruza: this.aux.cruza,
-        //             //   progenitor_f_direto: this.aux.progenitor_f_direto,
-        //             //   progenitor_m_direto: this.aux.progenitor_m_direto,
-        //             //   progenitor_f_origem: this.aux.progenitor_f_origem,
-        //             //   progenitor_m_origem: this.aux.progenitor_m_origem,
-        //             //   progenitores_origem: this.aux.progenitores_origem,
-        //             //   parentesco_completo: this.aux.parentesco_completo,
-        //             //   dt_export: this.aux.dt_export,
-        //             //   created_by: createdBy,
-        //             // });
-        //             // this.aux.id_genotipo = genotipo.response.id;
-        //           }
-
-        //           // if (this.aux.id_genotipo && this.aux.ncc) {
-        //           //   if (this.aux.id_lote) {
-        //           //     // const lote_obj = {
-        //           //     //   id: Number(this.aux.id_lote),
-        //           //     //   id_genotipo: Number(this.aux.id_genotipo),
-        //           //     //   id_safra: Number(idSafra),
-        //           //     //   cod_lote: String(this.aux.cod_lote),
-        //           //     //   id_s2: Number(this.aux.id_s2),
-        //           //     //   id_dados: Number(this.aux.id_dados_lote),
-        //           //     //   year: Number(this.aux.year),
-        //           //     //   ncc: Number(this.aux.ncc),
-        //           //     //   fase: this.aux.fase,
-        //           //     //   peso: this.aux.peso,
-        //           //     //   quant_sementes: this.aux.quant_sementes,
-        //           //     //   dt_export: this.aux.dt_export,
-        //           //     //   created_by: createdBy,
-        //           //     // };
-        //           //     // loteQueue.add({
-        //           //     //   instance: lote_obj,
-        //           //     //   request_type: 'update',
-        //           //     // });
-        //           //     await loteController.update({
-        //           //       id: Number(this.aux.id_lote),
-        //           //       id_genotipo: Number(this.aux.id_genotipo),
-        //           //       id_safra: Number(idSafra),
-        //           //       cod_lote: String(this.aux.cod_lote),
-        //           //       id_s2: Number(this.aux.id_s2),
-        //           //       id_dados: Number(this.aux.id_dados_lote),
-        //           //       year: Number(this.aux.year),
-        //           //       ncc: Number(this.aux.ncc),
-        //           //       fase: this.aux.fase,
-        //           //       peso: this.aux.peso,
-        //           //       quant_sementes: this.aux.quant_sementes,
-        //           //       created_by: createdBy,
-        //           //     });
-        //           //     delete this.aux.id_lote;
-        //           //     delete this.aux.id_genotipo;
-        //           //   } else {
-        //           //     // const lote_obj = {
-        //           //     //   id_genotipo: Number(this.aux.id_genotipo),
-        //           //     //   id_safra: Number(idSafra),
-        //           //     //   cod_lote: String(this.aux.cod_lote),
-        //           //     //   id_s2: Number(this.aux.id_s2),
-        //           //     //   id_dados: Number(this.aux.id_dados_lote),
-        //           //     //   year: Number(this.aux.year),
-        //           //     //   ncc: Number(this.aux.ncc),
-        //           //     //   fase: this.aux.fase,
-        //           //     //   peso: this.aux.peso,
-        //           //     //   quant_sementes: this.aux.quant_sementes,
-        //           //     //   dt_export: this.aux.dt_export,
-        //           //     //   created_by: createdBy,
-        //           //     // };
-        //           //     // loteQueue.add({
-        //           //     //   instance: lote_obj,
-        //           //     //   request_type: 'create',
-        //           //     // });
-        //           //     await loteController.create({
-        //           //       id_genotipo: Number(this.aux.id_genotipo),
-        //           //       id_safra: Number(idSafra),
-        //           //       cod_lote: String(this.aux.cod_lote),
-        //           //       id_s2: Number(this.aux.id_s2),
-        //           //       id_dados: Number(this.aux.id_dados_lote),
-        //           //       year: Number(this.aux.year),
-        //           //       ncc: Number(this.aux.ncc),
-        //           //       fase: this.aux.fase,
-        //           //       peso: this.aux.peso,
-        //           //       quant_sementes: this.aux.quant_sementes,
-        //           //       created_by: createdBy,
-        //           //     });
-        //           //     delete this.aux.id_genotipo;
-        //           //   }
-        //           // }
-        //         }
-        //       }
-        //     }
-        //   }
-        //   await logImportController.update({
-        //     id: idLog,
-        //     status: 1,
-        //     state: 'SUCESSO',
-        //   });
-        //   return { status: 200, message: 'Genótipo importado com sucesso' };
-        // } catch (error: any) {
-        //   await logImportController.update({
-        //     id: idLog,
-        //     status: 1,
-        //     state: 'FALHA',
-        //   });
-        //   handleError('Genótipo controller', 'Save Import', error.message);
-        //   return {
-        //     status: 500,
-        //     message: 'Erro ao salvar planilha de Genótipo',
-        //   };
-        // }
         this.storeRecords(idLog, {
           spreadSheet, idSafra, idCulture, created_by: createdBy,
         });
@@ -1189,9 +726,7 @@ export class ImportGenotypeController {
               if (
                 spreadSheet[row].length === Number(column) + 1
               ) {
-                // this.aux.id_safra = idSafra;
                 if (this.aux.id_genotipo) {
-                  
                   await genotipoRepository.updateTransaction(this.aux.id_genotipo, {
                     id: this.aux.id_genotipo,
                     id_tecnologia: Number(this.aux.id_tecnologia),
@@ -1217,7 +752,6 @@ export class ImportGenotypeController {
                     created_by: createdBy,
                   });
                 } else {
-                  delete this.aux.id_genotipo;
                   const genotipo: any = await genotipoRepository.createTransaction({
                     id_culture: idCulture,
                     id_tecnologia: this.aux.id_tecnologia,
@@ -1242,10 +776,10 @@ export class ImportGenotypeController {
                     dt_export: this.aux.dt_export,
                     created_by: createdBy,
                   });
-                  this.aux.id_genotipo = await genotipo.response.id;
+                  this.aux.id_genotipo = await genotipo.id;
                 }
 
-                if (this.aux.id_genotipo && this.aux.ncc) {
+                if (this.aux.id_genotipo && this.aux.ncc) {                  
                   if (this.aux.id_lote) {
                     await loteRepository.updateTransaction(this.aux.id_lote, {
                       id: Number(this.aux.id_lote),
@@ -1262,13 +796,11 @@ export class ImportGenotypeController {
                       created_by: createdBy,
                     });
 
-                    const genotype: any = await genotipoController.getOne(this.aux.id_genotipo);
-                    await genotipoRepository.updateTransaction(genotype?.response?.id, { numberLotes: genotype?.response?.lote?.length });
+                    const genotype: any = await genotipoRepository.findOne(this.aux.id_genotipo);
+                    const genotypeUpdated:any = await genotipoRepository.updateTransaction(this.aux.id_genotipo, { numberLotes: genotype?.lote?.length });
 
-                    delete this.aux.id_lote;
-                    delete this.aux.id_genotipo;
                   } else {
-                    await loteRepository.createTransaction({
+                    const lote = await loteRepository.createTransaction({
                       id_genotipo: Number(this.aux.id_genotipo),
                       id_safra: Number(idSafra),
                       cod_lote: Number(this.aux.cod_lote),
@@ -1281,11 +813,8 @@ export class ImportGenotypeController {
                       quant_sementes: this.aux.quant_sementes,
                       created_by: createdBy,
                     });
-                    
-                    const genotype: any = await genotipoController.getOne(this.aux.id_genotipo);
-                    await genotipoRepository.updateTransaction(genotype?.response?.id, { numberLotes: genotype?.response?.lote?.length });
-
-                    delete this.aux.id_genotipo;
+                    const genotype: any = await genotipoRepository.findOne(this.aux.id_genotipo);
+                    const genotypeUpdated:any = await genotipoRepository.updateTransaction(this.aux.id_genotipo, { numberLotes: genotype?.lote?.length });
                   }
                 }
               }
