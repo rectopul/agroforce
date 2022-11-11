@@ -134,7 +134,7 @@ export default function Listagem({
     // },
     {
       name: "CamposGerenciados[]",
-      title: "Nome do L. de Cult.",
+      title: "Lugar de cultura",
       value: "name_local_culture",
       defaultChecked: () => camposGerenciados.includes("name_local_culture"),
     },
@@ -369,7 +369,7 @@ export default function Listagem({
       if (objectCampos[item] === "name_local_culture") {
         arrOb.push(
           headerTableFactoryGlobal({
-            name: "Nome do L. de cult.",
+            name: "Lugar de cultura",
             title: "name_local_culture",
             orderList,
             fieldOrder,
@@ -730,7 +730,7 @@ export default function Listagem({
                 >
                   {filterFieldFactory(
                     "filterNameLocalCulture",
-                    "N. do L. de Cult."
+                    "Lugar de cultura"
                   )}
 
                   {filterFieldFactory("filterLabel", "Rótulo")}

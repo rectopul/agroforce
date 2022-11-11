@@ -181,7 +181,7 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
-      title: "Epoca ",
+      title: "Época ",
       value: "epoca",
       defaultChecked: () => camposGerenciados.includes("epoca"),
     },
@@ -499,7 +499,7 @@ export default function Listagem({
       if (columnCampos[item] === "epoca") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Epoca",
+            name: "Época",
             title: "epoca",
             orderList,
             fieldOrder,
@@ -518,22 +518,22 @@ export default function Listagem({
           })
         );
       }
-      if (columnCampos[item] === "group") {
+      if (columnCampos[item] === "prox_npe") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Grupo",
-            title: "group.group",
+            name: "Prox NPE",
+            title: "prox_npe",
             orderList,
             fieldOrder,
             handleOrder,
           })
         );
       }
-      if (columnCampos[item] === "prox_npe") {
+      if (columnCampos[item] === "group") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Prox NPE",
-            title: "prox_npe",
+            name: "Grupo",
+            title: "group.group",
             orderList,
             fieldOrder,
             handleOrder,
@@ -853,7 +853,7 @@ export default function Listagem({
                 className="flex flex-col
                   w-full
                   items-center
-                  px-4
+                  px-0
                   bg-white
                 "
                 onSubmit={formik.handleSubmit}
@@ -879,13 +879,13 @@ export default function Listagem({
 
                   {filterFieldFactory("filterEnsaio", "Ensaio")}
 
-                  {filterFieldFactory("filterCodTecnologia", "Cód. Tec.")}
+                  {filterFieldFactory("filterCodTecnologia", "Cod Tec")}
 
-                  {filterFieldFactory("filterTecnologia", "Nome Tec.")}
+                  {filterFieldFactory("filterTecnologia", "Nome Tec")}
 
                   {filterFieldFactory("filterLocal", "Lugar cultura")}
 
-                  {filterFieldFactory("filterEpoca", "Epoca")}
+                  {filterFieldFactory("filterEpoca", "Época")}
 
                   <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
