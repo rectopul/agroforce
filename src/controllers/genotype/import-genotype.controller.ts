@@ -430,7 +430,7 @@ export class ImportGenotypeController {
       }
 
       if (responseIfError.length === 0) {
-        this.storeRecords(idLog, {
+        return this.storeRecords(idLog, {
           spreadSheet, idSafra, idCulture, created_by: createdBy,
         });
       }
@@ -784,10 +784,9 @@ export class ImportGenotypeController {
                   });
 
                   this.aux.id_genotipo = await genotipo.id;
-
                 }
 
-                if (this.aux.id_genotipo && this.aux.ncc) {                  
+                if (this.aux.id_genotipo && this.aux.ncc) {
                   if (this.aux.id_lote) {
                     await loteRepository.updateTransaction(this.aux.id_lote, {
                       id: Number(this.aux.id_lote),
@@ -820,11 +819,12 @@ export class ImportGenotypeController {
                       quant_sementes: this.aux.quant_sementes,
                       created_by: createdBy,
                     });
-                    
+
                     const genotype: any = await genotipoRepository.findOne(this.aux.id_genotipo);
                     const genotypeUpdated:any = await genotipoRepository.updateTransaction(this.aux.id_genotipo, { numberLotes: genotype?.lote?.length });
                   }
                 }
+                this.aux = [];
               }
             }
           }
