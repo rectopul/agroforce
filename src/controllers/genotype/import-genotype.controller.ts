@@ -430,7 +430,7 @@ export class ImportGenotypeController {
       }
 
       if (responseIfError.length === 0) {
-        return this.storeRecords(idLog, {
+        this.storeRecords(idLog, {
           spreadSheet, idSafra, idCulture, created_by: createdBy,
         });
       }
@@ -732,7 +732,6 @@ export class ImportGenotypeController {
               if (
                 spreadSheet[row].length === Number(column) + 1
               ) {
-                // this.aux.id_safra = idSafra;
                 if (this.aux.id_genotipo) {
                   await genotipoRepository.updateTransaction(this.aux.id_genotipo, {
                     id: this.aux.id_genotipo,
@@ -759,7 +758,6 @@ export class ImportGenotypeController {
                     created_by: createdBy,
                   });
                 } else {
-                  delete this.aux.id_genotipo;
                   const genotipo: any = await genotipoRepository.createTransaction({
                     id_culture: idCulture,
                     id_tecnologia: this.aux.id_tecnologia,
@@ -784,10 +782,12 @@ export class ImportGenotypeController {
                     dt_export: this.aux.dt_export,
                     created_by: createdBy,
                   });
-                  this.aux.id_genotipo = await genotipo.response?.id;
+
+                  this.aux.id_genotipo = await genotipo.id;
+
                 }
 
-                if (this.aux.id_genotipo && this.aux.ncc) {
+                if (this.aux.id_genotipo && this.aux.ncc) {                  
                   if (this.aux.id_lote) {
                     await loteRepository.updateTransaction(this.aux.id_lote, {
                       id: Number(this.aux.id_lote),
@@ -804,16 +804,10 @@ export class ImportGenotypeController {
                       created_by: createdBy,
                     });
 
-                    const genotype: any = await genotipoController.getOne(this.aux.id_genotipo);
-                    await genotipoRepository.updateTransaction(
-                      genotype?.response?.id,
-                      { numberLotes: genotype?.response?.lote?.length },
-                    );
-
-                    delete this.aux.id_lote;
-                    delete this.aux.id_genotipo;
+                    const genotype: any = await genotipoRepository.findOne(this.aux.id_genotipo);
+                    const genotypeUpdated:any = await genotipoRepository.updateTransaction(this.aux.id_genotipo, { numberLotes: genotype?.lote?.length });
                   } else {
-                    await loteRepository.createTransaction({
+                    const lote = await loteRepository.createTransaction({
                       id_genotipo: Number(this.aux.id_genotipo),
                       id_safra: Number(idSafra),
                       cod_lote: Number(this.aux.cod_lote),
@@ -826,14 +820,9 @@ export class ImportGenotypeController {
                       quant_sementes: this.aux.quant_sementes,
                       created_by: createdBy,
                     });
-
-                    const genotype: any = await genotipoController.getOne(this.aux.id_genotipo);
-                    await genotipoRepository.updateTransaction(
-                      genotype?.response?.id,
-                      { numberLotes: genotype?.response?.lote?.length },
-                    );
-
-                    delete this.aux.id_genotipo;
+                    
+                    const genotype: any = await genotipoRepository.findOne(this.aux.id_genotipo);
+                    const genotypeUpdated:any = await genotipoRepository.updateTransaction(this.aux.id_genotipo, { numberLotes: genotype?.lote?.length });
                   }
                 }
               }
