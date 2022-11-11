@@ -14,7 +14,7 @@ import { SafraController } from '../safra.controller';
 import { LocalController } from './local.controller';
 import { UnidadeCulturaController } from './unidade-cultura.controller';
 import { LocalRepository } from '../../repository/local.repository';
-import {UnidadeCulturaRepository} from '../../repository/unidade-cultura.repository'
+import { UnidadeCulturaRepository } from '../../repository/unidade-cultura.repository';
 
 export class ImportLocalController {
   static aux: any = {};
@@ -33,8 +33,14 @@ export class ImportLocalController {
     const transactionConfig = new TransactionConfig();
     const localRepository = new LocalRepository();
     const unidadeCulturaRepository = new UnidadeCulturaRepository();
-    localRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
-    unidadeCulturaRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+    localRepository.setTransaction(
+      transactionConfig.clientManager,
+      transactionConfig.transactionScope,
+    );
+    unidadeCulturaRepository.setTransaction(
+      transactionConfig.clientManager,
+      transactionConfig.transactionScope,
+    );
     /* --------------------------------------- */
 
     const localTemp: Array<string> = [];
@@ -340,27 +346,39 @@ export class ImportLocalController {
                 });
 
                 // Abrir transação
-                if (response.total > 0) {
+                if (response.length > 0) {
                   localCultureDTO.id = response[0]?.id;
                   unityCultureDTO.id_local = response[0]?.id;
-                  
-                  await localRepository.updateTransaction(localCultureDTO.id, localCultureDTO);
-                  if (unityExist.total > 0) {
+
+                  await localRepository.updateTransaction(
+                    localCultureDTO.id,
+                    localCultureDTO,
+                  );
+                  if (unityExist.length > 0) {
                     unityCultureDTO.id = unityExist[0]?.id;
-                    await unidadeCulturaRepository.updateTransaction(unityCultureDTO.id, unityCultureDTO);
+                    await unidadeCulturaRepository.updateTransaction(
+                      unityCultureDTO.id,
+                      unityCultureDTO,
+                    );
                   } else {
                     delete unityCultureDTO.id;
                     await unidadeCulturaRepository.createTransaction(unityCultureDTO);
                   }
                 } else {
                   delete localCultureDTO.id;
-                  const { response: newLocal } = await localRepository.createTransaction(localCultureDTO);
+                  const {
+                    response: newLocal,
+                  } = await localRepository.createTransaction(localCultureDTO);
                   unityCultureDTO.id_local = newLocal?.id;
                   if (unityExist.total > 0) {
                     unityCultureDTO.id = unityExist[0]?.id;
-                    await unidadeCulturaRepository.updateTransaction(unityCultureDTO.id, unityCultureDTO);
+                    await unidadeCulturaRepository.updateTransaction(
+                      unityCultureDTO.id,
+                      unityCultureDTO,
+                    );
                   } else {
                     delete unityCultureDTO.id;
+
                     await unidadeCulturaRepository.createTransaction(unityCultureDTO);
                   }
                 }
@@ -368,7 +386,7 @@ export class ImportLocalController {
               }
             }
           });
-         
+
           await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
           return { status: 200, message: 'Local importado com sucesso' };
         } catch (error: any) {

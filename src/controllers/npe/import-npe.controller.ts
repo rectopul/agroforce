@@ -268,7 +268,7 @@ export class ImportNpeController {
                       Number(column) + 1,
                       row,
                       spreadSheet[0][column],
-                      'o foco não existe no sistema',
+                      'o foco não existe no sistema ou está inativo',
                     );
                   } else {
                     this.aux.focoId = response[0]?.id;
@@ -315,7 +315,7 @@ export class ImportNpeController {
                       Number(column) + 1,
                       row,
                       spreadSheet[0][column],
-                      'o tipo de ensaio não existe no sistema',
+                      'o tipo de ensaio não existe no sistema ou está inativo',
                     );
                   } else {
                     this.aux.typeAssayId = ensaio.response[0]?.id;
