@@ -182,14 +182,14 @@ export default function Listagem({
     {
       name: "StatusCheckbox",
       title: "IMPORTADO ",
-      value: "importado",
-      defaultChecked: () => camposGerenciados.includes("importado"),
+      value: "IMPORTADO",
+      defaultChecked: () => camposGerenciados.includes("IMPORTADO"),
     },
     {
       name: "StatusCheckbox",
       title: "SORTEADO",
-      value: "sorteado",
-      defaultChecked: () => camposGerenciados.includes("sorteado"),
+      value: "SORTEADO",
+      defaultChecked: () => camposGerenciados.includes("SORTEADO"),
     },
     {
       name: "StatusCheckbox",
