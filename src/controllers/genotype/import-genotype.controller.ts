@@ -2,6 +2,7 @@
 /* eslint-disable no-loop-func */
 /* eslint-disable import/no-cycle */
 /* eslint-disable no-await-in-loop */
+
 import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import {
   ImportValidate,
@@ -58,15 +59,6 @@ export class ImportGenotypeController {
     const genotipoController = new GenotipoController();
     const logImportController = new LogImportController();
     const tecnologiaController = new TecnologiaController();
-
-    /* --------- Transcation Context --------- */
-    const transactionConfig = new TransactionConfig();
-    const genotipoRepository = new GenotipoRepository();
-    genotipoRepository.setTransaction(
-      transactionConfig.clientManager,
-      transactionConfig.transactionScope,
-    );
-    /* --------------------------------------- */
 
     const responseIfError: any = [];
     const headers = [
@@ -326,7 +318,7 @@ export class ImportGenotypeController {
                     row,
                     spreadSheet[0][column],
                   );
-                } else if (!isNaN(spreadSheet[row][column])) {
+                } else {
                   const lote: any = loteController.getAll({
                     cod_lote: String(spreadSheet[row][column]),
                   });
@@ -338,13 +330,6 @@ export class ImportGenotypeController {
                       'código do lote deve ser um campo único no GOM',
                     );
                   }
-                } else {
-                  responseIfError[Number(column)] += responseGenericFactory(
-                    Number(column) + 1,
-                    row,
-                    spreadSheet[0][column],
-                    'código do lote deve ser um campo numérico',
-                  );
                 }
               }
 
@@ -737,6 +722,13 @@ export class ImportGenotypeController {
                   this.aux.quant_sementes = spreadSheet[row][column];
                 }
               }
+
+              if (configModule.response[0]?.fields[column] === 'DT_EXPORT') {
+                if (spreadSheet[row][column] !== null) {
+                  this.aux.dt_export = spreadSheet[row][column];
+                }
+              }
+
               if (
                 spreadSheet[row].length === Number(column) + 1
               ) {
@@ -766,7 +758,6 @@ export class ImportGenotypeController {
                     created_by: createdBy,
                   });
                 } else {
-                  delete this.aux.id_genotipo;
                   const genotipo: any = await genotipoRepository.createTransaction({
                     id_culture: idCulture,
                     id_tecnologia: this.aux.id_tecnologia,
@@ -791,7 +782,8 @@ export class ImportGenotypeController {
                     dt_export: this.aux.dt_export,
                     created_by: createdBy,
                   });
-                  this.aux.id_genotipo = genotipo?.id;
+
+                  this.aux.id_genotipo = await genotipo.id;
                 }
 
                 if (this.aux.id_genotipo && this.aux.ncc) {
@@ -805,23 +797,16 @@ export class ImportGenotypeController {
                       id_dados: Number(this.aux.id_dados_lote),
                       year: Number(this.aux.year),
                       ncc: Number(this.aux.ncc),
-                      fase: this.aux.fase ? String(this.aux.fase) : null,
-                      peso: this.aux.peso ? Number(this.aux.peso) : null,
+                      fase: this.aux.fase,
+                      peso: this.aux.peso,
                       quant_sementes: this.aux.quant_sementes,
                       created_by: createdBy,
                     });
 
-                    const genotype: any = await genotipoController.getOne(this.aux.id_genotipo);
-
-                    await genotipoRepository.updateTransaction(
-                      genotype?.response?.id,
-                      { numberLotes: genotype?.response?.lote?.length },
-                    );
-
-                    delete this.aux.id_lote;
-                    delete this.aux.id_genotipo;
+                    const genotype: any = await genotipoRepository.findOne(this.aux.id_genotipo);
+                    const genotypeUpdated:any = await genotipoRepository.updateTransaction(this.aux.id_genotipo, { numberLotes: genotype?.lote?.length });
                   } else {
-                    await loteRepository.createTransaction({
+                    const lote = await loteRepository.createTransaction({
                       id_genotipo: Number(this.aux.id_genotipo),
                       id_safra: Number(idSafra),
                       cod_lote: Number(this.aux.cod_lote),
@@ -829,19 +814,14 @@ export class ImportGenotypeController {
                       id_dados: Number(this.aux.id_dados_lote),
                       year: Number(this.aux.year),
                       ncc: Number(this.aux.ncc),
-                      fase: this.aux.fase ? String(this.aux.fase) : null,
-                      peso: this.aux.peso ? Number(this.aux.peso) : null,
+                      fase: this.aux.fase,
+                      peso: this.aux.peso,
                       quant_sementes: this.aux.quant_sementes,
                       created_by: createdBy,
                     });
 
-                    const genotype: any = await genotipoController.getOne(this.aux.id_genotipo);
-                    await genotipoRepository.updateTransaction(
-                      genotype?.response?.id,
-                      { numberLotes: genotype?.response?.lote?.length },
-                    );
-
-                    delete this.aux.id_genotipo;
+                    const genotype: any = await genotipoRepository.findOne(this.aux.id_genotipo);
+                    const genotypeUpdated:any = await genotipoRepository.updateTransaction(this.aux.id_genotipo, { numberLotes: genotype?.lote?.length });
                   }
                 }
                 this.aux = [];
@@ -850,7 +830,6 @@ export class ImportGenotypeController {
           }
         }
       });
-
       await logImportController.update({
         id: idLog,
         status: 1,

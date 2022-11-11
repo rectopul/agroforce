@@ -7,6 +7,7 @@ export const PRISMA_CLIENT_KEY = 'prisma';
 
 export class PrismaTransactionScope implements TransactionScope {
   private readonly prisma: PrismaClient;
+
   private readonly transactionContext: cls.Namespace;
 
   constructor(prisma: PrismaClient, transactionContext: cls.Namespace) {
@@ -19,14 +20,15 @@ export class PrismaTransactionScope implements TransactionScope {
   async run(fn: () => Promise<any>): Promise<any> {
     // attempt to get the Transaction Client
     const prisma = this.transactionContext.get(
-      PRISMA_CLIENT_KEY
+      PRISMA_CLIENT_KEY,
     ) as Prisma.TransactionClient;
 
     // if the Transaction Client
-    if (prisma) {     
+    if (prisma) {
       // exists, there is no need to create a transaction and you just execute the callback
       return await fn();
     } else {
+      await this.prisma.$executeRaw`SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED`; 
       // does not exist, create a Prisma transaction 
       await this.prisma.$transaction(async (prisma) => {
         await this.transactionContext.runPromise(async () => {
@@ -44,5 +46,22 @@ export class PrismaTransactionScope implements TransactionScope {
         });
       });
     }
+    // does not exist, create a Prisma transaction
+    await this.prisma.$executeRaw`SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED`;
+    await this.prisma.$transaction(async (prisma) => {
+      await this.transactionContext.runPromise(async () => {
+        // and save the Transaction Client inside the CLS namespace to be retrieved later on
+        this.transactionContext.set(PRISMA_CLIENT_KEY, prisma);
+
+        try {
+          // execute the transaction callback
+          return await fn();
+        } catch (err) {
+          // unset the transaction client when something goes wrong
+          this.transactionContext.set(PRISMA_CLIENT_KEY, null);
+          throw err;
+        }
+      });
+    });
   }
 }
