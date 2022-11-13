@@ -27,6 +27,11 @@ spec:
                 key: dburl
           - name: COPYMOD
             value: "tmgdns-qa"
+          - name: MAX_DIRECT_UPLOAD_ALLOWED
+            value: "10"
+          - name: REDIS_URL
+            value: "redis://localhost:6379"
+
         resources:
           limits:
             memory: 1024Mi
