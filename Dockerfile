@@ -47,6 +47,8 @@ ENV TZ=America/Fortaleza
 RUN cp /usr/share/zoneinfo/America/Fortaleza /etc/localtime
 
 
+RUN apk --update add redis 
+
 USER nextjs
 
 EXPOSE 3000
