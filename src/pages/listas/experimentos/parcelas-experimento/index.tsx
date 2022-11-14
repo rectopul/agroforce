@@ -154,7 +154,7 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
-      title: "REP",
+      title: "REP EXP",
       value: "rep",
       defaultChecked: () => camposGerenciados.includes("rep"),
     },
@@ -557,7 +557,7 @@ export default function Listagem({
       if (columnOrder[item] === "rep") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "REP",
+            name: "REP EXP",
             title: "rep",
             orderList,
             fieldOrder,
@@ -1124,7 +1124,7 @@ export default function Listagem({
                 >
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      REP
+                      REP EXP
                     </label>
                     <div className="flex">
                       <Input

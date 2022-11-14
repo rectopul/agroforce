@@ -140,8 +140,8 @@ export default function AtualizarLocal({
       title: "Nome do genotipo",
       value: "genotipo",
     },
-    { name: "CamposGerenciados[]", title: "GMR", value: "gmr" },
-    { name: "CamposGerenciados[]", title: "BGM", value: "bgm" },
+    { name: "CamposGerenciados[]", title: "GMR_ens", value: "gmr" },
+    { name: "CamposGerenciados[]", title: "BGM_ens", value: "bgm" },
     { name: "CamposGerenciados[]", title: "Fase", value: "fase" },
     { name: "CamposGerenciados[]", title: "Tecnologia", value: "tecnologia" },
     { name: "CamposGerenciados[]", title: "NT", value: "nt" },
@@ -337,7 +337,7 @@ export default function AtualizarLocal({
       if (columnCampos[index] === "repetitionExperience") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Reg Exp",
+            name: "Rep Exp",
             title: "rep",
             orderList,
             fieldOrder,
@@ -360,19 +360,19 @@ export default function AtualizarLocal({
       if (columnCampos[index] === "gmr") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "GMR",
+            name: "GMR_ens",
             title: "genotipo.gmr",
             orderList,
             fieldOrder,
             handleOrder,
             render: (rowData: any) => formatDecimal(rowData.genotipo.gmr),
-          }),
+          })
         );
       }
       if (columnCampos[index] === "bgm") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "BGM",
+            name: "BGM_ens",
             title: "genotipo.bgm",
             orderList,
             fieldOrder,
