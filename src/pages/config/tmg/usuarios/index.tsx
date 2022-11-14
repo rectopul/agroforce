@@ -115,7 +115,7 @@ export default function Listagem({
     Number(pageBeforeEdit),
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
@@ -152,7 +152,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Status',
+      title: 'Ação',
       value: 'status',
       defaultChecked: () => camposGerenciados.includes('status'),
     },
@@ -232,7 +232,10 @@ export default function Listagem({
           response.total >= take ? take : response.total,
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
 
   // Call that function when change type order value.
@@ -371,7 +374,7 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: 'Status',
+      title: 'Ação',
       field: 'status',
       sorting: false,
       searchable: false,

@@ -43,10 +43,10 @@ import {
   Select,
   FieldItemsPerPage,
   ButtonDeleteConfirmation,
-} from "../../../components";
-import * as ITabs from "../../../shared/utils/dropdown";
-import { tableGlobalFunctions } from "../../../helpers";
-import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
+} from '../../../components';
+import * as ITabs from '../../../shared/utils/dropdown';
+import { tableGlobalFunctions } from '../../../helpers';
+import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../components/Loading';
 
 interface INpeProps {
@@ -169,7 +169,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Nome tec.',
+      title: 'Tecnologia',
       value: 'tecnologia',
       defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
@@ -181,7 +181,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Epoca ',
+      title: 'Época ',
       value: 'epoca',
       defaultChecked: () => camposGerenciados.includes('epoca'),
     },
@@ -199,7 +199,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Status',
+      title: 'Ação',
       value: 'status',
       defaultChecked: () => camposGerenciados.includes('status'),
     },
@@ -295,7 +295,10 @@ export default function Listagem({
           response.total >= take ? take : response.total,
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
 
   // Call that function when change type order value.
@@ -488,13 +491,18 @@ export default function Listagem({
             orderList,
             fieldOrder,
             handleOrder,
+            render: (rowData: any) => (
+              <div>
+                {`${rowData?.tecnologia?.cod_tec} ${rowData?.tecnologia?.name}`}
+              </div>
+            ),
           }),
         );
       }
       if (columnCampos[item] === 'epoca') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Epoca',
+            name: 'Época',
             title: 'epoca',
             orderList,
             fieldOrder,
@@ -513,22 +521,22 @@ export default function Listagem({
           }),
         );
       }
-      if (columnCampos[item] === 'group') {
+      if (columnCampos[item] === 'prox_npe') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Grupo',
-            title: 'group.group',
+            name: 'Prox NPE',
+            title: 'prox_npe',
             orderList,
             fieldOrder,
             handleOrder,
           }),
         );
       }
-      if (columnCampos[item] === 'prox_npe') {
+      if (columnCampos[item] === 'group') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Prox NPE',
-            title: 'prox_npe',
+            name: 'Grupo',
+            title: 'group.group',
             orderList,
             fieldOrder,
             handleOrder,

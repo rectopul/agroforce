@@ -132,7 +132,7 @@ export default function Listagem({
   );
   const [filter, setFilter] = useState<any>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -152,9 +152,9 @@ export default function Listagem({
       title: 'Delineamento',
       value: 'delineamento',
     },
-    { name: 'CamposGerenciados[]', title: 'Rep.', value: 'repetitionsNumber' },
-    { name: 'CamposGerenciados[]', title: 'Status EXP.', value: 'status' },
-    { name: 'CamposGerenciados[]', title: 'Ações', value: 'action' },
+    { name: 'CamposGerenciados[]', title: 'Rep', value: 'repetitionsNumber' },
+    { name: 'CamposGerenciados[]', title: 'Status EXP', value: 'status' },
+    { name: 'CamposGerenciados[]', title: 'Ação', value: 'action' },
   ]);
 
   const [isOpenModalConfirm, setIsOpenModalConfirm] = useState<boolean>(false);
@@ -182,14 +182,14 @@ export default function Listagem({
     {
       name: 'StatusCheckbox',
       title: 'IMPORTADO ',
-      value: 'importado',
-      defaultChecked: () => camposGerenciados.includes('importado'),
+      value: 'IMPORTADO',
+      defaultChecked: () => camposGerenciados.includes('IMPORTADO'),
     },
     {
       name: 'StatusCheckbox',
       title: 'SORTEADO',
-      value: 'sorteado',
-      defaultChecked: () => camposGerenciados.includes('sorteado'),
+      value: 'SORTEADO',
+      defaultChecked: () => camposGerenciados.includes('SORTEADO'),
     },
     {
       name: 'StatusCheckbox',
@@ -313,7 +313,10 @@ export default function Listagem({
           response.total >= take ? take : response.total,
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
 
   // Call that function when change type order value.
@@ -454,7 +457,7 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: 'Ações',
+      title: 'Ação',
       field: 'action',
       sorting: false,
       searchable: false,
@@ -617,7 +620,7 @@ export default function Listagem({
       if (columnCampos[index] === 'repetitionsNumber') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Rep.',
+            name: 'Rep',
             title: 'repetitionsNumber',
             orderList,
             fieldOrder,
@@ -628,7 +631,7 @@ export default function Listagem({
       if (columnCampos[index] === 'status') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Status Exp.',
+            name: 'Status EXP',
             title: 'status',
             orderList,
             fieldOrder,
@@ -877,7 +880,7 @@ export default function Listagem({
                     'filterExperimentName',
                     'Nome Experimento',
                   )}
-                  {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
+                  {filterFieldFactory('filterCod', 'Cod Tec')}
                 </div>
 
                 <div
@@ -888,7 +891,7 @@ export default function Listagem({
                                         "
                 >
                   {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
-                  {filterFieldFactory('filterPeriod', 'Epoca')}
+                  {filterFieldFactory('filterPeriod', 'Época')}
                   {filterFieldFactory('filterDelineamento', 'Delineamento')}
 
                   <div className="h-6 w-1/2 ml-2">

@@ -158,7 +158,7 @@ export default function AtualizarTipoEnsaio({
     },
     { name: 'CamposGerenciados[]', title: 'T', value: 'status' },
     { name: 'CamposGerenciados[]', title: 'NCA', value: 'nca' },
-    { name: 'CamposGerenciados[]', title: 'Cód. lote', value: 'cod_lote' },
+    { name: 'CamposGerenciados[]', title: 'Cód lote', value: 'cod_lote' },
     { name: 'CamposGerenciados[]', title: 'OBS', value: 'comments' },
     {
       name: 'CamposGerenciados[]',
@@ -186,7 +186,7 @@ export default function AtualizarTipoEnsaio({
     { name: 'CamposGerenciados[]', title: 'CLP', value: 'clp' },
     // { name: "CamposGerenciados[]", title: "EEL", value: "eel" },
     { name: 'CamposGerenciados[]', title: 'Densidade', value: 'density' },
-    { name: 'CamposGerenciados[]', title: 'Status EXP.', value: 'status' },
+    { name: 'CamposGerenciados[]', title: 'Status EXP', value: 'status' },
   ]);
   const [colorStar, setColorStar] = useState<string>('');
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -297,7 +297,10 @@ export default function AtualizarTipoEnsaio({
           response.total >= take ? take : response.total,
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
 
   async function handleOrder(
@@ -305,37 +308,35 @@ export default function AtualizarTipoEnsaio({
     order: number,
     name: any,
   ): Promise<void> {
-    // let typeOrder: any;
-    // let parametersFilter: any;
-    // if (order === 1) {
-    //   typeOrder = 'asc';
-    // } else if (order === 2) {
-    //   typeOrder = 'desc';
-    // } else {
-    //   typeOrder = '';
-    // }
-    // setOrderBy(column);
-    // setOrderType(typeOrder);
-    // if (filter && typeof filter !== 'undefined') {
-    //   if (typeOrder !== '') {
-    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-    //   } else {
-    //     parametersFilter = filter;
-    //   }
-    // } else if (typeOrder !== '') {
-    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    // } else {
-    //   parametersFilter = filter;
-    // }
-    // console.log('parametersFilter');
-    // console.log(parametersFilter);
-    // await genotypeTreatmentService
-    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
-    //   .then(({ status, response }) => {
-    //     if (status === 200) {
-    //       setGenotypeTreatments(response);
-    //     }
-    //   });
+    let typeOrder: any;
+    let parametersFilter: any;
+    if (order === 1) {
+      typeOrder = 'asc';
+    } else if (order === 2) {
+      typeOrder = 'desc';
+    } else {
+      typeOrder = '';
+    }
+    setOrderBy(column);
+    setOrderType(typeOrder);
+    if (treatmentsFilter && typeof treatmentsFilter !== 'undefined') {
+      if (typeOrder !== '') {
+        parametersFilter = `${treatmentsFilter}&orderBy=${column}&typeOrder=${typeOrder}`;
+      } else {
+        parametersFilter = treatmentsFilter;
+      }
+    } else if (typeOrder !== '') {
+      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    } else {
+      parametersFilter = treatmentsFilter;
+    }
+    await genotypeTreatmentService
+      .getAll(`${parametersFilter}&skip=0&take=${take}`)
+      .then(({ status, response }) => {
+        if (status === 200) {
+          setGenotypeTreatments(response);
+        }
+      });
 
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
@@ -542,7 +543,7 @@ export default function AtualizarTipoEnsaio({
       if (columnOrder[index] === 'status_experiment') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Status Trat.',
+            name: 'Status Trat',
             title: 'status_experiment',
             orderList,
             fieldOrder,
@@ -569,7 +570,7 @@ export default function AtualizarTipoEnsaio({
             title: 'experimentName',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: handleOrderExperiments,
           }),
         );
       }
@@ -580,7 +581,7 @@ export default function AtualizarTipoEnsaio({
             title: 'local.name_local_culture',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: handleOrderExperiments,
           }),
         );
       }
@@ -591,7 +592,7 @@ export default function AtualizarTipoEnsaio({
             title: 'delineamento.name',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: handleOrderExperiments,
           }),
         );
       }
@@ -602,7 +603,7 @@ export default function AtualizarTipoEnsaio({
             title: 'repetitionsNumber',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: handleOrderExperiments,
           }),
         );
       }
@@ -613,7 +614,7 @@ export default function AtualizarTipoEnsaio({
             title: 'nlp',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: handleOrderExperiments,
           }),
         );
       }
@@ -624,7 +625,7 @@ export default function AtualizarTipoEnsaio({
             title: 'clp',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: handleOrderExperiments,
           }),
         );
       }
@@ -638,18 +639,18 @@ export default function AtualizarTipoEnsaio({
             title: 'density',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: handleOrderExperiments,
           }),
         );
       }
       if (columnOrder[index] === 'status') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Status EXP.',
+            name: 'Status EXP',
             title: 'status',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: handleOrderExperiments,
           }),
         );
       }

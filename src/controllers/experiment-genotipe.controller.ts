@@ -20,6 +20,8 @@ export class ExperimentGenotipeController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
+      console.log('options');
+      console.log(options);
       if (options.filterFoco) {
         parameters.foco = JSON.parse(
           `{ "name": { "contains": "${options.filterFoco}" } }`,
@@ -82,17 +84,15 @@ export class ExperimentGenotipeController {
         parameters.OR = [];
 
         const statusParams = options.filterStatus.split(',');
-        parameters.OR.push(
-          JSON.parse(
-            `{ "experiment": {"status": {"contains": "${statusParams[0]}" } } }`,
-          ),
-        );
-        parameters.OR.push(
-          JSON.parse(
-            `{ "experiment": {"status": {"contains": "${statusParams[1]}" } } }`,
-          ),
-        );
+        statusParams.forEach((_, index: number) => {
+          parameters.OR.push(
+            JSON.parse(
+              `{ "experiment": {"status": {"contains": "${statusParams[index]}" } } }`,
+            ),
+          );
+        });
       }
+      console.log(parameters.OR);
       if (options.ensaio) {
         parameters.AND.push(
           JSON.parse(

@@ -118,7 +118,7 @@ export default function Listagem({
   );
   const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
 
@@ -136,7 +136,7 @@ export default function Listagem({
       title: 'Período ideal do fim do plantio',
       value: 'plantingEndTime',
     },
-    { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
+    { name: 'CamposGerenciados[]', title: 'Ação', value: 'status' },
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
@@ -219,7 +219,10 @@ export default function Listagem({
           response.total >= take ? take : response.total,
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
 
   // Call that function when change type order value.
@@ -368,7 +371,7 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: 'Status',
+      title: 'Ação',
       field: 'status',
       sorting: false,
       searchable: false,
