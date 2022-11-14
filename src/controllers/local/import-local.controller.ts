@@ -2,6 +2,7 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
 import { responseGenericFactory, responseNullFactory, responsePositiveNumericFactory } from '../../shared/utils/responseErrorFactory';
@@ -12,6 +13,8 @@ import { LogImportController } from '../log-import.controller';
 import { SafraController } from '../safra.controller';
 import { LocalController } from './local.controller';
 import { UnidadeCulturaController } from './unidade-cultura.controller';
+import { LocalRepository } from '../../repository/local.repository';
+import { UnidadeCulturaRepository } from '../../repository/unidade-cultura.repository';
 
 export class ImportLocalController {
   static aux: any = {};
@@ -25,6 +28,20 @@ export class ImportLocalController {
     const importController = new ImportController();
     const logImportController = new LogImportController();
     const unidadeCulturaController = new UnidadeCulturaController();
+
+    /* --------- Transcation Context --------- */
+    const transactionConfig = new TransactionConfig();
+    const localRepository = new LocalRepository();
+    const unidadeCulturaRepository = new UnidadeCulturaRepository();
+    localRepository.setTransaction(
+      transactionConfig.clientManager,
+      transactionConfig.transactionScope,
+    );
+    unidadeCulturaRepository.setTransaction(
+      transactionConfig.clientManager,
+      transactionConfig.transactionScope,
+    );
+    /* --------------------------------------- */
 
     const localTemp: Array<string> = [];
     const responseIfError: Array<string> = [];
@@ -276,81 +293,100 @@ export class ImportLocalController {
         const localCultureDTO: object | any = {};
         const unityCultureDTO: object | any = {};
         try {
-          for (const row in spreadSheet) {
-            if (row !== '0') {
-              for (const column in spreadSheet[row]) {
-                if (spreadSheet[0][column].includes('ID da unidade de cultura')) {
-                  unityCultureDTO.id_unity_culture = Number(spreadSheet[row][column]);
-                } else if (spreadSheet[0][column].includes('Ano')) {
-                  unityCultureDTO.year = Number(spreadSheet[row][column]);
-                } else if (spreadSheet[0][column].includes('Nome da unidade de cultura')) {
-                  unityCultureDTO.name_unity_culture = (spreadSheet[row][column]?.toString());
-                } else if (spreadSheet[0][column].includes('ID do lugar de cultura')) {
-                  localCultureDTO.id_local_culture = Number(spreadSheet[row][column]);
-                } else if (spreadSheet[0][column].includes('Nome do lugar de cultura')) {
-                  localCultureDTO.name_local_culture = (spreadSheet[row][column]?.toString());
-                } else if (spreadSheet[0][column].includes('CP_LIBELLE')) {
-                  localCultureDTO.label = (spreadSheet[row][column]?.toString());
-                } else if (spreadSheet[0][column].includes('MLOC')) {
-                  localCultureDTO.mloc = (spreadSheet[row][column]?.toString());
-                } else if (spreadSheet[0][column].includes('Endereço')) {
-                  localCultureDTO.adress = (spreadSheet[row][column]?.toString());
-                } else if (spreadSheet[0][column].includes('Identificador de localidade')) {
-                  localCultureDTO.id_locality = Number(spreadSheet[row][column]);
-                } else if (spreadSheet[0][column].includes('Nome da localidade')) {
-                  localCultureDTO.name_locality = (spreadSheet[row][column]?.toString());
-                } else if (spreadSheet[0][column].includes('Identificador de região')) {
-                  localCultureDTO.id_region = Number(spreadSheet[row][column]);
-                } else if (spreadSheet[0][column].includes('Nome da região')) {
-                  localCultureDTO.name_region = (spreadSheet[row][column]?.toString());
-                } else if (spreadSheet[0][column].includes('REG_LIBELLE')) {
-                  localCultureDTO.label_region = (spreadSheet[row][column]?.toString());
-                } else if (spreadSheet[0][column].includes('ID do País')) {
-                  localCultureDTO.id_country = Number(spreadSheet[row][column]);
-                } else if (spreadSheet[0][column].includes('Nome do país')) {
-                  localCultureDTO.name_country = (spreadSheet[row][column]?.toString());
-                } else if (spreadSheet[0][column].includes('CNTR_LIBELLE')) {
-                  localCultureDTO.label_country = (spreadSheet[row][column]?.toString());
-                } else if (spreadSheet[0][column].includes('DT')) {
-                  unityCultureDTO.dt_export = spreadSheet[row][column];
+          await transactionConfig.transactionScope.run(async () => {
+            for (const row in spreadSheet) {
+              if (row !== '0') {
+                for (const column in spreadSheet[row]) {
+                  if (spreadSheet[0][column].includes('ID da unidade de cultura')) {
+                    unityCultureDTO.id_unity_culture = Number(spreadSheet[row][column]);
+                  } else if (spreadSheet[0][column].includes('Ano')) {
+                    unityCultureDTO.year = Number(spreadSheet[row][column]);
+                  } else if (spreadSheet[0][column].includes('Nome da unidade de cultura')) {
+                    unityCultureDTO.name_unity_culture = (spreadSheet[row][column]?.toString());
+                  } else if (spreadSheet[0][column].includes('ID do lugar de cultura')) {
+                    localCultureDTO.id_local_culture = Number(spreadSheet[row][column]);
+                  } else if (spreadSheet[0][column].includes('Nome do lugar de cultura')) {
+                    localCultureDTO.name_local_culture = (spreadSheet[row][column]?.toString());
+                  } else if (spreadSheet[0][column].includes('CP_LIBELLE')) {
+                    localCultureDTO.label = (spreadSheet[row][column]?.toString());
+                  } else if (spreadSheet[0][column].includes('MLOC')) {
+                    localCultureDTO.mloc = (spreadSheet[row][column]?.toString());
+                  } else if (spreadSheet[0][column].includes('Endereço')) {
+                    localCultureDTO.adress = (spreadSheet[row][column]?.toString());
+                  } else if (spreadSheet[0][column].includes('Identificador de localidade')) {
+                    localCultureDTO.id_locality = Number(spreadSheet[row][column]);
+                  } else if (spreadSheet[0][column].includes('Nome da localidade')) {
+                    localCultureDTO.name_locality = (spreadSheet[row][column]?.toString());
+                  } else if (spreadSheet[0][column].includes('Identificador de região')) {
+                    localCultureDTO.id_region = Number(spreadSheet[row][column]);
+                  } else if (spreadSheet[0][column].includes('Nome da região')) {
+                    localCultureDTO.name_region = (spreadSheet[row][column]?.toString());
+                  } else if (spreadSheet[0][column].includes('REG_LIBELLE')) {
+                    localCultureDTO.label_region = (spreadSheet[row][column]?.toString());
+                  } else if (spreadSheet[0][column].includes('ID do País')) {
+                    localCultureDTO.id_country = Number(spreadSheet[row][column]);
+                  } else if (spreadSheet[0][column].includes('Nome do país')) {
+                    localCultureDTO.name_country = (spreadSheet[row][column]?.toString());
+                  } else if (spreadSheet[0][column].includes('CNTR_LIBELLE')) {
+                    localCultureDTO.label_country = (spreadSheet[row][column]?.toString());
+                  } else if (spreadSheet[0][column].includes('DT')) {
+                    unityCultureDTO.dt_export = spreadSheet[row][column];
+                  }
                 }
-              }
-              localCultureDTO.created_by = Number(createdBy);
-              unityCultureDTO.created_by = Number(createdBy);
-              const { response } = await localController.getAll(
-                { id_local_culture: localCultureDTO.id_local_culture },
-              );
-              const {
-                response: unityExist,
-              }: IReturnObject = await unidadeCulturaController.getAll({
-                name_unity_culture: unityCultureDTO.name_unity_culture,
-                id_local: response[0]?.id,
-              });
-              if (response.total > 0) {
-                localCultureDTO.id = response[0]?.id;
-                unityCultureDTO.id_local = response[0]?.id;
-                await localController.update(localCultureDTO);
-                if (unityExist.total > 0) {
-                  unityCultureDTO.id = unityExist[0]?.id;
-                  await unidadeCulturaController.update(unityCultureDTO);
+                localCultureDTO.created_by = Number(createdBy);
+                unityCultureDTO.created_by = Number(createdBy);
+                const { response } = await localController.getAll(
+                  { id_local_culture: localCultureDTO.id_local_culture },
+                );
+                const {
+                  response: unityExist,
+                }: IReturnObject = await unidadeCulturaController.getAll({
+                  name_unity_culture: unityCultureDTO.name_unity_culture,
+                  id_local: response[0]?.id,
+                });
+
+                // Abrir transação
+                if (response.length > 0) {
+                  localCultureDTO.id = response[0]?.id;
+                  unityCultureDTO.id_local = response[0]?.id;
+
+                  await localRepository.updateTransaction(
+                    localCultureDTO.id,
+                    localCultureDTO,
+                  );
+                  if (unityExist.length > 0) {
+                    unityCultureDTO.id = unityExist[0]?.id;
+                    await unidadeCulturaRepository.updateTransaction(
+                      unityCultureDTO.id,
+                      unityCultureDTO,
+                    );
+                  } else {
+                    delete unityCultureDTO.id;
+                    await unidadeCulturaRepository.createTransaction(unityCultureDTO);
+                  }
                 } else {
-                  delete unityCultureDTO.id;
-                  await unidadeCulturaController.create(unityCultureDTO);
+                  delete localCultureDTO.id;
+                  const {
+                    response: newLocal,
+                  } = await localRepository.createTransaction(localCultureDTO);
+                  unityCultureDTO.id_local = newLocal?.id;
+                  if (unityExist.total > 0) {
+                    unityCultureDTO.id = unityExist[0]?.id;
+                    await unidadeCulturaRepository.updateTransaction(
+                      unityCultureDTO.id,
+                      unityCultureDTO,
+                    );
+                  } else {
+                    delete unityCultureDTO.id;
+
+                    await unidadeCulturaRepository.createTransaction(unityCultureDTO);
+                  }
                 }
-              } else {
-                delete localCultureDTO.id;
-                const { response: newLocal } = await localController.create(localCultureDTO);
-                unityCultureDTO.id_local = newLocal?.id;
-                if (unityExist.total > 0) {
-                  unityCultureDTO.id = unityExist[0]?.id;
-                  await unidadeCulturaController.update(unityCultureDTO);
-                } else {
-                  delete unityCultureDTO.id;
-                  await unidadeCulturaController.create(unityCultureDTO);
-                }
+                // fechar transação
               }
             }
-          }
+          });
+
           await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
           return { status: 200, message: 'Local importado com sucesso' };
         } catch (error: any) {

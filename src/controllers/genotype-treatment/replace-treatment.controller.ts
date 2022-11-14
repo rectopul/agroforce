@@ -134,6 +134,8 @@ export class ReplaceTreatmentController {
     parameters.OR = [];
     parameters.AND = [];
     try {
+      console.log('options');
+      console.log(options);
       if (options.filterYear) {
         parameters.year = Number(options.filterYear);
       }
@@ -146,11 +148,33 @@ export class ReplaceTreatmentController {
           parameters.year = JSON.parse(`{"lte": ${Number(options.filterYearTo)} }`);
         }
       }
-      if (options.filterCodLote) {
-        parameters.cod_lote = JSON.parse(`{ "contains":"${options.filterCodLote}" }`);
+      if (options.filterCodLoteFrom || options.filterCodLoteTo) {
+        if (options.filterCodLoteFrom && options.filterCodLoteTo) {
+          parameters.cod_lote = JSON.parse(`{"gte": ${Number(options.filterCodLoteFrom)}, "lte": ${Number(options.filterCodLoteTo)} }`);
+        } else if (options.filterCodLoteFrom) {
+          parameters.cod_lote = JSON.parse(`{"gte": ${Number(options.filterCodLoteFrom)} }`);
+        } else if (options.filterCodLoteTo) {
+          parameters.cod_lote = JSON.parse(`{"lte": ${Number(options.filterCodLoteTo)} }`);
+        }
       }
-      if (options.filterNcc) {
-        parameters.ncc = Number(options.filterNcc);
+      if (options.filterNcaFrom || options.filterNcaTo) {
+        if (options.filterNcaFrom === 'vazio' || options.filterNcaTo === 'vazio') {
+          parameters.ncc = null;
+        } else if (options.filterNcaFrom && options.filterNcaTo) {
+          parameters.nca = JSON.parse(
+            `{"gte": ${Number(options.filterNcaFrom)}, "lte": ${Number(
+              options.filterNcaTo,
+            )} }`,
+          );
+        } else if (options.filterNcaFrom) {
+          parameters.ncc = JSON.parse(
+            `{"gte": ${Number(options.filterNcaFrom)} }`,
+          );
+        } else if (options.filterNcaTo) {
+          parameters.ncc = JSON.parse(
+            `{"lte": ${Number(options.filterNcaTo)} }`,
+          );
+        }
       }
       if (options.filterPeso) {
         parameters.peso = Number(options.filterPeso);
@@ -215,6 +239,10 @@ export class ReplaceTreatmentController {
 
       if (options.filterNameTec) {
         parameters.genotipo = JSON.parse(`{ "tecnologia": { "desc": {"contains": "${options.filterNameTec}" } } }`);
+      }
+
+      if (options.idCulture) {
+        parameters.genotipo = JSON.parse(`{ "id_culture": ${Number(options.idCulture)} } `);
       }
 
       const select = {

@@ -1,8 +1,9 @@
 import { prisma } from '../pages/api/db/db';
+import {BaseRepository} from './base-repository';
 
-export class AllocatedExperimentRepository {
+export class AllocatedExperimentRepository extends BaseRepository {
   async create(data: any) {
-    const result = await prisma.allocatedExperiment.create({
+    const result = await this.getPrisma().allocatedExperiment.create({
       data,
     });
 
@@ -18,7 +19,7 @@ export class AllocatedExperimentRepository {
   }
 
   async update(id: number, data: any) {
-    const result = await prisma.allocatedExperiment.update({
+    const result = await this.getPrisma().allocatedExperiment.update({
       where: { id },
       data,
     });

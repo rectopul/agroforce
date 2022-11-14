@@ -558,6 +558,10 @@ export default function Listagem({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   async function getValuesColumns(): Promise<void> {
@@ -604,8 +608,10 @@ export default function Listagem({
   }
 
   async function handleStatus(idNPE: number, data: any): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&id_safra=${data.id_safra
-    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
+    const parametersFilter = `filterStatus=${1}&id_safra=${
+      data.id_safra
+    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${
+      data.id_type_assay
     }&epoca=${String(data.epoca)}`;
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {

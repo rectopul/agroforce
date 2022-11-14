@@ -273,6 +273,10 @@ export default function Listagem({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   // function headerTableFactory(name: any, title: string) {
@@ -535,7 +539,7 @@ export default function Listagem({
 
   return (
     <>
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de Tecnologias</title>
       </Head>
@@ -597,7 +601,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cod. tec.
+                      Cod Tec
                     </label>
                     <Input
                       type="text"

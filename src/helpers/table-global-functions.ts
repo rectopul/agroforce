@@ -175,13 +175,6 @@ async function handleOrderG(columnG:any, orderG :any, orderListG:any) {
   let typeOrderG: any;
   let orderByG: any; // RR
   let arrowOrder : any;
-  // if (orderG == 1) {
-  //   typeOrderG = "asc";
-  //   } else if (orderG == 2) {
-  //   typeOrderG = "desc";
-  // } else {
-  //   typeOrderG = "asc";
-  // }
 
   if (orderG == 1) {
     typeOrderG = 'asc';

@@ -12,6 +12,8 @@ export class GenotypeTreatmentController {
     parameters.AND = [];
     parameters.OR = [];
     try {
+      console.log('options');
+      console.log(options);
       if (options.filterStatus) {
         const statusParams = options.filterStatus?.split(',');
         parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[0]}" } } }`));
@@ -59,11 +61,30 @@ export class GenotypeTreatmentController {
       if (options.filterStatusT) {
         parameters.status = JSON.parse(`{ "contains":"${options.filterStatusT}" }`);
       }
-      if (options.filterNca) {
-        if (options.filterNca === 'vazio') {
-          parameters.AND.push(JSON.parse(`{"id_lote": ${null} }`));
-        } else {
-          parameters.AND.push(JSON.parse(`{ "lote": {"ncc": "${options.filterNca}" } } `));
+      // if (options.filterNca) {
+      //   if (options.filterNca === 'vazio') {
+      //     parameters.AND.push(JSON.parse(`{"id_lote": ${null} }`));
+      //   } else {
+      //     parameters.AND.push(JSON.parse(`{ "lote": {"ncc": "${options.filterNca}" } } `));
+      //   }
+      // }
+      if (options.filterNcaFrom || options.filterNcaTo) {
+        if (options.filterNcaFrom.toUpperCase() === 'VAZIO' || options.filterNcaTo.toUpperCase() === 'VAZIO') {
+          parameters.id_lote = null;
+        } else if (options.filterNcaFrom && options.filterNcaTo) {
+          parameters.lote = JSON.parse(
+            `{ "ncc": {"gte": "${Number(options.filterNcaFrom)}", "lte": "${Number(
+              options.filterNcaTo,
+            )}" } }`,
+          );
+        } else if (options.filterNcaFrom) {
+          parameters.lote = JSON.parse(
+            `{ "ncc": {"gte": "${Number(options.filterNcaFrom)}" } }`,
+          );
+        } else if (options.filterNcaTo) {
+          parameters.lote = JSON.parse(
+            `{ "ncc": {"lte": "${Number(options.filterNcaTo)}" } }`,
+          );
         }
       }
       if (options.filterTreatmentsNumber) {

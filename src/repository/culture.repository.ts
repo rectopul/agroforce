@@ -1,6 +1,7 @@
 import { prisma } from '../pages/api/db/db';
+import {BaseRepository} from './base-repository';
 
-export class CulturaRepository {
+export class CulturaRepository extends BaseRepository {
   async findOne(id: number) {
     const foco = await prisma.culture.findUnique({
       where: { id },
@@ -30,7 +31,7 @@ export class CulturaRepository {
   }
 
   async create(data: any) {
-    const culture = await prisma.culture.create({ data });
+    const culture = await this.getPrisma().culture.create({ data });
     return culture;
   }
 
@@ -46,7 +47,7 @@ export class CulturaRepository {
     const culture = await this.findOne(id);
 
     if (culture !== null) {
-      const result = await prisma.culture.update({
+      const result = await this.getPrisma().culture.update({
         where: { id },
         data,
       });

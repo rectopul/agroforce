@@ -225,62 +225,6 @@ export default function AtualizarTipoEnsaio({
     },
   });
 
-  // async function handleOrder(
-  //   column: string,
-  //   order: string | any,
-  //   name: any,
-  // ): Promise<void> {
-  //   if (table !== 'genotipo') {
-  //     handleOrderExperiments(column, order, name);
-  //     return;
-  //   }
-
-  //   let typeOrder: any;
-  //   let parametersFilter: any;
-  //   if (order === 1) {
-  //     typeOrder = 'asc';
-  //   } else if (order === 2) {
-  //     typeOrder = 'desc';
-  //   } else {
-  //     typeOrder = '';
-  //   }
-  //   setOrderBy(column);
-  //   setOrderType(typeOrder);
-  //   if (filter && typeof filter !== 'undefined') {
-  //     if (typeOrder !== '') {
-  //       parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-  //     } else {
-  //       parametersFilter = filter;
-  //     }
-  //   } else if (typeOrder !== '') {
-  //     parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_safra=${idSafra}`;
-  //   } else {
-  //     parametersFilter = filter;
-  //   }
-
-  //   await genotypeTreatmentService
-  //     .getAll(`${parametersFilter}&skip=0&take=${take}`)
-  //     .then(({ status, response }) => {
-  //       if (status === 200) {
-  //         setGenotypeTreatments(response);
-  //       }
-  //     });
-
-  //   if (orderList === 2) {
-  //     setOrder(0);
-  //     setArrowOrder(<AiOutlineArrowDown />);
-  //   } else {
-  //     setOrder(orderList + 1);
-  //     if (orderList === 1) {
-  //       setArrowOrder(<AiOutlineArrowUp />);
-  //     } else {
-  //       setArrowOrder('');
-  //     }
-  //   }
-
-  //   setFieldOrder(name);
-  // }
-
   async function callingApi(parametersFilter: any) {
     setCookies('filterBeforeEdit', parametersFilter);
     setCookies('filterBeforeEditTypeOrder', typeOrder);
@@ -919,7 +863,6 @@ export default function AtualizarTipoEnsaio({
       .getAll(parametersFilter)
       .then(({ status, response }) => {
         if (status === 200) {
-          console.log({ response });
           setExperiments(response);
           tableRef?.current?.dataManager?.changePageSize(
             response?.length >= take ? take : response?.length,

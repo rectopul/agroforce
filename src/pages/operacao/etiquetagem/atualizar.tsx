@@ -75,7 +75,7 @@ export default function Listagem({
   const [experiments, setExperiments] = useState<IExperiments[] | any>([]);
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -97,9 +97,9 @@ export default function Listagem({
       title: "Delineamento",
       value: "delineamento",
     },
-    { name: "CamposGerenciados[]", title: "Rep.", value: "repetitionsNumber" },
-    { name: "CamposGerenciados[]", title: "Status EXP.", value: "status" },
-    { name: "CamposGerenciados[]", title: "Ações", value: "action" },
+    { name: "CamposGerenciados[]", title: "Rep", value: "repetitionsNumber" },
+    { name: "CamposGerenciados[]", title: "Status EXP", value: "status" },
+    { name: "CamposGerenciados[]", title: "Ação", value: "action" },
   ]);
   const [orderBy, setOrderBy] = useState<string>("");
   const [orderType, setOrderType] = useState<string>("");
@@ -328,7 +328,7 @@ export default function Listagem({
       if (columnOrder[index] === "repetitionsNumber") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Rep.",
+            name: "Rep",
             title: "repetitionsNumber",
             orderList,
             fieldOrder,
@@ -339,7 +339,7 @@ export default function Listagem({
       if (columnOrder[index] === "status") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Status EXP.",
+            name: "Status EXP",
             title: "status",
             orderList,
             fieldOrder,
@@ -588,6 +588,17 @@ export default function Listagem({
     handleTotalPages();
   }, [currentPage]);
 
+  function selectableFilter(rowData: any) {
+    if (
+      rowData?.status === "ETIQ. EM ANDAMENTO" ||
+      rowData?.status === "ETIQ. FINALIZADA"
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
   return (
     <>
       <Head>
@@ -614,10 +625,10 @@ export default function Listagem({
             onSubmit={() => {}}
           >
             <div className="w-full flex justify-between items-start gap-5 mt-1">
-              {nameGroupFieldFactory("name", "Nome do grupo de exp.")}
-              {updateFieldFactory("experimentAmount", "Qtde. exp.")}
-              {updateFieldFactory("tagsToPrint", "Total etiq. a imp.")}
-              {updateFieldFactory("tagsPrinted", "Total etiq. imp.")}
+              {nameGroupFieldFactory("name", "Nome do grupo de exp")}
+              {updateFieldFactory("experimentAmount", "Qtde exp")}
+              {updateFieldFactory("tagsToPrint", "Total etiq a imp")}
+              {updateFieldFactory("tagsPrinted", "Total etiq imp")}
               {updateFieldFactory("totalTags", "Total etiq")}
               {updateFieldFactory("status", "Status")}
 
@@ -649,11 +660,18 @@ export default function Listagem({
                 },
                 showSelectAllCheckbox: false,
                 selection: true,
-                selectionProps: (rowData: any) => ({
-                  disabled:
-                    rowData.status === "ETIQ. EM ANDAMENTO" ||
-                    rowData.status === "ETIQ. FINALIZADA",
-                }),
+                selectionProps: (rowData: any) => {
+                  const selectable = selectableFilter(rowData);
+                  rowData.tableData.disabled = !selectable;
+                  return {
+                    disabled: !selectable,
+                  };
+                },
+                // selectionProps: (rowData: any) => ({
+                //   disabled:
+                //     rowData.status === "ETIQ. EM ANDAMENTO" ||
+                //     rowData.status === "ETIQ. FINALIZADA",
+                // }),
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,

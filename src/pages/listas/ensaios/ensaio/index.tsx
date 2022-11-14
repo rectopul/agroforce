@@ -86,7 +86,7 @@ export default function TipoEnsaio({
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit),
   );
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -278,6 +278,10 @@ export default function TipoEnsaio({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   // function headerTableFactory(name: string, title: string) {
@@ -742,7 +746,7 @@ export default function TipoEnsaio({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Nº de trat.
+                      Nº de trat
                     </label>
                     <div className="flex">
                       <Input

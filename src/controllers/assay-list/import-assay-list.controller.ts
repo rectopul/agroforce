@@ -23,6 +23,7 @@ import { AssayListController } from './assay-list.controller';
 export class ImportAssayListController {
   static async validate(
     idLog: number,
+    queueProcessing: boolean,
     {
       spreadSheet, idSafra, idCulture, created_by: createdBy,
     }: ImportValidate,

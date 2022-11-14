@@ -1,8 +1,9 @@
 import { prisma } from '../pages/api/db/db';
+import { BaseRepository } from './base-repository';
 
-export class GenotipoRepository {
+export class GenotipoRepository extends BaseRepository {
   async create(data: any) {
-    const result = await prisma.genotipo.create({ data });
+    const result = await this.getPrisma().genotipo.create({ data });
     return result;
   }
 
@@ -38,7 +39,6 @@ export class GenotipoRepository {
     return result;
   }
 
-
   async findOneByName(name: any) {
     const result = await prisma.genotipo.findMany({
       where: { name_genotipo: name },
@@ -71,9 +71,8 @@ export class GenotipoRepository {
     return result;
   }
 
-
   async update(id: number, data: any) {
-    const result = await prisma.genotipo.update({
+    const result = await this.getPrisma().genotipo.update({
       where: { id },
       data,
     });

@@ -96,7 +96,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     () => allExperimentGroup,
   );
   const [currentPage, setCurrentPage] = useState<number>(pageBeforeEdit);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
@@ -338,6 +338,10 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   async function deleteConfirmItem(item: any) {
@@ -856,7 +860,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
                   <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Qtde. exp.
+                      Qtde exp
                     </label>
                     <div className="flex">
                       <Input
@@ -879,7 +883,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
                   <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Etiq. a imprimir
+                      Etiq a imprimir
                     </label>
                     <div className="flex">
                       <Input
@@ -902,7 +906,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
                   <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Etiq. impressas
+                      Etiq impressas
                     </label>
                     <div className="flex">
                       <Input
@@ -950,7 +954,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
                   <div className="h-10 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status grupo exp.
+                      Status grupo exp
                     </label>
                     <SelectMultiple
                       data={statusFilter.map((i: any) => i.title)}

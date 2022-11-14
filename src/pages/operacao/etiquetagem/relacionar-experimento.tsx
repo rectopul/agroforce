@@ -110,7 +110,7 @@ export default function Listagem({
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -208,7 +208,7 @@ export default function Listagem({
           selecionados += `${allCheckBox[i].value},`;
         }
       }
-      //const filterStatus = selecionados.substr(0, selecionados.length - 1);
+      // const filterStatus = selecionados.substr(0, selecionados.length - 1);
       // const filterStatus = statusFilterSelected?.join(",");
 
       // // Call filter with there parameter
@@ -745,7 +745,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Repetição
+                      Rep
                     </label>
                     <div className="flex">
                       <Input

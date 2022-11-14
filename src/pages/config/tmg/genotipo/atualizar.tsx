@@ -178,7 +178,7 @@ export default function Atualizargenotipo({
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: "CamposGerenciados[]", title: "Ano", value: "year" },
-    { name: "CamposGerenciados[]", title: "Cód lote", value: "cod_lote" },
+    { name: "CamposGerenciados[]", title: "Cod lote", value: "cod_lote" },
     { name: "CamposGerenciados[]", title: "NCC", value: "ncc" },
     { name: "CamposGerenciados[]", title: "Fase", value: "fase" },
     { name: "CamposGerenciados[]", title: "Peso (kg)", value: "peso" },
@@ -343,7 +343,7 @@ export default function Atualizargenotipo({
       if (columnCampos[index] === "cod_lote") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Cód lote",
+            name: "Cod lote",
             title: "cod_lote",
             orderList,
             fieldOrder,
@@ -387,7 +387,7 @@ export default function Atualizargenotipo({
       if (columnCampos[index] === "quant_sementes") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Quant. sementes",
+            name: "Quant sementes",
             title: "quant_sementes",
             orderList,
             fieldOrder,

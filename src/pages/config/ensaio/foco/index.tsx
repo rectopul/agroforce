@@ -307,6 +307,10 @@ export default function Listagem({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   // function headerTableFactory(name: any, title: string) {
@@ -406,7 +410,7 @@ export default function Listagem({
           <div className="ml-1" />
           <ButtonToogleConfirmation
             data={rowData}
-            text="o tipo ensaio"
+            text="o foco"
             keyName="name"
             onPress={handleStatus}
           />
@@ -631,7 +635,7 @@ export default function Listagem({
 
   return (
     <>
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de focos</title>
       </Head>

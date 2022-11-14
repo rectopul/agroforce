@@ -98,7 +98,7 @@ export default function Listagem({
   );
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -333,6 +333,8 @@ export default function Listagem({
       });
   }
 
+  console.log({ orderList, orderBy, typeOrder });
+
   // Call that function when change type order value.
   useEffect(() => {
     callingApi(filter);
@@ -380,16 +382,29 @@ export default function Listagem({
     //   setOrder(orderList + 1);
     // }
 
+    console.log({ column, order, orderList });
+
     // Gobal manage orders
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+
+    console.log({
+      typeOrderG,
+      columnG,
+      orderByG,
+      arrowOrder,
+    });
 
     setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   // function headerTableFactory(
@@ -1122,7 +1137,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cód. Tecn
+                      Cod Tec
                     </label>
                     <div className="flex">
                       <Input
@@ -1138,7 +1153,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cód. GGEN
+                      Cod GGEN
                     </label>
                     <div className="flex">
                       <Input
@@ -1395,7 +1410,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      NCA.
+                      NCA
                     </label>
                     <div className="flex">
                       <Input
