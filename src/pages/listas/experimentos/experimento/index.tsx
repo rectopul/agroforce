@@ -133,7 +133,7 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
   const [orderList, setOrder] = useState<number>(0);
-  const [arrowOrder, setArrowOrder] = useState<any>("");
+  const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
@@ -152,9 +152,9 @@ export default function Listagem({
       title: "Delineamento",
       value: "delineamento",
     },
-    { name: "CamposGerenciados[]", title: "Rep", value: "repetitionsNumber" },
-    { name: "CamposGerenciados[]", title: "Status EXP", value: "status" },
-    { name: "CamposGerenciados[]", title: "Ação", value: "action" },
+    { name: 'CamposGerenciados[]', title: 'Rep', value: 'repetitionsNumber' },
+    { name: 'CamposGerenciados[]', title: 'Status EXP', value: 'status' },
+    { name: 'CamposGerenciados[]', title: 'Ação', value: 'action' },
   ]);
 
   const [isOpenModalConfirm, setIsOpenModalConfirm] = useState<boolean>(false);
@@ -180,16 +180,16 @@ export default function Listagem({
 
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
     {
-      name: "StatusCheckbox",
-      title: "IMPORTADO ",
-      value: "IMPORTADO",
-      defaultChecked: () => camposGerenciados.includes("IMPORTADO"),
+      name: 'StatusCheckbox',
+      title: 'IMPORTADO ',
+      value: 'IMPORTADO',
+      defaultChecked: () => camposGerenciados.includes('IMPORTADO'),
     },
     {
-      name: "StatusCheckbox",
-      title: "SORTEADO",
-      value: "SORTEADO",
-      defaultChecked: () => camposGerenciados.includes("SORTEADO"),
+      name: 'StatusCheckbox',
+      title: 'SORTEADO',
+      value: 'SORTEADO',
+      defaultChecked: () => camposGerenciados.includes('SORTEADO'),
     },
     {
       name: "StatusCheckbox",
@@ -313,7 +313,10 @@ export default function Listagem({
           response.total >= take ? take : response.total
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
 
   // Call that function when change type order value.
@@ -457,8 +460,8 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: "Ação",
-      field: "action",
+      title: 'Ação',
+      field: 'action',
       sorting: false,
       searchable: false,
       render: (rowData: any) => (
@@ -620,8 +623,8 @@ export default function Listagem({
       if (columnCampos[index] === "repetitionsNumber") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Rep",
-            title: "repetitionsNumber",
+            name: 'Rep',
+            title: 'repetitionsNumber',
             orderList,
             fieldOrder,
             handleOrder,
@@ -631,8 +634,8 @@ export default function Listagem({
       if (columnCampos[index] === "status") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Status EXP",
-            title: "status",
+            name: 'Status EXP',
+            title: 'status',
             orderList,
             fieldOrder,
             handleOrder,
@@ -879,7 +882,7 @@ export default function Listagem({
                     "filterExperimentName",
                     "Nome Experimento"
                   )}
-                  {filterFieldFactory("filterCod", "Cod Tec")}
+                  {filterFieldFactory('filterCod', 'Cod Tec')}
                 </div>
 
                 <div
@@ -889,9 +892,9 @@ export default function Listagem({
                                         pb-0
                                         "
                 >
-                  {filterFieldFactory("filterTecnologia", "Nome Tecnologia")}
-                  {filterFieldFactory("filterPeriod", "Época")}
-                  {filterFieldFactory("filterDelineamento", "Delineamento")}
+                  {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
+                  {filterFieldFactory('filterPeriod', 'Época')}
+                  {filterFieldFactory('filterDelineamento', 'Delineamento')}
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">

@@ -124,7 +124,13 @@ export class GenotypeTreatmentController {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
       }
       if (options.status_experiment) {
-        parameters.AND.push(JSON.parse(`{"assay_list": { "status": {"contains": "${options.status_experiment}" } } }`));
+        if (options.status_experiment.includes(',')) {
+          const filter = options.status_experiment.split(',');
+          parameters.OR.push(JSON.parse(`{"assay_list": { "status": {"contains": "${filter[0]}" } } }`));
+          parameters.OR.push(JSON.parse(`{"assay_list": { "status": {"contains": "${filter[1]}" } } }`));
+        } else {
+          parameters.AND.push(JSON.parse(`{"assay_list": { "status": {"contains": "${options.status_experiment}" } } }`));
+        }
       }
       const select = {
         id: true,

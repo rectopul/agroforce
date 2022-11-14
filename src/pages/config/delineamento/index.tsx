@@ -125,7 +125,7 @@ export default function Listagem({
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
 
   const [orderList, setOrder] = useState<number>(0);
-  const [arrowOrder, setArrowOrder] = useState<any>("");
+  const [arrowOrder, setArrowOrder] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -148,10 +148,10 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("repeticao"),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Trat Repetição",
-      value: "trat_repeticao",
-      defaultChecked: () => camposGerenciados.includes("trat_repeticao"),
+      name: 'CamposGerenciados[]',
+      title: 'Trat Repetição',
+      value: 'trat_repeticao',
+      defaultChecked: () => camposGerenciados.includes('trat_repeticao'),
     },
     {
       name: "CamposGerenciados[]",
@@ -160,10 +160,10 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("sequencia"),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Ação",
-      value: "status",
-      defaultChecked: () => camposGerenciados.includes("status"),
+      name: 'CamposGerenciados[]',
+      title: 'Ação',
+      value: 'status',
+      defaultChecked: () => camposGerenciados.includes('status'),
     },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -252,7 +252,10 @@ export default function Listagem({
           response.total >= take ? take : response.total
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
 
   // Call that function when change type order value.
@@ -279,8 +282,8 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: "Ação",
-      field: "status",
+      title: 'Ação',
+      field: 'status',
       sorting: false,
       searchable: false,
       filterPlaceholder: "Filtrar por status",
@@ -332,8 +335,8 @@ export default function Listagem({
       if (columnCampos[item] === "trat_repeticao") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Trat Repetição",
-            title: "trat_repeticao",
+            name: 'Trat Repetição',
+            title: 'trat_repeticao',
             orderList,
             fieldOrder,
             handleOrder,
