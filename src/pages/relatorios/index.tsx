@@ -202,7 +202,10 @@ export default function Listagem({
           response.total >= take ? take : response.total,
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
 
   // Call that function when change type order value.

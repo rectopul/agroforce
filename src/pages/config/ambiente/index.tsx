@@ -41,11 +41,11 @@ import {
   Select,
   FieldItemsPerPage,
   ButtonDeleteConfirmation,
-} from "../../../components";
-import * as ITabs from "../../../shared/utils/dropdown";
-import { tableGlobalFunctions } from "../../../helpers";
-import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
-import ComponentLoading from "../../../components/Loading";
+} from '../../../components';
+import * as ITabs from '../../../shared/utils/dropdown';
+import { tableGlobalFunctions } from '../../../helpers';
+import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
+import ComponentLoading from '../../../components/Loading';
 
 interface INpeProps {
   id: any;
@@ -168,10 +168,10 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("ensaio"),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Tecnologia",
-      value: "tecnologia",
-      defaultChecked: () => camposGerenciados.includes("tecnologia"),
+      name: 'CamposGerenciados[]',
+      title: 'Tecnologia',
+      value: 'tecnologia',
+      defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
     {
       name: "CamposGerenciados[]",
@@ -180,10 +180,10 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("local"),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Época ",
-      value: "epoca",
-      defaultChecked: () => camposGerenciados.includes("epoca"),
+      name: 'CamposGerenciados[]',
+      title: 'Época ',
+      value: 'epoca',
+      defaultChecked: () => camposGerenciados.includes('epoca'),
     },
     {
       name: "CamposGerenciados[]",
@@ -198,10 +198,10 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("prox_npe"),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Ação",
-      value: "status",
-      defaultChecked: () => camposGerenciados.includes("status"),
+      name: 'CamposGerenciados[]',
+      title: 'Ação',
+      value: 'status',
+      defaultChecked: () => camposGerenciados.includes('status'),
     },
   ]);
 
@@ -295,7 +295,10 @@ export default function Listagem({
           response.total >= take ? take : response.total
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
 
   // Call that function when change type order value.
@@ -493,14 +496,14 @@ export default function Listagem({
                 {`${rowData?.tecnologia?.cod_tec} ${rowData?.tecnologia?.name}`}
               </div>
             ),
-          })
+          }),
         );
       }
       if (columnCampos[item] === "epoca") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Época",
-            title: "epoca",
+            name: 'Época',
+            title: 'epoca',
             orderList,
             fieldOrder,
             handleOrder,
@@ -518,22 +521,22 @@ export default function Listagem({
           })
         );
       }
-      if (columnCampos[item] === "prox_npe") {
+      if (columnCampos[item] === 'prox_npe') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Prox NPE",
-            title: "prox_npe",
+            name: 'Prox NPE',
+            title: 'prox_npe',
             orderList,
             fieldOrder,
             handleOrder,
           })
         );
       }
-      if (columnCampos[item] === "group") {
+      if (columnCampos[item] === 'group') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Grupo",
-            title: "group.group",
+            name: 'Grupo',
+            title: 'group.group',
             orderList,
             fieldOrder,
             handleOrder,
