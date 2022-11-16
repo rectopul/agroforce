@@ -56,6 +56,7 @@ import * as ITabs from '../../../shared/utils/dropdown';
 import ComponentLoading from '../../../components/Loading';
 import { functionsUtils } from '../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
+import { tableGlobalFunctions } from '../../../helpers';
 
 export interface LogData {
   id: number;
@@ -429,7 +430,7 @@ export default function Import({
     // Gobal manage orders
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
-    } = await fetchWrapper.handleOrderG(column, order, orderList);
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setFieldOrder(name);
     setTypeOrder(typeOrderG);

@@ -82,7 +82,7 @@ export class ExperimentGenotipeController {
         parameters.OR = [];
 
         const statusParams = options.filterStatus.split(',');
-        statusParams.forEach((_, index: number) => {
+        statusParams.forEach((_: any, index: number) => {
           parameters.OR.push(
             JSON.parse(
               `{ "experiment": {"status": {"contains": "${statusParams[index]}" } } }`,

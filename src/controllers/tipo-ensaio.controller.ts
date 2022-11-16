@@ -10,7 +10,6 @@ export class TypeAssayController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: object | any) {
-    console.log('🚀 ~ file: tipo-ensaio.controller.ts ~ line 13 ~ TypeAssayController ~ getAll ~ p', p);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];

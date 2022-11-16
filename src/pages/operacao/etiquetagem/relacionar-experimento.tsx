@@ -37,6 +37,7 @@ import {
   ITreatmentGrid,
 } from '../../../interfaces/listas/ensaio/genotype-treatment.interface';
 import { IGenerateProps } from '../../../interfaces/shared/generate-props.interface';
+import ComponentLoading from '../../../components/Loading';
 
 import {
   AccordionFilter,
@@ -116,6 +117,7 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: 'CamposGerenciados[]', title: 'Foco', value: 'foco' },
@@ -688,6 +690,8 @@ export default function Listagem({
       <Head>
         <title>Listagem de genótipos do ensaio</title>
       </Head>
+
+      {loading && <ComponentLoading text="" />}
 
       <ModalConfirmation
         isOpen={isOpenModal}

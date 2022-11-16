@@ -1115,7 +1115,7 @@ export default function AtualizarTipoEnsaio({
                         <FieldItemsPerPage
                           widthClass="w-1/2"
                           selected={take}
-                          onChange={(e) => {
+                          onChange={(e: any) => {
                             setLoading(true);
                             setTake(e);
                           }}

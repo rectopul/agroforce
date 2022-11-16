@@ -24,7 +24,7 @@ export default function headerTableFactoryGlobal({
         <button
           type="button"
           className="font-medium text-gray-900"
-          onClick={() =>{
+          onClick={() => {
             handleOrder(title, orderList, name);
           }}
         >
