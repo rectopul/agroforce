@@ -28,6 +28,34 @@ export class ImportDelimitationController {
       spreadSheet, idSafra, idCulture, created_by: createdBy,
     }: ImportValidate,
   ): Promise<IReturnObject> {
+    const headers = [
+      'CULTURA',
+      'DELI',
+      'R',
+      'ORDEM',
+      'NT',
+      'B',
+      'ORIG_BLOCO',
+      'SEQ',
+    ];
+    const validate: any = await validateHeaders(spreadSheet, headers);
+    if (validate.length > 0) {
+      return { status: 400, message: validate };
+    }
+    if ((spreadSheet.length > Number(process.env.MAX_DIRECT_UPLOAD_ALLOWED))
+    && !queueProcessing) {
+      delimitationQueue.add({
+        instance: {
+          spreadSheet, idSafra, idCulture, created_by: createdBy,
+        },
+        logId: idLog,
+      });
+      return {
+        status: 400,
+        message: 'Os dados são validados e carregados em background',
+      };
+    }
+
     const importController = new ImportController();
     const culturaController = new CulturaController();
     const logImportController = new LogImportController();
@@ -43,34 +71,7 @@ export class ImportDelimitationController {
     /* --------------------------------------- */
 
     const responseIfError: Array<string> = [];
-    const headers = [
-      'CULTURA',
-      'DELI',
-      'R',
-      'ORDEM',
-      'NT',
-      'B',
-      'ORIG_BLOCO',
-      'SEQ',
-    ];
     try {
-      const validate: any = await validateHeaders(spreadSheet, headers);
-      if (validate.length > 0) {
-        return { status: 400, message: validate };
-      }
-      if ((spreadSheet.length > Number(process.env.MAX_DIRECT_UPLOAD_ALLOWED))
-      && !queueProcessing) {
-        delimitationQueue.add({
-          instance: {
-            spreadSheet, idSafra, idCulture, created_by: createdBy,
-          },
-          logId: idLog,
-        });
-        return {
-          status: 400,
-          message: 'Os dados são validados e carregados em background',
-        };
-      }
       const configModule: object | any = await importController.getAll(7);
       for (const row in spreadSheet) {
         if (row !== '0') {

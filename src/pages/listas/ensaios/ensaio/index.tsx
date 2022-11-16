@@ -31,10 +31,10 @@ import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { BsTrashFill } from 'react-icons/bs';
 import Swal from 'sweetalert2';
 import foco from 'src/pages/api/foco';
+import ComponentLoading from '../../../../components/Loading';
 import { IGenerateProps } from '../../../../interfaces/shared/generate-props.interface';
 import {
   IAssayList,
-  IAssayListGrid,
   IAssayListFilter,
 } from '../../../../interfaces/listas/ensaio/assay-list.interface';
 import { assayListService, userPreferencesService } from '../../../../services';
@@ -309,6 +309,7 @@ export default function TipoEnsaio({
 
   async function deleteItem() {
     setIsOpenModalConfirm(false);
+    setLoading(true);
 
     const { status, message } = await assayListService.deleted({
       id: itemSelectedDelete?.id,
@@ -704,6 +705,8 @@ export default function TipoEnsaio({
       <Head>
         <title>Listagem de Ensaio</title>
       </Head>
+
+      {loading && <ComponentLoading text="" />}
 
       <ModalConfirmation
         isOpen={isOpenModalConfirm}

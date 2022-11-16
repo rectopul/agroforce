@@ -39,28 +39,6 @@ export class ImportGenotypeController {
       spreadSheet, idSafra, idCulture, created_by: createdBy,
     }: ImportValidate,
   ): Promise<IReturnObject> {
-    if ((spreadSheet.length > Number(process.env.MAX_DIRECT_UPLOAD_ALLOWED)) && !queueProcessing) {
-      genotipeQueue.add({
-        instance: {
-          spreadSheet, idSafra, idCulture, created_by: createdBy,
-        },
-        logId: idLog,
-      });
-      return {
-        status: 400,
-        message: 'Os dados são validados e carregados em background',
-      };
-    }
-
-    const loteController = new LoteController();
-    const safraController = new SafraController();
-    const importController = new ImportController();
-    const culturaController = new CulturaController();
-    const genotipoController = new GenotipoController();
-    const logImportController = new LogImportController();
-    const tecnologiaController = new TecnologiaController();
-
-    const responseIfError: any = [];
     const headers = [
       'ID_S1 (S1_ID_S1)',
       'Identificador de dados (S1_DATA_ID)',
@@ -93,11 +71,34 @@ export class ImportGenotypeController {
       'Quantidade (C0126)',
       'DT_Export (SCRIPT0002)',
     ];
+    const validate: any = await validateHeaders(spreadSheet, headers);
+    if (validate.length > 0) {
+      return { status: 400, message: validate };
+    }
+
+    if ((spreadSheet.length > Number(process.env.MAX_DIRECT_UPLOAD_ALLOWED)) && !queueProcessing) {
+      genotipeQueue.add({
+        instance: {
+          spreadSheet, idSafra, idCulture, created_by: createdBy,
+        },
+        logId: idLog,
+      });
+      return {
+        status: 400,
+        message: 'Os dados são validados e carregados em background',
+      };
+    }
+
+    const loteController = new LoteController();
+    const safraController = new SafraController();
+    const importController = new ImportController();
+    const culturaController = new CulturaController();
+    const genotipoController = new GenotipoController();
+    const logImportController = new LogImportController();
+    const tecnologiaController = new TecnologiaController();
+
+    const responseIfError: any = [];
     try {
-      const validate: any = await validateHeaders(spreadSheet, headers);
-      if (validate.length > 0) {
-        return { status: 400, message: validate };
-      }
       const configModule: object | any = await importController.getAll(10);
       if (spreadSheet[0]?.length < 30) {
         return {
@@ -294,7 +295,7 @@ export class ImportGenotypeController {
                         Number(column) + 1,
                         row,
                         spreadSheet[0][column],
-                        'safra não cadastrada nessa cultura',
+                        'safra não cadastrada ou inativa nessa cultura',
                       );
                     }
                   } else {

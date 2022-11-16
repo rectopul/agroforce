@@ -1085,7 +1085,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const { response: allTypeAssay, total: totalItems } = await fetch(
+  const { response: allTypeAssay = [], total: totalItems = 0 } = await fetch(
     urlParameters.toString(),
     requestOptions,
   ).then((response) => response.json());

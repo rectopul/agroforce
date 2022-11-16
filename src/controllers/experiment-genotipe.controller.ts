@@ -20,8 +20,6 @@ export class ExperimentGenotipeController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterFoco) {
         parameters.foco = JSON.parse(
           `{ "name": { "contains": "${options.filterFoco}" } }`,
@@ -92,7 +90,6 @@ export class ExperimentGenotipeController {
           );
         });
       }
-      console.log(parameters.OR);
       if (options.ensaio) {
         parameters.AND.push(
           JSON.parse(
