@@ -344,7 +344,7 @@ export class ImportLocalController {
                   name_unity_culture: unityCultureDTO.name_unity_culture,
                   id_local: response[0]?.id,
                 });
-
+                
                 // Abrir transação
                 if (response.length > 0) {
                   localCultureDTO.id = response[0]?.id;
@@ -366,10 +366,8 @@ export class ImportLocalController {
                   }
                 } else {
                   delete localCultureDTO.id;
-                  const {
-                    response: newLocal,
-                  } = await localRepository.createTransaction(localCultureDTO);
-                  unityCultureDTO.id_local = newLocal?.id;
+                  const newLocal = await localRepository.createTransaction(localCultureDTO);
+                  unityCultureDTO.id_local = await newLocal?.id;
                   if (unityExist.total > 0) {
                     unityCultureDTO.id = unityExist[0]?.id;
                     await unidadeCulturaRepository.updateTransaction(
