@@ -12,6 +12,7 @@ export class UnidadeCulturaController {
   safraController = new SafraController();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: unidade-cultura.controller.ts ~ line 15 ~ UnidadeCulturaController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     try {
@@ -93,9 +94,21 @@ export class UnidadeCulturaController {
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
       if (options.orderBy) {
-        orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
-        orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+        if (!options.excel) {
+          if (typeof options.orderBy !== 'string') {
+            if (options.orderBy[1] == '' || !options.orderBy[1]) {
+              orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `{"${options.orderBy[1]}":"${options.typeOrder[1]}"}`];
+            } else {
+              orderBy = handleOrderForeign(options.orderBy[1], options.typeOrder[1]);
+              orderBy = orderBy || `{"${options.orderBy[1]}":"${options.typeOrder[1]}"}`;
+            }
+          } else {
+            orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
+            orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+          }
+        }
       }
+
       const response: object | any = await this.unidadeCulturaRepository.findAll(
         parameters,
         select,

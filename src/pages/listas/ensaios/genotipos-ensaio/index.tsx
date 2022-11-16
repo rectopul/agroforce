@@ -333,8 +333,6 @@ export default function Listagem({
       });
   }
 
-  console.log({ orderList, orderBy, typeOrder });
-
   // Call that function when change type order value.
   useEffect(() => {
     callingApi(filter);
@@ -382,19 +380,10 @@ export default function Listagem({
     //   setOrder(orderList + 1);
     // }
 
-    console.log({ column, order, orderList });
-
     // Gobal manage orders
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
-
-    console.log({
-      typeOrderG,
-      columnG,
-      orderByG,
-      arrowOrder,
-    });
 
     setFieldOrder(name);
     setTypeOrder(typeOrderG);
@@ -581,7 +570,7 @@ export default function Listagem({
         tableFields.push(
           headerTableFactoryGlobal({
             name: 'GMR_Gen',
-            title: 'gmr',
+            title: 'genotipo.gmr',
             orderList,
             fieldOrder,
             handleOrder,

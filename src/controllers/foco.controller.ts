@@ -1,6 +1,7 @@
 import handleError from '../shared/utils/handleError';
 import { FocoRepository } from '../repository/foco.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
+import handleOrderForeign from '../shared/utils/handleOrderForeign';
 
 export class FocoController {
   public readonly required = 'Campo obrigatório';
@@ -11,6 +12,7 @@ export class FocoController {
 
   async getAll(options: any) {
     const parameters: object | any = {};
+    let orderBy: object | any;
     try {
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
@@ -50,7 +52,11 @@ export class FocoController {
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
-      const orderBy = (options.orderBy) ? `{"${options.orderBy}":"${options.typeOrder}"}` : undefined;
+      if (options.orderBy) {
+        orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
+        orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+      }
+      console.log('🚀 ~ file: foco.controller.ts ~ line 54 ~ FocoController ~ getAll ~ orderBy', orderBy);
 
       const response: object | any = await this.focoRepository.findAll(
         parameters,

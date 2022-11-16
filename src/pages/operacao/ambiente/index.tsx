@@ -135,12 +135,6 @@ export default function Listagem({
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [selectedNPE, setSelectedNPE] = useState<INpeProps[]>([]);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    // {
-    //   name: 'CamposGerenciados[]',
-    //   title: 'Favorito ',
-    //   value: 'id',
-    //   defaultChecked: () => camposGerenciados.includes('id'),
-    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Lugar de cultura',
@@ -204,8 +198,8 @@ export default function Listagem({
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
   const [fieldOrder, setFieldOrder] = useState<any>(null);
 
-  // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}`;
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}`;
 
   const filters = [
     { id: 2, name: 'Todos' },
@@ -295,97 +289,6 @@ export default function Listagem({
   useEffect(() => {
     callingApi(filter);
   }, [typeOrder]);
-
-  // async function handleOrder(
-  //   column: string,
-  //   order: string | any,
-  // ): Promise<void> {
-  //   let typeOrder: any;
-  //   let parametersFilter: any;
-  //   if (order === 1) {
-  //     typeOrder = 'asc';
-  //   } else if (order === 2) {
-  //     typeOrder = 'desc';
-  //   } else {
-  //     typeOrder = '';
-  //   }
-
-  //   if (filter && typeof filter !== 'undefined') {
-  //     if (typeOrder !== '') {
-  //       parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-  //     } else {
-  //       parametersFilter = filter;
-  //     }
-  //   } else if (typeOrder !== '') {
-  //     parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-  //   } else {
-  //     parametersFilter = filter;
-  //   }
-
-  //   await npeService
-  //     .getAll(`${parametersFilter}&skip=0&take=${take}`)
-  //     .then((response) => {
-  //       if (response.status === 200) {
-  //         setNPE(response.response);
-  //       }
-  //     });
-
-  //   if (orderList === 2) {
-  //     setOrder(0);
-  //     setArrowOrder(<AiOutlineArrowDown />);
-  //   } else {
-  //     setOrder(orderList + 1);
-  //     if (orderList === 1) {
-  //       setArrowOrder(<AiOutlineArrowUp />);
-  //     } else {
-  //       setArrowOrder('');
-  //     }
-  //   }
-  // }
-
-  // function headerTableFactory(name: any, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: true,
-  //   };
-  // }
-
-  function tecnologiaHeaderFactory(title: string, name: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList, 'tecnologia')}
-          >
-            {title}
-          </button>
-        </div>
-      ),
-      field: 'tecnologia',
-      width: 0,
-      sorting: true,
-      render: (rowData: any) => (
-        <div className="h-10 flex">
-          <div>
-            {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
-          </div>
-        </div>
-      ),
-    };
-  }
 
   function colums(camposGerenciados: any): any {
     const columnCampos: any = camposGerenciados.split(',');
@@ -506,48 +409,6 @@ export default function Listagem({
     order: string | any,
     name: any,
   ): Promise<void> {
-    // let typeOrder: any;
-    // let parametersFilter: any;
-    // if (order === 1) {
-    //   typeOrder = 'asc';
-    // } else if (order === 2) {
-    //   typeOrder = 'desc';
-    // } else {
-    //   typeOrder = '';
-    // }
-
-    // if (filter && typeof filter !== 'undefined') {
-    //   if (typeOrder !== '') {
-    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-    //   } else {
-    //     parametersFilter = filter;
-    //   }
-    // } else if (typeOrder !== '') {
-    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    // } else {
-    //   parametersFilter = filter;
-    // }
-
-    // await npeService
-    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
-    //   .then((response) => {
-    //     if (response.status === 200) {
-    //       setNPE(response.response);
-    //     }
-    //   });
-
-    // if (orderList === 2) {
-    //   setOrder(0);
-    //   setArrowOrder(<AiOutlineArrowDown />);
-    // } else {
-    //   setOrder(orderList + 1);
-    //   if (orderList === 1) {
-    //     setArrowOrder(<AiOutlineArrowUp />);
-    //   } else {
-    //     setArrowOrder('');
-    //   }
-    // }
-
     // Gobal manage orders
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
@@ -605,43 +466,6 @@ export default function Listagem({
 
     setStatusAccordion(false);
     setCamposGerenciados(campos);
-  }
-
-  async function handleStatus(idNPE: number, data: any): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&id_safra=${
-      data.id_safra
-    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${
-      data.id_type_assay
-    }&epoca=${String(data.epoca)}`;
-    if (data.status == 0) {
-      await npeService.getAll(parametersFilter).then((response) => {
-        if (response.total > 0) {
-          Swal.fire(
-            'NPE não pode ser atualizada pois já existe uma npei cadastrada com essas informações',
-          );
-          router.push('');
-        }
-      });
-    } else {
-      if (data.status === 0) {
-        data.status = 1;
-      } else {
-        data.status = 0;
-      }
-      await npeService.update({ id: idNPE, status: data.status });
-
-      const index = npe.findIndex((npe: any) => npe.id === idNPE);
-
-      if (index === -1) {
-        return;
-      }
-
-      setNPE((oldSafra: any) => {
-        const copy = [...oldSafra];
-        copy[index].status = data.status;
-        return copy;
-      });
-    }
   }
 
   function handleOnDragEnd(result: DropResult) {
@@ -728,17 +552,6 @@ export default function Listagem({
   }
 
   async function handlePagination(): Promise<void> {
-    // const skip = currentPage * Number(take);
-    // let parametersFilter = `skip=${skip}&take=${take}`;
-    // if (filter) {
-    //   parametersFilter = `${parametersFilter}&${filter}`;
-    // }
-    // await npeService.getAll(parametersFilter).then((response) => {
-    //   if (response.status === 200) {
-    //     setNPE(response.response);
-    //   }
-    // });
-
     await callingApi(filter); // handle pagination globly
   }
 

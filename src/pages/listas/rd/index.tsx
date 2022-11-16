@@ -100,6 +100,7 @@ export default function Import({
   const disabledButton = executeUpload === 1;
   const bgColor = executeUpload === 1 ? 'bg-red-600' : 'bg-blue-600';
   const [loading, setLoading] = useState<boolean>(false);
+  const [importLoading, setImportLoading] = useState<boolean>(false);
 
   async function readExcel(moduleId: number, table: string) {
     try {
@@ -124,7 +125,7 @@ export default function Import({
 
       readXlsxFile(value.files[0])
         .then(async (rows) => {
-          setLoading(true);
+          setImportLoading(true);
 
           if (moduleId) {
             const { message } = await importService.validate({
@@ -136,7 +137,7 @@ export default function Import({
               table,
               disabledButton,
             });
-            setLoading(false);
+            setImportLoading(false);
             handlePagination();
             Swal.fire({
               html: message,
@@ -153,7 +154,7 @@ export default function Import({
               table,
               disabledButton,
             });
-            setLoading(false);
+            setImportLoading(false);
             handlePagination();
             Swal.fire({
               html: message,
@@ -636,7 +637,8 @@ export default function Import({
 
   return (
     <>
-      {loading && <ComponentLoading text="Importando planilha, aguarde..." />}
+      {importLoading && <ComponentLoading text="Importando planilha, aguarde..." />}
+      {loading && <ComponentLoading text="" />}
 
       <Head>
         <title>Importação planilhas</title>
