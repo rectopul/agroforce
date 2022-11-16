@@ -12,8 +12,6 @@ export class GenotypeTreatmentController {
     parameters.AND = [];
     parameters.OR = [];
     try {
-      console.log('options');
-      console.log(options);
       if (options.filterStatus) {
         const statusParams = options.filterStatus?.split(',');
         parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[0]}" } } }`));
@@ -124,7 +122,13 @@ export class GenotypeTreatmentController {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
       }
       if (options.status_experiment) {
-        parameters.AND.push(JSON.parse(`{"assay_list": { "status": {"contains": "${options.status_experiment}" } } }`));
+        if (options.status_experiment.includes(',')) {
+          const filter = options.status_experiment.split(',');
+          parameters.OR.push(JSON.parse(`{"assay_list": { "status": {"contains": "${filter[0]}" } } }`));
+          parameters.OR.push(JSON.parse(`{"assay_list": { "status": {"contains": "${filter[1]}" } } }`));
+        } else {
+          parameters.AND.push(JSON.parse(`{"assay_list": { "status": {"contains": "${options.status_experiment}" } } }`));
+        }
       }
       const select = {
         id: true,
@@ -208,11 +212,16 @@ export class GenotypeTreatmentController {
 
       if (options.orderBy) {
         if (!options.excel) {
-          if (options.orderBy[2] == '' || !options.orderBy[2]) {
-            orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `{"${options.orderBy[1]}":"${options.typeOrder[1]}"}`];
+          if (typeof options.orderBy !== 'string') {
+            if (options.orderBy[2] == '' || !options.orderBy[2]) {
+              orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `{"${options.orderBy[1]}":"${options.typeOrder[1]}"}`];
+            } else {
+              orderBy = handleOrderForeign(options.orderBy[2], options.typeOrder[2]);
+              orderBy = orderBy || `{"${options.orderBy[2]}":"${options.typeOrder[2]}"}`;
+            }
           } else {
-            orderBy = handleOrderForeign(options.orderBy[2], options.typeOrder[2]);
-            orderBy = orderBy || `{"${options.orderBy[2]}":"${options.typeOrder[2]}"}`;
+            orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
+            orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
           }
         }
       }

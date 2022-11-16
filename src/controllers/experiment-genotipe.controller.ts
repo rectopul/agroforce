@@ -82,16 +82,13 @@ export class ExperimentGenotipeController {
         parameters.OR = [];
 
         const statusParams = options.filterStatus.split(',');
-        parameters.OR.push(
-          JSON.parse(
-            `{ "experiment": {"status": {"contains": "${statusParams[0]}" } } }`,
-          ),
-        );
-        parameters.OR.push(
-          JSON.parse(
-            `{ "experiment": {"status": {"contains": "${statusParams[1]}" } } }`,
-          ),
-        );
+        statusParams.forEach((_: any, index: number) => {
+          parameters.OR.push(
+            JSON.parse(
+              `{ "experiment": {"status": {"contains": "${statusParams[index]}" } } }`,
+            ),
+          );
+        });
       }
       if (options.ensaio) {
         parameters.AND.push(

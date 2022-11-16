@@ -1,36 +1,38 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
-import { removeCookies, setCookies } from "cookies-next";
-import { useFormik } from "formik";
-import MaterialTable from "material-table";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import getConfig from "next/config";
-import { RequestInit } from "next/dist/server/web/spec-extension/request";
-import Head from "next/head";
-import router from "next/router";
-import { useEffect, useState, useRef } from "react";
+import { removeCookies, setCookies } from 'cookies-next';
+import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import Head from 'next/head';
+import router from 'next/router';
+import { useEffect, useState, useRef } from 'react';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from "react-beautiful-dnd";
+} from 'react-beautiful-dnd';
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiTwotoneStar,
-} from "react-icons/ai";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
-import { UserPreferenceController } from "src/controllers/user-preference.controller";
-import { unidadeCulturaService, userPreferencesService } from "src/services";
-import * as XLSX from "xlsx";
-import { BsTrashFill } from "react-icons/bs";
-import Swal from "sweetalert2";
+} from 'react-icons/ai';
+import {
+  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+} from 'react-icons/bi';
+import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
+import { UserPreferenceController } from 'src/controllers/user-preference.controller';
+import { unidadeCulturaService, userPreferencesService } from 'src/services';
+import * as XLSX from 'xlsx';
+import { BsTrashFill } from 'react-icons/bs';
+import Swal from 'sweetalert2';
 import {
   AccordionFilter,
   Button,
@@ -39,11 +41,11 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
-} from "../../../../components";
-import * as ITabs from "../../../../shared/utils/dropdown";
-import { tableGlobalFunctions } from "../../../../helpers";
-import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
-import ComponentLoading from "../../../../components/Loading";
+} from '../../../../components';
+import * as ITabs from '../../../../shared/utils/dropdown';
+import { tableGlobalFunctions } from '../../../../helpers';
+import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+import ComponentLoading from '../../../../components/Loading';
 
 interface IUnityCultureProps {
   id: number;
@@ -109,29 +111,27 @@ export default function Listagem({
   const tableRef = useRef<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const tabsDropDowns = TabsDropDowns("config");
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "LOCAL" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  const tabsDropDowns = TabsDropDowns('config');
+  tabsDropDowns.map((tab) => (tab.titleTab === 'LOCAL' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.unidadeCultura || {
     id: 0,
     table_preferences:
-      "id,name_unity_culture,year,name_local_culture,label,mloc,adress,label_country,label_region,name_locality",
+      'id,name_unity_culture,year,name_local_culture,label,mloc,adress,label_country,label_region,name_locality',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences
+    preferences.table_preferences,
   );
   const [unidadeCultura, setUnidadeCultura] = useState<IUnityCultureProps[]>(
-    () => allCultureUnity
+    () => allCultureUnity,
   );
   const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit)
+    Number(pageBeforeEdit),
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [orderList, setOrder] = useState<number>(0);
-  const [arrowOrder, setArrowOrder] = useState<any>("");
+  const [arrowOrder, setArrowOrder] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -142,58 +142,58 @@ export default function Listagem({
     //   defaultChecked: () => camposGerenciados.includes('id'),
     // },
     {
-      name: "CamposGerenciados[]",
-      title: "Unidade de cultura",
-      value: "name_unity_culture",
-      defaultChecked: () => camposGerenciados.includes("name_unity_culture"),
+      name: 'CamposGerenciados[]',
+      title: 'Unidade de cultura',
+      value: 'name_unity_culture',
+      defaultChecked: () => camposGerenciados.includes('name_unity_culture'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Ano",
-      value: "year",
-      defaultChecked: () => camposGerenciados.includes("year"),
+      name: 'CamposGerenciados[]',
+      title: 'Ano',
+      value: 'year',
+      defaultChecked: () => camposGerenciados.includes('year'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Lugar de cultura",
-      value: "name_local_culture",
-      defaultChecked: () => camposGerenciados.includes("name_local_culture"),
+      name: 'CamposGerenciados[]',
+      title: 'Lugar de cultura',
+      value: 'name_local_culture',
+      defaultChecked: () => camposGerenciados.includes('name_local_culture'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Rótulo",
-      value: "label",
-      defaultChecked: () => camposGerenciados.includes("label"),
+      name: 'CamposGerenciados[]',
+      title: 'Rótulo',
+      value: 'label',
+      defaultChecked: () => camposGerenciados.includes('label'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "MLOC",
-      value: "mloc",
-      defaultChecked: () => camposGerenciados.includes("mloc"),
+      name: 'CamposGerenciados[]',
+      title: 'MLOC',
+      value: 'mloc',
+      defaultChecked: () => camposGerenciados.includes('mloc'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Endereço",
-      value: "adress",
-      defaultChecked: () => camposGerenciados.includes("adress"),
+      name: 'CamposGerenciados[]',
+      title: 'Endereço',
+      value: 'adress',
+      defaultChecked: () => camposGerenciados.includes('adress'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "País",
-      value: "label_country",
-      defaultChecked: () => camposGerenciados.includes("label_country"),
+      name: 'CamposGerenciados[]',
+      title: 'País',
+      value: 'label_country',
+      defaultChecked: () => camposGerenciados.includes('label_country'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Região",
-      value: "label_region",
-      defaultChecked: () => camposGerenciados.includes("label_region"),
+      name: 'CamposGerenciados[]',
+      title: 'Região',
+      value: 'label_region',
+      defaultChecked: () => camposGerenciados.includes('label_region'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Localidade",
-      value: "name_locality",
-      defaultChecked: () => camposGerenciados.includes("name_locality"),
+      name: 'CamposGerenciados[]',
+      title: 'Localidade',
+      value: 'name_locality',
+      defaultChecked: () => camposGerenciados.includes('name_locality'),
     },
     // {
     //   name: 'CamposGerenciados[]',
@@ -204,9 +204,9 @@ export default function Listagem({
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [selectedRowById, setSelectedRowById] = useState<number>();
-  const [colorStar, setColorStar] = useState<string>("");
+  const [colorStar, setColorStar] = useState<string>('');
   // const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>("");
+  const [orderType, setOrderType] = useState<string>('');
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
@@ -221,19 +221,19 @@ export default function Listagem({
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterNameUnityCulture: checkValue("filterNameUnityCulture"),
-      filterYear: checkValue("filterYear"),
-      filterYearTo: checkValue("filterYearTo"),
-      filterYearFrom: checkValue("filterYearFrom"),
-      filterNameLocalCulture: checkValue("filterNameLocalCulture"),
-      filterLabel: checkValue("filterLabel"),
-      filterMloc: checkValue("filterMloc"),
-      filterAdress: checkValue("filterAdress"),
-      filterLabelCountry: checkValue("filterLabelCountry"),
-      filterLabelRegion: checkValue("filterLabelRegion"),
-      filterNameLocality: checkValue("filterNameLocality"),
-      orderBy: "",
-      typeOrder: "",
+      filterNameUnityCulture: checkValue('filterNameUnityCulture'),
+      filterYear: checkValue('filterYear'),
+      filterYearTo: checkValue('filterYearTo'),
+      filterYearFrom: checkValue('filterYearFrom'),
+      filterNameLocalCulture: checkValue('filterNameLocalCulture'),
+      filterLabel: checkValue('filterLabel'),
+      filterMloc: checkValue('filterMloc'),
+      filterAdress: checkValue('filterAdress'),
+      filterLabelCountry: checkValue('filterLabelCountry'),
+      filterLabelRegion: checkValue('filterLabelRegion'),
+      filterNameLocality: checkValue('filterNameLocality'),
+      orderBy: '',
+      typeOrder: '',
     },
     onSubmit: async ({
       filterNameUnityCulture,
@@ -268,22 +268,25 @@ export default function Listagem({
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
-    setCookies("filterBeforeEdit", parametersFilter);
-    setCookies("filterBeforeEditTypeOrder", typeOrder);
-    setCookies("filterBeforeEditOrderBy", orderBy);
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies("filtersParams", parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
     await unidadeCulturaService.getAll(parametersFilter).then((response) => {
       if (response.status === 200 || response.status === 400) {
         setUnidadeCultura(response.response);
         setTotalItems(response.total);
         tableRef.current.dataManager.changePageSize(
-          response.total >= take ? take : response.total
+          response.total >= take ? take : response.total,
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
 
   // Call that function when change type order value.
@@ -294,7 +297,7 @@ export default function Listagem({
   async function handleOrder(
     column: string,
     order: string | any,
-    name: any
+    name: any,
   ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
@@ -340,8 +343,9 @@ export default function Listagem({
     // }
 
     // Gobal manage orders
-    const { typeOrderG, columnG, orderByG, arrowOrder } =
-      await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setFieldOrder(name);
     setTypeOrder(typeOrderG);
@@ -364,7 +368,7 @@ export default function Listagem({
     } else {
       Swal.fire({
         html: message,
-        width: "800",
+        width: '800',
       });
     }
   }
@@ -389,8 +393,8 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: "Ações",
-      field: "action",
+      title: 'Ações',
+      field: 'action',
       sorting: false,
       searchable: false,
       render: (rowData: any) => (
@@ -410,106 +414,106 @@ export default function Listagem({
   }
 
   function columnsOrder(columnOrder: any): any {
-    const columnCampos: any = columnOrder.split(",");
+    const columnCampos: any = columnOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item) => {
-      if (columnCampos[item] === "name_unity_culture") {
+      if (columnCampos[item] === 'name_unity_culture') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Unidade de cultura",
-            title: "name_unity_culture",
+            name: 'Unidade de cultura',
+            title: 'name_unity_culture',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[item] === "year") {
+      if (columnCampos[item] === 'year') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Ano",
-            title: "year",
+            name: 'Ano',
+            title: 'year',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[item] === "name_local_culture") {
+      if (columnCampos[item] === 'name_local_culture') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Lugar de cultura",
-            title: "local.name_local_culture",
+            name: 'Lugar de cultura',
+            title: 'local.name_local_culture',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[item] === "label") {
+      if (columnCampos[item] === 'label') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Rótulo",
-            title: "local.label",
+            name: 'Rótulo',
+            title: 'local.label',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[item] === "adress") {
+      if (columnCampos[item] === 'adress') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Endereço",
-            title: "local.adress",
+            name: 'Endereço',
+            title: 'local.adress',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[item] === "mloc") {
+      if (columnCampos[item] === 'mloc') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "MLOC",
-            title: "local.mloc",
+            name: 'MLOC',
+            title: 'local.mloc',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[item] === "label_country") {
+      if (columnCampos[item] === 'label_country') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "País",
-            title: "local.label_country",
+            name: 'País',
+            title: 'local.label_country',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[item] === "label_region") {
+      if (columnCampos[item] === 'label_region') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Região",
-            title: "local.label_region",
+            name: 'Região',
+            title: 'local.label_region',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[item] === "name_locality") {
+      if (columnCampos[item] === 'name_locality') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Localidade",
-            title: "local.name_locality",
+            name: 'Localidade',
+            title: 'local.name_locality',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
       // if (columnCampos[item] === 'action') {
@@ -523,7 +527,7 @@ export default function Listagem({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = "";
+    let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -546,7 +550,7 @@ export default function Listagem({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
       userLogado.preferences.unidadeCultura = {
         id: preferences.id,
@@ -557,7 +561,7 @@ export default function Listagem({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -601,7 +605,7 @@ export default function Listagem({
             seconds = String(dataExp.getSeconds());
           }
           newRow.DT = `${dataExp.toLocaleDateString(
-            "pt-BR"
+            'pt-BR',
           )} ${hours}:${minutes}:${seconds}`;
           newRow.NOME_UNIDADE_CULTURA = newRow?.name_unity_culture;
           newRow.ANO = newRow?.year;
@@ -627,20 +631,20 @@ export default function Listagem({
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "unidade-cultura");
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'unidade-cultura');
 
         // buffer
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "buffer",
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "binary",
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, "Unidade-cultura.xlsx");
+        XLSX.writeFile(workBook, 'Unidade-cultura.xlsx');
       }
     });
   };
@@ -697,7 +701,7 @@ export default function Listagem({
   function checkValue(value: any) {
     const parameter = tableGlobalFunctions.getValuesForFilter(
       value,
-      filtersParams
+      filtersParams,
     );
     return parameter;
   }
@@ -740,8 +744,8 @@ export default function Listagem({
                 "
                 >
                   {filterFieldFactory(
-                    "filterNameUnityCulture",
-                    "Unidade de cultura"
+                    'filterNameUnityCulture',
+                    'Unidade de cultura',
                   )}
 
                   <div className="h-6 w-1/2 ml-2">
@@ -765,13 +769,13 @@ export default function Listagem({
                   </div>
 
                   {filterFieldFactory(
-                    "filterNameLocalCulture",
-                    "Lugar de cultura"
+                    'filterNameLocalCulture',
+                    'Lugar de cultura',
                   )}
 
-                  {filterFieldFactory("filterLabel", "Rótulo")}
+                  {filterFieldFactory('filterLabel', 'Rótulo')}
 
-                  {filterFieldFactory("filterMloc", "MLOC")}
+                  {filterFieldFactory('filterMloc', 'MLOC')}
                 </div>
 
                 <div
@@ -782,13 +786,13 @@ export default function Listagem({
                   pb-0
                   "
                 >
-                  {filterFieldFactory("filterAdress", "Endereço")}
+                  {filterFieldFactory('filterAdress', 'Endereço')}
 
-                  {filterFieldFactory("filterLabelCountry", "País")}
+                  {filterFieldFactory('filterLabelCountry', 'País')}
 
-                  {filterFieldFactory("filterLabelRegion", "Região")}
+                  {filterFieldFactory('filterLabelRegion', 'Região')}
 
-                  {filterFieldFactory("filterNameLocality", "Localidade")}
+                  {filterFieldFactory('filterNameLocality', 'Localidade')}
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
@@ -825,7 +829,7 @@ export default function Listagem({
                 pageSize: Number(take),
                 rowStyle: (rowData: IUnityCultureProps) => ({
                   backgroundColor:
-                    selectedRowById === rowData.id ? "#c7e3f5" : "#fff",
+                    selectedRowById === rowData.id ? '#c7e3f5' : '#fff',
                   height: 35,
                 }),
               }}
@@ -846,7 +850,9 @@ export default function Listagem({
                   >
                     <div className="h-12" />
                     <strong className="text-blue-600">
-                      Total registrado: {itemsTotal}
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
                     </strong>
 
                     <div
@@ -893,7 +899,7 @@ export default function Listagem({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value
+                                                generate.value,
                                               )}
                                             />
                                           </li>
@@ -922,59 +928,58 @@ export default function Listagem({
                     </div>
                   </div>
                 ),
-                Pagination: (props) =>
-                  (
-                    <div
-                      className="flex
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(0)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage < 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill("")
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setCurrentPage(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(pages - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(0)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage < 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(pages - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
                   ) as any,
               }}
             />
@@ -991,10 +996,9 @@ export const getServerSideProps: GetServerSideProps = async ({
 }: any) => {
   const userPreferenceController = new UserPreferenceController();
   // eslint-disable-next-line max-len
-  const itensPerPage =
-    (await (
-      await userPreferenceController.getConfigGerais()
-    )?.response[0]?.itens_per_page) ?? 10;
+  const itensPerPage = (await (
+    await userPreferenceController.getConfigGerais()
+  )?.response[0]?.itens_per_page) ?? 10;
 
   const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);
@@ -1008,35 +1012,35 @@ export const getServerSideProps: GetServerSideProps = async ({
     : `id_safra=${idSafra}`;
 
   // Last page
-  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
-  if (lastPageServer == undefined || lastPageServer == "No") {
-    removeCookies("filterBeforeEdit", { req, res });
-    removeCookies("pageBeforeEdit", { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
   }
 
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : "desc";
+    : 'desc';
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : "name_unity_culture";
+    : 'name_unity_culture';
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : `id_safra=${idSafra}`;
 
-  removeCookies("filterBeforeEdit", { req, res });
-  removeCookies("pageBeforeEdit", { req, res });
-  removeCookies("filterBeforeEditTypeOrder", { req, res });
-  removeCookies("filterBeforeEditOrderBy", { req, res });
-  removeCookies("lastPage", { req, res });
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/unidade-cultura`;
@@ -1045,14 +1049,14 @@ export const getServerSideProps: GetServerSideProps = async ({
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
   const { response: allCultureUnity, total: totalItems } = await fetch(
     urlParameters.toString(),
-    requestOptions
+    requestOptions,
   ).then((response) => response.json());
 
   return {
