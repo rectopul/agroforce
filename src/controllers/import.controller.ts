@@ -2,6 +2,8 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable eqeqeq */
 /* eslint-disable no-await-in-loop */
+import { v4 as uuidv4 } from 'uuid';
+import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
 import { SafraController } from './safra.controller';
 import { LocalController } from './local/local.controller';
 import { FocoController } from './foco.controller';
@@ -94,6 +96,38 @@ export class ImportController {
   tecnologiaRepository = new TecnologiaRepository();
 
   aux: object | any = {};
+
+
+  private const importblob(file){   
+    const newFileName =
+    uuidv4() + '.' + FormData.file.name.split('.').pop();
+    uploadFileToBlob(FormData.file, newFileName);
+    registerItem(newFileName);
+
+    const containerName = 'sample-container';
+    const sasToken = process.env.NEXT_PUBLIC_STORAGESASTOKEN;
+    const storageAccountName = process.env.NEXT_PUBLIC_STORAGERESOURCENAME;
+
+    const uploadFileToBlob = useCallback(
+    async (file: File | null, newFileName: string) => {
+
+    const blobService = new BlobServiceClient(
+      `https://${storageAccountName}.blob.core.windows.net/?${sasToken}`
+    );
+
+    const containerClient: ContainerClient =
+      blobService.getContainerClient(containerName);
+    await containerClient.createIfNotExists({
+      access: 'container',
+    });
+
+    const blobClient = containerClient.getBlockBlobClient(newFileName);
+    const options = { blobHTTPHeaders: { blobContentType: file.type } };
+
+    await blobClient.uploadData(file, options);
+  }
+    
+
 
   async getAll(moduleId: number) {
     try {
@@ -233,6 +267,7 @@ export class ImportController {
       }
 
       if (data.moduleId === 27) {
+        await importblob(data.files[0]);
         return await ImportGenotypeTreatmentController.validate(responseLog?.id, data);
       }
 

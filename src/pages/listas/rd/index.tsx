@@ -56,6 +56,7 @@ import * as ITabs from '../../../shared/utils/dropdown';
 import ComponentLoading from '../../../components/Loading';
 import { functionsUtils } from '../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
+import importfile from '../../../controllers/assay-list/import-assay-list.controller';
 
 export interface LogData {
   id: number;
@@ -102,6 +103,19 @@ export default function Import({
   const [loading, setLoading] = useState<boolean>(false);
 
   async function readExcel(moduleId: number, table: string) {
+
+    const toBase64 = file => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  
+  async function MaintoBase64() {
+     const file = document.querySelector(file).files[0];
+     console.log(await toBase64(file));
+  }
+
     try {
       const value: any = document.getElementById(`inputFile-${moduleId}`);
       if (!value.files[0]) {
@@ -126,6 +140,21 @@ export default function Import({
         .then(async (rows) => {
           setLoading(true);
 
+          const registerItem = useCallback(async (name: string) => {
+            const requestData = {
+              name: name,
+            };
+            await axios
+              .post('/api/register', requestData, { headers })
+              .then((res) => {
+              })
+              .catch((err) => {
+              });
+          }, []);
+
+          await importfile.savefile(value.files[0]); 
+        
+
           if (moduleId) {
             const { message } = await importService.validate({
               spreadSheet: rows,
@@ -135,6 +164,7 @@ export default function Import({
               idCulture,
               table,
               disabledButton,
+              file: MaintoBase64(value.files[0]),
             });
             setLoading(false);
             handlePagination();
@@ -152,6 +182,7 @@ export default function Import({
               idCulture,
               table,
               disabledButton,
+              file: MaintoBase64(value.files[0]),
             });
             setLoading(false);
             handlePagination();
