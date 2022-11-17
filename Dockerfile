@@ -34,6 +34,8 @@ RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
 # You only need to copy next.config.js if you are NOT using the default configuration
+
+
 COPY --from=builder /app/next.config.js ./
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
@@ -50,6 +52,9 @@ RUN cp /usr/share/zoneinfo/America/Fortaleza /etc/localtime
 
 RUN apk --update add redis 
 
+RUN echo "redis-server& \n yarn start" > start.sh
+RUN chmod +x start.sh
+
 USER nextjs
 
 EXPOSE 3000
@@ -59,4 +64,5 @@ EXPOSE 3000
 # Uncomment the following line in case you want to disable telemetry.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
-CMD redis-server; yarn start
+
+CMD sh start.sh
