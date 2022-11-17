@@ -52,10 +52,13 @@ RUN cp /usr/share/zoneinfo/America/Fortaleza /etc/localtime
 
 RUN apk --update add redis 
 
-RUN echo "redis-server& \n yarn start" > /tmp/start.sh
-RUN chmod +x /tmp/start.sh
+
 
 USER nextjs
+
+RUN echo "redis-server&" > /tmp/start.sh
+RUN echo "yarn start" >> /tmp/start.sh
+RUN chmod +x /tmp/start.sh
 
 EXPOSE 3000
 
