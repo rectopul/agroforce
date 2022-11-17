@@ -52,8 +52,8 @@ RUN cp /usr/share/zoneinfo/America/Fortaleza /etc/localtime
 
 RUN apk --update add redis 
 
-RUN echo "redis-server& \n yarn start" > start.sh
-RUN chmod +x start.sh
+RUN echo "redis-server& \n yarn start" > /tmp/start.sh
+RUN chmod +x /tmp/start.sh
 
 USER nextjs
 
@@ -65,4 +65,4 @@ EXPOSE 3000
 # ENV NEXT_TELEMETRY_DISABLED 1
 
 
-CMD sh start.sh
+CMD sh /tmp/start.sh
