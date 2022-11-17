@@ -1,6 +1,8 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable keyword-spacing */
+import { TecnologiaRepository } from 'src/repository/tecnologia.repository';
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
 import { responseGenericFactory, responseNullFactory } from '../../shared/utils/responseErrorFactory';
@@ -18,6 +20,12 @@ export class ImportTechnologyController {
     const logImportController = new LogImportController();
     const tecnologiaController = new TecnologiaController();
 
+    /* --------- Transcation Context --------- */
+    const transactionConfig = new TransactionConfig();
+    const tecnologiaRepository = new TecnologiaRepository();
+    tecnologiaRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+    /* --------------------------------------- */
+
     const responseIfError: any = [];
     const headers = [
       'Código da tecnologia (S1_C0189)',
@@ -29,6 +37,7 @@ export class ImportTechnologyController {
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
+        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
         return { status: 400, message: validate };
       }
       const duplicateCode: any = [];
@@ -36,6 +45,7 @@ export class ImportTechnologyController {
         if (row !== '0') {
           for (const column in spreadSheet[row]) {
             if (column === '0') {
+              console.log(typeof (spreadSheet[row][column]));
               if (spreadSheet[row][column] === null) {
                 responseIfError[column]
                   += responseNullFactory(
@@ -51,9 +61,11 @@ export class ImportTechnologyController {
                     spreadSheet[0][column],
                     'o limite de caracteres e 2',
                   );
-              } else if ((typeof (spreadSheet[row][column])) === 'number' && spreadSheet[row][column].toString().length < 2) {
-                // eslint-disable-next-line no-param-reassign
-                spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+              } else {
+                if (spreadSheet[row][column].toString().length < 2) {
+                  // eslint-disable-next-line no-param-reassign
+                  spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+                }
                 if(duplicateCode.includes(spreadSheet[row][column])) {
                   responseIfError[column]
                       += responseGenericFactory(
@@ -168,37 +180,36 @@ export class ImportTechnologyController {
 
       if (responseIfError.length === 0) {
         try {
-          spreadSheet.forEach(async (item: any, row: number) => {
-            if (row !== 0) {
-              const {
-                response: responseCulture,
-              }: IReturnObject = await culturaController.getOneCulture(idCulture);
-              const { status, response }: IReturnObject = await tecnologiaController.getAll(
-                { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
-              );
-
-              if (status === 200) {
-                await tecnologiaController.update({
-                  id: response[0]?.id,
-                  id_culture: responseCulture?.id,
-                  cod_tec: String(spreadSheet[row][0]),
-                  name: spreadSheet[row][1],
-                  desc: spreadSheet[row][2],
-                  created_by: createdBy,
-                  dt_export: new Date(spreadSheet[row][4]),
-                });
-              } else {
-                await tecnologiaController.create({
-                  id_culture: responseCulture?.id,
-                  cod_tec: String(spreadSheet[row][0]),
-                  name: spreadSheet[row][1],
-                  desc: spreadSheet[row][2],
-                  created_by: createdBy,
-                  dt_export: new Date(spreadSheet[row][4]),
-                });
+          await transactionConfig.transactionScope.run(async () => {
+            for (const row in spreadSheet) {
+              if (row !== '0') {
+                const { status, response }: IReturnObject = await tecnologiaController.getAll(
+                  { id_culture: idCulture, cod_tec: String(spreadSheet[row][0]) },
+                );
+                if (status === 200 && response[0]?.id) {
+                  await tecnologiaRepository.updateTransaction(response[0]?.id, {
+                    id: response[0]?.id,
+                    id_culture: idCulture,
+                    cod_tec: String(spreadSheet[row][0]),
+                    name: spreadSheet[row][1],
+                    desc: String(spreadSheet[row][2]),
+                    created_by: createdBy,
+                    dt_export: new Date(spreadSheet[row][4]),
+                  });
+                } else {
+                  await tecnologiaRepository.createTransaction({
+                    id_culture: idCulture,
+                    cod_tec: String(spreadSheet[row][0]),
+                    name: spreadSheet[row][1],
+                    desc: String(spreadSheet[row][2]),
+                    created_by: createdBy,
+                    dt_export: new Date(spreadSheet[row][4]),
+                  });
+                }
               }
             }
           });
+
           await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
           return { status: 200, message: 'Tecnologia importado com sucesso' };
         } catch (error: any) {

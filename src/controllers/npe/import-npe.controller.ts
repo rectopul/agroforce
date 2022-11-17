@@ -58,6 +58,7 @@ export class ImportNpeController {
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
+        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
         return { status: 400, message: validate };
       }
       const configModule: object | any = await importController.getAll(14);
@@ -268,7 +269,7 @@ export class ImportNpeController {
                       Number(column) + 1,
                       row,
                       spreadSheet[0][column],
-                      'o foco não existe no sistema',
+                      'o foco não existe no sistema ou está inativo',
                     );
                   } else {
                     this.aux.focoId = response[0]?.id;
@@ -315,7 +316,7 @@ export class ImportNpeController {
                       Number(column) + 1,
                       row,
                       spreadSheet[0][column],
-                      'o tipo de ensaio não existe no sistema',
+                      'o tipo de ensaio não existe no sistema ou está inativo',
                     );
                   } else {
                     this.aux.typeAssayId = ensaio.response[0]?.id;

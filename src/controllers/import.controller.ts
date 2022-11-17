@@ -242,7 +242,7 @@ export class ImportController {
 
       // Validação Lista de Ensaio
       if (data.moduleId === 26) {
-        return await ImportAssayListController.validate(responseLog?.id, data);
+        return await ImportAssayListController.validate(responseLog?.id, false, data);
       }
 
       // Validação do modulo Local
@@ -256,7 +256,7 @@ export class ImportController {
 
       // Validação do modulo Delineamento
       if (data.moduleId === 7) {
-        return await ImportDelimitationController.validate(responseLog?.id, data);
+        return await ImportDelimitationController.validate(responseLog?.id, false, data);
       }
 
       // Validação do modulo Genotipo

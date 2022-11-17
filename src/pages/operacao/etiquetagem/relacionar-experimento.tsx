@@ -37,6 +37,7 @@ import {
   ITreatmentGrid,
 } from '../../../interfaces/listas/ensaio/genotype-treatment.interface';
 import { IGenerateProps } from '../../../interfaces/shared/generate-props.interface';
+import ComponentLoading from '../../../components/Loading';
 
 import {
   AccordionFilter,
@@ -110,12 +111,13 @@ export default function Listagem({
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: 'CamposGerenciados[]', title: 'Foco', value: 'foco' },
@@ -133,9 +135,9 @@ export default function Listagem({
       title: 'Delineamento',
       value: 'delineamento',
     },
-    { name: 'CamposGerenciados[]', title: 'Rep.', value: 'repetitionsNumber' },
-    { name: 'CamposGerenciados[]', title: 'Status EXP.', value: 'status' },
-    { name: 'CamposGerenciados[]', title: 'Ações', value: 'action' },
+    { name: 'CamposGerenciados[]', title: 'Rep', value: 'repetitionsNumber' },
+    { name: 'CamposGerenciados[]', title: 'Status EXP', value: 'status' },
+    // { name: "CamposGerenciados[]", title: "Ação", value: "action" },
   ]);
 
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
@@ -269,7 +271,10 @@ export default function Listagem({
           itemsTotal >= take ? take : itemsTotal,
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
 
   // Call that function when change type order value.
@@ -464,7 +469,7 @@ export default function Listagem({
       if (columnOrder[index] === 'repetitionsNumber') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Rep.',
+            name: 'Rep',
             title: 'repetitionsNumber',
             orderList,
             fieldOrder,
@@ -475,7 +480,7 @@ export default function Listagem({
       if (columnOrder[index] === 'status') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Status EXP.',
+            name: 'Status EXP',
             title: 'status',
             orderList,
             fieldOrder,
@@ -686,6 +691,8 @@ export default function Listagem({
         <title>Listagem de genótipos do ensaio</title>
       </Head>
 
+      {loading && <ComponentLoading text="" />}
+
       <ModalConfirmation
         isOpen={isOpenModal}
         text={`Você tem certeza de que quer associar ${rowsSelected?.length} experimentos a esse grupo?`}
@@ -726,7 +733,7 @@ export default function Listagem({
                     'filterExperimentName',
                     'Nome Experimento',
                   )}
-                  {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
+                  {filterFieldFactory('filterCod', 'Cod Tec')}
                 </div>
 
                 <div
@@ -737,12 +744,12 @@ export default function Listagem({
                                         "
                 >
                   {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
-                  {filterFieldFactory('filterPeriod', 'Epoca')}
+                  {filterFieldFactory('filterPeriod', 'Época')}
                   {filterFieldFactory('filterDelineamento', 'Delineamento')}
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Repetição
+                      Rep
                     </label>
                     <div className="flex">
                       <Input

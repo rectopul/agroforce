@@ -23,6 +23,7 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
+import ComponentLoading from '../../../../components/Loading';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   localService,
@@ -99,8 +100,9 @@ export default function AtualizarLocal({
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit),
   );
+  const [loading, setLoading] = useState<boolean>(false);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -286,6 +288,11 @@ export default function AtualizarLocal({
       }
     }
 
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
     setFieldOrder(name);
   }
 
@@ -413,7 +420,6 @@ export default function AtualizarLocal({
 
   useEffect(() => {
     handlePagination();
-    ('');
     handleTotalPages();
   }, [currentPage]);
 
@@ -422,6 +428,8 @@ export default function AtualizarLocal({
       <Head>
         <title>Novo Local</title>
       </Head>
+
+      {loading && <ComponentLoading text="" />}
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form

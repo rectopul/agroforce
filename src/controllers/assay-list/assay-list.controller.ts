@@ -13,6 +13,7 @@ export class AssayListController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: assay-list.controller.ts ~ line 16 ~ AssayListController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     try {

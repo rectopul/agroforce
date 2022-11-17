@@ -96,32 +96,32 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     () => allExperimentGroup,
   );
   const [currentPage, setCurrentPage] = useState<number>(pageBeforeEdit);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
       name: 'CamposGerenciados[]',
-      title: 'Nome do grupo de exp.',
+      title: 'Nome do grupo de exp',
       value: 'name',
       defaultChecked: () => camposGerenciados.includes('name'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Qtde. exp.',
+      title: 'Qtde exp',
       value: 'experimentAmount',
       defaultChecked: () => camposGerenciados.includes('experimentAmount'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Etiq. a imprimir',
+      title: 'Etiq a imprimir',
       value: 'tagsToPrint',
       defaultChecked: () => camposGerenciados.includes('tagsToPrint'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Etiq. impressas',
+      title: 'Etiq impressas',
       value: 'tagsPrinted',
       defaultChecked: () => camposGerenciados.includes('tagsPrinted'),
     },
@@ -133,7 +133,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Status grupo exp.',
+      title: 'Status grupo exp',
       value: 'status',
       defaultChecked: () => camposGerenciados.includes('status'),
     },
@@ -271,7 +271,10 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
           response.total >= take ? take : response.total,
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
 
   // Call that function when change type order value.
@@ -335,6 +338,10 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   async function deleteConfirmItem(item: any) {
@@ -457,7 +464,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       if (columnOrder[item] === 'name') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Nome do grupo de exp.',
+            name: 'Nome do grupo de exp',
             title: 'name',
             orderList,
             fieldOrder,
@@ -468,7 +475,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       if (columnOrder[item] === 'experimentAmount') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Qtde. exp.',
+            name: 'Qtde exp',
             title: 'experimentAmount',
             orderList,
             fieldOrder,
@@ -479,7 +486,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       if (columnOrder[item] === 'tagsToPrint') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Etiq. a imprimir',
+            name: 'Etiq a imprimir',
             title: 'tagsToPrint',
             orderList,
             fieldOrder,
@@ -490,7 +497,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       if (columnOrder[item] === 'tagsPrinted') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Etiq. impressas',
+            name: 'Etiq impressas',
             title: 'tagsPrinted',
             orderList,
             fieldOrder,
@@ -512,7 +519,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       if (columnOrder[item] === 'status') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Status grupo exp.',
+            name: 'Status grupo exp',
             title: 'status',
             orderList,
             fieldOrder,
@@ -829,7 +836,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                 >
                   {filterFieldFactory(
                     'filterExperimentGroup',
-                    'Nome do grupo de exp.',
+                    'Nome do grupo de exp',
                   )}
                   {/* {filterFieldFactory(
                     "filterQuantityExperiment",
@@ -853,7 +860,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
                   <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Qtde. exp.
+                      Qtde exp
                     </label>
                     <div className="flex">
                       <Input
@@ -876,7 +883,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
                   <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Etiq. a imprimir
+                      Etiq a imprimir
                     </label>
                     <div className="flex">
                       <Input
@@ -899,7 +906,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
                   <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Etiq. impressas
+                      Etiq impressas
                     </label>
                     <div className="flex">
                       <Input
@@ -947,7 +954,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
                   <div className="h-10 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status grupo exp.
+                      Status grupo exp
                     </label>
                     <SelectMultiple
                       data={statusFilter.map((i: any) => i.title)}

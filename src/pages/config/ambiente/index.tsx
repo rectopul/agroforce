@@ -43,10 +43,10 @@ import {
   Select,
   FieldItemsPerPage,
   ButtonDeleteConfirmation,
-} from "../../../components";
-import * as ITabs from "../../../shared/utils/dropdown";
-import { tableGlobalFunctions } from "../../../helpers";
-import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
+} from '../../../components';
+import * as ITabs from '../../../shared/utils/dropdown';
+import { tableGlobalFunctions } from '../../../helpers';
+import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../components/Loading';
 
 interface INpeProps {
@@ -136,7 +136,7 @@ export default function Listagem({
   );
   const [npe, setNPE] = useState(allNpe);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
@@ -169,7 +169,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Nome tec.',
+      title: 'Tecnologia',
       value: 'tecnologia',
       defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
@@ -181,7 +181,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Epoca ',
+      title: 'Época ',
       value: 'epoca',
       defaultChecked: () => camposGerenciados.includes('epoca'),
     },
@@ -199,7 +199,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Status',
+      title: 'Ação',
       value: 'status',
       defaultChecked: () => camposGerenciados.includes('status'),
     },
@@ -295,7 +295,10 @@ export default function Listagem({
           response.total >= take ? take : response.total,
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
 
   // Call that function when change type order value.
@@ -488,13 +491,18 @@ export default function Listagem({
             orderList,
             fieldOrder,
             handleOrder,
+            render: (rowData: any) => (
+              <div>
+                {`${rowData?.tecnologia?.cod_tec} ${rowData?.tecnologia?.name}`}
+              </div>
+            ),
           }),
         );
       }
       if (columnCampos[item] === 'epoca') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Epoca',
+            name: 'Época',
             title: 'epoca',
             orderList,
             fieldOrder,
@@ -513,22 +521,22 @@ export default function Listagem({
           }),
         );
       }
-      if (columnCampos[item] === 'group') {
+      if (columnCampos[item] === 'prox_npe') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Grupo',
-            title: 'group.group',
+            name: 'Prox NPE',
+            title: 'prox_npe',
             orderList,
             fieldOrder,
             handleOrder,
           }),
         );
       }
-      if (columnCampos[item] === 'prox_npe') {
+      if (columnCampos[item] === 'group') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Prox NPE',
-            title: 'prox_npe',
+            name: 'Grupo',
+            title: 'group.group',
             orderList,
             fieldOrder,
             handleOrder,
@@ -602,6 +610,10 @@ export default function Listagem({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   async function getValuesColumns(): Promise<void> {
@@ -826,8 +838,7 @@ export default function Listagem({
 
   return (
     <>
-
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
 
       <Head>
         <title>Listagem dos Ambientes</title>
@@ -846,7 +857,7 @@ export default function Listagem({
                 className="flex flex-col
                   w-full
                   items-center
-                  px-4
+                  px-0
                   bg-white
                 "
                 onSubmit={formik.handleSubmit}
@@ -872,13 +883,13 @@ export default function Listagem({
 
                   {filterFieldFactory('filterEnsaio', 'Ensaio')}
 
-                  {filterFieldFactory('filterCodTecnologia', 'Cód. Tec.')}
+                  {filterFieldFactory('filterCodTecnologia', 'Cod Tec')}
 
-                  {filterFieldFactory('filterTecnologia', 'Nome Tec.')}
+                  {filterFieldFactory('filterTecnologia', 'Nome Tec')}
 
                   {filterFieldFactory('filterLocal', 'Lugar cultura')}
 
-                  {filterFieldFactory('filterEpoca', 'Epoca')}
+                  {filterFieldFactory('filterEpoca', 'Época')}
 
                   <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">

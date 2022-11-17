@@ -1,47 +1,48 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { useFormik } from "formik";
-import MaterialTable from "material-table";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import getConfig from "next/config";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState, ReactNode, useEffect } from "react";
-import { IoMdArrowBack } from "react-icons/io";
-import Swal from "sweetalert2";
+import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import getConfig from 'next/config';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState, ReactNode, useEffect } from 'react';
+import { IoMdArrowBack } from 'react-icons/io';
+import Swal from 'sweetalert2';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from "react-beautiful-dnd";
+} from 'react-beautiful-dnd';
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiTwotoneStar,
-} from "react-icons/ai";
-import { BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line } from "react-icons/ri";
-import * as XLSX from "xlsx";
-import { RequestInit } from "next/dist/server/web/spec-extension/request";
+} from 'react-icons/ai';
+import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RiFileExcel2Line } from 'react-icons/ri';
+import * as XLSX from 'xlsx';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import {
   genotipoService,
   loteService,
   userPreferencesService,
-} from "../../../../services";
-import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
+} from '../../../../services';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   Button,
   Content,
   Input,
   AccordionFilter,
   CheckBox,
-} from "../../../../components";
-import * as ITabs from "../../../../shared/utils/dropdown";
-import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
+} from '../../../../components';
+import * as ITabs from '../../../../shared/utils/dropdown';
+import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+import ComponentLoading from '../../../../components/Loading';
 
 interface IFilter {
   filterStatus: object | any;
@@ -111,9 +112,7 @@ export default function Atualizargenotipo({
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "TMG" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
 
@@ -151,7 +150,7 @@ export default function Atualizargenotipo({
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire("Genótipo atualizado com sucesso!");
+            Swal.fire('Genótipo atualizado com sucesso!');
             router.back();
           } else {
             Swal.fire(response.message);
@@ -160,38 +159,38 @@ export default function Atualizargenotipo({
     },
   });
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.lote || {
     id: 0,
-    table_preferences: "id,year,cod_lote,ncc,fase,peso,quant_sementes",
+    table_preferences: 'id,year,cod_lote,ncc,fase,peso,quant_sementes',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences
+    preferences.table_preferences,
   );
-
+  const [loading, setLoading] = useState<boolean>(false);
   const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [orderList, setOrder] = useState<number>(0);
-  const [arrowOrder, setArrowOrder] = useState<ReactNode>("");
+  const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: "CamposGerenciados[]", title: "Ano", value: "year" },
-    { name: "CamposGerenciados[]", title: "Cód lote", value: "cod_lote" },
-    { name: "CamposGerenciados[]", title: "NCC", value: "ncc" },
-    { name: "CamposGerenciados[]", title: "Fase", value: "fase" },
-    { name: "CamposGerenciados[]", title: "Peso (kg)", value: "peso" },
+    { name: 'CamposGerenciados[]', title: 'Ano', value: 'year' },
+    { name: 'CamposGerenciados[]', title: 'Cod lote', value: 'cod_lote' },
+    { name: 'CamposGerenciados[]', title: 'NCC', value: 'ncc' },
+    { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
+    { name: 'CamposGerenciados[]', title: 'Peso (kg)', value: 'peso' },
     {
-      name: "CamposGerenciados[]",
-      title: "Quant sementes",
-      value: "quant_sementes",
+      name: 'CamposGerenciados[]',
+      title: 'Quant sementes',
+      value: 'quant_sementes',
     },
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [colorStar, setColorStar] = useState<string>("");
-  const [orderBy, setOrderBy] = useState<string>("");
-  const [orderType, setOrderType] = useState<string>("");
+  const [colorStar, setColorStar] = useState<string>('');
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const [fieldOrder, setFieldOrder] = useState<any>(null);
 
   const take: number = itensPerPage;
@@ -200,10 +199,10 @@ export default function Atualizargenotipo({
 
   useFormik<IFilter>({
     initialValues: {
-      filterStatus: "",
-      filterSearch: "",
-      orderBy: "",
-      typeOrder: "",
+      filterStatus: '',
+      filterSearch: '',
+      orderBy: '',
+      typeOrder: '',
     },
     onSubmit: async (values) => {
       const parametersFilter = `filterStatus=${values.filterStatus}&filterSearch=${values.filterSearch}&id_genotipo=${idGenotipo}`;
@@ -220,26 +219,26 @@ export default function Atualizargenotipo({
   async function handleOrder(
     column: string,
     order: string | any,
-    name: string | any
+    name: string | any,
   ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = "asc";
+      typeOrder = 'asc';
     } else if (order === 2) {
-      typeOrder = "desc";
+      typeOrder = 'desc';
     } else {
-      typeOrder = "";
+      typeOrder = '';
     }
     setOrderBy(column);
     setOrderType(typeOrder);
-    if (filter && typeof filter !== "undefined") {
-      if (typeOrder !== "") {
+    if (filter && typeof filter !== 'undefined') {
+      if (typeOrder !== '') {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== "") {
+    } else if (typeOrder !== '') {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
     } else {
       parametersFilter = filter;
@@ -261,10 +260,14 @@ export default function Atualizargenotipo({
       if (orderList === 1) {
         setArrowOrder(<AiOutlineArrowUp />);
       } else {
-        setArrowOrder("");
+        setArrowOrder('');
       }
     }
 
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
     setFieldOrder(name);
   }
 
@@ -289,110 +292,109 @@ export default function Atualizargenotipo({
   function idHeaderFactory() {
     return {
       title: <div className="flex items-center">{arrowOrder}</div>,
-      field: "id",
+      field: 'id',
       width: 0,
       sorting: false,
-      render: () =>
-        colorStar === "#eba417" ? (
-          <div className="h-10 flex">
-            <div>
-              <button
-                type="button"
-                className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar("")}
-              >
-                <AiTwotoneStar size={25} color="#eba417" />
-              </button>
-            </div>
+      render: () => (colorStar === '#eba417' ? (
+        <div className="h-10 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('')}
+            >
+              <AiTwotoneStar size={25} color="#eba417" />
+            </button>
           </div>
-        ) : (
-          <div className="h-10 flex">
-            <div>
-              <button
-                type="button"
-                className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar("#eba417")}
-              >
-                <AiTwotoneStar size={25} />
-              </button>
-            </div>
+        </div>
+      ) : (
+        <div className="h-10 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('#eba417')}
+            >
+              <AiTwotoneStar size={25} />
+            </button>
           </div>
-        ),
+        </div>
+      )),
     };
   }
 
   function columnsOrder(columnsCampos: string) {
-    const columnCampos: string[] = columnsCampos.split(",");
+    const columnCampos: string[] = columnsCampos.split(',');
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
       // if (columnCampos[index] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
-      if (columnCampos[index] === "year") {
+      if (columnCampos[index] === 'year') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Ano",
-            title: "year",
+            name: 'Ano',
+            title: 'year',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "cod_lote") {
+      if (columnCampos[index] === 'cod_lote') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Cód lote",
-            title: "cod_lote",
+            name: 'Cod lote',
+            title: 'cod_lote',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "ncc") {
+      if (columnCampos[index] === 'ncc') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "NCC",
-            title: "ncc",
+            name: 'NCC',
+            title: 'ncc',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "fase") {
+      if (columnCampos[index] === 'fase') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Fase",
-            title: "fase",
+            name: 'Fase',
+            title: 'fase',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "peso") {
+      if (columnCampos[index] === 'peso') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Peso",
-            title: "peso",
+            name: 'Peso',
+            title: 'peso',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "quant_sementes") {
+      if (columnCampos[index] === 'quant_sementes') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Quant. sementes",
-            title: "quant_sementes",
+            name: 'Quant sementes',
+            title: 'quant_sementes',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
     });
@@ -403,7 +405,7 @@ export default function Atualizargenotipo({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = "";
+    let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -426,7 +428,7 @@ export default function Atualizargenotipo({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
       userLogado.preferences.lote = {
         id: preferences.id,
@@ -437,7 +439,7 @@ export default function Atualizargenotipo({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -457,7 +459,7 @@ export default function Atualizargenotipo({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    if (!filterApplication.includes("paramSelect")) {
+    if (!filterApplication.includes('paramSelect')) {
       filterApplication += `&paramSelect=${camposGerenciados}&id_genotipo=${idGenotipo}`;
     }
 
@@ -465,9 +467,9 @@ export default function Atualizargenotipo({
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           if (row.status === 0) {
-            row.status = "Inativo";
+            row.status = 'Inativo';
           } else {
-            row.status = "Ativo";
+            row.status = 'Ativo';
           }
 
           row.ID_S2 = row.id_s2;
@@ -504,20 +506,20 @@ export default function Atualizargenotipo({
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "lotes");
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'lotes');
 
         // Buffer
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "buffer",
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "binary",
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, "Lotes.xlsx");
+        XLSX.writeFile(workBook, 'Lotes.xlsx');
       }
     });
   };
@@ -559,6 +561,9 @@ export default function Atualizargenotipo({
       <Head>
         <title>Atualizar genótipo</title>
       </Head>
+
+      {loading && <ComponentLoading text="" />}
+
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded px-4 pt-2 pb-3 mt-1"
@@ -576,7 +581,7 @@ export default function Atualizargenotipo({
                 </label>
                 <Input
                   required
-                  style={{ background: "#e5e7eb" }}
+                  style={{ background: '#e5e7eb' }}
                   disabled
                   id="name_genotipo"
                   name="name_genotipo"
@@ -590,7 +595,7 @@ export default function Atualizargenotipo({
                 </label>
                 <Input
                   required
-                  style={{ background: "#e5e7eb" }}
+                  style={{ background: '#e5e7eb' }}
                   disabled
                   id="name_main"
                   name="name_main"
@@ -603,7 +608,7 @@ export default function Atualizargenotipo({
                   Nome publico
                 </label>
                 <Input
-                  style={{ background: "#e5e7eb" }}
+                  style={{ background: '#e5e7eb' }}
                   disabled
                   id="name_public"
                   name="name_public"
@@ -619,7 +624,7 @@ export default function Atualizargenotipo({
                     Tecnologia
                   </label>
                   <Input
-                    style={{ background: "#e5e7eb" }}
+                    style={{ background: '#e5e7eb' }}
                     disabled
                     id="cod_tec"
                     name="cod_tec"
@@ -639,7 +644,7 @@ export default function Atualizargenotipo({
                 </label>
                 <Input
                   required
-                  style={{ background: "#e5e7eb" }}
+                  style={{ background: '#e5e7eb' }}
                   disabled
                   id="name_experiment"
                   name="name_experiment"
@@ -653,7 +658,7 @@ export default function Atualizargenotipo({
                 </label>
                 <Input
                   required
-                  style={{ background: "#e5e7eb" }}
+                  style={{ background: '#e5e7eb' }}
                   disabled
                   id="name_alter"
                   name="name_alter"
@@ -666,7 +671,7 @@ export default function Atualizargenotipo({
                   Elite nome
                 </label>
                 <Input
-                  style={{ background: "#e5e7eb" }}
+                  style={{ background: '#e5e7eb' }}
                   disabled
                   id="elit_name"
                   name="elit_name"
@@ -683,7 +688,7 @@ export default function Atualizargenotipo({
                     Tipo
                   </label>
                   <Input
-                    style={{ background: "#e5e7eb" }}
+                    style={{ background: '#e5e7eb' }}
                     disabled
                     id="type"
                     name="type"
@@ -697,7 +702,7 @@ export default function Atualizargenotipo({
                       GMR
                     </label>
                     <Input
-                      style={{ background: "#e5e7eb" }}
+                      style={{ background: '#e5e7eb' }}
                       disabled
                       id="gmr"
                       name="gmr"
@@ -710,7 +715,7 @@ export default function Atualizargenotipo({
                       BGM
                     </label>
                     <Input
-                      style={{ background: "#e5e7eb" }}
+                      style={{ background: '#e5e7eb' }}
                       disabled
                       id="bgm"
                       name="bgm"
@@ -725,7 +730,7 @@ export default function Atualizargenotipo({
 
           <div
             className="rounded border-inherit text-sm"
-            style={{ marginTop: "1%" }}
+            style={{ marginTop: '1%' }}
           >
             <span>Informações dos progenitores</span>
             <hr />
@@ -737,7 +742,7 @@ export default function Atualizargenotipo({
               </label>
               <Input
                 required
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
                 disabled
                 id="cruza"
                 name="cruza"
@@ -751,7 +756,7 @@ export default function Atualizargenotipo({
               </label>
               <Input
                 required
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
                 disabled
                 id="progenitor_f_direto"
                 name="progenitor_f_direto"
@@ -764,7 +769,7 @@ export default function Atualizargenotipo({
                 Progenitor M direto
               </label>
               <Input
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
                 disabled
                 id="progenitor_m_direto"
                 name="progenitor_m_direto"
@@ -777,7 +782,7 @@ export default function Atualizargenotipo({
                 Progenitor F de origem
               </label>
               <Input
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
                 disabled
                 id="progenitor_f_origem"
                 name="progenitor_f_origem"
@@ -790,7 +795,7 @@ export default function Atualizargenotipo({
                 Progenitor M de origem:
               </label>
               <Input
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
                 disabled
                 id="progenitor_m_origem"
                 name="progenitor_m_origem"
@@ -803,7 +808,7 @@ export default function Atualizargenotipo({
                 Progenitores de origem:
               </label>
               <Input
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
                 disabled
                 id="progenitores_origem"
                 name="progenitores_origem"
@@ -818,7 +823,7 @@ export default function Atualizargenotipo({
                 Parentesco completo
               </label>
               <Input
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
                 disabled
                 id="parentesco_completo"
                 name="parentesco_completo"
@@ -826,7 +831,7 @@ export default function Atualizargenotipo({
                 value={formik.values.parentesco_completo}
               />
             </div>
-            <div className="w-40 h-7" style={{ marginTop: "1%" }}>
+            <div className="w-40 h-7" style={{ marginTop: '1%' }}>
               <Button
                 type="button"
                 value="Voltar"
@@ -840,11 +845,11 @@ export default function Atualizargenotipo({
         </form>
         <main
           className="w-full flex flex-col items-start gap-8"
-          style={{ height: "45%" }}
+          style={{ height: '45%' }}
         >
-          <div style={{ marginTop: "1%" }} className="w-full h-auto">
+          <div style={{ marginTop: '1%' }} className="w-full h-auto">
             <MaterialTable
-              style={{ background: "#f9fafb" }}
+              style={{ background: '#f9fafb' }}
               columns={columns}
               data={lotes}
               options={{
@@ -852,7 +857,7 @@ export default function Atualizargenotipo({
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: "#f9fafb", height: 35 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -874,7 +879,9 @@ export default function Atualizargenotipo({
                   >
                     <div className="h-12" />
                     <strong className="text-blue-600">
-                      Total registrado: {itemsTotal}
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
                     </strong>
 
                     <div className="flex items-center gap-2">
@@ -918,7 +925,7 @@ export default function Atualizargenotipo({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value as string
+                                                generate.value as string,
                                               )}
                                             />
                                           </li>
@@ -948,59 +955,58 @@ export default function Atualizargenotipo({
                     </div>
                   </div>
                 ),
-                Pagination: (props) =>
-                  (
-                    <div
-                      className="flex
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(0)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage < 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill("")
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setCurrentPage(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(pages)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(0)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage < 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(pages)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
                   ) as any,
               }}
             />
@@ -1014,24 +1020,23 @@ export default function Atualizargenotipo({
 export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
-  const itensPerPage =
-    (await (
-      await PreferencesControllers.getConfigGerais()
-    )?.response[0]?.itens_per_page) ?? 5;
+  const itensPerPage = (await (
+    await PreferencesControllers.getConfigGerais()
+  )?.response[0]?.itens_per_page) ?? 5;
 
   const { token } = context.req.cookies;
 
   const { publicRuntimeConfig } = getConfig();
   const requestOptions: RequestInit | undefined = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   };
 
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
   const apiGenotipo = await fetch(
     `${baseUrl}/${context.query.id}`,
-    requestOptions
+    requestOptions,
   );
   const genotipo = await apiGenotipo.json();
 
@@ -1040,12 +1045,12 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const urlParameters: any = new URL(baseUrlLote);
   urlParameters.search = new URLSearchParams(param).toString();
 
-  const filterApplication = "filterStatus=1";
+  const filterApplication = 'filterStatus=1';
   const idGenotipo = Number(context.query.id);
 
   const response = await fetch(
     `${baseUrlLote}?id_genotipo=${idGenotipo}`,
-    requestOptions
+    requestOptions,
   );
 
   const { response: allLote, total: totalItems } = await response.json();

@@ -129,6 +129,7 @@ export class ReplaceTreatmentController {
   }
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: replace-treatment.controller.ts ~ line 132 ~ ReplaceTreatmentController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.OR = [];
@@ -146,8 +147,14 @@ export class ReplaceTreatmentController {
           parameters.year = JSON.parse(`{"lte": ${Number(options.filterYearTo)} }`);
         }
       }
-      if (options.filterCodLote) {
-        parameters.cod_lote = JSON.parse(`{ "contains":"${options.filterCodLote}" }`);
+      if (options.filterCodLoteFrom || options.filterCodLoteTo) {
+        if (options.filterCodLoteFrom && options.filterCodLoteTo) {
+          parameters.cod_lote = JSON.parse(`{"gte": ${Number(options.filterCodLoteFrom)}, "lte": ${Number(options.filterCodLoteTo)} }`);
+        } else if (options.filterCodLoteFrom) {
+          parameters.cod_lote = JSON.parse(`{"gte": ${Number(options.filterCodLoteFrom)} }`);
+        } else if (options.filterCodLoteTo) {
+          parameters.cod_lote = JSON.parse(`{"lte": ${Number(options.filterCodLoteTo)} }`);
+        }
       }
       if (options.filterNcaFrom || options.filterNcaTo) {
         if (options.filterNcaFrom === 'vazio' || options.filterNcaTo === 'vazio') {
@@ -231,6 +238,10 @@ export class ReplaceTreatmentController {
 
       if (options.filterNameTec) {
         parameters.genotipo = JSON.parse(`{ "tecnologia": { "desc": {"contains": "${options.filterNameTec}" } } }`);
+      }
+
+      if (options.idCulture) {
+        parameters.genotipo = JSON.parse(`{ "id_culture": ${Number(options.idCulture)} } `);
       }
 
       const select = {

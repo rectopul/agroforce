@@ -70,19 +70,19 @@ export class GenotypeTreatmentController {
         if (options.filterNcaFrom.toUpperCase() === 'VAZIO' || options.filterNcaTo.toUpperCase() === 'VAZIO') {
           parameters.id_lote = null;
         } else if (options.filterNcaFrom && options.filterNcaTo) {
-          parameters.AND.push(JSON.parse(
-            `{"gte": ${Number(options.filterNcaFrom)}, "lte": ${Number(
+          parameters.lote = JSON.parse(
+            `{ "ncc": {"gte": "${Number(options.filterNcaFrom)}", "lte": "${Number(
               options.filterNcaTo,
-            )} }`,
-          ));
+            )}" } }`,
+          );
         } else if (options.filterNcaFrom) {
-          parameters.AND.push(JSON.parse(
-            `{"gte": ${Number(options.filterNcaFrom)} }`,
-          ));
+          parameters.lote = JSON.parse(
+            `{ "ncc": {"gte": "${Number(options.filterNcaFrom)}" } }`,
+          );
         } else if (options.filterNcaTo) {
-          parameters.AND.push(JSON.parse(
-            `{"lte": ${Number(options.filterNcaTo)} }`,
-          ));
+          parameters.lote = JSON.parse(
+            `{ "ncc": {"lte": "${Number(options.filterNcaTo)}" } }`,
+          );
         }
       }
       if (options.filterTreatmentsNumber) {
@@ -122,7 +122,13 @@ export class GenotypeTreatmentController {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
       }
       if (options.status_experiment) {
-        parameters.AND.push(JSON.parse(`{"assay_list": { "status": {"contains": "${options.status_experiment}" } } }`));
+        if (options.status_experiment.includes(',')) {
+          const filter = options.status_experiment.split(',');
+          parameters.OR.push(JSON.parse(`{"assay_list": { "status": {"contains": "${filter[0]}" } } }`));
+          parameters.OR.push(JSON.parse(`{"assay_list": { "status": {"contains": "${filter[1]}" } } }`));
+        } else {
+          parameters.AND.push(JSON.parse(`{"assay_list": { "status": {"contains": "${options.status_experiment}" } } }`));
+        }
       }
       const select = {
         id: true,
@@ -206,11 +212,16 @@ export class GenotypeTreatmentController {
 
       if (options.orderBy) {
         if (!options.excel) {
-          if (options.orderBy[2] == '' || !options.orderBy[2]) {
-            orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `{"${options.orderBy[1]}":"${options.typeOrder[1]}"}`];
+          if (typeof options.orderBy !== 'string') {
+            if (options.orderBy[2] == '' || !options.orderBy[2]) {
+              orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `{"${options.orderBy[1]}":"${options.typeOrder[1]}"}`];
+            } else {
+              orderBy = handleOrderForeign(options.orderBy[2], options.typeOrder[2]);
+              orderBy = orderBy || `{"${options.orderBy[2]}":"${options.typeOrder[2]}"}`;
+            }
           } else {
-            orderBy = handleOrderForeign(options.orderBy[2], options.typeOrder[2]);
-            orderBy = orderBy || `{"${options.orderBy[2]}":"${options.typeOrder[2]}"}`;
+            orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
+            orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
           }
         }
       }

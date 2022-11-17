@@ -13,13 +13,6 @@ ex: (array que gera as colunas da tabela ruim: arrOrb | campos bom: camposTabela
 PS: tentar não abreviar muito ex: ruim: nome_un_cultura bom: nome_unidade_cultura
 12 - não repetir código( se ver que algo se repete, criar uma função genérica para faze-lo)
 
-Tabela bancos para refatorar:
-quadra
-npe
-lote
-genótipo
-experimento
-
 Links: - Resumo do SOLID guia de princípios para programação
 https://medium.com/desenvolvendo-com-paixao/o-que-%C3%A9-solid-o-guia-completo-para-voc%C3%AA-entender-os-5-princ%C3%ADpios-da-poo-2b937b3fc530
 

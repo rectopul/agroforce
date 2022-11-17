@@ -1,10 +1,10 @@
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { ReactNode, useEffect, useState } from 'react';
+import router from 'next/router';
+import { useEffect, useState } from 'react';
 import {
   DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
@@ -12,18 +12,25 @@ import { AiOutlineArrowDown, AiOutlineArrowUp, AiTwotoneStar } from 'react-icons
 import {
   BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
 } from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp, FaSortAmountUpAlt } from 'react-icons/fa';
+import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { MdFirstPage, MdLastPage, MdUpdate } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
+import { UserPreferenceController } from 'src/controllers/user-preference.controller';
+import { epocaService, userPreferencesService } from 'src/services';
+import * as XLSX from 'xlsx';
 import {
   AccordionFilter, Button, CheckBox, Content, Input, Select,
-} from 'src/components';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
-import { loteService, userPreferencesService } from 'src/services';
-import * as XLSX from 'xlsx';
-import ITabs from '../../../../../shared/utils/dropdown';
-import ComponentLoading from '../../../../../components/Loading';
+} from '../../../../components';
+import * as ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
+
+interface IEpoca {
+  id: number;
+  id_culture: number;
+  name: string;
+  status?: number;
+}
 
 interface IFilter {
   filterStatus: object | any;
@@ -31,77 +38,63 @@ interface IFilter {
   orderBy: object | any;
   typeOrder: object | any;
 }
-
-export interface LoteGenotipo {
-  id: number;
-  id_culture: number;
-  id_genotipo: number;
-  genealogy: string;
-  name: string;
-  volume: number;
-  status?: number;
-}
-
 interface IGenerateProps {
   name: string | undefined;
   title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
-
-interface IData {
-  allLote: LoteGenotipo[];
+interface Idata {
+  allItems: IEpoca[];
   totalItems: number;
-  itensPerPage: number;
+  filter: string | any;
+  itensPerPage: number | any;
   filterApplication: object | any;
-  id_genotipo: number;
+  cultureId: number;
 }
 
 export default function Listagem({
-  allLote, totalItems, itensPerPage, filterApplication, id_genotipo,
-}: IData) {
-  const { TabsDropDowns } = ITabs;
-  const [loading, setLoading] = useState<boolean>(false);
+      allItems, itensPerPage, filterApplication, totalItems, cultureId,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (
-    tab.titleTab === 'TMG'
+    tab.titleTab === 'ENSAIO'
       ? tab.statusTab = true
       : tab.statusTab = false
   ));
 
-  const router = useRouter();
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.lote || { id: 0, table_preferences: 'id,genealogy,name,volume,status' };
+  const [loading, setLoading] = useState<boolean>(false);
+  const preferences = userLogado.preferences.tipo_epoca || { id: 0, table_preferences: 'id,name,status' };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
 
-  const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
+  const [epoca, setEpoca] = useState<IEpoca[]>(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [orderName, setOrderName] = useState<number>(0);
-  const [arrowName, setArrowName] = useState<ReactNode>('');
-  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Genealógia', value: 'genealogy' },
-    { name: 'CamposGerenciados[]', title: 'Nome', value: 'name' },
-    { name: 'CamposGerenciados[]', title: 'Volume', value: 'volume' },
-    { name: 'CamposGerenciados[]', title: 'Status', value: 'status' },
-  ]);
+  const [arrowName, setArrowName] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
+  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
+  const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
+    {
+      name: 'CamposGerenciados[]', title: 'Favorito ', value: 'id', defaultChecked: () => camposGerenciados.includes('id'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Nome', value: 'name', defaultChecked: () => camposGerenciados.includes('name'),
+    },
+    {
+      name: 'CamposGerenciados[]', title: 'Status', value: 'status', defaultChecked: () => camposGerenciados.includes('status'),
+    },
+  ]);
+  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
-
-  const filtersStatusItem = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
-  ];
 
   const take: number = itensPerPage;
   const total: number = (itemsTotal <= 0 ? 1 : itemsTotal);
   const pages = Math.ceil(total / take);
 
-  const columns = columnsOrder(camposGerenciados);
+  const columns = colums(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -111,10 +104,10 @@ export default function Listagem({
       typeOrder: '',
     },
     onSubmit: async (values) => {
-      const parametersFilter = `filterStatus=${values.filterStatus}&filterSearch=${values.filterSearch}&id_portfolio=${id_genotipo}`;
-      await loteService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
+      const parametersFilter = `filterStatus=${values.filterStatus}&filterSearch=${values.filterSearch}&id_culture=${cultureId}`;
+      await epocaService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then((response) => {
         setFilter(parametersFilter);
-        setLotes(response);
+        setEpoca(response.response);
         setTotalItems(response.total);
         setCurrentPage(0);
       });
@@ -122,36 +115,45 @@ export default function Listagem({
     },
   });
 
-  async function handleStatusLote(idItem: number, data: LoteGenotipo): Promise<void> {
-    if (data.status === 1) {
-      data.status = 0;
-    } else {
+  const filters = [
+    { id: 2, name: 'Todos' },
+    { id: 1, name: 'Ativos' },
+    { id: 0, name: 'Inativos' },
+  ];
+
+  async function handleStatus(idItem: number, data: IEpoca): Promise<void> {
+    if (data.status === 0) {
       data.status = 1;
+    } else {
+      data.status = 0;
     }
 
-    const index = lotes.findIndex((lote) => lote.id === idItem);
+    const index = epoca.findIndex((epoca) => epoca.id === idItem);
 
     if (index === -1) {
       return;
     }
 
-    setLotes((oldLote) => {
-      const copy = [...oldLote];
+    setEpoca((oldUser) => {
+      const copy = [...oldUser];
       copy[index].status = data.status;
       return copy;
     });
 
-    const { id, status } = lotes[index];
+    const { id, name, status } = epoca[index];
 
-    await loteService.update({ id, status });
+    await epocaService.update({
+      id,
+      name,
+      status,
+    });
   }
 
-  function columnsOrder(camposGerenciados: string) {
-    const ObjetCampos: string[] = camposGerenciados.split(',');
+  function colums(camposGerenciados: any): any {
+    const ObjetCampos: any = camposGerenciados.split(',');
     const arrOb: any = [];
-
-    Object.keys(ObjetCampos).forEach((item, index) => {
-      if (ObjetCampos[index] === 'id') {
+    Object.keys(ObjetCampos).forEach((item) => {
+      if (ObjetCampos[item] === 'id') {
         arrOb.push({
           title: '',
           field: 'id',
@@ -184,81 +186,68 @@ export default function Listagem({
         });
       }
 
-      if (ObjetCampos[index] === 'id') {
-        arrOb.push({
-          title: 'Favorito',
-          field: 'id',
-          sorting: false,
-        });
+      if (ObjetCampos[item] === 'id') {
+        arrOb.push({ title: 'Código', field: 'id', sorting: false });
       }
-      if (ObjetCampos[index] === 'genealogy') {
+      if (ObjetCampos[item] === 'name') {
         arrOb.push({
           title: (
             <div className="flex items-center">
               {arrowName}
-              <button className="font-medium text-gray-900" onClick={() => handleOrderName('genealogy', orderName)}>
-                Genealógia
+              <button className="font-medium text-gray-900" onClick={() => handleOrderName('name', orderName)}>
+                Nome
               </button>
             </div>
           ),
-          field: 'genealogy',
-          sorting: false,
-        });
-      }
-      if (ObjetCampos[index] === 'name') {
-        arrOb.push({
-          title: 'Nome',
           field: 'name',
           sorting: false,
         });
       }
-      if (ObjetCampos[index] === 'volume') {
-        arrOb.push({
-          title: 'Volume',
-          field: 'volume',
-          sorting: false,
-        });
-      }
-      if (ObjetCampos[index] === 'status') {
+
+      if (ObjetCampos[item] === 'status') {
         arrOb.push({
           title: 'Status',
           field: 'status',
           sorting: false,
           searchable: false,
           filterPlaceholder: 'Filtrar por status',
-          render: (rowData: LoteGenotipo) => (
+          render: (rowData: IEpoca) => (
             <div className="h-10 flex">
-              <div className="h-10">
+              <div className="
+                h-10
+              "
+              >
                 <Button
                   icon={<BiEdit size={16} />}
-                  onClick={() => { router.push(`lote/atualizar?id=${rowData.id}`); }}
+                  onClick={() => { }}
                   bgColor="bg-blue-600"
                   textColor="white"
-                // href={`/config/npe/lote/atualizar?id=${rowData.id}`}
+                  href={`/config/ensaio/epoca/atualizar?id=${rowData.id}`}
+                  title={`Atualizar ${rowData.name}`}
                 />
               </div>
               {rowData.status === 1 ? (
-                <div className="h-10">
+                <div>
                   <Button
-                    type="submit"
                     icon={<FaRegThumbsUp size={16} />}
-                    onClick={async () => await handleStatusLote(rowData.id, {
+                    onClick={async () => await handleStatus(rowData.id, {
                       status: rowData.status,
                       ...rowData,
                     })}
+                    title="Ativo"
                     bgColor="bg-green-600"
                     textColor="white"
                   />
                 </div>
               ) : (
-                <div className="h-10">
+                <div>
                   <Button
-                    type="submit"
                     icon={<FaRegThumbsDown size={16} />}
-                    onClick={async () => await handleStatusLote(rowData.id, {
+                    onClick={async () => await handleStatus(rowData.id, {
                       status: rowData.status,
                       ...rowData,
                     })}
+                    title="Inativo"
                     bgColor="bg-red-800"
                     textColor="white"
                   />
@@ -269,6 +258,7 @@ export default function Listagem({
         });
       }
     });
+
     return arrOb;
   }
 
@@ -283,13 +273,13 @@ export default function Listagem({
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
     if (preferences.id === 0) {
-      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 12 }).then((response) => {
-        userLogado.preferences.lote = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
+      await userPreferencesService.create({ table_preferences: campos, userId: userLogado.id, module_id: 15 }).then((response) => {
+        userLogado.preferences.tipo_epoca = { id: response.response.id, userId: preferences.userId, table_preferences: campos };
         preferences.id = response.response.id;
       });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.lote = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
+      userLogado.preferences.tipo_epoca = { id: preferences.id, userId: preferences.userId, table_preferences: campos };
       await userPreferencesService.update({ table_preferences: campos, id: preferences.id });
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
@@ -321,9 +311,9 @@ export default function Listagem({
       parametersFilter = filter;
     }
 
-    await loteService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
+    await epocaService.getAll(`${parametersFilter}&skip=0&take=${take}`).then((response) => {
       if (response.status === 200) {
-        setOrderName(response.response);
+        setEpoca(response.response);
       }
     });
 
@@ -344,7 +334,7 @@ export default function Listagem({
     }, 2000);
   }
 
-  function handleOnDragEnd(result: DropResult): void {
+  function handleOnDragEnd(result: DropResult) {
     setStatusAccordion(true);
     if (!result) return;
 
@@ -358,26 +348,24 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_portfolio=${id_genotipo}`;
+      filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
 
-    await loteService.getAll(filterApplication).then((response) => {
+    await epocaService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           if (row.status === 0) {
-            row.status = 'Inativo';
+            row.status = 'Inativo' as any;
           } else {
-            row.status = 'Ativo';
+            row.status = 'Ativo' as any;
           }
-          delete row.id;
-          delete row.genotipo;
 
           return row;
         });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'lotes');
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'Época');
 
         // Buffer
         const buf = XLSX.write(workBook, {
@@ -390,7 +378,7 @@ export default function Listagem({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'Lotes.xlsx');
+        XLSX.writeFile(workBook, 'Época.xlsx');
       }
     });
   };
@@ -405,15 +393,14 @@ export default function Listagem({
 
   async function handlePagination(): Promise<void> {
     const skip = currentPage * Number(take);
-
-    let parametersFilter = `skip=${skip}&take=${take}&id_portfolio=${id_genotipo}`;
+    let parametersFilter = `skip=${skip}&take=${take}`;
 
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
-    await loteService.getAll(parametersFilter).then((response) => {
+    await epocaService.getAll(parametersFilter).then((response) => {
       if (response.status === 200) {
-        setLotes(response.response);
+        setEpoca(response.response);
       }
     });
   }
@@ -425,9 +412,10 @@ export default function Listagem({
 
   return (
     <>
-      {loading && <ComponentLoading text="" />}
-      <Head><title>Listagem de Lotes</title></Head>
-
+    {loading && <ComponentLoading text="" />}
+      <Head>
+        <title>Listagem de Épocas</title>
+      </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main className="h-full w-full
           flex flex-col
@@ -435,7 +423,7 @@ export default function Listagem({
           gap-8
         "
         >
-          <AccordionFilter title="Filtrar lotes">
+          <AccordionFilter title="Filtrar épocas">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -456,15 +444,16 @@ export default function Listagem({
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Status
                     </label>
-                    <Select name="filterStatus" onChange={formik.handleChange} values={filtersStatusItem.map((id) => id)} selected="1" />
+                    <Select name="filterStatus" onChange={formik.handleChange} values={filters.map((id) => id)} selected="1" />
                   </div>
+
                   <div className="h-10 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-2">
                       Nome
                     </label>
                     <Input
                       type="text"
-                      placeholder="Nome"
+                      placeholder="nome"
                       max="40"
                       id="filterSearch"
                       name="filterSearch"
@@ -476,7 +465,7 @@ export default function Listagem({
                 <div className="h-16 w-32 mt-3">
                   <Button
                     type="submit"
-                    onClick={() => {
+                    onClick={() => { 
                       setLoading(true);
                     }}
                     value="Filtrar"
@@ -489,16 +478,18 @@ export default function Listagem({
             </div>
           </AccordionFilter>
 
+          {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
               style={{ background: '#f9fafb' }}
               columns={columns}
-              data={lotes}
+              data={epoca}
               options={{
                 showTitle: false,
                 headerStyle: {
                   zIndex: 20,
                 },
+                rowStyle: { background: '#f9fafb' },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -520,12 +511,13 @@ export default function Listagem({
                   >
                     <div className="h-12">
                       <Button
-                        title="Cadastrar lote"
-                        value="Cadastrar lote"
+                        title="Cadastrar época"
+                        value="Cadastrar época"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => { router.push(`lote/cadastro/${id_genotipo}`); }}
-                        icon={<FaSortAmountUpAlt size={20} />}
+                        onClick={() => { }}
+                        href="/config/ensaio/epoca/cadastro"
+                        icon={<MdUpdate size={20} />}
                       />
                     </div>
 
@@ -535,9 +527,11 @@ export default function Listagem({
                       {itemsTotal}
                     </strong>
 
-                    <div className="h-full flex items-center gap-2">
+                    <div className="h-full flex items-center gap-2
+                    "
+                    >
                       <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-72">
+                        <div className="w-64">
                           <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                               <Droppable droppableId="characters">
@@ -562,7 +556,7 @@ export default function Listagem({
                                                   name={generate.name}
                                                   title={generate.title?.toString()}
                                                   value={generate.value}
-                                                  defaultChecked={camposGerenciados.includes(generate.value as string)}
+                                                  defaultChecked={camposGerenciados.includes(generate.value)}
                                                 />
                                               </li>
                                             )}
@@ -579,7 +573,7 @@ export default function Listagem({
                         </div>
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha de lotes" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                        <Button title="Exportar planilha de locais" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
                       </div>
                     </div>
                   </div>
@@ -646,42 +640,38 @@ export default function Listagem({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context: any) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = await (
-    await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 10;
+    await PreferencesControllers.getConfigGerais())?.response[0]?.itens_per_page ?? 15;
 
-  const { token } = context.req.cookies;
+  const { token } = req.cookies;
+  const { cultureId } = req.cookies;
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/lote-genotipo`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/epoca`;
 
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
-  const filterApplication = 'filterStatus=1';
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
+  const filterApplication = `filterStatus=1&id_culture=${cultureId}`;
   const urlParameters: any = new URL(baseUrl);
-
   urlParameters.search = new URLSearchParams(param).toString();
-
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const id_genotipo = Number(context.query.id_genotipo);
-
-  const api = await fetch(`${baseUrl}?id_genotipo=${id_genotipo}`, requestOptions);
-
-  const allLote: LoteGenotipo[] = await api.json();
-
-  const totalItems = allLote.length || 0;
+  const epoca = await fetch(urlParameters.toString(), requestOptions);
+  const Response = await epoca.json();
+  const allItems = Response.response;
+  const totalItems = Response.total;
 
   return {
     props: {
-      allLote,
+      allItems,
       totalItems,
       itensPerPage,
       filterApplication,
-      id_genotipo,
+      cultureId,
     },
   };
 };

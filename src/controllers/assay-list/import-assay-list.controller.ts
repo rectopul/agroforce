@@ -23,6 +23,7 @@ import { AssayListController } from './assay-list.controller';
 export class ImportAssayListController {
   static async validate(
     idLog: number,
+    queueProcessing: boolean,
     {
       spreadSheet, idSafra, idCulture, created_by: createdBy,
     }: ImportValidate,
@@ -57,6 +58,7 @@ export class ImportAssayListController {
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
+        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
         return { status: 400, message: validate };
       }
       for (const count in spreadSheet) {

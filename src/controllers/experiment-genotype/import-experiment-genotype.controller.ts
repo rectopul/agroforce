@@ -15,9 +15,9 @@ import { ExperimentGenotipeController } from '../experiment-genotipe.controller'
 import { GenotipoController } from '../genotype/genotipo.controller';
 import { LogImportController } from '../log-import.controller';
 import { LoteController } from '../lote.controller';
-import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';
-import { HistoryGenotypeTreatmentController } from '../genotype-treatment/history-genotype-treatment.controller';
 
+import {ExperimentGenotipeRepository} from '../../repository/experiment-genotipe.repository'
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 export class ImportExperimentGenotypeController {
   static async validate(
     idLog: number,
@@ -30,16 +30,24 @@ export class ImportExperimentGenotypeController {
     const experimentController = new ExperimentController();
     const experimentGenotipeController = new ExperimentGenotipeController();
 
+    /* --------- Transcation Context --------- */
+    const transactionConfig = new TransactionConfig();
+    const experimentGenotipeRepository = new ExperimentGenotipeRepository();
+
+    experimentGenotipeRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+    /* --------------------------------------- */
+
     const responseIfError: Array<string> = [];
     try {
       const value_hold: any = {};
 
-      if (spreadSheet.length === 0) {
+      if (spreadSheet.length == 0) {
         responseIfError[0]
           += '<li style="text-align:left"> Não há registros por favor verifique. </li> <br>';
       }
 
       for (const row in spreadSheet) {
+
         if (row !== '0') {
           // experiments
           if (spreadSheet[row][5] != null) {
@@ -305,50 +313,53 @@ export class ImportExperimentGenotypeController {
 
       if (responseIfError.length === 0) {
         try {
-          for (const row in spreadSheet) {
-            if (row !== '0') {
-              const { response: treatment } = await experimentGenotipeController.getAll({
-                nt: Number(spreadSheet[row][9]),
-                gli: spreadSheet[row][4],
-                treatments_number: spreadSheet[row][8], // Nt Value
-                idExperiment: value_hold.idExperiment,
-                npe: spreadSheet[row][10],
-                rep: spreadSheet[row][8],
-              });
-
-              const { response: genotipo } = await genotipoController.getAll({
-                name_genotipo: spreadSheet[row][15], // New genetic Name
-              });
-
-              const { response: lote } = await loteController.getAll({
-                ncc: spreadSheet[row][16], // NEW NCA
-                filterGenotipo: spreadSheet[row][15], // new geneticName
-              });
-
-              const response12 = await experimentGenotipeController.updateData({
-                id: treatment[0]?.id,
-                gli: spreadSheet[row][4],
-                idExperiment: value_hold.idExperiment,
-                nt: Number(spreadSheet[row][9]),
-                rep: spreadSheet[row][8],
-                status_t: spreadSheet[row][14],
-                idGenotipo: lote[0]?.id_genotipo,
-                idLote: lote[0]?.id,
-                nca: spreadSheet[row][16].toString(),
-              });
-
-              //   id: treatment[0]?.id,
-              //   gli: spreadSheet[row][4],
-              //   idExperiment : value_hold.idExperiment,
-              //   nt:  value_hold.nt,
-              //   rep: spreadSheet[row][8],
-              //   // status_t: spreadSheet[row][14],
-              //   idGenotipo : lote[0]?.id_genotipo,
-              //   idLote : lote[0]?.id,
-              //   nca :  spreadSheet[row][16].toString()
-              //   });
+          await transactionConfig.transactionScope.run(async () => {
+            for (const row in spreadSheet) {
+              if (row !== '0') {
+                const { response: treatment } = await experimentGenotipeController.getAll({
+                  nt: Number(spreadSheet[row][9]),
+                  gli: spreadSheet[row][4],
+                  treatments_number: spreadSheet[row][8], // Nt Value
+                  idExperiment: value_hold.idExperiment,
+                  npe: spreadSheet[row][10],
+                  rep: spreadSheet[row][8],
+                });
+  
+                const { response: genotipo } = await genotipoController.getAll({
+                  name_genotipo: spreadSheet[row][15], // New genetic Name
+                });
+  
+                const { response: lote } = await loteController.getAll({
+                  ncc: spreadSheet[row][16], // NEW NCA
+                  filterGenotipo: spreadSheet[row][15], // new geneticName
+                });
+  
+                const response12 = await experimentGenotipeRepository.updateTransaction(treatment[0]?.id,{
+                  id: treatment[0]?.id,
+                  gli: spreadSheet[row][4],
+                  idExperiment: value_hold.idExperiment,
+                  nt: Number(spreadSheet[row][9]),
+                  rep: spreadSheet[row][8],
+                  status_t: spreadSheet[row][14],
+                  idGenotipo: lote[0]?.id_genotipo,
+                  idLote: lote[0]?.id,
+                  nca: spreadSheet[row][16].toString(),
+                });
+  
+                //   id: treatment[0]?.id,
+                //   gli: spreadSheet[row][4],
+                //   idExperiment : value_hold.idExperiment,
+                //   nt:  value_hold.nt,
+                //   rep: spreadSheet[row][8],
+                //   // status_t: spreadSheet[row][14],
+                //   idGenotipo : lote[0]?.id_genotipo,
+                //   idLote : lote[0]?.id,
+                //   nca :  spreadSheet[row][16].toString()
+                //   });
+              }
             }
-          }
+          });
+       
           return { status: 200, message: 'Sub. de parcelas importado com sucesso' };
         } catch (error: any) {
           await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });

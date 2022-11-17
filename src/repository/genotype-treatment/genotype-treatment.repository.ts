@@ -1,8 +1,8 @@
 import { prisma } from '../../pages/api/db/db';
-
-export class GenotypeTreatmentRepository {
+import { BaseRepository } from '../base-repository';
+export class GenotypeTreatmentRepository extends BaseRepository {
   async create(data: any) {
-    const result = await prisma.genotype_treatment.create({
+    const result = await this.getPrisma().genotype_treatment.create({
       data,
     });
 
@@ -18,7 +18,7 @@ export class GenotypeTreatmentRepository {
   }
 
   async update(id: number, data: any) {
-    const result = await prisma.genotype_treatment.update({
+    const result = await this.getPrisma().genotype_treatment.update({
       where: { id },
       data,
     });

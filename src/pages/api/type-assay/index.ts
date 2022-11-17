@@ -4,6 +4,8 @@ import { apiHandler } from '../../../helpers/api';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const typeAssayController = new TypeAssayController();
+  console.log('req.method');
+  console.log(req.method);
   switch (req.method) {
     case 'GET': {
       const result = await typeAssayController.getAll(req.query);

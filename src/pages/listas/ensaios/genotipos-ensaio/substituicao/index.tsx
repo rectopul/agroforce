@@ -48,7 +48,8 @@ interface IFilter {
   filterYear: string;
   filterYearFrom: string;
   filterYearTo: string;
-  filterCodLote: string;
+  filterCodLoteFrom: string;
+  filterCodLoteTo: string;
   filterNcaTo: string;
   filterNcaFrom: string;
   filterFase: string;
@@ -97,6 +98,7 @@ export default function Listagem({
   allLote,
   totalItems,
   idSafra,
+  idCUlture,
   itensPerPage,
   filterApplication,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -131,20 +133,20 @@ export default function Listagem({
   const [nameReplace, setNameReplace] = useState<any>('');
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>('');
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Safra', value: 'safra' },
     { name: 'CamposGerenciados[]', title: 'Ano lote', value: 'year' },
-    { name: 'CamposGerenciados[]', title: 'Cód. lote', value: 'cod_lote' },
+    { name: 'CamposGerenciados[]', title: 'Cod lote', value: 'cod_lote' },
     { name: 'CamposGerenciados[]', title: 'NCA', value: 'ncc' },
     { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
     { name: 'CamposGerenciados[]', title: 'Peso', value: 'peso' },
     {
       name: 'CamposGerenciados[]',
-      title: 'Qtd. sementes',
+      title: 'Qtd sementes',
       value: 'quant_sementes',
     },
     {
@@ -182,7 +184,8 @@ export default function Listagem({
       filterYear: '',
       filterYearFrom: '',
       filterYearTo: '',
-      filterCodLote: '',
+      filterCodLoteFrom: '',
+      filterCodLoteTo: '',
       filterNcaTo: '',
       filterNcaFrom: '',
       filterFase: '',
@@ -207,7 +210,8 @@ export default function Listagem({
       filterYear,
       filterYearFrom,
       filterYearTo,
-      filterCodLote,
+      filterCodLoteFrom,
+      filterCodLoteTo,
       filterNcaFrom,
       filterNcaTo,
       filterFase,
@@ -232,7 +236,7 @@ export default function Listagem({
           }
         });
       }
-      const parametersFilter = `filterStatus=${1}&id_safra=${idSafra}&filterYear=${filterYear}&filterCodLote=${filterCodLote}&filterNcaFrom=${filterNcaFrom}&filterNcaTo=${filterNcaTo}&filterFase=${filterFase}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCodTec=${filterCodTec}&filterNameTec=${filterNameTec}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterPesoTo=${filterPesoTo}&filterPesoFrom=${filterPesoFrom}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}`;
+      const parametersFilter = `filterStatus=${1}&idCulture=${idCulture}&id_safra=${idSafra}&filterYear=${filterYear}&filterCodLoteTo=${filterCodLoteTo}&filterCodLoteFrom=${filterCodLoteFrom}&filterNcaFrom=${filterNcaFrom}&filterNcaTo=${filterNcaTo}&filterFase=${filterFase}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCodTec=${filterCodTec}&filterNameTec=${filterNameTec}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterPesoTo=${filterPesoTo}&filterPesoFrom=${filterPesoFrom}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}`;
 
       await replaceTreatmentService
         .getAll(
@@ -435,7 +439,7 @@ export default function Listagem({
       if (columnCampos[index] === 'cod_lote') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Cód. lote',
+            name: 'Cod lote',
             title: 'cod_lote',
             orderList,
             fieldOrder,
@@ -479,7 +483,7 @@ export default function Listagem({
       if (columnCampos[index] === 'quant_sementes') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Qtd. sementes',
+            name: 'Qtd sementes',
             title: 'quant_sementes',
             orderList,
             fieldOrder,
@@ -717,9 +721,26 @@ export default function Listagem({
                 "
                 >
                   {filterFieldFactory('filterYear', 'Ano lote', true)}
-
-                  {filterFieldFactory('filterCodLote', 'Cód. lote')}
-
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Cod. Lote
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        id="filterCodLoteFrom"
+                        name="filterCodLoteFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterCodLoteTo"
+                        name="filterCodLoteTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       NCA
@@ -766,7 +787,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Qnt. Sementes
+                      Qnt Sementes
                     </label>
                     <div className="flex">
                       <Input
@@ -1048,6 +1069,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { token } = req.cookies;
   const { checked }: any = query;
   const idSafra = req.cookies.safraId;
+  const idCulture = req.cookies.cultureId;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
@@ -1058,7 +1080,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
 
-  const filterApplication = 'filterStatus=1';
+  const filterApplication = `filterStatus=1&idCulture=${idCulture}`;
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
@@ -1075,6 +1097,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       allLote,
       totalItems,
       idSafra,
+      idCulture,
       itensPerPage,
       filterApplication,
     },

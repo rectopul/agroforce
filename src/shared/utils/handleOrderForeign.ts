@@ -25,6 +25,8 @@ export default function handleOrderForeign(orderBy: any, orderType: any) {
         return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
       case 'lote':
         return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
+      case 'group':
+        return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
       case 'type_assay':
         return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
       case 'tecnologia':

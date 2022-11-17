@@ -57,6 +57,7 @@ import {
 } from '../../../../components';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import { tableGlobalFunctions } from '../../../../helpers';
+import ComponentLoading from '../../../../components/Loading';
 
 type IAssayListUpdate = Omit<IAssayList, 'id_safra' | 'period'>;
 
@@ -79,9 +80,6 @@ export default function AtualizarTipoEnsaio({
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
-
-  console.log({ allGenotypeTreatment });
-  console.log({ allExperiments });
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
@@ -128,6 +126,7 @@ export default function AtualizarTipoEnsaio({
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const [loading, setLoading] = useState<boolean>(false);
   const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
     orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy
   }&typeOrder=${typeOrder}`;
@@ -158,7 +157,7 @@ export default function AtualizarTipoEnsaio({
     },
     { name: 'CamposGerenciados[]', title: 'T', value: 'status' },
     { name: 'CamposGerenciados[]', title: 'NCA', value: 'nca' },
-    { name: 'CamposGerenciados[]', title: 'Cód. lote', value: 'cod_lote' },
+    { name: 'CamposGerenciados[]', title: 'Cód lote', value: 'cod_lote' },
     { name: 'CamposGerenciados[]', title: 'OBS', value: 'comments' },
     {
       name: 'CamposGerenciados[]',
@@ -186,7 +185,7 @@ export default function AtualizarTipoEnsaio({
     { name: 'CamposGerenciados[]', title: 'CLP', value: 'clp' },
     // { name: "CamposGerenciados[]", title: "EEL", value: "eel" },
     { name: 'CamposGerenciados[]', title: 'Densidade', value: 'density' },
-    { name: 'CamposGerenciados[]', title: 'Status EXP.', value: 'status' },
+    { name: 'CamposGerenciados[]', title: 'Status EXP', value: 'status' },
   ]);
   const [colorStar, setColorStar] = useState<string>('');
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -225,62 +224,6 @@ export default function AtualizarTipoEnsaio({
     },
   });
 
-  // async function handleOrder(
-  //   column: string,
-  //   order: string | any,
-  //   name: any,
-  // ): Promise<void> {
-  //   if (table !== 'genotipo') {
-  //     handleOrderExperiments(column, order, name);
-  //     return;
-  //   }
-
-  //   let typeOrder: any;
-  //   let parametersFilter: any;
-  //   if (order === 1) {
-  //     typeOrder = 'asc';
-  //   } else if (order === 2) {
-  //     typeOrder = 'desc';
-  //   } else {
-  //     typeOrder = '';
-  //   }
-  //   setOrderBy(column);
-  //   setOrderType(typeOrder);
-  //   if (filter && typeof filter !== 'undefined') {
-  //     if (typeOrder !== '') {
-  //       parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-  //     } else {
-  //       parametersFilter = filter;
-  //     }
-  //   } else if (typeOrder !== '') {
-  //     parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_safra=${idSafra}`;
-  //   } else {
-  //     parametersFilter = filter;
-  //   }
-
-  //   await genotypeTreatmentService
-  //     .getAll(`${parametersFilter}&skip=0&take=${take}`)
-  //     .then(({ status, response }) => {
-  //       if (status === 200) {
-  //         setGenotypeTreatments(response);
-  //       }
-  //     });
-
-  //   if (orderList === 2) {
-  //     setOrder(0);
-  //     setArrowOrder(<AiOutlineArrowDown />);
-  //   } else {
-  //     setOrder(orderList + 1);
-  //     if (orderList === 1) {
-  //       setArrowOrder(<AiOutlineArrowUp />);
-  //     } else {
-  //       setArrowOrder('');
-  //     }
-  //   }
-
-  //   setFieldOrder(name);
-  // }
-
   async function callingApi(parametersFilter: any) {
     setCookies('filterBeforeEdit', parametersFilter);
     setCookies('filterBeforeEditTypeOrder', typeOrder);
@@ -297,8 +240,15 @@ export default function AtualizarTipoEnsaio({
           response.total >= take ? take : response.total,
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
+
+  useEffect(() => {
+    callingApi(treatmentsFilter);
+  }, [typeOrder]);
 
   async function handleOrder(
     column: string,
@@ -316,19 +266,17 @@ export default function AtualizarTipoEnsaio({
     // }
     // setOrderBy(column);
     // setOrderType(typeOrder);
-    // if (filter && typeof filter !== 'undefined') {
+    // if (treatmentsFilter && typeof treatmentsFilter !== 'undefined') {
     //   if (typeOrder !== '') {
-    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
+    //     parametersFilter = `${treatmentsFilter}&orderBy=${column}&typeOrder=${typeOrder}`;
     //   } else {
-    //     parametersFilter = filter;
+    //     parametersFilter = treatmentsFilter;
     //   }
     // } else if (typeOrder !== '') {
     //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
     // } else {
-    //   parametersFilter = filter;
+    //   parametersFilter = treatmentsFilter;
     // }
-    // console.log('parametersFilter');
-    // console.log(parametersFilter);
     // await genotypeTreatmentService
     //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
     //   .then(({ status, response }) => {
@@ -346,6 +294,10 @@ export default function AtualizarTipoEnsaio({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   async function handleOrderExperiments(
@@ -542,7 +494,7 @@ export default function AtualizarTipoEnsaio({
       if (columnOrder[index] === 'status_experiment') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Status Trat.',
+            name: 'Status Trat',
             title: 'status_experiment',
             orderList,
             fieldOrder,
@@ -569,7 +521,7 @@ export default function AtualizarTipoEnsaio({
             title: 'experimentName',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: handleOrderExperiments,
           }),
         );
       }
@@ -580,7 +532,7 @@ export default function AtualizarTipoEnsaio({
             title: 'local.name_local_culture',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: handleOrderExperiments,
           }),
         );
       }
@@ -591,7 +543,7 @@ export default function AtualizarTipoEnsaio({
             title: 'delineamento.name',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: handleOrderExperiments,
           }),
         );
       }
@@ -602,7 +554,7 @@ export default function AtualizarTipoEnsaio({
             title: 'repetitionsNumber',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: handleOrderExperiments,
           }),
         );
       }
@@ -613,7 +565,7 @@ export default function AtualizarTipoEnsaio({
             title: 'nlp',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: handleOrderExperiments,
           }),
         );
       }
@@ -624,7 +576,7 @@ export default function AtualizarTipoEnsaio({
             title: 'clp',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: handleOrderExperiments,
           }),
         );
       }
@@ -638,18 +590,18 @@ export default function AtualizarTipoEnsaio({
             title: 'density',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: handleOrderExperiments,
           }),
         );
       }
       if (columnOrder[index] === 'status') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Status EXP.',
+            name: 'Status EXP',
             title: 'status',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: handleOrderExperiments,
           }),
         );
       }
@@ -895,6 +847,7 @@ export default function AtualizarTipoEnsaio({
       .then(({ status, response }) => {
         if (status === 200) {
           setGenotypeTreatments(response);
+          setLoading(false);
           tableRef?.current?.dataManager?.changePageSize(
             response?.length >= take ? take : response?.length,
           );
@@ -918,8 +871,8 @@ export default function AtualizarTipoEnsaio({
       .getAll(parametersFilter)
       .then(({ status, response }) => {
         if (status === 200) {
-          console.log({ response });
           setExperiments(response);
+          setLoading(false);
           tableRef?.current?.dataManager?.changePageSize(
             response?.length >= take ? take : response?.length,
           );
@@ -955,6 +908,8 @@ export default function AtualizarTipoEnsaio({
       <Head>
         <title>Atualizar Lista de Ensaio</title>
       </Head>
+
+      {loading && <ComponentLoading text="" />}
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <form
@@ -1160,7 +1115,10 @@ export default function AtualizarTipoEnsaio({
                         <FieldItemsPerPage
                           widthClass="w-1/2"
                           selected={take}
-                          onChange={setTake}
+                          onChange={(e: any) => {
+                            setLoading(true);
+                            setTake(e);
+                          }}
                         />
                       </div>
                     </div>
@@ -1393,7 +1351,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? req.cookies.filterBeforeEditOrderBy
     : '';
 
-  const treatmentsFilterApplication = `&id_safra=${idSafra}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
+  const treatmentsFilterApplication = `&id_safra=${idSafra}&id_assay_list=${idAssay}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
   const experimentFilterApplication = `&id_safra=${idSafra}&id_assay_list=${idAssay}`;
 
   // RR
