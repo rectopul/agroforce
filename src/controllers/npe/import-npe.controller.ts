@@ -58,6 +58,7 @@ export class ImportNpeController {
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
+        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
         return { status: 400, message: validate };
       }
       const configModule: object | any = await importController.getAll(14);

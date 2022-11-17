@@ -505,7 +505,7 @@ export default function Listagem({
         tableFields.push(
           headerTableFactoryGlobal({
             name: 'Tecnologia',
-            title: 'tecnologia',
+            title: 'assay_list.tecnologia.cod_tec',
             orderList,
             fieldOrder,
             handleOrder,
@@ -521,7 +521,7 @@ export default function Listagem({
         tableFields.push(
           headerTableFactoryGlobal({
             name: 'GGEN',
-            title: 'tecnologia',
+            title: 'genotipo.tecnologia.cod_tec',
             orderList,
             fieldOrder,
             handleOrder,

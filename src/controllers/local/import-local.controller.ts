@@ -68,6 +68,7 @@ export class ImportLocalController {
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
+        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
         return { status: 400, message: validate };
       }
       const configModule: object | any = await importController.getAll(4);
@@ -344,7 +345,7 @@ export class ImportLocalController {
                   name_unity_culture: unityCultureDTO.name_unity_culture,
                   id_local: response[0]?.id,
                 });
-                
+
                 // Abrir transação
                 if (response.length > 0) {
                   localCultureDTO.id = response[0]?.id;
