@@ -40,6 +40,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma/BaltimoreCyberTrustRoot.crt.pem /tmp/BaltimoreCyberTrustRoot.crt.pem
+COPY --from=builder /app/start.sh ./
 
 # Essentials
 RUN apk add -U tzdata
