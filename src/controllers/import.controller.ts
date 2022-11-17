@@ -45,6 +45,7 @@ import { ImportDelimitationController } from './delimitation/delimitation-import
 import { ImportNpeController } from './npe/import-npe.controller';
 import { ImportAllocationController } from './allocation/import-allocation.controller';
 import { ImportExperimentGenotypeController } from './experiment-genotype/import-experiment-genotype.controller';
+import { ImportBlob } from '../services/azure_services/import_blob_azure';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -96,36 +97,6 @@ export class ImportController {
   tecnologiaRepository = new TecnologiaRepository();
 
   aux: object | any = {};
-
-
-  private const importblob(file){   
-    const newFileName =
-    uuidv4() + '.' + FormData.file.name.split('.').pop();
-    uploadFileToBlob(FormData.file, newFileName);
-    registerItem(newFileName);
-
-    const containerName = 'sample-container';
-    const sasToken = process.env.NEXT_PUBLIC_STORAGESASTOKEN;
-    const storageAccountName = process.env.NEXT_PUBLIC_STORAGERESOURCENAME;
-
-    const uploadFileToBlob = useCallback(
-    async (file: File | null, newFileName: string) => {
-
-    const blobService = new BlobServiceClient(
-      `https://${storageAccountName}.blob.core.windows.net/?${sasToken}`
-    );
-
-    const containerClient: ContainerClient =
-      blobService.getContainerClient(containerName);
-    await containerClient.createIfNotExists({
-      access: 'container',
-    });
-
-    const blobClient = containerClient.getBlockBlobClient(newFileName);
-    const options = { blobHTTPHeaders: { blobContentType: file.type } };
-
-    await blobClient.uploadData(file, options);
-  }
     
 
 
@@ -267,7 +238,7 @@ export class ImportController {
       }
 
       if (data.moduleId === 27) {
-        await importblob(data.files[0]);
+        await ImportBlob(data.files[0]);
         return await ImportGenotypeTreatmentController.validate(responseLog?.id, data);
       }
 
