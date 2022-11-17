@@ -162,7 +162,7 @@ export default function Listagem({
       title: "Delineamento",
       value: "delineamento",
     },
-    { name: "CamposGerenciados[]", title: "Rep.", value: "repetitionsNumber" },
+    { name: "CamposGerenciados[]", title: "Rep", value: "repetitionsNumber" },
     {
       name: "CamposGerenciados[]",
       title: "Qtd Genótipos",
@@ -178,7 +178,7 @@ export default function Listagem({
       title: "NPE Final",
       value: "repetitionsNumber",
     },
-    { name: "CamposGerenciados[]", title: "QT. NPE", value: "npeQT" },
+    { name: "CamposGerenciados[]", title: "QT NPE", value: "npeQT" },
   ]);
 
   const [colorStar, setColorStar] = useState<string>("");
@@ -479,7 +479,7 @@ export default function Listagem({
       if (columnCampos[index] === "repetitionsNumber") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Rep.",
+            name: "Rep",
             title: "repetitionsNumber",
             orderList,
             fieldOrder,
@@ -521,7 +521,7 @@ export default function Listagem({
 
     tableFields.push(
       headerTableFactoryGlobal({
-        name: "QT. NPE",
+        name: "QT NPE",
         title: "npeQT",
         orderList,
         fieldOrder,
@@ -680,7 +680,7 @@ export default function Listagem({
     { title: "Foco", field: "foco.name" },
     { title: "Ensaio", field: "type_assay.name" },
     { title: "Tecnologia", field: "tecnologia.name" },
-    { title: "Epoca", field: "epoca" },
+    { title: "Época", field: "epoca" },
     { title: "NPE Inicial", field: "prox_npe" },
     { title: "NPE Final", field: "npef" },
     { title: "NPE Quantity", field: "npeQT" },
@@ -811,40 +811,35 @@ export default function Listagem({
       let npei = Number(NPESelectedRow?.npei_i);
 
       experimentos?.map((item: any) => {
-        let ntQT = 1;
-        let repititions = 1;
-        while (repititions <= item.repetitionsNumber) {
-          item.assay_list?.genotype_treatment.map((gt: any) => {
-            let sd = item.seq_delineamento.filter(
-              (x: any) => x.repeticao == repititions && x.nt == ntQT
-            )[0];
-            const data: any = {};
-            data.idSafra = gt.id_safra;
-            data.idFoco = item.assay_list?.foco.id;
-            data.idTypeAssay = item.assay_list?.type_assay.id;
-            data.idTecnologia = item.assay_list?.tecnologia.id;
-            data.idExperiment = item.id;
-            data.gli = item.assay_list?.gli;
-            data.rep = repititions;
-            data.nt = gt.treatments_number;
-            data.npe = npei;
-            data.idLote = gt.genotipo?.id_lote;
-            data.idGenotipo = gt.genotipo?.id; // Added new field
-            data.gli = item.assay_list?.gli;
-            data.id_seq_delineamento = sd.id;
-            data.nca = gt.lote?.ncc;
-            data.status_t = gt.status;
-            experiment_genotipo.push(data);
-            npei++;
-            // });
-            const gt_new: any = {};
-            gt_new.id = gt.id;
-            gt_new.status_experiment = "EXP. SORTEADO";
-            genotipo_treatment.push(gt_new);
-          });
-          repititions++;
-          ntQT++;
-        }
+        item.seq_delineamento.map((sd: any) => {
+          let gt = item.assay_list.genotype_treatment.filter(
+            (x: any) => x.treatments_number == sd.nt
+          )[0];
+
+          const data: any = {};
+          data.idSafra = gt.id_safra;
+          data.idFoco = item.assay_list?.foco.id;
+          data.idTypeAssay = item.assay_list?.type_assay.id;
+          data.idTecnologia = item.assay_list?.tecnologia.id;
+          data.idExperiment = item.id;
+          data.gli = item.assay_list?.gli;
+          data.rep = sd.repeticao;
+          data.nt = sd.nt;
+          data.npe = npei;
+          data.idLote = gt.genotipo?.id_lote;
+          data.idGenotipo = gt.genotipo?.id; // Added new field
+          data.gli = item.assay_list?.gli;
+          data.id_seq_delineamento = sd.id;
+          data.nca = gt.lote?.ncc;
+          data.status_t = gt.status;
+          experiment_genotipo.push(data);
+          npei++;
+          // });
+          const gt_new: any = {};
+          gt_new.id = gt.id;
+          gt_new.status_experiment = "EXP. SORTEADO";
+          genotipo_treatment.push(gt_new);
+        });
       });
       createExperimentGenotipe({
         data: experiment_genotipo,

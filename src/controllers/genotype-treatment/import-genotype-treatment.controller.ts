@@ -2,8 +2,11 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
-import { TransactionConfig } from '../../shared/prisma/transactionConfig';
-import { ExperimentGenotipeRepository } from '../../repository/experiment-genotipe.repository';
+import { AssayListRepository } from 'src/repository/assay-list.repository';
+import { GenotypeTreatmentRepository } from 'src/repository/genotype-treatment/genotype-treatment.repository';
+import { HistoryGenotypeTreatmentRepository } from 'src/repository/genotype-treatment/history-genotype-tratment.repository';
+
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
 import { validateInteger } from '../../shared/utils/numberValidate';
@@ -31,11 +34,13 @@ export class ImportGenotypeTreatmentController {
 
     /* --------- Transcation Context --------- */
     const transactionConfig = new TransactionConfig();
-    const experimentgenotipeRepository = new ExperimentGenotipeRepository();
-    experimentgenotipeRepository.setTransaction(
-      transactionConfig.clientManager,
-      transactionConfig.transactionScope,
-    );
+    const assayListRepository = new AssayListRepository();
+    const genotypeTreatmentRepository = new GenotypeTreatmentRepository();
+    const historyGenotypeTreatmentRepository = new HistoryGenotypeTreatmentRepository();
+
+    assayListRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+    genotypeTreatmentRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+    historyGenotypeTreatmentRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
     /* --------------------------------------- */
 
     const responseIfError: Array<string> = [];
@@ -257,7 +262,7 @@ export class ImportGenotypeTreatmentController {
                 const { response: lote } = await loteController.getAll({
                   ncc: spreadSheet[row][12],
                 });
-                await genotypeTreatmentController.update(
+                await genotypeTreatmentRepository.updateTransaction(treatment[0]?.id,
                   {
                     id: treatment[0]?.id,
                     id_genotipo: genotipo[0]?.id,
@@ -265,7 +270,7 @@ export class ImportGenotypeTreatmentController {
                     status: spreadSheet[row][11],
                   },
                 );
-                await historyGenotypeTreatmentController.create({
+                await historyGenotypeTreatmentRepository.createTransaction({
                   gli: spreadSheet[row][4],
                   safra: spreadSheet[row][0],
                   foco: spreadSheet[row][1],
@@ -280,9 +285,10 @@ export class ImportGenotypeTreatmentController {
                 });
               }
             }
-            await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
-            return { status: 200, message: 'Tratamento de genótipo importado com sucesso' };
           });
+         
+          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
+          return { status: 200, message: 'Tratamento de genótipo importado com sucesso' };
         } catch (error: any) {
           await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
           handleError('Tratamento de genótipo controller', 'Save Import', error.message);

@@ -54,11 +54,11 @@ import {
   genotypeTreatmentService,
   importService,
   userPreferencesService,
-} from "../../../../services";
-import * as ITabs from "../../../../shared/utils/dropdown";
-import { tableGlobalFunctions } from "../../../../helpers";
-import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
-import ComponentLoading from "../../../../components/Loading";
+} from '../../../../services';
+import * as ITabs from '../../../../shared/utils/dropdown';
+import { tableGlobalFunctions } from '../../../../helpers';
+import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+import ComponentLoading from '../../../../components/Loading';
 
 export default function Listagem({
   // assaySelect,
@@ -88,7 +88,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.genotypeTreatment || {
     id: 0,
     table_preferences:
-      "id,foco,type_assay,tecnologia,gli,experiment,culture,rep,status,status_t,nt,npe,genotipo,nca",
+      'id,foco,type_assay,tecnologia,gli,experiment,culture,status_t,rep,status,nt,npe,genotipo,nca',
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
@@ -147,28 +147,28 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("culture"),
     },
     {
+      name: 'CamposGerenciados[]',
+      title: 'StatusT',
+      value: 'status_t',
+      defaultChecked: () => camposGerenciados.includes('status_t'),
+    },
+    {
       name: "CamposGerenciados[]",
-      title: "REP.",
+      title: "REP EXP",
       value: "rep",
       defaultChecked: () => camposGerenciados.includes("rep"),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Status EXP",
-      value: "status",
-      defaultChecked: () => camposGerenciados.includes("status"),
+      name: 'CamposGerenciados[]',
+      title: 'Status EXP',
+      value: 'status',
+      defaultChecked: () => camposGerenciados.includes('status'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "StatusT",
-      value: "status_t",
-      defaultChecked: () => camposGerenciados.includes("status_t"),
-    },
-    {
-      name: "CamposGerenciados[]",
-      title: "NT",
-      value: "nt",
-      defaultChecked: () => camposGerenciados.includes("nt"),
+      name: 'CamposGerenciados[]',
+      title: 'NT',
+      value: 'nt',
+      defaultChecked: () => camposGerenciados.includes('nt'),
     },
     {
       name: "CamposGerenciados[]",
@@ -354,6 +354,9 @@ export default function Listagem({
             response.total >= take ? take : response.total
           );
         }
+      })
+      .catch((_) => {
+        setLoading(false);
       });
   }
 
@@ -543,10 +546,21 @@ export default function Listagem({
           })
         );
       }
-      if (columnOrder[item] === "rep") {
+      if (columnOrder[item] === 'status_t') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "REP",
+            name: 'StatusT',
+            title: 'status_t',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
+      }
+      if (columnOrder[item] === 'rep') {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "REP EXP",
             title: "rep",
             orderList,
             fieldOrder,
@@ -554,22 +568,11 @@ export default function Listagem({
           })
         );
       }
-      if (columnOrder[item] === "status") {
+      if (columnOrder[item] === 'status') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Status EXP",
-            title: "status",
-            orderList,
-            fieldOrder,
-            handleOrder,
-          })
-        );
-      }
-      if (columnOrder[item] === "status_t") {
-        tableFields.push(
-          headerTableFactoryGlobal({
-            name: "StatusT",
-            title: "status_t",
+            name: 'Status EXP',
+            title: 'status',
             orderList,
             fieldOrder,
             handleOrder,
@@ -667,7 +670,8 @@ export default function Listagem({
       localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
-    setStatusAccordion(false);status
+    setStatusAccordion(false);
+    status;
     setCamposGerenciados(campos);
   }
 
@@ -1104,14 +1108,14 @@ export default function Listagem({
                   pb-8
                 "
                 >
-                  {filterFieldFactory("filterFoco", "Foco")}
-                  {filterFieldFactory("filterTypeAssay", "Ensaio")}
-                  {filterFieldFactory("filterCodTec", "Cód. Tecnologia")}
-                  {filterFieldFactory("filterTechnology", "Nome da Tecnologia")}
-                  {filterFieldFactory("filterGli", "GLI")}
-                  {filterFieldFactory("filterExperimentName", "Experimento")}
-                  {filterFieldFactory("filterPlacingPlace", "Lugar plantio")}
-                  {filterFieldFactory("filterStatusT", "StatusT")}
+                  {filterFieldFactory('filterFoco', 'Foco')}
+                  {filterFieldFactory('filterTypeAssay', 'Ensaio')}
+                  {filterFieldFactory('filterCodTec', 'Cod Tec')}
+                  {filterFieldFactory('filterTechnology', 'Nome da Tecnologia')}
+                  {filterFieldFactory('filterGli', 'GLI')}
+                  {filterFieldFactory('filterExperimentName', 'Experimento')}
+                  {filterFieldFactory('filterPlacingPlace', 'Lugar plantio')}
+                  {filterFieldFactory('filterStatusT', 'StatusT')}
                 </div>
                 <div
                   className="w-full h-full
@@ -1123,7 +1127,7 @@ export default function Listagem({
                 >
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      REP
+                      REP EXP
                     </label>
                     <div className="flex">
                       <Input

@@ -31,10 +31,10 @@ import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { BsTrashFill } from 'react-icons/bs';
 import Swal from 'sweetalert2';
 import foco from 'src/pages/api/foco';
+import ComponentLoading from '../../../../components/Loading';
 import { IGenerateProps } from '../../../../interfaces/shared/generate-props.interface';
 import {
   IAssayList,
-  IAssayListGrid,
   IAssayListFilter,
 } from '../../../../interfaces/listas/ensaio/assay-list.interface';
 import { assayListService, userPreferencesService } from '../../../../services';
@@ -131,7 +131,7 @@ export default function TipoEnsaio({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Nº de trat.',
+      title: 'Nº de trat',
       value: 'treatmentsNumber',
       defaultChecked: () => camposGerenciados.includes('treatmentsNumber'),
     },
@@ -222,7 +222,10 @@ export default function TipoEnsaio({
           response.total >= take ? take : response.total,
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
 
   // Call that function when change type order value.
@@ -306,6 +309,7 @@ export default function TipoEnsaio({
 
   async function deleteItem() {
     setIsOpenModalConfirm(false);
+    setLoading(true);
 
     const { status, message } = await assayListService.deleted({
       id: itemSelectedDelete?.id,
@@ -492,7 +496,7 @@ export default function TipoEnsaio({
       if (columnOrder[item] === 'treatmentsNumber') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Nº de trat.',
+            name: 'Nº de trat',
             title: 'treatmentsNumber',
             orderList,
             fieldOrder,
@@ -702,6 +706,8 @@ export default function TipoEnsaio({
         <title>Listagem de Ensaio</title>
       </Head>
 
+      {loading && <ComponentLoading text="" />}
+
       <ModalConfirmation
         isOpen={isOpenModalConfirm}
         text={`Tem certeza que deseja deletar o item ${itemSelectedDelete?.gli}?`}
@@ -738,12 +744,12 @@ export default function TipoEnsaio({
                   {filterFieldFactory('filterFoco', 'Foco')}
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
                   {filterFieldFactory('filterGli', 'GLI')}
-                  {filterFieldFactory('filterCod', 'Cód. Tecnologia')}
+                  {filterFieldFactory('filterCod', 'Cod Tec')}
                   {filterFieldFactory('filterTechnology', 'Nome Tecnologia')}
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Nº de trat.
+                      Nº de trat
                     </label>
                     <div className="flex">
                       <Input

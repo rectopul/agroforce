@@ -4,6 +4,7 @@ import { PRISMA_CLIENT_KEY } from './prismaTransactionScope';
 
 export class PrismaClientManager {
   private prisma: PrismaClient;
+
   private transactionContext: cls.Namespace;
 
   constructor(prisma: PrismaClient, transactionContext: cls.Namespace) {
@@ -13,12 +14,11 @@ export class PrismaClientManager {
 
   getClient(): Prisma.TransactionClient {
     const prisma = this.transactionContext.get(
-      PRISMA_CLIENT_KEY
+      PRISMA_CLIENT_KEY,
     ) as Prisma.TransactionClient;
     if (prisma) {
       return prisma;
-    } else {
-      return this.prisma;
     }
+    return this.prisma;
   }
 }

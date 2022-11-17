@@ -1,4 +1,3 @@
-/* eslint-disable no-return-await */
 import { PrismaClientManager } from '../shared/prisma/prismaClientManager';
 import { TransactionScope } from '../shared/prisma/transactionScope';
 import { prisma as primaDB } from '../pages/api/db/db';
@@ -27,18 +26,14 @@ export class BaseRepository {
 
   async createTransaction(data: object | any) {
     if (this.clientManager && this.transactionScope) {
-      return await this.transactionScope.run(
-        async () => await this.create(data),
-      );
+      return await this.transactionScope.run(async () => this.create(data));
     }
     throw new Error('Transação não encontrada!');
   }
 
   async updateTransaction(id: number, data: object | any) {
     if (this.clientManager && this.transactionScope) {
-      return await this.transactionScope.run(
-        async () => await this.update(id, data),
-      );
+      return await this.transactionScope.run(async () => this.update(id, data));
     }
     throw new Error('Transação não encontrada!');
   }

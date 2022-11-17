@@ -1,21 +1,16 @@
-import { useFormik } from 'formik';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
-import { AiOutlineFileSearch } from 'react-icons/ai';
-import { IoMdArrowBack } from 'react-icons/io';
-import Swal from 'sweetalert2';
-import InputMask from 'react-input-mask';
-import { GetServerSideProps } from 'next';
-import getConfig from 'next/config';
-import { envelopeService } from 'src/services';
-import {
-  Button,
-  Content,
-  Select,
-  Input,
-} from '../../../../../components';
-import * as ITabs from '../../../../../shared/utils/dropdown';
+import { useFormik } from "formik";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { AiOutlineFileSearch } from "react-icons/ai";
+import { IoMdArrowBack } from "react-icons/io";
+import Swal from "sweetalert2";
+import InputMask from "react-input-mask";
+import { GetServerSideProps } from "next";
+import getConfig from "next/config";
+import { envelopeService } from "src/services";
+import { Button, Content, Select, Input } from "../../../../../components";
+import * as ITabs from "../../../../../shared/utils/dropdown";
 
 interface ICreateTypeAssay {
   safra: string;
@@ -29,16 +24,14 @@ export default function Cadastro({ safra, id_type_assay }: any) {
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) => (
-    tab.titleTab === 'ENSAIO'
-      ? tab.statusTab = true
-      : tab.statusTab = false
-  ));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === "ENSAIO" ? (tab.statusTab = true) : (tab.statusTab = false)
+  );
 
   const router = useRouter();
-  const [checkInput, setCheckInput] = useState('text-black');
+  const [checkInput, setCheckInput] = useState("text-black");
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
   const formik = useFormik<ICreateTypeAssay>({
     initialValues: {
@@ -50,33 +43,37 @@ export default function Cadastro({ safra, id_type_assay }: any) {
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.seeds) {
-        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
+        Swal.fire(
+          "Preencha todos os campos obrigatórios destacados em vermelho."
+        );
         return;
       }
 
-      await envelopeService.create({
-        id_safra: Number(safra.id),
-        id_type_assay: Number(id_type_assay),
-        seeds: Number(values.seeds),
-        created_by: formik.values.created_by,
-      }).then((response) => {
-        if (response.status === 200) {
-          Swal.fire('Envelope cadastrado com sucesso!');
-          router.back();
-        } else {
-          Swal.fire(response.message);
-        }
-      });
+      await envelopeService
+        .create({
+          id_safra: Number(safra.id),
+          id_type_assay: Number(id_type_assay),
+          seeds: Number(values.seeds),
+          created_by: formik.values.created_by,
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            Swal.fire("Envelope cadastrado com sucesso!");
+            router.back();
+          } else {
+            Swal.fire(response.message);
+          }
+        });
     },
   });
 
   function validateInputs(values: any) {
     if (!values.seeds) {
-      const inputSeeds: any = document.getElementById('seeds');
-      inputSeeds.style.borderColor = 'red';
+      const inputSeeds: any = document.getElementById("seeds");
+      inputSeeds.style.borderColor = "red";
     } else {
-      const inputSeeds: any = document.getElementById('seeds');
-      inputSeeds.style.borderColor = '';
+      const inputSeeds: any = document.getElementById("seeds");
+      inputSeeds.style.borderColor = "";
     }
   }
 
@@ -89,12 +86,12 @@ export default function Cadastro({ safra, id_type_assay }: any) {
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded px-8 pt-6 pb-8 mt-2"
-
           onSubmit={formik.handleSubmit}
         >
           <h1 className="text-2xl">Novo Envelope</h1>
 
-          <div className="w-1/2
+          <div
+            className="w-1/2
                                 flex
                                 justify-around
                                 gap-6
@@ -107,7 +104,7 @@ export default function Cadastro({ safra, id_type_assay }: any) {
                 Safra
               </label>
               <Input
-                style={{ background: '#e5e7eb' }}
+                style={{ background: "#e5e7eb" }}
                 id="safra"
                 name="safra"
                 type="text"
@@ -118,7 +115,7 @@ export default function Cadastro({ safra, id_type_assay }: any) {
             </div>
             <div className="w-full h-7">
               <label className="block text-gray-900 text-sm font-bold mb-1">
-                *Quant. de sementes por envelope
+                *Quant de sementes por envelope
               </label>
               <Input
                 id="seeds"
@@ -129,7 +126,8 @@ export default function Cadastro({ safra, id_type_assay }: any) {
             </div>
           </div>
 
-          <div className="
+          <div
+            className="
                             h-7 w-full
                             flex
                             gap-3
@@ -154,7 +152,7 @@ export default function Cadastro({ safra, id_type_assay }: any) {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<AiOutlineFileSearch size={20} />}
-                onClick={() => { }}
+                onClick={() => {}}
               />
             </div>
           </div>
@@ -171,8 +169,8 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { safraId } = context.req.cookies;
 
   const requestOptions: RequestInit | undefined = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   };
 

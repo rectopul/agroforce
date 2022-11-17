@@ -327,10 +327,11 @@ export default function Listagem({
           response.total >= take ? take : response.total,
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
-
-  console.log({ orderList, orderBy, typeOrder });
 
   // Call that function when change type order value.
   useEffect(() => {
@@ -379,16 +380,10 @@ export default function Listagem({
     //   setOrder(orderList + 1);
     // }
 
-    console.log({ column, order, orderList });
-
     // Gobal manage orders
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
-
-    console.log({
-      typeOrderG, columnG, orderByG, arrowOrder,
-    });
 
     setFieldOrder(name);
     setTypeOrder(typeOrderG);
@@ -575,7 +570,7 @@ export default function Listagem({
         tableFields.push(
           headerTableFactoryGlobal({
             name: 'GMR_Gen',
-            title: 'gmr',
+            title: 'genotipo.gmr',
             orderList,
             fieldOrder,
             handleOrder,
@@ -1131,7 +1126,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cód. Tecn
+                      Cod Tec
                     </label>
                     <div className="flex">
                       <Input
@@ -1147,7 +1142,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cód. GGEN
+                      Cod GGEN
                     </label>
                     <div className="flex">
                       <Input

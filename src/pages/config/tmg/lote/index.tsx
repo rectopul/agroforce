@@ -128,7 +128,7 @@ export default function Listagem({
 
   const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [arrowOrder, setArrowOrder] = useState<any>("");
+  const [arrowOrder, setArrowOrder] = useState<any>('');
   const [orderList, setOrder] = useState<number>(0);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -136,11 +136,11 @@ export default function Listagem({
 
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: "CamposGerenciados[]", title: "Ano", value: "year" },
-    { name: "CamposGerenciados[]", title: "Cód lote", value: "cod_lote" },
-    { name: "CamposGerenciados[]", title: "NCC", value: "ncc" },
-    { name: "CamposGerenciados[]", title: "Fase", value: "fase" },
-    { name: "CamposGerenciados[]", title: "Peso (kg)", value: "peso" },
+    { name: 'CamposGerenciados[]', title: 'Ano', value: 'year' },
+    { name: 'CamposGerenciados[]', title: 'Cod lote', value: 'cod_lote' },
+    { name: 'CamposGerenciados[]', title: 'NCC', value: 'ncc' },
+    { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
+    { name: 'CamposGerenciados[]', title: 'Peso (kg)', value: 'peso' },
     {
       name: "CamposGerenciados[]",
       title: "Quant sementes",
@@ -266,7 +266,10 @@ export default function Listagem({
           response.total >= take ? take : response.total
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
 
   // Call that function when change type order value.
@@ -387,8 +390,8 @@ export default function Listagem({
       if (columnCampos[index] === "cod_lote") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Cód lote",
-            title: "cod_lote",
+            name: 'Cod lote',
+            title: 'cod_lote',
             orderList,
             fieldOrder,
             handleOrder,
@@ -431,8 +434,8 @@ export default function Listagem({
       if (columnCampos[index] === "quant_sementes") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Quant. sementes",
-            title: "quant_sementes",
+            name: 'Quant sementes',
+            title: 'quant_sementes',
             orderList,
             fieldOrder,
             handleOrder,
@@ -486,7 +489,7 @@ export default function Listagem({
       }
       if (columnCampos[index] === "tecnologia") {
         tableFields.push(
-          tecnologiaHeaderFactory("Tecnologia", "genotipo.tecnologia.cod_tec")
+          tecnologiaHeaderFactory('Tecnologia', 'genotipo.tecnologia.cod_tec'),
         );
       }
     });
@@ -745,7 +748,7 @@ export default function Listagem({
 
                   <div className="h-6 w-full ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cód. Lote
+                      Cod Lote
                     </label>
                     <div className="flex">
                       <Input
@@ -810,7 +813,7 @@ export default function Listagem({
 
                   <div className="h-6 w-full ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Quant. sementes
+                      Quant sementes
                     </label>
                     <div className="flex">
                       <Input
@@ -881,11 +884,7 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory(
-                    "filterTecnologiaCod",
-                    "Cód. Tecnologia",
-                    true
-                  )}
+                  {filterFieldFactory('filterTecnologiaCod', 'Cod Tec', true)}
 
                   {filterFieldFactory(
                     "filterTecnologiaDesc",

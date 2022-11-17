@@ -57,6 +57,7 @@ import {
 } from '../../../../components';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import { tableGlobalFunctions } from '../../../../helpers';
+import ComponentLoading from '../../../../components/Loading';
 
 type IAssayListUpdate = Omit<IAssayList, 'id_safra' | 'period'>;
 
@@ -79,9 +80,6 @@ export default function AtualizarTipoEnsaio({
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
-
-  console.log({ allGenotypeTreatment });
-  console.log({ allExperiments });
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
@@ -128,6 +126,7 @@ export default function AtualizarTipoEnsaio({
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const [loading, setLoading] = useState<boolean>(false);
   const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
     orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy
   }&typeOrder=${typeOrder}`;
@@ -158,7 +157,7 @@ export default function AtualizarTipoEnsaio({
     },
     { name: 'CamposGerenciados[]', title: 'T', value: 'status' },
     { name: 'CamposGerenciados[]', title: 'NCA', value: 'nca' },
-    { name: 'CamposGerenciados[]', title: 'Cód. lote', value: 'cod_lote' },
+    { name: 'CamposGerenciados[]', title: 'Cód lote', value: 'cod_lote' },
     { name: 'CamposGerenciados[]', title: 'OBS', value: 'comments' },
     {
       name: 'CamposGerenciados[]',
@@ -241,43 +240,50 @@ export default function AtualizarTipoEnsaio({
           response.total >= take ? take : response.total,
         );
       }
-    });
+    })
+      .catch((_) => {
+        setLoading(false);
+      });
   }
+
+  useEffect(() => {
+    callingApi(treatmentsFilter);
+  }, [typeOrder]);
 
   async function handleOrder(
     column: string,
     order: number,
     name: any,
   ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (treatmentsFilter && typeof treatmentsFilter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${treatmentsFilter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = treatmentsFilter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = treatmentsFilter;
-    }
-    await genotypeTreatmentService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          setGenotypeTreatments(response);
-        }
-      });
+    // let typeOrder: any;
+    // let parametersFilter: any;
+    // if (order === 1) {
+    //   typeOrder = 'asc';
+    // } else if (order === 2) {
+    //   typeOrder = 'desc';
+    // } else {
+    //   typeOrder = '';
+    // }
+    // setOrderBy(column);
+    // setOrderType(typeOrder);
+    // if (treatmentsFilter && typeof treatmentsFilter !== 'undefined') {
+    //   if (typeOrder !== '') {
+    //     parametersFilter = `${treatmentsFilter}&orderBy=${column}&typeOrder=${typeOrder}`;
+    //   } else {
+    //     parametersFilter = treatmentsFilter;
+    //   }
+    // } else if (typeOrder !== '') {
+    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
+    // } else {
+    //   parametersFilter = treatmentsFilter;
+    // }
+    // await genotypeTreatmentService
+    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
+    //   .then(({ status, response }) => {
+    //     if (status === 200) {
+    //       setGenotypeTreatments(response);
+    //     }
+    //   });
 
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
@@ -288,6 +294,10 @@ export default function AtualizarTipoEnsaio({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }
 
   async function handleOrderExperiments(
@@ -484,7 +494,7 @@ export default function AtualizarTipoEnsaio({
       if (columnOrder[index] === 'status_experiment') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Status Trat.',
+            name: 'Status Trat',
             title: 'status_experiment',
             orderList,
             fieldOrder,
@@ -837,6 +847,7 @@ export default function AtualizarTipoEnsaio({
       .then(({ status, response }) => {
         if (status === 200) {
           setGenotypeTreatments(response);
+          setLoading(false);
           tableRef?.current?.dataManager?.changePageSize(
             response?.length >= take ? take : response?.length,
           );
@@ -861,6 +872,7 @@ export default function AtualizarTipoEnsaio({
       .then(({ status, response }) => {
         if (status === 200) {
           setExperiments(response);
+          setLoading(false);
           tableRef?.current?.dataManager?.changePageSize(
             response?.length >= take ? take : response?.length,
           );
@@ -896,6 +908,8 @@ export default function AtualizarTipoEnsaio({
       <Head>
         <title>Atualizar Lista de Ensaio</title>
       </Head>
+
+      {loading && <ComponentLoading text="" />}
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <form
@@ -1101,7 +1115,10 @@ export default function AtualizarTipoEnsaio({
                         <FieldItemsPerPage
                           widthClass="w-1/2"
                           selected={take}
-                          onChange={setTake}
+                          onChange={(e: any) => {
+                            setLoading(true);
+                            setTake(e);
+                          }}
                         />
                       </div>
                     </div>

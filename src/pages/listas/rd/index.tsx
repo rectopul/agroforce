@@ -102,6 +102,7 @@ export default function Import({
   const disabledButton = executeUpload === 1;
   const bgColor = executeUpload === 1 ? 'bg-red-600' : 'bg-blue-600';
   const [loading, setLoading] = useState<boolean>(false);
+  const [importLoading, setImportLoading] = useState<boolean>(false);
 
   async function readExcel(moduleId: number, table: string) {
 
@@ -127,7 +128,7 @@ export default function Import({
 
       readXlsxFile(value.files[0])
         .then(async (rows) => {
-          setLoading(true);
+          setImportLoading(true);
 
           const registerItem = useCallback(async (name: string) => {
             const requestData = {
@@ -156,7 +157,7 @@ export default function Import({
               file: ImputtoBase64(value.files[0]),
               name:value.files[0].name,
             });
-            setLoading(false);
+            setImportLoading(false);
             handlePagination();
             Swal.fire({
               html: message,
@@ -175,7 +176,7 @@ export default function Import({
               file: ImputtoBase64(value.files[0]),
               name:value.files[0].name,
             });
-            setLoading(false);
+            setImportLoading(false);
             handlePagination();
             Swal.fire({
               html: message,
@@ -450,7 +451,7 @@ export default function Import({
     // Gobal manage orders
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
-    } = await fetchWrapper.handleOrderG(column, order, orderList);
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setFieldOrder(name);
     setTypeOrder(typeOrderG);
@@ -658,7 +659,8 @@ export default function Import({
 
   return (
     <>
-      {loading && <ComponentLoading text="Importando planilha, aguarde..." />}
+      {importLoading && <ComponentLoading text="Importando planilha, aguarde..." />}
+      {loading && <ComponentLoading text="" />}
 
       <Head>
         <title>Importação planilhas</title>
