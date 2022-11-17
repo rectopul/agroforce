@@ -57,5 +57,5 @@ EXPOSE 3000
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry.
 # ENV NEXT_TELEMETRY_DISABLED 1
-
-CMD ["start.sh"]
+RUN chmod +x start.sh
+CMD ./start.sh
