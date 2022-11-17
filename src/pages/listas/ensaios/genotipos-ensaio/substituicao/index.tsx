@@ -98,7 +98,7 @@ export default function Listagem({
   allLote,
   totalItems,
   idSafra,
-  idCUlture,
+  idCulture,
   itensPerPage,
   filterApplication,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
