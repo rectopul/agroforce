@@ -129,6 +129,7 @@ export class ReplaceTreatmentController {
   }
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: replace-treatment.controller.ts ~ line 132 ~ ReplaceTreatmentController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.OR = [];

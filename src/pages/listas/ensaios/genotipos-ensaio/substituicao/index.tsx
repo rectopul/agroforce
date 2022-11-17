@@ -98,6 +98,7 @@ export default function Listagem({
   allLote,
   totalItems,
   idSafra,
+  idCUlture,
   itensPerPage,
   filterApplication,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -235,7 +236,7 @@ export default function Listagem({
           }
         });
       }
-      const parametersFilter = `filterStatus=${1}&id_safra=${idSafra}&filterYear=${filterYear}&filterCodLoteTo=${filterCodLoteTo}&filterCodLoteFrom=${filterCodLoteFrom}&filterNcaFrom=${filterNcaFrom}&filterNcaTo=${filterNcaTo}&filterFase=${filterFase}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCodTec=${filterCodTec}&filterNameTec=${filterNameTec}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterPesoTo=${filterPesoTo}&filterPesoFrom=${filterPesoFrom}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}`;
+      const parametersFilter = `filterStatus=${1}&idCulture=${idCulture}&id_safra=${idSafra}&filterYear=${filterYear}&filterCodLoteTo=${filterCodLoteTo}&filterCodLoteFrom=${filterCodLoteFrom}&filterNcaFrom=${filterNcaFrom}&filterNcaTo=${filterNcaTo}&filterFase=${filterFase}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCodTec=${filterCodTec}&filterNameTec=${filterNameTec}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterPesoTo=${filterPesoTo}&filterPesoFrom=${filterPesoFrom}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}`;
 
       await replaceTreatmentService
         .getAll(
@@ -1096,6 +1097,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       allLote,
       totalItems,
       idSafra,
+      idCulture,
       itensPerPage,
       filterApplication,
     },
