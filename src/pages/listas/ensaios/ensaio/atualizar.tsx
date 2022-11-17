@@ -1351,7 +1351,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? req.cookies.filterBeforeEditOrderBy
     : '';
 
-  const treatmentsFilterApplication = `&id_safra=${idSafra}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
+  const treatmentsFilterApplication = `&id_safra=${idSafra}&id_assay_list=${idAssay}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
   const experimentFilterApplication = `&id_safra=${idSafra}&id_assay_list=${idAssay}`;
 
   // RR

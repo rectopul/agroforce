@@ -28,6 +28,7 @@ export class ImportDelimitationController {
       spreadSheet, idSafra, idCulture, created_by: createdBy,
     }: ImportValidate,
   ): Promise<IReturnObject> {
+    const logImportController = new LogImportController();
     const headers = [
       'CULTURA',
       'DELI',
@@ -40,6 +41,7 @@ export class ImportDelimitationController {
     ];
     const validate: any = await validateHeaders(spreadSheet, headers);
     if (validate.length > 0) {
+      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
       return { status: 400, message: validate };
     }
     if ((spreadSheet.length > Number(process.env.MAX_DIRECT_UPLOAD_ALLOWED))
@@ -58,7 +60,6 @@ export class ImportDelimitationController {
 
     const importController = new ImportController();
     const culturaController = new CulturaController();
-    const logImportController = new LogImportController();
     const delineamentoController = new DelineamentoController();
 
     /* --------- Transcation Context --------- */

@@ -481,7 +481,7 @@ export default function TipoEnsaio({
         tableFields.push(
           headerTableFactoryGlobal({
             name: 'Tecnologia',
-            title: 'tecnologia',
+            title: 'tecnologia.cod_tec',
             orderList,
             fieldOrder,
             handleOrder,

@@ -39,6 +39,7 @@ export class ImportGenotypeController {
       spreadSheet, idSafra, idCulture, created_by: createdBy,
     }: ImportValidate,
   ): Promise<IReturnObject> {
+    const logImportController = new LogImportController();
     const headers = [
       'ID_S1 (S1_ID_S1)',
       'Identificador de dados (S1_DATA_ID)',
@@ -73,6 +74,7 @@ export class ImportGenotypeController {
     ];
     const validate: any = await validateHeaders(spreadSheet, headers);
     if (validate.length > 0) {
+      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
       return { status: 400, message: validate };
     }
 
@@ -94,7 +96,6 @@ export class ImportGenotypeController {
     const importController = new ImportController();
     const culturaController = new CulturaController();
     const genotipoController = new GenotipoController();
-    const logImportController = new LogImportController();
     const tecnologiaController = new TecnologiaController();
 
     const responseIfError: any = [];
