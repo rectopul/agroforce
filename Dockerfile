@@ -40,7 +40,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma/BaltimoreCyberTrustRoot.crt.pem /tmp/BaltimoreCyberTrustRoot.crt.pem
-COPY --from=builder /app/start.sh ./
+COPY --from=builder --chmod=+x /app/start.sh ./
 
 # Essentials
 RUN apk add -U tzdata
@@ -58,5 +58,5 @@ EXPOSE 3000
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry.
 # ENV NEXT_TELEMETRY_DISABLED 1
-RUN chmod +x start.sh
+
 CMD ./start.sh
