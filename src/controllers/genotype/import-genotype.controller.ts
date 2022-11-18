@@ -675,6 +675,7 @@ export class ImportGenotypeController {
                 if (spreadSheet[row][column] !== null) {
                   const lote: any = await loteController.getAll({
                     id_dados: spreadSheet[row][column],
+                    id_safra: idSafra,
                   });
                   if (lote.total > 0) {
                     this.aux.id_lote = lote.response[0]?.id;
