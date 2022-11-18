@@ -431,6 +431,7 @@ export default function Listagem({
       if (columnCampos[item] === 'year') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: "int",
             name: 'Ano',
             title: 'year',
             orderList,
@@ -754,12 +755,14 @@ export default function Listagem({
                     </label>
                     <div className="flex gap-2">
                       <Input
+                        type = "int"
                         placeholder="De"
                         id="filterYearFrom"
                         name="filterYearFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type = "int"
                         placeholder="Até"
                         id="filterYearTo"
                         name="filterYearTo"

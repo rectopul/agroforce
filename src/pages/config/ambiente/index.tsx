@@ -486,6 +486,7 @@ export default function Listagem({
       if (columnCampos[item] === 'tecnologia') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: "int",
             name: 'Tecnologia',
             title: 'tecnologia.cod_tec',
             orderList,
@@ -502,6 +503,7 @@ export default function Listagem({
       if (columnCampos[item] === 'epoca') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: "int",
             name: 'Época',
             title: 'epoca',
             orderList,
@@ -513,6 +515,7 @@ export default function Listagem({
       if (columnCampos[item] === 'npei') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: "int",
             name: 'NPE Inicial',
             title: 'npei',
             orderList,
@@ -524,6 +527,7 @@ export default function Listagem({
       if (columnCampos[item] === 'prox_npe') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: "int",
             name: 'Prox NPE',
             title: 'prox_npe',
             orderList,

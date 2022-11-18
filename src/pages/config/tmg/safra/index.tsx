@@ -434,6 +434,7 @@ export default function Listagem({
       if (columnCampos[index] === "year") {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: "int",
             name: "Ano",
             title: "year",
             orderList,
@@ -685,6 +686,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type = "int"
                         placeholder="De"
                         id="filterYearFrom"
                         name="filterYearFrom"
@@ -692,6 +694,7 @@ export default function Listagem({
                       />
                       <Input
                         style={{ marginLeft: 8 }}
+                        type = "int"
                         placeholder="Até"
                         id="filterYearTo"
                         name="filterYearTo"

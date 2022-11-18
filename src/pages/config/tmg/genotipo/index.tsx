@@ -512,6 +512,7 @@ export default function Listagem({
       if (columnCampos[index] === 'tecnologia') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: "int",
             name: 'Tecnologia',
             title: 'tecnologia.cod_tec',
             orderList,
@@ -539,6 +540,7 @@ export default function Listagem({
       if (columnCampos[index] === 'gmr') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: "int",
             name: 'GMR',
             title: 'gmr',
             orderList,
@@ -551,6 +553,7 @@ export default function Listagem({
       if (columnCampos[index] === 'numberLotes') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: "int",
             name: 'Nº Lotes',
             title: 'numberLotes',
             orderList,

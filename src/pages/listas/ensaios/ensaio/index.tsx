@@ -753,6 +753,7 @@ export default function TipoEnsaio({
                     </label>
                     <div className="flex">
                       <Input
+                        type="int"
                         placeholder="De"
                         id="filterTratFrom"
                         name="filterTratFrom"
@@ -760,6 +761,7 @@ export default function TipoEnsaio({
                       />
                       <Input
                         style={{ marginLeft: 8 }}
+                        type="int"
                         placeholder="Até"
                         id="filterTratTo"
                         name="filterTratTo"
