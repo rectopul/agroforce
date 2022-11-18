@@ -538,7 +538,7 @@ export default function Listagem({
       if (columnCampos[index] === 'tecnologia') {
         tableFields.push(
           headerTableFactoryGlobal({
-            type="int"
+            type: 'int',
             name: 'Tec_Gen',
             title: 'tecnologia',
             orderList,
