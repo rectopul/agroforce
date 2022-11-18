@@ -456,6 +456,7 @@ export default function Listagem({
                 setCookies('filterBeforeEditTypeOrder', typeOrder);
                 setCookies('filterBeforeEditOrderBy', orderBy);
                 setCookies('filtersParams', filtersParams);
+                setCookies('itensPage', itensPerPage);
                 setCookies('lastPage', 'atualizar');
                 router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`);
               }}
@@ -1295,9 +1296,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   res,
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) ?? 10;
+  const itensPerPage = (await itensPage ) ?? 10;
 
   const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);
@@ -1313,8 +1312,13 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('filtersParams', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('itensPage', { req, res });
     // setCookies('filterParams','');
   }
+
+  const itensPage = req.cookies.itensPerPage
+    ? req.cookies.itensPerPage
+    : 10;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
