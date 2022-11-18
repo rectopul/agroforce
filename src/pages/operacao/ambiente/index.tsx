@@ -368,6 +368,7 @@ export default function Listagem({
       if (columnCampos[item] === 'npei_i') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: "int",
             name: 'NPE Inicial',
             title: 'npei_i',
             orderList,
@@ -379,6 +380,7 @@ export default function Listagem({
       if (columnCampos[item] === 'npef') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: "int",
             name: 'NPE Final',
             title: 'npef',
             orderList,
@@ -679,12 +681,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type = "int"
                         placeholder="De"
                         id="filterNpeFrom"
                         name="filterNpeFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type = "int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNpeTo"
@@ -700,12 +704,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type = "int"
                         placeholder="De"
                         id="filterNpeFinalFrom"
                         name="filterNpeFinalFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type = "int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNpeFinalTo"
@@ -721,12 +727,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type = "int"
                         placeholder="De"
                         id="filterGrpFrom"
                         name="filterGrpFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type = "int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterGrpTo"

@@ -538,6 +538,7 @@ export default function Listagem({
       if (columnCampos[index] === 'tecnologia') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: 'int',
             name: 'Tec_Gen',
             title: 'tecnologia',
             orderList,
@@ -825,12 +826,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="int"
                         placeholder="De"
                         id="filterGmrFrom"
                         name="filterGmrFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterGmrTo"
