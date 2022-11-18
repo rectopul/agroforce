@@ -895,6 +895,7 @@ export default function Listagem({
                     </label>
                     <div className="flex gap-2">
                       <Input
+                        type = "int"
                         placeholder="De"
                         id="filterPFrom"
                         name="filterPFrom"
@@ -902,6 +903,7 @@ export default function Listagem({
                         defaultValue={checkValue('filterPFrom')}
                       />
                       <Input
+                        type = "int"
                         placeholder="Até"
                         id="filterPTo"
                         name="filterPTo"

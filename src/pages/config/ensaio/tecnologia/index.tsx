@@ -604,7 +604,7 @@ export default function Listagem({
                       Cod Tec
                     </label>
                     <Input
-                      type="text"
+                      type="int"
                       placeholder="Cod. tecnologia"
                       max="40"
                       id="filterCode"

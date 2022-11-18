@@ -451,6 +451,7 @@ export default function Listagem({
       if (columnCampos[item] === 'tiros') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: "int",
             name: 'Tiros',
             title: 'tiros',
             orderList,
@@ -462,6 +463,7 @@ export default function Listagem({
       if (columnCampos[item] === 'disparos') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: "int",
             name: 'Disparos',
             title: 'disparos',
             orderList,
@@ -473,6 +475,7 @@ export default function Listagem({
       if (columnCampos[item] === 'parcelas') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: "int",
             name: 'Parcelas',
             title: 'parcelas',
             orderList,
@@ -838,6 +841,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type = "int"
                         placeholder="De"
                         id="filterPopFrom"
                         name="filterPopFrom"
@@ -861,12 +865,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type = "int"
                         placeholder="De"
                         id="filterShotsFrom"
                         name="filterShotsFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type = "int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterShotsTo"
@@ -882,12 +888,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type = "int"
                         placeholder="De"
                         id="filterParcelFrom"
                         name="filterParcelFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type = "int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterParcelTo"

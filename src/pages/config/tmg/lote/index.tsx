@@ -379,6 +379,7 @@ export default function Listagem({
       if (columnCampos[index] === "year") {
         tableFields.push(
           headerTableFactoryGlobal({
+            type="int",
             name: "Ano",
             title: "year",
             orderList,
@@ -390,6 +391,7 @@ export default function Listagem({
       if (columnCampos[index] === "cod_lote") {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: "int",
             name: 'Cod lote',
             title: 'cod_lote',
             orderList,
@@ -402,6 +404,7 @@ export default function Listagem({
         tableFields.push(
           headerTableFactoryGlobal({
             name: "NCC",
+            type: "int",
             title: "ncc",
             orderList,
             fieldOrder,
@@ -424,6 +427,7 @@ export default function Listagem({
         tableFields.push(
           headerTableFactoryGlobal({
             name: "Peso (kg)",
+            type: "int",
             title: "peso",
             orderList,
             fieldOrder,
@@ -435,6 +439,7 @@ export default function Listagem({
         tableFields.push(
           headerTableFactoryGlobal({
             name: 'Quant sementes',
+            type: "int",
             title: 'quant_sementes',
             orderList,
             fieldOrder,
@@ -468,6 +473,7 @@ export default function Listagem({
         tableFields.push(
           headerTableFactoryGlobal({
             name: "GMR",
+            type: "int",
             title: "genotipo.gmr",
             orderList,
             fieldOrder,
@@ -479,6 +485,7 @@ export default function Listagem({
       if (columnCampos[index] === "bgm") {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: "int",
             name: "BGM",
             title: "genotipo.bgm",
             orderList,
