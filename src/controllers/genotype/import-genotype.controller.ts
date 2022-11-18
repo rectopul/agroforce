@@ -267,8 +267,12 @@ export class ImportGenotypeController {
                     spreadSheet[0][column],
                   );
                 }
-                const { response }: IReturnObject = await safraController.getOne(idSafra);
-                if (Number(response?.year) !== Number(spreadSheet[row][column])) {
+                const { response }: IReturnObject = await safraController.getAll({
+                  id_culture: idCulture,
+                  filterSafra: String(spreadSheet[row][23]),
+                  filterStatus: 1,
+                });
+                if (Number(response[0]?.year) !== Number(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     row,
@@ -288,7 +292,8 @@ export class ImportGenotypeController {
                 } else {
                   const { response: safras }: IReturnObject = await safraController.getAll({
                     id_culture: idCulture,
-                    safraName: String(spreadSheet[row][column]),
+                    filterSafra: String(spreadSheet[row][column]),
+                    filterStatus: 1,
                   });
                   if (safras.length <= 0) {
                     if (safras?.safraName !== spreadSheet[row][column]) {

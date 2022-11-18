@@ -1,5 +1,3 @@
-import { sequenciaDelineamentoService } from 'src/services/sequencia-delineamento.service';
-import EventEmitter from 'events';
 import handleError from '../../shared/utils/handleError';
 import { ExperimentRepository } from '../../repository/experiment.repository';
 import { ReporteRepository } from '../../repository/reporte.repository';
@@ -210,7 +208,9 @@ export class ExperimentController {
         newItem.countNT = functionsUtils
           .countChildrenForSafra(item.assay_list.genotype_treatment, Number(options.idSafra));
         newItem.npeQT = item.countNT * item.repetitionsNumber;
-        newItem.seq_delineamento = item.delineamento.sequencia_delineamento.filter((x: any) => x.nt <= item.countNT && x.repeticao <= item.repetitionsNumber);
+        newItem.seq_delineamento = item.delineamento.sequencia_delineamento.filter(
+          (x: any) => x.nt <= item.countNT && x.repeticao <= item.repetitionsNumber,
+        );
         return newItem;
       });
       if (response.total <= 0) {
@@ -313,6 +313,7 @@ export class ExperimentController {
       if (!experimentExist) return { status: 404, message: 'Experimento não encontrado' };
       if (experimentExist?.status === 'PARCIALMENTE ALOCADO' || experimentExist?.status === 'TOTALMENTE  ALOCADO') return { status: 400, message: 'Não é possível deletar.' };
       const { status } = await experimentGenotipeController.deleteAll(data.id);
+
       if (status === 200) {
         const response = await this.experimentRepository.delete(Number(data.id));
         const {

@@ -115,4 +115,17 @@ export class PrintHistoryController {
       throw new Error('[Controller] - GetAll Histórico de impressão erro');
     }
   }
+
+  async deleteAll(idList: any) {
+    try {
+      const response = await this.printHistoryRepository.deleteMany(idList);
+      if (response) {
+        return { status: 200 };
+      }
+      return { status: 400 };
+    } catch (error: any) {
+      handleError('Histórico de impressão Controller', 'DeleteAll', error.message);
+      throw new Error('[Controller] - DeleteAll Histórico de impressão erro');
+    }
+  }
 }

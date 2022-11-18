@@ -136,7 +136,7 @@ export class ImportAssayListController {
                     (Number(column) + 1),
                     spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
-                    'o foco informado não existe no sistema',
+                    'informado não existe no sistema ou está inativo',
                   );
               }
             }
