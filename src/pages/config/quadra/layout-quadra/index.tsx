@@ -451,7 +451,6 @@ export default function Listagem({
       if (columnCampos[item] === 'tiros') {
         tableFields.push(
           headerTableFactoryGlobal({
-            type: "int",
             name: 'Tiros',
             title: 'tiros',
             orderList,
@@ -850,6 +849,7 @@ export default function Listagem({
                       />
                       <Input
                         style={{ marginLeft: 8 }}
+                        type = "number"
                         placeholder="Até"
                         id="filterPopTo"
                         name="filterPopTo"

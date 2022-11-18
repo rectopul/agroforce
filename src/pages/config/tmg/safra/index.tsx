@@ -434,7 +434,6 @@ export default function Listagem({
       if (columnCampos[index] === "year") {
         tableFields.push(
           headerTableFactoryGlobal({
-            type: "int",
             name: "Ano",
             title: "year",
             orderList,

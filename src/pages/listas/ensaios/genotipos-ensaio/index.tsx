@@ -1130,6 +1130,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type = 'number'
                         placeholder="Cód. Tecnologia"
                         id="filterCodTec"
                         name="filterCodTec"
@@ -1146,6 +1147,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type = 'number'
                         placeholder="Cód. GGEN"
                         id="filterGgenCod"
                         name="filterGgenCod"
@@ -1202,12 +1204,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type = 'number'
                         placeholder="De"
                         id="filterBgmFrom"
                         name="filterBgmFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type = 'number'
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterBgmTo"
@@ -1223,12 +1227,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type = 'number'
                         placeholder="De"
                         id="filterBgmGenotypeFrom"
                         name="filterBgmGenotypeFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type = 'number'
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterBgmGenotypeTo"
@@ -1274,12 +1280,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type = 'number'
                         placeholder="De"
                         id="filterNtFrom"
                         name="filterNtFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type = 'number'
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNtTo"
@@ -1403,12 +1411,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type = 'number'
                         placeholder="De"
                         id="filterNcaFrom"
                         name="filterNcaFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type = 'number'
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNcaTo"
