@@ -755,14 +755,14 @@ export default function Listagem({
                     </label>
                     <div className="flex gap-2">
                       <Input
-                        type = "int"
+                        type = "number"
                         placeholder="De"
                         id="filterYearFrom"
                         name="filterYearFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type = "int"
+                        type = "number"
                         placeholder="Até"
                         id="filterYearTo"
                         name="filterYearTo"

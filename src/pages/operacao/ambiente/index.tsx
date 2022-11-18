@@ -681,14 +681,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type = "int"
+                        type = "number"
                         placeholder="De"
                         id="filterNpeFrom"
                         name="filterNpeFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type = "int"
+                        type = "number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNpeTo"
@@ -704,14 +704,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type = "int"
+                        type = "number"
                         placeholder="De"
                         id="filterNpeFinalFrom"
                         name="filterNpeFinalFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type = "int"
+                        type = "number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNpeFinalTo"
@@ -727,14 +727,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type = "int"
+                        type = "number"
                         placeholder="De"
                         id="filterGrpFrom"
                         name="filterGrpFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type = "int"
+                        type = "number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterGrpTo"

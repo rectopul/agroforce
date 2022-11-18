@@ -841,7 +841,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type = "int"
+                        type = "number"
                         placeholder="De"
                         id="filterPopFrom"
                         name="filterPopFrom"
@@ -865,14 +865,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type = "int"
+                        type = "number"
                         placeholder="De"
                         id="filterShotsFrom"
                         name="filterShotsFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type = "int"
+                        type = "number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterShotsTo"
@@ -888,14 +888,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type = "int"
+                        type = "number"
                         placeholder="De"
                         id="filterParcelFrom"
                         name="filterParcelFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type = "int"
+                        type = "number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterParcelTo"
