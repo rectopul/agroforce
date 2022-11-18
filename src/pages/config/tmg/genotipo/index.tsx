@@ -1296,7 +1296,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   res,
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = (await itensPage ) ?? 10;
+  const itensPerPage = (await req.cookies.itensPerPage
+    ? req.cookies.itensPerPage: 10 );
 
   const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);

@@ -389,6 +389,7 @@ export default function Listagem({
                 setCookies("filterBeforeEditTypeOrder", typeOrder);
                 setCookies("filterBeforeEditOrderBy", orderBy);
                 setCookies("filtersParams", filtersParams);
+                setCookies('itensPage', itensPerPage);
                 setCookies("lastPage", "atualizar");
                 router.push(
                   `/config/tmg/safra/atualizar?id=${rowData.id}&currentPage=${currentPage}&${filtersParams}`
@@ -957,10 +958,14 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
+
+  const itensPage = req.cookies.itensPerPage
+    ? req.cookies.itensPerPage
+    : 10;
+
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page;
+  const itensPerPage = (await req.cookies.itensPerPage
+    ? req.cookies.itensPerPage: 10 );
 
   const { cultureId } = req.cookies;
 
@@ -973,6 +978,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies("filterBeforeEditTypeOrder", { req, res });
     removeCookies("filterBeforeEditOrderBy", { req, res });
     removeCookies("lastPage", { req, res });
+    removeCookies('itensPage', { req, res });
   }
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit

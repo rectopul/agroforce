@@ -372,6 +372,7 @@ export default function Listagem({
                       setCookies("filterBeforeEditOrderBy", orderBy);
                       setCookies("filtersParams", filtersParams);
                       setCookies("lastPage", "sequencia-delineamento");
+                      setCookies('itensPage', itensPerPage);
                       router.push(
                         `delineamento/sequencia-delineamento?id_delineamento=${rowData.id}`
                       );
@@ -997,10 +998,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   res,
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage =
-    (await (
-      await PreferencesControllers.getConfigGerais()
-    )?.response[0]?.itens_per_page) ?? 15;
+  const itensPerPage = (await req.cookies.itensPerPage
+    ? req.cookies.itensPerPage: 10 );
 
   const { cultureId } = req.cookies;
 
@@ -1013,7 +1012,13 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies("filterBeforeEditTypeOrder", { req, res });
     removeCookies("filterBeforeEditOrderBy", { req, res });
     removeCookies("lastPage", { req, res });
+    removeCookies('itensPage', { req, res });
   }
+
+
+  const itensPage = req.cookies.itensPerPage
+    ? req.cookies.itensPerPage
+    : 10;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
