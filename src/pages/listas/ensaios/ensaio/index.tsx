@@ -762,7 +762,6 @@ export default function TipoEnsaio({
                       <Input
                         style={{ marginLeft: 8 }}
                         type="number"
-                        type={''}
                         placeholder="Até"
                         id="filterTratTo"
                         name="filterTratTo"
