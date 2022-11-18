@@ -128,6 +128,7 @@ export class ImportAssayListController {
               const { response }: IReturnObject = await focoController.getAll({
                 name: spreadSheet[row][column],
                 id_culture: idCulture,
+                filterStatus: 1,
               });
               if (response?.length === 0) {
                 responseIfError[Number(column)]
@@ -152,6 +153,7 @@ export class ImportAssayListController {
               const { response }: IReturnObject = await typeAssayController.getAll({
                 filterName: spreadSheet[row][column],
                 id_culture: idCulture,
+                filterStatus: 1,
               });
               if (response?.length === 0) {
                 responseIfError[Number(column)]
