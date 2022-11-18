@@ -1017,7 +1017,20 @@ export default function Listagem({
 
                   {filterFieldFactory('filterMainName', 'Nome principal')}
 
-                  {filterFieldFactory('filterTecnologiaCod', 'Cod Tec')}
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                    Cod Tec
+                    </label>
+                    <div className="flex">
+                      <Input
+                        type = "number"
+                        placeholder="Cod Tec"
+                        id="filterCodTecnologia"
+                        name="filterCodTecnologia"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   {filterFieldFactory(
                     'filterTecnologiaDesc',
@@ -1035,8 +1048,35 @@ export default function Listagem({
                 >
                   {filterFieldFactory('filterCruza', 'Cruzamento de Origem')}
 
-                  {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
-                  {filterLotRange('filterLots', 'Nº Lotes')}
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                    Faixa de GMR
+                    </label>
+                    <div className="flex">
+                      <Input
+                        type = "number"
+                        placeholder="Faixa de GMR"
+                        id="filterGmrRange"
+                        name="filterGmrRange"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                    Nº Lotes
+                    </label>
+                    <div className="flex">
+                      <Input
+                        type = "number"
+                        placeholder="Nº Lotes"
+                        id="filterLots"
+                        name="filterLots"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 

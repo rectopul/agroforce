@@ -661,7 +661,22 @@ export default function Listagem({
 
                   {filterFieldFactory('filterEnsaio', 'Ensaio')}
 
-                  {filterFieldFactory('filterCodTecnologia', 'Cod Tec')}
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                    Cod Tec
+                    </label>
+                    <div className="flex">
+                      <Input
+                        type = "number"
+                        placeholder="Cod Tec"
+                        id="filterCodTec"
+                        name="filterCodTec"
+                        onChange={formik.handleChange}
+                      />
+                      />
+                    </div>
+                  </div>
+                </div>
 
                   {filterFieldFactory('filterTecnologia', 'Tecnologia')}
                 </div>
@@ -673,7 +688,21 @@ export default function Listagem({
                   pt-8
                 "
                 >
-                  {filterFieldFactory('filterEpoca', 'Época')}
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                    Época
+                    </label>
+                    <div className="flex">
+                      <Input
+                        type = "number"
+                        placeholder="Época"
+                        id="filterPeriod"
+                        name="filterPeriod"
+                        onChange={formik.handleChange}
+                      />
+                      />
+                    </div>
+                  </div>
 
                   <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">

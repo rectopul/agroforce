@@ -812,7 +812,19 @@ export default function TipoEnsaio({
                     />
                   </div>
 
-                  {filterFieldFactorySeeds('Quant de sementes por envelope')}
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                    Quant de sementes por envelope
+                    </label>
+                    <Input
+                      type="number"
+                      placeholder="Quant de sementes por envelope"
+                      id="envelope"
+                      name="envelope"
+                      defaultValue={checkValue('filterName')}
+                      onChange={formik.handleChange}
+                    />
+                  </div>
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
