@@ -28,7 +28,7 @@ spec:
           - name: COPYMOD
             value: "tmgdns-qa"
           - name: MAX_DIRECT_UPLOAD_ALLOWED
-            value: "10"
+            value: "500"
           - name: REDIS_URL
             value: "redis://localhost:6379"
 
