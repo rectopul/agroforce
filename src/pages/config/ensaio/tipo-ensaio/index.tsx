@@ -812,7 +812,19 @@ export default function TipoEnsaio({
                     />
                   </div>
 
-                  {filterFieldFactorySeeds('Quant de sementes por envelope')}
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                    Quant de sementes por envelope
+                    </label>
+                    <Input
+                      type="number"
+                      placeholder="Quant de sementes por envelope"
+                      id="envelope"
+                      name="envelope"
+                      defaultValue={checkValue('filterName')}
+                      onChange={formik.handleChange}
+                    />
+                  </div>
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
@@ -1027,9 +1039,8 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   // eslint-disable-next-line max-len
 
-  const itensPerPage = await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page;
+  const itensPerPage = (await req.cookies.itensPerPage
+    ? req.cookies.itensPerPage: 10 );
 
   const { token } = req.cookies;
   const idCulture = req.cookies.cultureId;
@@ -1048,7 +1059,13 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('itensPage', { req, res });
   }
+
+
+  const itensPage = req.cookies.itensPerPage
+    ? req.cookies.itensPerPage
+    : 10;
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit

@@ -415,11 +415,17 @@ export class ExperimentGenotipeController {
 
   async deleteAll(idExperiment: number) {
     try {
-      const response = await this.ExperimentGenotipeRepository.deleteAll(Number(idExperiment));
-      if (response) {
-        return { status: 200, message: 'Parcelas excluídos' };
+      const { response: parcelas }: any = await this.getAll(idExperiment);
+      const toDelete = parcelas.map((item: any) => item.id);
+      const { status } = await this.printedHistoryController.deleteAll(toDelete);
+      if (status === 200) {
+        const response = await this.ExperimentGenotipeRepository.deleteAll(Number(idExperiment));
+        if (response) {
+          return { status: 200, message: 'Parcelas excluídos' };
+        }
+        return { status: 400, message: 'Parcelas não excluídos' };
       }
-      return { status: 400, message: 'Parcelas não excluídos' };
+      return { status: 400, message: 'Histórico de importação não excluídos' };
     } catch (error: any) {
       handleError('Parcelas controller', 'DeleteAll', error.message);
       throw new Error('[Controller] - DeleteAll Parcelas erro');

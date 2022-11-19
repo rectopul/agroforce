@@ -456,6 +456,7 @@ export default function Listagem({
                 setCookies('filterBeforeEditTypeOrder', typeOrder);
                 setCookies('filterBeforeEditOrderBy', orderBy);
                 setCookies('filtersParams', filtersParams);
+                setCookies('itensPage', itensPerPage);
                 setCookies('lastPage', 'atualizar');
                 router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`);
               }}
@@ -512,7 +513,7 @@ export default function Listagem({
       if (columnCampos[index] === 'tecnologia') {
         tableFields.push(
           headerTableFactoryGlobal({
-            type: "int",
+            type: 'int',
             name: 'Tecnologia',
             title: 'tecnologia.cod_tec',
             orderList,
@@ -540,7 +541,7 @@ export default function Listagem({
       if (columnCampos[index] === 'gmr') {
         tableFields.push(
           headerTableFactoryGlobal({
-            type: "int",
+            type: 'int',
             name: 'GMR',
             title: 'gmr',
             orderList,
@@ -553,7 +554,7 @@ export default function Listagem({
       if (columnCampos[index] === 'numberLotes') {
         tableFields.push(
           headerTableFactoryGlobal({
-            type: "int",
+            type: 'int',
             name: 'Nº Lotes',
             title: 'numberLotes',
             orderList,
@@ -1017,7 +1018,20 @@ export default function Listagem({
 
                   {filterFieldFactory('filterMainName', 'Nome principal')}
 
-                  {filterFieldFactory('filterTecnologiaCod', 'Cod Tec')}
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                    Cod Tec
+                    </label>
+                    <div className="flex">
+                      <Input
+                        type = "number"
+                        placeholder="Cod Tec"
+                        id="filterCodTecnologia"
+                        name="filterCodTecnologia"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   {filterFieldFactory(
                     'filterTecnologiaDesc',
@@ -1035,8 +1049,35 @@ export default function Listagem({
                 >
                   {filterFieldFactory('filterCruza', 'Cruzamento de Origem')}
 
-                  {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
-                  {filterLotRange('filterLots', 'Nº Lotes')}
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                    Faixa de GMR
+                    </label>
+                    <div className="flex">
+                      <Input
+                        type = "number"
+                        placeholder="Faixa de GMR"
+                        id="filterGmrRange"
+                        name="filterGmrRange"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                    Nº Lotes
+                    </label>
+                    <div className="flex">
+                      <Input
+                        type = "number"
+                        placeholder="Nº Lotes"
+                        id="filterLots"
+                        name="filterLots"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
@@ -1255,9 +1296,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   res,
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) ?? 10;
+  const itensPerPage = (await req.cookies.itensPerPage
+    ? req.cookies.itensPerPage: 10 );
 
   const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);
@@ -1273,8 +1313,13 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('filtersParams', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('itensPage', { req, res });
     // setCookies('filterParams','');
   }
+
+  const itensPage = req.cookies.itensPerPage
+    ? req.cookies.itensPerPage
+    : 10;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
