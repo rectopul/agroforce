@@ -389,6 +389,7 @@ export default function Listagem({
                 setCookies("filterBeforeEditTypeOrder", typeOrder);
                 setCookies("filterBeforeEditOrderBy", orderBy);
                 setCookies("filtersParams", filtersParams);
+                setCookies('itensPage', itensPerPage);
                 setCookies("lastPage", "atualizar");
                 router.push(
                   `/config/tmg/safra/atualizar?id=${rowData.id}&currentPage=${currentPage}&${filtersParams}`
@@ -434,7 +435,6 @@ export default function Listagem({
       if (columnCampos[index] === "year") {
         tableFields.push(
           headerTableFactoryGlobal({
-            type: "int",
             name: "Ano",
             title: "year",
             orderList,
@@ -686,7 +686,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type = "int"
+                        type = "number"
                         placeholder="De"
                         id="filterYearFrom"
                         name="filterYearFrom"
@@ -694,7 +694,7 @@ export default function Listagem({
                       />
                       <Input
                         style={{ marginLeft: 8 }}
-                        type = "int"
+                        type = "number"
                         placeholder="Até"
                         id="filterYearTo"
                         name="filterYearTo"
@@ -958,10 +958,14 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
+
+  const itensPage = req.cookies.itensPerPage
+    ? req.cookies.itensPerPage
+    : 10;
+
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page;
+  const itensPerPage = (await req.cookies.itensPerPage
+    ? req.cookies.itensPerPage: 10 );
 
   const { cultureId } = req.cookies;
 
@@ -974,6 +978,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies("filterBeforeEditTypeOrder", { req, res });
     removeCookies("filterBeforeEditOrderBy", { req, res });
     removeCookies("lastPage", { req, res });
+    removeCookies('itensPage', { req, res });
   }
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit

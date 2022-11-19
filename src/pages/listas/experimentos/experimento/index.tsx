@@ -479,6 +479,7 @@ export default function Listagem({
                 setCookies('filterBeforeEditOrderBy', orderBy);
                 setCookies('filtersParams', filtersParams);
                 setCookies('lastPage', 'atualizar');
+                setCookies('itensPage', itensPerPage);
                 router.push(
                   `/listas/experimentos/experimento/atualizar?id=${rowData.id}`,
                 );
@@ -884,7 +885,21 @@ export default function Listagem({
                     'filterExperimentName',
                     'Nome Experimento',
                   )}
-                  {filterFieldFactory('filterCod', 'Cod Tec')}
+
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Cod Tec
+                    </label>
+                    <div className="flex">
+                      <Input
+                        type="number"
+                        placeholder="Cod Tec"
+                        id="filterCodTec"
+                        name="filterCodTec"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div
@@ -895,7 +910,22 @@ export default function Listagem({
                                         "
                 >
                   {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
-                  {filterFieldFactory('filterPeriod', 'Época')}
+
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Época
+                    </label>
+                    <div className="flex">
+                      <Input
+                        type="number"
+                        placeholder="Época"
+                        id="filterPeriod"
+                        name="filterPeriod"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
                   {filterFieldFactory('filterDelineamento', 'Delineamento')}
 
                   <div className="h-6 w-1/2 ml-2">
@@ -904,7 +934,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type = "int"
+                        type="number"
                         placeholder="De"
                         id="filterRepetitionFrom"
                         name="filterRepetitionFrom"
@@ -912,7 +942,7 @@ export default function Listagem({
                       />
                       <Input
                         style={{ marginLeft: 8 }}
-                        type = "int"
+                        type="number"
                         placeholder="Até"
                         id="filterRepetitionTo"
                         name="filterRepetitionTo"
@@ -1197,9 +1227,8 @@ export const getServerSideProps: GetServerSideProps = async ({
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) ?? 10;
+  const itensPerPage = (await req.cookies.itensPerPage
+    ? req.cookies.itensPerPage : 10);
 
   const { token } = req.cookies;
   const { cultureId } = req.cookies;
@@ -1218,7 +1247,12 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('itensPage', { req, res });
   }
+
+  const itensPage = req.cookies.itensPerPage
+    ? req.cookies.itensPerPage
+    : 10;
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit

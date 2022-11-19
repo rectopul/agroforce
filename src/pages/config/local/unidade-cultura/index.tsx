@@ -62,7 +62,6 @@ interface IUnityCultureProps {
 
 interface IFilter {
   filterNameUnityCulture: string | any;
-  filterYear: string | any;
   filterYearFrom: string | number;
   filterYearTo: string | number;
   filterNameLocalCulture: string | any;
@@ -222,7 +221,6 @@ export default function Listagem({
   const formik = useFormik<IFilter>({
     initialValues: {
       filterNameUnityCulture: checkValue('filterNameUnityCulture'),
-      filterYear: checkValue('filterYear'),
       filterYearTo: checkValue('filterYearTo'),
       filterYearFrom: checkValue('filterYearFrom'),
       filterNameLocalCulture: checkValue('filterNameLocalCulture'),
@@ -237,7 +235,6 @@ export default function Listagem({
     },
     onSubmit: async ({
       filterNameUnityCulture,
-      filterYear,
       filterYearTo,
       filterYearFrom,
       filterNameLocalCulture,
@@ -248,7 +245,7 @@ export default function Listagem({
       filterLabelRegion,
       filterNameLocality,
     }) => {
-      const parametersFilter = `&filterNameUnityCulture=${filterNameUnityCulture}&filterYear=${filterYear}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&id_safra=${idSafra}`;
+      const parametersFilter = `&filterNameUnityCulture=${filterNameUnityCulture}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&id_safra=${idSafra}`;
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEdit', filtersParams);
       //   await unidadeCulturaService
@@ -755,14 +752,14 @@ export default function Listagem({
                     </label>
                     <div className="flex gap-2">
                       <Input
-                        type = "int"
+                        type = "number"
                         placeholder="De"
                         id="filterYearFrom"
                         name="filterYearFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type = "int"
+                        type = "number"
                         placeholder="Até"
                         id="filterYearTo"
                         name="filterYearTo"

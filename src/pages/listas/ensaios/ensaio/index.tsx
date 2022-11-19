@@ -344,6 +344,7 @@ export default function TipoEnsaio({
                 setCookies('filterBeforeEditOrderBy', orderBy);
                 setCookies('filtersParams', filtersParams);
                 setCookies('lastPage', 'atualizar');
+                setCookies('itensPage', itensPerPage);
                 router.push(
                   `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`,
                 );
@@ -753,7 +754,7 @@ export default function TipoEnsaio({
                     </label>
                     <div className="flex">
                       <Input
-                        type="int"
+                        type="number"
                         placeholder="De"
                         id="filterTratFrom"
                         name="filterTratFrom"
@@ -761,7 +762,7 @@ export default function TipoEnsaio({
                       />
                       <Input
                         style={{ marginLeft: 8 }}
-                        type="int"
+                        type="number"
                         placeholder="Até"
                         id="filterTratTo"
                         name="filterTratTo"
@@ -980,9 +981,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   res,
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page;
+  const itensPerPage = (await req.cookies.itensPerPage
+    ? req.cookies.itensPerPage: 10 );
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
@@ -1006,7 +1006,12 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('itensPage', { req, res });
   }
+
+  const itensPage = req.cookies.itensPerPage
+  ? req.cookies.itensPerPage
+  : 10;
 
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder

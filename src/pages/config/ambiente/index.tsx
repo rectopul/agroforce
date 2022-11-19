@@ -362,6 +362,7 @@ export default function Listagem({
                 setCookies('filterBeforeEditOrderBy', orderBy);
                 setCookies('filtersParams', filtersParams);
                 setCookies('lastPage', 'atualizar');
+                setCookies('itensPage', itensPerPage);
                 router.push(`/config/ambiente/atualizar?id=${rowData.id}`);
               }}
             />
@@ -486,7 +487,6 @@ export default function Listagem({
       if (columnCampos[item] === 'tecnologia') {
         tableFields.push(
           headerTableFactoryGlobal({
-            type: "int",
             name: 'Tecnologia',
             title: 'tecnologia.cod_tec',
             orderList,
@@ -515,7 +515,6 @@ export default function Listagem({
       if (columnCampos[item] === 'npei') {
         tableFields.push(
           headerTableFactoryGlobal({
-            type: "int",
             name: 'NPE Inicial',
             title: 'npei',
             orderList,
@@ -887,13 +886,39 @@ export default function Listagem({
 
                   {filterFieldFactory('filterEnsaio', 'Ensaio')}
 
-                  {filterFieldFactory('filterCodTecnologia', 'Cod Tec')}
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                    Cod Tec
+                    </label>
+                    <div className="flex">
+                      <Input
+                        type = "number"
+                        placeholder="Cod Tec"
+                        id="filterCodTecnologia"
+                        name="filterCodTecnologia"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   {filterFieldFactory('filterTecnologia', 'Nome Tec')}
 
                   {filterFieldFactory('filterLocal', 'Lugar cultura')}
 
-                  {filterFieldFactory('filterEpoca', 'Época')}
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                    Época
+                    </label>
+                    <div className="flex">
+                      <Input
+                        type = "number"
+                        placeholder="Época"
+                        id="filterEpoca"
+                        name="filterEpoca"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -902,6 +927,7 @@ export default function Listagem({
                     <div className="flex">
                       <Input
                         placeholder="De"
+                        type = "number"
                         id="filterNpeFrom"
                         name="filterNpeFrom"
                         onChange={formik.handleChange}
@@ -910,6 +936,7 @@ export default function Listagem({
                       <Input
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
+                        type = "number"
                         id="filterNpeTo"
                         name="filterNpeTo"
                         defaultValue={checkValue('filterNpeTo')}
@@ -925,6 +952,7 @@ export default function Listagem({
                     <div className="flex">
                       <Input
                         placeholder="De"
+                        type = "number"
                         id="filterNpeFinalFrom"
                         name="filterNpeFinalFrom"
                         onChange={formik.handleChange}
@@ -932,6 +960,7 @@ export default function Listagem({
                       <Input
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
+                        type = "number"
                         id="filterNpeFinalTo"
                         name="filterNpeFinalTo"
                         onChange={formik.handleChange}
@@ -1159,9 +1188,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   res,
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) || 10;
+  const itensPerPage = (await req.cookies.itensPerPage
+    ? req.cookies.itensPerPage: 10 );
 
   const { safraId } = req.cookies;
   const idCulture = req.cookies.cultureId;
@@ -1176,9 +1204,15 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('itensPage', { req, res });
   }
 
   // RR
+
+  const itensPage = req.cookies.itensPerPage
+    ? req.cookies.itensPerPage
+    : 10;
+
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
     : '';
