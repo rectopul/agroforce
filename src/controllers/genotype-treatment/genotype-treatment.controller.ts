@@ -21,8 +21,9 @@ export class GenotypeTreatmentController {
         if (options.filterBgmFrom && options.filterBgmTo) {
           if (options.filterNcaFrom === 'vazio' || options.filterNcaTo === 'vazio') {
             parameters.nca = null;
-          } else if
-          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"gte": ${Number(options.filterBgmFrom)}, "lte": ${Number(options.filterBgmTo)} } } }`));
+          } else {
+            parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"gte": ${Number(options.filterBgmFrom)}, "lte": ${Number(options.filterBgmTo)} } } }`));
+          }
         } else if (options.filterBgmFrom) {
           parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"gte": ${Number(options.filterBgmFrom)} } } }`));
         } else if (options.filterBgmTo) {
