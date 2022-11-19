@@ -135,14 +135,7 @@ export class ImportGenotypeController {
                   row,
                   spreadSheet[0][column],
                 );
-              } else {
-                const genotipo: any = await genotipoController.getAll({
-                  id_dados_geno: spreadSheet[row][column],
-                });
-                if (genotipo.total > 0) {
-                  this.aux.id_dados_geno = genotipo.response[0]?.id_dados;
-                }
-              }
+              } 
             }
 
             if (configModule.response[0]?.fields[column] === 'Cultura') {
@@ -502,12 +495,18 @@ export class ImportGenotypeController {
 
               if (configModule.response[0]?.fields[column] === 'S1_DATA_ID') {
                 if (spreadSheet[row][column] !== null) {
-                  const geno: any = await genotipoController.getAll({
-                    id_culture: idCulture,
-                    id_dados: spreadSheet[row][column],
-                  });
-                  if (geno.total > 0) {
-                    this.aux.id_genotipo = geno.response[0]?.id;
+                  
+                  const genotypeId : string = String(spreadSheet[row][column]);
+                  const params = {id_dados: genotypeId, id_culture: idCulture};
+                  const select = { id: true, id_dados: true, name_genotipo: true };
+                  const take = undefined;
+                  const skip = undefined;
+                  const order =  undefined;
+              
+                  const genotypeList : any = await genotipoRepository.findAll(params,select,take,skip,order);
+
+                  if (genotypeList.total > 0) {
+                    this.aux.id_genotipo = genotypeList[0].id;
                   } else {
                     this.aux.id_genotipo = null;
                   }
@@ -701,7 +700,7 @@ export class ImportGenotypeController {
                 if (spreadSheet[row][column] !== null) {
                   this.aux.ncc = spreadSheet[row][column];
                 } else {
-                  this.aux.ncc = null;
+                  this.aux.ncc = 0;
                 }
               }
 
@@ -794,7 +793,7 @@ export class ImportGenotypeController {
                   this.aux.id_genotipo = await genotipo.id;
                 }
 
-                if (this.aux.id_genotipo && this.aux.ncc) {
+                if (this.aux.id_genotipo) {
                   if (this.aux.id_lote) {
                     await loteRepository.updateTransaction(this.aux.id_lote, {
                       id: Number(this.aux.id_lote),

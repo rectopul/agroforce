@@ -8,7 +8,7 @@ export class GenotipoRepository extends BaseRepository {
   }
 
   async findOne(id: number) {
-    const result = await prisma.genotipo.findUnique({
+    const result = await this.getPrisma().genotipo.findUnique({
       where: { id },
       select: {
         id: true,
@@ -40,7 +40,7 @@ export class GenotipoRepository extends BaseRepository {
   }
 
   async findOneByName(name: any) {
-    const result = await prisma.genotipo.findMany({
+    const result = await this.getPrisma().genotipo.findMany({
       where: { name_genotipo: name },
       select: {
         id: true,
@@ -86,9 +86,9 @@ export class GenotipoRepository extends BaseRepository {
       order = JSON.parse(orderBy);
     }
 
-    const count = await prisma.genotipo.count({ where });
+    const count = await this.getPrisma().genotipo.count({ where });
 
-    const result: object | any = await prisma.genotipo.findMany({
+    const result: object | any = await this.getPrisma().genotipo.findMany({
       select,
       skip,
       take,
