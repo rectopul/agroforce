@@ -11,6 +11,7 @@ export class FocoController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: foco.controller.ts ~ line 14 ~ FocoController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     try {

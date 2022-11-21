@@ -325,6 +325,8 @@ export default function Listagem({
   // }
 
   async function deleteItem(data: any) {
+    setLoading(true);
+
     const { status, message } = await npeService.deleted({
       id: data?.id,
       userId: userLogado.id,
@@ -332,6 +334,7 @@ export default function Listagem({
     if (status === 200) {
       // router.reload();
       handlePagination();
+      setLoading(false);
     } else {
       Swal.fire({
         html: message,
@@ -363,6 +366,7 @@ export default function Listagem({
                 setCookies('filtersParams', filtersParams);
                 setCookies('lastPage', 'atualizar');
                 setCookies('itensPage', itensPerPage);
+                setCookies('takeBeforeEdit', take);
                 router.push(`/config/ambiente/atualizar?id=${rowData.id}`);
               }}
             />
@@ -503,7 +507,7 @@ export default function Listagem({
       if (columnCampos[item] === 'epoca') {
         tableFields.push(
           headerTableFactoryGlobal({
-            type: "int",
+            type: 'int',
             name: 'Época',
             title: 'epoca',
             orderList,
@@ -526,7 +530,7 @@ export default function Listagem({
       if (columnCampos[item] === 'prox_npe') {
         tableFields.push(
           headerTableFactoryGlobal({
-            type: "int",
+            type: 'int',
             name: 'Prox NPE',
             title: 'prox_npe',
             orderList,
@@ -888,11 +892,11 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                    Cod Tec
+                      Cod Tec
                     </label>
                     <div className="flex">
                       <Input
-                        type = "number"
+                        type="number"
                         placeholder="Cod Tec"
                         id="filterCodTecnologia"
                         name="filterCodTecnologia"
@@ -907,11 +911,11 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                    Época
+                      Época
                     </label>
                     <div className="flex">
                       <Input
-                        type = "number"
+                        type="number"
                         placeholder="Época"
                         id="filterEpoca"
                         name="filterEpoca"
@@ -927,7 +931,7 @@ export default function Listagem({
                     <div className="flex">
                       <Input
                         placeholder="De"
-                        type = "number"
+                        type="number"
                         id="filterNpeFrom"
                         name="filterNpeFrom"
                         onChange={formik.handleChange}
@@ -936,7 +940,7 @@ export default function Listagem({
                       <Input
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
-                        type = "number"
+                        type="number"
                         id="filterNpeTo"
                         name="filterNpeTo"
                         defaultValue={checkValue('filterNpeTo')}
@@ -952,7 +956,7 @@ export default function Listagem({
                     <div className="flex">
                       <Input
                         placeholder="De"
-                        type = "number"
+                        type="number"
                         id="filterNpeFinalFrom"
                         name="filterNpeFinalFrom"
                         onChange={formik.handleChange}
@@ -960,7 +964,7 @@ export default function Listagem({
                       <Input
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
-                        type = "number"
+                        type="number"
                         id="filterNpeFinalTo"
                         name="filterNpeFinalTo"
                         onChange={formik.handleChange}
@@ -1187,10 +1191,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = (await req.cookies.itensPerPage
-    ? req.cookies.itensPerPage: 10 );
-
   const { safraId } = req.cookies;
   const idCulture = req.cookies.cultureId;
   const { token } = req.cookies;
@@ -1209,8 +1209,8 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   // RR
 
-  const itensPage = req.cookies.itensPerPage
-    ? req.cookies.itensPerPage
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
     : 10;
 
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
@@ -1237,6 +1237,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
   removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('takeBeforeEdit', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });
   removeCookies('lastPage', { req, res });
 

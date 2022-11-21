@@ -5,8 +5,9 @@
 /* eslint-disable no-restricted-syntax */
 
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
+import { AssayListRepository } from '../../repository/assay-list.repository';
+import { TransactionConfig } from '../../shared/prisma/transactionConfig';
 import handleError from '../../shared/utils/handleError';
-import { validateInteger } from '../../shared/utils/numberValidate';
 import { responseGenericFactory, responseNullFactory, responsePositiveNumericFactory } from '../../shared/utils/responseErrorFactory';
 import { validateHeaders } from '../../shared/utils/validateHeaders';
 import { CulturaController } from '../cultura.controller';
@@ -18,6 +19,7 @@ import { LoteController } from '../lote.controller';
 import { SafraController } from '../safra.controller';
 import { TecnologiaController } from '../technology/tecnologia.controller';
 import { TypeAssayController } from '../tipo-ensaio.controller';
+import { assayListQueue } from './assay-list-queue';
 import { AssayListController } from './assay-list.controller';
 
 export class ImportAssayListController {
@@ -37,7 +39,15 @@ export class ImportAssayListController {
     const assayListController = new AssayListController();
     const typeAssayController = new TypeAssayController();
     const tecnologiaController = new TecnologiaController();
-    const genotypeTreatmentController = new GenotypeTreatmentController();
+
+    /* --------- Transcation Context --------- */
+    const transactionConfig = new TransactionConfig();
+    const assayListRepository = new AssayListRepository();
+    assayListRepository.setTransaction(
+      transactionConfig.clientManager,
+      transactionConfig.transactionScope,
+    );
+    /* --------------------------------------- */
 
     const responseIfError: any = [];
     const headers = [
@@ -55,11 +65,30 @@ export class ImportAssayListController {
       'NCA',
       'OBS',
     ];
+
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
-        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
+        await logImportController.update({
+          id: idLog,
+          status: 1,
+          state: 'INVALIDA',
+        });
         return { status: 400, message: validate };
+      }
+
+      if ((spreadSheet.length > Number(process.env.MAX_DIRECT_UPLOAD_ALLOWED))
+            && !queueProcessing) {
+        assayListQueue.add({
+          instance: {
+            spreadSheet, idSafra, idCulture, created_by: createdBy,
+          },
+          logId: idLog,
+        });
+        return {
+          status: 400,
+          message: 'Os dados são validados e carregados em background',
+        };
       }
       for (const count in spreadSheet) {
         spreadSheet[count].push(Number(count));
@@ -363,112 +392,18 @@ export class ImportAssayListController {
       }
 
       if (responseIfError.length === 0) {
-        let productivity: number = 0;
-        let advance: number = 0;
-        let register: number = 0;
-        let verifyToDelete: boolean = false;
-        try {
-          for (const row in spreadSheet) {
-            if (row !== '0') {
-              const { response: typeAssay }: IReturnObject = await typeAssayController.getAll({
-                filterName: spreadSheet[row][3],
-              });
-              const { response: foco }: IReturnObject = await focoController.getAll(
-                { name: spreadSheet[row][2], id_culture: idCulture },
-              );
-              const { response: technology }: IReturnObject = await tecnologiaController.getAll({
-                cod_tec: String(spreadSheet[row][5]),
-                id_culture: idCulture,
-              });
-              const { response: genotype }: IReturnObject = await genotipoController.getAll({
-                filterGenotipo: spreadSheet[row][10],
-                id_culture: idCulture,
-
-              });
-
-              const { response: lote }: IReturnObject = await loteController.getAll({
-                filterNcc: spreadSheet[row][11] || '0',
-              });
-
-              const { response: assayList }: IReturnObject = await assayListController.getAll({
-                filterGli: spreadSheet[row][4],
-                id_safra: idSafra,
-              });
-              let savedAssayList: any;
-              if (assayList.length === 0) {
-                savedAssayList = await assayListController.create({
-                  id_safra: idSafra,
-                  id_foco: foco[0]?.id,
-                  id_type_assay: typeAssay[0]?.id,
-                  id_tecnologia: technology[0]?.id,
-                  gli: spreadSheet[row][4],
-                  bgm: (spreadSheet[row][6]) ? Number(spreadSheet[row][6]) : null,
-                  project: String(spreadSheet[row][7]),
-                  created_by: createdBy,
-                });
-                await genotypeTreatmentController.create({
-                  id_safra: idSafra,
-                  id_assay_list: savedAssayList.response?.id,
-                  id_genotipo: genotype[0]?.id,
-                  id_lote: lote[0]?.id,
-                  treatments_number: spreadSheet[row][8],
-                  status: spreadSheet[row][9],
-                  comments: spreadSheet[row][12] || '',
-                  created_by: createdBy,
-                });
-              } else {
-                if (Number(spreadSheet[row][8]) === 1) {
-                  verifyToDelete = true;
-                }
-                savedAssayList = await assayListController.update({
-                  id: assayList[0]?.id,
-                  id_safra: idSafra,
-                  id_foco: foco[0]?.id,
-                  id_type_assay: typeAssay[0]?.id,
-                  id_tecnologia: technology[0]?.id,
-                  gli: spreadSheet[row][4],
-                  bgm: (spreadSheet[row][6]) ? Number(spreadSheet[row][6]) : null,
-                  project: String(spreadSheet[row][7]),
-                  created_by: createdBy,
-                });
-                if (verifyToDelete) {
-                  await genotypeTreatmentController.deleteAll(Number(savedAssayList.response?.id));
-                  verifyToDelete = false;
-                }
-                await genotypeTreatmentController.create({
-                  id_safra: idSafra,
-                  id_assay_list: savedAssayList.response?.id,
-                  id_genotipo: genotype[0]?.id,
-                  id_lote: lote[0]?.id,
-                  treatments_number: spreadSheet[row][8],
-                  comments: spreadSheet[row][12] || '',
-                  status: spreadSheet[row][9],
-                  created_by: createdBy,
-                });
-              }
-              if (savedAssayList.status === 200) {
-                if (spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]) {
-                  if (spreadSheet[row][0] === 'PRODUTIVIDADE') {
-                    productivity += 1;
-                  }
-                  if (spreadSheet[row][0] === 'AVANÇO') {
-                    advance += 1;
-                  }
-                  register += 1;
-                }
-              }
-            }
-          }
-          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
-          return { status: 200, message: `Ensaios importados (${String(register)}). Produtividade x Avanço (${String(productivity)} x ${String(advance)}) ` };
-        } catch (error: any) {
-          await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
-          handleError('Lista de ensaio controller', 'Save Import', error.message);
-          return { status: 500, message: 'Erro ao salvar planilha de Lista de ensaio' };
-        }
+        return this.storeRecords(idLog, {
+          spreadSheet, idSafra, idCulture, created_by: createdBy,
+        });
       }
-      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
+
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
+      await logImportController.update({
+        id: idLog,
+        status: 1,
+        state: 'INVALIDA',
+        invalid_data: responseStringError,
+      });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
       await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
@@ -478,23 +413,124 @@ export class ImportAssayListController {
   }
 
   private static orderByGLI(ordenanteSpreadSheet: any) {
-    function orderGLI(item: any, next: any) {
-      if (item[4] === next[4]) {
-        return 0;
-      }
-
-      return (item[4] < next[4]) ? -1 : 1;
-    }
-    function orderNt(item: any, next: any) {
-      if (item[8] === next[8]) {
-        return 0;
-      }
-
-      return (item[8] < next[8]) ? -1 : 1;
-    }
-
-    // ordenanteSpreadSheet.sort(orderGLI || orderNt);
     ordenanteSpreadSheet.sort((a: any, b: any) => a[4].localeCompare(b[4]) || a[8] - b[8]);
     return ordenanteSpreadSheet;
+  }
+
+  static async storeRecords(idLog: number, {
+    spreadSheet, idSafra, idCulture, created_by: createdBy,
+  }: ImportValidate) {
+    const typeAssayController = new TypeAssayController();
+    const focoController = new FocoController();
+    const tecnologiaController = new TecnologiaController();
+    const genotipoController = new GenotipoController();
+    const loteController = new LoteController();
+    const assayListController = new AssayListController();
+    const genotypeTreatmentController = new GenotypeTreatmentController();
+    const logImportController = new LogImportController();
+
+    let productivity: number = 0;
+    let advance: number = 0;
+    let register: number = 0;
+    let verifyToDelete: boolean = false;
+    try {
+      for (const row in spreadSheet) {
+        if (row !== '0') {
+          const { response: typeAssay }: IReturnObject = await typeAssayController.getAll({
+            filterName: spreadSheet[row][3],
+          });
+          const { response: foco }: IReturnObject = await focoController.getAll(
+            { name: spreadSheet[row][2], id_culture: idCulture },
+          );
+          const { response: technology }: IReturnObject = await tecnologiaController.getAll({
+            cod_tec: String(spreadSheet[row][5]),
+            id_culture: idCulture,
+          });
+          const { response: genotype }: IReturnObject = await genotipoController.getAll({
+            filterGenotipo: spreadSheet[row][10],
+            id_culture: idCulture,
+
+          });
+
+          const { response: lote }: IReturnObject = await loteController.getAll({
+            filterNcc: spreadSheet[row][11] || '0',
+          });
+
+          const { response: assayList }: IReturnObject = await assayListController.getAll({
+            filterGli: spreadSheet[row][4],
+            id_safra: idSafra,
+          });
+          let savedAssayList: any;
+          if (assayList.length === 0) {
+            savedAssayList = await assayListController.create({
+              id_safra: idSafra,
+              id_foco: foco[0]?.id,
+              id_type_assay: typeAssay[0]?.id,
+              id_tecnologia: technology[0]?.id,
+              gli: spreadSheet[row][4],
+              bgm: (spreadSheet[row][6]) ? Number(spreadSheet[row][6]) : null,
+              project: String(spreadSheet[row][7]),
+              created_by: createdBy,
+            });
+            await genotypeTreatmentController.create({
+              id_safra: idSafra,
+              id_assay_list: savedAssayList.response?.id,
+              id_genotipo: genotype[0]?.id,
+              id_lote: lote[0]?.id,
+              treatments_number: spreadSheet[row][8],
+              status: spreadSheet[row][9],
+              comments: spreadSheet[row][12] || '',
+              created_by: createdBy,
+            });
+          } else {
+            if (Number(spreadSheet[row][8]) === 1) {
+              verifyToDelete = true;
+            }
+            savedAssayList = await assayListController.update({
+              id: assayList[0]?.id,
+              id_safra: idSafra,
+              id_foco: foco[0]?.id,
+              id_type_assay: typeAssay[0]?.id,
+              id_tecnologia: technology[0]?.id,
+              gli: spreadSheet[row][4],
+              bgm: (spreadSheet[row][6]) ? Number(spreadSheet[row][6]) : null,
+              project: String(spreadSheet[row][7]),
+              created_by: createdBy,
+            });
+            if (verifyToDelete) {
+              await genotypeTreatmentController.deleteAll(Number(savedAssayList.response?.id));
+              verifyToDelete = false;
+            }
+            await genotypeTreatmentController.create({
+              id_safra: idSafra,
+              id_assay_list: savedAssayList.response?.id,
+              id_genotipo: genotype[0]?.id,
+              id_lote: lote[0]?.id,
+              treatments_number: spreadSheet[row][8],
+              comments: spreadSheet[row][12] || '',
+              status: spreadSheet[row][9],
+              created_by: createdBy,
+            });
+          }
+          if (savedAssayList.status === 200) {
+            if (spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]) {
+              if (spreadSheet[row][0] === 'PRODUTIVIDADE') {
+                productivity += 1;
+              }
+              if (spreadSheet[row][0] === 'AVANÇO') {
+                advance += 1;
+              }
+              register += 1;
+            }
+          }
+        }
+      }
+      await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
+      return { status: 200, message: `Ensaios importados (${String(register)}). Produtividade x Avanço (${String(productivity)} x ${String(advance)}) ` };
+    } catch (error: any) {
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+      handleError('Lista de ensaio controller', 'Save Import', error.message);
+      return { status: 500, message: 'Erro ao salvar planilha de Lista de ensaio' };
+    }
   }
 }

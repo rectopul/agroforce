@@ -386,6 +386,7 @@ export default function Listagem({
                   setCookies('filterBeforeEditOrderBy', orderBy);
                   setCookies('filtersParams', filtersParams);
                   setCookies('lastPage', 'atualizar');
+                  setCookies('takeBeforeEdit', take);
                   router.push(`/config/ensaio/foco/atualizar?id=${rowData.id}`);
                 }}
                 bgColor="bg-blue-600"
@@ -899,11 +900,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  // eslint-disable-next-line max-len
-  const itensPerPage = (await req.cookies.itensPerPage
-    ? req.cookies.itensPerPage: 10 );
-
   const { token } = req.cookies;
   const { safraId } = req.cookies;
   const { cultureId } = req.cookies;
@@ -920,8 +916,8 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('itensPage', { req, res });
   }
 
-  const itensPage = req.cookies.itensPerPage
-    ? req.cookies.itensPerPage
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
     : 10;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
@@ -952,6 +948,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
   removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('takeBeforeEdit', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });
   removeCookies('lastPage', { req, res });
 

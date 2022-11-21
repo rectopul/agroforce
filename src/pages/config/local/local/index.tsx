@@ -350,6 +350,7 @@ export default function Listagem({
                 setCookies('filterBeforeEditOrderBy', orderBy);
                 setCookies('filtersParams', filtersParams);
                 setCookies('lastPage', 'atualizar');
+                setCookies('takeBeforeEdit', take);
                 setCookies('itensPage', itensPerPage);
                 router.push(`/config/local/local/atualizar?id=${rowData.id}`);
               }}
@@ -970,11 +971,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const userPreferenceController = new UserPreferenceController();
-  // eslint-disable-next-line max-len
-  const itensPerPage = (await req.cookies.itensPerPage
-    ? req.cookies.itensPerPage: 10 );
-
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
@@ -994,10 +990,10 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('itensPage', { req, res });
   }
 
-  const itensPage = req.cookies.itensPerPage
-    ? req.cookies.itensPerPage
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
     : 10;
-    
+
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
@@ -1024,6 +1020,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
   removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('takeBeforeEdit', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });
   removeCookies('lastPage', { req, res });
 

@@ -150,13 +150,13 @@ export default function NovoLocal({
                   });
               } else {
                 Swal.fire(
-                  'Unable to update prox npe, prox npe entered is already consumed by experiment genotipe.',
+                  'Não foi possível atualizar o prox npe, o prox npe inserido já foi usado pela parcela.',
                 );
               }
             });
         } else {
           Swal.fire(
-            'Unable to update prox npe, prox npe entered is already consumed by another npe.',
+            'Não é possível atualizar o prox npe, o prox npe inserido já é consumido por outro npe.',
           );
         }
       });
