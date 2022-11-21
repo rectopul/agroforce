@@ -30,7 +30,7 @@ export function SelectMultiple({ data = [], values = [], onChange }) {
 
     let newValues = [];
 
-    if (check) {
+    if (check == true) {
       newValues = data;
     } else {
       newValues = [];
@@ -74,7 +74,7 @@ export function SelectMultiple({ data = [], values = [], onChange }) {
           }}
         >
           <button
-            type="button"
+            //type="button"
             className={classButtonItem}
             onClick={() => handleSelectAll(!checkAll)}
           >
