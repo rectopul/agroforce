@@ -236,28 +236,32 @@ export class ImportAssayListController {
                     spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                   );
-              } else if (isNaN(spreadSheet[row][column])) {
-                responseIfError[Number(column)] += responsePositiveNumericFactory(
-                  Number(column) + 1,
-                  spreadSheet[row][spreadSheet[row].length - 1],
-                  spreadSheet[0][column],
-                );
-              } else if (spreadSheet[row][column] < 10) {
-                // eslint-disable-next-line no-param-reassign
-                spreadSheet[row][column] = `0${spreadSheet[row][column]}`;
-              }
-              const { response }: IReturnObject = await tecnologiaController.getAll({
-                cod_tec: String(spreadSheet[row][column]),
-                id_culture: idCulture,
-              });
-              if (response?.length === 0) {
+              } else if ((spreadSheet[row][column]).toString().length > 2) {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
                     (Number(column) + 1),
-                    spreadSheet[row][spreadSheet[row].length - 1],
-                    spreadSheet[0][column],
-                    'a tecnologia informado não existe no sistema',
+                    row,
+                    spreadSheet[0][spreadSheet[row].length - 1],
+                    'o limite de caracteres e 2',
                   );
+              } else {
+                if (spreadSheet[row][column].toString().length < 2) {
+                  // eslint-disable-next-line no-param-reassign
+                  spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+                }
+                const { response }: IReturnObject = await tecnologiaController.getAll({
+                  cod_tec: String(spreadSheet[row][column]),
+                  id_culture: idCulture,
+                });
+                if (response?.length === 0) {
+                  responseIfError[Number(column)]
+                  += responseGenericFactory(
+                      (Number(column) + 1),
+                      spreadSheet[row][spreadSheet[row].length - 1],
+                      spreadSheet[0][column],
+                      'a tecnologia informado não existe no sistema',
+                    );
+                }
               }
             }
             // Validação do campo BGM
