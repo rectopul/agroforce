@@ -65,7 +65,7 @@ export class ImportNpeController {
       for (const row in spreadSheet) {
         if (row !== '0') {
           // LINHA COM TITULO DAS COLUNAS
-          if (spreadSheet[row][4] < 10) {
+          if (spreadSheet[row][4].toString().length < 2) {
             // eslint-disable-next-line no-param-reassign
             spreadSheet[row][4] = `0${spreadSheet[row][4]}`;
           }
