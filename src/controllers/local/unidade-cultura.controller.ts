@@ -12,7 +12,6 @@ export class UnidadeCulturaController {
   safraController = new SafraController();
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: unidade-cultura.controller.ts ~ line 15 ~ UnidadeCulturaController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     try {

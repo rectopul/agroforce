@@ -45,7 +45,6 @@ export class ImportTechnologyController {
         if (row !== '0') {
           for (const column in spreadSheet[row]) {
             if (column === '0') {
-              console.log(typeof (spreadSheet[row][column]));
               if (spreadSheet[row][column] === null) {
                 responseIfError[column]
                   += responseNullFactory(

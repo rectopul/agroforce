@@ -344,6 +344,7 @@ export default function TipoEnsaio({
                 setCookies('filterBeforeEditOrderBy', orderBy);
                 setCookies('filtersParams', filtersParams);
                 setCookies('lastPage', 'atualizar');
+                setCookies('takeBeforeEdit', take);
                 setCookies('itensPage', itensPerPage);
                 router.push(
                   `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`,
@@ -980,10 +981,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = (await req.cookies.itensPerPage
-    ? req.cookies.itensPerPage: 10 );
-
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
@@ -1009,9 +1006,9 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('itensPage', { req, res });
   }
 
-  const itensPage = req.cookies.itensPerPage
-  ? req.cookies.itensPerPage
-  : 10;
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
+    : 10;
 
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
@@ -1030,6 +1027,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   // //RR
   removeCookies('filterBeforeEditTypeOrder', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('takeBeforeEdit', { req, res });
   removeCookies('lastPage', { req, res });
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
