@@ -30,6 +30,7 @@ import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 
 import { tableGlobalFunctions } from 'src/helpers';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import {
   AccordionFilter,
   Button,
@@ -458,6 +459,7 @@ export default function Listagem({
                 setCookies('filtersParams', filtersParams);
                 setCookies('itensPage', itensPerPage);
                 setCookies('lastPage', 'atualizar');
+                setCookies('takeBeforeEdit', take);
                 router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`);
               }}
             />
@@ -1020,11 +1022,11 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                    Cod Tec
+                      Cod Tec
                     </label>
                     <div className="flex">
                       <Input
-                        type = "number"
+                        type="number"
                         placeholder="Cod Tec"
                         id="filterCodTecnologia"
                         name="filterCodTecnologia"
@@ -1051,11 +1053,11 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                    Faixa de GMR
+                      Faixa de GMR
                     </label>
                     <div className="flex">
                       <Input
-                        type = "number"
+                        type="number"
                         placeholder="Faixa de GMR"
                         id="filterGmrRange"
                         name="filterGmrRange"
@@ -1066,11 +1068,11 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                    Nº Lotes
+                      Nº Lotes
                     </label>
                     <div className="flex">
                       <Input
-                        type = "number"
+                        type="number"
                         placeholder="Nº Lotes"
                         id="filterLots"
                         name="filterLots"
@@ -1295,9 +1297,9 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = (await req.cookies.itensPerPage
-    ? req.cookies.itensPerPage: 10 );
+  // const PreferencesControllers = new UserPreferenceController();
+  // const itensPerPage = (await req.cookies.itensPerPage
+  //   ? req.cookies.itensPerPage : 10);
 
   const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);
@@ -1317,8 +1319,8 @@ export const getServerSideProps: GetServerSideProps = async ({
     // setCookies('filterParams','');
   }
 
-  const itensPage = req.cookies.itensPerPage
-    ? req.cookies.itensPerPage
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
     : 10;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
@@ -1350,7 +1352,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
-
+  removeCookies('takeBeforeEdit', { req, res });
   removeCookies('filterBeforeEditTypeOrder', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });
   removeCookies('lastPage', { req, res });

@@ -392,6 +392,11 @@ export default function AtualizarTipoEnsaio({
             orderList,
             fieldOrder,
             handleOrder,
+            render: (rowData: any) => (
+              <div>
+                {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.name}`}
+              </div>
+            ),
           }),
         );
       }

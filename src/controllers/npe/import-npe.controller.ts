@@ -65,7 +65,7 @@ export class ImportNpeController {
       for (const row in spreadSheet) {
         if (row !== '0') {
           // LINHA COM TITULO DAS COLUNAS
-          if (spreadSheet[row][4] < 10) {
+          if (spreadSheet[row][4].toString().length < 2) {
             // eslint-disable-next-line no-param-reassign
             spreadSheet[row][4] = `0${spreadSheet[row][4]}`;
           }
@@ -143,7 +143,9 @@ export class ImportNpeController {
                       'o local não existe no sistema',
                     );
                   } else {
-                    const { response: responseSafra }: IReturnObject = await safraController.getOne(idSafra);
+                    const {
+                      response: responseSafra,
+                    }: IReturnObject = await safraController.getOne(idSafra);
                     const cultureUnityValidate = response[0]?.cultureUnity.map(
                       (item: any) => {
                         if (item?.year === responseSafra?.year) return true;
@@ -227,25 +229,33 @@ export class ImportNpeController {
 
             if (configModule.response[0]?.fields[column] === 'OGM') {
               if (spreadSheet[row][column] !== null) {
-                if (isNaN(spreadSheet[row][column])) {
-                  responseIfError[Number(column)] += responsePositiveNumericFactory(
-                    Number(column) + 1,
-                    row,
-                    spreadSheet[0][column],
-                  );
-                }
-                const ogm: any = await tecnologiaController.getAll({
-                  cod_tec: String(spreadSheet[row][column]),
-                });
-                if (ogm.total === 0) {
-                  responseIfError[Number(column)] += responseGenericFactory(
-                    Number(column) + 1,
-                    row,
-                    spreadSheet[0][column],
-                    'a tecnologia informada não existe no sistema',
-                  );
+                if ((spreadSheet[row][column]).toString().length > 2) {
+                  responseIfError[Number(column)]
+                  += responseGenericFactory(
+                      (Number(column) + 1),
+                      row,
+                      spreadSheet[0][column],
+                      'o limite de caracteres e 2',
+                    );
                 } else {
-                  this.aux.tecnologiaId = ogm.response[0]?.id;
+                  if (spreadSheet[row][column].toString().length < 2) {
+                  // eslint-disable-next-line no-param-reassign
+                    spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+                  }
+                  const ogm: any = await tecnologiaController.getAll({
+                    cod_tec: String(spreadSheet[row][column]),
+                    id_culture: idCulture,
+                  });
+                  if (ogm.total === 0) {
+                    responseIfError[Number(column)] += responseGenericFactory(
+                      Number(column) + 1,
+                      row,
+                      spreadSheet[0][column],
+                      'a tecnologia informada não existe no sistema',
+                    );
+                  } else {
+                    this.aux.tecnologiaId = ogm.response[0]?.id;
+                  }
                 }
               } else {
                 responseIfError[Number(column)] += responseNullFactory(
@@ -259,7 +269,10 @@ export class ImportNpeController {
             if (configModule.response[0]?.fields[column] === 'Foco') {
               if (spreadSheet[row][column] !== null) {
                 if (typeof spreadSheet[row][column] === 'string') {
-                  const { status: focoStatus, response }: IReturnObject = await focoController.getAll({
+                  const {
+                    status: focoStatus,
+                    response,
+                  }: IReturnObject = await focoController.getAll({
                     name: spreadSheet[row][column],
                     id_culture: idCulture,
                     filterStatus: 1,
@@ -477,7 +490,7 @@ export class ImportNpeController {
               }
             }
           }
-          const npe = await npeController.create(createMany);
+          await npeController.create(createMany);
           await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
           return { status: 200, message: 'Ambiente importado com sucesso' };
         } catch (error: any) {

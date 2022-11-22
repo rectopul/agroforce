@@ -540,7 +540,7 @@ export default function Listagem({
           headerTableFactoryGlobal({
             type: 'int',
             name: 'Tec_Gen',
-            title: 'tecnologia',
+            title: 'genotipo.tecnologia.cod_tec',
             orderList,
             fieldOrder,
             handleOrder,

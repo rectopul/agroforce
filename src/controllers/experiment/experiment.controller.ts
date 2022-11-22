@@ -16,6 +16,7 @@ export class ExperimentController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: experiment.controller.ts ~ line 19 ~ ExperimentController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];

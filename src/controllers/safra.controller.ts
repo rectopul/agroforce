@@ -24,6 +24,7 @@ export class SafraController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: safra.controller.ts ~ line 27 ~ SafraController ~ getAll ~ options', options);
     const parameters: object | any = {};
     try {
       if (options.filterStatus) {

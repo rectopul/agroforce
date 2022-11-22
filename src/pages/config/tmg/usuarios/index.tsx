@@ -393,6 +393,7 @@ export default function Listagem({
                 setCookies('filtersParams', filtersParams);
                 setCookies('itensPage', itensPerPage);
                 setCookies('lastPage', 'atualizar');
+                setCookies('takeBeforeEdit', take);
                 router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
@@ -971,10 +972,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = (await req.cookies.itensPerPage
-    ? req.cookies.itensPerPage: 10 );
-
   const { token } = req.cookies;
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
@@ -992,9 +989,8 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('itensPage', { req, res });
   }
 
-
-  const itensPage = req.cookies.itensPerPage
-    ? req.cookies.itensPerPage
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
     : 10;
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
@@ -1018,6 +1014,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('pageBeforeEdit', { req, res });
   removeCookies('filterBeforeEditTypeOrder', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('takeBeforeEdit', { req, res });
   removeCookies('lastPage', { req, res });
   removeCookies('filtersParams', { req, res });
 
