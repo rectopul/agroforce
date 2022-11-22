@@ -161,19 +161,23 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (isNaN(spreadSheet[row][column])) {
-                responseIfError[Number(column)] += responsePositiveNumericFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                );
-              } else if (spreadSheet[row][column] < 10) {
-                // eslint-disable-next-line no-param-reassign
-                spreadSheet[row][column] = `0${spreadSheet[row][column]}`;
-              }
-              if (assayList?.tecnologia?.cod_tec !== (spreadSheet[row][column].toString())) {
+              } else if ((spreadSheet[row][column]).toString().length > 2) {
                 responseIfError[Number(column)]
+                  += responseGenericFactory(
+                    (Number(column) + 1),
+                    row,
+                    spreadSheet[0][column],
+                    'o limite de caracteres e 2',
+                  );
+              } else {
+                if (spreadSheet[row][column].toString().length < 2) {
+                  // eslint-disable-next-line no-param-reassign
+                  spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+                }
+                if (assayList?.tecnologia?.cod_tec !== (spreadSheet[row][column].toString())) {
+                  responseIfError[Number(column)]
                   += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                }
               }
             }
             if (column === '6') { // GGM // BGM

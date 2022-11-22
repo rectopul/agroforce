@@ -135,7 +135,7 @@ export class ImportGenotypeController {
                   row,
                   spreadSheet[0][column],
                 );
-              } 
+              }
             }
 
             if (configModule.response[0]?.fields[column] === 'Cultura') {
@@ -191,27 +191,31 @@ export class ImportGenotypeController {
                   row,
                   spreadSheet[0][column],
                 );
-              } else if (isNaN(spreadSheet[row][column])) {
-                responseIfError[Number(column)] += responsePositiveNumericFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                );
-              } else if (spreadSheet[row][column] < 10) {
-                // eslint-disable-next-line no-param-reassign
-                spreadSheet[row][column] = `0${spreadSheet[row][column]}`;
-              }
-              const tec: any = await tecnologiaController.getAll({
-                id_culture: idCulture,
-                cod_tec: String(spreadSheet[row][column]),
-              });
-              if (tec.total === 0) {
-                responseIfError[Number(column)] += responseGenericFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                  'a tecnologia informado não existe no sistema',
-                );
+              } else if ((spreadSheet[row][column]).toString().length > 2) {
+                responseIfError[Number(column)]
+                  += responseGenericFactory(
+                    (Number(column) + 1),
+                    row,
+                    spreadSheet[0][column],
+                    'o limite de caracteres e 2',
+                  );
+              } else {
+                if (spreadSheet[row][column].toString().length < 2) {
+                  // eslint-disable-next-line no-param-reassign
+                  spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+                }
+                const tec: any = await tecnologiaController.getAll({
+                  id_culture: idCulture,
+                  cod_tec: String(spreadSheet[row][column]),
+                });
+                if (tec.total === 0) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                    'a tecnologia informado não existe no sistema',
+                  );
+                }
               }
             }
 
@@ -495,15 +499,14 @@ export class ImportGenotypeController {
 
               if (configModule.response[0]?.fields[column] === 'S1_DATA_ID') {
                 if (spreadSheet[row][column] !== null) {
-                  
                   const genotypeId : string = String(spreadSheet[row][column]);
-                  const params = {id_dados: genotypeId, id_culture: idCulture};
+                  const params = { id_dados: genotypeId, id_culture: idCulture };
                   const select = { id: true, id_dados: true, name_genotipo: true };
                   const take = undefined;
                   const skip = undefined;
-                  const order =  undefined;
-              
-                  const genotypeList : any = await genotipoRepository.findAll(params,select,take,skip,order);
+                  const order = undefined;
+
+                  const genotypeList : any = await genotipoRepository.findAll(params, select, take, skip, order);
 
                   if (genotypeList.total > 0) {
                     this.aux.id_genotipo = genotypeList[0].id;

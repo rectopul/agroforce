@@ -439,6 +439,7 @@ export default function TipoEnsaio({
                     setCookies('filterBeforeEditOrderBy', orderBy);
                     setCookies('filtersParams', filtersParams);
                     setCookies('lastPage', 'atualizar');
+                    setCookies('takeBeforeEdit', take);
                     router.push(
                       `/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`,
                     );
@@ -814,7 +815,7 @@ export default function TipoEnsaio({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                    Quant de sementes por envelope
+                      Quant de sementes por envelope
                     </label>
                     <Input
                       type="number"
@@ -1035,13 +1036,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-
-  // eslint-disable-next-line max-len
-
-  const itensPerPage = (await req.cookies.itensPerPage
-    ? req.cookies.itensPerPage: 10 );
-
   const { token } = req.cookies;
   const idCulture = req.cookies.cultureId;
   const { safraId } = req.cookies;
@@ -1062,9 +1056,8 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('itensPage', { req, res });
   }
 
-
-  const itensPage = req.cookies.itensPerPage
-    ? req.cookies.itensPerPage
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
     : 10;
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
@@ -1087,8 +1080,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
-
-  // RR
+  removeCookies('takeBeforeEdit', { req, res });
   removeCookies('filterBeforeEditTypeOrder', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });
   removeCookies('lastPage', { req, res });
