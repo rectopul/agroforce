@@ -242,6 +242,7 @@ export class ImportNpeController {
                   // eslint-disable-next-line no-param-reassign
                     spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
                   }
+
                   const ogm: any = await tecnologiaController.getAll({
                     cod_tec: String(spreadSheet[row][column]),
                     id_culture: idCulture,

@@ -11,7 +11,6 @@ export class FocoController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: foco.controller.ts ~ line 14 ~ FocoController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     try {
@@ -29,11 +28,11 @@ export class FocoController {
 
       if (options.filterGroupFrom || options.filterGroupTo) {
         if (options.filterGroupFrom && options.filterGroupTo) {
-          parameters.group = JSON.parse(` { "some" : {"group": {"gte": ${Number(options.filterGroupFrom)}, "lte": ${Number(options.filterGroupTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
+          parameters.group = JSON.parse(`{ "group": { "gte": "${Number(options.filterGroupFrom)}", "lte": "${Number(options.filterGroupTo)}" } }`);
         } else if (options.filterGroupFrom) {
-          parameters.group = JSON.parse(`{ "some" : {"group": {"gte": ${Number(options.filterGroupFrom)} } , "id_safra": ${Number(options.id_safra)}} }`);
+          parameters.group = JSON.parse(`{ "group": { "gte": "${Number(options.filterGroupFrom)}" } }`);
         } else if (options.filterGroupTo) {
-          parameters.group = JSON.parse(` { "some" : {"group": {"lte": ${Number(options.filterGroupTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
+          parameters.group = JSON.parse(`{ "group": { "lte": "${Number(options.filterGroupTo)}" } }`);
         }
       }
 
@@ -57,7 +56,6 @@ export class FocoController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
-      console.log('🚀 ~ file: foco.controller.ts ~ line 54 ~ FocoController ~ getAll ~ orderBy', orderBy);
 
       const response: object | any = await this.focoRepository.findAll(
         parameters,

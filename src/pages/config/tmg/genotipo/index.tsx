@@ -234,7 +234,7 @@ export default function Listagem({
       filterGenotipo,
       filterMainName,
       filterCruza,
-      filterTecnologiaCod,
+      filterCodTecnologia,
       filterTecnologiaDesc,
       filterGmr,
       filterGmrRangeTo,
@@ -242,36 +242,7 @@ export default function Listagem({
       filterLotsTo,
       filterLotsFrom,
     }) => {
-      //   // Call filter with there parameter
-      //   const parametersFilter = await tableGlobalFunctions.handleFilterParameter(
-      //     'genotipo',
-      //     filterGenotipo,
-      //     filterMainName,
-      //     filterCruza,
-      //     filterTecnologiaCod,
-      //     filterTecnologiaDesc,
-      //     filterGmr,
-      //     idCulture,
-      //     idSafra,
-      //     filterGmrRangeTo,
-      //     filterGmrRangeFrom,
-      //     filterLotsTo,
-      //     filterLotsFrom,
-      //   );
-      //   setFiltersParams(parametersFilter); // Set filter pararameters
-      //   setCookiess('filterBeforeEdit', filtersParams);
-
-      //   await genotipoService
-      //     .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
-      //     .then((response) => {
-      //       setFilter(parametersFilter);
-      //       setGenotipo(response.response);
-      //       setTotalItems(response.total);
-      //       setCurrentPage(0);
-      //     });
-      // },
-
-      const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&filterLotsTo=${filterLotsTo}&filterLotsFrom=${filterLotsFrom}&id_culture=${idCulture}`;
+      const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterCodTecnologia=${filterCodTecnologia}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&filterLotsTo=${filterLotsTo}&filterLotsFrom=${filterLotsFrom}&id_culture=${idCulture}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -1022,20 +993,10 @@ export default function Listagem({
 
                   {filterFieldFactory("filterMainName", "Nome principal")}
 
-                  <div className="h-6 w-1/2 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cod Tec
-                    </label>
-                    <div className="flex">
-                      <Input
-                        type="number"
-                        placeholder="Cod Tec"
-                        id="filterCodTecnologia"
-                        name="filterCodTecnologia"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
+                  {filterFieldFactory(
+                    'filterCodTecnologia',
+                    'Cod Tec',
+                  )}
 
                   {filterFieldFactory("filterTecnologiaDesc", "Nome Tec")}
                 </div>
@@ -1050,35 +1011,8 @@ export default function Listagem({
                 >
                   {filterFieldFactory("filterCruza", "Cruzamento de Origem")}
 
-                  <div className="h-6 w-1/2 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Faixa de GMR
-                    </label>
-                    <div className="flex">
-                      <Input
-                        type="number"
-                        placeholder="Faixa de GMR"
-                        id="filterGmrRange"
-                        name="filterGmrRange"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="h-6 w-1/2 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Nº Lotes
-                    </label>
-                    <div className="flex">
-                      <Input
-                        type="number"
-                        placeholder="Nº Lotes"
-                        id="filterLots"
-                        name="filterLots"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
+                  {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
+                  {filterLotRange('filterLots', 'Nº Lotes')}
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 

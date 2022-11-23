@@ -39,10 +39,11 @@ import {
   loteService,
   replaceTreatmentService,
   userPreferencesService,
-} from "../../../../../services";
-import { UserPreferenceController } from "../../../../../controllers/user-preference.controller";
-import ITabs from "../../../../../shared/utils/dropdown";
-import headerTableFactoryGlobal from "../../../../../shared/utils/headerTableFactory";
+} from '../../../../../services';
+import { UserPreferenceController } from '../../../../../controllers/user-preference.controller';
+import ITabs from '../../../../../shared/utils/dropdown';
+import headerTableFactoryGlobal from '../../../../../shared/utils/headerTableFactory';
+import ComponentLoading from '../../../../../components/Loading';
 
 interface IFilter {
   filterYear: string;
@@ -132,7 +133,8 @@ export default function Listagem({
 
   // const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
   const [lotes, setLotes] = useState([]);
-  const [nameReplace, setNameReplace] = useState<any>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [nameReplace, setNameReplace] = useState<any>('');
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [orderList, setOrder] = useState<number>(0);
@@ -249,9 +251,13 @@ export default function Listagem({
           setLotes(response);
           setTotalItems(allTotal);
           setCurrentPage(0);
+          setLoading(false);
           tableRef?.current?.dataManager?.changePageSize(
             allTotal >= take ? take : allTotal
           );
+        })
+        .catch((_) => {
+          setLoading(false);
         });
     },
   });
@@ -306,6 +312,10 @@ export default function Listagem({
       }
     }
 
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
     setFieldOrder(name);
   }
 
@@ -658,7 +668,11 @@ export default function Listagem({
         if (status === 200) {
           setLotes(response);
           setTotalItems(total);
+          setLoading(false);
         }
+      })
+      .catch((_) => {
+        setLoading(false);
       });
   }
 
@@ -689,6 +703,8 @@ export default function Listagem({
       <Head>
         <title>Listagem de Lotes</title>
       </Head>
+
+      {loading && <ComponentLoading text="" />}
 
       <ModalConfirmation
         isOpen={isOpenModal}
@@ -774,15 +790,15 @@ export default function Listagem({
                     <div className="flex">
                       <Input
                         placeholder="De"
-                        id="filterSeedsFrom"
-                        name="filterSeedsFrom"
+                        id="filterPesoFrom"
+                        name="filterPesoFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
-                        id="filterSeedsTo"
-                        name="filterSeedsTo"
+                        id="filterPesoTo"
+                        name="filterPesoTo"
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -875,7 +891,9 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6 ml-2">
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

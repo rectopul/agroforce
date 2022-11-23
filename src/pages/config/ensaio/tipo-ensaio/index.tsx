@@ -330,8 +330,6 @@ export default function TipoEnsaio({
   }
 
   async function handleStatus(data: any): Promise<void> {
-    // console.log({ id, status });
-
     // if (status) {
     //   status = 1;
     // } else {
@@ -729,40 +727,6 @@ export default function TipoEnsaio({
     return parameter;
   }
 
-  function filterFieldFactorySeeds(name: any) {
-    return (
-      <div className="h-6 w-1/2 ml-2">
-        <label className="block text-gray-900 text-sm font-bold mb-1">
-          {name}
-        </label>
-
-        <div className="flex gap-2">
-          <div className="w-full">
-            <Input
-              type="text"
-              placeholder="De"
-              max="40"
-              id="filterSeedsFrom"
-              name="filterSeedsFrom"
-              onChange={formik.handleChange}
-            />
-          </div>
-
-          <div className="w-full">
-            <Input
-              type="text"
-              placeholder="Até"
-              max="40"
-              id="filterSeedsTo"
-              name="filterSeedsTo"
-              onChange={formik.handleChange}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -819,14 +783,30 @@ export default function TipoEnsaio({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Quant de sementes por envelope
                     </label>
-                    <Input
-                      type="number"
-                      placeholder="Quant de sementes por envelope"
-                      id="envelope"
-                      name="envelope"
-                      defaultValue={checkValue("filterName")}
-                      onChange={formik.handleChange}
-                    />
+
+                    <div className="flex gap-2">
+                      <div className="w-full">
+                        <Input
+                          type="text"
+                          placeholder="De"
+                          max="40"
+                          id="filterSeedsFrom"
+                          name="filterSeedsFrom"
+                          onChange={formik.handleChange}
+                        />
+                      </div>
+
+                      <div className="w-full">
+                        <Input
+                          type="text"
+                          placeholder="Até"
+                          max="40"
+                          id="filterSeedsTo"
+                          name="filterSeedsTo"
+                          onChange={formik.handleChange}
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />

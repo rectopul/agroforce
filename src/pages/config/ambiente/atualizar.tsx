@@ -79,7 +79,6 @@ export default function NovoLocal({
       idSafra,
     }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
-  console.log("idCulture : ", idCulture, " idSafra : ", idSafra);
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'AMBIENTE'

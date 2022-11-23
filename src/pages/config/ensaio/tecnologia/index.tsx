@@ -610,7 +610,6 @@ export default function Listagem({
                     <Input
                       type="number"
                       placeholder="Cod. tecnologia"
-                      max="40"
                       id="filterCode"
                       name="filterCode"
                       defaultValue={checkValue("filterCode")}
