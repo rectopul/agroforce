@@ -11,7 +11,7 @@ export class AssayListRepository extends BaseRepository {
   }
 
   async findById(id: number) {
-    const result = await prisma.assay_list.findUnique({
+    const result = await this.getPrisma().assay_list.findUnique({
       where: { id },
       select: {
         id: true,
@@ -42,7 +42,7 @@ export class AssayListRepository extends BaseRepository {
   }
 
   async findByName({ gli, id_safra }: any) {
-    const result = await prisma.assay_list.findFirst({
+    const result = await this.getPrisma().assay_list.findFirst({
       where: {
         gli,
         id_safra,
@@ -56,9 +56,9 @@ export class AssayListRepository extends BaseRepository {
     if (orderBy) {
       orderBy = JSON.parse(orderBy);
     }
-    const count = await prisma.assay_list.count({ where });
+    const count = await this.getPrisma().assay_list.count({ where });
 
-    const result: object | any = await prisma.assay_list.findMany({
+    const result: object | any = await this.getPrisma().assay_list.findMany({
       select,
       skip,
       take,
@@ -71,7 +71,7 @@ export class AssayListRepository extends BaseRepository {
   }
 
   async delete(id: number) {
-    const result = await prisma.assay_list.delete({ where: { id } });
+    const result = await this.getPrisma().assay_list.delete({ where: { id } });
     return result;
   }
 }

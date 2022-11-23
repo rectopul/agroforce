@@ -470,9 +470,8 @@ export class ImportAssayListController {
             let savedAssayList: any;
             let savedGenotype: any;
 
-            let filterGli = JSON.parse(`{"contains": "${spreadSheet[row][4]}" }`);
             let where = {
-              gli : filterGli,
+              gli : spreadSheet[row][4],
               id_safra: idSafra,
             };
             let select = {
