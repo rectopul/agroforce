@@ -258,7 +258,7 @@ export class ImportDelimitationController {
             let delineamentoId = listDelineamento[0]?.id;
 
             if (listDelineamento.total > 0 && delineamentoId) {
-              const delineamentoUpdated = await delineamentoRepository.update(delineamentoId, {
+              const delineamentoUpdated = await delineamentoRepository.updateTransaction(delineamentoId, {
                 id: delineamentoId,
                 name: spreadSheet[row][1],
                 id_culture: idCulture,
@@ -268,7 +268,7 @@ export class ImportDelimitationController {
               });
 
             } else {
-              const delineamentoCreated = await delineamentoRepository.create({
+              const delineamentoCreated = await delineamentoRepository.createTransaction({
                 name: spreadSheet[row][1],
                 id_culture: idCulture,
                 repeticao: 1,
@@ -277,7 +277,7 @@ export class ImportDelimitationController {
               });
               delineamentoId = delineamentoCreated.id;
             }
-            const sequenciaCreated = await sequenciaRepository.create({
+            const sequenciaCreated = await sequenciaRepository.createTransaction({
               id_delineamento: delineamentoId,
               repeticao: spreadSheet[row][2],
               sorteio: spreadSheet[row][3],
