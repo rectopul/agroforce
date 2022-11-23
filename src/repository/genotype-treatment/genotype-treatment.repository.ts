@@ -10,7 +10,7 @@ export class GenotypeTreatmentRepository extends BaseRepository {
   }
 
   async findById(id: number) {
-    const result = await prisma.genotype_treatment.findUnique({
+    const result = await this.getPrisma().genotype_treatment.findUnique({
       where: { id },
     });
 
@@ -26,7 +26,7 @@ export class GenotypeTreatmentRepository extends BaseRepository {
   }
 
   async replaceLote(idList: any, idLote: number) {
-    const result = await prisma.genotype_treatment.updateMany({
+    const result = await this.getPrisma().genotype_treatment.updateMany({
       where: {
         id: {
           in: idList,
@@ -40,7 +40,7 @@ export class GenotypeTreatmentRepository extends BaseRepository {
   }
 
   async replaceGenotype(idList: any, idLote:any, idGenotype: number) {
-    const result = await prisma.genotype_treatment.updateMany({
+    const result = await this.getPrisma().genotype_treatment.updateMany({
       where: {
         id: {
           in: idList,
@@ -64,9 +64,9 @@ export class GenotypeTreatmentRepository extends BaseRepository {
       order = JSON.parse(orderBy);
     }
 
-    const count = await prisma.genotype_treatment.count({ where });
+    const count = await this.getPrisma().genotype_treatment.count({ where });
 
-    const result: object | any = await prisma.genotype_treatment.findMany({
+    const result: object | any = await this.getPrisma().genotype_treatment.findMany({
       select,
       skip,
       take,
@@ -78,7 +78,7 @@ export class GenotypeTreatmentRepository extends BaseRepository {
   }
 
   async deleteAll(idAssayList: number) {
-    const result = await prisma.genotype_treatment.deleteMany({
+    const result = await this.getPrisma().genotype_treatment.deleteMany({
       where: {
         id_assay_list: idAssayList,
       },
