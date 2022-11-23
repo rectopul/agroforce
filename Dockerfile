@@ -52,7 +52,9 @@ RUN cp /usr/share/zoneinfo/America/Fortaleza /etc/localtime
 
 RUN apk --update add redis 
 
-RUN chown -R nextjs.nextjs /app
+RUN chown -R nextjs:nodejs /app
+RUN chmod 777 /app
+
 
 USER nextjs
 
