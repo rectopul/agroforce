@@ -1,34 +1,36 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { removeCookies, setCookies } from "cookies-next";
-import { useFormik } from "formik";
-import MaterialTable from "material-table";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import getConfig from "next/config";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useEffect, useState, useRef } from "react";
+import { removeCookies, setCookies } from 'cookies-next';
+import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import getConfig from 'next/config';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect, useState, useRef } from 'react';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from "react-beautiful-dnd";
+} from 'react-beautiful-dnd';
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiTwotoneStar,
-} from "react-icons/ai";
-import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line } from "react-icons/ri";
-import Swal from "sweetalert2";
-import * as XLSX from "xlsx";
+} from 'react-icons/ai';
+import {
+  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+} from 'react-icons/bi';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RiFileExcel2Line } from 'react-icons/ri';
+import Swal from 'sweetalert2';
+import * as XLSX from 'xlsx';
 
-import { tableGlobalFunctions } from "src/helpers";
-import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import { tableGlobalFunctions } from 'src/helpers';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import {
   AccordionFilter,
   Button,
@@ -36,17 +38,17 @@ import {
   Content,
   Input,
   FieldItemsPerPage,
-} from "../../../../components";
-import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
-import { genotipoService, userPreferencesService } from "../../../../services";
-import ITabs from "../../../../shared/utils/dropdown";
-import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
-import ComponentLoading from "../../../../components/Loading";
+} from '../../../../components';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
+import { genotipoService, userPreferencesService } from '../../../../services';
+import ITabs from '../../../../shared/utils/dropdown';
+import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+import ComponentLoading from '../../../../components/Loading';
 
 interface IFilter {
   filterGenotipo: string | any;
   filterMainName: string | any;
-  filterTecnologiaCod: string | any;
+  filterCodTecnologia: string | any;
   filterTecnologiaDesc: string | any;
   filterCruza: string | any;
   filterGmr: string | any;
@@ -107,103 +109,101 @@ export default function Listagem({
   const tableRef = useRef<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "TMG" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.genotipo || {
     id: 0,
     table_preferences:
-      "id,name_genotipo,name_main,tecnologia,cruza,gmr,numberLotes,name_public,name_experiment,name_alter,elit_name,type,progenitor_f_direto,progenitor_m_direto,progenitor_f_origem,progenitor_m_origem,progenitores_origem,parentesco_completo,action",
+      'id,name_genotipo,name_main,tecnologia,cruza,gmr,numberLotes,name_public,name_experiment,name_alter,elit_name,type,progenitor_f_direto,progenitor_m_direto,progenitor_f_origem,progenitor_m_origem,progenitores_origem,parentesco_completo,action',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences
+    preferences.table_preferences,
   );
   const router = useRouter();
   const [genotipos, setGenotipo] = useState<IGenotipos[]>(() => allGenotipos);
   const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit)
+    Number(pageBeforeEdit),
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
   const [orderList, setOrder] = useState<number>(0);
-  const [arrowOrder, setArrowOrder] = useState<any>("");
+  const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     {
-      name: "CamposGerenciados[]",
-      title: "Nome genótipo",
-      value: "name_genotipo",
+      name: 'CamposGerenciados[]',
+      title: 'Nome genótipo',
+      value: 'name_genotipo',
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Nome principal",
-      value: "name_main",
+      name: 'CamposGerenciados[]',
+      title: 'Nome principal',
+      value: 'name_main',
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Nome Tec",
-      value: "tecnologia",
+      name: 'CamposGerenciados[]',
+      title: 'Nome Tec',
+      value: 'tecnologia',
     },
-    { name: "CamposGerenciados[]", title: "Cruzamento origem", value: "cruza" },
-    { name: "CamposGerenciados[]", title: "GMR", value: "gmr" },
-    { name: "CamposGerenciados[]", title: "Nº Lotes", value: "numberLotes" },
+    { name: 'CamposGerenciados[]', title: 'Cruzamento origem', value: 'cruza' },
+    { name: 'CamposGerenciados[]', title: 'GMR', value: 'gmr' },
+    { name: 'CamposGerenciados[]', title: 'Nº Lotes', value: 'numberLotes' },
     {
-      name: "CamposGerenciados[]",
-      title: "Nome publico",
-      value: "name_public",
-    },
-    {
-      name: "CamposGerenciados[]",
-      title: "Nome experimental",
-      value: "name_experiment",
+      name: 'CamposGerenciados[]',
+      title: 'Nome publico',
+      value: 'name_public',
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Nome alternativo",
-      value: "name_alter",
-    },
-    { name: "CamposGerenciados[]", title: "Elite nome", value: "elit_name" },
-    { name: "CamposGerenciados[]", title: "Tipo", value: "type" },
-    {
-      name: "CamposGerenciados[]",
-      title: "Progenitor f direto",
-      value: "progenitor_f_direto",
+      name: 'CamposGerenciados[]',
+      title: 'Nome experimental',
+      value: 'name_experiment',
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Progenitor m direto",
-      value: "progenitor_m_direto",
+      name: 'CamposGerenciados[]',
+      title: 'Nome alternativo',
+      value: 'name_alter',
+    },
+    { name: 'CamposGerenciados[]', title: 'Elite nome', value: 'elit_name' },
+    { name: 'CamposGerenciados[]', title: 'Tipo', value: 'type' },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Progenitor f direto',
+      value: 'progenitor_f_direto',
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Progenitor f origem",
-      value: "progenitor_f_origem",
+      name: 'CamposGerenciados[]',
+      title: 'Progenitor m direto',
+      value: 'progenitor_m_direto',
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Progenitor m origem",
-      value: "progenitor_m_origem",
+      name: 'CamposGerenciados[]',
+      title: 'Progenitor f origem',
+      value: 'progenitor_f_origem',
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Progenitores origem",
-      value: "progenitores_origem",
+      name: 'CamposGerenciados[]',
+      title: 'Progenitor m origem',
+      value: 'progenitor_m_origem',
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Parentesco",
-      value: "parentesco_completo",
+      name: 'CamposGerenciados[]',
+      title: 'Progenitores origem',
+      value: 'progenitores_origem',
     },
-    { name: "CamposGerenciados[]", title: "Ação", value: "action" },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Parentesco',
+      value: 'parentesco_completo',
+    },
+    { name: 'CamposGerenciados[]', title: 'Ação', value: 'action' },
   ]);
 
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [colorStar, setColorStar] = useState<string>("");
+  const [colorStar, setColorStar] = useState<string>('');
   // const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>("");
+  const [orderType, setOrderType] = useState<string>('');
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
@@ -212,23 +212,23 @@ export default function Listagem({
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
   const [fieldOrder, setFieldOrder] = useState<any>(null);
   const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == "Tecnologia" ? "tecnologia.cod_tec" : orderBy
+    orderBy == 'Tecnologia' ? 'tecnologia.cod_tec' : orderBy
   }&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterGenotipo: checkValue("filterGenotipo"),
-      filterMainName: checkValue("filterMainName"),
-      filterTecnologiaCod: checkValue("filterTecnologiaCod"),
-      filterTecnologiaDesc: checkValue("filterTecnologiaDesc"),
-      filterCruza: checkValue("filterCruza"),
-      filterGmr: checkValue("filterGmr"),
-      filterGmrRangeFrom: checkValue("filterGmrRangeFrom"),
-      filterGmrRangeTo: checkValue("filterGmrRangeTo"),
-      filterLotsFrom: checkValue("filterLotsFrom"),
-      filterLotsTo: checkValue("filterLotsTo"),
-      orderBy: "",
-      typeOrder: "",
+      filterGenotipo: checkValue('filterGenotipo'),
+      filterMainName: checkValue('filterMainName'),
+      filterCodTecnologia: checkValue('filterCodTecnologia'),
+      filterTecnologiaDesc: checkValue('filterTecnologiaDesc'),
+      filterCruza: checkValue('filterCruza'),
+      filterGmr: checkValue('filterGmr'),
+      filterGmrRangeFrom: checkValue('filterGmrRangeFrom'),
+      filterGmrRangeTo: checkValue('filterGmrRangeTo'),
+      filterLotsFrom: checkValue('filterLotsFrom'),
+      filterLotsTo: checkValue('filterLotsTo'),
+      orderBy: '',
+      typeOrder: '',
     },
     onSubmit: async ({
       filterGenotipo,
@@ -253,12 +253,12 @@ export default function Listagem({
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
-    setCookies("filterBeforeEdit", parametersFilter);
-    setCookies("filterBeforeEditTypeOrder", typeOrder);
-    setCookies("filterBeforeEditOrderBy", orderBy);
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies("filtersParams", parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
     await genotipoService
       .getAll(parametersFilter)
@@ -267,7 +267,7 @@ export default function Listagem({
           setGenotipo(response.response);
           setTotalItems(response.total);
           tableRef.current.dataManager.changePageSize(
-            response.total >= take ? take : response.total
+            response.total >= take ? take : response.total,
           );
         }
       })
@@ -285,7 +285,7 @@ export default function Listagem({
   async function handleOrder(
     column: string,
     order: string | any,
-    name: string | any
+    name: string | any,
   ): Promise<void> {
     // // Manage orders of colunms
     // const parametersFilter = await tableGlobalFunctions.handleOrderGlobal(
@@ -317,8 +317,9 @@ export default function Listagem({
     // }
 
     // Gobal manage orders
-    const { typeOrderG, columnG, orderByG, arrowOrder } =
-      await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setFieldOrder(name);
     setTypeOrder(typeOrderG);
@@ -352,35 +353,34 @@ export default function Listagem({
   function idHeaderFactory() {
     return {
       title: <div className="flex items-center">{arrowOrder}</div>,
-      field: "id",
+      field: 'id',
       width: 0,
       sorting: false,
-      render: () =>
-        colorStar === "#eba417" ? (
-          <div className="h-9 flex">
-            <div>
-              <button
-                type="button"
-                className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar("")}
-              >
-                <AiTwotoneStar size={20} color="#eba417" />
-              </button>
-            </div>
+      render: () => (colorStar === '#eba417' ? (
+        <div className="h-9 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('')}
+            >
+              <AiTwotoneStar size={20} color="#eba417" />
+            </button>
           </div>
-        ) : (
-          <div className="h-9 flex">
-            <div>
-              <button
-                type="button"
-                className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar("#eba417")}
-              >
-                <AiTwotoneStar size={20} />
-              </button>
-            </div>
+        </div>
+      ) : (
+        <div className="h-9 flex">
+          <div>
+            <button
+              type="button"
+              className="w-full h-full flex items-center justify-center border-0"
+              onClick={() => setColorStar('#eba417')}
+            >
+              <AiTwotoneStar size={20} />
+            </button>
           </div>
-        ),
+        </div>
+      )),
     };
   }
 
@@ -391,13 +391,13 @@ export default function Listagem({
           <button
             type="button"
             className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList, "tecnologia")}
+            onClick={() => handleOrder(title, orderList, 'tecnologia')}
           >
             {title}
           </button>
         </div>
       ),
-      field: "tecnologia",
+      field: 'tecnologia',
       width: 0,
       sorting: true,
       render: (rowData: any) => (
@@ -412,8 +412,8 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: "Ação",
-      field: "action",
+      title: 'Ação',
+      field: 'action',
       sorting: false,
       searchable: false,
       render: (rowData: IGenotipos) => (
@@ -425,14 +425,14 @@ export default function Listagem({
               textColor="white"
               title={`Editar ${rowData.name_genotipo}`}
               onClick={() => {
-                setCookies("pageBeforeEdit", currentPage?.toString());
-                setCookies("filterBeforeEdit", filter);
-                setCookies("filterBeforeEditTypeOrder", typeOrder);
-                setCookies("filterBeforeEditOrderBy", orderBy);
-                setCookies("filtersParams", filtersParams);
-                setCookies("itensPage", itensPerPage);
-                setCookies("lastPage", "atualizar");
-                setCookies("takeBeforeEdit", take);
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('itensPage', itensPerPage);
+                setCookies('lastPage', 'atualizar');
+                setCookies('takeBeforeEdit', take);
                 router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`);
               }}
             />
@@ -447,7 +447,7 @@ export default function Listagem({
   }
 
   function columnsOrder(columnsCampos: any): any {
-    const columnCampos: string[] = columnsCampos.split(",");
+    const columnCampos: string[] = columnsCampos.split(',');
     const tableFields: any = [];
 
     // camposGerenciados.map((field: any) => {
@@ -463,34 +463,34 @@ export default function Listagem({
       // if (columnCampos[index] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
-      if (columnCampos[index] === "name_genotipo") {
+      if (columnCampos[index] === 'name_genotipo') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Nome genótipo",
-            title: "name_genotipo",
+            name: 'Nome genótipo',
+            title: 'name_genotipo',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "name_main") {
+      if (columnCampos[index] === 'name_main') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Nome principal",
-            title: "name_main",
+            name: 'Nome principal',
+            title: 'name_main',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "tecnologia") {
+      if (columnCampos[index] === 'tecnologia') {
         tableFields.push(
           headerTableFactoryGlobal({
-            type: "int",
-            name: "Nome Tec",
-            title: "tecnologia.cod_tec",
+            type: 'int',
+            name: 'Nome Tec',
+            title: 'tecnologia.cod_tec',
             orderList,
             fieldOrder,
             handleOrder,
@@ -499,167 +499,167 @@ export default function Listagem({
                 {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
               </div>
             ),
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "cruza") {
+      if (columnCampos[index] === 'cruza') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Cruzamento origem",
-            title: "cruza",
+            name: 'Cruzamento origem',
+            title: 'cruza',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "gmr") {
+      if (columnCampos[index] === 'gmr') {
         tableFields.push(
           headerTableFactoryGlobal({
-            type: "int",
-            name: "GMR",
-            title: "gmr",
+            type: 'int',
+            name: 'GMR',
+            title: 'gmr',
             orderList,
             fieldOrder,
             handleOrder,
             render: (rowData: any) => formatDecimal(rowData.gmr),
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "numberLotes") {
+      if (columnCampos[index] === 'numberLotes') {
         tableFields.push(
           headerTableFactoryGlobal({
-            type: "int",
-            name: "Nº Lotes",
-            title: "numberLotes",
+            type: 'int',
+            name: 'Nº Lotes',
+            title: 'numberLotes',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "name_public") {
+      if (columnCampos[index] === 'name_public') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Nome público",
-            title: "name_public",
+            name: 'Nome público',
+            title: 'name_public',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "name_experiment") {
+      if (columnCampos[index] === 'name_experiment') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Nome experimental",
-            title: "name_experiment",
+            name: 'Nome experimental',
+            title: 'name_experiment',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "name_alter") {
+      if (columnCampos[index] === 'name_alter') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Nome alternativo",
-            title: "name_alter",
+            name: 'Nome alternativo',
+            title: 'name_alter',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "elit_name") {
+      if (columnCampos[index] === 'elit_name') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Elite nome",
-            title: "elit_name",
+            name: 'Elite nome',
+            title: 'elit_name',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "type") {
+      if (columnCampos[index] === 'type') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Tipo",
-            title: "type",
+            name: 'Tipo',
+            title: 'type',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "progenitor_f_direto") {
+      if (columnCampos[index] === 'progenitor_f_direto') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Progenitor f direto",
-            title: "progenitor_f_direto",
+            name: 'Progenitor f direto',
+            title: 'progenitor_f_direto',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "progenitor_m_direto") {
+      if (columnCampos[index] === 'progenitor_m_direto') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Progenitor m direto",
-            title: "progenitor_m_direto",
+            name: 'Progenitor m direto',
+            title: 'progenitor_m_direto',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "progenitor_f_origem") {
+      if (columnCampos[index] === 'progenitor_f_origem') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Progenitor f origem",
-            title: "progenitor_f_origem",
+            name: 'Progenitor f origem',
+            title: 'progenitor_f_origem',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "progenitor_m_origem") {
+      if (columnCampos[index] === 'progenitor_m_origem') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Progenitor m origem",
-            title: "progenitor_m_origem",
+            name: 'Progenitor m origem',
+            title: 'progenitor_m_origem',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "progenitores_origem") {
+      if (columnCampos[index] === 'progenitores_origem') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Progenitores origem",
-            title: "Progenitores origem",
+            name: 'Progenitores origem',
+            title: 'Progenitores origem',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "parentesco_completo") {
+      if (columnCampos[index] === 'parentesco_completo') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Parentesco",
-            title: "parentesco_completo",
+            name: 'Parentesco',
+            title: 'parentesco_completo',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "action") {
+      if (columnCampos[index] === 'action') {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -671,7 +671,7 @@ export default function Listagem({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox']");
-    let selecionados = "";
+    let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -694,7 +694,7 @@ export default function Listagem({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
       userLogado.preferences.genotipo = {
         id: preferences.id,
@@ -705,7 +705,7 @@ export default function Listagem({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     }
     setStatusAccordion(false);
     setCamposGerenciados(campos);
@@ -747,7 +747,7 @@ export default function Listagem({
             seconds = String(dataExp.getSeconds());
           }
           row.DT = `${dataExp.toLocaleDateString(
-            "pt-BR"
+            'pt-BR',
           )} ${hours}:${minutes}:${seconds}`;
 
           row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.name}`;
@@ -811,20 +811,20 @@ export default function Listagem({
         const workSheet = XLSX.utils.json_to_sheet(newData);
 
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "Genótipos");
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'Genótipos');
 
         // Buffer
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "buffer",
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "binary",
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, "Genótipos.xlsx");
+        XLSX.writeFile(workBook, 'Genótipos.xlsx');
       } else {
         // eslint-disable-next-line no-undef
         Swal.fire(response);
@@ -862,7 +862,7 @@ export default function Listagem({
   function checkValue(value: any) {
     const parameter = tableGlobalFunctions.getValuesForFilter(
       value,
-      filtersParams
+      filtersParams,
     );
     return parameter;
   }
@@ -900,7 +900,7 @@ export default function Listagem({
               max="40"
               id="filterGmrRangeFrom"
               name="filterGmrRangeFrom"
-              defaultValue={checkValue("filterGmrRangeFrom")}
+              defaultValue={checkValue('filterGmrRangeFrom')}
               onChange={formik.handleChange}
             />
           </div>
@@ -911,7 +911,7 @@ export default function Listagem({
               max="40"
               id="filterGmrRangeTo"
               name="filterGmrRangeTo"
-              defaultValue={checkValue("filterGmrRangeTo")}
+              defaultValue={checkValue('filterGmrRangeTo')}
               onChange={formik.handleChange}
             />
           </div>
@@ -989,16 +989,16 @@ export default function Listagem({
                   justify-center
                 "
                 >
-                  {filterFieldFactory("filterGenotipo", "Nome genótipo")}
+                  {filterFieldFactory('filterGenotipo', 'Nome genótipo')}
 
-                  {filterFieldFactory("filterMainName", "Nome principal")}
+                  {filterFieldFactory('filterMainName', 'Nome principal')}
 
                   {filterFieldFactory(
                     'filterCodTecnologia',
                     'Cod Tec',
                   )}
 
-                  {filterFieldFactory("filterTecnologiaDesc", "Nome Tec")}
+                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec')}
                 </div>
 
                 <div
@@ -1009,7 +1009,7 @@ export default function Listagem({
                   pt-5
                 "
                 >
-                  {filterFieldFactory("filterCruza", "Cruzamento de Origem")}
+                  {filterFieldFactory('filterCruza', 'Cruzamento de Origem')}
 
                   {filterFieldFactoryGmrRange('filterGmrRange', 'Faixa de GMR')}
                   {filterLotRange('filterLots', 'Nº Lotes')}
@@ -1037,7 +1037,7 @@ export default function Listagem({
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
               tableRef={tableRef}
-              style={{ background: "#f9fafb", width: "100%" }}
+              style={{ background: '#f9fafb', width: '100%' }}
               columns={columns}
               data={genotipos}
               options={{
@@ -1046,7 +1046,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 20,
                 },
-                rowStyle: { background: "#f9fafb", height: 35 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: Number(take),
@@ -1079,7 +1079,9 @@ export default function Listagem({
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado: {itemsTotal}
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
@@ -1123,7 +1125,7 @@ export default function Listagem({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                String(generate.value)
+                                                String(generate.value),
                                               )}
                                             />
                                           </li>
@@ -1162,59 +1164,58 @@ export default function Listagem({
                     </div>
                   </div>
                 ),
-                Pagination: (props) =>
-                  (
-                    <div
-                      className="flex
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(0)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage <= 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill("")
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setCurrentPage(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600 rrinky123"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(pages - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => setCurrentPage(0)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage <= 1}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => setCurrentPage(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      bgColor="bg-blue-600 rrinky123"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => setCurrentPage(pages - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
                   ) as any,
               }}
             />
@@ -1238,16 +1239,16 @@ export const getServerSideProps: GetServerSideProps = async ({
   const idCulture = Number(req.cookies.cultureId);
 
   // Last page
-  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
-  if (lastPageServer == undefined || lastPageServer == "No") {
-    removeCookies("filterBeforeEdit", { req, res });
-    removeCookies("pageBeforeEdit", { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("filtersParams", { req, res });
-    removeCookies("lastPage", { req, res });
-    removeCookies("itensPage", { req, res });
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('filtersParams', { req, res });
+    removeCookies('lastPage', { req, res });
+    removeCookies('itensPage', { req, res });
     // setCookies('filterParams','');
   }
 
@@ -1260,15 +1261,15 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : "";
+    : '';
 
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : "desc";
+    : 'desc';
 
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : "name_genotipo";
+    : 'name_genotipo';
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/genotipo`;
@@ -1282,23 +1283,23 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? `${req.cookies.filterBeforeEdit}`
     : `&id_culture=${idCulture}`;
 
-  removeCookies("filterBeforeEdit", { req, res });
-  removeCookies("pageBeforeEdit", { req, res });
-  removeCookies("takeBeforeEdit", { req, res });
-  removeCookies("filterBeforeEditTypeOrder", { req, res });
-  removeCookies("filterBeforeEditOrderBy", { req, res });
-  removeCookies("lastPage", { req, res });
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies('takeBeforeEdit', { req, res });
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
 
   const requestOptions = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
   const { response: allGenotipos = [], total: totalItems = 0 } = await fetch(
     // const { response: allGenotipos, total: totalItems } = await fetch(
     urlParameters.toString(),
-    requestOptions
+    requestOptions,
   ).then((response) => response.json());
 
   return {
