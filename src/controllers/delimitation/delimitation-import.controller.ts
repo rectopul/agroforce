@@ -5,6 +5,7 @@
 /* eslint-disable no-restricted-syntax */
 import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import { DelineamentoRepository } from 'src/repository/delineamento.repository';
+import { SequenciaDelineamentoRepository } from 'src/repository/sequencia-delineamento.repository';
 import handleError from '../../shared/utils/handleError';
 import {
   responseNullFactory,
@@ -19,6 +20,7 @@ import { ImportController } from '../import.controller';
 import { CulturaController } from '../cultura.controller';
 import { validateHeaders } from '../../shared/utils/validateHeaders';
 import { delimitationQueue } from './delimitation-queue';
+import { skip } from 'rxjs';
 
 export class ImportDelimitationController {
   static async validate(
@@ -61,15 +63,6 @@ export class ImportDelimitationController {
     const importController = new ImportController();
     const culturaController = new CulturaController();
     const delineamentoController = new DelineamentoController();
-
-    /* --------- Transcation Context --------- */
-    const transactionConfig = new TransactionConfig();
-    const delineamentoRepository = new DelineamentoRepository();
-    delineamentoRepository.setTransaction(
-      transactionConfig.clientManager,
-      transactionConfig.transactionScope,
-    );
-    /* --------------------------------------- */
 
     const responseIfError: Array<string> = [];
     try {
@@ -230,44 +223,62 @@ export class ImportDelimitationController {
     const sequenciaDelineamentoController = new SequenciaDelineamentoController();
     const logImportController = new LogImportController();
 
+    /* --------- Transcation Context --------- */
+    const transactionConfig = new TransactionConfig();
+    const delineamentoRepository = new DelineamentoRepository();
+    delineamentoRepository.setTransaction(
+      transactionConfig.clientManager,
+      transactionConfig.transactionScope,
+    );
+    const sequenciaRepository = new SequenciaDelineamentoRepository();
+    sequenciaRepository.setTransaction(
+      transactionConfig.clientManager,
+      transactionConfig.transactionScope,
+    );
+    /* --------------------------------------- */
+
     try {
-      for (const row in spreadSheet) {
-        if (row !== '0') {
-          const {
-            status,
-            response: delineamento,
-          }: IReturnObject = await delineamentoController.getAll({
-            name: spreadSheet[row][1],
-            id_culture: idCulture,
-            status: 1,
-          });
-          if (status === 200) {
-            await delineamentoController.update({
-              id: delineamento[0]?.id,
-              name: spreadSheet[row][1],
-              id_culture: idCulture,
-              repeticao: 1,
-              trat_repeticao: 1,
-              created_by: createdBy,
-            });
-            await sequenciaDelineamentoController.create({
-              id_delineamento: delineamento[0]?.id,
-              repeticao: spreadSheet[row][2],
-              sorteio: spreadSheet[row][3],
-              nt: spreadSheet[row][4],
-              bloco: spreadSheet[row][5],
-              created_by: createdBy,
-            });
-          } else {
-            const { response }: IReturnObject = await delineamentoController.create({
-              name: spreadSheet[row][1],
-              id_culture: idCulture,
-              repeticao: 1,
-              trat_repeticao: 1,
-              created_by: createdBy,
-            });
-            await sequenciaDelineamentoController.create({
-              id_delineamento: response?.id,
+      await transactionConfig.transactionScope.run(async () => {
+        for (const row in spreadSheet) {
+          if (row !== '0') {
+            let where = {
+              name: spreadSheet[row][1], 
+              id_culture: idCulture, 
+              status: 1
+            };
+            let select = {
+              id: true,
+              name: true,
+              repeticao: true,
+              trat_repeticao: true,
+              status: true,
+            };
+
+            const listDelineamento = await delineamentoRepository.findAll(where,select,undefined,undefined,undefined);
+            let delineamentoId = listDelineamento[0]?.id;
+
+            if (listDelineamento.total > 0 && delineamentoId) {
+              const delineamentoUpdated = await delineamentoRepository.update(delineamentoId, {
+                id: delineamentoId,
+                name: spreadSheet[row][1],
+                id_culture: idCulture,
+                repeticao: 1,
+                trat_repeticao: 1,
+                created_by: createdBy,
+              });
+
+            } else {
+              const delineamentoCreated = await delineamentoRepository.create({
+                name: spreadSheet[row][1],
+                id_culture: idCulture,
+                repeticao: 1,
+                trat_repeticao: 1,
+                created_by: createdBy,
+              });
+              delineamentoId = delineamentoCreated.id;
+            }
+            const sequenciaCreated = await sequenciaRepository.create({
+              id_delineamento: delineamentoId,
               repeticao: spreadSheet[row][2],
               sorteio: spreadSheet[row][3],
               nt: spreadSheet[row][4],
@@ -276,7 +287,7 @@ export class ImportDelimitationController {
             });
           }
         }
-      }
+      });
       await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
       return { status: 200, message: 'Delineamento importado com sucesso' };
     } catch (error: any) {
