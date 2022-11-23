@@ -630,7 +630,7 @@ export default function Listagem({
         "
         >
           <AccordionFilter title="Filtrar ambientes">
-            <div className="w-full flex gap-2">
+            <div className="w-full flex gap-0">
               <form
                 className="flex flex-col
                   w-full
@@ -644,7 +644,7 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-0
+                  pb-6
                 "
                 >
                   {/* <div className="h-6 w-1/3 ml-1">
@@ -678,7 +678,7 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pt-8
+                  pt-4
                 "
                 >
 
