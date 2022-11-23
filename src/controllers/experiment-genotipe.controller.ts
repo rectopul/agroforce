@@ -16,6 +16,7 @@ export class ExperimentGenotipeController {
   private printedHistoryController = new PrintHistoryController();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: experiment-genotipe.controller.ts ~ line 19 ~ ExperimentGenotipeController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
@@ -106,7 +107,7 @@ export class ExperimentGenotipeController {
 
       if (options.filterGenotypeName) {
         parameters.genotipo = JSON.parse(
-          `{ "genotipo": { "name_genotipo": { "contains": "${options.filterGenotypeName}" } }`,
+          `{ "name_genotipo": { "contains": "${options.filterGenotypeName}" } }`,
         );
       }
 

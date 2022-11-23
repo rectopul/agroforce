@@ -91,14 +91,17 @@ export class LoteController {
         }
       }
       if (options.filterNccFrom || options.filterNccTo) {
-        if (options.filterNccFrom && options.filterNccTo) {
-          parameters.ncc = JSON.parse(`{"gte": "${Number(options.filterNccFrom)}", "lte": "${Number(options.filterNccTo)}" }`);
+        if (options.filterNccFrom.toUpperCase() === 'VAZIO' || options.filterNccTo.toUpperCase() === 'VAZIO') {
+          parameters.ncc = null;
+        } else if (options.filterNccFrom && options.filterNccTo) {
+          parameters.ncc = JSON.parse(`{"gte": "${options.filterNccFrom}", "lte": "${options.filterNccTo}" }`);
         } else if (options.filterNccFrom) {
-          parameters.ncc = JSON.parse(`{"gte": "${Number(options.filterNccFrom)}" }`);
+          parameters.ncc = JSON.parse(`{"gte": "${options.filterNccFrom}" }`);
         } else if (options.filterNccTo) {
-          parameters.ncc = JSON.parse(`{"lte": "${Number(options.filterNccTo)}" }`);
+          parameters.ncc = JSON.parse(`{"lte": "${options.filterNccTo}" }`);
         }
       }
+
       if (options.filterCodLoteFrom || options.filterCodLoteTo) {
         if (options.filterCodLoteFrom && options.filterCodLoteTo) {
           parameters.cod_lote = JSON.parse(`{"gte": "${Number(options.filterCodLoteFrom)}", "lte": "${Number(options.filterCodLoteTo)}" }`);

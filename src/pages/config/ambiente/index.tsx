@@ -169,7 +169,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Tecnologia',
+      title: 'Nome Tec',
       value: 'tecnologia',
       defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
@@ -240,6 +240,8 @@ export default function Listagem({
       filterNPE: checkValue('filterNPE'),
       filterNpeTo: checkValue('filterNpeTo'),
       filterNpeFrom: checkValue('filterNpeFrom'),
+      filterNpeFinalTo: checkValue('filterNpeFrom'),
+      filterNpeFinalFrom: checkValue('filterNpeFrom'),
       orderBy: '',
       typeOrder: '',
     },
@@ -261,7 +263,7 @@ export default function Listagem({
       // &filterSafra=${filterSafra}
       const parametersFilter = `filterStatus=${
         filterStatus || 1
-      }&filterNpeTo=${filterNpeTo}&filterCodTecnologia=${filterCodTecnologia}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_culture=${idCulture}&id_safra=${safraId}`;
+      }&filterSafra=${filterSafra}&filterNpeTo=${filterNpeTo}&filterCodTecnologia=${filterCodTecnologia}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_culture=${idCulture}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&id_safra=${safraId}`;
       // &id_safra=${safraId}
       // await npeService
       //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
@@ -287,15 +289,17 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await npeService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400) {
-        setNPE(response.response);
-        setTotalItems(response.total);
-        tableRef.current.dataManager.changePageSize(
-          response.total >= take ? take : response.total,
-        );
-      }
-    })
+    await npeService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          setNPE(response.response);
+          setTotalItems(response.total);
+          tableRef.current.dataManager.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+        }
+      })
       .catch((_) => {
         setLoading(false);
       });
@@ -491,7 +495,7 @@ export default function Listagem({
       if (columnCampos[item] === 'tecnologia') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Tecnologia',
+            name: 'Nome Tec',
             title: 'tecnologia.cod_tec',
             orderList,
             fieldOrder,
@@ -858,7 +862,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar ambiente">
+          <AccordionFilter title="Filtrar ambientes">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -896,7 +900,6 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
                         placeholder="Cod Tec"
                         id="filterCodTecnologia"
                         name="filterCodTecnologia"

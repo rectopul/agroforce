@@ -55,6 +55,7 @@ export class LogImportController {
   }
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: log-import.controller.ts ~ line 58 ~ LogImportController ~ getAll ~ options', options);
     const parameters: object | any = {};
     parameters.AND = [];
     let orderBy: string;

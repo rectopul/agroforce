@@ -204,6 +204,7 @@ export class ImportGenotypeController {
                   // eslint-disable-next-line no-param-reassign
                   spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
                 }
+
                 const tec: any = await tecnologiaController.getAll({
                   id_culture: idCulture,
                   cod_tec: String(spreadSheet[row][column]),

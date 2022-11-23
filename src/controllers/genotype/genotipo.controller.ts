@@ -44,8 +44,8 @@ export class GenotipoController {
         }
       }
 
-      if (options.filterTecnologiaCod) {
-        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterTecnologiaCod}" } }`);
+      if (options.filterCodTecnologia) {
+        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterCodTecnologia}" } }`);
       }
 
       if (options.filterTecnologiaDesc) {

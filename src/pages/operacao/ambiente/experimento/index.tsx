@@ -843,7 +843,6 @@ export default function Listagem({
           genotipo_treatment.push(gt_new);
         });
       });
-      console.log("experiment_genotipo : ", experiment_genotipo);
       createExperimentGenotipe({
         data: experiment_genotipo,
         total_consumed: experiment_genotipo.length,

@@ -161,7 +161,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Tecnologia',
+      title: 'Nome Tec',
       value: 'tecnologia',
       defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
@@ -198,7 +198,9 @@ export default function Listagem({
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
   const [fieldOrder, setFieldOrder] = useState<any>(null);
 
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${
+    currentPage * Number(take)
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
   // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}`;
 
   const filters = [
@@ -220,12 +222,15 @@ export default function Listagem({
       filterTecnologia: checkValue('filterTecnologia'),
       filterEpoca: checkValue('filterEpoca'),
       filterNPE: checkValue('filterNPE'),
+      filterCodTecnologia: checkValue('filterCodTecnologia'),
       orderBy: '',
       typeOrder: '',
       filterNpeTo: checkValue('filterNpeTo'),
       filterNpeFrom: checkValue('filterNpeFrom'),
       filterNpeFinalTo: checkValue('filterNpeFinalTo'),
       filterNpeFinalFrom: checkValue('filterNpeFinalFrom'),
+      filterGrpTo: checkValue('filterGrpTo'),
+      filterGrpFrom: checkValue('filterGrpFrom'),
     },
     onSubmit: async ({
       filterStatus,
@@ -245,7 +250,7 @@ export default function Listagem({
       filterGrpFrom,
     }) => {
       // &filterSafra=${filterSafra}
-      const parametersFilter = `filterStatus=${filterStatus}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&safraId=${id_safra}`;
+      const parametersFilter = `filterStatus=${filterStatus}&filterCodTecnologia=${filterCodTecnologia}&filterGrpTo=${filterGrpTo}&filterGrpFrom=${filterGrpFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&safraId=${id_safra}`;
       // await npeService
       //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
       //   .then((response) => {
@@ -271,15 +276,17 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await npeService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400) {
-        setNPE(response.response);
-        setTotalItems(response.total);
-        tableRef?.current?.dataManager?.changePageSize(
-          response.total >= take ? take : response.total,
-        );
-      }
-    })
+    await npeService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          setNPE(response.response);
+          setTotalItems(response.total);
+          tableRef?.current?.dataManager?.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+        }
+      })
       .catch((_) => {
         setLoading(false);
       });
@@ -341,7 +348,7 @@ export default function Listagem({
       if (columnCampos[item] === 'tecnologia') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Tecnologia',
+            name: 'Nome Tec',
             title: 'tecnologia',
             orderList,
             fieldOrder,
@@ -623,7 +630,7 @@ export default function Listagem({
         "
         >
           <AccordionFilter title="Filtrar ambientes">
-            <div className="w-full flex gap-2">
+            <div className="w-full flex gap-0">
               <form
                 className="flex flex-col
                   w-full
@@ -637,7 +644,7 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pb-0
+                  pb-6
                 "
                 >
                   {/* <div className="h-6 w-1/3 ml-1">
@@ -661,52 +668,21 @@ export default function Listagem({
 
                   {filterFieldFactory('filterEnsaio', 'Ensaio')}
 
-                  <div className="h-6 w-1/2 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cod Tec
-                    </label>
-                    <div className="flex">
-                      <Input
-                        type="number"
-                        placeholder="Cod Tec"
-                        id="filterCodTec"
-                        name="filterCodTec"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div
-                  className="w-full h-full
-                  flex
-                  justify-center
-                  pt-8
-                "
-                >
-                  {filterFieldFactory('filterTecnologia', 'Tecnologia')}
+                  {filterFieldFactory('filterCodTecnologia', 'Cod Tec')}
+
+                  {filterFieldFactory('filterTecnologia', 'Nome Tec')}
+
                 </div>
 
                 <div
                   className="w-full h-full
                   flex
                   justify-center
-                  pt-8
+                  pt-4
                 "
                 >
-                  <div className="h-6 w-1/2 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Época
-                    </label>
-                    <div className="flex">
-                      <Input
-                        type="number"
-                        placeholder="Época"
-                        id="filterPeriod"
-                        name="filterPeriod"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
+
+                  {filterFieldFactory('filterEpoca', 'Época')}
 
                   <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">

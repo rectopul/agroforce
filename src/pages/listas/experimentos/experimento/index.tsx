@@ -50,7 +50,7 @@ interface IFilter {
   filterGli: string;
   filterExperimentName: string;
   filterTecnologia: string;
-  filterCod: string;
+  filterCodTec: string;
   filterPeriod: string;
   filterDelineamento: string;
   filterRepetition: string;
@@ -142,10 +142,10 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
     {
       name: 'CamposGerenciados[]',
-      title: 'Nome do experimento',
+      title: 'Nome experimento',
       value: 'experimentName',
     },
-    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'Nome Tec', value: 'tecnologia' },
     { name: 'CamposGerenciados[]', title: 'Época', value: 'period' },
     {
       name: 'CamposGerenciados[]',
@@ -219,7 +219,7 @@ export default function Listagem({
       filterGli: checkValue('filterGli'),
       filterExperimentName: checkValue('filterExperimentName'),
       filterTecnologia: checkValue('filterTecnologia'),
-      filterCod: checkValue('filterCod'),
+      filterCodTec: checkValue('filterCodTec'),
       filterPeriod: checkValue('filterPeriod'),
       filterDelineamento: checkValue('filterDelineamento'),
       filterRepetition: checkValue('filterRepetition'),
@@ -234,7 +234,7 @@ export default function Listagem({
       filterGli,
       filterExperimentName,
       filterTecnologia,
-      filterCod,
+      filterCodTec,
       filterPeriod,
       filterDelineamento,
       filterRepetition,
@@ -251,40 +251,9 @@ export default function Listagem({
         }
       }
       // const filterStatus = selecionados.substr(0, selecionados.length - 1);
-      const filterStatus = statusFilterSelected?.join(',')?.toLowerCase();
+      const filterExperimentStatus = statusFilterSelected?.join(',')?.toLowerCase();
 
-      //   // Call filter with there parameter
-      //   const parametersFilter = await fetchWrapper.handleFilterParameter(
-      //     'experimento',
-      //     filterFoco,
-      //     filterTypeAssay,
-      //     filterProtocol,
-      //     filterGli,
-      //     filterExperimentName,
-      //     filterTecnologia,
-      //     filterCod,
-      //     filterPeriod,
-      //     filterDelineamento,
-      //     filterRepetition,
-      //     filterStatus,
-      //     idSafra,
-      //   );
-
-      //   setFiltersParams(parametersFilter);
-      //   setFilter(parametersFilter);
-      //   setCookies('filterBeforeEdit', filter);
-
-      //   await experimentService
-      //     .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
-      //     .then((response) => {
-      //       setFilter(parametersFilter);
-      //       setExperimento(response.response);
-      //       setTotalItems(response.total);
-      //       setCurrentPage(0);
-      //     });
-      // },
-
-      const parametersFilter = `filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterCod=${filterCod}&filterStatus=${filterStatus}&id_culture=${cultureId}`;
+      const parametersFilter = `filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterCodTec=${filterCodTec}&filterExperimentStatus=${filterExperimentStatus}&id_culture=${cultureId}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -302,18 +271,20 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await experimentService.getAll(parametersFilter).then((response) => {
-      if (
-        response.status === 200
-        || (response.status === 400 && response.total == 0)
-      ) {
-        setExperimento(response.response);
-        setTotalItems(response.total);
-        tableRef.current?.dataManager.changePageSize(
-          response.total >= take ? take : response.total,
-        );
-      }
-    })
+    await experimentService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (
+          response.status === 200
+          || (response.status === 400 && response.total == 0)
+        ) {
+          setExperimento(response.response);
+          setTotalItems(response.total);
+          tableRef.current?.dataManager.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+        }
+      })
       .catch((_) => {
         setLoading(false);
       });
@@ -578,7 +549,7 @@ export default function Listagem({
       if (columnCampos[index] === 'tecnologia') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Tecnologia',
+            name: 'Nome Tec',
             title: 'tecnologia',
             orderList,
             fieldOrder,
@@ -884,7 +855,7 @@ export default function Listagem({
                   {filterFieldFactory('filterGli', 'GLI')}
                   {filterFieldFactory(
                     'filterExperimentName',
-                    'Nome Experimento',
+                    'Nome experimento',
                   )}
 
                   <div className="h-6 w-1/2 ml-2">
@@ -893,7 +864,6 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
                         placeholder="Cod Tec"
                         id="filterCodTec"
                         name="filterCodTec"
@@ -910,7 +880,7 @@ export default function Listagem({
                                         pb-0
                                         "
                 >
-                  {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
+                  {filterFieldFactory('filterTecnologia', 'Nome Tec')}
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -931,7 +901,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Repetição
+                      Rep
                     </label>
                     <div className="flex">
                       <Input
