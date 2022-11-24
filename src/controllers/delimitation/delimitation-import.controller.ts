@@ -239,6 +239,8 @@ export class ImportDelimitationController {
 
     try {
       await transactionConfig.transactionScope.run(async () => {
+        let delineamentoSaved;
+
         for (const row in spreadSheet) {
           if (row !== '0') {
             let where = {
@@ -258,7 +260,7 @@ export class ImportDelimitationController {
             let delineamentoId = listDelineamento[0]?.id;
 
             if (listDelineamento.total > 0) {
-              const delineamentoUpdated = await delineamentoRepository.updateTransaction(delineamentoId, {
+               delineamentoSaved = await delineamentoRepository.updateTransaction(delineamentoId, {
                 id: delineamentoId,
                 name: spreadSheet[row][1],
                 id_culture: idCulture,
@@ -268,14 +270,14 @@ export class ImportDelimitationController {
               });
 
             } else {
-              const delineamentoCreated = await delineamentoRepository.createTransaction({
+               delineamentoSaved = await delineamentoRepository.createTransaction({
                 name: spreadSheet[row][1],
                 id_culture: idCulture,
                 repeticao: 1,
                 trat_repeticao: 1,
                 created_by: createdBy,
               });
-              delineamentoId = delineamentoCreated.id;
+              delineamentoId = delineamentoSaved.id;
             }
             const sequenciaCreated = await sequenciaRepository.createTransaction({
               id_delineamento: delineamentoId,
@@ -285,6 +287,28 @@ export class ImportDelimitationController {
               bloco: spreadSheet[row][5],
               created_by: createdBy,
             });
+
+            //Atualiza contagem apos inserir nova sequencia
+            if (delineamentoSaved){
+              
+              let repeticaoUpdated = delineamentoSaved.repeticao;
+              let tratRepeticaoUpdated = delineamentoSaved.trat_repeticao;
+
+              if (sequenciaCreated.repeticao > delineamentoSaved.repeticao) {
+                repeticaoUpdated = sequenciaCreated.repeticao;
+              } 
+
+              if (sequenciaCreated.nt > delineamentoSaved.trat_repeticao) {
+                tratRepeticaoUpdated = sequenciaCreated.nt;
+              }
+
+              delineamentoSaved = await delineamentoRepository.updateTransaction(delineamentoId, {
+                id: delineamentoId,
+                repeticao: repeticaoUpdated,
+                trat_repeticao: tratRepeticaoUpdated,
+              });
+            }
+            
           }
         }
       });
