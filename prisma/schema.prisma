@@ -33,6 +33,7 @@ model culture {
   type_assay        type_assay[]
   users_cultures    users_cultures[]
   users_permissions users_permissions[]
+  lote              lote[]
 }
 
 model department {
@@ -385,6 +386,7 @@ model lote {
   id_dados            Int
   id_s2               Int
   id_safra            Int
+  id_culture          Int
   ncc                 Decimal?              @db.Decimal(12, 0)
   peso                Decimal?              @db.Decimal(5, 0)
   quant_sementes      Int?
@@ -392,6 +394,7 @@ model lote {
   dt_export           DateTime?
   genotipo            genotipo              @relation(fields: [id_genotipo], references: [id])
   safra               safra                 @relation(fields: [id_safra], references: [id])
+  culture             culture               @relation(fields: [id_culture], references: [id])
   genotype_treatment  genotype_treatment[]
   experiment_genotipe experiment_genotipe[]
 }
