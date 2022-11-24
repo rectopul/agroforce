@@ -124,7 +124,7 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
-      title: "Nome Tec",
+      title: "Tecnologia",
       value: "tecnologia",
       defaultChecked: () => camposGerenciados.includes("tecnologia"),
     },
@@ -500,7 +500,7 @@ export default function Listagem({
       if (columnOrder[item] === "tecnologia") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Nome Tec",
+            name: "Tecnologia",
             title: "tecnologia.cod_tec",
             orderList,
             fieldOrder,
