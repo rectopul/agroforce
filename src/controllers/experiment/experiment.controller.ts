@@ -29,9 +29,7 @@ export class ExperimentController {
           parameters.repetitionsNumber = JSON.parse(`{"lte": ${Number(options.filterRepetitionTo)} }`);
         }
       }
-      // if (options.filterRepetition) {
-      //   parameters.repetitionsNumber = Number(options.filterRepetition);
-      // }
+
       if (options.filterExperimentStatus) {
         parameters.OR = [];
         const statusParams = options.filterExperimentStatus.split(',');
