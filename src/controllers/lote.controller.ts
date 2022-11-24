@@ -59,6 +59,7 @@ export class LoteController {
   }
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: lote.controller.ts ~ line 62 ~ LoteController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any = '';
     parameters.AND = [];
@@ -209,6 +210,10 @@ export class LoteController {
 
       if (options.id_safra) {
         parameters.id_safra = Number(options.id_safra);
+      }
+
+      if (options.id_culture) {
+        parameters.id_culture = Number(options.id_culture);
       }
 
       if (options.name) {
