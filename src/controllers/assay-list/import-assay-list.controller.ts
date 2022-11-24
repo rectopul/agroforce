@@ -477,7 +477,8 @@ export class ImportAssayListController {
             let select = {
               id: true,
               id_safra: true,
-              gli: true
+              gli: true,
+              treatmentsNumber: true
             };
 
             const assayList = await assayListRepository.findAll(where,select,undefined,undefined,undefined);
