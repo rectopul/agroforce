@@ -240,9 +240,8 @@ export default function Listagem({
   //   orderBy == "tecnologia" ? "genotipo.tecnologia.cod_tec" : orderBy
   // }&typeOrder=${typeOrder}`; // RR
 
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const [nccIsValid, setNccIsValid] = useState<boolean>(false);
   const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
@@ -1394,7 +1393,7 @@ export default function Listagem({
                     : "",
                 },
               }}
-              onChangeRowsPerPage={(e: any) => {}}
+              onChangeRowsPerPage={(e: any) => { }}
               onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (
@@ -1630,7 +1629,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies("filterBeforeEditOrderBy", { req, res });
   removeCookies("lastPage", { req, res });
 
-  const param = `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   const urlParametersAssay: any = new URL(baseUrlAssay);
   const urlParametersTreatment: any = new URL(baseUrlTreatment);
