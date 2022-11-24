@@ -482,6 +482,7 @@ export class ImportAssayListController {
 
             const assayList = await assayListRepository.findAll(where,select,undefined,undefined,undefined);
             let assayListId = assayList[0]?.id;
+            let assayTreatmentsNumber = 1;
 
             if (assayList.total == 0) {
               savedAssayList = await assayListRepository.createTransaction({
@@ -493,6 +494,7 @@ export class ImportAssayListController {
                 bgm: (spreadSheet[row][6]) ? Number(spreadSheet[row][6]) : null,
                 project: String(spreadSheet[row][7]),
                 created_by: createdBy,
+                treatmentsNumber: assayTreatmentsNumber,
               });
               savedGenotype = await genotypeTreatmentRepository.createTransaction({
                 id_safra: idSafra,
@@ -508,6 +510,9 @@ export class ImportAssayListController {
               if (Number(spreadSheet[row][8]) === 1) {
                 verifyToDelete = true;
               }
+
+              assayTreatmentsNumber = Number(assayList[0]?.treatmentsNumber) + 1;
+
               savedAssayList = await assayListRepository.updateTransaction(Number(assayListId), {
                 id: assayListId,
                 id_safra: idSafra,
@@ -518,6 +523,7 @@ export class ImportAssayListController {
                 bgm: (spreadSheet[row][6]) ? Number(spreadSheet[row][6]) : null,
                 project: String(spreadSheet[row][7]),
                 created_by: createdBy,
+                treatmentsNumber: assayTreatmentsNumber
               });
               if (verifyToDelete) {
                 await genotypeTreatmentRepository.deleteAll(Number(assayListId));
@@ -534,7 +540,7 @@ export class ImportAssayListController {
                 created_by: createdBy,
               });
             }
-            if (savedAssayList.status === 200) {
+            if (savedAssayList) {
               if (spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]) {
                 if (spreadSheet[row][0] === 'PRODUTIVIDADE') {
                   productivity += 1;
