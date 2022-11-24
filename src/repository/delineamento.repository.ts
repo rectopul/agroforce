@@ -17,7 +17,7 @@ export class DelineamentoRepository extends BaseRepository {
       order = JSON.parse(orderBy);
     }
     const count = await this.getPrisma().delineamento.count({ where });
-    const Result: object | any = await prisma.delineamento.findMany({
+    const Result: object | any = await this.getPrisma().delineamento.findMany({
       select, skip, take, where, orderBy: order,
     });
     Result.total = count;

@@ -242,8 +242,8 @@ export class ImportDelimitationController {
         for (const row in spreadSheet) {
           if (row !== '0') {
             let where = {
-              name: spreadSheet[row][1], 
-              id_culture: idCulture, 
+              name: spreadSheet[row][1] , 
+              id_culture: Number(idCulture), 
               status: 1
             };
             let select = {
@@ -257,7 +257,7 @@ export class ImportDelimitationController {
             const listDelineamento = await delineamentoRepository.findAll(where,select,undefined,undefined,undefined);
             let delineamentoId = listDelineamento[0]?.id;
 
-            if (listDelineamento.total > 0 && delineamentoId) {
+            if (listDelineamento.total > 0) {
               const delineamentoUpdated = await delineamentoRepository.updateTransaction(delineamentoId, {
                 id: delineamentoId,
                 name: spreadSheet[row][1],
