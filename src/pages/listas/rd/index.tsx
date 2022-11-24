@@ -347,7 +347,10 @@ export default function Import({
                 title={rowData.state}
                 onClick={() => {
                   Swal.fire({
-                    html: rowData.invalid_data,
+                    html:
+                      '<div style="max-height: 350px; overflow-y: auto">' +
+                      rowData.invalid_data +
+                      "</di>",
                     width: "800",
                   });
                 }}
