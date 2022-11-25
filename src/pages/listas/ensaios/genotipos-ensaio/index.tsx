@@ -1212,14 +1212,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterBgmFrom"
                         name="filterBgmFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterBgmTo"
@@ -1235,14 +1235,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterBgmGenotypeFrom"
                         name="filterBgmGenotypeFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterBgmGenotypeTo"

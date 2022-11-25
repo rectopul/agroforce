@@ -661,9 +661,7 @@ export default function Listagem({
                     />
                   </div> */}
 
-                  {filterFieldFactory("filterLocal", "Lugar de cultura")}
-
-                  {filterFieldFactory("filterSafra", "Safra")}
+                  {filterFieldFactory('filterLocal', 'Lugar de cultura')}
 
                   {filterFieldFactory("filterFoco", "Foco")}
 

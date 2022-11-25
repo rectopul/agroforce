@@ -333,40 +333,61 @@ export default function TipoEnsaio({
       field: "action",
       sorting: false,
       searchable: false,
-      render: (rowData: IAssayList) =>
-        !rowData.experiment.length ? (
-          <div className="h-7 flex">
-            <div className="h-7">
-              <Button
-                icon={<BiEdit size={14} />}
-                title={`Atualizar ${rowData.gli}`}
-                onClick={() => {
-                  setCookies("pageBeforeEdit", currentPage?.toString());
-                  setCookies("filterBeforeEdit", filter);
-                  setCookies("filterBeforeEditTypeOrder", typeOrder);
-                  setCookies("filterBeforeEditOrderBy", orderBy);
-                  setCookies("filtersParams", filtersParams);
-                  setCookies("lastPage", "atualizar");
-                  setCookies("takeBeforeEdit", take);
-                  setCookies("itensPage", itensPerPage);
-                  router.push(
-                    `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`
-                  );
-                }}
-                bgColor="bg-blue-600"
-                textColor="white"
-              />
-            </div>
-            <div style={{ width: 5 }} />
-            <div>
-              <Button
-                title={`Deletar ${rowData.gli}`}
-                icon={<BsTrashFill size={14} />}
-                onClick={() => deleteConfirmItem(rowData)}
-                bgColor="bg-red-600"
-                textColor="white"
-              />
-            </div>
+      render: (rowData: IAssayList) => (!rowData.experiment.length ? (
+        <div className="h-7 flex">
+          <div className="h-7">
+            <Button
+              icon={<BiEdit size={14} />}
+              title={`Atualizar ${rowData.gli}`}
+              onClick={() => {
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('lastPage', 'atualizar');
+                setCookies('takeBeforeEdit', take);
+                setCookies('itensPage', itensPerPage);
+                router.push(
+                  `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`,
+                );
+              }}
+              bgColor="bg-blue-600"
+              textColor="white"
+            />
+          </div>
+          <div style={{ width: 5 }} />
+          <div>
+            <Button
+              title={`Deletar ${rowData.gli}`}
+              icon={<BsTrashFill size={14} />}
+              onClick={() => deleteConfirmItem(rowData)}
+              bgColor="bg-red-600"
+              textColor="white"
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="h-7 flex">
+          <div className="h-7">
+            <Button
+              icon={<BiEdit size={14} />}
+              title={`Atualizar ${rowData.gli}`}
+              onClick={() => {
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('takeBeforeEdit', take);
+                setCookies('lastPage', 'atualizar');
+                router.push(
+                  `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`,
+                );
+              }}
+              bgColor="bg-blue-600"
+              textColor="white"
+            />
           </div>
         ) : (
           <div className="h-7 flex">

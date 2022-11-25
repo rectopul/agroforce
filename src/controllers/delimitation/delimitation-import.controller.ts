@@ -6,6 +6,7 @@
 import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import { DelineamentoRepository } from 'src/repository/delineamento.repository';
 import { SequenciaDelineamentoRepository } from 'src/repository/sequencia-delineamento.repository';
+import { skip } from 'rxjs';
 import handleError from '../../shared/utils/handleError';
 import {
   responseNullFactory,
@@ -20,7 +21,6 @@ import { ImportController } from '../import.controller';
 import { CulturaController } from '../cultura.controller';
 import { validateHeaders } from '../../shared/utils/validateHeaders';
 import { delimitationQueue } from './delimitation-queue';
-import { skip } from 'rxjs';
 
 export class ImportDelimitationController {
   static async validate(
@@ -243,12 +243,12 @@ export class ImportDelimitationController {
 
         for (const row in spreadSheet) {
           if (row !== '0') {
-            let where = {
-              name: spreadSheet[row][1] , 
-              id_culture: Number(idCulture), 
-              status: 1
+            const where = {
+              name: spreadSheet[row][1],
+              id_culture: Number(idCulture),
+              status: 1,
             };
-            let select = {
+            const select = {
               id: true,
               name: true,
               repeticao: true,
@@ -256,17 +256,16 @@ export class ImportDelimitationController {
               status: true,
             };
 
-            const listDelineamento = await delineamentoRepository.findAll(where,select,undefined,undefined,undefined);
+            const listDelineamento = await delineamentoRepository.findAll(where, select, undefined, undefined, undefined);
             let delineamentoId = listDelineamento[0]?.id;
 
             if (listDelineamento.total > 0) {
-               delineamentoSaved = await delineamentoRepository.updateTransaction(delineamentoId, {
+              delineamentoSaved = await delineamentoRepository.updateTransaction(delineamentoId, {
                 id: delineamentoId,
                 created_by: createdBy,
               });
-
             } else {
-               delineamentoSaved = await delineamentoRepository.createTransaction({
+              delineamentoSaved = await delineamentoRepository.createTransaction({
                 name: spreadSheet[row][1],
                 id_culture: idCulture,
                 repeticao: 1,
@@ -284,15 +283,14 @@ export class ImportDelimitationController {
               created_by: createdBy,
             });
 
-            //Atualiza contagem apos inserir nova sequencia
-            if (delineamentoSaved){
-              
+            // Atualiza contagem apos inserir nova sequencia
+            if (delineamentoSaved) {
               let repeticaoUpdated = delineamentoSaved.repeticao;
               let tratRepeticaoUpdated = delineamentoSaved.trat_repeticao;
 
               if (sequenciaCreated.repeticao > delineamentoSaved.repeticao) {
                 repeticaoUpdated = sequenciaCreated.repeticao;
-              } 
+              }
 
               if (sequenciaCreated.nt > delineamentoSaved.trat_repeticao) {
                 tratRepeticaoUpdated = sequenciaCreated.nt;
@@ -304,7 +302,6 @@ export class ImportDelimitationController {
                 trat_repeticao: tratRepeticaoUpdated,
               });
             }
-            
           }
         }
       });
