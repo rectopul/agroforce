@@ -124,7 +124,7 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
-      title: "Nome Tec",
+      title: "Tecnologia",
       value: "tecnologia",
       defaultChecked: () => camposGerenciados.includes("tecnologia"),
     },
@@ -240,8 +240,9 @@ export default function Listagem({
   //   orderBy == "tecnologia" ? "genotipo.tecnologia.cod_tec" : orderBy
   // }&typeOrder=${typeOrder}`; // RR
 
-  const pathExtra = `skip=${currentPage * Number(take)
-    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const pathExtra = `skip=${
+    currentPage * Number(take)
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const [nccIsValid, setNccIsValid] = useState<boolean>(false);
   const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
@@ -343,6 +344,8 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
+    setLoading(true);
+
     await experimentGenotipeService
       .getAll(parametersFilter)
       .then((response) => {
@@ -357,6 +360,8 @@ export default function Listagem({
       .catch((_) => {
         setLoading(false);
       });
+
+    setLoading(false);
   }
 
   // Call that function when change type order value.
@@ -499,7 +504,7 @@ export default function Listagem({
       if (columnOrder[item] === "tecnologia") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Nome Tec",
+            name: "Tecnologia",
             title: "tecnologia.cod_tec",
             orderList,
             fieldOrder,
@@ -1393,7 +1398,7 @@ export default function Listagem({
                     : "",
                 },
               }}
-              onChangeRowsPerPage={(e: any) => { }}
+              onChangeRowsPerPage={(e: any) => {}}
               onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (
