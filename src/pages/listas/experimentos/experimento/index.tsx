@@ -273,6 +273,8 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
+    setLoading(true);
+
     await experimentService
       .getAll(parametersFilter)
       .then((response) => {
@@ -290,6 +292,8 @@ export default function Listagem({
       .catch((_) => {
         setLoading(false);
       });
+
+    setLoading(false);
   }
 
   // Call that function when change type order value.
