@@ -373,7 +373,7 @@ export default function Listagem({
     await experimentGenotipeService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
       .then(({ status, response }: IReturnObject) => {
-        if (status === 200) {
+        if (status === 200 || status === 400) {
           setParcelas(response);
         }
       });
@@ -732,10 +732,11 @@ export default function Listagem({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
+
     await experimentGenotipeService
       .getAll(parametersFilter)
       .then(({ status, response }: IReturnObject) => {
-        if (status === 200) {
+        if (status === 200 || status === 400) {
           setParcelas(response);
         }
       });
@@ -974,8 +975,6 @@ export default function Listagem({
 
     return true;
   }
-
-  console.log({ parcelas });
 
   return (
     <>
@@ -1545,9 +1544,10 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { publicRuntimeConfig } = getConfig();
   const baseUrlParcelas = `${publicRuntimeConfig.apiUrl}/experiment-genotipe`;
 
-  const filterApplication =
-    req.cookies.filterBeforeEdit ||
-    `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  // const filterApplication =
+  //   req.cookies.filterBeforeEdit ||
+  //   `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const filterApplication = `&id_culture=${idCulture}&id_safra=${idSafra}`;
   removeCookies("filterBeforeEdit", { req, res });
   removeCookies("pageBeforeEdit", { req, res });
 
