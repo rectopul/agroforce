@@ -861,14 +861,14 @@ export default function Listagem({
                       </label>
                       <div className="flex">
                         <Input
-                          type="number"
+                          type="int"
                           placeholder="De"
                           id="filterGmrFrom"
                           name="filterGmrFrom"
                           onChange={formik.handleChange}
                         />
                         <Input
-                          type="number"
+                          type="int"
                           style={{ marginLeft: 5 }}
                           placeholder="Até"
                           id="filterGmrTo"

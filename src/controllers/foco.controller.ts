@@ -28,11 +28,11 @@ export class FocoController {
 
       if (options.filterGroupFrom || options.filterGroupTo) {
         if (options.filterGroupFrom && options.filterGroupTo) {
-          parameters.group = JSON.parse(`{ "group": { "gte": "${Number(options.filterGroupFrom)}", "lte": "${Number(options.filterGroupTo)}" } }`);
+          parameters.group = JSON.parse(` { "some" : {"group": {"gte": ${Number(options.filterGroupFrom)}, "lte": ${Number(options.filterGroupTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
         } else if (options.filterGroupFrom) {
-          parameters.group = JSON.parse(`{ "group": { "gte": "${Number(options.filterGroupFrom)}" } }`);
+          parameters.group = JSON.parse(`{ "some" : {"group": {"gte": ${Number(options.filterGroupFrom)} } , "id_safra": ${Number(options.id_safra)}} }`);
         } else if (options.filterGroupTo) {
-          parameters.group = JSON.parse(`{ "group": { "lte": "${Number(options.filterGroupTo)}" } }`);
+          parameters.group = JSON.parse(` { "some" : {"group": {"lte": ${Number(options.filterGroupTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
         }
       }
 

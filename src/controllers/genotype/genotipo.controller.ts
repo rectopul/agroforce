@@ -7,7 +7,9 @@ export class GenotipoController {
   genotipoRepository = new GenotipoRepository();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: genotipo.controller.ts ~ line 10 ~ GenotipoController ~ getAll ~ options', options);
     const parameters: object | any = {};
+    parameters.AND = [];
     let orderBy: object | any;
     let select: any = [];
     try {
@@ -45,11 +47,11 @@ export class GenotipoController {
       }
 
       if (options.filterCodTecnologia) {
-        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterCodTecnologia}" } }`);
+        parameters.AND.push(JSON.parse(`{ "tecnologia": { "cod_tec": {"contains": "${options.filterCodTecnologia}" } } }`));
       }
 
       if (options.filterTecnologiaDesc) {
-        parameters.tecnologia = JSON.parse(`{ "desc": {"contains": "${options.filterTecnologiaDesc}" } }`);
+        parameters.AND.push(JSON.parse(`{ "tecnologia": { "desc": {"contains": "${options.filterTecnologiaDesc}" } } }`));
       }
 
       if (options.filterCruza) {

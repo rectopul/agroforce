@@ -888,8 +888,6 @@ export default function Listagem({
                     />
                   </div> */}
 
-                  {filterFieldFactory('filterSafra', 'Safra')}
-
                   {filterFieldFactory('filterFoco', 'Foco')}
 
                   {filterFieldFactory('filterEnsaio', 'Ensaio')}

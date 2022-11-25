@@ -895,7 +895,7 @@ export default function Listagem({
         <div className="grid grid-cols-2 gap-2">
           <div>
             <Input
-              type="text"
+              type="int"
               placeholder="De"
               max="40"
               id="filterGmrRangeFrom"
@@ -906,7 +906,7 @@ export default function Listagem({
           </div>
           <div>
             <Input
-              type="text"
+              type="int"
               placeholder="Até"
               max="40"
               id="filterGmrRangeTo"
@@ -929,7 +929,7 @@ export default function Listagem({
         <div className="grid grid-cols-2 gap-2">
           <div>
             <Input
-              type="text"
+              type="number"
               placeholder="De"
               max="40"
               id="filterLotsFrom"
@@ -939,7 +939,7 @@ export default function Listagem({
           </div>
           <div>
             <Input
-              type="text"
+              type="number"
               placeholder="Até"
               max="40"
               id="filterLotsTo"

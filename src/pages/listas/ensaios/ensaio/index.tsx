@@ -380,6 +380,7 @@ export default function TipoEnsaio({
                 setCookies('filterBeforeEditTypeOrder', typeOrder);
                 setCookies('filterBeforeEditOrderBy', orderBy);
                 setCookies('filtersParams', filtersParams);
+                setCookies('takeBeforeEdit', take);
                 setCookies('lastPage', 'atualizar');
                 router.push(
                   `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`,
