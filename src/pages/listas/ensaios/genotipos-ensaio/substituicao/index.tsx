@@ -43,6 +43,7 @@ import {
 import { UserPreferenceController } from '../../../../../controllers/user-preference.controller';
 import ITabs from '../../../../../shared/utils/dropdown';
 import headerTableFactoryGlobal from '../../../../../shared/utils/headerTableFactory';
+import ComponentLoading from '../../../../../components/Loading';
 
 interface IFilter {
   filterYear: string;
@@ -130,6 +131,7 @@ export default function Listagem({
 
   // const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
   const [lotes, setLotes] = useState([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [nameReplace, setNameReplace] = useState<any>('');
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>('');
@@ -139,8 +141,8 @@ export default function Listagem({
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Safra', value: 'safra' },
-    { name: 'CamposGerenciados[]', title: 'Ano lote', value: 'year' },
-    { name: 'CamposGerenciados[]', title: 'Cod lote', value: 'cod_lote' },
+    { name: 'CamposGerenciados[]', title: 'Ano Lote', value: 'year' },
+    { name: 'CamposGerenciados[]', title: 'Cod Lote', value: 'cod_lote' },
     { name: 'CamposGerenciados[]', title: 'NCA', value: 'ncc' },
     { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
     { name: 'CamposGerenciados[]', title: 'Peso', value: 'peso' },
@@ -151,7 +153,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Nome do genotipo',
+      title: 'Nome genotipo',
       value: 'name_genotipo',
     },
     {
@@ -247,9 +249,13 @@ export default function Listagem({
           setLotes(response);
           setTotalItems(allTotal);
           setCurrentPage(0);
+          setLoading(false);
           tableRef?.current?.dataManager?.changePageSize(
             allTotal >= take ? take : allTotal,
           );
+        })
+        .catch((_) => {
+          setLoading(false);
         });
     },
   });
@@ -304,6 +310,10 @@ export default function Listagem({
       }
     }
 
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
     setFieldOrder(name);
   }
 
@@ -428,7 +438,7 @@ export default function Listagem({
       if (columnCampos[index] === 'year') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Ano lote',
+            name: 'Ano Lote',
             title: 'year',
             orderList,
             fieldOrder,
@@ -439,7 +449,7 @@ export default function Listagem({
       if (columnCampos[index] === 'cod_lote') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Cod lote',
+            name: 'Cod Lote',
             title: 'cod_lote',
             orderList,
             fieldOrder,
@@ -656,7 +666,11 @@ export default function Listagem({
         if (status === 200) {
           setLotes(response);
           setTotalItems(total);
+          setLoading(false);
         }
+      })
+      .catch((_) => {
+        setLoading(false);
       });
   }
 
@@ -687,6 +701,8 @@ export default function Listagem({
       <Head>
         <title>Listagem de Lotes</title>
       </Head>
+
+      {loading && <ComponentLoading text="" />}
 
       <ModalConfirmation
         isOpen={isOpenModal}
@@ -721,10 +737,21 @@ export default function Listagem({
                   pb-2
                 "
                 >
-                  {filterFieldFactory('filterYear', 'Ano lote', true)}
+                  <div className="h-10 w-1/3 ml-2">
+                    <label className="block text-gray-900 text-sm mb-1">Ano Lote</label>
+                    <Input
+                      type="text"
+                      placeholder="Ano Lote"
+                      max="40"
+                      id="filterYear"
+                      name="filterYear"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cod. Lote
+                      Cod Lote
                     </label>
                     <div className="flex">
                       <Input
@@ -772,15 +799,15 @@ export default function Listagem({
                     <div className="flex">
                       <Input
                         placeholder="De"
-                        id="filterSeedsFrom"
-                        name="filterSeedsFrom"
+                        id="filterPesoFrom"
+                        name="filterPesoFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
-                        id="filterSeedsTo"
-                        name="filterSeedsTo"
+                        id="filterPesoTo"
+                        name="filterPesoTo"
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -792,12 +819,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterSeedsFrom"
                         name="filterSeedsFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterSeedsTo"
@@ -873,7 +902,9 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6 ml-2">
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

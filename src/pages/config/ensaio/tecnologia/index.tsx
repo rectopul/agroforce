@@ -137,7 +137,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Cod Tec.',
+      title: 'Cod Tec',
       value: 'cod_tec',
       defaultChecked: () => camposGerenciados.includes('cod_tec'),
     },
@@ -196,15 +196,17 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await tecnologiaService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400) {
-        setTecnologias(response.response);
-        setTotalItems(response.total);
-        tableRef.current.dataManager.changePageSize(
-          response.total >= take ? take : response.total,
-        );
-      }
-    })
+    await tecnologiaService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          setTecnologias(response.response);
+          setTotalItems(response.total);
+          tableRef.current.dataManager.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+        }
+      })
       .catch((_) => {
         setLoading(false);
       });
@@ -604,9 +606,8 @@ export default function Listagem({
                       Cod Tec
                     </label>
                     <Input
-                      type="number"
+                      type="text"
                       placeholder="Cod. tecnologia"
-                      max="40"
                       id="filterCode"
                       name="filterCode"
                       defaultValue={checkValue('filterCode')}

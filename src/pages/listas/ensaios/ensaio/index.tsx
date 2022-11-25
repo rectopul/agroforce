@@ -214,15 +214,17 @@ export default function TipoEnsaio({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await assayListService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400) {
-        setAssayList(response.response);
-        setTotalItems(response.total);
-        tableRef.current.dataManager.changePageSize(
-          response.total >= take ? take : response.total,
-        );
-      }
-    })
+    await assayListService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          setAssayList(response.response);
+          setTotalItems(response.total);
+          tableRef.current.dataManager.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+        }
+      })
       .catch((_) => {
         setLoading(false);
       });
@@ -316,7 +318,8 @@ export default function TipoEnsaio({
       userId: userLogado.id,
     });
     if (status === 200) {
-      router.reload();
+      handlePagination();
+      setLoading(false);
     } else {
       Swal.fire({
         html: message,
@@ -377,6 +380,7 @@ export default function TipoEnsaio({
                 setCookies('filterBeforeEditTypeOrder', typeOrder);
                 setCookies('filterBeforeEditOrderBy', orderBy);
                 setCookies('filtersParams', filtersParams);
+                setCookies('takeBeforeEdit', take);
                 setCookies('lastPage', 'atualizar');
                 router.push(
                   `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`,
@@ -747,7 +751,7 @@ export default function TipoEnsaio({
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
                   {filterFieldFactory('filterGli', 'GLI')}
                   {filterFieldFactory('filterCod', 'Cod Tec')}
-                  {filterFieldFactory('filterTechnology', 'Nome Tecnologia')}
+                  {filterFieldFactory('filterTechnology', 'Nome Tec')}
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">

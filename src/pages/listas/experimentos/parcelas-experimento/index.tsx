@@ -121,10 +121,10 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes('type_assay'),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Tecnologia',
-      value: 'tecnologia',
-      defaultChecked: () => camposGerenciados.includes('tecnologia'),
+      name: "CamposGerenciados[]",
+      title: "Tecnologia",
+      value: "tecnologia",
+      defaultChecked: () => camposGerenciados.includes("tecnologia"),
     },
     {
       name: 'CamposGerenciados[]',
@@ -238,8 +238,8 @@ export default function Listagem({
   //   orderBy == "tecnologia" ? "genotipo.tecnologia.cod_tec" : orderBy
   // }&typeOrder=${typeOrder}`; // RR
 
-  const pathExtra = `skip=${
-    currentPage * Number(take)
+  const pathExtra = `skip=${currentPage * Number(take)
+
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const [nccIsValid, setNccIsValid] = useState<boolean>(false);
@@ -342,6 +342,8 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
+    setLoading(true);
+
     await experimentGenotipeService
       .getAll(parametersFilter)
       .then((response) => {
@@ -356,6 +358,8 @@ export default function Listagem({
       .catch((_) => {
         setLoading(false);
       });
+
+    setLoading(false);
   }
 
   // Call that function when change type order value.
@@ -499,8 +503,8 @@ export default function Listagem({
       if (columnOrder[item] === 'tecnologia') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Tecnologia',
-            title: 'tecnologia.cod_tec',
+            name: "Tecnologia",
+            title: "tecnologia.cod_tec",
             orderList,
             fieldOrder,
             handleOrder,
@@ -948,7 +952,7 @@ export default function Listagem({
       {loading && <ComponentLoading text="" />}
 
       <Head>
-        <title>Listagem de parcelas do experimento</title>
+        <title>Listagem de parcelas dos experimentos</title>
       </Head>
 
       <Modal
@@ -1089,7 +1093,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar parcelas experimento">
+          <AccordionFilter title="Filtrar parcelas dos experimentos">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -1116,7 +1120,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="text"
                         placeholder="Cod Tec"
                         id="filterCodTec"
                         name="filterCodTec"
@@ -1124,18 +1128,8 @@ export default function Listagem({
                       />
                     </div>
                   </div>
-                </div>
 
-                <div
-                  className="w-full h-full
-                  flex
-                  justify-center
-                  pt-2
-                  pb-0
-                  "
-                >
-
-                  {filterFieldFactory('filterTechnology', 'Nome da Tecnologia')}
+                  {filterFieldFactory('filterTechnology', 'Nome Tec')}
                   {filterFieldFactory('filterGli', 'GLI')}
                   {filterFieldFactory('filterExperimentName', 'Experimento')}
                   {filterFieldFactory('filterPlacingPlace', 'Lugar plantio')}
@@ -1145,7 +1139,7 @@ export default function Listagem({
                   className="w-full h-full
                   flex
                   justify-center
-                  pt-2
+                  pt-0
                   pb-0
                   "
                 >
@@ -1334,14 +1328,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="text"
                         placeholder="De"
                         id="filterNcaFrom"
                         name="filterNcaFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="text"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNcaTo"
@@ -1638,7 +1632,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('filterBeforeEditOrderBy', { req, res });
   removeCookies('lastPage', { req, res });
 
-  const param = `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   const urlParametersAssay: any = new URL(baseUrlAssay);
   const urlParametersTreatment: any = new URL(baseUrlTreatment);

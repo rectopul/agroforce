@@ -240,8 +240,13 @@ export default function Import({
     }) => {
       const parametersFilter = `filterUser=${filterUser}&filterTable=${filterTable}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&filterState=${filterState}`;
       setFilter(parametersFilter);
+
+      setLoading(true);
       await getAllLogs(`${parametersFilter}`);
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+      // setLoading(false);
     },
   });
 
@@ -342,10 +347,17 @@ export default function Import({
             <div className="h-7">
               <Button
                 title={rowData.state}
-                onClick={() => {
+                onClick={async () => {
+                  setLoading(true);
                   Swal.fire({
-                    html: rowData.invalid_data,
+                    html:
+                      `<div style="max-height: 350px; overflow-y: auto">${
+                        rowData.invalid_data
+                      }</di>`,
                     width: '800',
+                    didClose: () => {
+                      setLoading(false);
+                    },
                   });
                 }}
                 icon={<AiFillInfoCircle size={20} />}
@@ -638,7 +650,9 @@ export default function Import({
 
   return (
     <>
-      {importLoading && <ComponentLoading text="Importando planilha, aguarde..." />}
+      {importLoading && (
+        <ComponentLoading text="Importando planilha, aguarde..." />
+      )}
       {loading && <ComponentLoading text="" />}
 
       <Head>
@@ -1034,7 +1048,7 @@ export default function Import({
                     <div className="h-7 w-32 mt-6">
                       <Button
                         onClick={() => {
-                          setLoading(true);
+                          // setLoading(true);
                         }}
                         value="Filtrar"
                         bgColor="bg-blue-600"

@@ -1,4 +1,5 @@
 import { prisma } from '../pages/api/db/db';
+import { BaseRepository } from './base-repository';
 
 interface ISequenciaDelineamento {
   id: number;
@@ -19,9 +20,9 @@ type IUpdateSequenciaDelineamento = Omit<
   ISequenciaDelineamento, 'id_delineamento' | 'status' | 'created_by'
 >;
 
-export class SequenciaDelineamentoRepository {
+export class SequenciaDelineamentoRepository extends BaseRepository {
   async findById(id: number) {
-    const result = await prisma.sequencia_delineamento.findUnique({
+    const result = await this.getPrisma().sequencia_delineamento.findUnique({
       where: { id },
     });
     return result;
@@ -33,8 +34,8 @@ export class SequenciaDelineamentoRepository {
     if (orderBy) {
       order = JSON.parse(orderBy);
     }
-    const count = await prisma.sequencia_delineamento.count({ where });
-    const result: object | any = await prisma.sequencia_delineamento.findMany({
+    const count = await this.getPrisma().sequencia_delineamento.count({ where });
+    const result: object | any = await this.getPrisma().sequencia_delineamento.findMany({
       select,
       skip,
       take,
@@ -47,12 +48,12 @@ export class SequenciaDelineamentoRepository {
   }
 
   async create(data: ICreateSequenciaDelineamento) {
-    const result = await prisma.sequencia_delineamento.create({ data });
+    const result = await this.getPrisma().sequencia_delineamento.create({ data });
     return result;
   }
 
   async update(id: number, data: IUpdateSequenciaDelineamento) {
-    const result = await prisma.sequencia_delineamento.update({
+    const result = await this.getPrisma().sequencia_delineamento.update({
       where: { id },
       data,
     });

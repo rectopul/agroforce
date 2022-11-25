@@ -3,7 +3,7 @@ import {BaseRepository} from './base-repository';
 
 export class DelineamentoRepository extends BaseRepository {
   async findOne(id: number) {
-    const Result = await prisma.delineamento.findUnique({
+    const Result = await this.getPrisma().delineamento.findUnique({
       where: {
         id,
       },
@@ -16,8 +16,8 @@ export class DelineamentoRepository extends BaseRepository {
     if (orderBy) {
       order = JSON.parse(orderBy);
     }
-    const count = await prisma.delineamento.count({ where });
-    const Result: object | any = await prisma.delineamento.findMany({
+    const count = await this.getPrisma().delineamento.count({ where });
+    const Result: object | any = await this.getPrisma().delineamento.findMany({
       select, skip, take, where, orderBy: order,
     });
     Result.total = count;

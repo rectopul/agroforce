@@ -18,7 +18,6 @@ export class UserController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: user.controller.ts ~ line 21 ~ UserController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let take;
     let skip;

@@ -38,7 +38,7 @@ export function TabsDropDowns(typeAside: any = "config") {
                 iconDropDown: <RiSeedlingLine />,
               },
               {
-                labelDropDown: "Usuários",
+                labelDropDown: "Usuário",
                 hrefDropDown: "/config/tmg/usuarios",
                 iconDropDown: <BiUser />,
               },
@@ -58,7 +58,7 @@ export function TabsDropDowns(typeAside: any = "config") {
                 iconDropDown: <RiPlantLine />,
               },
               {
-                labelDropDown: "Lotes",
+                labelDropDown: "Lote",
                 hrefDropDown: "/config/tmg/lote",
                 iconDropDown: <RiPlantLine />,
               },

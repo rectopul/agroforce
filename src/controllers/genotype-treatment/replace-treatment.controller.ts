@@ -129,7 +129,6 @@ export class ReplaceTreatmentController {
   }
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: replace-treatment.controller.ts ~ line 132 ~ ReplaceTreatmentController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.OR = [];
@@ -160,7 +159,7 @@ export class ReplaceTreatmentController {
         if (options.filterNcaFrom === 'vazio' || options.filterNcaTo === 'vazio') {
           parameters.ncc = null;
         } else if (options.filterNcaFrom && options.filterNcaTo) {
-          parameters.nca = JSON.parse(
+          parameters.ncc = JSON.parse(
             `{"gte": ${Number(options.filterNcaFrom)}, "lte": ${Number(
               options.filterNcaTo,
             )} }`,
@@ -178,13 +177,13 @@ export class ReplaceTreatmentController {
       if (options.filterPeso) {
         parameters.peso = Number(options.filterPeso);
       }
-      if (options.filterPesoFrom || options.filterFaseTo) {
-        if (options.filterPesoFrom && options.filterFaseTo) {
-          parameters.peso = JSON.parse(`{"gte": ${Number(options.filterPesoFrom)}, "lte": ${Number(options.filterFaseTo)} }`);
+      if (options.filterPesoFrom || options.filterPesoTo) {
+        if (options.filterPesoFrom && options.filterPesoTo) {
+          parameters.peso = JSON.parse(`{"gte": ${Number(options.filterPesoFrom)}, "lte": ${Number(options.filterPesoTo)} }`);
         } else if (options.filterPesoFrom) {
           parameters.peso = JSON.parse(`{"gte": ${Number(options.filterPesoFrom)} }`);
-        } else if (options.filterFaseTo) {
-          parameters.peso = JSON.parse(`{"lte": ${Number(options.filterFaseTo)} }`);
+        } else if (options.filterPesoTo) {
+          parameters.peso = JSON.parse(`{"lte": ${Number(options.filterPesoTo)} }`);
         }
       }
       if (options.filterFase) {
@@ -233,15 +232,15 @@ export class ReplaceTreatmentController {
         }
       }
       if (options.filterCodTec) {
-        parameters.genotipo = JSON.parse(`{ "tecnologia": { "cod_tec": {"contains": "${options.filterCodTec}" } } }`);
+        parameters.AND.push(JSON.parse(`{ "genotipo": { "tecnologia": { "cod_tec": {"contains": "${options.filterCodTec}" } } } }`));
       }
 
       if (options.filterNameTec) {
-        parameters.genotipo = JSON.parse(`{ "tecnologia": { "desc": {"contains": "${options.filterNameTec}" } } }`);
+        parameters.AND.push(JSON.parse(`{ "genotipo": { "tecnologia": { "desc": {"contains": "${options.filterNameTec}" } } } }`));
       }
 
       if (options.idCulture) {
-        parameters.genotipo = JSON.parse(`{ "id_culture": ${Number(options.idCulture)} } `);
+        parameters.AND.push(JSON.parse(`{ "genotipo": { "id_culture": ${Number(options.idCulture)} } } `));
       }
 
       const select = {

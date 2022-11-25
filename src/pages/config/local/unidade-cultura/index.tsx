@@ -272,15 +272,17 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await unidadeCulturaService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400) {
-        setUnidadeCultura(response.response);
-        setTotalItems(response.total);
-        tableRef.current.dataManager.changePageSize(
-          response.total >= take ? take : response.total,
-        );
-      }
-    })
+    await unidadeCulturaService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          setUnidadeCultura(response.response);
+          setTotalItems(response.total);
+          tableRef.current.dataManager.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+        }
+      })
       .catch((_) => {
         setLoading(false);
       });
@@ -428,7 +430,7 @@ export default function Listagem({
       if (columnCampos[item] === 'year') {
         tableFields.push(
           headerTableFactoryGlobal({
-            type: "int",
+            type: 'int',
             name: 'Ano',
             title: 'year',
             orderList,
@@ -713,7 +715,7 @@ export default function Listagem({
     <>
       {loading && <ComponentLoading text="" />}
       <Head>
-        <title>Listagem das unidades de cultura</title>
+        <title>Listagem das unidades de culturas</title>
       </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main
@@ -723,7 +725,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar unidades de cultura">
+          <AccordionFilter title="Filtrar unidades de culturas">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -746,27 +748,27 @@ export default function Listagem({
                     'Unidade de cultura',
                   )}
 
-                  <div className="h-6 w-1/2 ml-2">
+                  {/* <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Ano
                     </label>
                     <div className="flex gap-2">
                       <Input
-                        type = "number"
+                        type="number"
                         placeholder="De"
                         id="filterYearFrom"
                         name="filterYearFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type = "number"
+                        type="number"
                         placeholder="Até"
                         id="filterYearTo"
                         name="filterYearTo"
                         onChange={formik.handleChange}
                       />
                     </div>
-                  </div>
+                  </div> */}
 
                   {filterFieldFactory(
                     'filterNameLocalCulture',

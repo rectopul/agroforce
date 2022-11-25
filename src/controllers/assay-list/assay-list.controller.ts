@@ -13,7 +13,9 @@ export class AssayListController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: assay-list.controller.ts ~ line 16 ~ AssayListController ~ getAll ~ options', options);
     const parameters: object | any = {};
+    parameters.AND = [];
     let orderBy: object | any;
     try {
       if (options.filterFoco) {
@@ -23,10 +25,10 @@ export class AssayListController {
         parameters.type_assay = JSON.parse(`{ "name": { "contains": "${options.filterTypeAssay}" } }`);
       }
       if (options.filterTechnology) {
-        parameters.tecnologia = JSON.parse(`{ "name": {"contains": "${options.filterTechnology}" } }`);
+        parameters.AND.push(JSON.parse(`{ "tecnologia": { "name": {"contains": "${options.filterTechnology}" } } }`));
       }
       if (options.filterCod) {
-        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterCod}" } }`);
+        parameters.AND.push(JSON.parse(`{ "tecnologia": { "cod_tec": {"contains": "${options.filterCod}" } } }`));
       }
       if (options.filterGenotipo) {
         parameters.AND.push(JSON.parse(`{ "genotipo": {"name_genotipo": {"contains": "${options.filterGenotipo}" } } }`));

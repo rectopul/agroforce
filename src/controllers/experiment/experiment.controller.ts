@@ -16,7 +16,6 @@ export class ExperimentController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: experiment.controller.ts ~ line 19 ~ ExperimentController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
@@ -30,21 +29,22 @@ export class ExperimentController {
           parameters.repetitionsNumber = JSON.parse(`{"lte": ${Number(options.filterRepetitionTo)} }`);
         }
       }
-      // if (options.filterRepetition) {
-      //   parameters.repetitionsNumber = Number(options.filterRepetition);
-      // }
-      if (options.experimentStatus) {
+
+      if (options.filterExperimentStatus) {
         parameters.OR = [];
-        const statusParams = options.experimentStatus.split(',');
+        const statusParams = options.filterExperimentStatus.split(',');
         parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
         parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
+        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[2]}" } }`));
+        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[3]}" } }`));
+        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[4]}" } }`));
       }
 
       if (options.filterExperimentName) {
         parameters.experimentName = JSON.parse(`{ "contains":"${options.filterExperimentName}" }`);
       }
-      if (options.filterCod) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "cod_tec":  {"contains": "${options.filterCod}" } } } }`));
+      if (options.filterCodTec) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "cod_tec":  {"contains": "${options.filterCodTec}" } } } }`));
       }
       if (options.filterPeriod) {
         parameters.period = Number(options.filterPeriod);

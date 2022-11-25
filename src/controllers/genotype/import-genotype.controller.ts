@@ -204,6 +204,7 @@ export class ImportGenotypeController {
                   // eslint-disable-next-line no-param-reassign
                   spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
                 }
+
                 const tec: any = await tecnologiaController.getAll({
                   id_culture: idCulture,
                   cod_tec: String(spreadSheet[row][column]),
@@ -325,6 +326,7 @@ export class ImportGenotypeController {
                 } else {
                   const lote: any = loteController.getAll({
                     cod_lote: String(spreadSheet[row][column]),
+                    id_culture: idCulture,
                   });
                   if (lote.total > 0) {
                     responseIfError[Number(column)] += responseGenericFactory(
@@ -393,8 +395,8 @@ export class ImportGenotypeController {
                 // eslint-disable-next-line no-param-reassign
                 spreadSheet[row][column] = new Date(spreadSheet[row][column]);
                 const { status, response }: IReturnObject = await loteController.getAll({
-                  id_s2: spreadSheet[row][20],
-                  id_safra: idSafra,
+                  id_dados: spreadSheet[row][20],
+                  id_culture: idCulture,
                 });
                 const dateNow = new Date();
                 if (dateNow.getTime() < spreadSheet[row][column].getTime()) {
@@ -682,7 +684,7 @@ export class ImportGenotypeController {
                 if (spreadSheet[row][column] !== null) {
                   const lote: any = await loteController.getAll({
                     id_dados: spreadSheet[row][column],
-                    id_safra: idSafra,
+                    id_culture: idCulture,
                   });
                   if (lote.total > 0) {
                     this.aux.id_lote = lote.response[0]?.id;
@@ -802,6 +804,7 @@ export class ImportGenotypeController {
                       id: Number(this.aux.id_lote),
                       id_genotipo: Number(this.aux.id_genotipo),
                       id_safra: Number(idSafra),
+                      id_culture: idCulture,
                       cod_lote: Number(this.aux.cod_lote),
                       id_s2: Number(this.aux.id_s2),
                       id_dados: Number(this.aux.id_dados_lote),
@@ -819,6 +822,7 @@ export class ImportGenotypeController {
                     const lote = await loteRepository.createTransaction({
                       id_genotipo: Number(this.aux.id_genotipo),
                       id_safra: Number(idSafra),
+                      id_culture: idCulture,
                       cod_lote: Number(this.aux.cod_lote),
                       id_s2: Number(this.aux.id_s2),
                       id_dados: Number(this.aux.id_dados_lote),

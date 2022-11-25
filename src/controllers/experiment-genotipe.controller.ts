@@ -106,7 +106,7 @@ export class ExperimentGenotipeController {
 
       if (options.filterGenotypeName) {
         parameters.genotipo = JSON.parse(
-          `{ "genotipo": { "name_genotipo": { "contains": "${options.filterGenotypeName}" } }`,
+          `{ "name_genotipo": { "contains": "${options.filterGenotypeName}" } }`,
         );
       }
 

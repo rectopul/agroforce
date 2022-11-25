@@ -232,15 +232,17 @@ export default function TipoEnsaio({
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
-    await typeAssayService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400) {
-        setTypeAssay(response.response);
-        setTotalItems(response.total);
-        tableRef.current.dataManager.changePageSize(
-          response.total >= take ? take : response.total,
-        );
-      }
-    })
+    await typeAssayService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          setTypeAssay(response.response);
+          setTotalItems(response.total);
+          tableRef.current.dataManager.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+        }
+      })
       .catch((_) => {
         setLoading(false);
       });
@@ -329,8 +331,6 @@ export default function TipoEnsaio({
   }
 
   async function handleStatus(data: any): Promise<void> {
-    // console.log({ id, status });
-
     // if (status) {
     //   status = 1;
     // } else {
@@ -727,40 +727,6 @@ export default function TipoEnsaio({
     return parameter;
   }
 
-  function filterFieldFactorySeeds(name: any) {
-    return (
-      <div className="h-6 w-1/2 ml-2">
-        <label className="block text-gray-900 text-sm font-bold mb-1">
-          {name}
-        </label>
-
-        <div className="flex gap-2">
-          <div className="w-full">
-            <Input
-              type="text"
-              placeholder="De"
-              max="40"
-              id="filterSeedsFrom"
-              name="filterSeedsFrom"
-              onChange={formik.handleChange}
-            />
-          </div>
-
-          <div className="w-full">
-            <Input
-              type="text"
-              placeholder="Até"
-              max="40"
-              id="filterSeedsTo"
-              name="filterSeedsTo"
-              onChange={formik.handleChange}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -771,12 +737,12 @@ export default function TipoEnsaio({
       {loading && <ComponentLoading text="" />}
 
       <Head>
-        <title>Listagem Tipos de Ensaio</title>
+        <title>Listagem Tipos de Ensaios</title>
       </Head>
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main className="h-full w-full flex flex-col items-start gap-4">
-          <AccordionFilter title="Filtrar tipos de ensaio">
+          <AccordionFilter title="Filtrar tipos de ensaios">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col w-full items-center px-4 bg-white"
@@ -817,14 +783,30 @@ export default function TipoEnsaio({
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Quant de sementes por envelope
                     </label>
-                    <Input
-                      type="number"
-                      placeholder="Quant de sementes por envelope"
-                      id="envelope"
-                      name="envelope"
-                      defaultValue={checkValue('filterName')}
-                      onChange={formik.handleChange}
-                    />
+
+                    <div className="flex gap-2">
+                      <div className="w-full">
+                        <Input
+                          type="number"
+                          placeholder="De"
+                          max="40"
+                          id="filterSeedsFrom"
+                          name="filterSeedsFrom"
+                          onChange={formik.handleChange}
+                        />
+                      </div>
+
+                      <div className="w-full">
+                        <Input
+                          type="number"
+                          placeholder="Até"
+                          max="40"
+                          id="filterSeedsTo"
+                          name="filterSeedsTo"
+                          onChange={formik.handleChange}
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
