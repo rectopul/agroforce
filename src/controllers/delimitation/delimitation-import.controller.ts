@@ -262,10 +262,6 @@ export class ImportDelimitationController {
             if (listDelineamento.total > 0) {
                delineamentoSaved = await delineamentoRepository.updateTransaction(delineamentoId, {
                 id: delineamentoId,
-                name: spreadSheet[row][1],
-                id_culture: idCulture,
-                repeticao: 1,
-                trat_repeticao: 1,
                 created_by: createdBy,
               });
 
