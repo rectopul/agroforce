@@ -958,12 +958,14 @@ export default function Listagem({
   }
 
   function selectableFilter(rowData: any) {
-    if (isOpenModal || rowData?.status_experiment == "SORTEADO") {
+    if (isOpenModal || rowData?.status_experiment == "EXP. SORTEADO") {
       return false;
     }
 
     return true;
   }
+
+  console.log({ treatments });
 
   return (
     <>
