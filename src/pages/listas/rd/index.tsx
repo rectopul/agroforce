@@ -351,10 +351,13 @@ export default function Import({
                   setLoading(true);
                   Swal.fire({
                     html:
-                      '<div style="max-height: 350px; overflow-y: auto">' +
-                      rowData.invalid_data +
-                      "</di>",
-                    width: "800",
+                      `<div style="max-height: 350px; overflow-y: auto">${
+                        rowData.invalid_data
+                      }</di>`,
+                    width: '800',
+                    didClose: () => {
+                      setLoading(false);
+                    },
                   });
                 }}
                 icon={<AiFillInfoCircle size={20} />}
