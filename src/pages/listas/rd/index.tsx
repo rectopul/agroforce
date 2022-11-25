@@ -350,11 +350,11 @@ export default function Import({
                 onClick={async () => {
                   setLoading(true);
                   Swal.fire({
-                    html: rowData.invalid_data,
-                    width: '800',
-                    didClose: () => {
-                      setLoading(false);
-                    },
+                    html:
+                      '<div style="max-height: 350px; overflow-y: auto">' +
+                      rowData.invalid_data +
+                      "</di>",
+                    width: "800",
                   });
                 }}
                 icon={<AiFillInfoCircle size={20} />}
