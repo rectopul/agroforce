@@ -220,7 +220,7 @@ export class ImportGenotypeController {
               }
             }
 
-            if (configModule.response[0]?.fields[column] === 'GMR') {
+            if (configModule.response[0]?.fields[column] === 'gmr') {
               if (spreadSheet[row][column] !== null) {
                 if (!validateInteger(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responseGenericFactory(
@@ -233,7 +233,7 @@ export class ImportGenotypeController {
               }
             }
 
-            if (configModule.response[0]?.fields[column] === 'BGM') {
+            if (configModule.response[0]?.fields[column] === 'bgm') {
               if (spreadSheet[row][column] !== null) {
                 if (isNaN(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responsePositiveNumericFactory(
