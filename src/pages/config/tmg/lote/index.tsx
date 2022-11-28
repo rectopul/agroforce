@@ -507,7 +507,7 @@ export default function Listagem({
             handleOrder,
             render: (rowData: any) => (
               <div>
-                {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
+                {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.name}`}
               </div>
             ),
           }),
