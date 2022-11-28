@@ -341,7 +341,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   async function deleteConfirmItem(item: any) {

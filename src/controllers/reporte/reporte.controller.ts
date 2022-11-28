@@ -8,6 +8,7 @@ export class ReporteController {
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
+    let orderBy: object | any = {};
     try {
       const select = {
         id: true,
@@ -25,9 +26,10 @@ export class ReporteController {
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
-      const orderBy = options.orderBy
-        ? `{"${options.orderBy}":"${options.typeOrder}"}`
-        : undefined;
+      if (options.orderBy) {
+        orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
+        orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+      }
 
       const response: object | any = await this.reporteRepository.findAll(
         parameters,

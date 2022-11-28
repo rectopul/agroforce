@@ -241,6 +241,7 @@ export default function TipoEnsaio({
           tableRef.current.dataManager.changePageSize(
             response.total >= take ? take : response.total,
           );
+          setLoading(false);
         }
       })
       .catch((_) => {
@@ -327,7 +328,7 @@ export default function TipoEnsaio({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   async function handleStatus(data: any): Promise<void> {

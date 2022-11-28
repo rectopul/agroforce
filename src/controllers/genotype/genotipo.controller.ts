@@ -7,7 +7,6 @@ export class GenotipoController {
   genotipoRepository = new GenotipoRepository();
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: genotipo.controller.ts ~ line 10 ~ GenotipoController ~ getAll ~ options', options);
     const parameters: object | any = {};
     parameters.AND = [];
     let orderBy: object | any;
