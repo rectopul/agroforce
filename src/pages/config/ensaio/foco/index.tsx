@@ -310,7 +310,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   // function headerTableFactory(name: any, title: string) {

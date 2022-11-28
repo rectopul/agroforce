@@ -341,7 +341,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   function handleOnDragEnd(result: DropResult): void {

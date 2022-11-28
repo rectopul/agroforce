@@ -297,7 +297,7 @@ export default function AtualizarTipoEnsaio({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   async function handleOrderExperiments(

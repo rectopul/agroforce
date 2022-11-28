@@ -452,7 +452,7 @@ export default function Import({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   async function getValuesColumns(): Promise<void> {
