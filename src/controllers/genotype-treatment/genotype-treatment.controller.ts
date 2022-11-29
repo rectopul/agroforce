@@ -2,6 +2,7 @@ import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import handleError from '../../shared/utils/handleError';
 import { GenotypeTreatmentRepository } from '../../repository/genotype-treatment/genotype-treatment.repository';
 import { countTreatmentsNumber } from '../../shared/utils/counts';
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 
 export class GenotypeTreatmentController {
   genotypeTreatmentRepository = new GenotypeTreatmentRepository();
@@ -293,12 +294,30 @@ export class GenotypeTreatmentController {
   }
 
   async update(data: any) {
+
     try {
-      const response: any = await this.genotypeTreatmentRepository.findById(data.id);
+      if (data.id) {
+        const response: any = await this.genotypeTreatmentRepository.findById(data.id);
 
-      if (!response) return { status: 404, response, message: 'Tratamentos do genótipo não existente' };
+        if (!response) return { status: 404, response, message: 'Tratamentos do genótipo não existente' };
 
-      await this.genotypeTreatmentRepository.update(data.id, data);
+        await this.genotypeTreatmentRepository.update(data.id, data);
+      } else {
+        const transactionConfig = new TransactionConfig();
+        const genotypeTreatmentRepositoryTransaction = new GenotypeTreatmentRepository();
+        genotypeTreatmentRepositoryTransaction.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+        try {
+          await transactionConfig.transactionScope.run(async () => {
+            for (const row in data) {
+              await genotypeTreatmentRepositoryTransaction.updateTransaction(data[row].id, data[row]);
+            }
+          })
+          return { status: 200, message: 'Tratamentos do genótipo atualizado' };
+        } catch (error: any) {
+          handleError('Tratamentos do genótipo controller', 'Update', error.message);
+          throw new Error('[Controller] - Update Tratamentos do genótipo erro');
+        }
+      }
       return { status: 200, message: 'Tratamentos do genótipo atualizado' };
     } catch (error: any) {
       handleError('Tratamentos do genótipo controller', 'Update', error.message);
