@@ -331,7 +331,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   // function headerTableFactory(name: any, title: string) {
@@ -869,7 +869,6 @@ export default function Listagem({
                     <Input
                       type="text"
                       placeholder="Local Preparo"
-                      max="40"
                       id="filterPreparation"
                       name="filterPreparation"
                       onChange={formik.handleChange}
@@ -882,7 +881,6 @@ export default function Listagem({
                     <Input
                       type="text"
                       placeholder="Código quadra"
-                      max="40"
                       id="filterSearch"
                       name="filterSearch"
                       defaultValue={checkValue('filterSearch')}
@@ -919,7 +917,6 @@ export default function Listagem({
                     <Input
                       type="text"
                       placeholder="Esquema"
-                      max="40"
                       id="filterSchema"
                       name="filterSchema"
                       onChange={formik.handleChange}

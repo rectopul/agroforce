@@ -396,7 +396,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   async function getValuesColumns(): Promise<void> {
@@ -587,7 +587,6 @@ export default function Listagem({
                     <Input
                       type="text"
                       placeholder="setor"
-                      max="40"
                       defaultValue={checkValue('filterSearch')}
                       id="filterSearch"
                       name="filterSearch"

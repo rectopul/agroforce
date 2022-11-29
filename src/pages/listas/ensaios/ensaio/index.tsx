@@ -283,7 +283,7 @@ export default function TipoEnsaio({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   // function headerTableFactory(name: string, title: string) {
@@ -443,7 +443,7 @@ export default function TipoEnsaio({
         tableFields.push(
           headerTableFactoryGlobal({
             name: 'Protocolo',
-            title: 'protocol_name',
+            title: 'type_assay.protocol_name',
             orderList,
             fieldOrder,
             handleOrder,

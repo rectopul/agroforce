@@ -267,7 +267,7 @@ export default function Atualizargenotipo({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
     setFieldOrder(name);
   }
 

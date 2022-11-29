@@ -71,17 +71,17 @@ export class ImportNpeController {
           }
           const npeInicial = spreadSheet[row][6];
           const npeName = `${spreadSheet[row][1]}_${spreadSheet[row][2]}_${spreadSheet[row][3]}_${spreadSheet[row][4]}_${spreadSheet[row][5]}_${spreadSheet[row][7]}`;
-          const { status }: IReturnObject = await npeController.getAll({
+          const { response: validateNpe }: IReturnObject = await npeController.getAll({
             safraId: idSafra,
             filterFoco: spreadSheet[row][2],
             filterEnsaio: spreadSheet[row][3],
-            filterCodTec: spreadSheet[row][4],
+            filterCodTecnologia: spreadSheet[row][4],
             filterLocal: spreadSheet[row][5],
             filterEpoca: spreadSheet[row][7],
             filterStatus: 1,
           });
 
-          if (status === 200) {
+          if (validateNpe.length > 0) {
             responseIfError[0] += `<li style="text-align:left"> Erro na linha ${Number(row)}. Ambiente já cadastrada no sistema. </li> <br>`;
           }
           if (npeTemp.includes(npeName)) {

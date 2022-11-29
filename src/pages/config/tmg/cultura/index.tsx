@@ -288,7 +288,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   // useEffect(()=>{
@@ -636,7 +636,6 @@ export default function Listagem({
                     <Input
                       type="text"
                       placeholder="cultura"
-                      max="40"
                       defaultValue={checkValue('filterSearch')}
                       id="filterSearch"
                       name="filterSearch"

@@ -553,7 +553,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   async function getValuesColumns(): Promise<void> {
@@ -776,7 +776,6 @@ export default function Listagem({
         <Input
           type="text"
           placeholder={name}
-          max="40"
           id={title}
           defaultValue={checkValue(title)}
           name={title}

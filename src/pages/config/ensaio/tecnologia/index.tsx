@@ -278,7 +278,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   // function headerTableFactory(name: any, title: string) {
@@ -578,7 +578,6 @@ export default function Listagem({
                     <Input
                       type="text"
                       placeholder="Nome"
-                      max="40"
                       id="filterName"
                       defaultValue={checkValue('filterName')}
                       name="filterName"
@@ -593,7 +592,6 @@ export default function Listagem({
                     <Input
                       type="text"
                       placeholder="Descrição"
-                      max="40"
                       id="filterDescription"
                       name="filterDescription"
                       defaultValue={checkValue('filterDescription')}
@@ -606,6 +604,7 @@ export default function Listagem({
                       Cod Tec
                     </label>
                     <Input
+                      size={7}
                       type="text"
                       placeholder="Cod. tecnologia"
                       id="filterCode"

@@ -284,7 +284,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
     setFieldOrder(name);
   }
 
@@ -665,7 +665,6 @@ export default function Listagem({
         <Input
           type="text"
           placeholder={name}
-          max="40"
           id={title}
           name={title}
           onChange={formik.handleChange}
@@ -762,40 +761,31 @@ export default function Listagem({
           .create(data)
           .then(async ({ status, response }: any) => {
             if (status === 200) {
-              genotipo_treatment.map(async (gt: any) => {
-                genotypeTreatmentService
-                  .update(gt)
-                  .then(({ status, message }: any) => { });
-              });
-              experimentObj.map(async (x: any) => {
-                await experimentService
-                  .update(x)
-                  .then(({ status, response }: any) => { });
-              });
 
-              await npeService
-                .update({
-                  id: NPESelectedRow?.id,
-                  npef: lastNpe,
-                  npeQT:
-                    NPESelectedRow?.npeQT == "N/A"
-                      ? null
-                      : NPESelectedRow?.npeQT - total_consumed,
-                  status: 3,
-                  prox_npe: lastNpe + 1,
-                })
-                .then(({ status, resposne }: any) => {
+              await genotypeTreatmentService.update(genotipo_treatment);
+              await experimentService.update(experimentObj);
+              await npeService.update({
+                id: NPESelectedRow?.id,
+                npef: lastNpe,
+                npeQT:
+                  NPESelectedRow?.npeQT == "N/A"
+                    ? null
+                    : NPESelectedRow?.npeQT - total_consumed,
+                status: 3,
+                prox_npe: lastNpe + 1,
+              })
+                .then(({ status }: any) => {
                   if (status === 200) {
                     Swal.fire({
                       title: 'Sorteio salvo com sucesso.',
                       showDenyButton: false,
                       showCancelButton: false,
                       confirmButtonText: 'Ok',
-                    }).then((result) => {
+                    }).then(() => {
                       router.push("/operacao/ambiente");
                     });
                   }
-                });
+                })
             }
           });
 
