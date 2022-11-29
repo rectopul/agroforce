@@ -606,6 +606,7 @@ export default function Listagem({
                       Cod Tec
                     </label>
                     <Input
+                      size={7}
                       type="text"
                       placeholder="Cod. tecnologia"
                       id="filterCode"

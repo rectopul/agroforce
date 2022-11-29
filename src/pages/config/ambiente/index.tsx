@@ -898,6 +898,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        size={7}
                         placeholder="Cod Tec"
                         id="filterCodTecnologia"
                         name="filterCodTecnologia"
