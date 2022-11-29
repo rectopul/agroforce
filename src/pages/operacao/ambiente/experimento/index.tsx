@@ -665,7 +665,6 @@ export default function Listagem({
         <Input
           type="text"
           placeholder={name}
-          max="40"
           id={title}
           name={title}
           onChange={formik.handleChange}

@@ -578,7 +578,6 @@ export default function Listagem({
                     <Input
                       type="text"
                       placeholder="Nome"
-                      max="40"
                       id="filterName"
                       defaultValue={checkValue('filterName')}
                       name="filterName"
@@ -593,7 +592,6 @@ export default function Listagem({
                     <Input
                       type="text"
                       placeholder="Descrição"
-                      max="40"
                       id="filterDescription"
                       name="filterDescription"
                       defaultValue={checkValue('filterDescription')}

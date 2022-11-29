@@ -32,6 +32,7 @@ export class BaseRepository {
   }
 
   async updateTransaction(id: number, data: object | any) {
+    console.log('🚀 ~ file: base-repository.ts ~ line 35 ~ BaseRepository ~ updateTransaction ~ data', data);
     if (this.clientManager && this.transactionScope) {
       return await this.transactionScope.run(async () => this.update(id, data));
     }

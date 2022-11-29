@@ -237,7 +237,6 @@ export default function NovoUsuario({
               <Input
                 type="text"
                 placeholder="José Oliveira"
-                max="40"
                 id="name"
                 name="name"
                 onChange={formik.handleChange}

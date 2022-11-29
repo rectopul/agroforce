@@ -553,7 +553,7 @@ model assay_list {
   experiment         experiment[]
   genotype_treatment genotype_treatment[]
 
-  @@unique([id_safra, id_foco, id_type_assay, id_tecnologia, gli, bgm])
+  @@unique([id_safra, gli])
 }
 
 model genotype_treatment {
