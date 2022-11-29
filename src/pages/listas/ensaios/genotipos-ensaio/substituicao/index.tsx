@@ -699,7 +699,7 @@ export default function Listagem({
   return (
     <>
       <Head>
-        <title>Listagem de Lotes</title>
+        <title>Listagem de substituição</title>
       </Head>
 
       {loading && <ComponentLoading text="" />}
@@ -740,7 +740,7 @@ export default function Listagem({
                   <div className="h-10 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm mb-1">Ano Lote</label>
                     <Input
-                      type="text"
+                      type="number"
                       placeholder="Ano Lote"
                       max="40"
                       id="filterYear"
