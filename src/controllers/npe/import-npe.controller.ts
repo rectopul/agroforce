@@ -80,7 +80,6 @@ export class ImportNpeController {
             filterEpoca: spreadSheet[row][7],
             filterStatus: 1,
           });
-          console.log('🚀 ~ file: import-npe.controller.ts ~ line 83 ~ ImportNpeController ~ validateNpe', validateNpe);
 
           if (validateNpe.length > 0) {
             responseIfError[0] += `<li style="text-align:left"> Erro na linha ${Number(row)}. Ambiente já cadastrada no sistema. </li> <br>`;
