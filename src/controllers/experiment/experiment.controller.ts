@@ -7,6 +7,7 @@ import { functionsUtils } from '../../shared/utils/functionsUtils';
 import { IReturnObject } from '../../interfaces/shared/Import.interface';
 import { ExperimentGroupController } from '../experiment-group/experiment-group.controller';
 import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -270,35 +271,52 @@ export class ExperimentController {
   async update(data: any) {
     try {
       const experimentGenotipeController = new ExperimentGenotipeController();
-      if (data.idList) {
-        await this.experimentRepository.relationGroup(data);
-        const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
-        await this.setParcelasStatus(idList);
-        return { status: 200, message: 'Experimento atualizado' };
-      }
-      const experimento: any = await this.experimentRepository.findOne(data.id);
-      if (!experimento) return { status: 404, message: 'Experimento não encontrado' };
-      if (data.experimentGroupId === null) {
-        if (!(data.nlp || data.clp || data.comments)) {
-          const parcelasId: any = [];
-          await experimento.experiment_genotipe.forEach(async (parcela: any) => {
-            parcelasId.push(parcela.id);
-          });
-          await experimentGenotipeController.update({ idList: parcelasId, status: 'SORTEADO', userId: data.userId });
-          delete data.userId;
+      if (data.id) {
+        if (data.idList) {
+          await this.experimentRepository.relationGroup(data);
+          const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
+          await this.setParcelasStatus(idList);
+          return { status: 200, message: 'Experimento atualizado' };
         }
-      }
-      const response = await this.experimentRepository.update(experimento.id, data);
-      if (experimento.experimentGroupId) {
-        await this.countExperimentGroupChildren(experimento.experimentGroupId);
-      }
-      if (!response.experimentGroupId) {
-        if (!(data.nlp || data.clp || data.comments)) {
-          await this.experimentRepository.update(response.id, { status: 'SORTEADO' });
+        const experimento: any = await this.experimentRepository.findOne(data.id);
+        if (!experimento) return { status: 404, message: 'Experimento não encontrado' };
+        if (data.experimentGroupId === null) {
+          if (!(data.nlp || data.clp || data.comments)) {
+            const parcelasId: any = [];
+            await experimento.experiment_genotipe.forEach(async (parcela: any) => {
+              parcelasId.push(parcela.id);
+            });
+            await experimentGenotipeController.update({ idList: parcelasId, status: 'SORTEADO', userId: data.userId });
+            delete data.userId;
+          }
         }
-      }
-      if (response) {
-        return { status: 200, message: 'Experimento atualizado' };
+        const response = await this.experimentRepository.update(experimento.id, data);
+        if (experimento.experimentGroupId) {
+          await this.countExperimentGroupChildren(experimento.experimentGroupId);
+        }
+        if (!response.experimentGroupId) {
+          if (!(data.nlp || data.clp || data.comments)) {
+            await this.experimentRepository.update(response.id, { status: 'SORTEADO' });
+          }
+        }
+        if (response) {
+          return { status: 200, message: 'Experimento atualizado' };
+        }
+      } else {
+        const transactionConfig = new TransactionConfig();
+        const experimentRepositoryTransaction = new ExperimentRepository();
+        experimentRepositoryTransaction.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+        try {
+          await transactionConfig.transactionScope.run(async () => {
+            for (const row in data) {
+              await experimentRepositoryTransaction.updateTransaction(data[row].id, data[row]);
+            }
+          })
+          return { status: 200, message: 'Experimento atualizado' };
+        } catch (error: any) {
+          handleError('Experimento controller', 'Update', error.message);
+          throw new Error('[Controller] - Update Experimento erro update many');
+        }
       }
       return { status: 400, message: 'Experimento não atualizado' };
     } catch (error: any) {
