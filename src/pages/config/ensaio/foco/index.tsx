@@ -420,6 +420,10 @@ export default function Listagem({
     };
   }
 
+  function returnFalse() {
+    return false;
+  }
+
   function columnsOrder(columnsCampos: string) {
     const columnOrder: string[] = columnsCampos.split(',');
     const tableFields: any = [];
@@ -446,7 +450,7 @@ export default function Listagem({
             title: 'group.group',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: returnFalse,
           }),
         );
       }
@@ -606,7 +610,6 @@ export default function Listagem({
             <Input
               type="text"
               placeholder="De"
-              max="40"
               id="filterGroupFrom"
               name="filterGroupFrom"
               defaultValue={checkValue('filterGroupFrom')}
@@ -617,7 +620,6 @@ export default function Listagem({
             <Input
               type="text"
               placeholder="Até"
-              max="40"
               id="filterGroupTo"
               name="filterGroupTo"
               defaultValue={checkValue('filterGroupTo')}
@@ -687,7 +689,6 @@ export default function Listagem({
                     <Input
                       type="text"
                       placeholder="Nome"
-                      max="40"
                       id="filterSearch"
                       name="filterSearch"
                       defaultValue={checkValue('filterSearch')}

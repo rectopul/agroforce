@@ -776,7 +776,6 @@ export default function Listagem({
         <Input
           type="text"
           placeholder={name}
-          max="40"
           id={title}
           defaultValue={checkValue(title)}
           name={title}

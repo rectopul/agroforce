@@ -476,6 +476,10 @@ export default function TipoEnsaio({
     };
   }
 
+  function returnFalse() {
+    return false;
+  }
+
   function colums(columnsOrder: any): any {
     const columnOrder: any = columnsOrder.split(',');
 
@@ -504,7 +508,7 @@ export default function TipoEnsaio({
             title: 'envelope.seeds',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: returnFalse,
           }),
         );
       }
@@ -515,7 +519,7 @@ export default function TipoEnsaio({
             title: 'envelope.safra.safraName',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: returnFalse,
           }),
         );
       }
@@ -772,7 +776,6 @@ export default function TipoEnsaio({
                     <Input
                       type="text"
                       placeholder="Nome"
-                      max="40"
                       id="filterName"
                       name="filterName"
                       defaultValue={checkValue('filterName')}
@@ -790,7 +793,6 @@ export default function TipoEnsaio({
                         <Input
                           type="number"
                           placeholder="De"
-                          max="40"
                           id="filterSeedsFrom"
                           name="filterSeedsFrom"
                           onChange={formik.handleChange}
@@ -801,7 +803,6 @@ export default function TipoEnsaio({
                         <Input
                           type="number"
                           placeholder="Até"
-                          max="40"
                           id="filterSeedsTo"
                           name="filterSeedsTo"
                           onChange={formik.handleChange}

@@ -824,7 +824,6 @@ export default function Listagem({
           type="text"
           placeholder={name}
           defaultValue={checkValue(title)}
-          max="40"
           id={title}
           name={title}
           onChange={formik.handleChange}

@@ -587,7 +587,6 @@ export default function Listagem({
                     <Input
                       type="text"
                       placeholder="setor"
-                      max="40"
                       defaultValue={checkValue('filterSearch')}
                       id="filterSearch"
                       name="filterSearch"

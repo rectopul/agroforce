@@ -636,7 +636,6 @@ export default function Listagem({
                     <Input
                       type="text"
                       placeholder="cultura"
-                      max="40"
                       defaultValue={checkValue('filterSearch')}
                       id="filterSearch"
                       name="filterSearch"

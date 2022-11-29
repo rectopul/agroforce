@@ -278,7 +278,6 @@ export default function AtualizarUsuario({
                 name="name"
                 type="text"
                 placeholder="José Oliveira"
-                max="40"
                 onChange={formik.handleChange}
                 value={formik.values.name}
               />
