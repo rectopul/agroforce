@@ -336,6 +336,7 @@ export default function NovoLocal({
                 Cod Tec.
               </label>
               <Input
+                size={7}
                 type="number"
                 placeholder="10"
                 id="cod_tec"
