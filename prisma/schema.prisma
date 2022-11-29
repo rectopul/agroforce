@@ -405,13 +405,13 @@ model lote {
   created_by          Int
   created_at          DateTime              @default(now())
   id_genotipo         Int
-  cod_lote            Decimal               @unique @db.Decimal(15, 0)
+  cod_lote            Decimal               @db.Decimal(15, 0)
   fase                String?
   id_dados            Int
   id_s2               Int
   id_safra            Int
   id_culture          Int
-  ncc                 Decimal?              @unique @db.Decimal(12, 0)
+  ncc                 Decimal?              @db.Decimal(12, 0)
   peso                Decimal?              @db.Decimal(5, 0)
   quant_sementes      Int?
   year                Int?
