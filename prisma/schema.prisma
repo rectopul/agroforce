@@ -423,6 +423,7 @@ model lote {
   experiment_genotipe experiment_genotipe[]
 
   @@unique([id_dados, id_culture])
+  @@unique([ncc, id_culture])
 }
 
 model epoca {
