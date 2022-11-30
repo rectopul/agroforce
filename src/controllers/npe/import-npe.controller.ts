@@ -287,18 +287,18 @@ export class ImportNpeController {
                     );
                   } else {
                     this.aux.focoId = response[0]?.id;
-                  //   const { status: focoGroup }: IReturnObject = await groupController.getAll({
-                  //     id_safra: idSafra,
-                  //     id_foco: this.aux.focoId,
-                  //   });
-                  //   if (focoGroup !== 200) {
-                  //     responseIfError[Number(column)] += responseGenericFactory(
-                  //       Number(column) + 1,
-                  //       row,
-                  //       spreadSheet[0][column],
-                  //       'os focos precisam ter grupos cadastrados nessa safra',
-                  //     );
-                  //   }
+                    const { status: focoGroup }: IReturnObject = await groupController.getAll({
+                      id_safra: idSafra,
+                      id_foco: this.aux.focoId,
+                    });
+                    if (focoGroup !== 200) {
+                      responseIfError[Number(column)] += responseGenericFactory(
+                        Number(column) + 1,
+                        row,
+                        spreadSheet[0][column],
+                        'os focos precisam ter grupos cadastrados nessa safra',
+                      );
+                    }
                   }
                 } else {
                   responseIfError[Number(column)] += responseGenericFactory(
@@ -366,22 +366,53 @@ export class ImportNpeController {
                       'O foco precisa ser importado antes da NPEI',
                     );
                   }
-                  const resp: any = await npeController.validateNpeiDBA({
-                    Column: Number(column) + 1,
-                    Line: Number(row) + 1,
-                    safra: idSafra,
-                    foco: this.aux.focoId,
-                    npei: spreadSheet[row][column],
+                  const {
+                    response,
+                  }: IReturnObject = await focoController.getAll({
+                    name: spreadSheet[row][2],
+                    id_culture: idCulture,
+                    filterStatus: 1,
                   });
-                  if (resp.erro === 1) {
-                    responseIfError[Number(column)] += resp.message;
+
+                  if (response.length > 0) {
+                    const groupNumber = response[0].group.filter(
+                      (item: any) => item.id_safra === idSafra,
+                    );
+                    const {
+                      response: npei,
+                    }: IReturnObject = await npeController.getAll({
+                      filterNPE: spreadSheet[row][column],
+                      filterGrpFrom: groupNumber[0]?.group,
+                      filterGrpTo: groupNumber[0]?.group,
+
+                    });
+                    console.log('npei');
+                    console.log(npei);
+                    if (npei.length > 0) {
+                      responseIfError[Number(column)] += responseGenericFactory(
+                        Number(column) + 1,
+                        row,
+                        spreadSheet[0][column],
+                        `ja cadastrado dentro do grupo ${groupNumber[0]?.group}`,
+                      );
+                    }
                   }
-                  if (responseIfError.length === 0) {
-                    this.aux.npei = spreadSheet[row][column];
-                    this.aux.npef = spreadSheet[row][column];
-                    this.aux.prox_npe = spreadSheet[row][column];
-                    this.aux.npei_i = spreadSheet[row][column];
-                  }
+                  // const resp: any = await npeController.validateNpeiDBA({
+                  //   Column: Number(column) + 1,
+                  //   Line: Number(row) + 1,
+                  //   safra: idSafra,
+                  //   foco: this.aux.focoId,
+                  //   npei: spreadSheet[row][column],
+                  // });
+                  // if (resp.erro === 1) {
+                  //   responseIfError[Number(column)] += resp.message;
+                  // }
+                  // if (responseIfError.length === 0) {
+                  //   this.aux.npei = spreadSheet[row][column];
+                  //   this.aux.npef = spreadSheet[row][column];
+                  //   this.aux.prox_npe = spreadSheet[row][column];
+                  //   this.aux.npei_i = spreadSheet[row][column];
+                  // }
                 } else {
                   responseIfError[Number(column)]
                     += responsePositiveNumericFactory(
