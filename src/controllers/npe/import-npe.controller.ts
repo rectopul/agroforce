@@ -58,7 +58,7 @@ export class ImportNpeController {
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
-        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
+        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
         return { status: 400, message: validate };
       }
       const configModule: object | any = await importController.getAll(14);
@@ -492,7 +492,7 @@ export class ImportNpeController {
             }
           }
           await npeController.create(createMany);
-          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
+          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO', updated_at: Date() });
           return { status: 200, message: 'Ambiente importado com sucesso' };
         } catch (error: any) {
           await logImportController.update({
