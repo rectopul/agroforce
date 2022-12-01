@@ -878,7 +878,6 @@ export default function Listagem({
         <Input
           type="text"
           placeholder={name}
-          max="40"
           id={title}
           name={title}
           defaultValue={checkValue(title)}
@@ -899,7 +898,6 @@ export default function Listagem({
             <Input
               type="int"
               placeholder="De"
-              max="40"
               id="filterGmrRangeFrom"
               name="filterGmrRangeFrom"
               defaultValue={checkValue('filterGmrRangeFrom')}
@@ -910,7 +908,6 @@ export default function Listagem({
             <Input
               type="int"
               placeholder="Até"
-              max="40"
               id="filterGmrRangeTo"
               name="filterGmrRangeTo"
               defaultValue={checkValue('filterGmrRangeTo')}
@@ -933,7 +930,6 @@ export default function Listagem({
             <Input
               type="number"
               placeholder="De"
-              max="40"
               id="filterLotsFrom"
               name="filterLotsFrom"
               onChange={formik.handleChange}
@@ -943,7 +939,6 @@ export default function Listagem({
             <Input
               type="number"
               placeholder="Até"
-              max="40"
               id="filterLotsTo"
               name="filterLotsTo"
               onChange={formik.handleChange}

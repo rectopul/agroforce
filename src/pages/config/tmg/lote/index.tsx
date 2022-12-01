@@ -507,7 +507,7 @@ export default function Listagem({
             handleOrder,
             render: (rowData: any) => (
               <div>
-                {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
+                {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.name}`}
               </div>
             ),
           }),
@@ -699,7 +699,6 @@ export default function Listagem({
         <Input
           type="text"
           placeholder={name}
-          max="40"
           id={title}
           name={title}
           onChange={formik.handleChange}

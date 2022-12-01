@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-loop-func */
 /* eslint-disable import/no-cycle */
@@ -220,20 +221,20 @@ export class ImportGenotypeController {
               }
             }
 
-            if (configModule.response[0]?.fields[column] === 'GMR') {
+            if (configModule.response[0]?.fields[column] === 'gmr') {
               if (spreadSheet[row][column] !== null) {
-                if (!validateInteger(spreadSheet[row][column])) {
+                if (isNaN(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     (Number(column) + 1),
                     row,
                     spreadSheet[0][column],
-                    'precisa ser um numero inteiro e positivo',
+                    'precisa ser um numero positivo',
                   );
                 }
               }
             }
 
-            if (configModule.response[0]?.fields[column] === 'BGM') {
+            if (configModule.response[0]?.fields[column] === 'bgm') {
               if (spreadSheet[row][column] !== null) {
                 if (isNaN(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responsePositiveNumericFactory(
@@ -254,6 +255,21 @@ export class ImportGenotypeController {
                     row,
                     spreadSheet[0][column],
                   );
+                } else {
+                  const { response: lote }: any = await loteController.getAll({
+                    id_dados: spreadSheet[row][column],
+                    id_culture: idCulture,
+                  });
+                  if (lote[0]?.safra?.id !== idSafra) {
+                    if (lote.length > 0) {
+                      responseIfError[Number(column)] += responseGenericFactory(
+                        Number(column) + 1,
+                        row,
+                        spreadSheet[0][column],
+                        'o lote já foi cadastrado em outra safra',
+                      );
+                    }
+                  }
                 }
               }
 
@@ -760,12 +776,12 @@ export class ImportGenotypeController {
                     gmr: this.aux.gmr,
                     bgm: this.aux.bgm,
                     cruza: this.aux.cruza,
-                    progenitor_f_direto: this.aux.progenitor_f_direto,
-                    progenitor_m_direto: this.aux.progenitor_m_direto,
-                    progenitor_f_origem: this.aux.progenitor_f_origem,
-                    progenitor_m_origem: this.aux.progenitor_m_origem,
-                    progenitores_origem: this.aux.progenitores_origem,
-                    parentesco_completo: this.aux.parentesco_completo,
+                    progenitor_f_direto: this.aux.progenitor_f_direto ? String(this.aux.progenitor_f_direto) : undefined,
+                    progenitor_m_direto: this.aux.progenitor_m_direto ? String(this.aux.progenitor_m_direto) : undefined,
+                    progenitor_f_origem: this.aux.progenitor_f_origem ? String(this.aux.progenitor_f_origem) : undefined,
+                    progenitor_m_origem: this.aux.progenitor_m_origem ? String(this.aux.progenitor_m_origem) : undefined,
+                    progenitores_origem: this.aux.progenitores_origem ? String(this.aux.progenitores_origem) : undefined,
+                    parentesco_completo: this.aux.parentesco_completo ? String(this.aux.parentesco_completo) : undefined,
                     dt_export: this.aux.dt_export,
                     created_by: createdBy,
                   });
@@ -785,12 +801,12 @@ export class ImportGenotypeController {
                     gmr: this.aux.gmr,
                     bgm: this.aux.bgm,
                     cruza: this.aux.cruza,
-                    progenitor_f_direto: this.aux.progenitor_f_direto,
-                    progenitor_m_direto: this.aux.progenitor_m_direto,
-                    progenitor_f_origem: this.aux.progenitor_f_origem,
-                    progenitor_m_origem: this.aux.progenitor_m_origem,
-                    progenitores_origem: this.aux.progenitores_origem,
-                    parentesco_completo: this.aux.parentesco_completo,
+                    progenitor_f_direto: String(this.aux.progenitor_f_direto),
+                    progenitor_m_direto: String(this.aux.progenitor_m_direto),
+                    progenitor_f_origem: String(this.aux.progenitor_f_origem),
+                    progenitor_m_origem: String(this.aux.progenitor_m_origem),
+                    progenitores_origem: String(this.aux.progenitores_origem),
+                    parentesco_completo: String(this.aux.parentesco_completo),
                     dt_export: this.aux.dt_export,
                     created_by: createdBy,
                   });

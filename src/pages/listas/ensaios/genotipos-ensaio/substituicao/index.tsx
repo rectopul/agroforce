@@ -682,7 +682,6 @@ export default function Listagem({
         <Input
           type="text"
           placeholder={name}
-          max="40"
           id={title}
           name={title}
           onChange={formik.handleChange}
@@ -742,7 +741,6 @@ export default function Listagem({
                     <Input
                       type="number"
                       placeholder="Ano Lote"
-                      max="40"
                       id="filterYear"
                       name="filterYear"
                       onChange={formik.handleChange}

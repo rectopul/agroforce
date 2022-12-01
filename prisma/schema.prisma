@@ -423,6 +423,7 @@ model lote {
   experiment_genotipe experiment_genotipe[]
 
   @@unique([id_dados, id_culture])
+  @@unique([ncc, id_culture])
 }
 
 model epoca {
@@ -466,6 +467,9 @@ model npe {
   group      group?      @relation(fields: [groupId], references: [id])
   type_assay type_assay? @relation(fields: [typeAssayId], references: [id])
   tecnologia tecnologia? @relation(fields: [tecnologiaId], references: [id])
+
+  @@unique([safraId, focoId, typeAssayId, tecnologiaId, localId, epoca])
+  @@unique([npei, groupId])
 }
 
 model sequencia_delineamento {
@@ -511,6 +515,8 @@ model experiment {
   ExperimentGroup     ExperimentGroup?      @relation(fields: [experimentGroupId], references: [id])
   quadra              quadra?               @relation(fields: [blockId], references: [id])
   experiment_genotipe experiment_genotipe[]
+
+  @@unique([idSafra, period, idLocal, idAssayList])
 }
 
 model log_import {
@@ -547,6 +553,8 @@ model assay_list {
   type_assay         type_assay           @relation(fields: [id_type_assay], references: [id])
   experiment         experiment[]
   genotype_treatment genotype_treatment[]
+
+  @@unique([id_safra, gli])
 }
 
 model genotype_treatment {
@@ -564,6 +572,8 @@ model genotype_treatment {
   genotipo          genotipo   @relation(fields: [id_genotipo], references: [id])
   lote              lote?      @relation(fields: [id_lote], references: [id])
   safra             safra      @relation(fields: [id_safra], references: [id])
+
+  @@unique([id_assay_list, treatments_number])
 }
 
 model history_genotype_treatment {
@@ -612,6 +622,8 @@ model experiment_genotipe {
   sequencia_delineamento sequencia_delineamento @relation(fields: [id_seq_delineamento], references: [id])
   lote                   lote?                  @relation(fields: [idLote], references: [id])
   PrintHistory           PrintHistory[]
+
+  @@unique([idExperiment, npe])
 }
 
 model ExperimentGroup {
