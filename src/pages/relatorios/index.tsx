@@ -74,7 +74,7 @@ export default function Listagem({
   const [loading, setLoading] = useState<boolean>(false);
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.genotypeTreatment || {
+  const preferences = userLogado.preferences.reporte || {
     id: 0,
     table_preferences: 'madeBy,madeIn,module,operation',
   };
@@ -389,7 +389,7 @@ export default function Listagem({
         .create({
           table_preferences: campos,
           userId: userLogado.id,
-          module_id: 27,
+          module_id: 31,
         })
         .then((response) => {
           userLogado.preferences.reporte = {

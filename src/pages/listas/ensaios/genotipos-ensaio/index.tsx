@@ -967,7 +967,6 @@ export default function Listagem({
     return true;
   }
 
-  console.log({ treatments });
 
   return (
     <>

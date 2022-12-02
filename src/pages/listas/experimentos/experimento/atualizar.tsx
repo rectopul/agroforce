@@ -105,7 +105,7 @@ export default function AtualizarLocal({
   const tableRef = useRef<any>();
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.materiais || {
+  const preferences = userLogado.preferences.parcelas || {
     id: 0,
     table_preferences:
       'repetitionExperience,genotipo,gmr,bgm,fase,tecnologia,nt,rep,status,nca,npe,sequence,block,experiment',
@@ -505,10 +505,10 @@ export default function AtualizarLocal({
         .create({
           table_preferences: campos,
           userId: userLogado.id,
-          module_id: 23,
+          module_id: 30,
         })
         .then((response) => {
-          userLogado.preferences.materiais = {
+          userLogado.preferences.parcelas = {
             id: response.response.id,
             userId: preferences.userId,
             table_preferences: campos,
@@ -517,7 +517,7 @@ export default function AtualizarLocal({
         });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.materiais = {
+      userLogado.preferences.parcelas = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,

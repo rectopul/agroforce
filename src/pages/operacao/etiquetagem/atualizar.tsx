@@ -61,7 +61,7 @@ export default function Listagem({
   const tabsEtiquetagemMenu = tabsOperation.map((i: any) => (i.titleTab === 'ETIQUETAGEM' ? { ...i, statusTab: true } : i));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.genotypeTreatment || {
+  const preferences = userLogado.preferences.experimento || {
     id: 0,
     table_preferences:
       'id,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status,action',
@@ -369,10 +369,10 @@ export default function Listagem({
         .create({
           table_preferences: campos,
           userId: userLogado.id,
-          module_id: 27,
+          module_id: 22,
         })
         .then((response) => {
-          userLogado.preferences.genotypeTreatment = {
+          userLogado.preferences.experimento = {
             id: response.response.id,
             userId: preferences.userId,
             table_preferences: campos,
@@ -381,7 +381,7 @@ export default function Listagem({
         });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.genotypeTreatment = {
+      userLogado.preferences.experimento = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,

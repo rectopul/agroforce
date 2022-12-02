@@ -1047,7 +1047,7 @@ export default function Listagem({
                           }}
                         />
                       </div>
-                      <div className="h-12 flex items-center justify-center w-full">
+                      {/* <div className="h-12 flex items-center justify-center w-full">
                         <Button
                           title="Configurar Importação de Planilha"
                           icon={<RiSettingsFill size={20} />}
@@ -1056,7 +1056,7 @@ export default function Listagem({
                           onClick={() => {}}
                           href="layout-quadra/importar-planilha/config-planilha"
                         />
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 ),

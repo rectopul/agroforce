@@ -44,6 +44,7 @@ export class ImportDelimitationController {
     const validate: any = await validateHeaders(spreadSheet, headers);
     if (validate.length > 0) {
       await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: responseStringError});
+
       return { status: 400, message: validate };
     }
     if ((spreadSheet.length > Number(process.env.MAX_DIRECT_UPLOAD_ALLOWED))

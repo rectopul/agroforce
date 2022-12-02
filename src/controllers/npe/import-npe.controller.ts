@@ -389,8 +389,6 @@ export class ImportNpeController {
                       filterGrpTo: groupNumber[0]?.group,
 
                     });
-                    console.log('npei');
-                    console.log(npei);
                     if (npei.length > 0) {
                       responseIfError[Number(column)] += responseGenericFactory(
                         Number(column) + 1,

@@ -561,6 +561,7 @@ export class ImportLayoutBlockController {
       return { status: 400, message: responseStringError };
     } catch (error: any) {
       await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError, });
+
       handleError('Layout de quadra controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Layout de quadra' };
     }
