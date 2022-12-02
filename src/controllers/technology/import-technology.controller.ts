@@ -37,7 +37,7 @@ export class ImportTechnologyController {
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
-        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
+        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
         return { status: 400, message: validate };
       }
       const duplicateCode: any = [];
@@ -209,20 +209,20 @@ export class ImportTechnologyController {
             }
           });
 
-          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
+          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO', updated_at: Date() });
           return { status: 200, message: 'Tecnologia importado com sucesso' };
         } catch (error: any) {
-          await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+          await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date() });
           handleError('Tecnologia controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de tecnologia' };
         }
       }
 
-      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
+      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date() });
       handleError('Tecnologia controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de tecnologia' };
     }
