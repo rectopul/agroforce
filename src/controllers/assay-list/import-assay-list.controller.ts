@@ -22,6 +22,7 @@ import { TecnologiaController } from '../technology/tecnologia.controller';
 import { TypeAssayController } from '../tipo-ensaio.controller';
 import { assayListQueue } from './assay-list-queue';
 import { AssayListController } from './assay-list.controller';
+import { GenotypeTreatmentRepository } from '../../repository/genotype-treatment/genotype-treatment.repository';
 
 export class ImportAssayListController {
   static async validate(
@@ -61,13 +62,11 @@ export class ImportAssayListController {
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
-        const responseIfError: any = [];
-        const responseStringError = responseIfError.join('').replace(/undefined/g, '');
         await logImportController.update({
           id: idLog,
           status: 1,
           state: 'INVALIDA',
-          invalid_data: responseStringError,
+          invalid_data: validate,
         });
         return { status: 400, message: validate };
       }
@@ -405,9 +404,9 @@ export class ImportAssayListController {
       });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
-      const responseIfError: any = [];
-      const responseStringError = responseIfError.join('').replace(/undefined/g, '');
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError, });
+      await logImportController.update({
+        id: idLog, status: 1, state: 'FALHA', updated_at: Date(),
+      });
       handleError('Lista de ensaio controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Lista de ensaio' };
     }
@@ -560,53 +559,50 @@ export class ImportAssayListController {
           }
         }
       });
-      await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO', updated_at: Date() });
+      await logImportController.update({
+        id: idLog, status: 1, state: 'SUCESSO', updated_at: Date(),
+      });
       return { status: 200, message: `Ensaios importados (${String(register)}). Produtividade x Avanço (${String(productivity)} x ${String(advance)}) ` };
     } catch (error: any) {
-      const responseIfError: any = [];
-      const responseStringError = responseIfError.join('').replace(/undefined/g, '');
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError, });
+      await logImportController.update({
+        id: idLog, status: 1, state: 'FALHA', updated_at: Date(),
+      });
       handleError('Lista de ensaio controller', 'Save Import', error.message);
       return { status: 500, message: 'Erro ao salvar planilha de Lista de ensaio' };
     }
   }
+
+  // private static savefile(files) {
+  //   try {
+  //     const newFileName = `${uuidv4()}.${FormData.files[0].name.split('.').pop()}`;
+  //     uploadFileToBlob(FormData.files[0], newFileName);
+  //     registerItem(newFileName);
+
+  //     const containerName = 'sample-container';
+  //     const sasToken = process.env.NEXT_PUBLIC_STORAGESASTOKEN;
+  //     const storageAccountName = process.env.NEXT_PUBLIC_STORAGERESOURCENAME;
+
+  //     const uploadFileToBlob = useCallback(
+  //       async (file: File | null, newFileName: string) => {
+  //         const blobService = new BlobServiceClient(
+  //           `https://${storageAccountName}.blob.core.windows.net/?${sasToken}`,
+  //         );
+
+  //         const containerClient: ContainerClient = blobService.getContainerClient(containerName);
+  //         await containerClient.createIfNotExists({
+  //           access: 'container',
+  //         });
+
+  //         const blobClient = containerClient.getBlockBlobClient(newFileName);
+  //         const options = { blobHTTPHeaders: { blobContentType: file.type } };
+
+  //         await blobClient.uploadData(file, options);
+  //       },
+  //       [],
+  //     );
+  //   } catch (error: any) {
+  //     handleError('Lista de ensaio controller', 'Save File', error.message);
+  //     return { status: 500, message: 'Erro ao salvar arquivo de Lista de ensaio' };
+  //   }
+  // }
 }
-
-      try {
-
-           function savefile(files){
-        
-           const newFileName =
-            uuidv4() + '.' + FormData.files[0].name.split('.').pop();
-            uploadFileToBlob(FormData.files[0], newFileName);
-            registerItem(newFileName);
-
-            const containerName = 'sample-container';
-            const sasToken = process.env.NEXT_PUBLIC_STORAGESASTOKEN;
-            const storageAccountName = process.env.NEXT_PUBLIC_STORAGERESOURCENAME;
-
-            const uploadFileToBlob = useCallback(
-              async (file: File | null, newFileName: string) => {
-
-                  const blobService = new BlobServiceClient(
-                    `https://${storageAccountName}.blob.core.windows.net/?${sasToken}`
-                  );
-          
-                  const containerClient: ContainerClient =
-                    blobService.getContainerClient(containerName);
-                  await containerClient.createIfNotExists({
-                    access: 'container',
-                  });
-          
-                  const blobClient = containerClient.getBlockBlobClient(newFileName);
-                  const options = { blobHTTPHeaders: { blobContentType: file.type } };
-          
-                  await blobClient.uploadData(file, options);
-              },
-              []
-            );
-        }
-
-      } catch (error) {
-        
-      }

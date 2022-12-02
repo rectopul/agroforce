@@ -45,7 +45,6 @@ export class ImportLocalController {
 
     const localTemp: Array<string> = [];
     const responseIfError: Array<string> = [];
-    const responseStringError = responseIfError.join('').replace(/undefined/g, '');
 
     const headers = [
       'ID da unidade de cultura (CULTURE_UNIT_ID)',
@@ -69,14 +68,18 @@ export class ImportLocalController {
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
-        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: responseStringError  });
+        await logImportController.update({
+          id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: validate,
+        });
         return { status: 400, message: validate };
       }
       const configModule: object | any = await importController.getAll(4);
       configModule.response[0]?.fields.push('DT');
       for (const row in spreadSheet) {
         if (localTemp.includes(spreadSheet[row][2])) {
-          await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: responseStringError  });
+          await logImportController.update({
+            id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela`,
+          });
           localTemp[row] = spreadSheet[row][2];
           return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela` };
         }
@@ -387,19 +390,27 @@ export class ImportLocalController {
             }
           });
 
-          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO', updated_at: Date() });
+          await logImportController.update({
+            id: idLog, status: 1, state: 'SUCESSO', updated_at: Date(),
+          });
           return { status: 200, message: 'Local importado com sucesso' };
         } catch (error: any) {
-          await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError});
+          await logImportController.update({
+            id: idLog, status: 1, state: 'FALHA', updated_at: Date(),
+          });
           handleError('Local controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de Local' };
         }
       }
-      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: responseStringError});
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
+      await logImportController.update({
+        id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: responseStringError,
+      });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError});
+      await logImportController.update({
+        id: idLog, status: 1, state: 'FALHA', updated_at: Date(),
+      });
       handleError('Local controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Local' };
     }

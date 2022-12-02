@@ -45,7 +45,7 @@ import { ImportDelimitationController } from './delimitation/delimitation-import
 import { ImportNpeController } from './npe/import-npe.controller';
 import { ImportAllocationController } from './allocation/import-allocation.controller';
 import { ImportExperimentGenotypeController } from './experiment-genotype/import-experiment-genotype.controller';
-import { ImportBlob } from '../services/azure_services/import_blob_azure';
+import { importblob } from '../services/azure_services/import_blob_azure';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -97,8 +97,6 @@ export class ImportController {
   tecnologiaRepository = new TecnologiaRepository();
 
   aux: object | any = {};
-    
-
 
   async getAll(moduleId: number) {
     try {
@@ -161,15 +159,13 @@ export class ImportController {
           status: 400, message,
         };
       }
-      const responseIfError: any = [];
-      const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       const protocolMessage = validateProtocolLevel(data.spreadSheet);
       if (protocolMessage.length > 0) {
         await this.logImportController.update({
           id: responseLog?.id,
           status: 1,
           state: 'INVALIDA',
-          invalid_data: responseStringError,
+          invalid_data: protocolMessage,
         });
         return { status: 400, message: protocolMessage };
       }
@@ -222,6 +218,7 @@ export class ImportController {
       state: 'EM ANDAMENTO',
     });
     try {
+      await importblob(data.files[0]);
       if (!data.moduleId) return { status: 400, message: 'precisa ser informado o modulo que está sendo acessado!' };
 
       if (status === 400) {
@@ -244,7 +241,6 @@ export class ImportController {
       }
 
       if (data.moduleId === 27) {
-        await ImportBlob(data.files[0]);
         return await ImportGenotypeTreatmentController.validate(responseLog?.id, data);
       }
 

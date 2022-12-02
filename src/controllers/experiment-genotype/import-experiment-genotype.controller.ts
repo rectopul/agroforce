@@ -2,6 +2,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
 import {
@@ -16,8 +17,8 @@ import { GenotipoController } from '../genotype/genotipo.controller';
 import { LogImportController } from '../log-import.controller';
 import { LoteController } from '../lote.controller';
 
-import {ExperimentGenotipeRepository} from '../../repository/experiment-genotipe.repository'
-import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
+import { ExperimentGenotipeRepository } from '../../repository/experiment-genotipe.repository';
+
 export class ImportExperimentGenotypeController {
   static async validate(
     idLog: number,
@@ -38,7 +39,6 @@ export class ImportExperimentGenotypeController {
     /* --------------------------------------- */
 
     const responseIfError: Array<string> = [];
-    const responseStringError = responseIfError.join('').replace(/undefined/g, '');
     try {
       const value_hold: any = {};
 
@@ -48,7 +48,6 @@ export class ImportExperimentGenotypeController {
       }
 
       for (const row in spreadSheet) {
-
         if (row !== '0') {
           // experiments
           if (spreadSheet[row][5] != null) {
@@ -325,17 +324,17 @@ export class ImportExperimentGenotypeController {
                   npe: spreadSheet[row][10],
                   rep: spreadSheet[row][8],
                 });
-  
+
                 const { response: genotipo } = await genotipoController.getAll({
                   name_genotipo: spreadSheet[row][15], // New genetic Name
                 });
-  
+
                 const { response: lote } = await loteController.getAll({
                   ncc: spreadSheet[row][16], // NEW NCA
                   filterGenotipo: spreadSheet[row][15], // new geneticName
                 });
-  
-                const response12 = await experimentGenotipeRepository.updateTransaction(treatment[0]?.id,{
+
+                const response12 = await experimentGenotipeRepository.updateTransaction(treatment[0]?.id, {
                   id: treatment[0]?.id,
                   gli: spreadSheet[row][4],
                   idExperiment: value_hold.idExperiment,
@@ -346,7 +345,7 @@ export class ImportExperimentGenotypeController {
                   idLote: lote[0]?.id,
                   nca: spreadSheet[row][16].toString(),
                 });
-  
+
                 //   id: treatment[0]?.id,
                 //   gli: spreadSheet[row][4],
                 //   idExperiment : value_hold.idExperiment,
@@ -360,19 +359,25 @@ export class ImportExperimentGenotypeController {
               }
             }
           });
-       
+
           return { status: 200, message: 'Sub. de parcelas importado com sucesso' };
         } catch (error: any) {
-          await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError});
+          await logImportController.update({
+            id: idLog, status: 1, state: 'FALHA', updated_at: Date(),
+          });
           handleError('Sub. de parcelas controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de Sub. de parcelas' };
         }
       }
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError});
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
+      await logImportController.update({
+        id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError,
+      });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError,   });
+      await logImportController.update({
+        id: idLog, status: 1, state: 'FALHA', updated_at: Date(),
+      });
       handleError('Sub. de parcelas controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Sub. de parcelas' };
     }

@@ -59,9 +59,9 @@ export class ImportBlockController {
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
-        const responseIfError: any = [];
-        const responseStringError = responseIfError.join('').replace(/undefined/g, '');
-        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: responseStringError});
+        await logImportController.update({
+          id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: validate,
+        });
 
         return { status: 400, message: validate };
       }
@@ -704,23 +704,27 @@ export class ImportBlockController {
               });
             }
           }
-          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO', updated_at: Date() });
+          await logImportController.update({
+            id: idLog, status: 1, state: 'SUCESSO', updated_at: Date(),
+          });
           return { status: 200, message: 'Quadra importada com sucesso' };
         } catch (error: any) {
-          const responseIfError: any = [];
-          const responseStringError = responseIfError.join('').replace(/undefined/g, '');
-          await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError, });
+          await logImportController.update({
+            id: idLog, status: 1, state: 'FALHA', updated_at: Date(),
+          });
           handleError('Quadra controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de Quadra' };
         }
       }
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError, });
+      await logImportController.update({
+        id: idLog, status: 1, state: 'FALHA', updated_at: Date(),
+      });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {
-      const responseIfError: any = [];
-      const responseStringError = responseIfError.join('').replace(/undefined/g, '');
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError, });
+      await logImportController.update({
+        id: idLog, status: 1, state: 'FALHA', updated_at: Date(),
+      });
       handleError('Quadra controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Quadra' };
     }
