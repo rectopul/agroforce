@@ -75,7 +75,7 @@ export class ImportGenotypeController {
     ];
     const validate: any = await validateHeaders(spreadSheet, headers);
     if (validate.length > 0) {
-      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
+      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
       return { status: 400, message: validate };
     }
 
