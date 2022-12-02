@@ -10,11 +10,11 @@ import React, {
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { IoIosCloudUpload } from 'react-icons/io';
-
 import {
   AiFillInfoCircle,
   AiOutlineArrowDown,
   AiOutlineArrowUp,
+  AiOutlineStop,
   AiTwotoneStar,
 } from 'react-icons/ai';
 import MaterialTable from 'material-table';
@@ -658,6 +658,24 @@ export default function Import({
     setValue(newValue);
   };
 
+  async function cancelImport() {
+    setImportLoading(true);
+
+    const { status, message } = await logImportService.update({
+      reset: true,
+      created_by: userLogado.id,
+    });
+    if (status === 200) {
+      router.reload();
+    } else if (status === 400) {
+      Swal.fire({
+        html: message,
+        width: 800,
+      });
+      setImportLoading(false);
+    }
+  }
+
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -1100,6 +1118,17 @@ export default function Import({
                     <div className="w-full max-h-96 flex items-center justify-between gap-4 bg-gray-50 py-2 px-5 border-solid border-b border-gray-200">
                       <div />
 
+                      <div className="h-12 flex items-left justify-left w-1/12">
+                        <Button
+                          title="Exportar planilha de logs"
+                          icon={<AiOutlineStop size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => {
+                            cancelImport();
+                          }}
+                        />
+                      </div>
                       <strong className="text-blue-600">
                         Total registrado:
                         {' '}

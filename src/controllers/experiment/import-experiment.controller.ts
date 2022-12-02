@@ -260,7 +260,9 @@ export class ImportExperimentController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
                 const { response } = await delineamentoController.getAll({
-                  id_culture: idCulture, name: spreadSheet[row][column],
+                  id_culture: idCulture,
+                  name: spreadSheet[row][column],
+                  filterStatus: 1,
                 });
 
                 if (response?.length === 0) {
@@ -353,7 +355,9 @@ export class ImportExperimentController {
                 id_safra: idSafra,
               });
               const { response: delineamento } = await delineamentoController.getAll({
-                id_culture: idCulture, name: spreadSheet[row][10],
+                id_culture: idCulture,
+                name: spreadSheet[row][10],
+                filterStatus: 1,
               });
               const comments = spreadSheet[row][14]?.substr(0, 255) ? spreadSheet[row][14]?.substr(0, 255) : '';
               let experimentName;
