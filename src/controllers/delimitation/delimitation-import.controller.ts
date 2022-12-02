@@ -43,7 +43,7 @@ export class ImportDelimitationController {
     ];
     const validate: any = await validateHeaders(spreadSheet, headers);
     if (validate.length > 0) {
-      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
+      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: responseStringError});
       return { status: 400, message: validate };
     }
     if ((spreadSheet.length > Number(process.env.MAX_DIRECT_UPLOAD_ALLOWED))
@@ -65,6 +65,7 @@ export class ImportDelimitationController {
     const delineamentoController = new DelineamentoController();
 
     const responseIfError: Array<string> = [];
+    const responseStringError = responseIfError.join('').replace(/undefined/g, '');
     try {
       const configModule: object | any = await importController.getAll(7);
       for (const row in spreadSheet) {
@@ -210,7 +211,7 @@ export class ImportDelimitationController {
       });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date() });
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError, });
       handleError('Delineamento controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Delineamento' };
     }
@@ -308,7 +309,9 @@ export class ImportDelimitationController {
       await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO', updated_at: Date() });
       return { status: 200, message: 'Delineamento importado com sucesso' };
     } catch (error: any) {
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date() });
+      const responseIfError: Array<string> = [];
+      const responseStringError = responseIfError.join('').replace(/undefined/g, '');
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError, });
       handleError('Delineamento controller', 'Save Import', error.message);
       return { status: 500, message: 'Erro ao salvar planilha de Delineamento' };
     }

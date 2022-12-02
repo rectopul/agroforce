@@ -45,6 +45,7 @@ export class ImportNpeController {
     const npeTemp: Array<string> = [];
     const npeiTemp: Array<number> = [];
     const responseIfError: Array<string> = [];
+    const responseStringError = responseIfError.join('').replace(/undefined/g, '');
     const headers = [
       'CULTURA',
       'SAFRA',
@@ -58,7 +59,7 @@ export class ImportNpeController {
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
-        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
+        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: responseStringError});
         return { status: 400, message: validate };
       }
       const configModule: object | any = await importController.getAll(14);
@@ -89,6 +90,7 @@ export class ImportNpeController {
               id: idLog,
               status: 1,
               state: 'INVALIDA',
+              , invalid_data: responseStringError  
             });
             npeTemp[row] = npeName;
             responseIfError[0] += `<li style="text-align:left"> Erro na linha ${Number(row)}. Ambiente duplicados na tabela. </li> <br>`;
@@ -98,6 +100,7 @@ export class ImportNpeController {
               id: idLog,
               status: 1,
               state: 'INVALIDA',
+              invalid_data: responseStringError  
             });
             npeiTemp[row] = npeInicial;
             responseIfError[0] += `<li style="text-align:left"> Erro na linha ${Number(row)}. NPEI duplicadas na tabela. </li> <br>`;
@@ -530,6 +533,7 @@ export class ImportNpeController {
             id: idLog,
             status: 1,
             state: 'FALHA',
+            invalid_data: responseStringError  
           });
           handleError('NPE controller', 'Save Import', error.message);
           return {
@@ -542,6 +546,7 @@ export class ImportNpeController {
         id: idLog,
         status: 1,
         state: 'INVALIDA',
+        invalid_data: responseStringError,
       });
       const responseStringError = responseIfError
         .join('')
@@ -552,6 +557,7 @@ export class ImportNpeController {
         id: idLog,
         status: 1,
         state: 'FALHA',
+        invalid_data: responseStringError,
       });
       handleError('NPE controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Ambiente' };
