@@ -586,6 +586,7 @@ export default function TipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await assayListService
       .getAll(filterApplication)
       .then(({ status, response }) => {
@@ -643,6 +644,7 @@ export default function TipoEnsaio({
           XLSX.writeFile(workBook, 'Ensaio.xlsx');
         }
       });
+      setLoading(false);
   };
 
   // manage total pages

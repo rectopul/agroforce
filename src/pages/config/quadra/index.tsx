@@ -585,6 +585,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await quadraService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((row: any) => {
@@ -645,6 +646,7 @@ export default function Listagem({
         Swal.fire(response);
       }
     });
+    setLoading(false);
   };
 
   const [idArray, setIdArray] = useState([]);

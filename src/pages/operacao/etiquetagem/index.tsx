@@ -592,6 +592,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await experimentGroupService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const workSheet = XLSX.utils.json_to_sheet(response);
@@ -616,6 +617,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
         XLSX.writeFile(workBook, 'Grupos do experimento.xlsx');
       }
     });
+    setLoading(false);
   };
 
   // manage total pages

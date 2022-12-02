@@ -556,6 +556,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await sequenciaDelineamentoService
       .getAll(filter)
       .then(({ status, response }: IReturnObject) => {
@@ -607,6 +608,7 @@ export default function Listagem({
           XLSX.writeFile(workBook, "Sequencia de delineamento.xlsx");
         }
       });
+      setLoading(false);
   };
 
   // manage total pages

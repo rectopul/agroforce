@@ -43,6 +43,7 @@ import { groupService, userPreferencesService } from "../../../../services";
 import { focoService } from "../../../../services/foco.service";
 import * as ITabs from "../../../../shared/utils/dropdown";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
+import ComponentLoading from '../../../../components/Loading';
 
 export interface IUpdateFoco {
   id: number;
@@ -88,6 +89,7 @@ export default function Atualizar({
   const router = useRouter();
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const [loading, setLoading] = useState<boolean>(false);
   const culture = userLogado.userCulture.cultura_selecionada as string;
 
   function validateInputs(values: any) {
@@ -400,6 +402,7 @@ export default function Atualizar({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await groupService
       .getAll(filterApplication)
       .then(({ status, response }) => {
@@ -444,6 +447,7 @@ export default function Atualizar({
           XLSX.writeFile(workBook, "grupos.xlsx");
         }
       });
+      setLoading(false);
   };
 
   function handleTotalPages(): void {

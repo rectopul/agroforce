@@ -351,6 +351,7 @@ export default function AtualizarLocal({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await unidadeCulturaService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
@@ -389,6 +390,7 @@ export default function AtualizarLocal({
         XLSX.writeFile(workBook, 'Unidade-Cultura.xlsx');
       }
     });
+    setLoading(false);
   };
 
   function handleTotalPages(): void {

@@ -53,7 +53,9 @@ export class ImportLayoutBlockController {
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
-        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
+        const responseIfError: any = [];
+        const responseStringError = responseIfError.join('').replace(/undefined/g, '');
+        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: responseStringError, });
         return { status: 400, message: validate };
       }
       const sColheita: any = {};

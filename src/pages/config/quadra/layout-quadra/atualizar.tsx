@@ -453,6 +453,7 @@ export default function Atualizarquadra({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await layoutChildrenService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
@@ -513,6 +514,7 @@ export default function Atualizarquadra({
         XLSX.writeFile(workBook, "Esquema.xlsx");
       }
     });
+    setLoading(false);
   };
 
   function handleTotalPages(): void {

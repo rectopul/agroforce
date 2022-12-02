@@ -459,6 +459,7 @@ export default function Atualizargenotipo({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     if (!filterApplication.includes('paramSelect')) {
       filterApplication += `&paramSelect=${camposGerenciados}&id_genotipo=${idGenotipo}`;
     }
@@ -522,6 +523,7 @@ export default function Atualizargenotipo({
         XLSX.writeFile(workBook, 'Lotes.xlsx');
       }
     });
+    setLoading(false);
   };
 
   function handleTotalPages(): void {
