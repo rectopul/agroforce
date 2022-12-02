@@ -38,6 +38,7 @@ export class ImportExperimentGenotypeController {
     /* --------------------------------------- */
 
     const responseIfError: Array<string> = [];
+    const responseStringError = responseIfError.join('').replace(/undefined/g, '');
     try {
       const value_hold: any = {};
 
@@ -362,16 +363,16 @@ export class ImportExperimentGenotypeController {
        
           return { status: 200, message: 'Sub. de parcelas importado com sucesso' };
         } catch (error: any) {
-          await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date() });
+          await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError});
           handleError('Sub. de parcelas controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de Sub. de parcelas' };
         }
       }
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date() });
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError});
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date() });
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError,   });
       handleError('Sub. de parcelas controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Sub. de parcelas' };
     }

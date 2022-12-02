@@ -688,6 +688,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await experimentService
       .getAll(filter)
       .then(({ status, response, message }: any) => {
@@ -757,6 +758,7 @@ export default function Listagem({
           Swal.fire(message);
         }
       });
+      setLoading(false);
   };
 
   // manage total pages

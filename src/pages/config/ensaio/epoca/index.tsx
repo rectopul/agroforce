@@ -347,6 +347,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     if (!filterApplication.includes('paramSelect')) {
       filterApplication += `&paramSelect=${camposGerenciados}&id_culture=${cultureId}`;
     }
@@ -381,6 +382,7 @@ export default function Listagem({
         XLSX.writeFile(workBook, 'Época.xlsx');
       }
     });
+    setLoading(false);
   };
 
   function handleTotalPages(): void {

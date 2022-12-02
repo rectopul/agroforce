@@ -545,6 +545,7 @@ export default function AtualizarLocal({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     if (!filterApplication.includes('paramSelect')) {
       filterApplication += `&paramSelect=${camposGerenciados}&id_experimento=${idExperiment}`;
     }
@@ -584,6 +585,7 @@ export default function AtualizarLocal({
     //     XLSX.writeFile(workBook, 'unidade-cultura.xlsx');
     //   }
     // });
+    setLoading(false);
   };
 
   // function handleTotalPages(): void {

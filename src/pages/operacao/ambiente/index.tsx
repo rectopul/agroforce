@@ -490,6 +490,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     if (!filterApplication.includes('paramSelect')) {
       filterApplication += `&paramSelect=${camposGerenciados}`;
     }
@@ -551,6 +552,7 @@ export default function Listagem({
         Swal.fire('Erro ao exportar');
       }
     });
+    setLoading(false);
   };
 
   // manage total pages

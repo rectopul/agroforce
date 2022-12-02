@@ -676,6 +676,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await layoutQuadraService.getAll(filter).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
@@ -723,6 +724,7 @@ export default function Listagem({
         XLSX.writeFile(workBook, "Layout_Quadra.xlsx");
       }
     });
+    setLoading(false);
   };
 
   // manage total pages

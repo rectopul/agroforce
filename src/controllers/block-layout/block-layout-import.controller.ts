@@ -30,9 +30,13 @@ export class ImportLayoutBlockController {
     const culturaController = new CulturaController();
     const logImportController = new LogImportController();
     const layoutQuadraController = new LayoutQuadraController();
-    const layoutChildrenController = new LayoutChildrenController();
+    const layoutChildrenController = new LayoutChildrenController();.
+
+    
+    
 
     const responseIfError: Array<string> = [];
+    const responseStringError = responseIfError.join('').replace(/undefined/g, '');
     const configModule: object | any = await importController.getAll(Number(5));
     const headers = [
       'CULTURA',
@@ -53,7 +57,9 @@ export class ImportLayoutBlockController {
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
-        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
+        const responseIfError: any = [];
+        const responseStringError = responseIfError.join('').replace(/undefined/g, '');
+        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: responseStringError, });
         return { status: 400, message: validate };
       }
       const sColheita: any = {};
@@ -542,19 +548,20 @@ export class ImportLayoutBlockController {
               }
             }
           }
-          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO', updated_at: Date() });
+          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO', updated_at: Date()});
           return { status: 200, message: 'Layout de quadra importado com sucesso' };
         } catch (error: any) {
-          await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date() });
+          await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError, });
           handleError('Layout de quadra controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de Layout de quadra' };
         }
       }
-      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
+      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: responseStringError, });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date() });
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date(), invalid_data: responseStringError, });
+
       handleError('Layout de quadra controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Layout de quadra' };
     }

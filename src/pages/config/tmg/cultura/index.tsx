@@ -504,6 +504,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await cultureService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((row: any) => {
@@ -541,6 +542,7 @@ export default function Listagem({
         XLSX.writeFile(workBook, 'Culturas.xlsx');
       }
     });
+    setLoading(false);
   };
 
   // manage total pages

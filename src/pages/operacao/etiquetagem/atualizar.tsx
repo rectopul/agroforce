@@ -410,6 +410,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await experimentService.getAll(filter).then(({ status, response }: any) => {
       if (status === 200) {
         const newData = response.map((item: any) => {
@@ -465,6 +466,7 @@ export default function Listagem({
         XLSX.writeFile(workBook, 'Experimentos.xlsx');
       }
     });
+    setLoading(false);
   };
 
   function handleTotalPages(): void {

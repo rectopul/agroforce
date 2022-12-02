@@ -391,6 +391,7 @@ export default function AtualizarTipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await envelopeService
       .getAll(filterApplication)
       .then(({ status, response }) => {
@@ -426,6 +427,7 @@ export default function AtualizarTipoEnsaio({
           XLSX.writeFile(workBook, "Envelopes.xlsx");
         }
       });
+      setLoading(false);
   };
 
   function handleTotalPages(): void {

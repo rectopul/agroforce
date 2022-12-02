@@ -554,6 +554,7 @@ export default function Import({
   // }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await logImportService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         response.map((item: any) => {
@@ -592,6 +593,7 @@ export default function Import({
         XLSX.writeFile(workBook, 'Logs.xlsx');
       }
     });
+    setLoading(false);
   };
 
   function handleTotalPages(): void {

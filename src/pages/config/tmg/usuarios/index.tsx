@@ -597,6 +597,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     if (!filterApplication.includes('paramSelect')) {
       // filterApplication += `&paramSelect=${camposGerenciados}`;
     }
@@ -655,6 +656,7 @@ export default function Listagem({
         XLSX.writeFile(workBook, 'Usuários.xlsx');
       }
     });
+    setLoading(false);
   };
 
   // manage total pages

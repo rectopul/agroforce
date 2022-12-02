@@ -691,6 +691,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await experimentGenotipeService
       .getAll(filter)
       .then(({ status, response }) => {
@@ -734,6 +735,7 @@ export default function Listagem({
           XLSX.writeFile(workBook, "Parcelas.xlsx");
         }
       });
+      setLoading(false);
   };
 
   const replacementExcel = async (): Promise<void> => {

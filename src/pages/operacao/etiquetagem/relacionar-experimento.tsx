@@ -550,6 +550,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await experimentService
       .getAll(filter)
       .then(({ status, response }: IReturnObject) => {
@@ -616,6 +617,7 @@ export default function Listagem({
           XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
         }
       });
+      setLoading(false);
   };
 
   function handleTotalPages(): void {

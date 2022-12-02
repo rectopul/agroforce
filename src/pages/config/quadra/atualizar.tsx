@@ -47,6 +47,7 @@ import {
 import * as ITabs from "../../../shared/utils/dropdown";
 import { allocatedExperimentService } from "../../../services/allocated-experiment.service";
 import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
+import ComponentLoading from '../../../../components/Loading';
 
 interface IFilter {
   filterStatus: object | any;
@@ -203,6 +204,7 @@ export default function AtualizarQuadra({
   });
 
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [preferences, setPreferences] = useState<any>(
     userLogado.preferences.dividers || {
@@ -917,6 +919,7 @@ export default function AtualizarQuadra({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     switch (table) {
       case "dividers": {
         const { response } = await dividersService.getAll(filter);
@@ -1018,6 +1021,7 @@ export default function AtualizarQuadra({
     //       XLSX.writeFile(workBook, "divisores.xlsx");
     //     }
     //   });
+    setLoading(false);
   };
 
   function generateSpreadSheet(data: any) {
