@@ -548,7 +548,7 @@ export default function Listagem({
       userId: userLogado.id,
     });
     if (status === 200) {
-      router.reload();
+      handlePagination();
     } else {
       Swal.fire({
         html: message,
