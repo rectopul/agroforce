@@ -1,7 +1,7 @@
 import { prisma } from '../pages/api/db/db';
 import { BaseRepository } from './base-repository';
 
-export class ExperimentGenotipeRepository extends BaseRepository{
+export class ExperimentGenotipeRepository extends BaseRepository {
   async createMany(data: any) {
     const result = await prisma.experiment_genotipe.createMany({ data });
     return result;

@@ -297,7 +297,7 @@ export default function AtualizarTipoEnsaio({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   async function handleOrderExperiments(
@@ -392,6 +392,11 @@ export default function AtualizarTipoEnsaio({
             orderList,
             fieldOrder,
             handleOrder,
+            render: (rowData: any) => (
+              <div>
+                {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.name}`}
+              </div>
+            ),
           }),
         );
       }
@@ -1351,7 +1356,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? req.cookies.filterBeforeEditOrderBy
     : '';
 
-  const treatmentsFilterApplication = `&id_safra=${idSafra}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
+  const treatmentsFilterApplication = `&id_safra=${idSafra}&id_assay_list=${idAssay}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
   const experimentFilterApplication = `&id_safra=${idSafra}&id_assay_list=${idAssay}`;
 
   // RR

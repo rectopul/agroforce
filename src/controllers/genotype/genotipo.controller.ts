@@ -8,6 +8,7 @@ export class GenotipoController {
 
   async getAll(options: any) {
     const parameters: object | any = {};
+    parameters.AND = [];
     let orderBy: object | any;
     let select: any = [];
     try {
@@ -44,12 +45,12 @@ export class GenotipoController {
         }
       }
 
-      if (options.filterTecnologiaCod) {
-        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterTecnologiaCod}" } }`);
+      if (options.filterCodTecnologia) {
+        parameters.AND.push(JSON.parse(`{ "tecnologia": { "cod_tec": {"contains": "${options.filterCodTecnologia}" } } }`));
       }
 
       if (options.filterTecnologiaDesc) {
-        parameters.tecnologia = JSON.parse(`{ "desc": {"contains": "${options.filterTecnologiaDesc}" } }`);
+        parameters.AND.push(JSON.parse(`{ "tecnologia": { "desc": {"contains": "${options.filterTecnologiaDesc}" } } }`));
       }
 
       if (options.filterCruza) {

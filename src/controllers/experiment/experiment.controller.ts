@@ -1,5 +1,4 @@
-import { sequenciaDelineamentoService } from 'src/services/sequencia-delineamento.service';
-import EventEmitter from 'events';
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import handleError from '../../shared/utils/handleError';
 import { ExperimentRepository } from '../../repository/experiment.repository';
 import { ReporteRepository } from '../../repository/reporte.repository';
@@ -31,21 +30,22 @@ export class ExperimentController {
           parameters.repetitionsNumber = JSON.parse(`{"lte": ${Number(options.filterRepetitionTo)} }`);
         }
       }
-      // if (options.filterRepetition) {
-      //   parameters.repetitionsNumber = Number(options.filterRepetition);
-      // }
-      if (options.experimentStatus) {
+
+      if (options.filterExperimentStatus) {
         parameters.OR = [];
-        const statusParams = options.experimentStatus.split(',');
+        const statusParams = options.filterExperimentStatus.split(',');
         parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
         parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
+        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[2]}" } }`));
+        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[3]}" } }`));
+        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[4]}" } }`));
       }
 
       if (options.filterExperimentName) {
         parameters.experimentName = JSON.parse(`{ "contains":"${options.filterExperimentName}" }`);
       }
-      if (options.filterCod) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "cod_tec":  {"contains": "${options.filterCod}" } } } }`));
+      if (options.filterCodTec) {
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "cod_tec":  {"contains": "${options.filterCodTec}" } } } }`));
       }
       if (options.filterPeriod) {
         parameters.period = Number(options.filterPeriod);
@@ -210,7 +210,9 @@ export class ExperimentController {
         newItem.countNT = functionsUtils
           .countChildrenForSafra(item.assay_list.genotype_treatment, Number(options.idSafra));
         newItem.npeQT = item.countNT * item.repetitionsNumber;
-        newItem.seq_delineamento = item.delineamento.sequencia_delineamento.filter((x: any) => x.nt <= item.countNT && x.repeticao <= item.repetitionsNumber);
+        newItem.seq_delineamento = item.delineamento.sequencia_delineamento.filter(
+          (x: any) => x.nt <= item.countNT && x.repeticao <= item.repetitionsNumber,
+        );
         return newItem;
       });
       if (response.total <= 0) {
@@ -269,35 +271,52 @@ export class ExperimentController {
   async update(data: any) {
     try {
       const experimentGenotipeController = new ExperimentGenotipeController();
-      if (data.idList) {
-        await this.experimentRepository.relationGroup(data);
-        const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
-        await this.setParcelasStatus(idList);
-        return { status: 200, message: 'Experimento atualizado' };
-      }
-      const experimento: any = await this.experimentRepository.findOne(data.id);
-      if (!experimento) return { status: 404, message: 'Experimento não encontrado' };
-      if (data.experimentGroupId === null) {
-        if (!(data.nlp || data.clp || data.comments)) {
-          const parcelasId: any = [];
-          await experimento.experiment_genotipe.forEach(async (parcela: any) => {
-            parcelasId.push(parcela.id);
+      if (data.id) {
+        if (data.idList) {
+          await this.experimentRepository.relationGroup(data);
+          const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
+          await this.setParcelasStatus(idList);
+          return { status: 200, message: 'Experimento atualizado' };
+        }
+        const experimento: any = await this.experimentRepository.findOne(data.id);
+        if (!experimento) return { status: 404, message: 'Experimento não encontrado' };
+        if (data.experimentGroupId === null) {
+          if (!(data.nlp || data.clp || data.comments)) {
+            const parcelasId: any = [];
+            await experimento.experiment_genotipe.forEach(async (parcela: any) => {
+              parcelasId.push(parcela.id);
+            });
+            await experimentGenotipeController.update({ idList: parcelasId, status: 'SORTEADO', userId: data.userId });
+            delete data.userId;
+          }
+        }
+        const response = await this.experimentRepository.update(experimento.id, data);
+        if (experimento.experimentGroupId) {
+          await this.countExperimentGroupChildren(experimento.experimentGroupId);
+        }
+        if (!response.experimentGroupId) {
+          if (!(data.nlp || data.clp || data.comments)) {
+            await this.experimentRepository.update(response.id, { status: 'SORTEADO' });
+          }
+        }
+        if (response) {
+          return { status: 200, message: 'Experimento atualizado' };
+        }
+      } else {
+        const transactionConfig = new TransactionConfig();
+        const experimentRepositoryTransaction = new ExperimentRepository();
+        experimentRepositoryTransaction.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+        try {
+          await transactionConfig.transactionScope.run(async () => {
+            for (const row in data) {
+              await experimentRepositoryTransaction.updateTransaction(data[row].id, data[row]);
+            }
           });
-          await experimentGenotipeController.update({ idList: parcelasId, status: 'SORTEADO', userId: data.userId });
-          delete data.userId;
+          return { status: 200, message: 'Experimento atualizado' };
+        } catch (error: any) {
+          handleError('Experimento controller', 'Update', error.message);
+          throw new Error('[Controller] - Update Experimento erro update many');
         }
-      }
-      const response = await this.experimentRepository.update(experimento.id, data);
-      if (experimento.experimentGroupId) {
-        await this.countExperimentGroupChildren(experimento.experimentGroupId);
-      }
-      if (!response.experimentGroupId) {
-        if (!(data.nlp || data.clp || data.comments)) {
-          await this.experimentRepository.update(response.id, { status: 'SORTEADO' });
-        }
-      }
-      if (response) {
-        return { status: 200, message: 'Experimento atualizado' };
       }
       return { status: 400, message: 'Experimento não atualizado' };
     } catch (error: any) {
@@ -313,6 +332,7 @@ export class ExperimentController {
       if (!experimentExist) return { status: 404, message: 'Experimento não encontrado' };
       if (experimentExist?.status === 'PARCIALMENTE ALOCADO' || experimentExist?.status === 'TOTALMENTE  ALOCADO') return { status: 400, message: 'Não é possível deletar.' };
       const { status } = await experimentGenotipeController.deleteAll(data.id);
+
       if (status === 200) {
         const response = await this.experimentRepository.delete(Number(data.id));
         const {

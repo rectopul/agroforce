@@ -16,8 +16,8 @@ export class NpeController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: object | any) {
-    console.log('🚀 ~ file: npe.controller.ts ~ line 19 ~ NpeController ~ getAll ~ options', options);
     const parameters: object | any = {};
+    parameters.AND = [];
     let orderBy: object | any;
     let select: any = [];
     try {
@@ -46,11 +46,11 @@ export class NpeController {
       }
 
       if (options.filterTecnologia) {
-        parameters.tecnologia = JSON.parse(`{ "name": {"contains": "${options.filterTecnologia}" } }`);
+        parameters.AND.push(JSON.parse(`{ "tecnologia": { "name": {"contains": "${options.filterTecnologia}" } } }`));
       }
 
-      if (options.filterCodTec) {
-        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterCodTec}" } }`);
+      if (options.filterCodTecnologia) {
+        parameters.AND.push(JSON.parse(`{ "tecnologia": { "cod_tec": {"contains": "${options.filterCodTecnologia}" } } }`));
       }
 
       if (options.filterEpoca) {
@@ -119,11 +119,11 @@ export class NpeController {
 
       if (options.filterGrpFrom || options.filterGrpTo) {
         if (options.filterGrpFrom && options.filterGrpTo) {
-          parameters.group = JSON.parse(` { "some" : {"group": {"gte": ${Number(options.filterGrpFrom)}, "lte": ${Number(options.filterGrpTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
+          parameters.group = JSON.parse(` {"group": {"gte": ${Number(options.filterGrpFrom)}, "lte": ${Number(options.filterGrpTo)} } }`);
         } else if (options.filterGrpFrom) {
-          parameters.group = JSON.parse(`{ "some" : {"group": {"gte": ${Number(options.filterGrpFrom)} } , "id_safra": ${Number(options.id_safra)}} }`);
+          parameters.group = JSON.parse(`{"group": {"gte": ${Number(options.filterGrpFrom)} } }`);
         } else if (options.filterGrpTo) {
-          parameters.group = JSON.parse(` { "some" : {"group": {"lte": ${Number(options.filterGrpTo)} } , "id_safra": ${Number(options.id_safra)}} }`);
+          parameters.group = JSON.parse(` {"group": {"lte": ${Number(options.filterGrpTo)} } }`);
         }
       }
 

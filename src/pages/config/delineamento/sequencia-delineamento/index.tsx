@@ -138,7 +138,7 @@ export default function Listagem({
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     {
       name: 'CamposGerenciados[]',
-      title: 'Delineamento',
+      title: 'Nome',
       value: 'delineamento',
     },
     { name: 'CamposGerenciados[]', title: 'Repetição', value: 'repeticao' },
@@ -328,7 +328,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   // function headerTableFactory(name: any, title: string) {
@@ -658,7 +658,7 @@ export default function Listagem({
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main className="h-full w-full flex flex-col items-start gap-4">
-          <AccordionFilter title="Filtrar sequências de delineamento">
+          <AccordionFilter title="Filtrar sequências de delineamentos">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col

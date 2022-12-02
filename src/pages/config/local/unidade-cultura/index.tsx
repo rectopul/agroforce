@@ -62,7 +62,6 @@ interface IUnityCultureProps {
 
 interface IFilter {
   filterNameUnityCulture: string | any;
-  filterYear: string | any;
   filterYearFrom: string | number;
   filterYearTo: string | number;
   filterNameLocalCulture: string | any;
@@ -222,7 +221,6 @@ export default function Listagem({
   const formik = useFormik<IFilter>({
     initialValues: {
       filterNameUnityCulture: checkValue('filterNameUnityCulture'),
-      filterYear: checkValue('filterYear'),
       filterYearTo: checkValue('filterYearTo'),
       filterYearFrom: checkValue('filterYearFrom'),
       filterNameLocalCulture: checkValue('filterNameLocalCulture'),
@@ -237,7 +235,6 @@ export default function Listagem({
     },
     onSubmit: async ({
       filterNameUnityCulture,
-      filterYear,
       filterYearTo,
       filterYearFrom,
       filterNameLocalCulture,
@@ -248,7 +245,7 @@ export default function Listagem({
       filterLabelRegion,
       filterNameLocality,
     }) => {
-      const parametersFilter = `&filterNameUnityCulture=${filterNameUnityCulture}&filterYear=${filterYear}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&id_safra=${idSafra}`;
+      const parametersFilter = `&filterNameUnityCulture=${filterNameUnityCulture}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&id_safra=${idSafra}`;
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEdit', filtersParams);
       //   await unidadeCulturaService
@@ -275,15 +272,17 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await unidadeCulturaService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400) {
-        setUnidadeCultura(response.response);
-        setTotalItems(response.total);
-        tableRef.current.dataManager.changePageSize(
-          response.total >= take ? take : response.total,
-        );
-      }
-    })
+    await unidadeCulturaService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          setUnidadeCultura(response.response);
+          setTotalItems(response.total);
+          tableRef.current.dataManager.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+        }
+      })
       .catch((_) => {
         setLoading(false);
       });
@@ -355,7 +354,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   async function deleteItem(id: number) {
@@ -431,6 +430,7 @@ export default function Listagem({
       if (columnCampos[item] === 'year') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: 'int',
             name: 'Ano',
             title: 'year',
             orderList,
@@ -715,7 +715,7 @@ export default function Listagem({
     <>
       {loading && <ComponentLoading text="" />}
       <Head>
-        <title>Listagem das unidades de cultura</title>
+        <title>Listagem das unidades de culturas</title>
       </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main
@@ -725,7 +725,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar unidades de cultura">
+          <AccordionFilter title="Filtrar unidades de culturas">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -748,25 +748,27 @@ export default function Listagem({
                     'Unidade de cultura',
                   )}
 
-                  <div className="h-6 w-1/2 ml-2">
+                  {/* <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Ano
                     </label>
                     <div className="flex gap-2">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterYearFrom"
                         name="filterYearFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="number"
                         placeholder="Até"
                         id="filterYearTo"
                         name="filterYearTo"
                         onChange={formik.handleChange}
                       />
                     </div>
-                  </div>
+                  </div> */}
 
                   {filterFieldFactory(
                     'filterNameLocalCulture',

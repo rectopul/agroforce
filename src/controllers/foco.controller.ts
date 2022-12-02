@@ -56,7 +56,6 @@ export class FocoController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
-      console.log('🚀 ~ file: foco.controller.ts ~ line 54 ~ FocoController ~ getAll ~ orderBy', orderBy);
 
       const response: object | any = await this.focoRepository.findAll(
         parameters,

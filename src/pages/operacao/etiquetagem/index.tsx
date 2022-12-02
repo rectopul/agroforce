@@ -341,7 +341,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   async function deleteConfirmItem(item: any) {
@@ -551,7 +551,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
         .create({
           table_preferences: campos,
           userId: userLogado.id,
-          module_id: 29,
+          module_id: 32,
         })
         .then((response) => {
           userLogado.preferences.etiquetagem = {

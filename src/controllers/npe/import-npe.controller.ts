@@ -58,29 +58,30 @@ export class ImportNpeController {
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
+        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
         return { status: 400, message: validate };
       }
       const configModule: object | any = await importController.getAll(14);
       for (const row in spreadSheet) {
         if (row !== '0') {
           // LINHA COM TITULO DAS COLUNAS
-          if (spreadSheet[row][4] < 10) {
+          if (spreadSheet[row][4].toString().length < 2) {
             // eslint-disable-next-line no-param-reassign
             spreadSheet[row][4] = `0${spreadSheet[row][4]}`;
           }
           const npeInicial = spreadSheet[row][6];
           const npeName = `${spreadSheet[row][1]}_${spreadSheet[row][2]}_${spreadSheet[row][3]}_${spreadSheet[row][4]}_${spreadSheet[row][5]}_${spreadSheet[row][7]}`;
-          const { status }: IReturnObject = await npeController.getAll({
+          const { response: validateNpe }: IReturnObject = await npeController.getAll({
             safraId: idSafra,
             filterFoco: spreadSheet[row][2],
             filterEnsaio: spreadSheet[row][3],
-            filterCodTec: spreadSheet[row][4],
+            filterCodTecnologia: spreadSheet[row][4],
             filterLocal: spreadSheet[row][5],
             filterEpoca: spreadSheet[row][7],
             filterStatus: 1,
           });
 
-          if (status === 200) {
+          if (validateNpe.length > 0) {
             responseIfError[0] += `<li style="text-align:left"> Erro na linha ${Number(row)}. Ambiente já cadastrada no sistema. </li> <br>`;
           }
           if (npeTemp.includes(npeName)) {
@@ -142,7 +143,9 @@ export class ImportNpeController {
                       'o local não existe no sistema',
                     );
                   } else {
-                    const { response: responseSafra }: IReturnObject = await safraController.getOne(idSafra);
+                    const {
+                      response: responseSafra,
+                    }: IReturnObject = await safraController.getOne(idSafra);
                     const cultureUnityValidate = response[0]?.cultureUnity.map(
                       (item: any) => {
                         if (item?.year === responseSafra?.year) return true;
@@ -226,25 +229,34 @@ export class ImportNpeController {
 
             if (configModule.response[0]?.fields[column] === 'OGM') {
               if (spreadSheet[row][column] !== null) {
-                if (isNaN(spreadSheet[row][column])) {
-                  responseIfError[Number(column)] += responsePositiveNumericFactory(
-                    Number(column) + 1,
-                    row,
-                    spreadSheet[0][column],
-                  );
-                }
-                const ogm: any = await tecnologiaController.getAll({
-                  cod_tec: String(spreadSheet[row][column]),
-                });
-                if (ogm.total === 0) {
-                  responseIfError[Number(column)] += responseGenericFactory(
-                    Number(column) + 1,
-                    row,
-                    spreadSheet[0][column],
-                    'a tecnologia informada não existe no sistema',
-                  );
+                if ((spreadSheet[row][column]).toString().length > 2) {
+                  responseIfError[Number(column)]
+                  += responseGenericFactory(
+                      (Number(column) + 1),
+                      row,
+                      spreadSheet[0][column],
+                      'o limite de caracteres e 2',
+                    );
                 } else {
-                  this.aux.tecnologiaId = ogm.response[0]?.id;
+                  if (spreadSheet[row][column].toString().length < 2) {
+                  // eslint-disable-next-line no-param-reassign
+                    spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+                  }
+
+                  const ogm: any = await tecnologiaController.getAll({
+                    cod_tec: String(spreadSheet[row][column]),
+                    id_culture: idCulture,
+                  });
+                  if (ogm.total === 0) {
+                    responseIfError[Number(column)] += responseGenericFactory(
+                      Number(column) + 1,
+                      row,
+                      spreadSheet[0][column],
+                      'a tecnologia informada não existe no sistema',
+                    );
+                  } else {
+                    this.aux.tecnologiaId = ogm.response[0]?.id;
+                  }
                 }
               } else {
                 responseIfError[Number(column)] += responseNullFactory(
@@ -258,7 +270,10 @@ export class ImportNpeController {
             if (configModule.response[0]?.fields[column] === 'Foco') {
               if (spreadSheet[row][column] !== null) {
                 if (typeof spreadSheet[row][column] === 'string') {
-                  const { status: focoStatus, response }: IReturnObject = await focoController.getAll({
+                  const {
+                    status: focoStatus,
+                    response,
+                  }: IReturnObject = await focoController.getAll({
                     name: spreadSheet[row][column],
                     id_culture: idCulture,
                     filterStatus: 1,
@@ -268,22 +283,22 @@ export class ImportNpeController {
                       Number(column) + 1,
                       row,
                       spreadSheet[0][column],
-                      'o foco não existe no sistema ou está inativo',
+                      'informado não existe no sistema ou está inativo',
                     );
                   } else {
                     this.aux.focoId = response[0]?.id;
-                  //   const { status: focoGroup }: IReturnObject = await groupController.getAll({
-                  //     id_safra: idSafra,
-                  //     id_foco: this.aux.focoId,
-                  //   });
-                  //   if (focoGroup !== 200) {
-                  //     responseIfError[Number(column)] += responseGenericFactory(
-                  //       Number(column) + 1,
-                  //       row,
-                  //       spreadSheet[0][column],
-                  //       'os focos precisam ter grupos cadastrados nessa safra',
-                  //     );
-                  //   }
+                    const { status: focoGroup }: IReturnObject = await groupController.getAll({
+                      id_safra: idSafra,
+                      id_foco: this.aux.focoId,
+                    });
+                    if (focoGroup !== 200) {
+                      responseIfError[Number(column)] += responseGenericFactory(
+                        Number(column) + 1,
+                        row,
+                        spreadSheet[0][column],
+                        'os focos precisam ter grupos cadastrados nessa safra',
+                      );
+                    }
                   }
                 } else {
                   responseIfError[Number(column)] += responseGenericFactory(
@@ -351,22 +366,51 @@ export class ImportNpeController {
                       'O foco precisa ser importado antes da NPEI',
                     );
                   }
-                  const resp: any = await npeController.validateNpeiDBA({
-                    Column: Number(column) + 1,
-                    Line: Number(row) + 1,
-                    safra: idSafra,
-                    foco: this.aux.focoId,
-                    npei: spreadSheet[row][column],
+                  const {
+                    response,
+                  }: IReturnObject = await focoController.getAll({
+                    name: spreadSheet[row][2],
+                    id_culture: idCulture,
+                    filterStatus: 1,
                   });
-                  if (resp.erro === 1) {
-                    responseIfError[Number(column)] += resp.message;
+
+                  if (response.length > 0) {
+                    const groupNumber = response[0].group.filter(
+                      (item: any) => item.id_safra === idSafra,
+                    );
+                    const {
+                      response: npei,
+                    }: IReturnObject = await npeController.getAll({
+                      filterNPE: spreadSheet[row][column],
+                      filterGrpFrom: groupNumber[0]?.group,
+                      filterGrpTo: groupNumber[0]?.group,
+
+                    });
+                    if (npei.length > 0) {
+                      responseIfError[Number(column)] += responseGenericFactory(
+                        Number(column) + 1,
+                        row,
+                        spreadSheet[0][column],
+                        `ja cadastrado dentro do grupo ${groupNumber[0]?.group}`,
+                      );
+                    }
                   }
-                  if (responseIfError.length === 0) {
-                    this.aux.npei = spreadSheet[row][column];
-                    this.aux.npef = spreadSheet[row][column];
-                    this.aux.prox_npe = spreadSheet[row][column];
-                    this.aux.npei_i = spreadSheet[row][column];
-                  }
+                  // const resp: any = await npeController.validateNpeiDBA({
+                  //   Column: Number(column) + 1,
+                  //   Line: Number(row) + 1,
+                  //   safra: idSafra,
+                  //   foco: this.aux.focoId,
+                  //   npei: spreadSheet[row][column],
+                  // });
+                  // if (resp.erro === 1) {
+                  //   responseIfError[Number(column)] += resp.message;
+                  // }
+                  // if (responseIfError.length === 0) {
+                  //   this.aux.npei = spreadSheet[row][column];
+                  //   this.aux.npef = spreadSheet[row][column];
+                  //   this.aux.prox_npe = spreadSheet[row][column];
+                  //   this.aux.npei_i = spreadSheet[row][column];
+                  // }
                 } else {
                   responseIfError[Number(column)]
                     += responsePositiveNumericFactory(
@@ -476,8 +520,8 @@ export class ImportNpeController {
               }
             }
           }
-          const npe = await npeController.create(createMany);
-          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
+          await npeController.create(createMany);
+          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO', updated_at: Date() });
           return { status: 200, message: 'Ambiente importado com sucesso' };
         } catch (error: any) {
           await logImportController.update({

@@ -232,15 +232,18 @@ export default function TipoEnsaio({
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
-    await typeAssayService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400) {
-        setTypeAssay(response.response);
-        setTotalItems(response.total);
-        tableRef.current.dataManager.changePageSize(
-          response.total >= take ? take : response.total,
-        );
-      }
-    })
+    await typeAssayService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          setTypeAssay(response.response);
+          setTotalItems(response.total);
+          tableRef.current.dataManager.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+          setLoading(false);
+        }
+      })
       .catch((_) => {
         setLoading(false);
       });
@@ -325,12 +328,10 @@ export default function TipoEnsaio({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   async function handleStatus(data: any): Promise<void> {
-    // console.log({ id, status });
-
     // if (status) {
     //   status = 1;
     // } else {
@@ -439,6 +440,7 @@ export default function TipoEnsaio({
                     setCookies('filterBeforeEditOrderBy', orderBy);
                     setCookies('filtersParams', filtersParams);
                     setCookies('lastPage', 'atualizar');
+                    setCookies('takeBeforeEdit', take);
                     router.push(
                       `/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`,
                     );
@@ -474,6 +476,10 @@ export default function TipoEnsaio({
     };
   }
 
+  function returnFalse() {
+    return false;
+  }
+
   function colums(columnsOrder: any): any {
     const columnOrder: any = columnsOrder.split(',');
 
@@ -502,7 +508,7 @@ export default function TipoEnsaio({
             title: 'envelope.seeds',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: returnFalse,
           }),
         );
       }
@@ -513,7 +519,7 @@ export default function TipoEnsaio({
             title: 'envelope.safra.safraName',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: returnFalse,
           }),
         );
       }
@@ -726,40 +732,6 @@ export default function TipoEnsaio({
     return parameter;
   }
 
-  function filterFieldFactorySeeds(name: any) {
-    return (
-      <div className="h-6 w-1/2 ml-2">
-        <label className="block text-gray-900 text-sm font-bold mb-1">
-          {name}
-        </label>
-
-        <div className="flex gap-2">
-          <div className="w-full">
-            <Input
-              type="text"
-              placeholder="De"
-              max="40"
-              id="filterSeedsFrom"
-              name="filterSeedsFrom"
-              onChange={formik.handleChange}
-            />
-          </div>
-
-          <div className="w-full">
-            <Input
-              type="text"
-              placeholder="Até"
-              max="40"
-              id="filterSeedsTo"
-              name="filterSeedsTo"
-              onChange={formik.handleChange}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -770,12 +742,12 @@ export default function TipoEnsaio({
       {loading && <ComponentLoading text="" />}
 
       <Head>
-        <title>Listagem Tipos de Ensaio</title>
+        <title>Listagem Tipos de Ensaios</title>
       </Head>
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main className="h-full w-full flex flex-col items-start gap-4">
-          <AccordionFilter title="Filtrar tipos de ensaio">
+          <AccordionFilter title="Filtrar tipos de ensaios">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col w-full items-center px-4 bg-white"
@@ -804,7 +776,6 @@ export default function TipoEnsaio({
                     <Input
                       type="text"
                       placeholder="Nome"
-                      max="40"
                       id="filterName"
                       name="filterName"
                       defaultValue={checkValue('filterName')}
@@ -812,7 +783,33 @@ export default function TipoEnsaio({
                     />
                   </div>
 
-                  {filterFieldFactorySeeds('Quant de sementes por envelope')}
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Quant de sementes por envelope
+                    </label>
+
+                    <div className="flex gap-2">
+                      <div className="w-full">
+                        <Input
+                          type="number"
+                          placeholder="De"
+                          id="filterSeedsFrom"
+                          name="filterSeedsFrom"
+                          onChange={formik.handleChange}
+                        />
+                      </div>
+
+                      <div className="w-full">
+                        <Input
+                          type="number"
+                          placeholder="Até"
+                          id="filterSeedsTo"
+                          name="filterSeedsTo"
+                          onChange={formik.handleChange}
+                        />
+                      </div>
+                    </div>
+                  </div>
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
@@ -1023,14 +1020,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-
-  // eslint-disable-next-line max-len
-
-  const itensPerPage = await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page;
-
   const { token } = req.cookies;
   const idCulture = req.cookies.cultureId;
   const { safraId } = req.cookies;
@@ -1048,7 +1037,12 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('itensPage', { req, res });
   }
+
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
+    : 10;
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
@@ -1070,8 +1064,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
-
-  // RR
+  removeCookies('takeBeforeEdit', { req, res });
   removeCookies('filterBeforeEditTypeOrder', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });
   removeCookies('lastPage', { req, res });

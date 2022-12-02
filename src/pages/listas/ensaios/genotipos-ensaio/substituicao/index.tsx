@@ -1,31 +1,31 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { removeCookies } from 'cookies-next';
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import getConfig from 'next/config';
-import Head from 'next/head';
-import { useEffect, useState, useRef } from 'react';
+import { removeCookies } from "cookies-next";
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
+import { useEffect, useState, useRef } from "react";
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from 'react-beautiful-dnd';
-import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai';
-import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { IoMdArrowBack } from 'react-icons/io';
+} from "react-beautiful-dnd";
+import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import { BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { IoMdArrowBack } from "react-icons/io";
 // import { TbArrowsDownUp } from 'react-icons/tb';
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiArrowUpDownLine } from 'react-icons/ri';
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiArrowUpDownLine } from "react-icons/ri";
 
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import Swal from 'sweetalert2';
+import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import Swal from "sweetalert2";
 import {
   AccordionFilter,
   Button,
@@ -34,15 +34,16 @@ import {
   Input,
   ModalConfirmation,
   FieldItemsPerPage,
-} from '../../../../../components';
+} from "../../../../../components";
 import {
   loteService,
   replaceTreatmentService,
   userPreferencesService,
-} from '../../../../../services';
-import { UserPreferenceController } from '../../../../../controllers/user-preference.controller';
-import ITabs from '../../../../../shared/utils/dropdown';
-import headerTableFactoryGlobal from '../../../../../shared/utils/headerTableFactory';
+} from "../../../../../services";
+import { UserPreferenceController } from "../../../../../controllers/user-preference.controller";
+import ITabs from "../../../../../shared/utils/dropdown";
+import headerTableFactoryGlobal from "../../../../../shared/utils/headerTableFactory";
+import ComponentLoading from "../../../../../components/Loading";
 
 interface IFilter {
   filterYear: string;
@@ -98,78 +99,86 @@ export default function Listagem({
   allLote,
   totalItems,
   idSafra,
+  idCulture,
   itensPerPage,
   filterApplication,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
+  const router = useRouter();
+  const Router = router.query;
+
   const tableRef = useRef<any>(null);
+  const tabsDropDowns = TabsDropDowns("listas");
 
-  const tabsDropDowns = TabsDropDowns('listas');
+  tabsDropDowns.map((tab) =>
+    tab.titleTab ===
+    (Router?.value === "experiment" ? "EXPERIMENTOS" : "ENSAIO")
+      ? (tab.statusTab = true)
+      : (tab.statusTab = false)
+  );
 
-  tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
-
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const checkedTreatments = JSON.parse(
-    localStorage.getItem('checkedTreatments') as string,
+    localStorage.getItem("checkedTreatments") as string
   );
   const treatmentsOptionSelected = JSON.parse(
-    localStorage.getItem('treatmentsOptionSelected') as string,
+    localStorage.getItem("treatmentsOptionSelected") as string
   );
 
   const preferences = userLogado.preferences.lote || {
     id: 0,
     table_preferences:
-      'safra,year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia,action',
+      "safra,year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia,action",
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+    preferences.table_preferences
   );
-  const router = useRouter();
 
   // const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
   const [lotes, setLotes] = useState([]);
-  const [nameReplace, setNameReplace] = useState<any>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [nameReplace, setNameReplace] = useState<any>("");
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [orderList, setOrder] = useState<number>(0);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Safra', value: 'safra' },
-    { name: 'CamposGerenciados[]', title: 'Ano lote', value: 'year' },
-    { name: 'CamposGerenciados[]', title: 'Cod lote', value: 'cod_lote' },
-    { name: 'CamposGerenciados[]', title: 'NCA', value: 'ncc' },
-    { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
-    { name: 'CamposGerenciados[]', title: 'Peso', value: 'peso' },
+    { name: "CamposGerenciados[]", title: "Safra", value: "safra" },
+    { name: "CamposGerenciados[]", title: "Ano Lote", value: "year" },
+    { name: "CamposGerenciados[]", title: "Cod Lote", value: "cod_lote" },
+    { name: "CamposGerenciados[]", title: "NCA", value: "ncc" },
+    { name: "CamposGerenciados[]", title: "Fase", value: "fase" },
+    { name: "CamposGerenciados[]", title: "Peso", value: "peso" },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Qtd sementes',
-      value: 'quant_sementes',
+      name: "CamposGerenciados[]",
+      title: "Qtd sementes",
+      value: "quant_sementes",
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Nome do genotipo',
-      value: 'name_genotipo',
+      name: "CamposGerenciados[]",
+      title: "Nome genotipo",
+      value: "name_genotipo",
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Nome principal',
-      value: 'name_main',
+      name: "CamposGerenciados[]",
+      title: "Nome principal",
+      value: "name_main",
     },
-    { name: 'CamposGerenciados[]', title: 'GMR_Gen', value: 'gmr' },
-    { name: 'CamposGerenciados[]', title: 'BGM_Gen', value: 'bgm' },
+    { name: "CamposGerenciados[]", title: "GMR_Gen", value: "gmr" },
+    { name: "CamposGerenciados[]", title: "BGM_Gen", value: "bgm" },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Tec_Gen',
-      value: 'tecnologia',
+      name: "CamposGerenciados[]",
+      title: "Tec_Gen",
+      value: "tecnologia",
     },
-    { name: 'CamposGerenciados[]', title: 'Substituir', value: 'action' },
+    { name: "CamposGerenciados[]", title: "Substituir", value: "action" },
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>('');
+  const [orderBy, setOrderBy] = useState<string>("");
+  const [orderType, setOrderType] = useState<string>("");
   const [fieldOrder, setFieldOrder] = useState<any>(null);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -180,30 +189,30 @@ export default function Listagem({
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterYear: '',
-      filterYearFrom: '',
-      filterYearTo: '',
-      filterCodLoteFrom: '',
-      filterCodLoteTo: '',
-      filterNcaTo: '',
-      filterNcaFrom: '',
-      filterFase: '',
-      filterPesoFrom: '',
-      filterPesoTo: '',
-      filterSeedsFrom: '',
-      filterSeedsTo: '',
-      filterPeso: '',
-      filterSeeds: '',
-      filterGenotipo: '',
-      filterMainName: '',
-      filterGmrFrom: '',
-      filterGmrTo: '',
-      filterBgmFrom: '',
-      filterBgmTo: '',
-      filterCodTec: '',
-      filterNameTec: '',
-      orderBy: '',
-      typeOrder: '',
+      filterYear: "",
+      filterYearFrom: "",
+      filterYearTo: "",
+      filterCodLoteFrom: "",
+      filterCodLoteTo: "",
+      filterNcaTo: "",
+      filterNcaFrom: "",
+      filterFase: "",
+      filterPesoFrom: "",
+      filterPesoTo: "",
+      filterSeedsFrom: "",
+      filterSeedsTo: "",
+      filterPeso: "",
+      filterSeeds: "",
+      filterGenotipo: "",
+      filterMainName: "",
+      filterGmrFrom: "",
+      filterGmrTo: "",
+      filterBgmFrom: "",
+      filterBgmTo: "",
+      filterCodTec: "",
+      filterNameTec: "",
+      orderBy: "",
+      typeOrder: "",
     },
     onSubmit: async ({
       filterYear,
@@ -228,27 +237,31 @@ export default function Listagem({
       filterNameTec,
     }) => {
       const tempParams: any = [];
-      if (treatmentsOptionSelected == 'nca') {
+      if (treatmentsOptionSelected == "nca") {
         checkedTreatments.forEach((item: any) => {
           if (item.idGenotipo) {
             tempParams.push(item.idGenotipo);
           }
         });
       }
-      const parametersFilter = `filterStatus=${1}&id_safra=${idSafra}&filterYear=${filterYear}&filterCodLoteTo=${filterCodLoteTo}&filterCodLoteFrom=${filterCodLoteFrom}&filterNcaFrom=${filterNcaFrom}&filterNcaTo=${filterNcaTo}&filterFase=${filterFase}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCodTec=${filterCodTec}&filterNameTec=${filterNameTec}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterPesoTo=${filterPesoTo}&filterPesoFrom=${filterPesoFrom}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}`;
+      const parametersFilter = `filterStatus=${1}&idCulture=${idCulture}&id_safra=${idSafra}&filterYear=${filterYear}&filterCodLoteTo=${filterCodLoteTo}&filterCodLoteFrom=${filterCodLoteFrom}&filterNcaFrom=${filterNcaFrom}&filterNcaTo=${filterNcaTo}&filterFase=${filterFase}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCodTec=${filterCodTec}&filterNameTec=${filterNameTec}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterPesoTo=${filterPesoTo}&filterPesoFrom=${filterPesoFrom}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}`;
 
       await replaceTreatmentService
         .getAll(
-          `${parametersFilter}&skip=0&take=${take}&checkedTreatments=${tempParams}`,
+          `${parametersFilter}&skip=0&take=${take}&checkedTreatments=${tempParams}`
         )
         .then(({ response, total: allTotal }) => {
           setFilter(parametersFilter);
           setLotes(response);
           setTotalItems(allTotal);
           setCurrentPage(0);
+          setLoading(false);
           tableRef?.current?.dataManager?.changePageSize(
-            allTotal >= take ? take : allTotal,
+            allTotal >= take ? take : allTotal
           );
+        })
+        .catch((_) => {
+          setLoading(false);
         });
     },
   });
@@ -256,26 +269,26 @@ export default function Listagem({
   async function handleOrder(
     column: string,
     order: string | any,
-    name: any,
+    name: any
   ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = 'asc';
+      typeOrder = "asc";
     } else if (order === 2) {
-      typeOrder = 'desc';
+      typeOrder = "desc";
     } else {
-      typeOrder = '';
+      typeOrder = "";
     }
     setOrderBy(column);
     setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
+    if (filter && typeof filter !== "undefined") {
+      if (typeOrder !== "") {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== '') {
+    } else if (typeOrder !== "") {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
     } else {
       parametersFilter = filter;
@@ -299,10 +312,14 @@ export default function Listagem({
       if (orderList === 1) {
         setArrowOrder(<AiOutlineArrowUp />);
       } else {
-        setArrowOrder('');
+        setArrowOrder("");
       }
     }
 
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 100);
     setFieldOrder(name);
   }
 
@@ -327,7 +344,7 @@ export default function Listagem({
   const { value } = router.query;
 
   async function openModal(id: number, genotipoName: string, nccName: number) {
-    if (treatmentsOptionSelected === 'genotipo') {
+    if (treatmentsOptionSelected === "genotipo") {
       setNameReplace(genotipoName);
     } else {
       setNameReplace(nccName);
@@ -344,13 +361,13 @@ export default function Listagem({
     });
     Swal.fire({
       html: message,
-      width: '800',
+      width: "800",
     });
 
-    if (value == 'ensaios') {
+    if (value == "ensaios") {
       router.back();
-    } else if (value == 'experiment') {
-      router.push('/listas/experimentos/parcelas-experimento');
+    } else if (value == "experiment") {
+      router.push("/listas/experimentos/parcelas-experimento");
     }
   }
 
@@ -369,7 +386,7 @@ export default function Listagem({
               openModal(
                 rowData.id,
                 rowData.genotipo.name_genotipo,
-                rowData.ncc,
+                rowData.ncc
               );
             }}
             rounder="rounded-full"
@@ -409,136 +426,137 @@ export default function Listagem({
   // }
 
   function columnsOrder(columnsCampos: string) {
-    const columnCampos: string[] = columnsCampos.split(',');
+    const columnCampos: string[] = columnsCampos.split(",");
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === 'safra') {
+      if (columnCampos[index] === "safra") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Safra',
-            title: 'safra.safraName',
+            name: "Safra",
+            title: "safra.safraName",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'year') {
+      if (columnCampos[index] === "year") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Ano lote',
-            title: 'year',
+            name: "Ano Lote",
+            title: "year",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'cod_lote') {
+      if (columnCampos[index] === "cod_lote") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Cod lote',
-            title: 'cod_lote',
+            name: "Cod Lote",
+            title: "cod_lote",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'ncc') {
+      if (columnCampos[index] === "ncc") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'NCA',
-            title: 'ncc',
+            name: "NCA",
+            title: "ncc",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'fase') {
+      if (columnCampos[index] === "fase") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Fase',
-            title: 'fase',
+            name: "Fase",
+            title: "fase",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'peso') {
+      if (columnCampos[index] === "peso") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Peso',
-            title: 'peso',
+            name: "Peso",
+            title: "peso",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'quant_sementes') {
+      if (columnCampos[index] === "quant_sementes") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Qtd sementes',
-            title: 'quant_sementes',
+            name: "Qtd sementes",
+            title: "quant_sementes",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'name_genotipo') {
+      if (columnCampos[index] === "name_genotipo") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Nome genótipo',
-            title: 'genotipo.name_genotipo',
+            name: "Nome genótipo",
+            title: "genotipo.name_genotipo",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'name_main') {
+      if (columnCampos[index] === "name_main") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Nome principal',
-            title: 'genotipo.name_main',
+            name: "Nome principal",
+            title: "genotipo.name_main",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'gmr') {
+      if (columnCampos[index] === "gmr") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'GMR_Gen',
-            title: 'genotipo.gmr',
+            name: "GMR_Gen",
+            title: "genotipo.gmr",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'bgm') {
+      if (columnCampos[index] === "bgm") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'BGM_Gen',
-            title: 'genotipo.bgm',
+            name: "BGM_Gen",
+            title: "genotipo.bgm",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'tecnologia') {
+      if (columnCampos[index] === "tecnologia") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Tec_Gen',
-            title: 'tecnologia',
+            type: "int",
+            name: "Tec_Gen",
+            title: "genotipo.tecnologia.cod_tec",
             orderList,
             fieldOrder,
             handleOrder,
@@ -547,11 +565,11 @@ export default function Listagem({
                 {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.name}`}
               </div>
             ),
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'action') {
-        tableFields.push(replaceFactory('Substituir', 'action'));
+      if (columnCampos[index] === "action") {
+        tableFields.push(replaceFactory("Substituir", "action"));
       }
     });
     return tableFields;
@@ -561,7 +579,7 @@ export default function Listagem({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
+    let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -584,7 +602,7 @@ export default function Listagem({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
       userLogado.preferences.lote = {
         id: preferences.id,
@@ -595,7 +613,7 @@ export default function Listagem({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
     setStatusAccordion(false);
     setCamposGerenciados(campos);
@@ -630,7 +648,7 @@ export default function Listagem({
 
     const tempParams: any = [];
 
-    if (treatmentsOptionSelected == 'nca') {
+    if (treatmentsOptionSelected == "nca") {
       checkedTreatments.forEach((item: any) => {
         if (item.idGenotipo) {
           tempParams.push(item.idGenotipo);
@@ -654,19 +672,22 @@ export default function Listagem({
         if (status === 200) {
           setLotes(response);
           setTotalItems(total);
+          setLoading(false);
         }
+      })
+      .catch((_) => {
+        setLoading(false);
       });
   }
 
   function filterFieldFactory(title: any, name: any, small: boolean = false) {
     return (
       // <div className="h-10 w-full ml-2" style={small ? { maxWidth: 65 } : {}}>
-      <div className={`h-10 w-${small ? '1/3' : 'full'} ml-2`}>
+      <div className={`h-10 w-${small ? "1/3" : "full"} ml-2`}>
         <label className="block text-gray-900 text-sm mb-1">{name}</label>
         <Input
           type="text"
           placeholder={name}
-          max="40"
           id={title}
           name={title}
           onChange={formik.handleChange}
@@ -683,8 +704,10 @@ export default function Listagem({
   return (
     <>
       <Head>
-        <title>Listagem de Lotes</title>
+        <title>Listagem de substituição</title>
       </Head>
+
+      {loading && <ComponentLoading text="" />}
 
       <ModalConfirmation
         isOpen={isOpenModal}
@@ -697,9 +720,9 @@ export default function Listagem({
         <main className="h-full w-full flex flex-col items-start gap-4">
           <AccordionFilter
             title={
-              treatmentsOptionSelected === 'genotipo'
-                ? 'Filtrar Genótipo/NCA'
-                : 'Filtrar lotes'
+              treatmentsOptionSelected === "genotipo"
+                ? "Filtrar Genótipo/NCA"
+                : "Filtrar lotes"
             }
           >
             <div className="w-full flex gap-2">
@@ -719,10 +742,22 @@ export default function Listagem({
                   pb-2
                 "
                 >
-                  {filterFieldFactory('filterYear', 'Ano lote', true)}
+                  <div className="h-10 w-1/3 ml-2">
+                    <label className="block text-gray-900 text-sm mb-1">
+                      Ano Lote
+                    </label>
+                    <Input
+                      type="number"
+                      placeholder="Ano Lote"
+                      id="filterYear"
+                      name="filterYear"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Cod. Lote
+                      Cod Lote
                     </label>
                     <div className="flex">
                       <Input
@@ -761,7 +796,7 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory('filterFase', 'Fase', true)}
+                  {filterFieldFactory("filterFase", "Fase", true)}
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -770,15 +805,15 @@ export default function Listagem({
                     <div className="flex">
                       <Input
                         placeholder="De"
-                        id="filterSeedsFrom"
-                        name="filterSeedsFrom"
+                        id="filterPesoFrom"
+                        name="filterPesoFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
-                        id="filterSeedsTo"
-                        name="filterSeedsTo"
+                        id="filterPesoTo"
+                        name="filterPesoTo"
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -790,12 +825,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterSeedsFrom"
                         name="filterSeedsFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterSeedsTo"
@@ -805,7 +842,7 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory('filterGenotipo', 'Nome genótipo')}
+                  {filterFieldFactory("filterGenotipo", "Nome genótipo")}
                 </div>
 
                 <div
@@ -816,7 +853,7 @@ export default function Listagem({
                   mt-4
                 "
                 >
-                  {filterFieldFactory('filterMainName', 'Nome principal')}
+                  {filterFieldFactory("filterMainName", "Nome principal")}
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -824,12 +861,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="int"
                         placeholder="De"
                         id="filterGmrFrom"
                         name="filterGmrFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterGmrTo"
@@ -860,16 +899,18 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory('filterCodTec', 'Cod tec_Gen')}
+                  {filterFieldFactory("filterCodTec", "Cod tec_Gen")}
 
-                  {filterFieldFactory('filterNameTec', 'Nome tec_Gen')}
+                  {filterFieldFactory("filterNameTec", "Nome tec_Gen")}
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
                   <div className="h-7 w-32 mt-6 ml-2">
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -884,7 +925,7 @@ export default function Listagem({
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
               tableRef={tableRef}
-              style={{ background: '#f9fafb' }}
+              style={{ background: "#f9fafb" }}
               columns={columns}
               data={lotes}
               options={{
@@ -892,7 +933,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 0,
                 },
-                rowStyle: { background: '#f9fafb', height: 35 },
+                rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: Number(take),
@@ -926,9 +967,7 @@ export default function Listagem({
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
+                      Total registrado: {itemsTotal}
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
@@ -972,7 +1011,7 @@ export default function Listagem({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value as string,
+                                                generate.value as string
                                               )}
                                             />
                                           </li>
@@ -993,58 +1032,59 @@ export default function Listagem({
                     </div>
                   </div>
                 ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => setCurrentPage(0)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {Array(1)
-                      .fill('')
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(pages)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(0)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage < 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(pages)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                   ) as any,
               }}
             />
@@ -1061,17 +1101,18 @@ export const getServerSideProps: GetServerSideProps = async ({
   query,
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) ?? 10;
+  const itensPerPage =
+    (await (
+      await PreferencesControllers.getConfigGerais()
+    )?.response[0]?.itens_per_page) ?? 10;
 
   const { token } = req.cookies;
   const { checked }: any = query;
   const idSafra = req.cookies.safraId;
   const idCulture = req.cookies.cultureId;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies("filterBeforeEdit", { req, res });
+  removeCookies("pageBeforeEdit", { req, res });
 
   const param = `skip=0&take=${itensPerPage}&treatmentChecked=${checked}`;
   const { publicRuntimeConfig } = getConfig();
@@ -1081,14 +1122,14 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const filterApplication = `filterStatus=1&idCulture=${idCulture}`;
   const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
   const { response: allLote, total: totalItems } = await fetch(
     `${urlParameters}`,
-    requestOptions,
+    requestOptions
   ).then((response) => response.json());
 
   return {
@@ -1096,6 +1137,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       allLote,
       totalItems,
       idSafra,
+      idCulture,
       itensPerPage,
       filterApplication,
     },

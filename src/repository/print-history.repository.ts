@@ -41,4 +41,15 @@ export class PrintHistoryRepository {
     result.total = count;
     return result;
   }
+
+  async deleteMany(idList: any) {
+    const result = await prisma.printHistory.deleteMany({
+      where: {
+        id: {
+          in: idList,
+        },
+      },
+    });
+    return result;
+  }
 }

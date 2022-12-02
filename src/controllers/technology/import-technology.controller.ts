@@ -37,6 +37,7 @@ export class ImportTechnologyController {
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
+        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
         return { status: 400, message: validate };
       }
       const duplicateCode: any = [];
@@ -59,9 +60,11 @@ export class ImportTechnologyController {
                     spreadSheet[0][column],
                     'o limite de caracteres e 2',
                   );
-              } else if ((typeof (spreadSheet[row][column])) === 'number' && spreadSheet[row][column].toString().length < 2) {
-                // eslint-disable-next-line no-param-reassign
-                spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+              } else {
+                if (spreadSheet[row][column].toString().length < 2) {
+                  // eslint-disable-next-line no-param-reassign
+                  spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+                }
                 if(duplicateCode.includes(spreadSheet[row][column])) {
                   responseIfError[column]
                       += responseGenericFactory(
@@ -188,7 +191,7 @@ export class ImportTechnologyController {
                     id_culture: idCulture,
                     cod_tec: String(spreadSheet[row][0]),
                     name: spreadSheet[row][1],
-                    desc: spreadSheet[row][2],
+                    desc: String(spreadSheet[row][2]),
                     created_by: createdBy,
                     dt_export: new Date(spreadSheet[row][4]),
                   });
@@ -197,7 +200,7 @@ export class ImportTechnologyController {
                     id_culture: idCulture,
                     cod_tec: String(spreadSheet[row][0]),
                     name: spreadSheet[row][1],
-                    desc: spreadSheet[row][2],
+                    desc: String(spreadSheet[row][2]),
                     created_by: createdBy,
                     dt_export: new Date(spreadSheet[row][4]),
                   });
@@ -206,20 +209,20 @@ export class ImportTechnologyController {
             }
           });
 
-          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
+          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO', updated_at: Date() });
           return { status: 200, message: 'Tecnologia importado com sucesso' };
         } catch (error: any) {
-          await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+          await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date() });
           handleError('Tecnologia controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de tecnologia' };
         }
       }
 
-      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
+      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date() });
       handleError('Tecnologia controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de tecnologia' };
     }

@@ -288,7 +288,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   // useEffect(()=>{
@@ -384,6 +384,7 @@ export default function Listagem({
                 setCookies('filterBeforeEditTypeOrder', typeOrder);
                 setCookies('filterBeforeEditOrderBy', orderBy);
                 setCookies('filtersParams', filtersParams);
+                setCookies('takeBeforeEdit', take);
                 setCookies('lastPage', 'atualizar');
                 localStorage.setItem('filterValueEdit', filtersParams);
                 localStorage.setItem('pageBeforeEdit', currentPage?.toString());
@@ -635,7 +636,6 @@ export default function Listagem({
                     <Input
                       type="text"
                       placeholder="cultura"
-                      max="40"
                       defaultValue={checkValue('filterSearch')}
                       id="filterSearch"
                       name="filterSearch"
@@ -850,11 +850,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) ?? 10;
-
   const { token } = req.cookies;
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
@@ -868,6 +863,10 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('lastPage', { req, res });
     // setCookies('filterParams','');
   }
+
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
+    : 10;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
@@ -892,8 +891,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   removeCookies('pageBeforeEdit', { req, res });
   removeCookies('filterBeforeEdit', { req, res });
-
-  // RR
+  removeCookies('takeBeforeEdit', { req, res });
   removeCookies('filterBeforeEditTypeOrder', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });
   removeCookies('lastPage', { req, res });

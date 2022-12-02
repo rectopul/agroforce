@@ -50,7 +50,7 @@ interface IFilter {
   filterGli: string;
   filterExperimentName: string;
   filterTecnologia: string;
-  filterCod: string;
+  filterCodTec: string;
   filterPeriod: string;
   filterDelineamento: string;
   filterRepetition: string;
@@ -142,7 +142,7 @@ export default function Listagem({
     { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
     {
       name: 'CamposGerenciados[]',
-      title: 'Nome do experimento',
+      title: 'Nome experimento',
       value: 'experimentName',
     },
     { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
@@ -219,7 +219,7 @@ export default function Listagem({
       filterGli: checkValue('filterGli'),
       filterExperimentName: checkValue('filterExperimentName'),
       filterTecnologia: checkValue('filterTecnologia'),
-      filterCod: checkValue('filterCod'),
+      filterCodTec: checkValue('filterCodTec'),
       filterPeriod: checkValue('filterPeriod'),
       filterDelineamento: checkValue('filterDelineamento'),
       filterRepetition: checkValue('filterRepetition'),
@@ -234,7 +234,7 @@ export default function Listagem({
       filterGli,
       filterExperimentName,
       filterTecnologia,
-      filterCod,
+      filterCodTec,
       filterPeriod,
       filterDelineamento,
       filterRepetition,
@@ -251,40 +251,11 @@ export default function Listagem({
         }
       }
       // const filterStatus = selecionados.substr(0, selecionados.length - 1);
-      const filterStatus = statusFilterSelected?.join(',')?.toLowerCase();
+      const filterExperimentStatus = statusFilterSelected
+        ?.join(',')
+        ?.toLowerCase();
 
-      //   // Call filter with there parameter
-      //   const parametersFilter = await fetchWrapper.handleFilterParameter(
-      //     'experimento',
-      //     filterFoco,
-      //     filterTypeAssay,
-      //     filterProtocol,
-      //     filterGli,
-      //     filterExperimentName,
-      //     filterTecnologia,
-      //     filterCod,
-      //     filterPeriod,
-      //     filterDelineamento,
-      //     filterRepetition,
-      //     filterStatus,
-      //     idSafra,
-      //   );
-
-      //   setFiltersParams(parametersFilter);
-      //   setFilter(parametersFilter);
-      //   setCookies('filterBeforeEdit', filter);
-
-      //   await experimentService
-      //     .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
-      //     .then((response) => {
-      //       setFilter(parametersFilter);
-      //       setExperimento(response.response);
-      //       setTotalItems(response.total);
-      //       setCurrentPage(0);
-      //     });
-      // },
-
-      const parametersFilter = `filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterCod=${filterCod}&filterStatus=${filterStatus}&id_culture=${cultureId}`;
+      const parametersFilter = `filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterCodTec=${filterCodTec}&filterExperimentStatus=${filterExperimentStatus}&id_culture=${cultureId}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -302,21 +273,27 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await experimentService.getAll(parametersFilter).then((response) => {
-      if (
-        response.status === 200
-        || (response.status === 400 && response.total == 0)
-      ) {
-        setExperimento(response.response);
-        setTotalItems(response.total);
-        tableRef.current?.dataManager.changePageSize(
-          response.total >= take ? take : response.total,
-        );
-      }
-    })
+    setLoading(true);
+
+    await experimentService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (
+          response.status === 200
+          || (response.status === 400 && response.total == 0)
+        ) {
+          setExperimento(response.response);
+          setTotalItems(response.total);
+          tableRef.current?.dataManager.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+        }
+      })
       .catch((_) => {
         setLoading(false);
       });
+
+    setLoading(false);
   }
 
   // Call that function when change type order value.
@@ -373,7 +350,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   // function headerTableFactory(name: any, title: string) {
@@ -451,7 +428,8 @@ export default function Listagem({
       userId: userLogado.id,
     });
     if (status === 200) {
-      router.reload();
+      handlePagination();
+      setLoading(false);
     } else {
       Swal.fire({
         html: message,
@@ -479,6 +457,8 @@ export default function Listagem({
                 setCookies('filterBeforeEditOrderBy', orderBy);
                 setCookies('filtersParams', filtersParams);
                 setCookies('lastPage', 'atualizar');
+                setCookies('takeBeforeEdit', take);
+                setCookies('itensPage', itensPerPage);
                 router.push(
                   `/listas/experimentos/experimento/atualizar?id=${rowData.id}`,
                 );
@@ -826,7 +806,6 @@ export default function Listagem({
         <Input
           type="text"
           placeholder={name}
-          max="40"
           id={title}
           name={title}
           defaultValue={checkValue(title)}
@@ -882,9 +861,23 @@ export default function Listagem({
                   {filterFieldFactory('filterGli', 'GLI')}
                   {filterFieldFactory(
                     'filterExperimentName',
-                    'Nome Experimento',
+                    'Nome experimento',
                   )}
-                  {filterFieldFactory('filterCod', 'Cod Tec')}
+
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Cod Tec
+                    </label>
+                    <div className="flex">
+                      <Input
+                        size={7}
+                        placeholder="Cod Tec"
+                        id="filterCodTec"
+                        name="filterCodTec"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div
@@ -894,16 +887,32 @@ export default function Listagem({
                                         pb-0
                                         "
                 >
-                  {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
-                  {filterFieldFactory('filterPeriod', 'Época')}
+                  {filterFieldFactory('filterTecnologia', 'Nome Tec')}
+
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Época
+                    </label>
+                    <div className="flex">
+                      <Input
+                        type="number"
+                        placeholder="Época"
+                        id="filterPeriod"
+                        name="filterPeriod"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
                   {filterFieldFactory('filterDelineamento', 'Delineamento')}
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Repetição
+                      Rep
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterRepetitionFrom"
                         name="filterRepetitionFrom"
@@ -911,6 +920,7 @@ export default function Listagem({
                       />
                       <Input
                         style={{ marginLeft: 8 }}
+                        type="number"
                         placeholder="Até"
                         id="filterRepetitionTo"
                         name="filterRepetitionTo"
@@ -1193,12 +1203,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  // eslint-disable-next-line max-len
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) ?? 10;
-
   const { token } = req.cookies;
   const { cultureId } = req.cookies;
 
@@ -1216,7 +1220,12 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('itensPage', { req, res });
   }
+
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
+    : 10;
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
@@ -1237,6 +1246,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
   removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('takeBeforeEdit', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });
   removeCookies('lastPage', { req, res });
 

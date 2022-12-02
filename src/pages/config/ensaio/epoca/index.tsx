@@ -331,7 +331,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   function handleOnDragEnd(result: DropResult) {
@@ -454,7 +454,6 @@ export default function Listagem({
                     <Input
                       type="text"
                       placeholder="nome"
-                      max="40"
                       id="filterSearch"
                       name="filterSearch"
                       onChange={formik.handleChange}

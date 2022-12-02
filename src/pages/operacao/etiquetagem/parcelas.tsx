@@ -371,7 +371,7 @@ export default function Listagem({
     await experimentGenotipeService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
       .then(({ status, response }: IReturnObject) => {
-        if (status === 200) {
+        if (status === 200 || status === 400) {
           setParcelas(response);
         }
       });
@@ -729,10 +729,11 @@ export default function Listagem({
     if (filter) {
       parametersFilter = `${parametersFilter}&${filter}`;
     }
+
     await experimentGenotipeService
       .getAll(parametersFilter)
       .then(({ status, response }: IReturnObject) => {
-        if (status === 200) {
+        if (status === 200 || status === 400) {
           setParcelas(response);
         }
       });
@@ -962,6 +963,14 @@ export default function Listagem({
   function openModal() {
     setIsOpenModal(true);
     setTimeout(() => (inputRef?.current as any)?.focus(), 100);
+  }
+
+  function selectableFilter(rowData: any) {
+    if (isOpenModal || rowData?.status == 'IMPRESSO') {
+      return false;
+    }
+
+    return true;
   }
 
   return (
@@ -1292,11 +1301,18 @@ export default function Listagem({
               columns={columns}
               data={parcelas}
               options={{
-                showSelectAllCheckbox: false,
+                // showSelectAllCheckbox: false,
                 selection: true,
-                selectionProps: (rowData: any) => ({
-                  disabled: rowData.status !== 'IMPRESSO',
-                }),
+                selectionProps: (rowData: any) => {
+                  const selectable = selectableFilter(rowData);
+                  rowData.tableData.disabled = !selectable;
+                  return {
+                    disabled: !selectable,
+                  };
+                },
+                // selectionProps: (rowData: any) => ({
+                //   disabled: rowData.status !== "IMPRESSO",
+                // }),
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,
@@ -1530,8 +1546,10 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { publicRuntimeConfig } = getConfig();
   const baseUrlParcelas = `${publicRuntimeConfig.apiUrl}/experiment-genotipe`;
 
-  const filterApplication = req.cookies.filterBeforeEdit
-    || `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  // const filterApplication =
+  //   req.cookies.filterBeforeEdit ||
+  //   `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const filterApplication = `&id_culture=${idCulture}&id_safra=${idSafra}`;
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 

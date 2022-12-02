@@ -118,7 +118,7 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'Nome da tecnologia',
+      title: 'Tecnologia',
       value: 'tecnologia',
       defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
@@ -317,20 +317,26 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await genotypeTreatmentService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400) {
-        setTreatments(response.response);
-        setTotalItems(response.total);
-        // setAfterFilter(true);
-        setMessage(true);
-        tableRef.current.dataManager.changePageSize(
-          response.total >= take ? take : response.total,
-        );
-      }
-    })
+    setLoading(true);
+
+    await genotypeTreatmentService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          setTreatments(response.response);
+          setTotalItems(response.total);
+          // setAfterFilter(true);
+          setMessage(true);
+          tableRef.current.dataManager.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+        }
+      })
       .catch((_) => {
         setLoading(false);
       });
+
+    setLoading(false);
   }
 
   // Call that function when change type order value.
@@ -393,7 +399,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   // function headerTableFactory(
@@ -505,7 +511,7 @@ export default function Listagem({
         tableFields.push(
           headerTableFactoryGlobal({
             name: 'Tecnologia',
-            title: 'tecnologia',
+            title: 'assay_list.tecnologia.cod_tec',
             orderList,
             fieldOrder,
             handleOrder,
@@ -521,7 +527,7 @@ export default function Listagem({
         tableFields.push(
           headerTableFactoryGlobal({
             name: 'GGEN',
-            title: 'tecnologia',
+            title: 'genotipo.tecnologia.cod_tec',
             orderList,
             fieldOrder,
             handleOrder,
@@ -952,12 +958,13 @@ export default function Listagem({
   }
 
   function selectableFilter(rowData: any) {
-    if (isOpenModal || rowData?.status_experiment == 'SORTEADO') {
+    if (isOpenModal || rowData?.status_experiment == 'EXP. SORTEADO') {
       return false;
     }
 
     return true;
   }
+
 
   return (
     <>
@@ -1130,6 +1137,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        size={7}
                         placeholder="Cód. Tecnologia"
                         id="filterCodTec"
                         name="filterCodTec"
@@ -1138,7 +1146,7 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {filterFieldFactory('filterTechnology', 'Nome Tecn')}
+                  {filterFieldFactory('filterTechnology', 'Nome Tec')}
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -1202,12 +1210,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="int"
                         placeholder="De"
                         id="filterBgmFrom"
                         name="filterBgmFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterBgmTo"
@@ -1223,12 +1233,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="int"
                         placeholder="De"
                         id="filterBgmGenotypeFrom"
                         name="filterBgmGenotypeFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterBgmGenotypeTo"
@@ -1274,12 +1286,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterNtFrom"
                         name="filterNtFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNtTo"

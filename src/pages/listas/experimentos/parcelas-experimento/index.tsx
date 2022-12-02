@@ -54,11 +54,11 @@ import {
   genotypeTreatmentService,
   importService,
   userPreferencesService,
-} from '../../../../services';
-import * as ITabs from '../../../../shared/utils/dropdown';
-import { tableGlobalFunctions } from '../../../../helpers';
-import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
-import ComponentLoading from '../../../../components/Loading';
+} from "../../../../services";
+import * as ITabs from "../../../../shared/utils/dropdown";
+import { tableGlobalFunctions } from "../../../../helpers";
+import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
+import ComponentLoading from "../../../../components/Loading";
 
 export default function Listagem({
   // assaySelect,
@@ -83,12 +83,11 @@ export default function Listagem({
       ? (tab.statusTab = true)
       : (tab.statusTab = false)
   );
-
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.genotypeTreatment || {
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const preferences = userLogado.preferences.parcelas || {
     id: 0,
     table_preferences:
-      'id,foco,type_assay,tecnologia,gli,experiment,culture,status_t,rep,status,nt,npe,genotipo,nca',
+      "id,foco,type_assay,tecnologia,gli,experiment,culture,status_t,rep,status,nt,npe,genotipo,nca",
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
@@ -123,10 +122,10 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("type_assay"),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Tecnologia",
-      value: "tecnologia",
-      defaultChecked: () => camposGerenciados.includes("tecnologia"),
+      name: 'CamposGerenciados[]',
+      title: 'Tecnologia',
+      value: 'tecnologia',
+      defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
     {
       name: "CamposGerenciados[]",
@@ -147,10 +146,10 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("culture"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'StatusT',
-      value: 'status_t',
-      defaultChecked: () => camposGerenciados.includes('status_t'),
+      name: "CamposGerenciados[]",
+      title: "StatusT",
+      value: "status_t",
+      defaultChecked: () => camposGerenciados.includes("status_t"),
     },
     {
       name: "CamposGerenciados[]",
@@ -159,16 +158,16 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("rep"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Status EXP',
-      value: 'status',
-      defaultChecked: () => camposGerenciados.includes('status'),
+      name: "CamposGerenciados[]",
+      title: "Status EXP",
+      value: "status",
+      defaultChecked: () => camposGerenciados.includes("status"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'NT',
-      value: 'nt',
-      defaultChecked: () => camposGerenciados.includes('nt'),
+      name: "CamposGerenciados[]",
+      title: "NT",
+      value: "nt",
+      defaultChecked: () => camposGerenciados.includes("nt"),
     },
     {
       name: "CamposGerenciados[]",
@@ -344,6 +343,8 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
+    setLoading(true);
+
     await experimentGenotipeService
       .getAll(parametersFilter)
       .then((response) => {
@@ -358,6 +359,8 @@ export default function Listagem({
       .catch((_) => {
         setLoading(false);
       });
+
+    setLoading(false);
   }
 
   // Call that function when change type order value.
@@ -500,8 +503,8 @@ export default function Listagem({
       if (columnOrder[item] === "tecnologia") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Tecnologia",
-            title: "tecnologia.cod_tec",
+            name: 'Tecnologia',
+            title: 'tecnologia.cod_tec',
             orderList,
             fieldOrder,
             handleOrder,
@@ -546,18 +549,18 @@ export default function Listagem({
           })
         );
       }
-      if (columnOrder[item] === 'status_t') {
+      if (columnOrder[item] === "status_t") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'StatusT',
-            title: 'status_t',
+            name: "StatusT",
+            title: "status_t",
             orderList,
             fieldOrder,
             handleOrder,
           })
         );
       }
-      if (columnOrder[item] === 'rep') {
+      if (columnOrder[item] === "rep") {
         tableFields.push(
           headerTableFactoryGlobal({
             name: "REP EXP",
@@ -568,11 +571,11 @@ export default function Listagem({
           })
         );
       }
-      if (columnOrder[item] === 'status') {
+      if (columnOrder[item] === "status") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Status EXP',
-            title: 'status',
+            name: "Status EXP",
+            title: "status",
             orderList,
             fieldOrder,
             handleOrder,
@@ -914,8 +917,9 @@ export default function Listagem({
     const selectedGenotype: any = {};
 
     rowsSelected.forEach((item: any) => {
-      selectedGenotype[item.name_genotipo] = true;
+      selectedGenotype[item?.genotipo?.name_genotipo] = true;
     });
+
     const checkedLength = Object.getOwnPropertyNames(selectedGenotype);
     if (checkedLength.length > 1) {
       setNccIsValid(true);
@@ -951,7 +955,7 @@ export default function Listagem({
       {loading && <ComponentLoading text="" />}
 
       <Head>
-        <title>Listagem de parcelas do experimento</title>
+        <title>Listagem de parcelas dos experimentos</title>
       </Head>
 
       <Modal
@@ -1090,7 +1094,7 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar parcelas experimento">
+          <AccordionFilter title="Filtrar parcelas dos experimentos">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -1108,20 +1112,36 @@ export default function Listagem({
                   pb-8
                 "
                 >
-                  {filterFieldFactory('filterFoco', 'Foco')}
-                  {filterFieldFactory('filterTypeAssay', 'Ensaio')}
-                  {filterFieldFactory('filterCodTec', 'Cod Tec')}
-                  {filterFieldFactory('filterTechnology', 'Nome da Tecnologia')}
-                  {filterFieldFactory('filterGli', 'GLI')}
-                  {filterFieldFactory('filterExperimentName', 'Experimento')}
-                  {filterFieldFactory('filterPlacingPlace', 'Lugar plantio')}
-                  {filterFieldFactory('filterStatusT', 'StatusT')}
+                  {filterFieldFactory("filterFoco", "Foco")}
+                  {filterFieldFactory("filterTypeAssay", "Ensaio")}
+
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Cod Tec
+                    </label>
+                    <div className="flex">
+                      <Input
+                        size={7}
+                        type="number"
+                        placeholder="Cod Tec"
+                        id="filterCodTec"
+                        name="filterCodTec"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  {filterFieldFactory("filterTechnology", "Nome Tec")}
+                  {filterFieldFactory("filterGli", "GLI")}
+                  {filterFieldFactory("filterExperimentName", "Experimento")}
+                  {filterFieldFactory("filterPlacingPlace", "Lugar plantio")}
+                  {filterFieldFactory("filterStatusT", "StatusT")}
                 </div>
                 <div
                   className="w-full h-full
                   flex
                   justify-center
-                  pt-2
+                  pt-0
                   pb-0
                   "
                 >
@@ -1131,12 +1151,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterRepFrom"
                         name="filterRepFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterRepTo"
@@ -1217,12 +1239,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterNtFrom"
                         name="filterNtFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNtTo"
@@ -1237,12 +1261,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterNpeFrom"
                         name="filterNpeFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNpeTo"
@@ -1304,12 +1330,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="text"
                         placeholder="De"
                         id="filterNcaFrom"
                         name="filterNcaFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="text"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNcaTo"
@@ -1607,7 +1635,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies("filterBeforeEditOrderBy", { req, res });
   removeCookies("lastPage", { req, res });
 
-  const param = `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   const urlParametersAssay: any = new URL(baseUrlAssay);
   const urlParametersTreatment: any = new URL(baseUrlTreatment);

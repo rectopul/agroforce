@@ -190,23 +190,16 @@ export default function TipoEnsaio({
       filterStatusAssay,
     }) => {
       const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterTechnology=${filterTechnology}&filterTreatmentNumber=${filterTreatmentNumber}&filterStatusAssay=${filterStatusAssay}&id_safra=${idSafra}&filterTratTo=${filterTratTo}&filterTratFrom=${filterTratFrom}&filterCod=${filterCod}&id_culture=${idCulture}`;
-      // setFiltersParams(parametersFilter);
-      // setCookies('filterBeforeEdit', filtersParams);
-      // await assayListService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then(({ response, total: allTotal }) => {
-      //   setFilter(parametersFilter);
-      //   setAssayList(response);
-      //   setTotalItems(allTotal);
-      //   setCurrentPage(0);
-
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
-      // });
+      setLoading(false);
     },
   });
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
+    setFilter(parametersFilter);
     setCookies('filterBeforeEdit', parametersFilter);
     setCookies('filterBeforeEditTypeOrder', typeOrder);
     setCookies('filterBeforeEditOrderBy', orderBy);
@@ -214,15 +207,17 @@ export default function TipoEnsaio({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await assayListService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400) {
-        setAssayList(response.response);
-        setTotalItems(response.total);
-        tableRef.current.dataManager.changePageSize(
-          response.total >= take ? take : response.total,
-        );
-      }
-    })
+    await assayListService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          setAssayList(response.response);
+          setTotalItems(response.total);
+          tableRef.current.dataManager.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+        }
+      })
       .catch((_) => {
         setLoading(false);
       });
@@ -281,7 +276,7 @@ export default function TipoEnsaio({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   // function headerTableFactory(name: string, title: string) {
@@ -316,7 +311,8 @@ export default function TipoEnsaio({
       userId: userLogado.id,
     });
     if (status === 200) {
-      router.reload();
+      handlePagination();
+      setLoading(false);
     } else {
       Swal.fire({
         html: message,
@@ -343,7 +339,9 @@ export default function TipoEnsaio({
                 setCookies('filterBeforeEditTypeOrder', typeOrder);
                 setCookies('filterBeforeEditOrderBy', orderBy);
                 setCookies('filtersParams', filtersParams);
+                setCookies('itensPage', itensPerPage);
                 setCookies('lastPage', 'atualizar');
+                setCookies('takeBeforeEdit', take);
                 router.push(
                   `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`,
                 );
@@ -375,6 +373,7 @@ export default function TipoEnsaio({
                 setCookies('filterBeforeEditTypeOrder', typeOrder);
                 setCookies('filterBeforeEditOrderBy', orderBy);
                 setCookies('filtersParams', filtersParams);
+                setCookies('takeBeforeEdit', take);
                 setCookies('lastPage', 'atualizar');
                 router.push(
                   `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`,
@@ -437,7 +436,7 @@ export default function TipoEnsaio({
         tableFields.push(
           headerTableFactoryGlobal({
             name: 'Protocolo',
-            title: 'protocol_name',
+            title: 'type_assay.protocol_name',
             orderList,
             fieldOrder,
             handleOrder,
@@ -481,7 +480,7 @@ export default function TipoEnsaio({
         tableFields.push(
           headerTableFactoryGlobal({
             name: 'Tecnologia',
-            title: 'tecnologia',
+            title: 'tecnologia.cod_tec',
             orderList,
             fieldOrder,
             handleOrder,
@@ -745,7 +744,7 @@ export default function TipoEnsaio({
                   {filterFieldFactory('filterTypeAssay', 'Ensaio')}
                   {filterFieldFactory('filterGli', 'GLI')}
                   {filterFieldFactory('filterCod', 'Cod Tec')}
-                  {filterFieldFactory('filterTechnology', 'Nome Tecnologia')}
+                  {filterFieldFactory('filterTechnology', 'Nome Tec')}
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -753,6 +752,7 @@ export default function TipoEnsaio({
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterTratFrom"
                         name="filterTratFrom"
@@ -760,6 +760,7 @@ export default function TipoEnsaio({
                       />
                       <Input
                         style={{ marginLeft: 8 }}
+                        type="number"
                         placeholder="Até"
                         id="filterTratTo"
                         name="filterTratTo"
@@ -977,17 +978,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page;
-
-  const pageBeforeEdit = req.cookies.pageBeforeEdit
-    ? req.cookies.pageBeforeEdit
-    : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : '';
   const { token } = req.cookies;
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
@@ -1003,8 +993,22 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('filtersParams', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('itensPage', { req, res });
   }
+
+  const pageBeforeEdit = req.cookies.pageBeforeEdit
+    ? req.cookies.pageBeforeEdit
+    : 0;
+
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : '';
+
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
+    : 10;
 
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
@@ -1017,12 +1021,13 @@ export const getServerSideProps: GetServerSideProps = async ({
     : '';
 
   const filterApplication = req.cookies.filterBeforeEdit
-    ? filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   // //RR
   removeCookies('filterBeforeEditTypeOrder', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('takeBeforeEdit', { req, res });
   removeCookies('lastPage', { req, res });
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;

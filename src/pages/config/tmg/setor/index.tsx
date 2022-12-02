@@ -304,7 +304,9 @@ export default function Listagem({
                 setCookies('filterBeforeEditTypeOrder', typeOrder);
                 setCookies('filterBeforeEditOrderBy', orderBy);
                 setCookies('filtersParams', filtersParams);
+                setCookies('itensPage', itensPerPage);
                 setCookies('lastPage', 'atualizar');
+                setCookies('takeBeforeEdit', take);
                 router.push(`/config/tmg/setor/atualizar?id=${rowData.id}`);
               }}
             />
@@ -394,7 +396,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   async function getValuesColumns(): Promise<void> {
@@ -585,7 +587,6 @@ export default function Listagem({
                     <Input
                       type="text"
                       placeholder="setor"
-                      max="40"
                       defaultValue={checkValue('filterSearch')}
                       id="filterSearch"
                       name="filterSearch"
@@ -799,11 +800,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page;
-
   const { token } = req.cookies;
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
@@ -818,7 +814,11 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('itensPage', { req, res });
   }
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
+    : 10;
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
@@ -839,6 +839,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
+  removeCookies('takeBeforeEdit', { req, res });
   removeCookies('lastPage', { req, res });
 
   const { publicRuntimeConfig } = getConfig();

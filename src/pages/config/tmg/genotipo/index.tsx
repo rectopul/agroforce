@@ -30,6 +30,7 @@ import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 
 import { tableGlobalFunctions } from 'src/helpers';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import {
   AccordionFilter,
   Button,
@@ -47,7 +48,7 @@ import ComponentLoading from '../../../../components/Loading';
 interface IFilter {
   filterGenotipo: string | any;
   filterMainName: string | any;
-  filterTecnologiaCod: string | any;
+  filterCodTecnologia: string | any;
   filterTecnologiaDesc: string | any;
   filterCruza: string | any;
   filterGmr: string | any;
@@ -218,7 +219,7 @@ export default function Listagem({
     initialValues: {
       filterGenotipo: checkValue('filterGenotipo'),
       filterMainName: checkValue('filterMainName'),
-      filterTecnologiaCod: checkValue('filterTecnologiaCod'),
+      filterCodTecnologia: checkValue('filterCodTecnologia'),
       filterTecnologiaDesc: checkValue('filterTecnologiaDesc'),
       filterCruza: checkValue('filterCruza'),
       filterGmr: checkValue('filterGmr'),
@@ -233,7 +234,7 @@ export default function Listagem({
       filterGenotipo,
       filterMainName,
       filterCruza,
-      filterTecnologiaCod,
+      filterCodTecnologia,
       filterTecnologiaDesc,
       filterGmr,
       filterGmrRangeTo,
@@ -241,36 +242,7 @@ export default function Listagem({
       filterLotsTo,
       filterLotsFrom,
     }) => {
-      //   // Call filter with there parameter
-      //   const parametersFilter = await tableGlobalFunctions.handleFilterParameter(
-      //     'genotipo',
-      //     filterGenotipo,
-      //     filterMainName,
-      //     filterCruza,
-      //     filterTecnologiaCod,
-      //     filterTecnologiaDesc,
-      //     filterGmr,
-      //     idCulture,
-      //     idSafra,
-      //     filterGmrRangeTo,
-      //     filterGmrRangeFrom,
-      //     filterLotsTo,
-      //     filterLotsFrom,
-      //   );
-      //   setFiltersParams(parametersFilter); // Set filter pararameters
-      //   setCookiess('filterBeforeEdit', filtersParams);
-
-      //   await genotipoService
-      //     .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
-      //     .then((response) => {
-      //       setFilter(parametersFilter);
-      //       setGenotipo(response.response);
-      //       setTotalItems(response.total);
-      //       setCurrentPage(0);
-      //     });
-      // },
-
-      const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&filterLotsTo=${filterLotsTo}&filterLotsFrom=${filterLotsFrom}&id_culture=${idCulture}`;
+      const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterCodTecnologia=${filterCodTecnologia}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&filterLotsTo=${filterLotsTo}&filterLotsFrom=${filterLotsFrom}&id_culture=${idCulture}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -288,15 +260,18 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await genotipoService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400) {
-        setGenotipo(response.response);
-        setTotalItems(response.total);
-        tableRef.current.dataManager.changePageSize(
-          response.total >= take ? take : response.total,
-        );
-      }
-    })
+    await genotipoService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          setGenotipo(response.response);
+          setTotalItems(response.total);
+          tableRef.current.dataManager.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+          setLoading(false);
+        }
+      })
       .catch((_) => {
         setLoading(false);
       });
@@ -342,6 +317,8 @@ export default function Listagem({
     //   }
     // }
 
+    setLoading(true);
+
     // Gobal manage orders
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
@@ -352,10 +329,9 @@ export default function Listagem({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
-    setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   // function headerTableFactory(name: any, title: string) {
@@ -456,7 +432,9 @@ export default function Listagem({
                 setCookies('filterBeforeEditTypeOrder', typeOrder);
                 setCookies('filterBeforeEditOrderBy', orderBy);
                 setCookies('filtersParams', filtersParams);
+                setCookies('itensPage', itensPerPage);
                 setCookies('lastPage', 'atualizar');
+                setCookies('takeBeforeEdit', take);
                 router.push(`/config/tmg/genotipo/atualizar?id=${rowData.id}`);
               }}
             />
@@ -512,6 +490,7 @@ export default function Listagem({
       if (columnCampos[index] === 'tecnologia') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: 'int',
             name: 'Tecnologia',
             title: 'tecnologia.cod_tec',
             orderList,
@@ -539,6 +518,7 @@ export default function Listagem({
       if (columnCampos[index] === 'gmr') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: 'int',
             name: 'GMR',
             title: 'gmr',
             orderList,
@@ -551,6 +531,7 @@ export default function Listagem({
       if (columnCampos[index] === 'numberLotes') {
         tableFields.push(
           headerTableFactoryGlobal({
+            type: 'int',
             name: 'Nº Lotes',
             title: 'numberLotes',
             orderList,
@@ -662,7 +643,7 @@ export default function Listagem({
         tableFields.push(
           headerTableFactoryGlobal({
             name: 'Progenitores origem',
-            title: 'Progenitores origem',
+            title: 'progenitores_origem',
             orderList,
             fieldOrder,
             handleOrder,
@@ -897,7 +878,6 @@ export default function Listagem({
         <Input
           type="text"
           placeholder={name}
-          max="40"
           id={title}
           name={title}
           defaultValue={checkValue(title)}
@@ -916,9 +896,8 @@ export default function Listagem({
         <div className="grid grid-cols-2 gap-2">
           <div>
             <Input
-              type="text"
+              type="int"
               placeholder="De"
-              max="40"
               id="filterGmrRangeFrom"
               name="filterGmrRangeFrom"
               defaultValue={checkValue('filterGmrRangeFrom')}
@@ -927,9 +906,8 @@ export default function Listagem({
           </div>
           <div>
             <Input
-              type="text"
+              type="int"
               placeholder="Até"
-              max="40"
               id="filterGmrRangeTo"
               name="filterGmrRangeTo"
               defaultValue={checkValue('filterGmrRangeTo')}
@@ -950,9 +928,8 @@ export default function Listagem({
         <div className="grid grid-cols-2 gap-2">
           <div>
             <Input
-              type="text"
+              type="number"
               placeholder="De"
-              max="40"
               id="filterLotsFrom"
               name="filterLotsFrom"
               onChange={formik.handleChange}
@@ -960,9 +937,8 @@ export default function Listagem({
           </div>
           <div>
             <Input
-              type="text"
+              type="number"
               placeholder="Até"
-              max="40"
               id="filterLotsTo"
               name="filterLotsTo"
               onChange={formik.handleChange}
@@ -1014,12 +990,9 @@ export default function Listagem({
 
                   {filterFieldFactory('filterMainName', 'Nome principal')}
 
-                  {filterFieldFactory('filterTecnologiaCod', 'Cod Tec')}
+                  {filterFieldFactory('filterCodTecnologia', 'Cod Tec')}
 
-                  {filterFieldFactory(
-                    'filterTecnologiaDesc',
-                    'Nome Tecnologia',
-                  )}
+                  {filterFieldFactory('filterTecnologiaDesc', 'Nome Tec')}
                 </div>
 
                 <div
@@ -1251,10 +1224,9 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) ?? 10;
+  // const PreferencesControllers = new UserPreferenceController();
+  // const itensPerPage = (await req.cookies.itensPerPage
+  //   ? req.cookies.itensPerPage : 10);
 
   const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);
@@ -1270,12 +1242,17 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('filtersParams', { req, res });
     removeCookies('lastPage', { req, res });
-    // setCookies('filterParams','');
+    removeCookies('itensPage', { req, res });
   }
+
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
+    : 10;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
+
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : '';
@@ -1302,7 +1279,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
-
+  removeCookies('takeBeforeEdit', { req, res });
   removeCookies('filterBeforeEditTypeOrder', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });
   removeCookies('lastPage', { req, res });

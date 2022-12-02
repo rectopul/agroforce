@@ -72,12 +72,13 @@ interface IData {
 }
 
 export default function NovoLocal({
-  local,
-  layoultEdit,
-  npe,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      local,
+      layoultEdit,
+      npe,
+      idCulture,
+      idSafra,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
-
   const tabsDropDowns = TabsDropDowns();
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'AMBIENTE'
@@ -127,7 +128,7 @@ export default function NovoLocal({
       const parametersFilter = `filterStatus=1&npei=${values.prox_npe}`;
       await npeService.getAll(parametersFilter).then(async (response) => {
         if (response.total <= 0) {
-          const paramFilter = `npe=${values.prox_npe}`;
+          const paramFilter = `id_culture=${idCulture}&id_safra=${idSafra}&npe=${values.prox_npe}`;
           await experimentGenotipeService
             .getAll(paramFilter)
             .then(async (response) => {
@@ -150,13 +151,13 @@ export default function NovoLocal({
                   });
               } else {
                 Swal.fire(
-                  'Unable to update prox npe, prox npe entered is already consumed by experiment genotipe.',
+                  'Não foi possível atualizar o prox npe, o prox npe inserido já foi usado pela parcela.',
                 );
               }
             });
         } else {
           Swal.fire(
-            'Unable to update prox npe, prox npe entered is already consumed by another npe.',
+            'Não é possível atualizar o prox npe, o prox npe inserido já é consumido por outro npe.',
           );
         }
       });
@@ -335,6 +336,7 @@ export default function NovoLocal({
                 Cod Tec.
               </label>
               <Input
+                size={7}
                 type="number"
                 placeholder="10"
                 id="cod_tec"
@@ -445,7 +447,7 @@ export default function NovoLocal({
                 bgColor="bg-blue-600"
                 icon={<MdDateRange size={18} />}
                 textColor="white"
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>
@@ -462,6 +464,8 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const baseUrlNpe = `${publicRuntimeConfig.apiUrl}/npe`;
 
   const { token } = context.req.cookies;
+  const idCulture = context.req.cookies.cultureId;
+  const idSafra = context.req.cookies.safraId;
 
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
@@ -480,5 +484,5 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const layoultEdit = await resU.json();
   let local = await apiLocal.json();
   local = local.response;
-  return { props: { local, layoultEdit, npe } };
+  return { props: { local, layoultEdit, npe, idCulture, idSafra } };
 };

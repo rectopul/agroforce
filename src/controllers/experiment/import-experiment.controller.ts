@@ -59,6 +59,7 @@ export class ImportExperimentController {
     try {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
+        await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
         return { status: 400, message: validate };
       }
       for (const row in spreadSheet) {
@@ -75,12 +76,12 @@ export class ImportExperimentController {
           });
           if (experiment?.length > 0) {
             if (experiment[0].status !== 'IMPORTADO') {
-              await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
+              await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
               return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimento já cadastrado e utilizado no sistema` };
             }
           }
           if (experimentNameTemp.includes(experimentName)) {
-            await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
+            await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
             experimentNameTemp[row] = experimentName;
             return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela` };
           }
@@ -160,19 +161,23 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (isNaN(spreadSheet[row][column])) {
-                responseIfError[Number(column)] += responsePositiveNumericFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                );
-              } else if (spreadSheet[row][column] < 10) {
-                // eslint-disable-next-line no-param-reassign
-                spreadSheet[row][column] = `0${spreadSheet[row][column]}`;
-              }
-              if (assayList?.tecnologia?.cod_tec !== (spreadSheet[row][column].toString())) {
+              } else if ((spreadSheet[row][column]).toString().length > 2) {
                 responseIfError[Number(column)]
+                  += responseGenericFactory(
+                    (Number(column) + 1),
+                    row,
+                    spreadSheet[0][column],
+                    'o limite de caracteres e 2',
+                  );
+              } else {
+                if (spreadSheet[row][column].toString().length < 2) {
+                  // eslint-disable-next-line no-param-reassign
+                  spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+                }
+                if (assayList?.tecnologia?.cod_tec !== (spreadSheet[row][column].toString())) {
+                  responseIfError[Number(column)]
                   += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                }
               }
             }
             if (column === '6') { // GGM // BGM
@@ -255,7 +260,9 @@ export class ImportExperimentController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
                 const { response } = await delineamentoController.getAll({
-                  id_culture: idCulture, name: spreadSheet[row][column],
+                  id_culture: idCulture,
+                  name: spreadSheet[row][column],
+                  filterStatus: 1,
                 });
 
                 if (response?.length === 0) {
@@ -348,7 +355,9 @@ export class ImportExperimentController {
                 id_safra: idSafra,
               });
               const { response: delineamento } = await delineamentoController.getAll({
-                id_culture: idCulture, name: spreadSheet[row][10],
+                id_culture: idCulture,
+                name: spreadSheet[row][10],
+                filterStatus: 1,
               });
               const comments = spreadSheet[row][14]?.substr(0, 255) ? spreadSheet[row][14]?.substr(0, 255) : '';
               let experimentName;
@@ -407,19 +416,19 @@ export class ImportExperimentController {
               }
             }
           }
-          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
+          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO', updated_at: Date() });
           return { status: 200, message: 'Experimento importado com sucesso' };
         } catch (error: any) {
-          await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+          await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date() });
           handleError('Experimento controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de experimento' };
         }
       }
-      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
+      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date() });
       handleError('Experimento controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de experimento' };
     }

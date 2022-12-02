@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-loop-func */
 /* eslint-disable import/no-cycle */
@@ -39,6 +40,7 @@ export class ImportGenotypeController {
       spreadSheet, idSafra, idCulture, created_by: createdBy,
     }: ImportValidate,
   ): Promise<IReturnObject> {
+    const logImportController = new LogImportController();
     const headers = [
       'ID_S1 (S1_ID_S1)',
       'Identificador de dados (S1_DATA_ID)',
@@ -73,6 +75,7 @@ export class ImportGenotypeController {
     ];
     const validate: any = await validateHeaders(spreadSheet, headers);
     if (validate.length > 0) {
+      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
       return { status: 400, message: validate };
     }
 
@@ -94,10 +97,11 @@ export class ImportGenotypeController {
     const importController = new ImportController();
     const culturaController = new CulturaController();
     const genotipoController = new GenotipoController();
-    const logImportController = new LogImportController();
     const tecnologiaController = new TecnologiaController();
 
     const responseIfError: any = [];
+
+    const nccValidate: any = [];
     try {
       const configModule: object | any = await importController.getAll(10);
       if (spreadSheet[0]?.length < 30) {
@@ -114,8 +118,17 @@ export class ImportGenotypeController {
       }
 
       for (const row in spreadSheet) {
-        for (const column in spreadSheet[row]) {
-          if (row !== '0') {
+        if (row !== '0') {
+          if (nccValidate.includes(spreadSheet[row][25])) {
+            responseIfError[Number(25)] += responseGenericFactory(
+              Number(25) + 1,
+              row,
+              spreadSheet[0][25],
+              'esta repetindo não planilha',
+            );
+          }
+          nccValidate.push(spreadSheet[row][25]);
+          for (const column in spreadSheet[row]) {
             // campos genotipo
             if (configModule.response[0]?.fields[column] === 'id_s1') {
               if (spreadSheet[row][column] === null) {
@@ -134,13 +147,6 @@ export class ImportGenotypeController {
                   row,
                   spreadSheet[0][column],
                 );
-              } else {
-                const genotipo: any = await genotipoController.getAll({
-                  id_dados_geno: spreadSheet[row][column],
-                });
-                if (genotipo.total > 0) {
-                  this.aux.id_dados_geno = genotipo.response[0]?.id_dados;
-                }
               }
             }
 
@@ -197,44 +203,49 @@ export class ImportGenotypeController {
                   row,
                   spreadSheet[0][column],
                 );
-              } else if (isNaN(spreadSheet[row][column])) {
-                responseIfError[Number(column)] += responsePositiveNumericFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                );
-              } else if (spreadSheet[row][column] < 10) {
-                // eslint-disable-next-line no-param-reassign
-                spreadSheet[row][column] = `0${spreadSheet[row][column]}`;
-              }
-              const tec: any = await tecnologiaController.getAll({
-                id_culture: idCulture,
-                cod_tec: String(spreadSheet[row][column]),
-              });
-              if (tec.total === 0) {
-                responseIfError[Number(column)] += responseGenericFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                  'a tecnologia informado não existe no sistema',
-                );
-              }
-            }
-
-            if (configModule.response[0]?.fields[column] === 'GMR') {
-              if (spreadSheet[row][column] !== null) {
-                if (!validateInteger(spreadSheet[row][column])) {
-                  responseIfError[Number(column)] += responseGenericFactory(
+              } else if ((spreadSheet[row][column]).toString().length > 2) {
+                responseIfError[Number(column)]
+                  += responseGenericFactory(
                     (Number(column) + 1),
                     row,
                     spreadSheet[0][column],
-                    'precisa ser um numero inteiro e positivo',
+                    'o limite de caracteres e 2',
+                  );
+              } else {
+                if (spreadSheet[row][column].toString().length < 2) {
+                  // eslint-disable-next-line no-param-reassign
+                  spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+                }
+
+                const tec: any = await tecnologiaController.getAll({
+                  id_culture: idCulture,
+                  cod_tec: String(spreadSheet[row][column]),
+                });
+                if (tec.total === 0) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                    'a tecnologia informado não existe no sistema',
                   );
                 }
               }
             }
 
-            if (configModule.response[0]?.fields[column] === 'BGM') {
+            if (configModule.response[0]?.fields[column] === 'gmr') {
+              if (spreadSheet[row][column] !== null) {
+                if (isNaN(spreadSheet[row][column])) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    (Number(column) + 1),
+                    row,
+                    spreadSheet[0][column],
+                    'precisa ser um numero positivo',
+                  );
+                }
+              }
+            }
+
+            if (configModule.response[0]?.fields[column] === 'bgm') {
               if (spreadSheet[row][column] !== null) {
                 if (isNaN(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responsePositiveNumericFactory(
@@ -255,6 +266,21 @@ export class ImportGenotypeController {
                     row,
                     spreadSheet[0][column],
                   );
+                } else {
+                  const { response: lote }: any = await loteController.getAll({
+                    id_dados: spreadSheet[row][column],
+                    id_culture: idCulture,
+                  });
+                  if (lote[0]?.safra?.id !== idSafra) {
+                    if (lote.length > 0) {
+                      responseIfError[Number(column)] += responseGenericFactory(
+                        Number(column) + 1,
+                        row,
+                        spreadSheet[0][column],
+                        'o lote já foi cadastrado em outra safra',
+                      );
+                    }
+                  }
                 }
               }
 
@@ -266,8 +292,12 @@ export class ImportGenotypeController {
                     spreadSheet[0][column],
                   );
                 }
-                const { response }: IReturnObject = await safraController.getOne(idSafra);
-                if (Number(response?.year) !== Number(spreadSheet[row][column])) {
+                const { response }: IReturnObject = await safraController.getAll({
+                  id_culture: idCulture,
+                  filterSafra: String(spreadSheet[row][23]),
+                  filterStatus: 1,
+                });
+                if (Number(response[0]?.year) !== Number(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     row,
@@ -287,7 +317,8 @@ export class ImportGenotypeController {
                 } else {
                   const { response: safras }: IReturnObject = await safraController.getAll({
                     id_culture: idCulture,
-                    safraName: String(spreadSheet[row][column]),
+                    filterSafra: String(spreadSheet[row][column]),
+                    filterStatus: 1,
                   });
                   if (safras.length <= 0) {
                     if (safras?.safraName !== spreadSheet[row][column]) {
@@ -322,6 +353,7 @@ export class ImportGenotypeController {
                 } else {
                   const lote: any = loteController.getAll({
                     cod_lote: String(spreadSheet[row][column]),
+                    id_culture: idCulture,
                   });
                   if (lote.total > 0) {
                     responseIfError[Number(column)] += responseGenericFactory(
@@ -360,23 +392,20 @@ export class ImportGenotypeController {
                     spreadSheet[0][column],
                     'precisa ser um numero inteiro e positivo e ter 12 dígitos',
                   );
-                }
-                const nccDados: any = [];
-                // eslint-disable-next-line array-callback-return
-                spreadSheet.map((val: any, index: any) => {
-                  if (index === column) {
-                    if (nccDados.includes(val)) {
-                      responseIfError[Number(column)] += responseGenericFactory(
-                        Number(column) + 1,
-                        row,
-                        spreadSheet[0][column],
-                        'o campo ncc não pode ser repetido',
-                      );
-                    } else {
-                      nccDados.push(val);
-                    }
+                } else {
+                  const { response }: IReturnObject = await loteController.getAll({
+                    ncc: spreadSheet[row][column],
+                    id_culture: idCulture,
+                  });
+                  if (response.length > 0) {
+                    responseIfError[Number(column)] += responseGenericFactory(
+                      (Number(column) + 1),
+                      row,
+                      spreadSheet[0][column],
+                      'é chave única na cultura, e já foi cadastrado',
+                    );
                   }
-                });
+                }
               }
             }
             if (configModule.response[0]?.fields[column] === 'DT_EXPORT') {
@@ -390,10 +419,11 @@ export class ImportGenotypeController {
                 // eslint-disable-next-line no-param-reassign
                 spreadSheet[row][column] = new Date(spreadSheet[row][column]);
                 const { status, response }: IReturnObject = await loteController.getAll({
-                  id_s2: spreadSheet[row][20],
-                  id_safra: idSafra,
+                  id_dados: spreadSheet[row][21],
+                  id_culture: idCulture,
                 });
                 const dateNow = new Date();
+
                 if (dateNow.getTime() < spreadSheet[row][column].getTime()) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
@@ -412,6 +442,7 @@ export class ImportGenotypeController {
                 }
                 if (status === 200) {
                   const lastDtImport = response[0]?.dt_export?.getTime();
+
                   if (
                     lastDtImport
                     > spreadSheet[row][column].getTime()
@@ -496,12 +527,17 @@ export class ImportGenotypeController {
 
               if (configModule.response[0]?.fields[column] === 'S1_DATA_ID') {
                 if (spreadSheet[row][column] !== null) {
-                  const geno: any = await genotipoController.getAll({
-                    id_culture: idCulture,
-                    id_dados: spreadSheet[row][column],
-                  });
-                  if (geno.total > 0) {
-                    this.aux.id_genotipo = geno.response[0]?.id;
+                  const genotypeId : string = String(spreadSheet[row][column]);
+                  const params = { id_dados: genotypeId, id_culture: idCulture };
+                  const select = { id: true, id_dados: true, name_genotipo: true };
+                  const take = undefined;
+                  const skip = undefined;
+                  const order = undefined;
+
+                  const genotypeList : any = await genotipoRepository.findAll(params, select, take, skip, order);
+
+                  if (genotypeList.total > 0) {
+                    this.aux.id_genotipo = genotypeList[0].id;
                   } else {
                     this.aux.id_genotipo = null;
                   }
@@ -674,6 +710,7 @@ export class ImportGenotypeController {
                 if (spreadSheet[row][column] !== null) {
                   const lote: any = await loteController.getAll({
                     id_dados: spreadSheet[row][column],
+                    id_culture: idCulture,
                   });
                   if (lote.total > 0) {
                     this.aux.id_lote = lote.response[0]?.id;
@@ -694,7 +731,7 @@ export class ImportGenotypeController {
                 if (spreadSheet[row][column] !== null) {
                   this.aux.ncc = spreadSheet[row][column];
                 } else {
-                  this.aux.ncc = null;
+                  this.aux.ncc = 0;
                 }
               }
 
@@ -749,13 +786,12 @@ export class ImportGenotypeController {
                     gmr: this.aux.gmr,
                     bgm: this.aux.bgm,
                     cruza: this.aux.cruza,
-                    progenitor_f_direto: this.aux.progenitor_f_direto,
-                    progenitor_m_direto: this.aux.progenitor_m_direto,
-                    progenitor_f_origem: this.aux.progenitor_f_origem,
-                    progenitor_m_origem: this.aux.progenitor_m_origem,
-                    progenitores_origem: this.aux.progenitores_origem,
-                    parentesco_completo: this.aux.parentesco_completo,
-                    dt_export: this.aux.dt_export,
+                    progenitor_f_direto: this.aux.progenitor_f_direto ? String(this.aux.progenitor_f_direto) : undefined,
+                    progenitor_m_direto: this.aux.progenitor_m_direto ? String(this.aux.progenitor_m_direto) : undefined,
+                    progenitor_f_origem: this.aux.progenitor_f_origem ? String(this.aux.progenitor_f_origem) : undefined,
+                    progenitor_m_origem: this.aux.progenitor_m_origem ? String(this.aux.progenitor_m_origem) : undefined,
+                    progenitores_origem: this.aux.progenitores_origem ? String(this.aux.progenitores_origem) : undefined,
+                    parentesco_completo: this.aux.parentesco_completo ? String(this.aux.parentesco_completo) : undefined,
                     created_by: createdBy,
                   });
                 } else {
@@ -774,25 +810,25 @@ export class ImportGenotypeController {
                     gmr: this.aux.gmr,
                     bgm: this.aux.bgm,
                     cruza: this.aux.cruza,
-                    progenitor_f_direto: this.aux.progenitor_f_direto,
-                    progenitor_m_direto: this.aux.progenitor_m_direto,
-                    progenitor_f_origem: this.aux.progenitor_f_origem,
-                    progenitor_m_origem: this.aux.progenitor_m_origem,
-                    progenitores_origem: this.aux.progenitores_origem,
-                    parentesco_completo: this.aux.parentesco_completo,
-                    dt_export: this.aux.dt_export,
+                    progenitor_f_direto: String(this.aux.progenitor_f_direto),
+                    progenitor_m_direto: String(this.aux.progenitor_m_direto),
+                    progenitor_f_origem: String(this.aux.progenitor_f_origem),
+                    progenitor_m_origem: String(this.aux.progenitor_m_origem),
+                    progenitores_origem: String(this.aux.progenitores_origem),
+                    parentesco_completo: String(this.aux.parentesco_completo),
                     created_by: createdBy,
                   });
 
                   this.aux.id_genotipo = await genotipo.id;
                 }
 
-                if (this.aux.id_genotipo && this.aux.ncc) {
+                if (this.aux.id_genotipo) {
                   if (this.aux.id_lote) {
                     await loteRepository.updateTransaction(this.aux.id_lote, {
                       id: Number(this.aux.id_lote),
                       id_genotipo: Number(this.aux.id_genotipo),
                       id_safra: Number(idSafra),
+                      id_culture: idCulture,
                       cod_lote: Number(this.aux.cod_lote),
                       id_s2: Number(this.aux.id_s2),
                       id_dados: Number(this.aux.id_dados_lote),
@@ -801,6 +837,7 @@ export class ImportGenotypeController {
                       fase: this.aux.fase,
                       peso: this.aux.peso,
                       quant_sementes: this.aux.quant_sementes,
+                      dt_export: this.aux.dt_export,
                       created_by: createdBy,
                     });
 
@@ -810,6 +847,7 @@ export class ImportGenotypeController {
                     const lote = await loteRepository.createTransaction({
                       id_genotipo: Number(this.aux.id_genotipo),
                       id_safra: Number(idSafra),
+                      id_culture: idCulture,
                       cod_lote: Number(this.aux.cod_lote),
                       id_s2: Number(this.aux.id_s2),
                       id_dados: Number(this.aux.id_dados_lote),
@@ -818,6 +856,7 @@ export class ImportGenotypeController {
                       fase: this.aux.fase,
                       peso: this.aux.peso,
                       quant_sementes: this.aux.quant_sementes,
+                      dt_export: this.aux.dt_export,
                       created_by: createdBy,
                     });
 

@@ -12,6 +12,8 @@ export default function handleOrderForeign(orderBy: any, orderType: any) {
         return `{ "${foreignKey}": { "${foreignColumn}": {"${foreignNextKey}": "${orderType}"} } }`;
       case 'experiment':
         return `{ "${foreignKey}": { "${foreignColumn}": {"${foreignNextKey}": "${orderType}"} } }`;
+      case 'envelope':
+        return `{ "${foreignKey}": { "${foreignColumn}": {"${foreignNextKey}": "${orderType}"} } }`;
       default:
         return '';
     }
@@ -44,6 +46,8 @@ export default function handleOrderForeign(orderBy: any, orderType: any) {
       case 'delineamento':
         return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
       case 'experiment':
+        return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
+      case 'envelope':
         return `{ "${foreignKey}": {"${foreignColumn}": "${orderType}" } }`;
       default:
         return '';

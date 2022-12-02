@@ -310,7 +310,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   // function headerTableFactory(name: any, title: string) {
@@ -386,6 +386,7 @@ export default function Listagem({
                   setCookies('filterBeforeEditOrderBy', orderBy);
                   setCookies('filtersParams', filtersParams);
                   setCookies('lastPage', 'atualizar');
+                  setCookies('takeBeforeEdit', take);
                   router.push(`/config/ensaio/foco/atualizar?id=${rowData.id}`);
                 }}
                 bgColor="bg-blue-600"
@@ -419,6 +420,10 @@ export default function Listagem({
     };
   }
 
+  function returnFalse() {
+    return false;
+  }
+
   function columnsOrder(columnsCampos: string) {
     const columnOrder: string[] = columnsCampos.split(',');
     const tableFields: any = [];
@@ -445,7 +450,7 @@ export default function Listagem({
             title: 'group.group',
             orderList,
             fieldOrder,
-            handleOrder,
+            handleOrder: returnFalse,
           }),
         );
       }
@@ -605,7 +610,6 @@ export default function Listagem({
             <Input
               type="text"
               placeholder="De"
-              max="40"
               id="filterGroupFrom"
               name="filterGroupFrom"
               defaultValue={checkValue('filterGroupFrom')}
@@ -616,7 +620,6 @@ export default function Listagem({
             <Input
               type="text"
               placeholder="Até"
-              max="40"
               id="filterGroupTo"
               name="filterGroupTo"
               defaultValue={checkValue('filterGroupTo')}
@@ -686,7 +689,6 @@ export default function Listagem({
                     <Input
                       type="text"
                       placeholder="Nome"
-                      max="40"
                       id="filterSearch"
                       name="filterSearch"
                       defaultValue={checkValue('filterSearch')}
@@ -899,12 +901,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  // eslint-disable-next-line max-len
-  const itensPerPage = await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page;
-
   const { token } = req.cookies;
   const { safraId } = req.cookies;
   const { cultureId } = req.cookies;
@@ -918,7 +914,12 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('itensPage', { req, res });
   }
+
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
+    : 10;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
@@ -948,6 +949,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
   removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('takeBeforeEdit', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });
   removeCookies('lastPage', { req, res });
 

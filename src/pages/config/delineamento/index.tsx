@@ -125,7 +125,7 @@ export default function Listagem({
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
 
   const [orderList, setOrder] = useState<number>(0);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -148,10 +148,10 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("repeticao"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Trat Repetição',
-      value: 'trat_repeticao',
-      defaultChecked: () => camposGerenciados.includes('trat_repeticao'),
+      name: "CamposGerenciados[]",
+      title: "Trat Repetição",
+      value: "trat_repeticao",
+      defaultChecked: () => camposGerenciados.includes("trat_repeticao"),
     },
     {
       name: "CamposGerenciados[]",
@@ -160,10 +160,10 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("sequencia"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Ação',
-      value: 'status',
-      defaultChecked: () => camposGerenciados.includes('status'),
+      name: "CamposGerenciados[]",
+      title: "Ação",
+      value: "status",
+      defaultChecked: () => camposGerenciados.includes("status"),
     },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -244,15 +244,17 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
-    await delineamentoService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400) {
-        setDelineamento(response.response);
-        setTotalItems(response.total);
-        tableRef.current.dataManager.changePageSize(
-          response.total >= take ? take : response.total
-        );
-      }
-    })
+    await delineamentoService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          setDelineamento(response.response);
+          setTotalItems(response.total);
+          tableRef.current.dataManager.changePageSize(
+            response.total >= take ? take : response.total
+          );
+        }
+      })
       .catch((_) => {
         setLoading(false);
       });
@@ -282,8 +284,8 @@ export default function Listagem({
 
   function statusHeaderFactory() {
     return {
-      title: 'Ação',
-      field: 'status',
+      title: "Ação",
+      field: "status",
       sorting: false,
       searchable: false,
       filterPlaceholder: "Filtrar por status",
@@ -335,8 +337,8 @@ export default function Listagem({
       if (columnCampos[item] === "trat_repeticao") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Trat Repetição',
-            title: 'trat_repeticao',
+            name: "Trat Repetição",
+            title: "trat_repeticao",
             orderList,
             fieldOrder,
             handleOrder,
@@ -372,6 +374,8 @@ export default function Listagem({
                       setCookies("filterBeforeEditOrderBy", orderBy);
                       setCookies("filtersParams", filtersParams);
                       setCookies("lastPage", "sequencia-delineamento");
+                      setCookies("itensPage", itensPerPage);
+                      setCookies("takeBeforeEdit", take);
                       router.push(
                         `delineamento/sequencia-delineamento?id_delineamento=${rowData.id}`
                       );
@@ -450,7 +454,7 @@ export default function Listagem({
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 100);
   }
 
   async function getValuesColumns(): Promise<void> {
@@ -663,7 +667,7 @@ export default function Listagem({
     <>
       {loading && <ComponentLoading text="" />}
       <Head>
-        <title>Listagem dos Layout</title>
+        <title>Listagem dos delineamentos</title>
       </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main
@@ -724,6 +728,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterRepetitionFrom"
                         name="filterRepetitionFrom"
@@ -732,6 +737,7 @@ export default function Listagem({
                       />
                       <Input
                         style={{ marginLeft: 8 }}
+                        type="number"
                         placeholder="Até"
                         id="filterRepetitionTo"
                         name="filterRepetitionTo"
@@ -746,6 +752,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterTratRepetitionFrom"
                         name="filterTratRepetitionFrom"
@@ -754,6 +761,7 @@ export default function Listagem({
                       />
                       <Input
                         style={{ marginLeft: 8 }}
+                        type="number"
                         placeholder="Até"
                         id="filterTratRepetitionTo"
                         name="filterTratRepetitionTo"
@@ -912,7 +920,7 @@ export default function Listagem({
                           }}
                         />
                       </div>
-                      <div className="h-12 flex items-center justify-center w-full">
+                      {/* <div className="h-12 flex items-center justify-center w-full">
                         <Button
                           title="Configurar Importação de Planilha"
                           icon={<RiSettingsFill size={20} />}
@@ -921,7 +929,7 @@ export default function Listagem({
                           onClick={() => {}}
                           href="delineamento/importar-planilha/config-planilha"
                         />
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 ),
@@ -992,12 +1000,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage =
-    (await (
-      await PreferencesControllers.getConfigGerais()
-    )?.response[0]?.itens_per_page) ?? 15;
-
   const { cultureId } = req.cookies;
 
   // Last page
@@ -1009,7 +1011,12 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies("filterBeforeEditTypeOrder", { req, res });
     removeCookies("filterBeforeEditOrderBy", { req, res });
     removeCookies("lastPage", { req, res });
+    removeCookies("itensPage", { req, res });
   }
+
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
+    : 10;
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
@@ -1037,8 +1044,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   removeCookies("filterBeforeEdit", { req, res });
   removeCookies("pageBeforeEdit", { req, res });
-
-  // RR
+  removeCookies("takeBeforeEdit", { req, res });
   removeCookies("filterBeforeEditTypeOrder", { req, res });
   removeCookies("filterBeforeEditOrderBy", { req, res });
   removeCookies("lastPage", { req, res });
