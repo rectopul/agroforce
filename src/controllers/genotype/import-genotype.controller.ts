@@ -75,7 +75,7 @@ export class ImportGenotypeController {
     ];
     const validate: any = await validateHeaders(spreadSheet, headers);
     if (validate.length > 0) {
-      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA' });
+      await logImportController.update({ id: idLog, status: 1, state: 'INVALIDA', updated_at: Date() });
       return { status: 400, message: validate };
     }
 
@@ -100,6 +100,8 @@ export class ImportGenotypeController {
     const tecnologiaController = new TecnologiaController();
 
     const responseIfError: any = [];
+
+    const nccValidate: any = [];
     try {
       const configModule: object | any = await importController.getAll(10);
       if (spreadSheet[0]?.length < 30) {
@@ -116,8 +118,17 @@ export class ImportGenotypeController {
       }
 
       for (const row in spreadSheet) {
-        for (const column in spreadSheet[row]) {
-          if (row !== '0') {
+        if (row !== '0') {
+          if (nccValidate.includes(spreadSheet[row][25])) {
+            responseIfError[Number(25)] += responseGenericFactory(
+              Number(25) + 1,
+              row,
+              spreadSheet[0][25],
+              'esta repetindo não planilha',
+            );
+          }
+          nccValidate.push(spreadSheet[row][25]);
+          for (const column in spreadSheet[row]) {
             // campos genotipo
             if (configModule.response[0]?.fields[column] === 'id_s1') {
               if (spreadSheet[row][column] === null) {
@@ -381,23 +392,20 @@ export class ImportGenotypeController {
                     spreadSheet[0][column],
                     'precisa ser um numero inteiro e positivo e ter 12 dígitos',
                   );
-                }
-                const nccDados: any = [];
-                // eslint-disable-next-line array-callback-return
-                spreadSheet.map((val: any, index: any) => {
-                  if (index === column) {
-                    if (nccDados.includes(val)) {
-                      responseIfError[Number(column)] += responseGenericFactory(
-                        Number(column) + 1,
-                        row,
-                        spreadSheet[0][column],
-                        'o campo ncc não pode ser repetido',
-                      );
-                    } else {
-                      nccDados.push(val);
-                    }
+                } else {
+                  const { response }: IReturnObject = await loteController.getAll({
+                    ncc: spreadSheet[row][column],
+                    id_culture: idCulture,
+                  });
+                  if (response.length > 0) {
+                    responseIfError[Number(column)] += responseGenericFactory(
+                      (Number(column) + 1),
+                      row,
+                      spreadSheet[0][column],
+                      'é chave única na cultura, e já foi cadastrado',
+                    );
                   }
-                });
+                }
               }
             }
             if (configModule.response[0]?.fields[column] === 'DT_EXPORT') {
@@ -411,10 +419,11 @@ export class ImportGenotypeController {
                 // eslint-disable-next-line no-param-reassign
                 spreadSheet[row][column] = new Date(spreadSheet[row][column]);
                 const { status, response }: IReturnObject = await loteController.getAll({
-                  id_dados: spreadSheet[row][20],
+                  id_dados: spreadSheet[row][21],
                   id_culture: idCulture,
                 });
                 const dateNow = new Date();
+
                 if (dateNow.getTime() < spreadSheet[row][column].getTime()) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
@@ -433,6 +442,7 @@ export class ImportGenotypeController {
                 }
                 if (status === 200) {
                   const lastDtImport = response[0]?.dt_export?.getTime();
+
                   if (
                     lastDtImport
                     > spreadSheet[row][column].getTime()
@@ -782,7 +792,6 @@ export class ImportGenotypeController {
                     progenitor_m_origem: this.aux.progenitor_m_origem ? String(this.aux.progenitor_m_origem) : undefined,
                     progenitores_origem: this.aux.progenitores_origem ? String(this.aux.progenitores_origem) : undefined,
                     parentesco_completo: this.aux.parentesco_completo ? String(this.aux.parentesco_completo) : undefined,
-                    dt_export: this.aux.dt_export,
                     created_by: createdBy,
                   });
                 } else {
@@ -807,7 +816,6 @@ export class ImportGenotypeController {
                     progenitor_m_origem: String(this.aux.progenitor_m_origem),
                     progenitores_origem: String(this.aux.progenitores_origem),
                     parentesco_completo: String(this.aux.parentesco_completo),
-                    dt_export: this.aux.dt_export,
                     created_by: createdBy,
                   });
 
@@ -829,6 +837,7 @@ export class ImportGenotypeController {
                       fase: this.aux.fase,
                       peso: this.aux.peso,
                       quant_sementes: this.aux.quant_sementes,
+                      dt_export: this.aux.dt_export,
                       created_by: createdBy,
                     });
 
@@ -847,6 +856,7 @@ export class ImportGenotypeController {
                       fase: this.aux.fase,
                       peso: this.aux.peso,
                       quant_sementes: this.aux.quant_sementes,
+                      dt_export: this.aux.dt_export,
                       created_by: createdBy,
                     });
 

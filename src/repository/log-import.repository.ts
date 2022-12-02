@@ -58,4 +58,16 @@ export class LogImportRepository {
     result.total = count;
     return result;
   }
+
+  async reset() {
+    const result = await prisma.log_import.updateMany({
+      where: {
+        status: 2,
+      },
+      data: {
+        status: 1,
+      },
+    });
+    return result;
+  }
 }

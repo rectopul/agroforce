@@ -402,7 +402,7 @@ export class ImportAssayListController {
       });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date() });
       handleError('Lista de ensaio controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Lista de ensaio' };
     }
@@ -425,19 +425,19 @@ export class ImportAssayListController {
     const genotypeTreatmentController = new GenotypeTreatmentController();
     const logImportController = new LogImportController();
 
-        /* --------- Transcation Context --------- */
-        const transactionConfig = new TransactionConfig();
-        const assayListRepository = new AssayListRepository();
-        assayListRepository.setTransaction(
-          transactionConfig.clientManager,
-          transactionConfig.transactionScope,
-        );
-        const genotypeTreatmentRepository = new GenotypeTreatmentRepository();
-        genotypeTreatmentRepository.setTransaction(
-          transactionConfig.clientManager,
-          transactionConfig.transactionScope,
-        );
-        /* --------------------------------------- */
+    /* --------- Transcation Context --------- */
+    const transactionConfig = new TransactionConfig();
+    const assayListRepository = new AssayListRepository();
+    assayListRepository.setTransaction(
+      transactionConfig.clientManager,
+      transactionConfig.transactionScope,
+    );
+    const genotypeTreatmentRepository = new GenotypeTreatmentRepository();
+    genotypeTreatmentRepository.setTransaction(
+      transactionConfig.clientManager,
+      transactionConfig.transactionScope,
+    );
+    /* --------------------------------------- */
 
     let productivity: number = 0;
     let advance: number = 0;
@@ -470,19 +470,19 @@ export class ImportAssayListController {
             let savedAssayList: any;
             let savedGenotype: any;
 
-            let where = {
-              gli : spreadSheet[row][4],
+            const where = {
+              gli: spreadSheet[row][4],
               id_safra: idSafra,
             };
-            let select = {
+            const select = {
               id: true,
               id_safra: true,
               gli: true,
-              treatmentsNumber: true
+              treatmentsNumber: true,
             };
 
-            const assayList = await assayListRepository.findAll(where,select,undefined,undefined,undefined);
-            let assayListId = assayList[0]?.id;
+            const assayList = await assayListRepository.findAll(where, select, undefined, undefined, undefined);
+            const assayListId = assayList[0]?.id;
             let assayTreatmentsNumber = 1;
 
             if (assayList.total == 0) {
@@ -524,7 +524,7 @@ export class ImportAssayListController {
                 bgm: (spreadSheet[row][6]) ? Number(spreadSheet[row][6]) : null,
                 project: String(spreadSheet[row][7]),
                 created_by: createdBy,
-                treatmentsNumber: assayTreatmentsNumber
+                treatmentsNumber: assayTreatmentsNumber,
               });
               if (verifyToDelete) {
                 await genotypeTreatmentRepository.deleteAll(Number(assayListId));
@@ -555,10 +555,10 @@ export class ImportAssayListController {
           }
         }
       });
-      await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
+      await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO', updated_at: Date() });
       return { status: 200, message: `Ensaios importados (${String(register)}). Produtividade x Avanço (${String(productivity)} x ${String(advance)}) ` };
     } catch (error: any) {
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+      await logImportController.update({ id: idLog, status: 1, state: 'FALHA', updated_at: Date() });
       handleError('Lista de ensaio controller', 'Save Import', error.message);
       return { status: 500, message: 'Erro ao salvar planilha de Lista de ensaio' };
     }

@@ -83,9 +83,8 @@ export default function Listagem({
       ? (tab.statusTab = true)
       : (tab.statusTab = false)
   );
-
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.genotypeTreatment || {
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const preferences = userLogado.preferences.parcelas || {
     id: 0,
     table_preferences:
       "id,foco,type_assay,tecnologia,gli,experiment,culture,status_t,rep,status,nt,npe,genotipo,nca",
@@ -123,10 +122,10 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("type_assay"),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Tecnologia",
-      value: "tecnologia",
-      defaultChecked: () => camposGerenciados.includes("tecnologia"),
+      name: 'CamposGerenciados[]',
+      title: 'Tecnologia',
+      value: 'tecnologia',
+      defaultChecked: () => camposGerenciados.includes('tecnologia'),
     },
     {
       name: "CamposGerenciados[]",
@@ -504,8 +503,8 @@ export default function Listagem({
       if (columnOrder[item] === "tecnologia") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Tecnologia",
-            title: "tecnologia.cod_tec",
+            name: 'Tecnologia',
+            title: 'tecnologia.cod_tec',
             orderList,
             fieldOrder,
             handleOrder,
