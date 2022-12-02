@@ -2,6 +2,8 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable eqeqeq */
 /* eslint-disable no-await-in-loop */
+import { v4 as uuidv4 } from 'uuid';
+import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
 import { SafraController } from './safra.controller';
 import { LocalController } from './local/local.controller';
 import { FocoController } from './foco.controller';
@@ -43,6 +45,7 @@ import { ImportDelimitationController } from './delimitation/delimitation-import
 import { ImportNpeController } from './npe/import-npe.controller';
 import { ImportAllocationController } from './allocation/import-allocation.controller';
 import { ImportExperimentGenotypeController } from './experiment-genotype/import-experiment-genotype.controller';
+import { ImportBlob } from '../services/azure_services/import_blob_azure';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -94,6 +97,8 @@ export class ImportController {
   tecnologiaRepository = new TecnologiaRepository();
 
   aux: object | any = {};
+    
+
 
   async getAll(moduleId: number) {
     try {
@@ -239,6 +244,7 @@ export class ImportController {
       }
 
       if (data.moduleId === 27) {
+        await ImportBlob(data.files[0]);
         return await ImportGenotypeTreatmentController.validate(responseLog?.id, data);
       }
 

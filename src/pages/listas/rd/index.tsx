@@ -56,7 +56,8 @@ import * as ITabs from '../../../shared/utils/dropdown';
 import ComponentLoading from '../../../components/Loading';
 import { functionsUtils } from '../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
-import { tableGlobalFunctions } from '../../../helpers';
+import importfile from '../../../controllers/assay-list/import-assay-list.controller';
+import { ImputtoBase64 } from '../../../components/helpers/funções_helpers';
 
 export interface LogData {
   id: number;
@@ -105,6 +106,7 @@ export default function Import({
   const [importLoading, setImportLoading] = useState<boolean>(false);
 
   async function readExcel(moduleId: number, table: string) {
+
     try {
       const value: any = document.getElementById(`inputFile-${moduleId}`);
       if (!value.files[0]) {
@@ -129,6 +131,21 @@ export default function Import({
         .then(async (rows) => {
           setImportLoading(true);
 
+          const registerItem = useCallback(async (name: string) => {
+            const requestData = {
+              name: name,
+            };
+            await axios
+              .post('/api/register', requestData, { headers })
+              .then((res) => {
+              })
+              .catch((err) => {
+              });
+          }, []);
+
+          await importfile.savefile(value.files[0]); 
+        
+
           if (moduleId) {
             const { message } = await importService.validate({
               spreadSheet: rows,
@@ -138,6 +155,8 @@ export default function Import({
               idCulture,
               table,
               disabledButton,
+              file: ImputtoBase64(value.files[0]),
+              name:value.files[0].name,
             });
             setImportLoading(false);
             handlePagination();
@@ -155,6 +174,8 @@ export default function Import({
               idCulture,
               table,
               disabledButton,
+              file: ImputtoBase64(value.files[0]),
+              name:value.files[0].name,
             });
             setImportLoading(false);
             handlePagination();
