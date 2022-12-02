@@ -642,7 +642,7 @@ export default function Listagem({
         .create({
           table_preferences: campos,
           userId: userLogado.id,
-          module_id: 5,
+          module_id: 14,
         })
         .then((response) => {
           userLogado.preferences.npe = {
@@ -654,7 +654,7 @@ export default function Listagem({
         });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.layout_quadra = {
+      userLogado.preferences.npe = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,

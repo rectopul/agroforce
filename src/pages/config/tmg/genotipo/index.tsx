@@ -1243,7 +1243,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filtersParams', { req, res });
     removeCookies('lastPage', { req, res });
     removeCookies('itensPage', { req, res });
-    // setCookies('filterParams','');
   }
 
   const itensPerPage = req.cookies.takeBeforeEdit
@@ -1253,6 +1252,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
+
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : '';

@@ -1,3 +1,4 @@
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import handleError from '../../shared/utils/handleError';
 import { ExperimentRepository } from '../../repository/experiment.repository';
 import { ReporteRepository } from '../../repository/reporte.repository';
@@ -7,7 +8,6 @@ import { functionsUtils } from '../../shared/utils/functionsUtils';
 import { IReturnObject } from '../../interfaces/shared/Import.interface';
 import { ExperimentGroupController } from '../experiment-group/experiment-group.controller';
 import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
-import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -311,7 +311,7 @@ export class ExperimentController {
             for (const row in data) {
               await experimentRepositoryTransaction.updateTransaction(data[row].id, data[row]);
             }
-          })
+          });
           return { status: 200, message: 'Experimento atualizado' };
         } catch (error: any) {
           handleError('Experimento controller', 'Update', error.message);
