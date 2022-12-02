@@ -10,11 +10,11 @@ import React, {
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { IoIosCloudUpload } from 'react-icons/io';
-
 import {
   AiFillInfoCircle,
   AiOutlineArrowDown,
   AiOutlineArrowUp,
+  AiOutlineStop,
   AiTwotoneStar,
 } from 'react-icons/ai';
 import MaterialTable from 'material-table';
@@ -63,6 +63,7 @@ export interface LogData {
   user_id: number;
   table: string;
   created_at: string;
+  updated_at: string;
 }
 
 interface IGenerateProps {
@@ -189,7 +190,7 @@ export default function Import({
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.rd || {
     id: 0,
-    table_preferences: 'id,user_id,created_at,table,state',
+    table_preferences: 'id,user_id,created_at,table,state,updated_at',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -206,7 +207,8 @@ export default function Import({
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Usuário', value: 'user_id' },
     { name: 'CamposGerenciados[]', title: 'Tabela', value: 'table' },
-    { name: 'CamposGerenciados[]', title: 'Importado em', value: 'created_at' },
+    { name: 'CamposGerenciados[]', title: 'Inicio', value: 'created_at' },
+    { name: 'CamposGerenciados[]', title: 'Fim', value: 'updated_at' },
     { name: 'CamposGerenciados[]', title: 'Status', value: 'state' },
     { name: 'CamposGerenciados[]', title: 'Ação', value: 'action' },
   ]);
@@ -406,8 +408,19 @@ export default function Import({
       if (columnCampos[index] === 'created_at') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Importado em',
+            name: 'Inicio',
             title: 'created_at',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
+      }
+      if (columnCampos[index] === 'updated_at') {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Fim',
+            title: 'updated_at',
             orderList,
             fieldOrder,
             handleOrder,
@@ -550,11 +563,13 @@ export default function Import({
           newItem.TABELA = item.table;
           newItem.STATUS = item.state;
           newItem.IMPORTADO_EM = item.created_at;
+          newItem.FIM_EM = item.updated_at;
 
           delete newItem.user;
           delete newItem.table;
           delete newItem.state;
           delete newItem.created_at;
+          delete newItem.updated_at;
           delete newItem.id;
           delete newItem.status;
           return newItem;
@@ -642,6 +657,24 @@ export default function Import({
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  async function cancelImport() {
+    setImportLoading(true);
+
+    const { status, message } = await logImportService.update({
+      reset: true,
+      created_by: userLogado.id,
+    });
+    if (status === 200) {
+      router.reload();
+    } else if (status === 400) {
+      Swal.fire({
+        html: message,
+        width: 800,
+      });
+      setImportLoading(false);
+    }
+  }
 
   useEffect(() => {
     handlePagination();
@@ -1085,6 +1118,17 @@ export default function Import({
                     <div className="w-full max-h-96 flex items-center justify-between gap-4 bg-gray-50 py-2 px-5 border-solid border-b border-gray-200">
                       <div />
 
+                      <div className="h-12 flex items-left justify-left w-1/12">
+                        <Button
+                          title="Exportar planilha de logs"
+                          icon={<AiOutlineStop size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => {
+                            cancelImport();
+                          }}
+                        />
+                      </div>
                       <strong className="text-blue-600">
                         Total registrado:
                         {' '}
