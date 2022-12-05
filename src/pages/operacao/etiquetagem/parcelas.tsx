@@ -734,8 +734,9 @@ export default function Listagem({
 
     await experimentGenotipeService
       .getAll(parametersFilter)
-      .then(({ status, response }: IReturnObject) => {
+      .then(({ status, response, total }: IReturnObject) => {
         if (status === 200 || status === 400) {
+          setTotalItems(total);
           setParcelas(response);
         }
       });
@@ -932,7 +933,8 @@ export default function Listagem({
 
   async function reprint() {
     setIsLoading(true);
-
+    console.log('rowsSelected');
+    console.log([rowsSelected]);
     const idList = rowsSelected.map((item: any) => item.id);
 
     await experimentGenotipeService.update({
@@ -1507,7 +1509,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
