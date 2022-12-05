@@ -56,7 +56,7 @@ import * as ITabs from '../../../shared/utils/dropdown';
 import ComponentLoading from '../../../components/Loading';
 import { functionsUtils } from '../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
-import importfile from '../../../controllers/assay-list/import-assay-list.controller';
+import { importblob } from '../../../services/azure_services/import_blob_azure';
 import { ImputtoBase64 } from '../../../components/helpers/funções_helpers';
 
 export interface LogData {
@@ -130,20 +130,9 @@ export default function Import({
       readXlsxFile(value.files[0])
         .then(async (rows) => {
           setImportLoading(true);
+          
 
-          const registerItem = useCallback(async (name: string) => {
-            const requestData = {
-              name: name,
-            };
-            await axios
-              .post('/api/register', requestData, { headers })
-              .then((res) => {
-              })
-              .catch((err) => {
-              });
-          }, []);
-
-          await importfile.savefile(value.files[0]); 
+          // await importblob(value.files[0]); 
         
 
           if (moduleId) {
