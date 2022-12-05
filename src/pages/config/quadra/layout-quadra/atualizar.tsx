@@ -41,6 +41,7 @@ import {
 import * as XLSX from 'xlsx';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+import ComponentLoading from "../../../../components/Loading";
 
 interface IFilter {
   filterStatus: object | any;
@@ -74,6 +75,7 @@ export default function Atualizarquadra({
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
+  const [loading, setLoading] = useState<boolean>(false);
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'QUADRAS'
     ? (tab.statusTab = true)
@@ -567,6 +569,7 @@ export default function Atualizarquadra({
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Atualizar layout quadra</title>
       </Head>
