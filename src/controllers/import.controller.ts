@@ -218,7 +218,7 @@ export class ImportController {
       state: 'EM ANDAMENTO',
     });
     try {
-      await importblob(data.files[0]);
+      // await importblob(data.files[0]);
       if (!data.moduleId) return { status: 400, message: 'precisa ser informado o modulo que está sendo acessado!' };
 
       if (status === 400) {

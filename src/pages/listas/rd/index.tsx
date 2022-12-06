@@ -36,7 +36,7 @@ import { useFormik } from 'formik';
 import {
   Box, Tab, Tabs, Typography,
 } from '@mui/material';
-import { fetchWrapper } from 'src/helpers';
+import { fetchWrapper, tableGlobalFunctions } from 'src/helpers';
 import { useRouter } from 'next/router';
 import {
   AccordionFilter,
@@ -56,8 +56,13 @@ import * as ITabs from '../../../shared/utils/dropdown';
 import ComponentLoading from '../../../components/Loading';
 import { functionsUtils } from '../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
-import { importblob } from '../../../services/azure_services/import_blob_azure';
+<<<<<<< Updated upstream
+import importfile from '../../../controllers/assay-list/import-assay-list.controller';
 import { ImputtoBase64 } from '../../../components/helpers/funções_helpers';
+=======
+// import { importblob } from '../../../services/azure_services/import_blob_azure';
+// import { ImputtoBase64 } from '../../../components/helpers/funções_helpers';
+>>>>>>> Stashed changes
 
 export interface LogData {
   id: number;
@@ -144,8 +149,8 @@ export default function Import({
               idCulture,
               table,
               disabledButton,
-              file: ImputtoBase64(value.files[0]),
-              name:value.files[0].name,
+              // file: ImputtoBase64(value.files[0]),
+              // name:value.files[0].name,
             });
             setImportLoading(false);
             handlePagination();
@@ -163,8 +168,8 @@ export default function Import({
               idCulture,
               table,
               disabledButton,
-              file: ImputtoBase64(value.files[0]),
-              name:value.files[0].name,
+              // file: ImputtoBase64(value.files[0]),
+              // name:value.files[0].name,
             });
             setImportLoading(false);
             handlePagination();
