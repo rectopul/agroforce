@@ -83,6 +83,7 @@ export class ImportExperimentGenotypeController {
 
               const { response: treatment } = await experimentGenotipeController.getAll({
                 safraName: spreadSheet[row][0],
+                take: 1
               });
 
               if (treatment.length == 0) {
@@ -102,6 +103,7 @@ export class ImportExperimentGenotypeController {
 
               const { response: treatment } = await experimentGenotipeController.getAll({
                 filterFoco: spreadSheet[row][1],
+                take: 1
               });
 
               if (treatment.length == 0) {
@@ -121,6 +123,7 @@ export class ImportExperimentGenotypeController {
 
               const { response: treatment } = await experimentGenotipeController.getAll({
                 ensaio: spreadSheet[row][2],
+                take: 1
               });
 
               if (treatment.length == 0) {
@@ -139,6 +142,7 @@ export class ImportExperimentGenotypeController {
               } else {
                 const { response: treatment } = await experimentGenotipeController.getAll({
                   filterCodTec: spreadSheet[row][column],
+                  take: 1
                 });
                 if (treatment.length == 0) {
                   responseIfError[Number(column)] += responseGenericFactory(
@@ -157,6 +161,7 @@ export class ImportExperimentGenotypeController {
               }
               const { response: treatment } = await experimentGenotipeController.getAll({
                 gli: spreadSheet[row][4],
+                take: 1
               });
 
               if (treatment.length == 0) {
@@ -188,6 +193,7 @@ export class ImportExperimentGenotypeController {
                   idExperiment: value_hold.idExperiment,
                   npe: spreadSheet[row][10],
                   rep: spreadSheet[row][8],
+                  take: 1
                 });
 
                 if (treatment.length == 0) {
@@ -209,6 +215,7 @@ export class ImportExperimentGenotypeController {
               } else {
                 const { response: treatment } = await experimentGenotipeController.getAll({
                   npe: spreadSheet[row][10],
+                  take: 1
                 });
 
                 if (treatment.length == 0) {
@@ -323,6 +330,7 @@ export class ImportExperimentGenotypeController {
                   idExperiment: value_hold.idExperiment,
                   npe: spreadSheet[row][10],
                   rep: spreadSheet[row][8],
+                  take: 1
                 });
 
                 const { response: genotipo } = await genotipoController.getAll({

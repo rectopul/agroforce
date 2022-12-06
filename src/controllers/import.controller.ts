@@ -45,7 +45,7 @@ import { ImportDelimitationController } from './delimitation/delimitation-import
 import { ImportNpeController } from './npe/import-npe.controller';
 import { ImportAllocationController } from './allocation/import-allocation.controller';
 import { ImportExperimentGenotypeController } from './experiment-genotype/import-experiment-genotype.controller';
-import { importblob } from '../services/azure_services/import_blob_azure';
+// import { importblob } from '../services/azure_services/import_blob_azure';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -218,7 +218,7 @@ export class ImportController {
       state: 'EM ANDAMENTO',
     });
     try {
-      await importblob(data.files[0]);
+      // await importblob(data.files[0]);
       if (!data.moduleId) return { status: 400, message: 'precisa ser informado o modulo que está sendo acessado!' };
 
       if (status === 400) {

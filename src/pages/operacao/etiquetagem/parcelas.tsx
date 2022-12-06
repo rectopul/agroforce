@@ -107,6 +107,7 @@ export default function Listagem({
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
   const [orderList, setOrder] = useState<number>(0);
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
