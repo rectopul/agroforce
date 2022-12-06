@@ -739,6 +739,7 @@ export default function Listagem({
   };
 
   const replacementExcel = async (): Promise<void> => {
+    setLoading(true);
     await experimentGenotipeService
       .getAll(filter)
       .then(({ status, response }) => {
@@ -784,6 +785,7 @@ export default function Listagem({
           XLSX.writeFile(workBook, "Substituição-parcelas.xlsx");
         }
       });
+      setLoading(false);
   };
 
   // manage total pages

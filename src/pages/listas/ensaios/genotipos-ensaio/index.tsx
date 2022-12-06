@@ -749,6 +749,7 @@ export default function Listagem({
   };
 
   const replacementExcel = async (): Promise<void> => {
+    setLoading(true);
     await genotypeTreatmentService
       .getAll(`${filter}&excel=true`)
       .then(({ status, response }) => {
@@ -788,6 +789,7 @@ export default function Listagem({
           XLSX.writeFile(workBook, 'Substituição-genótipos.xlsx');
         }
       });
+      setLoading(false);
   };
 
   // manage total pages
