@@ -49,6 +49,7 @@ export class ImportExperimentGenotypeController {
 
       for (const row in spreadSheet) {
         if (row !== '0') {
+          
           // experiments
           if (spreadSheet[row][5] != null) {
             const experiments: any = await experimentController.getFromExpName(spreadSheet[row][5]);
@@ -326,13 +327,12 @@ export class ImportExperimentGenotypeController {
                 const { response: treatment } = await experimentGenotipeController.getAll({
                   nt: Number(spreadSheet[row][9]),
                   gli: spreadSheet[row][4],
-                  treatments_number: spreadSheet[row][8], // Nt Value
-                  idExperiment: value_hold.idExperiment,
+                  // treatments_number: spreadSheet[row][8], // Nt Value
                   npe: spreadSheet[row][10],
                   rep: spreadSheet[row][8],
                   take: 1
                 });
-
+                
                 const { response: genotipo } = await genotipoController.getAll({
                   name_genotipo: spreadSheet[row][15], // New genetic Name
                 });
@@ -341,7 +341,8 @@ export class ImportExperimentGenotypeController {
                   ncc: spreadSheet[row][16], // NEW NCA
                   filterGenotipo: spreadSheet[row][15], // new geneticName
                 });
-
+                console.log("🚀 ~ file: import-experiment-genotype.controller.ts:335 ~ ImportExperimentGenotypeController ~ awaittransactionConfig.transactionScope.run ~ treatment", treatment)
+                
                 const response12 = await experimentGenotipeRepository.updateTransaction(treatment[0]?.id, {
                   id: treatment[0]?.id,
                   gli: spreadSheet[row][4],
@@ -367,7 +368,9 @@ export class ImportExperimentGenotypeController {
               }
             }
           });
-
+          await logImportController.update({
+            id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
+          });
           return { status: 200, message: 'Sub. de parcelas importado com sucesso' };
         } catch (error: any) {
           await logImportController.update({
