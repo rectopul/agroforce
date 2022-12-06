@@ -26,4 +26,6 @@
 
 //   await blobClient.uploadData(file, options);
 // }
-console.log('teste')
+export function teste() { 
+  console.log('teste')
+}

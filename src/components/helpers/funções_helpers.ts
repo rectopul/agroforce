@@ -9,4 +9,6 @@
 //   const value: any = document.getElementById(`inputFile-${moduleId}`);
 //   const file = document.querySelector(value).files[0];
 // }
-console.log('teste')
+export function teste() { 
+  console.log('teste')
+}

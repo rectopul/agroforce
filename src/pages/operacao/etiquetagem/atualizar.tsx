@@ -72,6 +72,7 @@ export default function Listagem({
   );
   const [experiments, setExperiments] = useState<IExperiments[] | any>([]);
   const [tableMessage, setMessage] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(0);
   const [afterFilter, setAfterFilter] = useState<boolean>(false);

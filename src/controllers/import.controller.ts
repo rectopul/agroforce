@@ -45,7 +45,7 @@ import { ImportDelimitationController } from './delimitation/delimitation-import
 import { ImportNpeController } from './npe/import-npe.controller';
 import { ImportAllocationController } from './allocation/import-allocation.controller';
 import { ImportExperimentGenotypeController } from './experiment-genotype/import-experiment-genotype.controller';
-import { importblob } from '../services/azure_services/import_blob_azure';
+// import { importblob } from '../services/azure_services/import_blob_azure';
 
 export class ImportController {
   importRepository = new ImportRepository();
