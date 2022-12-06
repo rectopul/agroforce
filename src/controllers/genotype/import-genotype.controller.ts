@@ -77,7 +77,7 @@ export class ImportGenotypeController {
     if (validate.length > 0) {
       const responseStringError = validate.join('').replace(/undefined/g, '');
       await logImportController.update({
-        id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: responseStringError,
+        id: idLog, status: 1, state: 'INVALIDA', updated_at: Date().toLocaleString(), invalid_data: responseStringError,
       });
       return { status: 400, message: validate };
     }

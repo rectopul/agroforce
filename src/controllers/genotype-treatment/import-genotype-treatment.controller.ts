@@ -289,12 +289,12 @@ export class ImportGenotypeTreatmentController {
           });
 
           await logImportController.update({
-            id: idLog, status: 1, state: 'SUCESSO', updated_at: Date(),
+            id: idLog, status: 1, state: 'SUCESSO', updated_at: Date().toLocaleString(),
           });
           return { status: 200, message: 'Tratamento de genótipo importado com sucesso' };
         } catch (error: any) {
           await logImportController.update({
-            id: idLog, status: 1, state: 'FALHA', updated_at: Date(),
+            id: idLog, status: 1, state: 'FALHA', updated_at: Date().toLocaleString(),
           });
           handleError('Tratamento de genótipo controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de tratamento de genótipo' };
@@ -302,12 +302,12 @@ export class ImportGenotypeTreatmentController {
       }
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       await logImportController.update({
-        id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: responseStringError,
+        id: idLog, status: 1, state: 'INVALIDA', updated_at: Date().toLocaleString(), invalid_data: responseStringError,
       });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
       await logImportController.update({
-        id: idLog, status: 1, state: 'FALHA', updated_at: Date(),
+        id: idLog, status: 1, state: 'FALHA', updated_at: Date().toLocaleString(),
       });
       handleError('Tratamento de genótipo controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de tratamento de genótipo' };

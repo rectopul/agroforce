@@ -38,7 +38,7 @@ export class ImportTechnologyController {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
         await logImportController.update({
-          id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: validate,
+          id: idLog, status: 1, state: 'INVALIDA', updated_at: Date().toLocaleString(), invalid_data: validate,
         });
         return { status: 400, message: validate };
       }
@@ -212,12 +212,12 @@ export class ImportTechnologyController {
           });
 
           await logImportController.update({
-            id: idLog, status: 1, state: 'SUCESSO', updated_at: Date(),
+            id: idLog, status: 1, state: 'SUCESSO', updated_at: Date().toLocaleString(),
           });
           return { status: 200, message: 'Tecnologia importado com sucesso' };
         } catch (error: any) {
           await logImportController.update({
-            id: idLog, status: 1, state: 'FALHA', updated_at: Date(),
+            id: idLog, status: 1, state: 'FALHA', updated_at: Date().toLocaleString(),
           });
           handleError('Tecnologia controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de tecnologia' };
@@ -226,12 +226,12 @@ export class ImportTechnologyController {
 
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       await logImportController.update({
-        id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: responseStringError,
+        id: idLog, status: 1, state: 'INVALIDA', updated_at: Date().toLocaleString(), invalid_data: responseStringError,
       });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
       await logImportController.update({
-        id: idLog, status: 1, state: 'FALHA', updated_at: Date(),
+        id: idLog, status: 1, state: 'FALHA', updated_at: Date().toLocaleString(),
       });
       handleError('Tecnologia controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de tecnologia' };

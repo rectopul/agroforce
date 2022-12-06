@@ -60,7 +60,7 @@ export class ImportExperimentController {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
         await logImportController.update({
-          id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: validate,
+          id: idLog, status: 1, state: 'INVALIDA', updated_at: Date().toLocaleString(), invalid_data: validate,
         });
         return { status: 400, message: validate };
       }
@@ -79,14 +79,14 @@ export class ImportExperimentController {
           if (experiment?.length > 0) {
             if (experiment[0].status !== 'IMPORTADO') {
               await logImportController.update({
-                id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: `Erro na linha ${Number(row) + 1}. Experimento já cadastrado e utilizado no sistema`,
+                id: idLog, status: 1, state: 'INVALIDA', updated_at: Date().toLocaleString(), invalid_data: `Erro na linha ${Number(row) + 1}. Experimento já cadastrado e utilizado no sistema`,
               });
               return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimento já cadastrado e utilizado no sistema` };
             }
           }
           if (experimentNameTemp.includes(experimentName)) {
             await logImportController.update({
-              id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela`,
+              id: idLog, status: 1, state: 'INVALIDA', updated_at: Date().toLocaleString(), invalid_data: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela`,
             });
 
             experimentNameTemp[row] = experimentName;
@@ -424,12 +424,12 @@ export class ImportExperimentController {
             }
           }
           await logImportController.update({
-            id: idLog, status: 1, state: 'SUCESSO', updated_at: Date(),
+            id: idLog, status: 1, state: 'SUCESSO', updated_at: Date().toLocaleString(),
           });
           return { status: 200, message: 'Experimento importado com sucesso' };
         } catch (error: any) {
           await logImportController.update({
-            id: idLog, status: 1, state: 'FALHA', updated_at: Date(),
+            id: idLog, status: 1, state: 'FALHA', updated_at: Date().toLocaleString(),
           });
           handleError('Experimento controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de experimento' };
@@ -437,12 +437,12 @@ export class ImportExperimentController {
       }
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       await logImportController.update({
-        id: idLog, status: 1, state: 'INVALIDA', updated_at: Date(), invalid_data: responseStringError,
+        id: idLog, status: 1, state: 'INVALIDA', updated_at: Date().toLocaleString(), invalid_data: responseStringError,
       });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
       await logImportController.update({
-        id: idLog, status: 1, state: 'FALHA', updated_at: Date(),
+        id: idLog, status: 1, state: 'FALHA', updated_at: Date().toLocaleString(),
       });
       handleError('Experimento controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de experimento' };
