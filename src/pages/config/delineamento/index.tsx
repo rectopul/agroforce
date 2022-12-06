@@ -577,6 +577,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await delineamentoService.getAll(filter).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
@@ -619,6 +620,7 @@ export default function Listagem({
         XLSX.writeFile(workBook, "Delineamento.xlsx");
       }
     });
+    setLoading(false);
   };
 
   async function handlePagination(): Promise<void> {

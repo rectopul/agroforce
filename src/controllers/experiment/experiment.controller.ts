@@ -271,13 +271,13 @@ export class ExperimentController {
   async update(data: any) {
     try {
       const experimentGenotipeController = new ExperimentGenotipeController();
+      if (data.idList) {
+        await this.experimentRepository.relationGroup(data);
+        const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
+        await this.setParcelasStatus(idList);
+        return { status: 200, message: 'Experimento atualizado' };
+      }
       if (data.id) {
-        if (data.idList) {
-          await this.experimentRepository.relationGroup(data);
-          const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
-          await this.setParcelasStatus(idList);
-          return { status: 200, message: 'Experimento atualizado' };
-        }
         const experimento: any = await this.experimentRepository.findOne(data.id);
         if (!experimento) return { status: 404, message: 'Experimento não encontrado' };
         if (data.experimentGroupId === null) {

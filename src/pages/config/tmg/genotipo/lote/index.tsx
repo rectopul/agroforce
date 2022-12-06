@@ -357,6 +357,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     if (!filterApplication.includes('paramSelect')) {
       filterApplication += `&paramSelect=${camposGerenciados}&id_portfolio=${id_genotipo}`;
     }
@@ -393,6 +394,7 @@ export default function Listagem({
         XLSX.writeFile(workBook, 'Lotes.xlsx');
       }
     });
+    setLoading(false);
   };
 
   function handleTotalPages(): void {

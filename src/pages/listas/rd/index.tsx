@@ -36,7 +36,7 @@ import { useFormik } from 'formik';
 import {
   Box, Tab, Tabs, Typography,
 } from '@mui/material';
-import { fetchWrapper } from 'src/helpers';
+import { fetchWrapper, tableGlobalFunctions } from 'src/helpers';
 import { useRouter } from 'next/router';
 import {
   AccordionFilter,
@@ -56,7 +56,8 @@ import * as ITabs from '../../../shared/utils/dropdown';
 import ComponentLoading from '../../../components/Loading';
 import { functionsUtils } from '../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
-import { tableGlobalFunctions } from '../../../helpers';
+// import { importblob } from '../../../services/azure_services/import_blob_azure';
+// import { ImputtoBase64 } from '../../../components/helpers/funções_helpers';
 
 export interface LogData {
   id: number;
@@ -105,6 +106,7 @@ export default function Import({
   const [importLoading, setImportLoading] = useState<boolean>(false);
 
   async function readExcel(moduleId: number, table: string) {
+
     try {
       const value: any = document.getElementById(`inputFile-${moduleId}`);
       if (!value.files[0]) {
@@ -128,6 +130,10 @@ export default function Import({
       readXlsxFile(value.files[0])
         .then(async (rows) => {
           setImportLoading(true);
+          
+
+          // await importblob(value.files[0]); 
+        
 
           if (moduleId) {
             const { message } = await importService.validate({
@@ -138,6 +144,8 @@ export default function Import({
               idCulture,
               table,
               disabledButton,
+              // file: ImputtoBase64(value.files[0]),
+              // name:value.files[0].name,
             });
             setImportLoading(false);
             handlePagination();
@@ -155,6 +163,8 @@ export default function Import({
               idCulture,
               table,
               disabledButton,
+              // file: ImputtoBase64(value.files[0]),
+              // name:value.files[0].name,
             });
             setImportLoading(false);
             handlePagination();
@@ -554,6 +564,7 @@ export default function Import({
   // }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await logImportService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         response.map((item: any) => {
@@ -592,6 +603,7 @@ export default function Import({
         XLSX.writeFile(workBook, 'Logs.xlsx');
       }
     });
+    setLoading(false);
   };
 
   function handleTotalPages(): void {
@@ -1119,7 +1131,7 @@ export default function Import({
                       <div />
 
                       <div className="h-12 flex items-left justify-left w-1/12">
-                        <Button
+                        {/* <Button
                           title="Exportar planilha de logs"
                           icon={<AiOutlineStop size={20} />}
                           bgColor="bg-blue-600"
@@ -1127,7 +1139,7 @@ export default function Import({
                           onClick={() => {
                             cancelImport();
                           }}
-                        />
+                        /> */}
                       </div>
                       <strong className="text-blue-600">
                         Total registrado:

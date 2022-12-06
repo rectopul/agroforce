@@ -114,7 +114,7 @@ export class FocoController {
         { name: data.name, id_culture: data.id_culture, status: 1 },
       );
 
-      if (focoAlreadyExists) return { status: 409, message: 'Foco já existente' };
+      if (focoAlreadyExists) return { status: 409, message: 'Foco já existe, favor checar registros inativos.' };
 
       const response = await this.focoRepository.create(data);
       await this.reporteRepository.create({
@@ -154,7 +154,7 @@ export class FocoController {
       const focoAlreadyExists = await this.focoRepository.findByName(
         { name: data.name, id_culture: data.id_culture, status: 1 },
       );
-      if (focoAlreadyExists) return { status: 409, message: 'Foco já existente' };
+      if (focoAlreadyExists) return { status: 409, message: 'Foco já existe, favor checar registros inativos.' };
 
       const response = await this.focoRepository.update(data.id, data);
       if (response) {

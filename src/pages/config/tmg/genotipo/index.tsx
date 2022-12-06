@@ -726,6 +726,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await genotipoService.getAll(filter).then(({ response, status }) => {
       if (status === 200) {
         const newData = response.map((row: any) => {
@@ -832,6 +833,7 @@ export default function Listagem({
         Swal.fire(response);
       }
     });
+    setLoading(false);
   };
 
   // manage total pages

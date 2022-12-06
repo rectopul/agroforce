@@ -72,6 +72,7 @@ export default function Listagem({
   );
   const [experiments, setExperiments] = useState<IExperiments[] | any>([]);
   const [tableMessage, setMessage] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(0);
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
@@ -410,6 +411,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await experimentService.getAll(filter).then(({ status, response }: any) => {
       if (status === 200) {
         const newData = response.map((item: any) => {
@@ -465,6 +467,7 @@ export default function Listagem({
         XLSX.writeFile(workBook, 'Experimentos.xlsx');
       }
     });
+    setLoading(false);
   };
 
   function handleTotalPages(): void {
@@ -548,7 +551,7 @@ export default function Listagem({
       userId: userLogado.id,
     });
     if (status === 200) {
-      router.reload();
+      handlePagination();
     } else {
       Swal.fire({
         html: message,

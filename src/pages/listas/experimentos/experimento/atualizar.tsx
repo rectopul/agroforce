@@ -43,6 +43,7 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+import ComponentLoading from "../../../../components/Loading";
 
 export interface IData {
   // allItens: any;
@@ -103,6 +104,7 @@ export default function AtualizarLocal({
   const router = useRouter();
 
   const tableRef = useRef<any>();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.parcelas || {
@@ -545,6 +547,7 @@ export default function AtualizarLocal({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     if (!filterApplication.includes('paramSelect')) {
       filterApplication += `&paramSelect=${camposGerenciados}&id_experimento=${idExperiment}`;
     }
@@ -584,6 +587,7 @@ export default function AtualizarLocal({
     //     XLSX.writeFile(workBook, 'unidade-cultura.xlsx');
     //   }
     // });
+    setLoading(false);
   };
 
   // function handleTotalPages(): void {
@@ -682,6 +686,7 @@ export default function AtualizarLocal({
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Dados do experimento</title>
       </Head>

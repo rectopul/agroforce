@@ -107,6 +107,7 @@ export default function Listagem({
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
   const [orderList, setOrder] = useState<number>(0);
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
@@ -666,6 +667,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await experimentGenotipeService
       .getAll(filter)
       .then(({ status, response }) => {
@@ -707,6 +709,7 @@ export default function Listagem({
           XLSX.writeFile(workBook, 'Parcelas.xlsx');
         }
       });
+      setLoading(false);
   };
 
   function handleTotalPages(): void {
@@ -732,8 +735,9 @@ export default function Listagem({
 
     await experimentGenotipeService
       .getAll(parametersFilter)
-      .then(({ status, response }: IReturnObject) => {
+      .then(({ status, response, total }: IReturnObject) => {
         if (status === 200 || status === 400) {
+          setTotalItems(total);
           setParcelas(response);
         }
       });
@@ -930,7 +934,8 @@ export default function Listagem({
 
   async function reprint() {
     setIsLoading(true);
-
+    console.log('rowsSelected');
+    console.log([rowsSelected]);
     const idList = rowsSelected.map((item: any) => item.id);
 
     await experimentGenotipeService.update({
@@ -1505,7 +1510,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages)}
+                      onClick={() => setCurrentPage(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}

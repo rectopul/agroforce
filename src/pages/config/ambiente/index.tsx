@@ -719,6 +719,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await npeService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((row: any) => {
@@ -783,6 +784,7 @@ export default function Listagem({
         Swal.fire("Não existem registros para serem exportados, favor checar.");
       }
     });
+    setLoading(false);
   };
 
   // manage total pages

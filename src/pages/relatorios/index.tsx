@@ -430,6 +430,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await reporteService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((item: any) => {
@@ -465,6 +466,7 @@ export default function Listagem({
         XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
       }
     });
+    setLoading(false);
   };
 
   // manage total pages

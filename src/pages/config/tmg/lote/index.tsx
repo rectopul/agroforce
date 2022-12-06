@@ -518,6 +518,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await loteService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((item: any) => {
@@ -598,6 +599,7 @@ export default function Listagem({
         Swal.fire(response);
       }
     });
+    setLoading(false);
   };
 
   const columns = columnsOrder(camposGerenciados);
