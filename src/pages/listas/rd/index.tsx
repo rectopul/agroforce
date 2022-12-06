@@ -144,7 +144,7 @@ export default function Import({
               idCulture,
               table,
               disabledButton,
-              file: ImputtoBase64(value.files[0]),
+              // file: ImputtoBase64(value.files[0]),
               name:value.files[0].name,
             });
             setImportLoading(false);
@@ -163,7 +163,7 @@ export default function Import({
               idCulture,
               table,
               disabledButton,
-              file: ImputtoBase64(value.files[0]),
+              // file: ImputtoBase64(value.files[0]),
               name:value.files[0].name,
             });
             setImportLoading(false);
