@@ -401,11 +401,12 @@ export class ImportAssayListController {
         status: 1,
         state: 'INVALIDA',
         invalid_data: responseStringError,
+        updated_at: new Date(Date.now())
       });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
       await logImportController.update({
-        id: idLog, status: 1, state: 'FALHA', updated_at: Date().toLocaleString(),
+        id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
       handleError('Lista de ensaio controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Lista de ensaio' };
@@ -560,12 +561,12 @@ export class ImportAssayListController {
         }
       });
       await logImportController.update({
-        id: idLog, status: 1, state: 'SUCESSO', updated_at: Date().toLocaleString(),
+        id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
       });
       return { status: 200, message: `Ensaios importados (${String(register)}). Produtividade x Avanço (${String(productivity)} x ${String(advance)}) ` };
     } catch (error: any) {
       await logImportController.update({
-        id: idLog, status: 1, state: 'FALHA', updated_at: Date().toLocaleString(),
+        id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
       handleError('Lista de ensaio controller', 'Save Import', error.message);
       return { status: 500, message: 'Erro ao salvar planilha de Lista de ensaio' };

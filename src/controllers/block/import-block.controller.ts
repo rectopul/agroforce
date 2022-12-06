@@ -60,7 +60,7 @@ export class ImportBlockController {
       const validate: any = await validateHeaders(spreadSheet, headers);
       if (validate.length > 0) {
         await logImportController.update({
-          id: idLog, status: 1, state: 'INVALIDA', updated_at: Date().toLocaleString(), invalid_data: validate,
+          id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: validate,
         });
 
         return { status: 400, message: validate };
@@ -705,25 +705,25 @@ export class ImportBlockController {
             }
           }
           await logImportController.update({
-            id: idLog, status: 1, state: 'SUCESSO', updated_at: Date().toLocaleString(),
+            id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
           });
           return { status: 200, message: 'Quadra importada com sucesso' };
         } catch (error: any) {
           await logImportController.update({
-            id: idLog, status: 1, state: 'FALHA', updated_at: Date().toLocaleString(),
+            id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
           });
           handleError('Quadra controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de Quadra' };
         }
       }
       await logImportController.update({
-        id: idLog, status: 1, state: 'FALHA', updated_at: Date().toLocaleString(),
+        id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       return { status: 400, message: responseStringError };
     } catch (error: any) {
       await logImportController.update({
-        id: idLog, status: 1, state: 'FALHA', updated_at: Date().toLocaleString(),
+        id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
       handleError('Quadra controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Quadra' };
