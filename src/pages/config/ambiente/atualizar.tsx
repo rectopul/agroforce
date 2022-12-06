@@ -305,7 +305,7 @@ export default function NovoLocal({
                 Epoca
               </label>
               <Input
-                type="number"
+                type="int"
                 placeholder="1"
                 id="epoca"
                 name="epoca"
@@ -337,7 +337,7 @@ export default function NovoLocal({
               </label>
               <Input
                 size={7}
-                type="number"
+                type="int"
                 placeholder="10"
                 id="cod_tec"
                 name="cod_tec"
@@ -377,7 +377,7 @@ export default function NovoLocal({
                 NPE Inicial
               </label>
               <Input
-                type="number"
+                type="int"
                 placeholder="1"
                 id="npei"
                 name="npei"
@@ -392,7 +392,7 @@ export default function NovoLocal({
                 NPE Final
               </label>
               <Input
-                type="number"
+                type="int"
                 placeholder="1"
                 id="npef"
                 name="npef"
@@ -407,7 +407,7 @@ export default function NovoLocal({
                 Prox NPE
               </label>
               <Input
-                type="number"
+                type="int"
                 placeholder="0"
                 id="prox_npe"
                 name="prox_npe"

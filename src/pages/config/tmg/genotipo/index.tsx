@@ -930,7 +930,7 @@ export default function Listagem({
         <div className="grid grid-cols-2 gap-2">
           <div>
             <Input
-              type="number"
+              type="int"
               placeholder="De"
               id="filterLotsFrom"
               name="filterLotsFrom"
@@ -939,7 +939,7 @@ export default function Listagem({
           </div>
           <div>
             <Input
-              type="number"
+              type="int"
               placeholder="Até"
               id="filterLotsTo"
               name="filterLotsTo"

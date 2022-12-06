@@ -137,7 +137,7 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
               <Input
                 id="repeticao"
                 name="repeticao"
-                type="number"
+                type="int"
                 placeholder="ex: 1"
                 onChange={formik.handleChange}
                 value={formik.values.repeticao}
@@ -151,7 +151,7 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
               <Input
                 id="sorteio"
                 name="sorteio"
-                type="number"
+                type="int"
                 placeholder="ex: 1"
                 onChange={formik.handleChange}
                 value={formik.values.sorteio}
@@ -174,7 +174,7 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
               <Input
                 id="nt"
                 name="nt"
-                type="number"
+                type="int"
                 placeholder="ex: 1"
                 onChange={formik.handleChange}
                 value={formik.values.nt}
@@ -188,7 +188,7 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
               <Input
                 id="bloco"
                 name="bloco"
-                type="number"
+                type="int"
                 placeholder="ex: 1"
                 onChange={formik.handleChange}
                 value={formik.values.bloco}

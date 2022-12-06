@@ -843,7 +843,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterPopFrom"
                         name="filterPopFrom"
@@ -852,7 +852,7 @@ export default function Listagem({
                       />
                       <Input
                         style={{ marginLeft: 8 }}
-                        type="number"
+                        type="int"
                         placeholder="Até"
                         id="filterPopTo"
                         name="filterPopTo"
@@ -868,14 +868,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterShotsFrom"
                         name="filterShotsFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterShotsTo"
@@ -891,14 +891,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterParcelFrom"
                         name="filterParcelFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterParcelTo"

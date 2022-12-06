@@ -1288,14 +1288,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterNtFrom"
                         name="filterNtFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNtTo"
