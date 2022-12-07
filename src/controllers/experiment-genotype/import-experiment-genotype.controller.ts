@@ -49,7 +49,6 @@ export class ImportExperimentGenotypeController {
 
       for (const row in spreadSheet) {
         if (row !== '0') {
-          
           // experiments
           if (spreadSheet[row][5] != null) {
             const experiments: any = await experimentController.getFromExpName(spreadSheet[row][5]);
@@ -334,12 +333,12 @@ export class ImportExperimentGenotypeController {
                 });
                 
                 const { response: genotipo } = await genotipoController.getAll({
-                  name_genotipo: spreadSheet[row][15], // New genetic Name
+                  name_genotipo: spreadSheet[row][14], // New genetic Name
                 });
 
                 const { response: lote } = await loteController.getAll({
                   ncc: spreadSheet[row][16], // NEW NCA
-                  filterGenotipo: spreadSheet[row][15], // new geneticName
+                  filterGenotipo: spreadSheet[row][14], // new geneticName
                 });
                 console.log("🚀 ~ file: import-experiment-genotype.controller.ts:335 ~ ImportExperimentGenotypeController ~ awaittransactionConfig.transactionScope.run ~ treatment", treatment)
                 
@@ -349,7 +348,7 @@ export class ImportExperimentGenotypeController {
                   idExperiment: value_hold.idExperiment,
                   nt: Number(spreadSheet[row][9]),
                   rep: spreadSheet[row][8],
-                  status_t: spreadSheet[row][14],
+                  status_t: spreadSheet[row][15],
                   idGenotipo: lote[0]?.id_genotipo,
                   idLote: lote[0]?.id,
                   nca: spreadSheet[row][16].toString(),
