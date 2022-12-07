@@ -381,7 +381,7 @@ export class ImportExperimentGenotypeController {
       }
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       await logImportController.update({
-        id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()), invalid_data: responseStringError,
+        id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: responseStringError,
       });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
