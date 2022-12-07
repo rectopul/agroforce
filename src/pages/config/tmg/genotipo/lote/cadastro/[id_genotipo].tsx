@@ -104,7 +104,7 @@ export default function Cadastro({ id_genotipo }: IIdGenotipo) {
                 Volume
               </label>
               <Input
-                type="number"
+                type="int"
                 placeholder="ex: 500"
                 id="volume"
                 name="volume"

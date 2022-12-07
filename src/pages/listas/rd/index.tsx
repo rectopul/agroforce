@@ -1081,6 +1081,22 @@ export default function Import({
                         onChange={formik.handleChange}
                       />
                     </div>
+
+                    <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Finalizado em:
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="Fim"
+                        id="updated_at"
+                        name="updated_at"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                    
                     {filterFieldFactory('filterState', 'Status')}
 
                     <FieldItemsPerPage
