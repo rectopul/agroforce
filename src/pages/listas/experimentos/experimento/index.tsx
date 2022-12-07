@@ -897,7 +897,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="Época"
                         id="filterPeriod"
                         name="filterPeriod"
@@ -914,7 +914,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterRepetitionFrom"
                         name="filterRepetitionFrom"
@@ -922,7 +922,7 @@ export default function Listagem({
                       />
                       <Input
                         style={{ marginLeft: 8 }}
-                        type="number"
+                        type="int"
                         placeholder="Até"
                         id="filterRepetitionTo"
                         name="filterRepetitionTo"

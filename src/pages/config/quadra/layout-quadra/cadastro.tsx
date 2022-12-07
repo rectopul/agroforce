@@ -250,7 +250,7 @@ export default function NovoLocal({ local }: IData) {
                 *Sementes por Metros
               </label>
               <Input
-                type="number"
+                type="int"
                 placeholder="10"
                 id="semente_metros"
                 name="semente_metros"
@@ -407,7 +407,7 @@ export default function NovoLocal({ local }: IData) {
                 *T4 Inicial
               </label>
               <Input
-                type="number"
+                type="int"
                 placeholder="10"
                 id="t4_inicial"
                 name="t4_inicial"

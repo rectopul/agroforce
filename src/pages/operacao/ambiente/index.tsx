@@ -687,14 +687,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterNpeFrom"
                         name="filterNpeFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNpeTo"
@@ -710,14 +710,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterNpeFinalFrom"
                         name="filterNpeFinalFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNpeFinalTo"
@@ -733,14 +733,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterGrpFrom"
                         name="filterGrpFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterGrpTo"
