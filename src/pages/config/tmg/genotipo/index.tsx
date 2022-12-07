@@ -726,6 +726,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await genotipoService.getAll(filter).then(({ response, status }) => {
       if (status === 200) {
         const newData = response.map((row: any) => {
@@ -832,6 +833,7 @@ export default function Listagem({
         Swal.fire(response);
       }
     });
+    setLoading(false);
   };
 
   // manage total pages
@@ -928,7 +930,7 @@ export default function Listagem({
         <div className="grid grid-cols-2 gap-2">
           <div>
             <Input
-              type="number"
+              type="int"
               placeholder="De"
               id="filterLotsFrom"
               name="filterLotsFrom"
@@ -937,7 +939,7 @@ export default function Listagem({
           </div>
           <div>
             <Input
-              type="number"
+              type="int"
               placeholder="Até"
               id="filterLotsTo"
               name="filterLotsTo"
@@ -1243,7 +1245,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filtersParams', { req, res });
     removeCookies('lastPage', { req, res });
     removeCookies('itensPage', { req, res });
-    // setCookies('filterParams','');
   }
 
   const itensPerPage = req.cookies.takeBeforeEdit
@@ -1253,6 +1254,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
+
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : '';

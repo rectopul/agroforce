@@ -581,6 +581,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await unidadeCulturaService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((row: any) => {
@@ -647,6 +648,7 @@ export default function Listagem({
         XLSX.writeFile(workBook, 'Unidade-cultura.xlsx');
       }
     });
+    setLoading(false);
   };
 
   // manage total pages
@@ -754,14 +756,14 @@ export default function Listagem({
                     </label>
                     <div className="flex gap-2">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterYearFrom"
                         name="filterYearFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="Até"
                         id="filterYearTo"
                         name="filterYearTo"

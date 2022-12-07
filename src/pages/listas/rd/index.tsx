@@ -10,11 +10,11 @@ import React, {
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { IoIosCloudUpload } from 'react-icons/io';
-
 import {
   AiFillInfoCircle,
   AiOutlineArrowDown,
   AiOutlineArrowUp,
+  AiOutlineStop,
   AiTwotoneStar,
 } from 'react-icons/ai';
 import MaterialTable from 'material-table';
@@ -36,7 +36,7 @@ import { useFormik } from 'formik';
 import {
   Box, Tab, Tabs, Typography,
 } from '@mui/material';
-import { fetchWrapper } from 'src/helpers';
+import { fetchWrapper, tableGlobalFunctions } from 'src/helpers';
 import { useRouter } from 'next/router';
 import {
   AccordionFilter,
@@ -56,13 +56,15 @@ import * as ITabs from '../../../shared/utils/dropdown';
 import ComponentLoading from '../../../components/Loading';
 import { functionsUtils } from '../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
-import { tableGlobalFunctions } from '../../../helpers';
+// import { importblob } from '../../../services/azure_services/import_blob_azure';
+// import { ImputtoBase64 } from '../../../components/helpers/funções_helpers';
 
 export interface LogData {
   id: number;
   user_id: number;
   table: string;
   created_at: string;
+  updated_at: string;
 }
 
 interface IGenerateProps {
@@ -104,6 +106,7 @@ export default function Import({
   const [importLoading, setImportLoading] = useState<boolean>(false);
 
   async function readExcel(moduleId: number, table: string) {
+
     try {
       const value: any = document.getElementById(`inputFile-${moduleId}`);
       if (!value.files[0]) {
@@ -127,6 +130,10 @@ export default function Import({
       readXlsxFile(value.files[0])
         .then(async (rows) => {
           setImportLoading(true);
+          
+
+          // await importblob(value.files[0]); 
+        
 
           if (moduleId) {
             const { message } = await importService.validate({
@@ -137,6 +144,8 @@ export default function Import({
               idCulture,
               table,
               disabledButton,
+              // file: ImputtoBase64(value.files[0]),
+              // name:value.files[0].name,
             });
             setImportLoading(false);
             handlePagination();
@@ -154,6 +163,8 @@ export default function Import({
               idCulture,
               table,
               disabledButton,
+              // file: ImputtoBase64(value.files[0]),
+              // name:value.files[0].name,
             });
             setImportLoading(false);
             handlePagination();
@@ -189,7 +200,7 @@ export default function Import({
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.rd || {
     id: 0,
-    table_preferences: 'id,user_id,created_at,table,state',
+    table_preferences: 'id,user_id,created_at,table,state,updated_at',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -206,7 +217,8 @@ export default function Import({
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Usuário', value: 'user_id' },
     { name: 'CamposGerenciados[]', title: 'Tabela', value: 'table' },
-    { name: 'CamposGerenciados[]', title: 'Importado em', value: 'created_at' },
+    { name: 'CamposGerenciados[]', title: 'Inicio', value: 'created_at' },
+    { name: 'CamposGerenciados[]', title: 'Fim', value: 'updated_at' },
     { name: 'CamposGerenciados[]', title: 'Status', value: 'state' },
     { name: 'CamposGerenciados[]', title: 'Ação', value: 'action' },
   ]);
@@ -406,8 +418,19 @@ export default function Import({
       if (columnCampos[index] === 'created_at') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Importado em',
+            name: 'Inicio',
             title: 'created_at',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
+      }
+      if (columnCampos[index] === 'updated_at') {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Fim',
+            title: 'updated_at',
             orderList,
             fieldOrder,
             handleOrder,
@@ -541,6 +564,7 @@ export default function Import({
   // }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await logImportService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         response.map((item: any) => {
@@ -550,11 +574,13 @@ export default function Import({
           newItem.TABELA = item.table;
           newItem.STATUS = item.state;
           newItem.IMPORTADO_EM = item.created_at;
+          newItem.FIM_EM = item.updated_at;
 
           delete newItem.user;
           delete newItem.table;
           delete newItem.state;
           delete newItem.created_at;
+          delete newItem.updated_at;
           delete newItem.id;
           delete newItem.status;
           return newItem;
@@ -577,6 +603,7 @@ export default function Import({
         XLSX.writeFile(workBook, 'Logs.xlsx');
       }
     });
+    setLoading(false);
   };
 
   function handleTotalPages(): void {
@@ -642,6 +669,24 @@ export default function Import({
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  async function cancelImport() {
+    setImportLoading(true);
+
+    const { status, message } = await logImportService.update({
+      reset: true,
+      created_by: userLogado.id,
+    });
+    if (status === 200) {
+      router.reload();
+    } else if (status === 400) {
+      Swal.fire({
+        html: message,
+        width: 800,
+      });
+      setImportLoading(false);
+    }
+  }
 
   useEffect(() => {
     handlePagination();
@@ -1036,6 +1081,22 @@ export default function Import({
                         onChange={formik.handleChange}
                       />
                     </div>
+
+                    <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Finalizado em:
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="Fim"
+                        id="updated_at"
+                        name="updated_at"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                    
                     {filterFieldFactory('filterState', 'Status')}
 
                     <FieldItemsPerPage
@@ -1085,6 +1146,17 @@ export default function Import({
                     <div className="w-full max-h-96 flex items-center justify-between gap-4 bg-gray-50 py-2 px-5 border-solid border-b border-gray-200">
                       <div />
 
+                      <div className="h-12 flex items-left justify-left w-1/12">
+                        {/* <Button
+                          title="Exportar planilha de logs"
+                          icon={<AiOutlineStop size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => {
+                            cancelImport();
+                          }}
+                        /> */}
+                      </div>
                       <strong className="text-blue-600">
                         Total registrado:
                         {' '}

@@ -2,6 +2,8 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable eqeqeq */
 /* eslint-disable no-await-in-loop */
+import { v4 as uuidv4 } from 'uuid';
+import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
 import { SafraController } from './safra.controller';
 import { LocalController } from './local/local.controller';
 import { FocoController } from './foco.controller';
@@ -43,6 +45,7 @@ import { ImportDelimitationController } from './delimitation/delimitation-import
 import { ImportNpeController } from './npe/import-npe.controller';
 import { ImportAllocationController } from './allocation/import-allocation.controller';
 import { ImportExperimentGenotypeController } from './experiment-genotype/import-experiment-genotype.controller';
+// import { importblob } from '../services/azure_services/import_blob_azure';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -162,6 +165,7 @@ export class ImportController {
           id: responseLog?.id,
           status: 1,
           state: 'INVALIDA',
+          invalid_data: protocolMessage,
         });
         return { status: 400, message: protocolMessage };
       }
@@ -179,10 +183,13 @@ export class ImportController {
           return { status: 400, response: [], message: 'Nenhum protocol_level configurado ' };
       }
     } catch (error: any) {
+      const responseIfError: any = [];
+      const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       await this.logImportController.update({
         id: responseLog?.id,
         status: 1,
         state: 'FALHA',
+        invalid_data: responseStringError,
       });
       handleError('Validate protocol controller', 'Validate protocol', error.message);
       throw new Error('[Controller] - Validate protocol erro');
@@ -211,6 +218,7 @@ export class ImportController {
       state: 'EM ANDAMENTO',
     });
     try {
+      // await importblob(data.files[0]);
       if (!data.moduleId) return { status: 400, message: 'precisa ser informado o modulo que está sendo acessado!' };
 
       if (status === 400) {

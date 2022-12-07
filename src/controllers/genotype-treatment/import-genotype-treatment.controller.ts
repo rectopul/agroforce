@@ -262,7 +262,8 @@ export class ImportGenotypeTreatmentController {
                 const { response: lote } = await loteController.getAll({
                   ncc: spreadSheet[row][12],
                 });
-                await genotypeTreatmentRepository.updateTransaction(treatment[0]?.id,
+                await genotypeTreatmentRepository.updateTransaction(
+                  treatment[0]?.id,
                   {
                     id: treatment[0]?.id,
                     id_genotipo: genotipo[0]?.id,
@@ -286,20 +287,28 @@ export class ImportGenotypeTreatmentController {
               }
             }
           });
-         
-          await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
+
+          await logImportController.update({
+            id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
+          });
           return { status: 200, message: 'Tratamento de genótipo importado com sucesso' };
         } catch (error: any) {
-          await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+          await logImportController.update({
+            id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
+          });
           handleError('Tratamento de genótipo controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de tratamento de genótipo' };
         }
       }
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
+      await logImportController.update({
+        id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: responseStringError,
+      });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+      await logImportController.update({
+        id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
+      });
       handleError('Tratamento de genótipo controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de tratamento de genótipo' };
     }

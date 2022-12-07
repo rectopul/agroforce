@@ -449,7 +449,7 @@ export default function Listagem({
         .create({
           table_preferences: campos,
           userId: userLogado.id,
-          module_id: 5,
+          module_id: 14,
         })
         .then((response) => {
           userLogado.preferences.npe = {
@@ -461,7 +461,7 @@ export default function Listagem({
         });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.layout_quadra = {
+      userLogado.preferences.npe = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
@@ -490,6 +490,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     if (!filterApplication.includes('paramSelect')) {
       filterApplication += `&paramSelect=${camposGerenciados}`;
     }
@@ -551,6 +552,7 @@ export default function Listagem({
         Swal.fire('Erro ao exportar');
       }
     });
+    setLoading(false);
   };
 
   // manage total pages
@@ -685,14 +687,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterNpeFrom"
                         name="filterNpeFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNpeTo"
@@ -708,14 +710,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterNpeFinalFrom"
                         name="filterNpeFinalFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNpeFinalTo"
@@ -731,14 +733,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterGrpFrom"
                         name="filterGrpFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterGrpTo"

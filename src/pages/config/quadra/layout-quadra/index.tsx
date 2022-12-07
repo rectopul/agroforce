@@ -676,6 +676,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await layoutQuadraService.getAll(filter).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
@@ -723,6 +724,7 @@ export default function Listagem({
         XLSX.writeFile(workBook, "Layout_Quadra.xlsx");
       }
     });
+    setLoading(false);
   };
 
   // manage total pages
@@ -841,7 +843,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterPopFrom"
                         name="filterPopFrom"
@@ -850,7 +852,7 @@ export default function Listagem({
                       />
                       <Input
                         style={{ marginLeft: 8 }}
-                        type="number"
+                        type="int"
                         placeholder="Até"
                         id="filterPopTo"
                         name="filterPopTo"
@@ -866,14 +868,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterShotsFrom"
                         name="filterShotsFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterShotsTo"
@@ -889,14 +891,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterParcelFrom"
                         name="filterParcelFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterParcelTo"
@@ -1045,7 +1047,7 @@ export default function Listagem({
                           }}
                         />
                       </div>
-                      <div className="h-12 flex items-center justify-center w-full">
+                      {/* <div className="h-12 flex items-center justify-center w-full">
                         <Button
                           title="Configurar Importação de Planilha"
                           icon={<RiSettingsFill size={20} />}
@@ -1054,7 +1056,7 @@ export default function Listagem({
                           onClick={() => {}}
                           href="layout-quadra/importar-planilha/config-planilha"
                         />
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 ),

@@ -551,6 +551,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await safraService.getAll(filter).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
@@ -595,6 +596,7 @@ export default function Listagem({
         XLSX.writeFile(workBook, 'Safras.xlsx');
       }
     });
+    setLoading(false);
   };
 
   // manage total pages
@@ -687,7 +689,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterYearFrom"
                         name="filterYearFrom"
@@ -695,7 +697,7 @@ export default function Listagem({
                       />
                       <Input
                         style={{ marginLeft: 8 }}
-                        type="number"
+                        type="int"
                         placeholder="Até"
                         id="filterYearTo"
                         name="filterYearTo"

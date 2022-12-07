@@ -3,11 +3,11 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
-
-import { GenotypeTreatmentRepository } from 'src/repository/genotype-treatment/genotype-treatment.repository';
+import { v4 as uuidv4 } from 'uuid';
+import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
+import { AssayListRepository } from 'src/repository/assay-list.repository';
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
-import { AssayListRepository } from '../../repository/assay-list.repository';
-import { TransactionConfig } from '../../shared/prisma/transactionConfig';
 import handleError from '../../shared/utils/handleError';
 import { responseGenericFactory, responseNullFactory, responsePositiveNumericFactory } from '../../shared/utils/responseErrorFactory';
 import { validateHeaders } from '../../shared/utils/validateHeaders';
@@ -22,6 +22,7 @@ import { TecnologiaController } from '../technology/tecnologia.controller';
 import { TypeAssayController } from '../tipo-ensaio.controller';
 import { assayListQueue } from './assay-list-queue';
 import { AssayListController } from './assay-list.controller';
+import { GenotypeTreatmentRepository } from '../../repository/genotype-treatment/genotype-treatment.repository';
 
 export class ImportAssayListController {
   static async validate(
@@ -65,6 +66,7 @@ export class ImportAssayListController {
           id: idLog,
           status: 1,
           state: 'INVALIDA',
+          invalid_data: validate,
         });
         return { status: 400, message: validate };
       }
@@ -399,10 +401,13 @@ export class ImportAssayListController {
         status: 1,
         state: 'INVALIDA',
         invalid_data: responseStringError,
+        updated_at: new Date(Date.now())
       });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+      await logImportController.update({
+        id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
+      });
       handleError('Lista de ensaio controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Lista de ensaio' };
     }
@@ -425,19 +430,19 @@ export class ImportAssayListController {
     const genotypeTreatmentController = new GenotypeTreatmentController();
     const logImportController = new LogImportController();
 
-        /* --------- Transcation Context --------- */
-        const transactionConfig = new TransactionConfig();
-        const assayListRepository = new AssayListRepository();
-        assayListRepository.setTransaction(
-          transactionConfig.clientManager,
-          transactionConfig.transactionScope,
-        );
-        const genotypeTreatmentRepository = new GenotypeTreatmentRepository();
-        genotypeTreatmentRepository.setTransaction(
-          transactionConfig.clientManager,
-          transactionConfig.transactionScope,
-        );
-        /* --------------------------------------- */
+    /* --------- Transcation Context --------- */
+    const transactionConfig = new TransactionConfig();
+    const assayListRepository = new AssayListRepository();
+    assayListRepository.setTransaction(
+      transactionConfig.clientManager,
+      transactionConfig.transactionScope,
+    );
+    const genotypeTreatmentRepository = new GenotypeTreatmentRepository();
+    genotypeTreatmentRepository.setTransaction(
+      transactionConfig.clientManager,
+      transactionConfig.transactionScope,
+    );
+    /* --------------------------------------- */
 
     let productivity: number = 0;
     let advance: number = 0;
@@ -470,19 +475,19 @@ export class ImportAssayListController {
             let savedAssayList: any;
             let savedGenotype: any;
 
-            let where = {
-              gli : spreadSheet[row][4],
+            const where = {
+              gli: spreadSheet[row][4],
               id_safra: idSafra,
             };
-            let select = {
+            const select = {
               id: true,
               id_safra: true,
               gli: true,
-              treatmentsNumber: true
+              treatmentsNumber: true,
             };
 
-            const assayList = await assayListRepository.findAll(where,select,undefined,undefined,undefined);
-            let assayListId = assayList[0]?.id;
+            const assayList = await assayListRepository.findAll(where, select, undefined, undefined, undefined);
+            const assayListId = assayList[0]?.id;
             let assayTreatmentsNumber = 1;
 
             if (assayList.total == 0) {
@@ -524,7 +529,7 @@ export class ImportAssayListController {
                 bgm: (spreadSheet[row][6]) ? Number(spreadSheet[row][6]) : null,
                 project: String(spreadSheet[row][7]),
                 created_by: createdBy,
-                treatmentsNumber: assayTreatmentsNumber
+                treatmentsNumber: assayTreatmentsNumber,
               });
               if (verifyToDelete) {
                 await genotypeTreatmentRepository.deleteAll(Number(assayListId));
@@ -555,12 +560,50 @@ export class ImportAssayListController {
           }
         }
       });
-      await logImportController.update({ id: idLog, status: 1, state: 'SUCESSO' });
+      await logImportController.update({
+        id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
+      });
       return { status: 200, message: `Ensaios importados (${String(register)}). Produtividade x Avanço (${String(productivity)} x ${String(advance)}) ` };
     } catch (error: any) {
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+      await logImportController.update({
+        id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
+      });
       handleError('Lista de ensaio controller', 'Save Import', error.message);
       return { status: 500, message: 'Erro ao salvar planilha de Lista de ensaio' };
     }
   }
+
+  // private static savefile(files) {
+  //   try {
+  //     const newFileName = `${uuidv4()}.${FormData.files[0].name.split('.').pop()}`;
+  //     uploadFileToBlob(FormData.files[0], newFileName);
+  //     registerItem(newFileName);
+
+  //     const containerName = 'sample-container';
+  //     const sasToken = process.env.NEXT_PUBLIC_STORAGESASTOKEN;
+  //     const storageAccountName = process.env.NEXT_PUBLIC_STORAGERESOURCENAME;
+
+  //     const uploadFileToBlob = useCallback(
+  //       async (file: File | null, newFileName: string) => {
+  //         const blobService = new BlobServiceClient(
+  //           `https://${storageAccountName}.blob.core.windows.net/?${sasToken}`,
+  //         );
+
+  //         const containerClient: ContainerClient = blobService.getContainerClient(containerName);
+  //         await containerClient.createIfNotExists({
+  //           access: 'container',
+  //         });
+
+  //         const blobClient = containerClient.getBlockBlobClient(newFileName);
+  //         const options = { blobHTTPHeaders: { blobContentType: file.type } };
+
+  //         await blobClient.uploadData(file, options);
+  //       },
+  //       [],
+  //     );
+  //   } catch (error: any) {
+  //     handleError('Lista de ensaio controller', 'Save File', error.message);
+  //     return { status: 500, message: 'Erro ao salvar arquivo de Lista de ensaio' };
+  //   }
+  // }
 }

@@ -190,23 +190,16 @@ export default function TipoEnsaio({
       filterStatusAssay,
     }) => {
       const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterTechnology=${filterTechnology}&filterTreatmentNumber=${filterTreatmentNumber}&filterStatusAssay=${filterStatusAssay}&id_safra=${idSafra}&filterTratTo=${filterTratTo}&filterTratFrom=${filterTratFrom}&filterCod=${filterCod}&id_culture=${idCulture}`;
-      // setFiltersParams(parametersFilter);
-      // setCookies('filterBeforeEdit', filtersParams);
-      // await assayListService.getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`).then(({ response, total: allTotal }) => {
-      //   setFilter(parametersFilter);
-      //   setAssayList(response);
-      //   setTotalItems(allTotal);
-      //   setCurrentPage(0);
-
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
-      // });
+      setLoading(false);
     },
   });
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
+    setFilter(parametersFilter);
     setCookies('filterBeforeEdit', parametersFilter);
     setCookies('filterBeforeEditTypeOrder', typeOrder);
     setCookies('filterBeforeEditOrderBy', orderBy);
@@ -346,9 +339,9 @@ export default function TipoEnsaio({
                 setCookies('filterBeforeEditTypeOrder', typeOrder);
                 setCookies('filterBeforeEditOrderBy', orderBy);
                 setCookies('filtersParams', filtersParams);
+                setCookies('itensPage', itensPerPage);
                 setCookies('lastPage', 'atualizar');
                 setCookies('takeBeforeEdit', take);
-                setCookies('itensPage', itensPerPage);
                 router.push(
                   `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`,
                 );
@@ -586,6 +579,7 @@ export default function TipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await assayListService
       .getAll(filterApplication)
       .then(({ status, response }) => {
@@ -643,6 +637,7 @@ export default function TipoEnsaio({
           XLSX.writeFile(workBook, 'Ensaio.xlsx');
         }
       });
+      setLoading(false);
   };
 
   // manage total pages
@@ -759,7 +754,7 @@ export default function TipoEnsaio({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterTratFrom"
                         name="filterTratFrom"
@@ -767,7 +762,7 @@ export default function TipoEnsaio({
                       />
                       <Input
                         style={{ marginLeft: 8 }}
-                        type="number"
+                        type="int"
                         placeholder="Até"
                         id="filterTratTo"
                         name="filterTratTo"
@@ -985,12 +980,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const pageBeforeEdit = req.cookies.pageBeforeEdit
-    ? req.cookies.pageBeforeEdit
-    : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : '';
   const { token } = req.cookies;
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
@@ -1006,9 +995,18 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('filtersParams', { req, res });
     removeCookies('lastPage', { req, res });
     removeCookies('itensPage', { req, res });
   }
+
+  const pageBeforeEdit = req.cookies.pageBeforeEdit
+    ? req.cookies.pageBeforeEdit
+    : 0;
+
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : '';
 
   const itensPerPage = req.cookies.takeBeforeEdit
     ? req.cookies.takeBeforeEdit
@@ -1025,7 +1023,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     : '';
 
   const filterApplication = req.cookies.filterBeforeEdit
-    ? filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   // //RR

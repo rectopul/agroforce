@@ -2,6 +2,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
 import {
@@ -16,8 +17,8 @@ import { GenotipoController } from '../genotype/genotipo.controller';
 import { LogImportController } from '../log-import.controller';
 import { LoteController } from '../lote.controller';
 
-import {ExperimentGenotipeRepository} from '../../repository/experiment-genotipe.repository'
-import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
+import { ExperimentGenotipeRepository } from '../../repository/experiment-genotipe.repository';
+
 export class ImportExperimentGenotypeController {
   static async validate(
     idLog: number,
@@ -47,7 +48,6 @@ export class ImportExperimentGenotypeController {
       }
 
       for (const row in spreadSheet) {
-
         if (row !== '0') {
           // experiments
           if (spreadSheet[row][5] != null) {
@@ -83,6 +83,7 @@ export class ImportExperimentGenotypeController {
 
               const { response: treatment } = await experimentGenotipeController.getAll({
                 safraName: spreadSheet[row][0],
+                take: 1
               });
 
               if (treatment.length == 0) {
@@ -102,6 +103,7 @@ export class ImportExperimentGenotypeController {
 
               const { response: treatment } = await experimentGenotipeController.getAll({
                 filterFoco: spreadSheet[row][1],
+                take: 1
               });
 
               if (treatment.length == 0) {
@@ -121,6 +123,7 @@ export class ImportExperimentGenotypeController {
 
               const { response: treatment } = await experimentGenotipeController.getAll({
                 ensaio: spreadSheet[row][2],
+                take: 1
               });
 
               if (treatment.length == 0) {
@@ -139,6 +142,7 @@ export class ImportExperimentGenotypeController {
               } else {
                 const { response: treatment } = await experimentGenotipeController.getAll({
                   filterCodTec: spreadSheet[row][column],
+                  take: 1
                 });
                 if (treatment.length == 0) {
                   responseIfError[Number(column)] += responseGenericFactory(
@@ -157,6 +161,7 @@ export class ImportExperimentGenotypeController {
               }
               const { response: treatment } = await experimentGenotipeController.getAll({
                 gli: spreadSheet[row][4],
+                take: 1
               });
 
               if (treatment.length == 0) {
@@ -188,6 +193,7 @@ export class ImportExperimentGenotypeController {
                   idExperiment: value_hold.idExperiment,
                   npe: spreadSheet[row][10],
                   rep: spreadSheet[row][8],
+                  take: 1
                 });
 
                 if (treatment.length == 0) {
@@ -209,6 +215,7 @@ export class ImportExperimentGenotypeController {
               } else {
                 const { response: treatment } = await experimentGenotipeController.getAll({
                   npe: spreadSheet[row][10],
+                  take: 1
                 });
 
                 if (treatment.length == 0) {
@@ -319,33 +326,34 @@ export class ImportExperimentGenotypeController {
                 const { response: treatment } = await experimentGenotipeController.getAll({
                   nt: Number(spreadSheet[row][9]),
                   gli: spreadSheet[row][4],
-                  treatments_number: spreadSheet[row][8], // Nt Value
-                  idExperiment: value_hold.idExperiment,
+                  // treatments_number: spreadSheet[row][8], // Nt Value
                   npe: spreadSheet[row][10],
                   rep: spreadSheet[row][8],
+                  take: 1
                 });
-  
+                
                 const { response: genotipo } = await genotipoController.getAll({
-                  name_genotipo: spreadSheet[row][15], // New genetic Name
+                  name_genotipo: spreadSheet[row][14], // New genetic Name
                 });
-  
+
                 const { response: lote } = await loteController.getAll({
                   ncc: spreadSheet[row][16], // NEW NCA
-                  filterGenotipo: spreadSheet[row][15], // new geneticName
+                  filterGenotipo: spreadSheet[row][14], // new geneticName
                 });
-  
-                const response12 = await experimentGenotipeRepository.updateTransaction(treatment[0]?.id,{
+                console.log("🚀 ~ file: import-experiment-genotype.controller.ts:335 ~ ImportExperimentGenotypeController ~ awaittransactionConfig.transactionScope.run ~ treatment", treatment)
+                
+                const response12 = await experimentGenotipeRepository.updateTransaction(treatment[0]?.id, {
                   id: treatment[0]?.id,
                   gli: spreadSheet[row][4],
                   idExperiment: value_hold.idExperiment,
                   nt: Number(spreadSheet[row][9]),
                   rep: spreadSheet[row][8],
-                  status_t: spreadSheet[row][14],
+                  status_t: spreadSheet[row][15],
                   idGenotipo: lote[0]?.id_genotipo,
                   idLote: lote[0]?.id,
                   nca: spreadSheet[row][16].toString(),
                 });
-  
+
                 //   id: treatment[0]?.id,
                 //   gli: spreadSheet[row][4],
                 //   idExperiment : value_hold.idExperiment,
@@ -359,19 +367,27 @@ export class ImportExperimentGenotypeController {
               }
             }
           });
-       
+          await logImportController.update({
+            id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
+          });
           return { status: 200, message: 'Sub. de parcelas importado com sucesso' };
         } catch (error: any) {
-          await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+          await logImportController.update({
+            id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
+          });
           handleError('Sub. de parcelas controller', 'Save Import', error.message);
           return { status: 500, message: 'Erro ao salvar planilha de Sub. de parcelas' };
         }
       }
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
+      await logImportController.update({
+        id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: responseStringError,
+      });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
-      await logImportController.update({ id: idLog, status: 1, state: 'FALHA' });
+      await logImportController.update({
+        id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
+      });
       handleError('Sub. de parcelas controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Sub. de parcelas' };
     }

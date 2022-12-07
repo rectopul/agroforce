@@ -518,6 +518,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await loteService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((item: any) => {
@@ -598,6 +599,7 @@ export default function Listagem({
         Swal.fire(response);
       }
     });
+    setLoading(false);
   };
 
   const columns = columnsOrder(camposGerenciados);
@@ -751,14 +753,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterYearFrom"
                         name="filterYearFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         style={{ marginLeft: 5 }}
                         placeholder="Até"
                         id="filterYearTo"
@@ -774,14 +776,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterCodLoteFrom"
                         name="filterCodLoteFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         style={{ marginLeft: 5 }}
                         placeholder="Até"
                         id="filterCodLoteTo"
@@ -820,14 +822,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterWeightFrom"
                         name="filterWeightFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         style={{ marginLeft: 5 }}
                         placeholder="Até"
                         id="filterWeightTo"
@@ -843,14 +845,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
+                        type="int"
                         placeholder="De"
                         id="filterSeedFrom"
                         name="filterSeedFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
+                        type="int"
                         style={{ marginLeft: 5 }}
                         placeholder="Até"
                         id="filterSeedTo"
@@ -898,14 +900,14 @@ export default function Listagem({
                       </label>
                       <div className="flex">
                         <Input
-                          type="number"
+                          type="int"
                           placeholder="De"
                           id="filterBgmFrom"
                           name="filterBgmFrom"
                           onChange={formik.handleChange}
                         />
                         <Input
-                          type="number"
+                          type="int"
                           style={{ marginLeft: 5 }}
                           placeholder="Até"
                           id="filterBgmTo"

@@ -519,6 +519,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await focoService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((row: any) => {
@@ -559,6 +560,7 @@ export default function Listagem({
         XLSX.writeFile(workBook, 'Focos.xlsx');
       }
     });
+    setLoading(false);
   };
 
   // manage total pages

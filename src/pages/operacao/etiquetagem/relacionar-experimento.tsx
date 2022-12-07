@@ -246,7 +246,7 @@ export default function Listagem({
       //   });
 
       const filterStatus = 'SORTEADO';
-      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterCod=${filterCod}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterStatus=SORTEADO`;
+      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterCod=${filterCod}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterExperimentStatus=SORTEADO`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -550,6 +550,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await experimentService
       .getAll(filter)
       .then(({ status, response }: IReturnObject) => {
@@ -616,6 +617,7 @@ export default function Listagem({
           XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
         }
       });
+      setLoading(false);
   };
 
   function handleTotalPages(): void {
@@ -1083,12 +1085,12 @@ export const getServerSideProps: GetServerSideProps = async ({
   const baseUrlExperimento = `${publicRuntimeConfig.apiUrl}/experiment`;
 
   const filterApplication = req.cookies.filterBeforeEdit
-    || `&id_culture=${idCulture}&id_safra=${idSafra}&filterStatus=SORTEADO`;
+    || `&id_culture=${idCulture}&id_safra=${idSafra}&filterExperimentStatus=SORTEADO`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
-  const param = `&id_culture=${idCulture}&id_safra=${idSafra}&filterStatus=SORTEADO`;
+  const param = `&id_culture=${idCulture}&id_safra=${idSafra}&filterExperimentStatus=SORTEADO`;
 
   const urlParametersExperiment: any = new URL(baseUrlExperimento);
   urlParametersExperiment.search = new URLSearchParams(param).toString();

@@ -61,7 +61,7 @@ export default function Listagem({
   const tabsEtiquetagemMenu = tabsOperation.map((i: any) => (i.titleTab === 'ETIQUETAGEM' ? { ...i, statusTab: true } : i));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.genotypeTreatment || {
+  const preferences = userLogado.preferences.experimento || {
     id: 0,
     table_preferences:
       'id,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status,action',
@@ -72,6 +72,7 @@ export default function Listagem({
   );
   const [experiments, setExperiments] = useState<IExperiments[] | any>([]);
   const [tableMessage, setMessage] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(0);
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
@@ -369,10 +370,10 @@ export default function Listagem({
         .create({
           table_preferences: campos,
           userId: userLogado.id,
-          module_id: 27,
+          module_id: 22,
         })
         .then((response) => {
-          userLogado.preferences.genotypeTreatment = {
+          userLogado.preferences.experimento = {
             id: response.response.id,
             userId: preferences.userId,
             table_preferences: campos,
@@ -381,7 +382,7 @@ export default function Listagem({
         });
       localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.genotypeTreatment = {
+      userLogado.preferences.experimento = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
@@ -410,6 +411,7 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
     await experimentService.getAll(filter).then(({ status, response }: any) => {
       if (status === 200) {
         const newData = response.map((item: any) => {
@@ -465,6 +467,7 @@ export default function Listagem({
         XLSX.writeFile(workBook, 'Experimentos.xlsx');
       }
     });
+    setLoading(false);
   };
 
   function handleTotalPages(): void {
@@ -548,7 +551,7 @@ export default function Listagem({
       userId: userLogado.id,
     });
     if (status === 200) {
-      router.reload();
+      handlePagination();
     } else {
       Swal.fire({
         html: message,
