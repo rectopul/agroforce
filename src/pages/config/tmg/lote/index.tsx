@@ -753,14 +753,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="int"
+                        type="number"
                         placeholder="De"
                         id="filterYearFrom"
                         name="filterYearFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="int"
+                        type="number"
                         style={{ marginLeft: 5 }}
                         placeholder="Até"
                         id="filterYearTo"
@@ -776,14 +776,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="int"
+                        type="number"
                         placeholder="De"
                         id="filterCodLoteFrom"
                         name="filterCodLoteFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="int"
+                        type="number"
                         style={{ marginLeft: 5 }}
                         placeholder="Até"
                         id="filterCodLoteTo"
@@ -822,14 +822,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="int"
+                        type="number"
                         placeholder="De"
                         id="filterWeightFrom"
                         name="filterWeightFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="int"
+                        type="number"
                         style={{ marginLeft: 5 }}
                         placeholder="Até"
                         id="filterWeightTo"
@@ -845,14 +845,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="int"
+                        type="number"
                         placeholder="De"
                         id="filterSeedFrom"
                         name="filterSeedFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="int"
+                        type="number"
                         style={{ marginLeft: 5 }}
                         placeholder="Até"
                         id="filterSeedTo"
@@ -875,14 +875,14 @@ export default function Listagem({
                       </label>
                       <div className="flex">
                         <Input
-                          type="int"
+                          type="number"
                           placeholder="De"
                           id="filterGmrFrom"
                           name="filterGmrFrom"
                           onChange={formik.handleChange}
                         />
                         <Input
-                          type="int"
+                          type="number"
                           style={{ marginLeft: 5 }}
                           placeholder="Até"
                           id="filterGmrTo"
@@ -900,14 +900,14 @@ export default function Listagem({
                       </label>
                       <div className="flex">
                         <Input
-                          type="int"
+                          type="number"
                           placeholder="De"
                           id="filterBgmFrom"
                           name="filterBgmFrom"
                           onChange={formik.handleChange}
                         />
                         <Input
-                          type="int"
+                          type="number"
                           style={{ marginLeft: 5 }}
                           placeholder="Até"
                           id="filterBgmTo"

@@ -25,7 +25,7 @@ export default function ImportacaoPlanilha() {
             Quantidade de colunas
           </label>
           <input
-            type="int"
+            type="number"
             name="quantity-columns"
             id="columns"
             placeholder="ex: 7"

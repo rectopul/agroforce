@@ -689,7 +689,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="int"
+                        type="number"
                         placeholder="De"
                         id="filterYearFrom"
                         name="filterYearFrom"
@@ -697,7 +697,7 @@ export default function Listagem({
                       />
                       <Input
                         style={{ marginLeft: 8 }}
-                        type="int"
+                        type="number"
                         placeholder="Até"
                         id="filterYearTo"
                         name="filterYearTo"
