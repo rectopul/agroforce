@@ -1214,14 +1214,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="int"
+                        type="number"
                         placeholder="De"
                         id="filterBgmFrom"
                         name="filterBgmFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="int"
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterBgmTo"
@@ -1237,14 +1237,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="int"
+                        type="number"
                         placeholder="De"
                         id="filterBgmGenotypeFrom"
                         name="filterBgmGenotypeFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="int"
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterBgmGenotypeTo"
@@ -1290,14 +1290,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="int"
+                        type="number"
                         placeholder="De"
                         id="filterNtFrom"
                         name="filterNtFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="int"
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNtTo"

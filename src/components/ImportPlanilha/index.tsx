@@ -144,7 +144,7 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
                 Adicionar colunas:
               </strong>
               <Input
-                type="int"
+                type="number"
                 name="quantity-columns"
                 id="quantity-columns"
                 min={`${data.length}`}

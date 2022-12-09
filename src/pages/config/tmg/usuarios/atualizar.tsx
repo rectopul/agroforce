@@ -355,7 +355,7 @@ export default function AtualizarUsuario({
                 Matricula
               </label>
               <Input
-                type="int"
+                type="number"
                 placeholder="Campo númerico"
                 id="registration"
                 name="registration"
