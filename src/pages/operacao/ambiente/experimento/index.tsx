@@ -820,6 +820,7 @@ export default function Listagem({
           data.nt = sd.nt;
           data.npe = npei;
           data.idLote = gt.genotipo?.id_lote;
+          data.groupId = NPESelectedRow.group.id;
           data.idGenotipo = gt.genotipo?.id; // Added new field
           data.gli = item.assay_list?.gli;
           data.id_seq_delineamento = sd.id;
@@ -827,7 +828,7 @@ export default function Listagem({
           data.status_t = gt.status;
           experiment_genotipo.push(data);
           npei++;
-          // });
+
           const gt_new: any = {};
           gt_new.id = gt.id;
           gt_new.status_experiment = "EXP. SORTEADO";

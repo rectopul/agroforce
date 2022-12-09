@@ -323,15 +323,16 @@ model foco {
 }
 
 model group {
-  id         Int       @id @default(autoincrement())
-  id_safra   Int
-  id_foco    Int
-  created_by Int
-  created_at DateTime? @default(now())
-  group      Int
-  foco       foco      @relation(fields: [id_foco], references: [id])
-  safra      safra     @relation(fields: [id_safra], references: [id])
-  npe        npe[]
+  id                  Int                   @id @default(autoincrement())
+  id_safra            Int
+  id_foco             Int
+  created_by          Int
+  created_at          DateTime?             @default(now())
+  group               Int
+  foco                foco                  @relation(fields: [id_foco], references: [id])
+  safra               safra                 @relation(fields: [id_safra], references: [id])
+  npe                 npe[]
+  experiment_genotipe experiment_genotipe[]
 }
 
 model type_assay {
@@ -566,6 +567,7 @@ model experiment_genotipe {
   id_seq_delineamento Int
   blockLayoutId       Int?
   idLote              Int?
+  groupId             Int?      
   gli                 String
   rep                 Int
   nt                  Int
@@ -580,6 +582,7 @@ model experiment_genotipe {
   foco                   foco                   @relation(fields: [idFoco], references: [id])
   experiment             experiment             @relation(fields: [idExperiment], references: [id])
   genotipo               genotipo?              @relation(fields: [idGenotipo], references: [id])
+  group                  group?                 @relation(fields: [groupId], references: [id])
   layout_quadra          layout_quadra?         @relation(fields: [blockLayoutId], references: [id])
   sequencia_delineamento sequencia_delineamento @relation(fields: [id_seq_delineamento], references: [id])
   lote                   lote?                  @relation(fields: [idLote], references: [id])
