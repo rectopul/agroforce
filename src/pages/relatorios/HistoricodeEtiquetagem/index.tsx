@@ -44,6 +44,7 @@ import * as ITabs from "../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../helpers";
 import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
 import ComponentLoading from "../../../components/Loading";
+import { userPreferencesService } from "src/services";
 
 interface INpeProps {
   id: any;
