@@ -61,31 +61,46 @@ export class ImportGenotypeTreatmentController {
           //   }
           // }
           const {
-            status: treatmentsStatus,
             response: treatments,
           }: any = await genotypeTreatmentController.getAll({
-            gli: spreadSheet[row][4],
-            treatments_number: spreadSheet[row][6],
-            name_genotipo: spreadSheet[row][8],
-          });
-          if (treatmentsStatus === 400) {
+            filterFoco: spreadSheet[row][1],
+            filterTypeAssay: spreadSheet[row][2],
+            filterCodTec: spreadSheet[row][3],
+            filterGli: spreadSheet[row][4],
+            filterBgm: spreadSheet[row][5],
+            filterTreatmentsNumber: spreadSheet[row][6],
+            filterStatusT: spreadSheet[row][7],
+            filterGenotypeName: spreadSheet[row][8],
+          }); 
+          if (treatments.length === 0) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tratamento de genótipo não encontrado </li> <br>`;
           }
-          if (treatments[0]?.status_experiment === 'SORTEADO') {
-            responseIfError[0]
-              += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tratamento já foi sorteado e não pode ser substituído. </li> <br>`;
-          }
+          // if (treatments[0]?.status_experiment === 'SORTEADO') {
+          //   responseIfError[0]
+          //     += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tratamento já foi sorteado e não pode ser substituído. </li> <br>`;
+          // }
 
-          if (treatments[0]?.assay_list.foco.name !== spreadSheet[row][1]) {
-            responseIfError[0]
-              += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o foco e diferente do cadastrado no ensaio. </li> <br>`;
-          }
+          // if (treatments[0]?.assay_list.foco.name !== spreadSheet[row][1]) {
+          //   responseIfError[0]
+          //     += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o foco e diferente do cadastrado no ensaio. </li> <br>`;
+          // }
+          
+          // if (treatments[0]?.assay_list.type_assay.name !== spreadSheet[row][2]) {
+          //   responseIfError[0]
+          //   += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tipo de ensaio e diferente do cadastrado no ensaio. </li> <br>`;
+          // }
+          
+          //           if (treatments[0]?.genotipo.name_genotipo !== spreadSheet[row][8]) {
+          //             responseIfError[0]
+          //               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o genotipo e diferente do cadastrado no tratamento. </li> <br>`;
+          //           }
 
-          if (treatments[0]?.assay_list.type_assay.name !== spreadSheet[row][2]) {
-            responseIfError[0]
-              += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tipo de ensaio e diferente do cadastrado no ensaio. </li> <br>`;
-          }
+          //           if (treatments[0]?.genotipo.name_genotipo !== spreadSheet[row][7]) {
+          //             responseIfError[0]
+          //               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o status T e diferente do cadastrado no tratamento. </li> <br>`;
+          //           }
+
           if (spreadSheet[row][3].toString().length < 2) {
             // eslint-disable-next-line no-param-reassign
             spreadSheet[row][3] = `0${spreadSheet[row][3]}`;
@@ -174,8 +189,12 @@ export class ImportGenotypeTreatmentController {
             if (column === '9') { // NCA
               if (treatments[0]?.lote) {
                 if (Number(treatments[0]?.lote?.ncc) !== Number(spreadSheet[row][column])) {
-                  responseIfError[Number(column)]
-                    += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    (Number(column) + 1),
+                    row,
+                    spreadSheet[  0][column],
+                    'não é o mesmo desse tratamento de genótipo',
+                  );
                 }
               }
             }

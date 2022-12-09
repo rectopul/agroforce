@@ -156,7 +156,7 @@ export class ReplaceTreatmentController {
         }
       }
       if (options.filterNcaFrom || options.filterNcaTo) {
-        if (options.filterNcaFrom === 'vazio' || options.filterNcaTo === 'vazio') {
+        if (options.filterNcaFrom.toUpperCase() === 'vazio' || options.filterNcaTo.toUpperCase() === 'vazio') {
           parameters.ncc = null;
         } else if (options.filterNcaFrom && options.filterNcaTo) {
           parameters.ncc = JSON.parse(
