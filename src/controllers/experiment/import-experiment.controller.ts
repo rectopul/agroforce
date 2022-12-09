@@ -274,7 +274,12 @@ export class ImportExperimentController {
 
                 if (response?.length === 0) {
                   responseIfError[Number(column)]
-                    += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
+                    += responseGenericFactory(
+                      (Number(column) + 1),
+                      row,
+                      spreadSheet[0][column],
+                      'não existe ou esta inativo',
+                    );
                 } else if (response[0]?.repeticao < spreadSheet[row][11]) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(

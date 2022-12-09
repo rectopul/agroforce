@@ -399,13 +399,15 @@ export class ImportGenotypeController {
                     ncc: spreadSheet[row][column],
                     id_culture: idCulture,
                   });
-                  if (response.length > 0) {
-                    responseIfError[Number(column)] += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'é chave única na cultura, e já foi cadastrado',
-                    );
+                  if (response[0]?.safra?.id !== idSafra) {
+                    if (response.length > 0) {
+                      responseIfError[Number(column)] += responseGenericFactory(
+                        (Number(column) + 1),
+                        row,
+                        spreadSheet[0][column],
+                        'é chave única na cultura, e já foi cadastrado',
+                      );
+                    }
                   }
                 }
               }

@@ -497,7 +497,7 @@ export default function Listagem({
         XLSX.writeFile(workBook, 'Setores.xlsx');
       }
     });
-    setLoading(true);
+    setLoading(false);
   };
 
   // manage total pages

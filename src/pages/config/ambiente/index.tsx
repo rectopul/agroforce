@@ -917,7 +917,7 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="int"
+                        type="number"
                         placeholder="Época"
                         id="filterEpoca"
                         name="filterEpoca"
@@ -933,7 +933,7 @@ export default function Listagem({
                     <div className="flex">
                       <Input
                         placeholder="De"
-                        type="int"
+                        type="number"
                         id="filterNpeFrom"
                         name="filterNpeFrom"
                         onChange={formik.handleChange}
@@ -942,7 +942,7 @@ export default function Listagem({
                       <Input
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
-                        type="int"
+                        type="number"
                         id="filterNpeTo"
                         name="filterNpeTo"
                         defaultValue={checkValue("filterNpeTo")}
@@ -958,7 +958,7 @@ export default function Listagem({
                     <div className="flex">
                       <Input
                         placeholder="De"
-                        type="int"
+                        type="number"
                         id="filterNpeFinalFrom"
                         name="filterNpeFinalFrom"
                         onChange={formik.handleChange}
@@ -966,7 +966,7 @@ export default function Listagem({
                       <Input
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
-                        type="int"
+                        type="number"
                         id="filterNpeFinalTo"
                         name="filterNpeFinalTo"
                         onChange={formik.handleChange}

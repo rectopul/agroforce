@@ -17,6 +17,7 @@ export class ExperimentController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
+    console.log("🚀 ~ file: experiment.controller.ts:20 ~ ExperimentController ~ getAll ~ options", options)
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
@@ -171,17 +172,17 @@ export class ExperimentController {
         parameters.period = Number(options.Epoca);
       }
       if (options.Status) {
-        parameters.status = options.Status;
+        parameters.status = JSON.parse(`{"equals": "${options.Status}" }`);
       }
 
       if (options.gli) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.gli}" } } }`));
       }
-
+      
       const take = (options.take) ? Number(options.take) : undefined;
-
+      
       const skip = (options.skip) ? Number(options.skip) : undefined;
-
+      
       if (options.orderBy) {
         if (!options.excel) {
           if (typeof options.orderBy !== 'string' || typeof options.typeOrder !== 'string') {

@@ -112,7 +112,7 @@ export class ExperimentGenotipeController {
       }
 
       if (options.filterNcaFrom || options.filterNcaTo) {
-        if (options.filterNcaFrom === 'vazio' || options.filterNcaTo === 'vazio') {
+        if (options.filterNcaFrom.toUpperCase() === 'VAZIO' || options.filterNcaTo.toUpperCase() === 'VAZIO') {
           parameters.nca = null;
         } else if (options.filterNcaFrom && options.filterNcaTo) {
           parameters.nca = JSON.parse(
@@ -275,6 +275,7 @@ export class ExperimentGenotipeController {
         },
         nca: true,
         lote: true,
+        group: true,
         status_t: true,
         sequencia_delineamento: true,
       };
