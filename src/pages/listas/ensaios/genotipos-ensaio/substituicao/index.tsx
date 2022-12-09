@@ -747,7 +747,7 @@ export default function Listagem({
                       Ano Lote
                     </label>
                     <Input
-                      type="int"
+                      type="number"
                       placeholder="Ano Lote"
                       id="filterYear"
                       name="filterYear"
@@ -825,14 +825,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="int"
+                        type="number"
                         placeholder="De"
                         id="filterSeedsFrom"
                         name="filterSeedsFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="int"
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterSeedsTo"
@@ -861,14 +861,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="int"
+                        type="number"
                         placeholder="De"
                         id="filterGmrFrom"
                         name="filterGmrFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="int"
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterGmrTo"

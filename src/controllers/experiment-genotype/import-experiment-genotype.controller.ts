@@ -329,7 +329,7 @@ export class ImportExperimentGenotypeController {
                   // treatments_number: spreadSheet[row][8], // Nt Value
                   npe: spreadSheet[row][10],
                   rep: spreadSheet[row][8],
-                  take: 1
+                  take: 1,
                 });
                 
                 const { response: genotipo } = await genotipoController.getAll({
@@ -340,7 +340,6 @@ export class ImportExperimentGenotypeController {
                   ncc: spreadSheet[row][16], // NEW NCA
                   filterGenotipo: spreadSheet[row][14], // new geneticName
                 });
-                console.log("🚀 ~ file: import-experiment-genotype.controller.ts:335 ~ ImportExperimentGenotypeController ~ awaittransactionConfig.transactionScope.run ~ treatment", treatment)
                 
                 const response12 = await experimentGenotipeRepository.updateTransaction(treatment[0]?.id, {
                   id: treatment[0]?.id,

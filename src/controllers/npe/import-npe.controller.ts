@@ -376,7 +376,7 @@ export class ImportNpeController {
                       filterNPE: spreadSheet[row][column],
                       filterGrpFrom: groupNumber[0]?.group,
                       filterGrpTo: groupNumber[0]?.group,
-
+                      safraId: idSafra,
                     });
                     if (npei.length > 0) {
                       responseIfError[Number(column)] += responseGenericFactory(

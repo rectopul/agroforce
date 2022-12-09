@@ -132,7 +132,7 @@ export default function Cultura(item: IUpdateSequenciaDelineamento) {
               <Input
                 id="repeticao"
                 name="repeticao"
-                type="int"
+                type="number"
                 placeholder="ex: 1"
                 onChange={formik.handleChange}
                 value={formik.values.repeticao}
@@ -155,7 +155,7 @@ export default function Cultura(item: IUpdateSequenciaDelineamento) {
               <Input
                 id="sorteio"
                 name="sorteio"
-                type="int"
+                type="number"
                 placeholder="ex: 1"
                 onChange={formik.handleChange}
                 value={formik.values.sorteio}
@@ -169,7 +169,7 @@ export default function Cultura(item: IUpdateSequenciaDelineamento) {
               <Input
                 id="nt"
                 name="nt"
-                type="int"
+                type="number"
                 placeholder="ex: 1"
                 onChange={formik.handleChange}
                 value={formik.values.nt}
@@ -183,7 +183,7 @@ export default function Cultura(item: IUpdateSequenciaDelineamento) {
               <Input
                 id="bloco"
                 name="bloco"
-                type="int"
+                type="number"
                 placeholder="ex: 1"
                 onChange={formik.handleChange}
                 value={formik.values.bloco}

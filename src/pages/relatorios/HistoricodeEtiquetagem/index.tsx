@@ -1,6 +1,3 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-return-assign */
-/* eslint-disable react/no-array-index-key */
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
@@ -24,12 +21,15 @@ import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
-import * as XLSX from "xlsx";
 import Swal from "sweetalert2";
-import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import * as XLSX from "xlsx";
 import { removeCookies, setCookies } from "cookies-next";
-import experiment from "src/pages/api/experiment";
-import { number } from "yup";
+import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import { BsTrashFill } from "react-icons/bs";
+import { UserPreferenceController } from "../../../controllers/user-preference.controller";
+import {
+  printhistoryService,
+} from "../../../services/print-history.service";
 import {
   AccordionFilter,
   Button,
@@ -38,172 +38,240 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
-  ButtonToogleConfirmation,
+  ButtonDeleteConfirmation,
 } from "../../../components";
-import { quadraService, userPreferencesService } from "../../../services";
-import { UserPreferenceController } from "../../../controllers/user-preference.controller";
-import ITabs from "../../../shared/utils/dropdown";
+import * as ITabs from "../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../helpers";
 import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
 import ComponentLoading from "../../../components/Loading";
+import { userPreferencesService } from "src/services";
+
+interface INpeProps {
+  id: any;
+  local: any;
+  safra: any;
+  foco: any;
+  type_assay: any;
+  ogm: any;
+  epoca: any;
+  npei: any;
+  npef: any;
+  prox_npe: any;
+  status?: any;
+  created_by: any;
+  edited?: any;
+}
 
 interface IFilter {
   filterStatus: object | any;
-  filterSearch: string | any;
-  filterSchema: string | any;
-  filterPreparation: string | any;
-  filterPFrom: string | any;
-  filterPTo: string | any;
+  filterLocal: string | any;
+  filterSafra: string | any;
+  filterFoco: string | any;
+  filterEnsaio: string | any;
+  filterTecnologia: string | any;
+  filterCodTecnologia: string | any;
+  filterEpoca: string | any;
+  filterNPE: string | any;
+  filterNpeFrom: string | any;
+  filterNpeTo: string | any;
+  filterNpeFinalFrom: string | any;
+  filterNpeFinalTo: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
-
-export interface IQuadra {
-  id: number;
-  id_culture: number;
-  local: any;
-  local_plagio: string;
-  cod_quadra: string;
-  comp_p: string;
-  linha_p: string;
-  esquema: string;
-  divisor: string;
-  status?: number;
-}
-
 interface IGenerateProps {
   name: string | undefined;
   title: string | number | readonly string[] | undefined;
   value: string | number | readonly string[] | undefined;
 }
-
 interface IData {
-  quadras: IQuadra[];
+  allNpe: any;
   totalItems: number;
-  itensPerPage: number;
+  filter: string | any;
+  itensPerPage: number | any;
   filterApplication: object | any;
-  cultureId: number;
-  pageBeforeEdit: string | any;
-  filterBeforeEdit: string | any;
-  typeOrderServer: any | string;
-  orderByserver: any | string;
+  filterBeforeEdit: object | any;
+  typeOrderServer: any | string; // RR
+  orderByserver: any | string; // RR
+  safraId: any | number;
+  idCulture: any | number;
 }
 
 export default function Listagem({
-  quadras,
-  totalItems,
+  allNpe,
   itensPerPage,
   filterApplication,
-  cultureId,
-  pageBeforeEdit,
   filterBeforeEdit,
+  totalItems,
   typeOrderServer,
   orderByserver,
+  safraId,
+  idCulture,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { TabsDropDowns } = ITabs;
-
-  const tabsDropDowns = TabsDropDowns();
   const [loading, setLoading] = useState<boolean>(false);
 
+  const { TabsDropDowns } = ITabs.default;
+
+  const tableRef = useRef<any>(null);
+
+  const tabsDropDowns = TabsDropDowns();
+  const router = useRouter();
+
+  // eslint-disable-next-line no-return-assign, no-param-reassign
   tabsDropDowns.map((tab) =>
-    tab.titleTab === "QUADRAS"
+    tab.titleTab === "AMBIENTE"
       ? (tab.statusTab = true)
       : (tab.statusTab = false)
   );
 
-  const tableRef = useRef<any>(null);
-
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.quadras || {
+  const preferences = userLogado.preferences.npe || {
     id: 0,
     table_preferences:
-      "id,local_preparo,cod_quadra,linha_p,esquema,allocation,action",
+      "id,safra,foco,ensaio,tecnologia,local,npei,epoca,prox_npe,status",
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences
   );
-  const router = useRouter();
-  const [quadra, setQuadra] = useState<IQuadra[]>(() => quadras);
-  const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit)
-  );
-  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
-  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [npe, setNPE] = useState(allNpe);
+  const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>("");
-  const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    {
-      name: "CamposGerenciados[]",
-      title: "Local preparo",
-      value: "local_preparo",
-    },
-    {
-      name: "CamposGerenciados[]",
-      title: "Código quadra",
-      value: "cod_quadra",
-    },
-    { name: "CamposGerenciados[]", title: "Linha P", value: "linha_p" },
-    { name: "CamposGerenciados[]", title: "Esquema", value: "esquema" },
-    { name: "CamposGerenciados[]", title: "Status", value: "allocation" },
-    { name: "CamposGerenciados[]", title: "Ação", value: "action" },
-  ]);
   const [filter, setFilter] = useState<any>(filterApplication);
+  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
+  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>("");
+  const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'Favorito ',
+    //   value: 'id',
+    //   defaultChecked: () => camposGerenciados.includes('id'),
+    // },
+    {
+      name: "CamposGerenciados[]",
+      title: "Safra ",
+      value: "safra",
+      defaultChecked: () => camposGerenciados.includes("safra"),
+    },
+    {
+      name: "CamposGerenciados[]",
+      title: "Foco ",
+      value: "foco",
+      defaultChecked: () => camposGerenciados.includes("foco"),
+    },
+    {
+      name: "CamposGerenciados[]",
+      title: "Ensaio ",
+      value: "ensaio",
+      defaultChecked: () => camposGerenciados.includes("ensaio"),
+    },
+    {
+      name: "CamposGerenciados[]",
+      title: "Tecnologia",
+      value: "tecnologia",
+      defaultChecked: () => camposGerenciados.includes("tecnologia"),
+    },
+    {
+      name: "CamposGerenciados[]",
+      title: "Lugar cultura",
+      value: "local",
+      defaultChecked: () => camposGerenciados.includes("local"),
+    },
+    {
+      name: "CamposGerenciados[]",
+      title: "Época ",
+      value: "epoca",
+      defaultChecked: () => camposGerenciados.includes("epoca"),
+    },
+    {
+      name: "CamposGerenciados[]",
+      title: "NPE Inicial ",
+      value: "npei",
+      defaultChecked: () => camposGerenciados.includes("npei"),
+    },
+    {
+      name: "CamposGerenciados[]",
+      title: "Prox NPE ",
+      value: "prox_npe",
+      defaultChecked: () => camposGerenciados.includes("prox_npe"),
+    },
+    {
+      name: "CamposGerenciados[]",
+      title: "Ação",
+      value: "status",
+      defaultChecked: () => camposGerenciados.includes("status"),
+    },
+  ]);
+
   // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>("");
-  const filtersStatusItem = [
+  const [take, setTake] = useState<number>(itensPerPage);
+  const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
+  const pages = Math.ceil(total / take);
+  const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
+  const [orderBy, setOrderBy] = useState<string>(orderByserver);
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
+    orderBy == "Tecnologia" ? "tecnologia.cod_tec" : orderBy
+  }&typeOrder=${typeOrder}`;
+
+  const filters = [
     { id: 2, name: "Todos" },
     { id: 1, name: "Ativos" },
     { id: 0, name: "Inativos" },
   ];
 
-  const filterStatusBeforeEdit = filterBeforeEdit.split("");
+  const filterStatusBeforeEdit = filterApplication.split("");
 
-  const [take, setTake] = useState<number>(itensPerPage);
-  const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
-  const pages = Math.ceil(total / take);
-
-  const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
-  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
-
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
-
-  const formik = useFormik<IFilter>({
+  const formik = useFormik<any>({
     initialValues: {
       filterStatus: filterStatusBeforeEdit[13],
-      filterSearch: checkValue("filterSearch"),
-      filterSchema: checkValue("filterSchema"),
-      filterPTo: checkValue("filterPTo"),
-      filterPFrom: checkValue("filterPFrom"),
-      filterPreparation: "",
+      filterLocal: checkValue("filterLocal"),
+      filterSafra: checkValue("filterSafra"),
+      filterFoco: checkValue("filterFoco"),
+      filterEnsaio: checkValue("filterEnsaio"),
+      filterTecnologia: checkValue("filterTecnologia"),
+      filterCodTecnologia: checkValue("filterCodTecnologia"),
+      filterEpoca: checkValue("filterEpoca"),
+      filterNPE: checkValue("filterNPE"),
+      filterNpeTo: checkValue("filterNpeTo"),
+      filterNpeFrom: checkValue("filterNpeFrom"),
+      filterNpeFinalTo: checkValue("filterNpeFrom"),
+      filterNpeFinalFrom: checkValue("filterNpeFrom"),
       orderBy: "",
       typeOrder: "",
     },
     onSubmit: async ({
       filterStatus,
-      filterSearch,
-      filterSchema,
-      filterPTo,
-      filterPFrom,
-      filterPreparation,
+      filterLocal,
+      filterSafra,
+      filterFoco,
+      filterEnsaio,
+      filterTecnologia,
+      filterCodTecnologia,
+      filterEpoca,
+      filterNPE,
+      filterNpeTo,
+      filterNpeFrom,
+      filterNpeFinalTo,
+      filterNpeFinalFrom,
     }) => {
-      const parametersFilter = `filterStatus=${filterStatus}&filterPreparation=${filterPreparation}&filterSearch=${filterSearch}&filterSchema=${filterSchema}&filterPTo=${filterPTo}&filterPFrom=${filterPFrom}`;
-      // setFiltersParams(parametersFilter);
-      // setCookies('filterBeforeEdit', filtersParams);
-      // await quadraService
+      // &filterSafra=${filterSafra}
+      const parametersFilter = `filterStatus=${
+        filterStatus || 1
+      }&filterSafra=${filterSafra}&filterNpeTo=${filterNpeTo}&filterCodTecnologia=${filterCodTecnologia}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_culture=${idCulture}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&id_safra=${safraId}`;
+      // &id_safra=${safraId}
+      // await npeService
       //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
       //   .then((response) => {
       //     setFilter(parametersFilter);
-      //     setQuadra(response.response);
+      //     setNPE(response.response);
       //     setTotalItems(response.total);
       //     setCurrentPage(0);
       //   });
-
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
@@ -220,11 +288,11 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
-    await quadraService
+    await printhistoryService
       .getAll(parametersFilter)
       .then((response) => {
         if (response.status === 200 || response.status === 400) {
-          setQuadra(response.response);
+          setNPE(response.response);
           setTotalItems(response.total);
           tableRef.current.dataManager.changePageSize(
             response.total >= take ? take : response.total
@@ -241,36 +309,258 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleStatus(data: IQuadra): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&cod_quadra=${
-      data.cod_quadra
-    }&local_preparo=${data.local.name_local_culture}`;
+  // function headerTableFactory(name: any, title: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {name}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: title,
+  //     sorting: true,
+  //   };
+  // }
 
-    await quadraService.getAll(parametersFilter).then(async ({ status }) => {
-      if (status === 200 && data.status === 1) {
-        Swal.fire("Foco já ativado");
-        return;
-      }
-      await quadraService.update({
-        id: data?.id,
-        status: data.status === 0 ? 1 : 0,
-      });
+  async function deleteItem(data: any) {
+    setLoading(true);
 
-      handlePagination();
+    const { status, message } = await printhistoryService.deleted({
+      id: data?.id,
+      userId: userLogado.id,
     });
-
-    // const index = quadra.findIndex(
-    //   (quadraIndex) => quadraIndex.id === data?.id
-    // );
-
-    // if (index === -1) return;
-
-    // setQuadra((oldSafra) => {
-    //   const copy = [...oldSafra];
-    //   copy[index].status = data.status === 0 ? 1 : 0;
-    //   return copy;
-    // });
+    if (status === 200) {
+      // router.reload();
+      handlePagination();
+      setLoading(false);
+    } else {
+      Swal.fire({
+        html: message,
+        width: "800",
+      });
+    }
   }
+
+  function statusHeaderFactory() {
+    return {
+      title: "Ação",
+      field: "status",
+      sorting: false,
+      searchable: false,
+      filterPlaceholder: "Filtrar por status",
+      render: (rowData: INpeProps) => (
+        <div className="h-7 flex">
+          <div className="h-7">
+            <Button
+              icon={<BiEdit size={14} />}
+              bgColor={rowData.edited === 1 ? "bg-blue-900" : "bg-blue-600"}
+              textColor="white"
+              title="Editar"
+              onClick={() => {
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filter);
+                setCookies("filterBeforeEditTypeOrder", typeOrder);
+                setCookies("filterBeforeEditOrderBy", orderBy);
+                setCookies("filtersParams", filtersParams);
+                setCookies("lastPage", "atualizar");
+                setCookies("itensPage", itensPerPage);
+                setCookies("takeBeforeEdit", take);
+                router.push(`/config/ambiente/atualizar?id=${rowData.id}`);
+              }}
+            />
+          </div>
+          <div style={{ width: 5 }} />
+          <ButtonDeleteConfirmation
+            data={rowData}
+            keyName={rowData?.local?.name_local_culture}
+            onPress={deleteItem}
+            disabled={rowData.status === 3}
+          />
+          {/* {rowData.status === 1 || rowData.status === 3 ? (
+            <div>
+              <Button
+                title={rowData.status === 3 ? '' : 'Ativo'}
+                icon={<BsTrashFill size={14} />}
+                onClick={() => deleteItem(rowData.id)}
+                bgColor={rowData.status === 3 ? 'bg-gray-400' : 'bg-red-600'}
+                textColor="white"
+                disabled={rowData.status === 3}
+              />
+            </div>
+          ) : (
+            <div className="h-7 flex">
+              <div className="h-7" />
+              <div>
+                <Button
+                  title="Inativo"
+                  icon={<BsTrashFill size={14} />}
+                  onClick={async () => deleteItem(rowData.id)}
+                  bgColor="bg-red-800"
+                  textColor="white"
+                />
+              </div>
+            </div>
+          )} */}
+        </div>
+      ),
+    };
+  }
+
+  // function tecnologiaHeaderFactory(title: string, name: string) {
+  //   return {
+  //     title: (
+  //       <div className="flex items-center">
+  //         <button
+  //           type="button"
+  //           className="font-medium text-gray-900"
+  //           onClick={() => handleOrder(title, orderList)}
+  //         >
+  //           {title}
+  //         </button>
+  //       </div>
+  //     ),
+  //     field: "tecnologia",
+  //     width: 0,
+  //     sorting: true,
+  //     render: (rowData: any) => (
+  //       <div className="h-10 flex">
+  //         <div>
+  //           {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
+  //         </div>
+  //       </div>
+  //     ),
+  //   };
+  // }
+
+  function colums(camposGerenciados: any): any {
+    const columnCampos: any = camposGerenciados.split(",");
+    const tableFields: any = [];
+    Object.keys(columnCampos).forEach((item) => {
+      // if (columnCampos[item] === 'id') {
+      //   tableFields.push(idHeaderFactory());
+      // }
+      if (columnCampos[item] === "local") {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Lugar cultura",
+            title: "local.name_local_culture",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
+      }
+      if (columnCampos[item] === "safra") {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Safra",
+            title: "safra.safraName",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
+      }
+      if (columnCampos[item] === "foco") {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Foco",
+            title: "foco.name",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
+      }
+      if (columnCampos[item] === "ensaio") {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Ensaio",
+            title: "type_assay.name",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
+      }
+      // if (columnCampos[item] === 'tecnologia') {
+      //   tableFields.push(headerTableFactory('Nome tec.', 'tecnologia.name'));
+      // }
+      if (columnCampos[item] === "tecnologia") {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Tecnologia",
+            title: "tecnologia.cod_tec",
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: any) => (
+              <div>
+                {`${rowData?.tecnologia?.cod_tec} ${rowData?.tecnologia?.name}`}
+              </div>
+            ),
+          })
+        );
+      }
+      if (columnCampos[item] === "epoca") {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            type: "int",
+            name: "Época",
+            title: "epoca",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
+      }
+      if (columnCampos[item] === "npei") {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "NPE Inicial",
+            title: "npei",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
+      }
+      if (columnCampos[item] === "prox_npe") {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            type: "int",
+            name: "Prox NPE",
+            title: "prox_npe",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
+      }
+      if (columnCampos[item] === "group") {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Grupo",
+            title: "group.group",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
+      }
+      if (columnCampos[item] === "status") {
+        tableFields.push(statusHeaderFactory());
+      }
+    });
+    return tableFields;
+  }
+
+  const columns = colums(camposGerenciados);
 
   async function handleOrder(
     column: string,
@@ -300,11 +590,11 @@ export default function Listagem({
     //   parametersFilter = filter;
     // }
 
-    // await quadraService
+    // await npeService
     //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
     //   .then((response) => {
     //     if (response.status === 200) {
-    //       setQuadra(response.response);
+    //       setNPE(response.response);
     //     }
     //   });
 
@@ -335,204 +625,8 @@ export default function Listagem({
     }, 100);
   }
 
-  // function headerTableFactory(name: any, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: true,
-  //   };
-  // }
-
-  function idHeaderFactory() {
-    return {
-      title: <div className="flex items-center">{arrowOrder}</div>,
-      field: "id",
-      width: 0,
-      sorting: false,
-      render: () =>
-        colorStar === "#eba417" ? (
-          <div className="h-9 flex">
-            <div>
-              <button
-                type="button"
-                className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar("")}
-              >
-                <AiTwotoneStar size={20} color="#eba417" />
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="h-9 flex">
-            <div>
-              <button
-                type="button"
-                className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar("#eba417")}
-              >
-                <AiTwotoneStar size={20} />
-              </button>
-            </div>
-          </div>
-        ),
-    };
-  }
-
-  function statusHeaderFactory() {
-    return {
-      title: "Ação",
-      field: "action",
-      sorting: false,
-      searchable: false,
-      filterPlaceholder: "Filtrar por status",
-      render: (rowData: IQuadra) => (
-        <div className="h-7 flex">
-          <div className="h-7">
-            <Button
-              icon={<BiEdit size={14} />}
-              bgColor="bg-blue-600"
-              textColor="white"
-              title={`Editar ${rowData.cod_quadra}`}
-              onClick={() => {
-                setCookies("pageBeforeEdit", currentPage?.toString());
-                setCookies("filterBeforeEdit", filter);
-                setCookies("filterBeforeEditTypeOrder", typeOrder);
-                setCookies("filterBeforeEditOrderBy", orderBy);
-                setCookies("filtersParams", filtersParams);
-                setCookies("lastPage", "atualizar");
-                router.push(`/config/quadra/atualizar?id=${rowData.id}`);
-              }}
-            />
-          </div>
-          <div style={{ width: 5 }} />
-          <ButtonToogleConfirmation
-            data={rowData}
-            text="a quadra"
-            keyName="name"
-            onPress={handleStatus}
-          />
-        </div>
-      ),
-    };
-  }
-
-  function columnsOrder(columnsCampos: any): any {
-    const columnCampos: any = columnsCampos.split(",");
-    const tableFields: any = [];
-
-    Object.keys(columnCampos).forEach((_, index) => {
-      // if (columnCampos[index] === 'id') {
-      //   tableFields.push(idHeaderFactory());
-      // }
-      if (columnCampos[index] === "cod_quadra") {
-        tableFields.push(
-          headerTableFactoryGlobal({
-            name: "Código quadra",
-            title: "cod_quadra",
-            orderList,
-            fieldOrder,
-            handleOrder,
-          })
-        );
-      }
-      if (columnCampos[index] === "comp_p") {
-        tableFields.push(
-          headerTableFactoryGlobal({
-            name: "Comp P",
-            title: "comp_p",
-            orderList,
-            fieldOrder,
-            handleOrder,
-          })
-        );
-      }
-      if (columnCampos[index] === "linha_p") {
-        tableFields.push(
-          headerTableFactoryGlobal({
-            name: "Linha P",
-            title: "linha_p",
-            orderList,
-            fieldOrder,
-            handleOrder,
-          })
-        );
-      }
-      if (columnCampos[index] === "esquema") {
-        tableFields.push(
-          headerTableFactoryGlobal({
-            name: "Esquema",
-            title: "esquema",
-            orderList,
-            fieldOrder,
-            handleOrder,
-          })
-        );
-      }
-      if (columnCampos[index] === "divisor") {
-        tableFields.push(
-          headerTableFactoryGlobal({
-            name: "Divisor",
-            title: "divisor",
-            orderList,
-            fieldOrder,
-            handleOrder,
-          })
-        );
-      }
-      if (columnCampos[index] === "local_plantio") {
-        tableFields.push(
-          headerTableFactoryGlobal({
-            name: "Local plantio",
-            title: "local_plantio",
-            orderList,
-            fieldOrder,
-            handleOrder,
-          })
-        );
-      }
-      if (columnCampos[index] === "local_preparo") {
-        tableFields.push(
-          headerTableFactoryGlobal({
-            name: "Local preparo",
-            title: "local.name_local_culture",
-            orderList,
-            fieldOrder,
-            handleOrder,
-          })
-        );
-      }
-      if (columnCampos[index] === "allocation") {
-        tableFields.push(
-          headerTableFactoryGlobal({
-            name: "Status",
-            title: "allocation",
-            orderList,
-            fieldOrder,
-            handleOrder,
-          })
-        );
-      }
-      if (columnCampos[index] === "action") {
-        tableFields.push(statusHeaderFactory());
-      }
-    });
-    return tableFields;
-  }
-
-  const columns = columnsOrder(camposGerenciados);
-
   async function getValuesColumns(): Promise<void> {
-    const els: any = document.querySelectorAll("input[type='checkbox']");
+    const els: any = document.querySelectorAll("input[type='checkbox'");
     let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
@@ -546,10 +640,10 @@ export default function Listagem({
         .create({
           table_preferences: campos,
           userId: userLogado.id,
-          module_id: 17,
+          module_id: 14,
         })
         .then((response) => {
-          userLogado.preferences.quadras = {
+          userLogado.preferences.npe = {
             id: response.response.id,
             userId: preferences.userId,
             table_preferences: campos,
@@ -558,7 +652,7 @@ export default function Listagem({
         });
       localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.quadras = {
+      userLogado.preferences.npe = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
@@ -574,7 +668,44 @@ export default function Listagem({
     setCamposGerenciados(campos);
   }
 
-  function handleOnDragEnd(result: DropResult): void {
+  async function handleStatus(idNPE: number, data: any): Promise<void> {
+    const parametersFilter = `filterStatus=${1}&safraId=${
+      data.safraId
+    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${
+      data.id_type_assay
+    }&epoca=${String(data.epoca)}`;
+    if (data.status == 0) {
+      await printhistoryService.getAll(parametersFilter).then((response) => {
+        if (response.total > 0) {
+          Swal.fire(
+            "NPE não pode ser atualizada pois já existe uma npei cadastrada com essas informações"
+          );
+          router.push("");
+        }
+      });
+    } else {
+      if (data.status === 0) {
+        data.status = 1;
+      } else {
+        data.status = 0;
+      }
+      await printhistoryService.update({ id: idNPE, status: data.status });
+
+      const index = npe.findIndex((npe: any) => npe.id === idNPE);
+
+      if (index === -1) {
+        return;
+      }
+
+      setNPE((oldSafra: any) => {
+        const copy = [...oldSafra];
+        copy[index].status = data.status;
+        return copy;
+      });
+    }
+  }
+
+  function handleOnDragEnd(result: DropResult) {
     setStatusAccordion(true);
     if (!result) return;
 
@@ -588,49 +719,53 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    await quadraService.getAll(filter).then(({ status, response }) => {
+    await printhistoryService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((row: any) => {
+          delete row.avatar;
           if (row.status === 0) {
-            row.status = "Inativo" as any;
+            row.status = "Inativo";
           } else {
-            row.status = "Ativo" as any;
+            row.status = "Ativo";
           }
 
-          row.COD_QUADRA = row.cod_quadra;
+          row.SAFRA = row.safra?.safraName;
+          row.FOCO = row.foco?.name;
+          row.TIPO_ENSAIO = row.type_assay?.name;
+          row.TECNOLOGIA = row.tecnologia?.name;
           row.LOCAL = row.local?.name_local_culture;
-          row.ESQUEMA = row.esquema;
-          row.LARG_Q = row.larg_q;
-          row.COMP_P = row.comp_p;
-          row.LINHA_P = row.linha_p;
-          row.COMP_C = row.comp_c;
-          row.TIRO_FIXO = row.tiro_fixo;
-          row.DISPARO_FIXO = row.disparo_fixo;
-          row.STATUS_ALOCADO = row.allocation;
+          row.NPEI = row.npei;
+          row.ÉPOCA = row?.epoca;
+          row.GRUPO = row.group.group;
+          row.NEXT_AVAILABLE_NPE = row?.nextAvailableNPE;
+          row.PROX_NPE = row.prox_npe;
           row.STATUS = row.status;
 
-          delete row.cod_quadra;
+          delete row.nextAvailableNPE;
+          delete row.prox_npe;
+
+          delete row.edited;
           delete row.local;
-          delete row.esquema;
-          delete row.larg_q;
-          delete row.comp_p;
-          delete row.linha_p;
-          delete row.q;
-          delete row.comp_c;
-          delete row.tiro_fixo;
-          delete row.disparo_fixo;
-          delete row.status;
-          delete row.id;
           delete row.safra;
-          delete row.tableData;
-          delete row.local_plantio;
-          delete row.allocation;
+          delete row.foco;
+          delete row.epoca;
+          delete row.tecnologia;
+          delete row.type_assay;
+          delete row.group;
+          delete row.npei;
+          delete row.status;
+          delete row.nextNPE;
+          delete row.npeQT;
+          delete row.localId;
+          delete row.safraId;
+          delete row.npef;
+          delete row.id;
           return row;
         });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "quadra");
+        XLSX.utils.book_append_sheet(workBook, workSheet, "npe");
 
         // Buffer
         XLSX.write(workBook, {
@@ -643,140 +778,12 @@ export default function Listagem({
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Quadras.xlsx");
+        XLSX.writeFile(workBook, "NPE.xlsx");
       } else {
-        Swal.fire(response);
+        Swal.fire("Não existem registros para serem exportados, favor checar.");
       }
     });
     setLoading(false);
-  };
-
-  const [idArray, setIdArray] = useState([]);
-
-  const downloadExcelSintetico = async (): Promise<void> => {
-    await quadraService.getAll(filter).then(({ status, response }) => {
-      if (status === 200) {
-        const experimentArray: any = [];
-        const object: any = {};
-        const experimentObject: any = {
-          id: "",
-          safra: "",
-          experimentName: "",
-          npei: "",
-          npef: "",
-          ntparcelas: "",
-          locpreparo: "",
-          qm: "",
-        };
-
-        const data = response.map((tow: any) => {
-          tow.cod = tow.cod_quadra;
-          // tow.local = tow.name_local;
-          experimentObject.locpreparo = tow.local.name_local_culture;
-          object.qm = tow.cod;
-          // const localMap = tow.local;
-
-          const allocatedMap = tow.AllocatedExperiment.map((a: any) => {
-            experimentObject.npei = a.npei;
-            experimentObject.npef = a.npef;
-            experimentObject.ntparcelas = a.parcelas;
-            experimentArray.push(experimentObject);
-            return a;
-          });
-          const experimentMap = tow.experiment.map((e: any) => {
-            object.id = e.id;
-            experimentObject.safra = e.safra.safraName;
-            experimentObject.experimentName = e.experimentName;
-            return e;
-          });
-          experimentArray.push(object);
-          experimentArray.push(experimentObject);
-          return tow;
-        });
-        const newData = experimentArray.map((row: any) => {
-          row.ID_EXPERIMENTO = row.id;
-          return row;
-        });
-
-        const workSheet = XLSX.utils.json_to_sheet(newData);
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "quadra");
-
-        // Buffer
-        XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "buffer",
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "binary",
-        });
-        // Download
-        XLSX.writeFile(workBook, "Sintética.xlsx");
-      } else {
-        Swal.fire(response);
-      }
-    });
-  };
-
-  const dowloadExcelAnalytics = async () => {
-    await quadraService
-      .getAll(`${filter}&allocation=${"IMPORTADO"}`)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          const lines: any = [];
-          response.forEach(async (block: any) => {
-            await block.experiment?.forEach(async (experiment: any) => {
-              await experiment.experiment_genotipe?.forEach(
-                (parcela: any, index: number) => {
-                  lines.push({
-                    ID_EXPERIMENTO: experiment?.id,
-                    SAFRA: experiment?.safra?.safraName,
-                    EXPE: experiment?.experimentName,
-                    NPEI: parcela?.npe,
-                    NPEF: parcela?.npe,
-                    NTPARC: 1,
-                    LOCALPREP: block.local?.name_local_culture,
-                    QM: block.cod_quadra,
-                    SEQ: block.AllocatedExperiment[index]?.seq,
-                    FOCO: experiment?.assay_list?.foco?.name,
-                    ENSAIO: experiment?.assay_list?.type_assay?.name,
-                    GLI: experiment?.assay_list?.gli,
-                    CODLOCAL_EXP: experiment?.local?.name_local_culture,
-                    EPOCA: experiment?.period,
-                    TECNOLOGIA: experiment?.assay_list?.tecnologia?.name,
-                    BGM: experiment?.bgm,
-                    REP: experiment?.repetitionsNumber,
-                    STATUS_EXP: experiment?.status,
-                    CÓDIGO_GENOTIPO: parcela?.genotipo?.name_genotipo,
-                    STATUS_PARCELA: parcela?.status,
-                  });
-                }
-              );
-            });
-          });
-
-          const workSheet = XLSX.utils.json_to_sheet(lines);
-          const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, "quadra");
-
-          // Buffer
-          XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "buffer",
-          });
-          // Binary
-          XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "binary",
-          });
-          // Download
-          XLSX.writeFile(workBook, "Analítico.xlsx");
-        } else {
-          Swal.fire("Nenhuma quadra alocada");
-        }
-      });
   };
 
   // manage total pages
@@ -796,14 +803,33 @@ export default function Listagem({
     // }
 
     // if (filter) {
-    //   parametersFilter = `${parametersFilter}&${filter}&${cultureId}`;
+    //   parametersFilter = `${parametersFilter}&${filter}`;
     // }
-    // await quadraService.getAll(parametersFilter).then((response) => {
-    //   if (response.status === 200) {
-    //     setQuadra(response.response);
+    // await npeService.getAll(parametersFilter).then(({ status, response }) => {
+    //   if (status === 200) {
+    //     setNPE(response);
     //   }
     // });
+
     await callingApi(filter); // handle pagination globly
+  }
+
+  function filterFieldFactory(title: any, name: any) {
+    return (
+      <div className="h-4 w-1/4 ml-2">
+        <label className="block text-gray-900 text-sm font-bold mb-1">
+          {name}
+        </label>
+        <Input
+          type="text"
+          placeholder={name}
+          defaultValue={checkValue(title)}
+          id={title}
+          name={title}
+          onChange={formik.handleChange}
+        />
+      </div>
+    );
   }
 
   // Checking defualt values
@@ -823,10 +849,10 @@ export default function Listagem({
   return (
     <>
       {loading && <ComponentLoading text="" />}
-      <Head>
-        <title>Listagem de quadras</title>
-      </Head>
 
+      <Head>
+        <title>Listagem dos Ambientes</title>
+      </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <main
           className="h-full w-full
@@ -835,25 +861,19 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar quadras">
+          <AccordionFilter title="Filtrar ambientes">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
                   w-full
                   items-center
-                  px-2
+                  px-0
                   bg-white
                 "
                 onSubmit={formik.handleSubmit}
               >
-                <div
-                  className="w-full h-full
-                  flex
-                  justify-center
-                  pb-0
-                "
-                >
-                  <div className="h-7 w-1/2 ml-2">
+                <div className="w-full h-full flex justify-center pb-0">
+                  {/* <div className="h-6 w-1/4 ml-0">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status
                     </label>
@@ -861,78 +881,103 @@ export default function Listagem({
                       name="filterStatus"
                       onChange={formik.handleChange}
                       defaultValue={filterStatusBeforeEdit[13]}
-                      // defaultValue={checkValue('filterSearch')}
-                      values={filtersStatusItem.map((id) => id)}
+                      // defaultValue={checkValue('filterStatus')}
+                      values={filters.map((id) => id)}
                       selected="1"
                     />
-                  </div>
-                  <div className="h-10 w-1/2 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Local preparo
-                    </label>
-                    <Input
-                      type="text"
-                      placeholder="Local Preparo"
-                      id="filterPreparation"
-                      name="filterPreparation"
-                      onChange={formik.handleChange}
-                    />
-                  </div>
-                  <div className="h-10 w-1/2 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Código quadra
-                    </label>
-                    <Input
-                      type="text"
-                      placeholder="Código quadra"
-                      id="filterSearch"
-                      name="filterSearch"
-                      defaultValue={checkValue("filterSearch")}
-                      onChange={formik.handleChange}
-                    />
-                  </div>
+                  </div> */}
+
+                  {filterFieldFactory("filterFoco", "Foco")}
+
+                  {filterFieldFactory("filterEnsaio", "Ensaio")}
+
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Linha P
+                      Cod Tec
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex">
                       <Input
-                        type="number"
-                        placeholder="De"
-                        id="filterPFrom"
-                        name="filterPFrom"
+                        size={7}
+                        placeholder="Cod Tec"
+                        id="filterCodTecnologia"
+                        name="filterCodTecnologia"
                         onChange={formik.handleChange}
-                        defaultValue={checkValue("filterPFrom")}
-                      />
-                      <Input
-                        type="number"
-                        placeholder="Até"
-                        id="filterPTo"
-                        name="filterPTo"
-                        onChange={formik.handleChange}
-                        defaultValue={checkValue("filterPTo")}
                       />
                     </div>
                   </div>
-                  <div className="h-10 w-1/2 ml-2">
+
+                  {filterFieldFactory("filterTecnologia", "Nome Tec")}
+
+                  {filterFieldFactory("filterLocal", "Lugar cultura")}
+
+                  <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Esquema
+                      Época
                     </label>
-                    <Input
-                      type="text"
-                      placeholder="Esquema"
-                      id="filterSchema"
-                      name="filterSchema"
-                      onChange={formik.handleChange}
-                      defaultValue={checkValue("filterSchema")}
-                    />
+                    <div className="flex">
+                      <Input
+                        type="number"
+                        placeholder="Época"
+                        id="filterEpoca"
+                        name="filterEpoca"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/3 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NPE Inicial
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        type="number"
+                        id="filterNpeFrom"
+                        name="filterNpeFrom"
+                        onChange={formik.handleChange}
+                        defaultValue={checkValue("filterNpeFrom")}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        type="number"
+                        id="filterNpeTo"
+                        name="filterNpeTo"
+                        defaultValue={checkValue("filterNpeTo")}
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/3 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Prox NPE
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        type="number"
+                        id="filterNpeFinalFrom"
+                        name="filterNpeFinalFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        type="number"
+                        id="filterNpeFinalTo"
+                        name="filterNpeFinalTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
                   </div>
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
-                  <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
+                  <div style={{ width: 40 }} />
+                  <div className="h-7 w-32 mt-6">
                     <Button
-                      type="submit"
                       onClick={() => {
                         setLoading(true);
                       }}
@@ -947,12 +992,13 @@ export default function Listagem({
             </div>
           </AccordionFilter>
 
+          {/* overflow-y-scroll */}
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
               tableRef={tableRef}
               style={{ background: "#f9fafb" }}
               columns={columns}
-              data={quadra}
+              data={npe}
               options={{
                 showTitle: false,
                 headerStyle: {
@@ -966,7 +1012,7 @@ export default function Listagem({
               components={{
                 Toolbar: () => (
                   <div
-                    className="w-full max-h-96
+                    className="w-full max-h-max
                     flex
                     items-center
                     justify-between
@@ -978,14 +1024,29 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
+                    {/* <div className="h-12">
+                      <Button
+                        title="Importar Planilha"
+                        value="Importar Planilha"
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        onClick={() => { }}
+                        href="npe/importar-planilha"
+                        icon={<RiFileExcel2Line size={20} />}
+                      />
+                    </div> */}
+
                     <div />
                     <strong className="text-blue-600">
                       Total registrado: {itemsTotal}
                     </strong>
 
-                    <div className="h-full flex items-center gap-2">
+                    <div
+                      className="h-full flex items-center gap-2
+                    "
+                    >
                       <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-72">
+                        <div className="w-64">
                           <AccordionFilter
                             title="Gerenciar Campos"
                             grid={statusAccordion}
@@ -1013,18 +1074,18 @@ export default function Listagem({
                                         draggableId={String(generate.title)}
                                         index={index}
                                       >
-                                        {(provider) => (
+                                        {(provided) => (
                                           <li
-                                            ref={provider.innerRef}
-                                            {...provider.draggableProps}
-                                            {...provider.dragHandleProps}
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
                                           >
                                             <CheckBox
                                               name={generate.name}
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                String(generate.value)
+                                                generate.value
                                               )}
                                             />
                                           </li>
@@ -1042,7 +1103,7 @@ export default function Listagem({
 
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
-                          title="Exportar planilha de quadras"
+                          title="Exportar planilha de NPE"
                           icon={<RiFileExcel2Line size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
@@ -1050,39 +1111,16 @@ export default function Listagem({
                             downloadExcel();
                           }}
                         />
-                      </div>
-                      <div className="h-12 flex items-center justify-center w-full">
-                        <Button
-                          title="Exportação Sintética"
-                          icon={<RiFileExcel2Line size={20} />}
-                          bgColor="bg-yellow-500"
-                          textColor="white"
-                          onClick={() => {
-                            downloadExcelSintetico();
-                          }}
-                        />
-                      </div>
-                      <div className="h-12 flex items-center justify-center w-full">
-                        <Button
-                          title="Exportação Analítico"
-                          icon={<RiFileExcel2Line size={20} />}
-                          bgColor="bg-green-600"
-                          textColor="white"
-                          onClick={() => {
-                            dowloadExcelAnalytics();
-                          }}
-                        />
-                      </div>
-                      {/* <div className="h-12 flex items-center justify-center w-full">
-                        <Button
+                        {/* <div style={{ width: 20 }} /> */}
+                        {/* <Button
                           title="Configurar Importação de Planilha"
                           icon={<RiSettingsFill size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
                           onClick={() => {}}
-                          href="quadra/importar-planilha/config-planilha"
-                        />
-                      </div> */}
+                          href="npe/importar-planilha/config-planilha"
+                        /> */}
+                      </div>
                     </div>
                   </div>
                 ),
@@ -1153,17 +1191,9 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage =
-    (await (
-      await PreferencesControllers.getConfigGerais()
-    )?.response[0]?.itens_per_page) ?? 15;
-
+  const { safraId } = req.cookies;
+  const idCulture = req.cookies.cultureId;
   const { token } = req.cookies;
-  const cultureId: number = Number(req.cookies.cultureId);
-  const pageBeforeEdit = req.cookies.pageBeforeEdit
-    ? req.cookies.pageBeforeEdit
-    : 0;
 
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
@@ -1174,58 +1204,68 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies("filterBeforeEditTypeOrder", { req, res });
     removeCookies("filterBeforeEditOrderBy", { req, res });
     removeCookies("lastPage", { req, res });
+    removeCookies("itensPage", { req, res });
   }
 
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : "filterStatus=1";
+  // RR
+
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
+    : 10;
 
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : "desc";
+    : "";
 
+  // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : "local.name_local_culture";
+    : "";
+
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
+
+  const { publicRuntimeConfig } = getConfig();
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}`
-    : "filterStatus=1";
+    : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
+  // id_culture=${idCulture}&id_safra=${safraId}
 
   removeCookies("filterBeforeEdit", { req, res });
   removeCookies("pageBeforeEdit", { req, res });
-
   removeCookies("filterBeforeEditTypeOrder", { req, res });
+  removeCookies("takeBeforeEdit", { req, res });
   removeCookies("filterBeforeEditOrderBy", { req, res });
   removeCookies("lastPage", { req, res });
 
-  const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/quadra`;
-
-  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
-
   const requestOptions = {
     method: "GET",
     credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const response = await fetch(`${baseUrl}`, requestOptions);
-  const { response: quadras, total: totalItems } = await response.json();
+  const { response: allNpe = [], total: totalItems = 0 } = await fetch(
+    urlParameters.toString(),
+    requestOptions
+  ).then((response) => response.json());
 
   return {
     props: {
-      quadras,
+      allNpe,
       totalItems,
       itensPerPage,
       filterApplication,
-      cultureId,
-      pageBeforeEdit,
       filterBeforeEdit,
-      orderByserver,
-      typeOrderServer,
+      orderByserver, // RR
+      typeOrderServer, // RR
+      safraId,
+      idCulture,
     },
   };
 };

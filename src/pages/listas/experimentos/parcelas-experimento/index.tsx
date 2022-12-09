@@ -1126,7 +1126,7 @@ export default function Listagem({
                     <div className="flex">
                       <Input
                         size={7}
-                        type="int"
+                        type="number"
                         placeholder="Cod Tec"
                         id="filterCodTec"
                         name="filterCodTec"
@@ -1155,14 +1155,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="int"
+                        type="number"
                         placeholder="De"
                         id="filterRepFrom"
                         name="filterRepFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="int"
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterRepTo"
@@ -1243,14 +1243,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="int"
+                        type="number"
                         placeholder="De"
                         id="filterNtFrom"
                         name="filterNtFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="int"
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNtTo"
@@ -1265,14 +1265,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="int"
+                        type="number"
                         placeholder="De"
                         id="filterNpeFrom"
                         name="filterNpeFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="int"
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNpeTo"

@@ -793,7 +793,7 @@ export default function TipoEnsaio({
                     <div className="flex gap-2">
                       <div className="w-full">
                         <Input
-                          type="int"
+                          type="number"
                           placeholder="De"
                           id="filterSeedsFrom"
                           name="filterSeedsFrom"
@@ -803,7 +803,7 @@ export default function TipoEnsaio({
 
                       <div className="w-full">
                         <Input
-                          type="int"
+                          type="number"
                           placeholder="Até"
                           id="filterSeedsTo"
                           name="filterSeedsTo"

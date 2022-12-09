@@ -20,7 +20,7 @@ export class GenotypeTreatmentController {
       }
       if (options.filterBgmFrom || options.filterBgmTo) {
         if (options.filterBgmFrom && options.filterBgmTo) {
-          if (options.filterNcaFrom === 'vazio' || options.filterNcaTo === 'vazio') {
+          if (options.filterNcaFrom.toUpperCase() === 'VAZIO' || options.filterNcaTo.toUpperCase() === 'VAZIO') {
             parameters.nca = null;
           } else {
             parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm": {"gte": ${Number(options.filterBgmFrom)}, "lte": ${Number(options.filterBgmTo)} } } }`));

@@ -312,7 +312,7 @@ export default function NovoUsuario({
                 Matricula
               </label>
               <Input
-                type="int"
+                type="number"
                 placeholder="Campo númerico"
                 id="registration"
                 name="registration"
