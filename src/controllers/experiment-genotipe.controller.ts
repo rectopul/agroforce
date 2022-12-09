@@ -275,6 +275,7 @@ export class ExperimentGenotipeController {
         },
         nca: true,
         lote: true,
+        group: true,
         status_t: true,
         sequencia_delineamento: true,
       };
