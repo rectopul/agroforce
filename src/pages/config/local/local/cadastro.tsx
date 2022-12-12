@@ -16,6 +16,7 @@ import { Content } from '../../../../components/Content/index';
 import { Input } from '../../../../components/Input/index';
 import { Select } from '../../../../components/Select/index';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 interface ILocalProps {
   id: number | any;
@@ -59,6 +60,9 @@ export default function NovoLocal({ uf }: IData) {
       ? tab.statusTab = true
       : tab.statusTab = false
   ));
+
+  const [loading, setLoading] = useState<boolean>(false);
+  setLoading(false);
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const ufs: object | any = [];
@@ -134,6 +138,7 @@ export default function NovoLocal({ uf }: IData) {
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Novo Local</title>
       </Head>
@@ -348,7 +353,9 @@ export default function NovoLocal({ uf }: IData) {
                 bgColor="bg-blue-600"
                 icon={<FiUserPlus size={18} />}
                 textColor="white"
-                onClick={() => { }}
+                onClick={() => { 
+                  setLoading(true); 
+                }}
               />
             </div>
           </div>

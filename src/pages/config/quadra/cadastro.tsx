@@ -9,6 +9,7 @@ import { Button, Content, Input } from 'src/components';
 import { genotipoService } from 'src/services';
 import Swal from 'sweetalert2';
 import * as ITabs from '../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 export interface ICreateGenotipo {
   id_culture: number;
@@ -30,6 +31,10 @@ export default function Cadastro() {
   ));
 
   const router = useRouter();
+
+  const [loading, setLoading] = useState<boolean>(false);
+  setLoading(false);
+
   const [checkInput, setCheckInput] = useState('text-black');
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
@@ -64,6 +69,7 @@ export default function Cadastro() {
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Cadastro de genótipo</title>
       </Head>
@@ -129,7 +135,7 @@ export default function Cadastro() {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<SiMicrogenetics size={18} />}
-                onClick={() => { }}
+                onClick={() => { setLoading(true); }}
               />
             </div>
           </div>

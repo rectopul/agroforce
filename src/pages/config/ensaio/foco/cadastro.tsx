@@ -10,6 +10,7 @@ import Swal from 'sweetalert2';
 import { focoService } from '../../../../services/foco.service';
 import { Button, Content, Input } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 interface ICreateFoco {
   name: string;
@@ -25,6 +26,9 @@ export default function Cadastro() {
   tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
+
+  const [loading, setLoading] = useState<boolean>(false);
+  setLoading(false);
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
@@ -74,6 +78,7 @@ export default function Cadastro() {
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Novo foco</title>
       </Head>
@@ -136,7 +141,7 @@ export default function Cadastro() {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<AiOutlineFileSearch size={20} />}
-                onClick={() => {}}
+                onClick={() => {setLoading(true);}}
               />
             </div>
           </div>

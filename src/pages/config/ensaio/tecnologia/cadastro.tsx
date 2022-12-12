@@ -11,6 +11,7 @@ import {
   Input,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 interface ITecnologiaProps {
   id: number;
@@ -24,6 +25,9 @@ interface ITecnologiaProps {
 
 export default function NovoLocal() {
   const { TabsDropDowns } = ITabs.default;
+
+  const [loading, setLoading] = useState<boolean>(false);
+  setLoading(false);
 
   const tabsDropDowns = TabsDropDowns();
 
@@ -88,6 +92,7 @@ export default function NovoLocal() {
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Nova tecnologia</title>
       </Head>
@@ -176,7 +181,7 @@ export default function NovoLocal() {
                 value="Cadastrar"
                 bgColor="bg-blue-600"
                 textColor="white"
-                onClick={() => { }}
+                onClick={() => { setLoading(true); }}
               />
             </div>
           </div>
