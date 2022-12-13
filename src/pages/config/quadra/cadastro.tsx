@@ -9,7 +9,7 @@ import { Button, Content, Input } from 'src/components';
 import { genotipoService } from 'src/services';
 import Swal from 'sweetalert2';
 import * as ITabs from '../../../shared/utils/dropdown';
-import ComponentLoading from '../../../../components/Loading';
+import ComponentLoading from '../../../components/Loading';
 
 export interface ICreateGenotipo {
   id_culture: number;
@@ -69,7 +69,7 @@ export default function Cadastro() {
 
   return (
     <>
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Cadastro de genótipo</title>
       </Head>

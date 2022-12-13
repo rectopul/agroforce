@@ -6,6 +6,7 @@ import { FiUserPlus } from 'react-icons/fi';
 import { IoMdArrowBack } from 'react-icons/io';
 import { tecnologiaService } from 'src/services';
 import Swal from 'sweetalert2';
+import { useState } from 'react';
 import {
   Button, Content,
   Input,
@@ -92,7 +93,7 @@ export default function NovoLocal() {
 
   return (
     <>
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Nova tecnologia</title>
       </Head>

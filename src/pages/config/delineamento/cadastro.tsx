@@ -12,6 +12,7 @@ import {
 } from '../../../components';
 import * as ITabs from '../../../shared/utils/dropdown';
 import ComponentLoading from '../../../components/Loading';
+import { useState } from 'react';
 
 interface IDelineamentoProps {
   id_culture: number;

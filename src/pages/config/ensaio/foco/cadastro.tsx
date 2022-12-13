@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { AiOutlineFileSearch } from 'react-icons/ai';
 import { IoMdArrowBack } from 'react-icons/io';
 import Swal from 'sweetalert2';
+import { useState } from 'react';
 import { focoService } from '../../../../services/foco.service';
 import { Button, Content, Input } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
@@ -78,7 +79,7 @@ export default function Cadastro() {
 
   return (
     <>
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Novo foco</title>
       </Head>
@@ -141,7 +142,7 @@ export default function Cadastro() {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<AiOutlineFileSearch size={20} />}
-                onClick={() => {setLoading(true);}}
+                onClick={() => { setLoading(true); }}
               />
             </div>
           </div>
