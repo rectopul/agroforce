@@ -189,10 +189,10 @@ export function Content({
           </div>
         )}
       >
-        {tabsHeader.map((item, index) => (
+        {tabsHeader.map((item: any, index: any) => (
           <ToolTip
             key={index}
-            contentMenu={item.data.map((dropdown, index) => (
+            contentMenu={item.data.map((dropdown: any, index: any) => (
               <DropDown
                 key={index}
                 label={dropdown.labelDropDown}

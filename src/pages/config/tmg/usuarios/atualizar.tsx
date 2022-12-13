@@ -629,17 +629,17 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
     })),
   };
 
-  const departmentsData = responseDepartment.map((department) => ({
+  const departmentsData = responseDepartment.map((department: any) => ({
     id: department.id,
     name: department.name,
   }));
 
-  const profilesData = responseProfile.map((profile) => ({
+  const profilesData = responseProfile.map((profile: any) => ({
     id: profile.id,
     name: profile.name,
   }));
 
-  const culturesData = responseCulture.map((culture) => ({
+  const culturesData = responseCulture.map((culture: any) => ({
     id: culture.id,
     name: culture.name,
   }));

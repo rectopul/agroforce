@@ -202,7 +202,7 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
           >
             <main className="relative sm:bottom-12 md:bottom-16 lg:bottom-20  w-importation-content mb-2 flex flex-col overflow-x-scroll h-1/12">
               <div className="absolute flex pl-2 justify-start items-center gap-3 text-white">
-                {Letras.map((item, index) => {
+                {Letras.map((item: any, index: any) => {
                   if (index < quantityColumns) {
                     {
                       return (
@@ -219,7 +219,7 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
               <div className="flex  justify-start items-center py-8 gap-3">
                 <div className="flex pl-2 justify-start items-center gap-3 py-3 mt-16 ml-2">
                   {(quantityColumns > 0)
-                    ? Array(quantityColumns).fill('').map((_, index) => (
+                    ? Array(quantityColumns).fill('').map((_, index: any) => (
                       <div key={index} className="h-11 w-32">
                         <Select name={`fields_${index}`} onChange={formik.handleChange} selected={configPlanilhaSalva[index]} values={Options} />
                       </div>
