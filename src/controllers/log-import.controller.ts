@@ -84,6 +84,16 @@ export class LogImportController {
         parameters.state = JSON.parse(`{"contains":"${options.filterState}"}`);
       }
 
+      if (options.filterEndFinishDate) {
+        const newStartDate = new Date(options.filterEndFinishDate);
+        parameters.AND.push({ updated_at: { gte: newStartDate } });
+      }
+
+      if (options.filterStartFinishDate) {
+        const newEndDate = new Date(options.filterStartFinishDate);
+        parameters.AND.push({ updated_at: { lte: newEndDate } });
+      }
+
       if (options.filterStartDate) {
         const newStartDate = new Date(options.filterStartDate);
         parameters.AND.push({ created_at: { gte: newStartDate } });
@@ -102,6 +112,7 @@ export class LogImportController {
         status: true,
         invalid_data: true,
         created_at: true,
+        updated_at: true,
       };
 
       if (options.status) {
@@ -133,6 +144,7 @@ export class LogImportController {
       response.map((item: any) => {
         const newItem = item;
         newItem.created_at = functionsUtils.formatDate(item.created_at);
+        newItem.updated_at = functionsUtils.formatDate(item.updated_at);
         return newItem;
       });
       return { status: 200, response, total: response.total };

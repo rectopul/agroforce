@@ -106,7 +106,6 @@ export default function Import({
   const [importLoading, setImportLoading] = useState<boolean>(false);
 
   async function readExcel(moduleId: number, table: string) {
-
     try {
       const value: any = document.getElementById(`inputFile-${moduleId}`);
       if (!value.files[0]) {
@@ -130,10 +129,8 @@ export default function Import({
       readXlsxFile(value.files[0])
         .then(async (rows) => {
           setImportLoading(true);
-          
 
-          // await importblob(value.files[0]); 
-        
+          // await importblob(value.files[0]);
 
           if (moduleId) {
             const { message } = await importService.validate({
@@ -239,6 +236,8 @@ export default function Import({
       filterTable: '',
       filterStartDate: '',
       filterEndDate: '',
+      filterStartFinishDate: '',
+      filterEndFinishDate: '',
       filterState: '',
       orderBy: '',
       typeOrder: '',
@@ -248,9 +247,11 @@ export default function Import({
       filterTable,
       filterStartDate,
       filterEndDate,
+      filterStartFinishDate,
+      filterEndFinishDate,
       filterState,
     }) => {
-      const parametersFilter = `filterUser=${filterUser}&filterTable=${filterTable}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&filterState=${filterState}`;
+      const parametersFilter = `filterStartFinishDate=${filterStartFinishDate}&filterEndFinishDate=${filterEndFinishDate}&filterUser=${filterUser}&filterTable=${filterTable}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&filterState=${filterState}`;
       setFilter(parametersFilter);
 
       setLoading(true);
@@ -1061,7 +1062,7 @@ export default function Import({
                     {filterFieldFactory('filterTable', 'Tabela')}
                     <div className="h-10 w-1/2 ml-2">
                       <label className="block text-gray-900 text-sm font-bold mb-1">
-                        De:
+                        Inicio De:
                       </label>
                       <Input
                         type="date"
@@ -1072,7 +1073,7 @@ export default function Import({
                     </div>
                     <div className="h-10 w-1/2 ml-2">
                       <label className="block text-gray-900 text-sm font-bold mb-1">
-                        Até:
+                        Inicio Até:
                       </label>
                       <Input
                         type="date"
@@ -1082,21 +1083,29 @@ export default function Import({
                       />
                     </div>
 
-                    <div className="h-6 w-1/2 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Finalizado em:
-                    </label>
-                    <div className="flex">
+                    <div className="h-10 w-1/2 ml-2">
+                      <label className="block text-gray-900 text-sm font-bold mb-1">
+                        Fim De:
+                      </label>
                       <Input
-                        placeholder="Fim"
-                        id="updated_at"
-                        name="updated_at"
+                        type="date"
+                        id="filterStartFinishDate"
+                        name="filterStartFinishDate"
                         onChange={formik.handleChange}
                       />
                     </div>
-                  </div>
+                    <div className="h-10 w-1/2 ml-2">
+                      <label className="block text-gray-900 text-sm font-bold mb-1">
+                        Fim Até:
+                      </label>
+                      <Input
+                        type="date"
+                        id="filterEndFinishDate"
+                        name="filterEndFinishDate"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
 
-                    
                     {filterFieldFactory('filterState', 'Status')}
 
                     <FieldItemsPerPage
