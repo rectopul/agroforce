@@ -90,6 +90,7 @@ export class ImportGenotypeTreatmentController {
           } else if (treatments[0]?.status_experiment === 'EXP. SORTEADO') {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tratamento do genótipo já foi sorteado. </li> <br>`;
+
           }
           // if (treatments[0]?.status_experiment === 'SORTEADO') {
           //   responseIfError[0]
@@ -115,6 +116,11 @@ export class ImportGenotypeTreatmentController {
           //             responseIfError[0]
           //               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o status T e diferente do cadastrado no tratamento. </li> <br>`;
           //           }
+
+          // if (spreadSheet[row][3].toString().length < 2) {
+          //   // eslint-disable-next-line no-param-reassign
+          //   spreadSheet[row][3] = `0${spreadSheet[row][3]}`;
+          // }
 
           // if (String(treatments[0]?.assay_list.tecnologia.cod_tec)
           //     !== String(spreadSheet[row][3])) {
