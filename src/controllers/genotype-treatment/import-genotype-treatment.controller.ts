@@ -54,15 +54,21 @@ export class ImportGenotypeTreatmentController {
     try {
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
-          const { response: assayList } = await assayListController.getAll({
-            gli: spreadSheet[row][4],
-          });
-          if (assayList.length !== 0) {
-            if ((assayList[0]?.status) === 'EXP IMP.') {
-              responseIfError[0]
-                += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o ensaio já foi sorteado </li> <br>`;
-            }
+          // const { response: assayList } = await assayListController.getAll({
+          //   gli: spreadSheet[row][4],
+          // });
+          // if (assayList.length !== 0) {
+          //   if ((assayList[0]?.status) === 'EXP IMP.') {
+          //     responseIfError[0]
+          //       += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o ensaio já foi sorteado </li> <br>`;
+          //   }
+          // }
+
+          if (spreadSheet[row][3]?.toString().length < 2) {
+            // eslint-disable-next-line no-param-reassign
+            spreadSheet[row][3] = `0${spreadSheet[row][3]}`;
           }
+
           const {
             response: treatments,
           }: any = await genotypeTreatmentController.getAll({
@@ -70,16 +76,20 @@ export class ImportGenotypeTreatmentController {
             filterTypeAssay: spreadSheet[row][2],
             filterCodTec: spreadSheet[row][3],
             filterGli: spreadSheet[row][4],
-            filterBgm: spreadSheet[row][5],
-            filterTreatmentsNumber: spreadSheet[row][6],
+            filterBgm: Number(spreadSheet[row][5]),
+            filterTreatmentsNumber: Number(spreadSheet[row][6]),
             filterStatusT: spreadSheet[row][7],
             filterGenotypeName: spreadSheet[row][8],
           });
+
           if (treatments.length === 0) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tratamento de genótipo não encontrado, as chaves para encontra-lo são (
                 FOCO, TIPO DE ENSAIO, TECNOLOGIA, GLI, BGM, NT, STATUS_T E GENÓTIPO
               ) </li> <br>`;
+          } else if (treatments[0]?.status_experiment === 'EXP. SORTEADO') {
+            responseIfError[0]
+              += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tratamento do genótipo já foi sorteado. </li> <br>`;
           }
           // if (treatments[0]?.status_experiment === 'SORTEADO') {
           //   responseIfError[0]
@@ -105,11 +115,6 @@ export class ImportGenotypeTreatmentController {
           //             responseIfError[0]
           //               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o status T e diferente do cadastrado no tratamento. </li> <br>`;
           //           }
-
-          // if (spreadSheet[row][3].toString().length < 2) {
-          //   // eslint-disable-next-line no-param-reassign
-          //   spreadSheet[row][3] = `0${spreadSheet[row][3]}`;
-          // }
 
           // if (String(treatments[0]?.assay_list.tecnologia.cod_tec)
           //     !== String(spreadSheet[row][3])) {
