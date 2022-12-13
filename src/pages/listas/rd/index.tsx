@@ -584,6 +584,7 @@ export default function Import({
           delete newItem.updated_at;
           delete newItem.id;
           delete newItem.status;
+          delete newItem.invalid_data;
           return newItem;
         });
         const workSheet = XLSX.utils.json_to_sheet(response);
