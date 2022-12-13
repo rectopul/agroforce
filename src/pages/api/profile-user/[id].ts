@@ -56,10 +56,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         registration: response?.registration,
         name_department: response?.department.name,
         status: response?.status,
-        cultures: response?.users_cultures.map((item) => ({
+        cultures: response?.users_cultures.map((item: any) => ({
           culture_id: item.culture.id,
           culture_name: item.culture.name,
-          permissions: item.culture.users_permissions.map((item) => ({
+          permissions: item.culture.users_permissions.map((item: any) => ({
             permission_id: item.profile.id,
             permission_name: item.profile.name,
           })),
