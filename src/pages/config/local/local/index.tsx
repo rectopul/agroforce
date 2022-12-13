@@ -369,7 +369,7 @@ export default function Listagem({
   function columnsOrder(camposGerenciados: any): any {
     const objectCampos: any = camposGerenciados.split(",");
     const arrOb: any = [];
-    Object.keys(objectCampos).forEach((item) => {
+    Object.keys(objectCampos).forEach((item: any) => {
       // if (objectCampos[item] === 'id') {
       //   arrOb.push(idHeaderFactory());
       // }

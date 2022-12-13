@@ -152,7 +152,7 @@ export default function Listagem({
   function colums(camposGerenciados: any): any {
     const ObjetCampos: any = camposGerenciados.split(',');
     const arrOb: any = [];
-    Object.keys(ObjetCampos).forEach((item) => {
+    Object.keys(ObjetCampos).forEach((item: any) => {
       if (ObjetCampos[item] === 'id') {
         arrOb.push({
           title: '',

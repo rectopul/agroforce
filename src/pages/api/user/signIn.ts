@@ -35,7 +35,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       if (!userCulture.culturas || userCulture.culturas.status === 400 || userCulture.culturas.length === 0) throw new Error('Você está sem acesso as culturas, contate o seu lider!');
 
       let cultureSelecionada;
-      Object.keys(userCulture.culturas).forEach((item) => {
+      Object.keys(userCulture.culturas).forEach((item: any) => {
         if (userCulture.culturas[item].status === 1) {
           cultureSelecionada = userCulture.culturas[item].cultureId;
         }

@@ -477,7 +477,7 @@ export default function Listagem({
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(",");
     const tableFields: any = [];
-    Object.keys(columnOrder).forEach((item) => {
+    Object.keys(columnOrder).forEach((item: any) => {
       if (columnOrder[item] === "foco") {
         tableFields.push(
           headerTableFactoryGlobal({

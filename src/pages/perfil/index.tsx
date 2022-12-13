@@ -210,7 +210,7 @@ export default function Perfil({ user }: User) {
               </h2>
 
               <div className={styles.content} style={{ padding: 10 }}>
-                {user.cultures.map((item) => (
+                {user.cultures.map((item: any) => (
                   <div key={item.culture_id}>
                     <label>
                       {item.culture_name}
@@ -218,7 +218,7 @@ export default function Perfil({ user }: User) {
                       {' '}
                     </label>
                     <span>
-                      {item.permissions.map((permission) => (
+                      {item.permissions.map((permission: any) => (
                         `${permission.permission_name}, `
                       ))}
 

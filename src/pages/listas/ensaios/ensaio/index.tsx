@@ -428,7 +428,7 @@ export default function TipoEnsaio({
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
-    Object.keys(columnOrder).forEach((item) => {
+    Object.keys(columnOrder).forEach((item: any) => {
       // if (columnOrder[item] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }

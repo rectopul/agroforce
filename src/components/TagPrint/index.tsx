@@ -24,7 +24,7 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
   const random = (max = 30, min = 10) => Math.floor(Math.random() * max) + min;
 
   if (tagType === 1) {
-    const listTags = data.map((item) => (
+    const listTags = data.map((item: any) => (
       <div className="etiquetaModelo1">
         <div className="flexRow" style={{ fontSize: 16 }}>
           <div className="flex1">{item?.npe}</div>
