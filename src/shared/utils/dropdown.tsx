@@ -382,6 +382,12 @@ const tabsReport = [
         hrefDropDown: "/relatorios",
         iconDropDown: <AiOutlineFileSearch />,
       },
+      {
+        labelDropDown: "Historico de Etiquetagem",
+        hrefDropDown: "/relatorios/historicodeEtiquetagem",
+        
+        iconDropDown: <AiOutlineFileSearch />,
+      },
     ],
   },
 ];

@@ -10,6 +10,7 @@ import {
   Button, Content, Input, Radio,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 interface ISafraProps {
   id_culture: number;
@@ -31,6 +32,9 @@ interface Input {
 
 export default function Safra() {
   const { TabsDropDowns } = ITabs.default;
+
+  const [loading, setLoading] = useState<boolean>(false);
+  setLoading(false);
 
   const tabsDropDowns = TabsDropDowns();
 
@@ -119,6 +123,7 @@ export default function Safra() {
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Cadastro de safra</title>
       </Head>
@@ -216,7 +221,7 @@ export default function Safra() {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<MdDateRange size={18} />}
-                onClick={() => {}}
+                onClick={() => {setLoading(true);}}
               />
             </div>
           </div>

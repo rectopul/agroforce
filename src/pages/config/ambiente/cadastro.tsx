@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import { useJsApiLoader } from '@react-google-maps/api';
 import Swal from 'sweetalert2';
+import ComponentLoading from '../../../components/Loading';
 
 import { layoutQuadraService } from 'src/services';
 
@@ -53,6 +54,8 @@ interface ILocal {
 
 export default function NovoNPE({ local }: IData) {
   const { TabsDropDowns } = ITabs.default;
+  const [loading, setLoading] = useState<boolean>(false);
+  setLoading(false);
 
   const tabsDropDowns = TabsDropDowns();
 
@@ -169,6 +172,7 @@ export default function NovoNPE({ local }: IData) {
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Novo NPE</title>
       </Head>
@@ -314,7 +318,7 @@ export default function NovoNPE({ local }: IData) {
                 icon={<FiUserPlus size={18} />}
                 bgColor="bg-blue-600"
                 textColor="white"
-                onClick={() => { }}
+                onClick={() => {setLoading(true); }}
               />
             </div>
           </div>
