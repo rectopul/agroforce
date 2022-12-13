@@ -67,7 +67,7 @@ export class ImportNpeController {
       for (const row in spreadSheet) {
         if (row !== '0') {
           // LINHA COM TITULO DAS COLUNAS
-          if (spreadSheet[row][4].toString().length < 2) {
+          if (spreadSheet[row][4]?.toString().length < 2) {
             // eslint-disable-next-line no-param-reassign
             spreadSheet[row][4] = `0${spreadSheet[row][4]}`;
           }
@@ -221,7 +221,7 @@ export class ImportNpeController {
 
             if (configModule.response[0]?.fields[column] === 'OGM') {
               if (spreadSheet[row][column] !== null) {
-                if ((spreadSheet[row][column]).toString().length > 2) {
+                if ((spreadSheet[row][column])?.toString().length > 2) {
                   responseIfError[Number(column)]
                   += responseGenericFactory(
                       (Number(column) + 1),
@@ -230,9 +230,9 @@ export class ImportNpeController {
                       'o limite de caracteres e 2',
                     );
                 } else {
-                  if (spreadSheet[row][column].toString().length < 2) {
+                  if (spreadSheet[row][column]?.toString().length < 2) {
                   // eslint-disable-next-line no-param-reassign
-                    spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
+                    spreadSheet[row][column] = `0${spreadSheet[row][column]?.toString()}`;
                   }
 
                   const ogm: any = await tecnologiaController.getAll({
@@ -538,7 +538,7 @@ export class ImportNpeController {
         status: 1,
         state: 'INVALIDA',
         invalid_data: responseStringError,
-        updated_at: new Date(Date.now())
+        updated_at: new Date(Date.now()),
       });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
@@ -546,7 +546,7 @@ export class ImportNpeController {
         id: idLog,
         status: 1,
         state: 'FALHA',
-        updated_at: new Date(Date.now())
+        updated_at: new Date(Date.now()),
       });
       handleError('NPE controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Ambiente' };

@@ -156,6 +156,7 @@ export default function Safra() {
               <Input
                 id="year"
                 name="year"
+                type="number"
                 maxLength={4}
                 placeholder="____"
                 onChange={formik.handleChange}
