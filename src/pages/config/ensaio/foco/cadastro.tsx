@@ -70,9 +70,6 @@ export default function Cadastro() {
           } else {
             Swal.fire(message);
           }
-        })
-        .finally(() => {
-          formik.values.name = '';
         });
     },
   });

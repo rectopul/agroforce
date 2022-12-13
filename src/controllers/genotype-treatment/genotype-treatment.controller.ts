@@ -1,8 +1,8 @@
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import handleError from '../../shared/utils/handleError';
 import { GenotypeTreatmentRepository } from '../../repository/genotype-treatment/genotype-treatment.repository';
 import { countTreatmentsNumber } from '../../shared/utils/counts';
-import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 
 export class GenotypeTreatmentController {
   genotypeTreatmentRepository = new GenotypeTreatmentRepository();
@@ -91,7 +91,9 @@ export class GenotypeTreatmentController {
         }
       }
       if (options.filterTreatmentsNumber) {
-        parameters.treatments_number = Number(options.filterTreatmentsNumber);
+        if (typeof options.filterTreatmentsNumber === 'number') {
+          parameters.treatments_number = Number(options.filterTreatmentsNumber);
+        }
       }
       if (options.filterFoco) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"foco": {"name": {"contains": "${options.filterFoco}" } } } }`));
@@ -115,7 +117,9 @@ export class GenotypeTreatmentController {
         parameters.AND.push(JSON.parse(`{ "genotipo": {"tecnologia": { "cod_tec":  {"contains": "${options.filterGgenCod}" } } } }`));
       }
       if (options.filterBgm) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm":  ${Number(options.filterBgm)}  } }`));
+        if (typeof options.filterBgm === 'number') {
+          parameters.AND.push(JSON.parse(`{ "assay_list": {"bgm":  ${Number(options.filterBgm)}  } }`));
+        }
       }
       if (options.filterStatusAssay) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
@@ -294,7 +298,6 @@ export class GenotypeTreatmentController {
   }
 
   async update(data: any) {
-
     try {
       if (data.id) {
         const response: any = await this.genotypeTreatmentRepository.findById(data.id);
@@ -311,7 +314,7 @@ export class GenotypeTreatmentController {
             for (const row in data) {
               await genotypeTreatmentRepositoryTransaction.updateTransaction(data[row].id, data[row]);
             }
-          })
+          });
           return { status: 200, message: 'Tratamentos do genótipo atualizado' };
         } catch (error: any) {
           handleError('Tratamentos do genótipo controller', 'Update', error.message);

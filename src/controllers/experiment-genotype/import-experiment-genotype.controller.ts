@@ -83,7 +83,8 @@ export class ImportExperimentGenotypeController {
 
               const { response: treatment } = await experimentGenotipeController.getAll({
                 safraName: spreadSheet[row][0],
-                take: 1
+                idExperiment: value_hold.idExperiment,
+                take: 1,
               });
 
               if (treatment.length == 0) {
@@ -103,7 +104,8 @@ export class ImportExperimentGenotypeController {
 
               const { response: treatment } = await experimentGenotipeController.getAll({
                 filterFoco: spreadSheet[row][1],
-                take: 1
+                idExperiment: value_hold.idExperiment,
+                take: 1,
               });
 
               if (treatment.length == 0) {
@@ -123,7 +125,8 @@ export class ImportExperimentGenotypeController {
 
               const { response: treatment } = await experimentGenotipeController.getAll({
                 ensaio: spreadSheet[row][2],
-                take: 1
+                idExperiment: value_hold.idExperiment,
+                take: 1,
               });
 
               if (treatment.length == 0) {
@@ -142,7 +145,8 @@ export class ImportExperimentGenotypeController {
               } else {
                 const { response: treatment } = await experimentGenotipeController.getAll({
                   filterCodTec: spreadSheet[row][column],
-                  take: 1
+                  idExperiment: value_hold.idExperiment,
+                  take: 1,
                 });
                 if (treatment.length == 0) {
                   responseIfError[Number(column)] += responseGenericFactory(
@@ -161,7 +165,8 @@ export class ImportExperimentGenotypeController {
               }
               const { response: treatment } = await experimentGenotipeController.getAll({
                 gli: spreadSheet[row][4],
-                take: 1
+                idExperiment: value_hold.idExperiment,
+                take: 1,
               });
 
               if (treatment.length == 0) {
@@ -178,22 +183,10 @@ export class ImportExperimentGenotypeController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                //  {   nt: Number(spreadSheet[row][9]),
-                //     gli: spreadSheet[row][4],
-                //     // treatments_number: spreadSheet[row][8], //Nt Value
-                //     idExperiment : value_hold.idExperiment,
-                //     npe:  spreadSheet[row][10],
-                //     rep: spreadSheet[row][8],
-                // })
-
                 const { response: treatment } = await experimentGenotipeController.getAll({
                   nt: Number(spreadSheet[row][9]),
-                  gli: spreadSheet[row][4],
-                  // treatments_number: spreadSheet[row][8], //Nt Value
                   idExperiment: value_hold.idExperiment,
-                  npe: spreadSheet[row][10],
-                  rep: spreadSheet[row][8],
-                  take: 1
+                  take: 1,
                 });
 
                 if (treatment.length == 0) {
@@ -214,8 +207,9 @@ export class ImportExperimentGenotypeController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
                 const { response: treatment } = await experimentGenotipeController.getAll({
-                  npe: spreadSheet[row][10],
-                  take: 1
+                  npe: spreadSheet[row][column],
+                  idExperiment: value_hold.idExperiment,
+                  take: 1,
                 });
 
                 if (treatment.length == 0) {
@@ -227,13 +221,28 @@ export class ImportExperimentGenotypeController {
                   );
                 }
 
-                value_hold.npe = spreadSheet[row][10];
+                value_hold.npe = spreadSheet[row][column];
               }
             }
             if (column === '11') { // STATUS_T
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              } else {
+                const { response: treatment } = await experimentGenotipeController.getAll({
+                  status: spreadSheet[row][column],
+                  idExperiment: value_hold.idExperiment,
+                  take: 1,
+                });
+
+                if (treatment.length == 0) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                    ' está incorreta, o NPE é diferente do registrado no experimento',
+                  );
+                }
               }
             }
             if (column === '12') { // GENOTIPO
@@ -254,6 +263,7 @@ export class ImportExperimentGenotypeController {
                 const { status, response } = await loteController.getAll({
                   ncc: String(spreadSheet[row][column]),
                   filterGenotipo: String(spreadSheet[row][12]),
+                  idExperiment: value_hold.idExperiment,
                 });
 
                 if (status === 400) {
@@ -331,7 +341,7 @@ export class ImportExperimentGenotypeController {
                   rep: spreadSheet[row][8],
                   take: 1,
                 });
-                
+
                 const { response: genotipo } = await genotipoController.getAll({
                   name_genotipo: spreadSheet[row][14], // New genetic Name
                 });
@@ -340,7 +350,7 @@ export class ImportExperimentGenotypeController {
                   ncc: spreadSheet[row][16], // NEW NCA
                   filterGenotipo: spreadSheet[row][14], // new geneticName
                 });
-                
+
                 const response12 = await experimentGenotipeRepository.updateTransaction(treatment[0]?.id, {
                   id: treatment[0]?.id,
                   gli: spreadSheet[row][4],
