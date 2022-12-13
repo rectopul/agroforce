@@ -12,6 +12,7 @@ import {
   Button, Content, Input, Select,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 interface ITypeAssayProps {
   id_culture: number;
@@ -23,6 +24,9 @@ interface ITypeAssayProps {
 
 export default function NovoTipoEnsaio() {
   const { TabsDropDowns } = ITabs.default;
+
+  const [loading, setLoading] = useState<boolean>(false);
+  setLoading(false);
 
   const tabsDropDowns = TabsDropDowns();
 
@@ -81,6 +85,7 @@ export default function NovoTipoEnsaio() {
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Novo Tipo Ensaio</title>
       </Head>
@@ -136,7 +141,7 @@ export default function NovoTipoEnsaio() {
                 bgColor="bg-blue-600"
                 icon={<RiOrganizationChart size={18} />}
                 textColor="white"
-                onClick={() => {}}
+                onClick={() => {setLoading(true);}}
               />
             </div>
           </div>

@@ -9,6 +9,7 @@ import { cultureService } from 'src/services';
 import Swal from 'sweetalert2';
 import { Button, Content, Input } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 interface ICreateCulture {
   name: string;
@@ -25,6 +26,9 @@ export default function Cadastro() {
   tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
+
+  const [loading, setLoading] = useState<boolean>(false);
+  setLoading(false);
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const formik = useFormik<ICreateCulture>({
@@ -75,6 +79,7 @@ export default function Cadastro() {
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Cadastro de cultura</title>
       </Head>
@@ -159,7 +164,7 @@ export default function Cadastro() {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<RiPlantLine size={20} />}
-                onClick={() => {}}
+                onClick={() => {setLoading(true);}}
               />
             </div>
           </div>

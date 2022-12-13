@@ -9,6 +9,7 @@ import { departmentService } from 'src/services';
 import Swal from 'sweetalert2';
 import { Button, Content, Input } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 interface IDepartmentProps {
   name: string;
@@ -17,6 +18,8 @@ interface IDepartmentProps {
 
 export default function Safra() {
   const { TabsDropDowns } = ITabs.default;
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const tabsDropDowns = TabsDropDowns();
 
@@ -68,6 +71,7 @@ export default function Safra() {
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Cadastro de setor</title>
       </Head>
@@ -132,7 +136,7 @@ export default function Safra() {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<HiOutlineOfficeBuilding size={18} />}
-                onClick={() => {}}
+                onClick={() => {setLoading(true);}}
               />
             </div>
           </div>
