@@ -15,8 +15,8 @@ WORKDIR /app
 COPY . .
 COPY --from=deps /app/node_modules ./node_modules
 RUN npm install next  --frozen-lockfile --legacy-peer-deps
-RUN apk add --update libc6-compat openssl openssl-dev
-RUN npx prisma generate
+#RUN apk add --update libc6-compat openssl openssl-dev
+RUN npx prisma generate --schema="/app/prisma/schema.prisma"
 RUN npx update
 ENV DATABASE_URL "mysql://root:root@localhost:3306/agro_force" 
 ENV COPYMOD "tmgdns-qa" 
