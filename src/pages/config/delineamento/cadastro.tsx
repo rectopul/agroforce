@@ -11,6 +11,8 @@ import {
   Input,
 } from '../../../components';
 import * as ITabs from '../../../shared/utils/dropdown';
+import ComponentLoading from '../../../components/Loading';
+import { useState } from 'react';
 
 interface IDelineamentoProps {
   id_culture: number;
@@ -34,6 +36,8 @@ export default function NovoLocal() {
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const id_culture = userLogado.userCulture.cultura_selecionada as string;
+  const [loading, setLoading] = useState<boolean>(false);
+  setLoading(false);
 
   const router = useRouter();
 
@@ -76,6 +80,7 @@ export default function NovoLocal() {
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Novo Delineamento</title>
       </Head>
@@ -163,7 +168,7 @@ export default function NovoLocal() {
                 bgColor="bg-blue-600"
                 icon={<FiUserPlus size={18} />}
                 textColor="white"
-                onClick={() => { }}
+                onClick={() => { setLoading(true); }}
               />
             </div>
           </div>

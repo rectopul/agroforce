@@ -1,4 +1,30 @@
-// export const importblob (table: string) => {   
+const AzureStorageBlob = require('@azure/storage-blob');
+const { DefaultAzureCredential } = require('@azure/identity');
+const { BlobServiceClient } = require('@azure/storage-blob');
+
+const account = '<account>';
+const accountKey = '<accountkey>';
+const connStr = '<connection string>';
+const defaultAzureCredential = new DefaultAzureCredential();
+
+const blobServiceClient = new BlobServiceClient(
+  `https://${account}.blob.core.windows.net`,
+  defaultAzureCredential,
+);
+
+// const blobServiceClient = BlobServiceClient.fromConnectionString(connStr);
+
+// const { BlobServiceClient, StorageSharedKeyCredential } = require("@azure/storage-blob");
+
+// // Use StorageSharedKeyCredential with storage account and account key
+// // StorageSharedKeyCredential is only available in Node.js runtime, not in browsers
+// const sharedKeyCredential = new StorageSharedKeyCredential(account, accountKey);
+// const blobServiceClient = new BlobServiceClient(
+//   `https://${account}.blob.core.windows.net`,
+//   sharedKeyCredential
+// );
+
+// export const importblob (table: string) => {
 //   const newFileName =
 //   uuidv4() + '.' + FormData.file.name.split('.').pop();
 //   uploadFileToBlob(FormData.file, newFileName);
@@ -26,6 +52,6 @@
 
 //   await blobClient.uploadData(file, options);
 // }
-export function teste() { 
-  console.log('teste')
+export function teste() {
+  console.log('teste');
 }

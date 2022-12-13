@@ -13,6 +13,7 @@ import { FiUserPlus } from 'react-icons/fi';
 import { IoMdArrowBack } from 'react-icons/io';
 import InputMask from 'react-input-mask';
 import Swal from 'sweetalert2';
+import { useState } from 'react';
 import { userService } from '../../../../services/user.service';
 import {
   Button,
@@ -23,6 +24,7 @@ import {
 } from '../../../../components';
 import IDepartment from '../../../../../props/departmentDTO';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 interface ICulture {
   id: number;
@@ -61,6 +63,8 @@ export default function NovoUsuario({
   Cultures,
 }: IData) {
   const { TabsDropDowns } = ITabs.default;
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const tabsDropDowns = TabsDropDowns('config');
 
@@ -208,6 +212,7 @@ export default function NovoUsuario({
 
   return (
     <>
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Novo usuário</title>
       </Head>
@@ -480,7 +485,9 @@ export default function NovoUsuario({
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<FiUserPlus size={18} />}
-                onClick={() => {}}
+                onClick={() => {
+                  setLoading(true);
+                }}
               />
             </div>
           </div>
