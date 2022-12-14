@@ -205,10 +205,6 @@ export class ExperimentGenotipeController {
         }
       }
 
-      // if (options.npe) {
-      //   parameters.npe = Number(options.npe);
-      // }
-
       const select = {
         id: true,
         safra: { select: { safraName: true } },
@@ -369,11 +365,11 @@ export class ExperimentGenotipeController {
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
-      if (!parameters.AND) {
+      if (parameters.AND.length === 0) {
         delete parameters.AND;
       }
 
-      if (!parameters.OR) {
+      if (parameters.OR.length === 0) {
         delete parameters.OR;
       }
 

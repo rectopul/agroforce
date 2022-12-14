@@ -4,7 +4,7 @@
 /* eslint-disable no-return-assign */
 import React, { useRef, useState, useEffect } from 'react';
 import { removeCookies, setCookies } from 'cookies-next';
-import { useFormik } from 'formik';
+import { replace, useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
@@ -241,7 +241,7 @@ export default function Listagem({
       filterBgmTo: checkValue('filterBgmTo'),
       filterBgmFrom: checkValue('filterBgmFrom'),
       filterBgmGenotypeTo: checkValue('filterBgmGenotypeTo'),
-      filterBgmGenotypeFrom: checkValue('filterBgmGenotypeFrom'), //
+      filterBgmGenotypeFrom: checkValue('filterBgmGenotypeFrom'), 
       filterGmrTo: checkValue('filterGmrTo'),
       filterGmrFrom: checkValue('filterGmrFrom'),
       filterNtTo: checkValue('filterNtTo'),
@@ -830,8 +830,9 @@ export default function Listagem({
     const parameter = tableGlobalFunctions.getValuesForFilter(
       value,
       filtersParams,
-    );
-    return parameter;
+    ).trim();
+    
+    return parameter; 	 	
   }
 
   function filterFieldFactory(title: string, name: string) {
@@ -1421,12 +1422,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterNcaFrom"
                         name="filterNcaFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNcaTo"

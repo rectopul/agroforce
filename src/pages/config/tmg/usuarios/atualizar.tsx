@@ -527,7 +527,7 @@ export default function AtualizarUsuario({
                 bgColor="bg-blue-600"
                 icon={<RiUserSettingsLine size={18} />}
                 textColor="white"
-                onClick={() => {}}
+                onClick={() => {setLoading(true);}}
               />
             </div>
           </div>

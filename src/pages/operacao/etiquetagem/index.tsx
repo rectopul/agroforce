@@ -347,6 +347,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   async function deleteConfirmItem(item: any) {
     setItemSelectedDelete(item);
     setIsOpenModalConfirm(true);
+    setLoading(false);
   }
 
   async function deleteItem() {
@@ -440,7 +441,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
               }
               title={`Excluir ${rowData.name}`}
               type="button"
-              onClick={() => deleteConfirmItem(rowData)}
+              onClick={() => {deleteConfirmItem(rowData), setLoading(true)}}
               rounder="rounded-full"
               bgColor={
                 rowData.status === 'ETIQ. EM ANDAMENTO'
@@ -713,7 +714,9 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
   return (
     <>
+      
       {loading && <ComponentLoading text="" />}
+
       <Head>
         <title>Listagem de grupos de experimento</title>
       </Head>
@@ -730,6 +733,8 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
         onPress={(e: any) => handleSubmit(e)}
         onCancel={() => setIsOpenModal(false)}
       >
+        
+
         <form className="flex flex-col">
           <div className="flex flex-col px-4  justify-between">
             <header className="flex flex-col mt-2">
