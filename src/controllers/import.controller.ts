@@ -179,7 +179,9 @@ export class ImportController {
         case 'GENOTYPE_S2':
           return await ImportGenotypeController.validate(responseLog?.id, false, newData);
         default:
-          await this.logImportController.update({ id: responseLog?.id, status: 1, state: 'FALHA' });
+          await this.logImportController.update({
+            id: responseLog?.id, table: 'PROTOCOL_LEVEL INVALIDO', status: 1, state: 'FALHA',
+          });
           return { status: 400, response: [], message: 'Nenhum protocol_level configurado ' };
       }
     } catch (error: any) {
