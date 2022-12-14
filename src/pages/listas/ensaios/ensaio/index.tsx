@@ -703,11 +703,10 @@ export default function TipoEnsaio({
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de Ensaio</title>
       </Head>
-
-      {loading && <ComponentLoading text="" />}
 
       <ModalConfirmation
         isOpen={isOpenModalConfirm}
@@ -777,7 +776,9 @@ export default function TipoEnsaio({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => {
+                        setLoading(true);
+                      }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
