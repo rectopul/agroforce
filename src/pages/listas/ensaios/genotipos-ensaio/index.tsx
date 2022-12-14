@@ -4,7 +4,7 @@
 /* eslint-disable no-return-assign */
 import React, { useRef, useState, useEffect } from 'react';
 import { removeCookies, setCookies } from 'cookies-next';
-import { useFormik } from 'formik';
+import { replace, useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
@@ -831,8 +831,8 @@ export default function Listagem({
       value,
       filtersParams,
     ).trim();
-    console.log(parameter);
-    return parameter;
+    
+    return parameter; 	 	
   }
 
   function filterFieldFactory(title: string, name: string) {
