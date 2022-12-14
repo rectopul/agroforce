@@ -87,21 +87,24 @@ export class ImportExperimentGenotypeController {
             filterFoco: spreadSheet[row][1],
             filterTypeAssay: spreadSheet[row][2],
             filterCodTec: spreadSheet[row][3],
-            // filterGli: spreadSheet[row][4],
+            filterGli: spreadSheet[row][4],
             filterExperimentName: spreadSheet[row][5],
+            filterLocal: spreadSheet[row][6],
+            filterDelineamento: spreadSheet[row][7],
             rep: spreadSheet[row][8],
             nt: spreadSheet[row][9],
             npe: spreadSheet[row][10],
             filterStatusT: spreadSheet[row][11],
             filterGenotypeName: spreadSheet[row][12],
             nca: String(spreadSheet[row][13]),
+            take: 1,
           });
           console.log('🚀 ~ file: import-experiment-genotype.controller.ts:86 ~ ImportExperimentGenotypeController ~ parcels', parcels);
 
           if (parcels.length === 0) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, parcela do experimento não encontrada, as chaves para encontra-lo são (
-                FOCO, TIPO DE ENSAIO, TECNOLOGIA, GLI, NOME DO EXPERIMENTO, REP, NT, NPE, STATUS_T, GENÓTIPO E NCA
+                FOCO, TIPO DE ENSAIO, TECNOLOGIA, GLI, NOME DO EXPERIMENTO, LOCAL, DELINEAMENTO, REP, NT, NPE, STATUS_T, GENÓTIPO E NCA
               ) </li> <br>`;
           }
 
@@ -377,11 +380,19 @@ export class ImportExperimentGenotypeController {
             for (const row in spreadSheet) {
               if (row !== '0') {
                 const { response: treatment } = await experimentGenotipeController.getAll({
-                  nt: Number(spreadSheet[row][9]),
-                  gli: spreadSheet[row][4],
-                  // treatments_number: spreadSheet[row][8], // Nt Value
-                  npe: spreadSheet[row][10],
+                  filterFoco: spreadSheet[row][1],
+                  filterTypeAssay: spreadSheet[row][2],
+                  filterCodTec: spreadSheet[row][3],
+                  // filterGli: spreadSheet[row][4],
+                  filterExperimentName: spreadSheet[row][5],
+                  filterLocal: spreadSheet[row][6],
+                  filterDelineamento: spreadSheet[row][7],
                   rep: spreadSheet[row][8],
+                  nt: spreadSheet[row][9],
+                  npe: spreadSheet[row][10],
+                  filterStatusT: spreadSheet[row][11],
+                  filterGenotypeName: spreadSheet[row][12],
+                  nca: String(spreadSheet[row][13]),
                   take: 1,
                 });
 
