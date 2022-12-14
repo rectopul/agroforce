@@ -18,12 +18,14 @@ import { LogImportController } from '../log-import.controller';
 import { LoteController } from '../lote.controller';
 
 import { ExperimentGenotipeRepository } from '../../repository/experiment-genotipe.repository';
+import { SafraController } from '../safra.controller';
 
 export class ImportExperimentGenotypeController {
   static async validate(
     idLog: number,
-    { spreadSheet, created_by: createdBy }: ImportValidate,
+    { spreadSheet, idSafra, created_by: createdBy }: ImportValidate,
   ): Promise<IReturnObject> {
+    const safraController = new SafraController();
     const loteController = new LoteController();
     const genotipoController = new GenotipoController();
     // const assayListController = new AssayListController();
@@ -50,28 +52,57 @@ export class ImportExperimentGenotypeController {
       for (const row in spreadSheet) {
         if (row !== '0') {
           // experiments
-          if (spreadSheet[row][5] != null) {
-            const experiments: any = await experimentController.getFromExpName(spreadSheet[row][5]);
+          // if (spreadSheet[row][5] != null) {
+          //   const experiments: any = await experimentController.getFromExpName(spreadSheet[row][5]);
 
-            if (experiments.status == 200 && experiments.response.length > 0) {
-              value_hold.idExperiment = experiments.response[0]?.id;
+          //   if (experiments.status == 200 && experiments.response.length > 0) {
+          //     value_hold.idExperiment = experiments.response[0]?.id;
 
-              if (experiments.response[0]?.local.name_local_culture != spreadSheet[row][6]) {
-                responseIfError[0]
-                  += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a Lugar de plantio e diferente da cadastrada no experimento. </li> <br>`;
-              }
+          //     if (experiments.response[0]?.local.name_local_culture != spreadSheet[row][6]) {
+          //       responseIfError[0]
+          //         += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a Lugar de plantio e diferente da cadastrada no experimento. </li> <br>`;
+          //     }
 
-              if (experiments.response[0]?.delineamento.name != spreadSheet[row][7]) {
-                responseIfError[0]
-                  += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a delineamento e diferente da cadastrada no experimento. </li> <br>`;
-              }
-            } else {
-              responseIfError[0]
-                += `<li style="text-align:left"> A ${row}ª linha está incorreta, o experimento é diferente do registrado no experimento </li> <br>`;
-            }
-          } else {
+          //     if (experiments.response[0]?.delineamento.name != spreadSheet[row][7]) {
+          //       responseIfError[0]
+          //         += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a delineamento e diferente da cadastrada no experimento. </li> <br>`;
+          //     }
+          //   } else {
+          //     responseIfError[0]
+          //       += `<li style="text-align:left"> A ${row}ª linha está incorreta, o experimento é diferente do registrado no experimento </li> <br>`;
+          //   }
+          // } else {
+          //   responseIfError[0]
+          //     += `<li style="text-align:left"> A ${row}ª linha está vazia para para o experimento </li> <br>`;
+          // }
+
+          if (spreadSheet[row][3]?.toString().length < 2) {
+            // eslint-disable-next-line no-param-reassign
+            spreadSheet[row][3] = `0${spreadSheet[row][3]}`;
+          }
+
+          const {
+            response: parcels,
+          }: any = await experimentGenotipeController.getAll({
+            filterFoco: spreadSheet[row][1],
+            filterTypeAssay: spreadSheet[row][2],
+            filterCodTec: spreadSheet[row][3],
+            // filterGli: spreadSheet[row][4],
+            filterExperimentName: spreadSheet[row][5],
+            rep: spreadSheet[row][8],
+            nt: spreadSheet[row][9],
+            npe: spreadSheet[row][10],
+            filterStatusT: spreadSheet[row][11],
+            filterGenotypeName: spreadSheet[row][12],
+            nca: String(spreadSheet[row][13]),
+          });
+          console.log('🚀 ~ file: import-experiment-genotype.controller.ts:86 ~ ImportExperimentGenotypeController ~ parcels', parcels);
+
+          if (parcels.length === 0) {
             responseIfError[0]
-              += `<li style="text-align:left"> A ${row}ª linha está vazia para para o experimento </li> <br>`;
+              += `<li style="text-align:left"> A ${row}ª linha esta incorreta, parcela do experimento não encontrada, as chaves para encontra-lo são (
+                FOCO, TIPO DE ENSAIO, TECNOLOGIA, GLI, NOME DO EXPERIMENTO, REP, NT, NPE, STATUS_T, GENÓTIPO E NCA
+              ) </li> <br>`;
           }
 
           for (const column in spreadSheet[row]) {
@@ -80,21 +111,33 @@ export class ImportExperimentGenotypeController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
-
-              const { response: treatment } = await experimentGenotipeController.getAll({
-                safraName: spreadSheet[row][0],
-                idExperiment: value_hold.idExperiment,
-                take: 1,
-              });
-
-              if (treatment.length == 0) {
-                responseIfError[Number(column)] += responseGenericFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                  'está incorreta, o Safra é diferente do registrado no experimento',
-                );
+              const { status, response }: IReturnObject = await safraController.getOne(idSafra);
+              if (status === 200) {
+                if (response?.safraName !== spreadSheet[row][column]) {
+                  responseIfError[Number(column)]
+                    += responseGenericFactory(
+                      (Number(column) + 1),
+                      row,
+                      spreadSheet[0][column],
+                      'safra informada e diferente da selecionada',
+                    );
+                }
               }
+
+              // const { response: treatment } = await experimentGenotipeController.getAll({
+              //   safraName: spreadSheet[row][0],
+              //   idExperiment: value_hold.idExperiment,
+              //   take: 1,
+              // });
+
+              // if (treatment.length == 0) {
+              //   responseIfError[Number(column)] += responseGenericFactory(
+              //     Number(column) + 1,
+              //     row,
+              //     spreadSheet[0][column],
+              //     'está incorreta, o Safra é diferente do registrado no experimento',
+              //   );
+              // }
             }
             if (column === '1') { // FOCO
               if (spreadSheet[row][column] === null) {
@@ -102,20 +145,20 @@ export class ImportExperimentGenotypeController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
 
-              const { response: treatment } = await experimentGenotipeController.getAll({
-                filterFoco: spreadSheet[row][1],
-                idExperiment: value_hold.idExperiment,
-                take: 1,
-              });
+              // const { response: treatment } = await experimentGenotipeController.getAll({
+              //   filterFoco: spreadSheet[row][1],
+              //   idExperiment: value_hold.idExperiment,
+              //   take: 1,
+              // });
 
-              if (treatment.length == 0) {
-                responseIfError[Number(column)] += responseGenericFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                  'está incorreta, o foco é diferente do registrado no experimento',
-                );
-              }
+              // if (treatment.length == 0) {
+              //   responseIfError[Number(column)] += responseGenericFactory(
+              //     Number(column) + 1,
+              //     row,
+              //     spreadSheet[0][column],
+              //     'está incorreta, o foco é diferente do registrado no experimento',
+              //   );
+              // }
             }
             if (column === '2') { // ENSAIO
               if (spreadSheet[row][column] === null) {
@@ -123,39 +166,39 @@ export class ImportExperimentGenotypeController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
 
-              const { response: treatment } = await experimentGenotipeController.getAll({
-                ensaio: spreadSheet[row][2],
-                idExperiment: value_hold.idExperiment,
-                take: 1,
-              });
+              // const { response: treatment } = await experimentGenotipeController.getAll({
+              //   ensaio: spreadSheet[row][2],
+              //   idExperiment: value_hold.idExperiment,
+              //   take: 1,
+              // });
 
-              if (treatment.length == 0) {
-                responseIfError[Number(column)] += responseGenericFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                  'está incorreta, o ensaio é diferente do registrado no experimento',
-                );
-              }
+              // if (treatment.length == 0) {
+              //   responseIfError[Number(column)] += responseGenericFactory(
+              //     Number(column) + 1,
+              //     row,
+              //     spreadSheet[0][column],
+              //     'está incorreta, o ensaio é diferente do registrado no experimento',
+              //   );
+              // }
             }
             if (column === '3') { // TECNOLOGIA
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                const { response: treatment } = await experimentGenotipeController.getAll({
-                  filterCodTec: spreadSheet[row][column],
-                  idExperiment: value_hold.idExperiment,
-                  take: 1,
-                });
-                if (treatment.length == 0) {
-                  responseIfError[Number(column)] += responseGenericFactory(
-                    Number(column) + 1,
-                    row,
-                    spreadSheet[0][column],
-                    ' está incorreta, o Cód Tecnologia é diferente do registrado no experimento ',
-                  );
-                }
+                // const { response: treatment } = await experimentGenotipeController.getAll({
+                //   filterCodTec: spreadSheet[row][column],
+                //   idExperiment: value_hold.idExperiment,
+                //   take: 1,
+                // });
+                // if (treatment.length == 0) {
+                //   responseIfError[Number(column)] += responseGenericFactory(
+                //     Number(column) + 1,
+                //     row,
+                //     spreadSheet[0][column],
+                //     ' está incorreta, o Cód Tecnologia é diferente do registrado no experimento ',
+                //   );
+                // }
               }
             }
             if (column === '4') { // GLI
@@ -163,40 +206,40 @@ export class ImportExperimentGenotypeController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
-              const { response: treatment } = await experimentGenotipeController.getAll({
-                gli: spreadSheet[row][4],
-                idExperiment: value_hold.idExperiment,
-                take: 1,
-              });
+              // const { response: treatment } = await experimentGenotipeController.getAll({
+              //   gli: spreadSheet[row][4],
+              //   idExperiment: value_hold.idExperiment,
+              //   take: 1,
+              // });
 
-              if (treatment.length == 0) {
-                responseIfError[Number(column)] += responseGenericFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                  'está incorreta, o GLI é diferente do registrado no experimento ',
-                );
-              }
+              // if (treatment.length == 0) {
+              //   responseIfError[Number(column)] += responseGenericFactory(
+              //     Number(column) + 1,
+              //     row,
+              //     spreadSheet[0][column],
+              //     'está incorreta, o GLI é diferente do registrado no experimento ',
+              //   );
+              // }
             }
             if (column === '9') { // NT
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                const { response: treatment } = await experimentGenotipeController.getAll({
-                  nt: Number(spreadSheet[row][9]),
-                  idExperiment: value_hold.idExperiment,
-                  take: 1,
-                });
+                // const { response: treatment } = await experimentGenotipeController.getAll({
+                //   nt: Number(spreadSheet[row][9]),
+                //   idExperiment: value_hold.idExperiment,
+                //   take: 1,
+                // });
 
-                if (treatment.length == 0) {
-                  responseIfError[Number(column)] += responseGenericFactory(
-                    Number(column) + 1,
-                    row,
-                    spreadSheet[0][column],
-                    ' está incorreta, o NT é diferente do registrado no experimento',
-                  );
-                }
+                // if (treatment.length == 0) {
+                //   responseIfError[Number(column)] += responseGenericFactory(
+                //     Number(column) + 1,
+                //     row,
+                //     spreadSheet[0][column],
+                //     ' está incorreta, o NT é diferente do registrado no experimento',
+                //   );
+                // }
 
                 value_hold.nt = spreadSheet[row][9];
               }
@@ -206,79 +249,74 @@ export class ImportExperimentGenotypeController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                const { response: treatment } = await experimentGenotipeController.getAll({
-                  npe: spreadSheet[row][column],
-                  idExperiment: value_hold.idExperiment,
-                  take: 1,
-                });
+                // const { response: treatment } = await experimentGenotipeController.getAll({
+                //   npe: spreadSheet[row][column],
+                //   idExperiment: value_hold.idExperiment,
+                //   take: 1,
+                // });
 
-                if (treatment.length == 0) {
-                  responseIfError[Number(column)] += responseGenericFactory(
-                    Number(column) + 1,
-                    row,
-                    spreadSheet[0][column],
-                    ' está incorreta, o NPE é diferente do registrado no experimento',
-                  );
-                }
+                // if (treatment.length == 0) {
+                //   responseIfError[Number(column)] += responseGenericFactory(
+                //     Number(column) + 1,
+                //     row,
+                //     spreadSheet[0][column],
+                //     ' está incorreta, o NPE é diferente do registrado no experimento',
+                //   );
+                // }
 
                 value_hold.npe = spreadSheet[row][column];
               }
             }
             if (column === '11') { // STATUS_T
-              if (spreadSheet[row][column] === null) {
-                responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else {
-                const { response: treatment } = await experimentGenotipeController.getAll({
-                  status: spreadSheet[row][column],
-                  idExperiment: value_hold.idExperiment,
-                  take: 1,
-                });
+              // if (spreadSheet[row][column] === null) {
+              //   responseIfError[Number(column)]
+              //     += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              // } else {
+              //   const { response: treatment } = await experimentGenotipeController.getAll({
+              //     status: spreadSheet[row][column],
+              //     idExperiment: value_hold.idExperiment,
+              //     take: 1,
+              //   });
 
-                if (treatment.length == 0) {
-                  responseIfError[Number(column)] += responseGenericFactory(
-                    Number(column) + 1,
-                    row,
-                    spreadSheet[0][column],
-                    ' está incorreta, o NPE é diferente do registrado no experimento',
-                  );
-                }
-              }
+              //   if (treatment.length == 0) {
+              //     responseIfError[Number(column)] += responseGenericFactory(
+              //       Number(column) + 1,
+              //       row,
+              //       spreadSheet[0][column],
+              //       ' está incorreta, o NPE é diferente do registrado no experimento',
+              //     );
+              //   }
+              // }
             }
             if (column === '12') { // GENOTIPO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                const { response } = await experimentGenotipeController.getAll({
-                  filterGenotypeName: spreadSheet[row][column],
-                  idExperiment: value_hold.idExperiment,
-                  take: 1,
-                });
+                // const { status }: any = await genotipoController.getOneByName(spreadSheet[row][12]);
 
-                if (response.length === 0) {
-                  responseIfError[Number(column)]
-                    += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
-                }
+                // if (status === 400) {
+                //   responseIfError[Number(column)]
+                //     += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
+                // }
               }
             }
             if (column === '13') { // NCA
               if (spreadSheet[row][column] != null) {
-                const { response } = await experimentGenotipeController.getAll({
+                const { status, response } = await loteController.getAll({
                   ncc: String(spreadSheet[row][column]),
+                  filterGenotipo: String(spreadSheet[row][12]),
                   idExperiment: value_hold.idExperiment,
-                  take: 1,
                 });
-                console.log('🚀 ~ file: import-experiment-genotype.controller.ts:278 ~ ImportExperimentGenotypeController ~ response', response);
 
-                if (response.length === 0) {
-                  responseIfError[Number(column)] += responseGenericFactory(
-                    Number(column) + 1,
-                    row,
-                    spreadSheet[0][column],
-                    ' não pertence ao nome genérico',
-                  );
-                }
+                // if (status === 400) {
+                //   responseIfError[Number(column)] += responseGenericFactory(
+                //     Number(column) + 1,
+                //     row,
+                //     spreadSheet[0][column],
+                //     ' não pertence ao nome genérico',
+                //   );
+                // }
                 value_hold.idLote = response[0]?.id;
               }
             }
@@ -358,10 +396,10 @@ export class ImportExperimentGenotypeController {
 
                 const response12 = await experimentGenotipeRepository.updateTransaction(treatment[0]?.id, {
                   id: treatment[0]?.id,
-                  gli: spreadSheet[row][4],
-                  idExperiment: value_hold.idExperiment,
-                  nt: Number(spreadSheet[row][9]),
-                  rep: spreadSheet[row][8],
+                  // gli: spreadSheet[row][4],
+                  // idExperiment: value_hold.idExperiment,
+                  // nt: Number(spreadSheet[row][9]),
+                  // rep: spreadSheet[row][8],
                   status_t: spreadSheet[row][15],
                   idGenotipo: lote[0]?.id_genotipo,
                   idLote: lote[0]?.id,
