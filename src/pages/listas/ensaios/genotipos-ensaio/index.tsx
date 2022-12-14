@@ -241,7 +241,7 @@ export default function Listagem({
       filterBgmTo: checkValue('filterBgmTo'),
       filterBgmFrom: checkValue('filterBgmFrom'),
       filterBgmGenotypeTo: checkValue('filterBgmGenotypeTo'),
-      filterBgmGenotypeFrom: checkValue('filterBgmGenotypeFrom'), //
+      filterBgmGenotypeFrom: checkValue('filterBgmGenotypeFrom'), 
       filterGmrTo: checkValue('filterGmrTo'),
       filterGmrFrom: checkValue('filterGmrFrom'),
       filterNtTo: checkValue('filterNtTo'),
@@ -830,7 +830,8 @@ export default function Listagem({
     const parameter = tableGlobalFunctions.getValuesForFilter(
       value,
       filtersParams,
-    );
+    ).trim();
+    console.log(parameter);
     return parameter;
   }
 
@@ -1421,12 +1422,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterNcaFrom"
                         name="filterNcaFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNcaTo"
