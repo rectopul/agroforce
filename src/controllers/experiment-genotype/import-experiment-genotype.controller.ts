@@ -250,9 +250,13 @@ export class ImportExperimentGenotypeController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                const { status }: any = await genotipoController.getOneByName(spreadSheet[row][12]);
+                const { response } = await experimentGenotipeController.getAll({
+                  filterGenotypeName: spreadSheet[row][column],
+                  idExperiment: value_hold.idExperiment,
+                  take: 1,
+                });
 
-                if (status === 400) {
+                if (response.length === 0) {
                   responseIfError[Number(column)]
                     += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
                 }
@@ -260,13 +264,14 @@ export class ImportExperimentGenotypeController {
             }
             if (column === '13') { // NCA
               if (spreadSheet[row][column] != null) {
-                const { status, response } = await loteController.getAll({
+                const { response } = await experimentGenotipeController.getAll({
                   ncc: String(spreadSheet[row][column]),
-                  filterGenotipo: String(spreadSheet[row][12]),
                   idExperiment: value_hold.idExperiment,
+                  take: 1,
                 });
+                console.log('🚀 ~ file: import-experiment-genotype.controller.ts:278 ~ ImportExperimentGenotypeController ~ response', response);
 
-                if (status === 400) {
+                if (response.length === 0) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     row,
