@@ -550,7 +550,7 @@ export default function Atualizar({
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<AiOutlineFileSearch size={20} />}
-                onClick={() => {setLoading(false);}}
+                onClick={() => {setLoading(true);}}
               />
             </div>
           </div>

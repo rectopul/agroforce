@@ -1032,7 +1032,7 @@ export default function AtualizarTipoEnsaio({
                   bgColor="bg-blue-600"
                   textColor="white"
                   icon={<RiOrganizationChart size={18} />}
-                  onClick={() => {}}
+                  onClick={() => {setLoading(true);}}
                 />
               </div>
             </div>

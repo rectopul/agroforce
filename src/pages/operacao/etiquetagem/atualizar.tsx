@@ -47,6 +47,7 @@ import {
 import * as ITabs from '../../../shared/utils/dropdown';
 import { IExperiments } from '../../../interfaces/listas/experimento/experimento.interface';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
+import ComponentLoading from '../../../components/Loading';
 
 export default function Listagem({
   experimentGroup,
@@ -221,7 +222,7 @@ export default function Listagem({
               }
               title={`Excluir ${rowData.name}`}
               type="button"
-              onClick={() => deleteConfirmItem(rowData)}
+              onClick={() => {deleteConfirmItem(rowData), setLoading(true)}}
               rounder="rounded-full"
               bgColor={
                 rowData.status === 'ETIQ. EM ANDAMENTO'
@@ -540,6 +541,7 @@ export default function Listagem({
   async function deleteConfirmItem(item: any) {
     setItemSelectedDelete(item);
     setIsOpenModalConfirm(true);
+    setLoading(false);
   }
 
   async function deleteItem() {
@@ -582,6 +584,7 @@ export default function Listagem({
     //     width: "800",
     //   });
     // }
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -602,6 +605,7 @@ export default function Listagem({
 
   return (
     <>
+     {loading && <ComponentLoading text="" />}
       <Head>
         <title>Listagem de experimentos</title>
       </Head>
