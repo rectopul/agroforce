@@ -20,6 +20,7 @@ export class ExperimentGenotipeController {
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
+    parameters.OR = [];
     try {
       if (options.filterFoco) {
         parameters.foco = JSON.parse(
@@ -72,7 +73,7 @@ export class ExperimentGenotipeController {
       }
 
       if (options.filterGli) {
-        parameters.AND.push(JSON.parse(`{ "experiment": { "assay_list": {"gli": {"contains": "${options.filterGli}" } } } }`));
+        parameters.OR.push(JSON.parse(`{ "experiment": { "assay_list": {"gli": {"contains": "${options.filterGli}" } } } }`));
       }
 
       if (options.filterStatus) {
@@ -96,9 +97,15 @@ export class ExperimentGenotipeController {
       }
 
       if (options.filterLocal) {
-        parameters.experiment = JSON.parse(
-          `{ "local": { "name_local_culture": { "contains": "${options.filterLocal}" } } }`,
-        );
+        parameters.OR.push(JSON.parse(
+          `{ "experiment": { "local": { "name_local_culture": { "contains": "${options.filterLocal}" } } } }`,
+        ));
+      }
+
+      if (options.filterDelineamento) {
+        parameters.OR.push(JSON.parse(
+          `{ "experiment": { "delineamento": { "name": { "contains": "${options.filterLocal}" } } } }`,
+        ));
       }
 
       if (options.filterGenotypeName) {
@@ -317,11 +324,15 @@ export class ExperimentGenotipeController {
       }
 
       if (options.nt) {
-        parameters.nt = Number(options.nt);
+        if (typeof options.nt === 'number') {
+          parameters.nt = Number(options.nt);
+        }
       }
 
       if (options.rep) {
-        parameters.rep = Number(options.rep);
+        if (typeof options.rep === 'number') {
+          parameters.rep = Number(options.rep);
+        }
       }
 
       if (options.nca) {
@@ -333,7 +344,9 @@ export class ExperimentGenotipeController {
       }
 
       if (options.npe) {
-        parameters.npe = Number(options.npe);
+        if (typeof options.npe === 'number') {
+          parameters.npe = Number(options.npe);
+        }
       }
 
       if (options.idExperiment) {
@@ -357,8 +370,13 @@ export class ExperimentGenotipeController {
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
-      console.log('parameters');
-      console.log(parameters);
+      if (!parameters.AND) {
+        delete parameters.AND;
+      }
+
+      if (!parameters.OR) {
+        delete parameters.OR;
+      }
 
       const response: object | any = await this.ExperimentGenotipeRepository.findAll(
         parameters,
