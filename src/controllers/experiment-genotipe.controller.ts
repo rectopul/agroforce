@@ -52,11 +52,7 @@ export class ExperimentGenotipeController {
       }
 
       if (options.filterCodTec) {
-        parameters.AND.push(
-          JSON.parse(
-            `{ "tecnologia": {"cod_tec": {"contains": "${options.filterCodTec}" } } }`,
-          ),
-        );
+        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterCodTec}" } }`);
       }
 
       if (options.filterTechnology) {
@@ -324,6 +320,14 @@ export class ExperimentGenotipeController {
         parameters.nt = Number(options.nt);
       }
 
+      if (options.rep) {
+        parameters.rep = Number(options.rep);
+      }
+
+      if (options.nca) {
+        parameters.nca = options.nca;
+      }
+
       if (options.gli) {
         parameters.gli = options.gli;
       }
@@ -352,6 +356,9 @@ export class ExperimentGenotipeController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
+
+      console.log('parameters');
+      console.log(parameters);
 
       const response: object | any = await this.ExperimentGenotipeRepository.findAll(
         parameters,

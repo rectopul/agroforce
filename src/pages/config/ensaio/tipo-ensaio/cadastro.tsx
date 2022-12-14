@@ -27,7 +27,7 @@ export default function NovoTipoEnsaio() {
   const { TabsDropDowns } = ITabs.default;
 
   const [loading, setLoading] = useState<boolean>(false);
-  setLoading(false);
+  
 
   const tabsDropDowns = TabsDropDowns();
 
@@ -60,6 +60,7 @@ export default function NovoTipoEnsaio() {
       validateInputs(values);
       if (!values.name) {
         Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
+        setLoading(false);
         return;
       }
 
@@ -74,8 +75,10 @@ export default function NovoTipoEnsaio() {
         .then((response) => {
           if (response.status === 200) {
             Swal.fire('Tipo de Ensaio cadastrado com sucesso!');
+            setLoading(false);
             router.back();
           } else {
+            setLoading(false);
             Swal.fire(response.message);
           }
         });

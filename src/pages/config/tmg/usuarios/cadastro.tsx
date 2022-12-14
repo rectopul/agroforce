@@ -154,10 +154,12 @@ export default function NovoUsuario({
         Swal.fire(
           'Preencha todos os campos obrigatórios destacados em vermelho.',
         );
+        setLoading(false);
         return;
       }
       if (values.password !== values.confirmPassword) {
         Swal.fire('As senhas devem ser iguais');
+        setLoading(false);
         return;
       }
 
@@ -202,8 +204,10 @@ export default function NovoUsuario({
         .then((response) => {
           if (response.status === 200) {
             Swal.fire('Usuário cadastrado com sucesso!');
+            setLoading(false);
             router.back();
           } else {
+            setLoading(false);
             Swal.fire(response.message);
           }
         });
@@ -212,7 +216,7 @@ export default function NovoUsuario({
 
   return (
     <>
-      {loading && <ComponentLoading text="" />}
+       {loading && <ComponentLoading text="" />}
       <Head>
         <title>Novo usuário</title>
       </Head>
@@ -486,7 +490,7 @@ export default function NovoUsuario({
                 textColor="white"
                 icon={<FiUserPlus size={18} />}
                 onClick={() => {
-                  setLoading(true);
+                  
                 }}
               />
             </div>
