@@ -28,7 +28,7 @@ export default function Cadastro() {
   const router = useRouter();
 
   const [loading, setLoading] = useState<boolean>(false);
-  setLoading(false);
+  
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const formik = useFormik<ICreateCulture>({
@@ -42,6 +42,7 @@ export default function Cadastro() {
       validateInputs(values);
       if (!values.name || !values.desc) {
         Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
+        setLoading(false);
         return;
       }
 
@@ -55,8 +56,10 @@ export default function Cadastro() {
         .then((response) => {
           if (response.status === 200) {
             Swal.fire('Cultura cadastrada com sucesso!');
+            setLoading(false);
             router.back();
           } else {
+            setLoading(false);
             Swal.fire(response.message);
           }
         });

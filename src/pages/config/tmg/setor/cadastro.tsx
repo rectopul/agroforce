@@ -39,6 +39,7 @@ export default function Safra() {
       validateInputs(values);
       if (!values.name) {
         Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
+        setLoading(false);
         return;
       }
 
@@ -50,9 +51,11 @@ export default function Safra() {
         .then((response) => {
           if (response.status === 200) {
             Swal.fire('Setor cadastrado com sucesso!');
+            setLoading(false);
             router.back();
           } else {
             setCheckInput('text-red-600');
+            setLoading(false);
             Swal.fire(response.message);
           }
         });

@@ -674,7 +674,6 @@ export default function TipoEnsaio({
           XLSX.writeFile(workBook, 'Tipo_Ensaio.xlsx');
         }
       });
-      setLoading(false);
   };
 
   // manage total pages

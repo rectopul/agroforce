@@ -12,6 +12,7 @@ import { cultureService } from 'src/services';
 import Swal from 'sweetalert2';
 import { Button, Content, Input } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 export interface IUpdateCulture {
   id: number;
@@ -33,6 +34,8 @@ export default function Cultura(culture: IUpdateCulture) {
 
   const [checkInput, setCheckInput] = useState('text-black');
 
+  const [loading, setLoading] = useState<boolean>(false);
+
   const formik = useFormik<IUpdateCulture>({
     initialValues: {
       id: culture.id,
@@ -45,6 +48,7 @@ export default function Cultura(culture: IUpdateCulture) {
       validateInputs(values);
       if (!values.name || !values.desc) {
         Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
+        setLoading(false);
         return;
       }
       await cultureService
@@ -58,8 +62,10 @@ export default function Cultura(culture: IUpdateCulture) {
         .then((response) => {
           if (response.status === 200) {
             Swal.fire('Cultura atualizada com sucesso');
+            setLoading(false);
             router.back();
           } else {
+            setLoading(false);
             Swal.fire(response.message);
           }
         })
@@ -85,6 +91,7 @@ export default function Cultura(culture: IUpdateCulture) {
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Atualizar cultura</title>
       </Head>
@@ -165,7 +172,7 @@ export default function Cultura(culture: IUpdateCulture) {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<RiPlantLine size={20} />}
-                onClick={() => {}}
+                onClick={() => {setLoading(true);}}
               />
             </div>
           </div>

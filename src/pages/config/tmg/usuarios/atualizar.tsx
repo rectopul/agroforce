@@ -22,6 +22,7 @@ import {
   Select,
 } from "../../../../components";
 import * as ITabs from "../../../../shared/utils/dropdown";
+import ComponentLoading from '../../../../components/Loading';
 
 interface IDepartment {
   id: number;
@@ -78,6 +79,8 @@ export default function AtualizarUsuario({
   );
 
   const router = useRouter();
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const userCultures: any = [];
   const userPermissions: any = [];
@@ -182,10 +185,12 @@ export default function AtualizarUsuario({
         Swal.fire(
           "Preencha todos os campos obrigatórios destacados em vermelho."
         );
+        setLoading(false);
         return;
       }
       if (values.password !== values.confirmPassword) {
         Swal.fire("As senhas devem ser iguais");
+        setLoading(false);
         return;
       }
 
@@ -236,8 +241,10 @@ export default function AtualizarUsuario({
         .then((response) => {
           if (response.status === 200) {
             Swal.fire("Usuário atualizado com sucesso!");
+            setLoading(false);
             router.back();
           } else {
+            setLoading(false);
             Swal.fire(response.message);
           }
         });

@@ -114,6 +114,7 @@ export default function Atualizar({
         Swal.fire(
           "Preencha todos os campos obrigatórios destacados em vermelho."
         );
+        setLoading(false);
         return;
       }
 
@@ -126,8 +127,10 @@ export default function Atualizar({
         .then((response) => {
           if (response.status === 200) {
             Swal.fire("Foco atualizado com sucesso!");
+            setLoading(false);
             router.back();
           } else {
+            setLoading(false);
             Swal.fire(response.message);
           }
         });
@@ -484,6 +487,7 @@ export default function Atualizar({
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Atualizar foco</title>
       </Head>
@@ -546,7 +550,7 @@ export default function Atualizar({
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<AiOutlineFileSearch size={20} />}
-                onClick={() => {}}
+                onClick={() => {setLoading(false);}}
               />
             </div>
           </div>
