@@ -45,6 +45,7 @@ import {
   Input,
 } from '../../../../components';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+import ComponentLoading from '../../../../components/Loading';
 
 interface ITypeAssayProps {
   name: any;
@@ -84,6 +85,8 @@ export default function AtualizarTipoEnsaio({
 
   const tabsDropDowns = TabsDropDowns();
 
+  const [loading, setLoading] = useState<boolean>(false);
+
   tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
@@ -118,7 +121,6 @@ export default function AtualizarTipoEnsaio({
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const [fieldOrder, setFieldOrder] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(false);
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -148,6 +150,7 @@ export default function AtualizarTipoEnsaio({
         Swal.fire(
           'Preencha todos os campos obrigatórios destacados em vermelho.',
         );
+        setLoading(false);
         return;
       }
       await typeAssayService
@@ -160,8 +163,10 @@ export default function AtualizarTipoEnsaio({
         .then((response) => {
           if (response.status === 200) {
             Swal.fire('Tipo de Ensaio atualizado com sucesso!');
+            setLoading(false);
             router.push('/config/ensaio/tipo-ensaio');
           } else {
+            setLoading(false);
             Swal.fire(response.message);
           }
         });
@@ -463,6 +468,7 @@ export default function AtualizarTipoEnsaio({
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Atualizar Tipo Ensaio</title>
       </Head>
@@ -526,7 +532,7 @@ export default function AtualizarTipoEnsaio({
                   bgColor="bg-blue-600"
                   textColor="white"
                   icon={<RiOrganizationChart size={18} />}
-                  onClick={() => {}}
+                  onClick={() => {setLoading(true);}}
                 />
               </div>
             </div>
