@@ -11,6 +11,7 @@ import { Button, Content, Input } from 'src/components';
 import { departmentService } from 'src/services';
 import Swal from 'sweetalert2';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 interface IDepartmentProps {
   id: number;
@@ -22,6 +23,8 @@ export default function AtualizarSafra(item: IDepartmentProps) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
@@ -38,6 +41,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
       validateInputs(values);
       if (!values.name) {
         Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
+        setLoading(false);
         return;
       }
 
@@ -50,9 +54,11 @@ export default function AtualizarSafra(item: IDepartmentProps) {
         .then((response) => {
           if (response.status === 200) {
             Swal.fire('Setor atualizado com sucesso!');
+            setLoading(false);
             router.back();
           } else {
             setCheckInput('text-red-600');
+            setLoading(false);
             Swal.fire(response.message);
           }
         });
@@ -71,6 +77,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Atualizar setor</title>
       </Head>
@@ -122,7 +129,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<HiOutlineOfficeBuilding size={18} />}
-                onClick={() => {}}
+                onClick={() => {setLoading(true);}}
               />
             </div>
           </div>

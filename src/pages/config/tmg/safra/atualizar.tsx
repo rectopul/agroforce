@@ -10,6 +10,7 @@ import { Button, Content, Input } from 'src/components';
 import { safraService } from 'src/services';
 import Swal from 'sweetalert2';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 interface ISafraProps {
   id: number;
@@ -32,6 +33,8 @@ export default function AtualizarSafra(safra: ISafraProps) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
@@ -63,6 +66,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
       validateInputs(values);
       if (!values.safraName || !values.year) {
         Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
+        setLoading(false);
         return;
       }
 
@@ -94,8 +98,10 @@ export default function AtualizarSafra(safra: ISafraProps) {
         .then((response) => {
           if (response.status === 200) {
             Swal.fire('Safra atualizada com sucesso!');
+            setLoading(false);
             router.back();
           } else {
+            setLoading(false);
             Swal.fire(response.message);
           }
         });
@@ -118,6 +124,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
 
   return (
     <>
+    {loading && <ComponentLoading text="" />}
       <Head>
         <title>Atualizar safra</title>
       </Head>
@@ -216,6 +223,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
                 textColor="white"
                 icon={<MdDateRange size={18} />}
                 onClick={() => {
+                  setLoading(true);
                   formik.submitForm;
                 }}
               />
