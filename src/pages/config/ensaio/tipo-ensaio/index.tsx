@@ -485,7 +485,7 @@ export default function TipoEnsaio({
 
     const tableFields: any = [];
 
-    Object.keys(columnOrder).forEach((item) => {
+    Object.keys(columnOrder).forEach((item: any) => {
       // if (columnOrder[item] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }

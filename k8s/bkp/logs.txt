@@ -1,0 +1,698 @@
+Windows PowerShell
+
+error: error validating ".\\app.deployment.yaml": error validating data: [ValidationError(Deployment.spec.template.spec.volumes[0].csi): invalid type for io.k8s.api.core.v1.CSIVolumap", ValidationError(Deployment.spec.template.spec.volumes[0]): unknown field "readOnly" in io.k8s.api.core.v1.Volume, ValidationError(Deployment.spec.template.spec.volumes[0]): u io.k8s.api.core.v1.Volume]; if you choose to ignore these errors, turn validation off with --validate=false
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl apply -f .\app.deployment.yaml
+deployment.apps/tmgapp configured
+error: the server doesn't have a resource type "azureindentitybinding"
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get azureidentitybinding
+error: the server doesn't have a resource type "azureidentitybinding"
+tmgapp-778b475d84-2shnc                     1/1     Running             0          139m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          138m
+tmgapp-9976c98d8-tsjtq                      0/1     ContainerCreating   0          3m39s
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+NAME                                        READY   STATUS              RESTARTS   AGE
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-778b475d84-2shnc                     1/1     Running             0          139m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          138m
+tmgapp-9976c98d8-tsjtq                      0/1     ContainerCreating   0          3m45s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          139m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          138m
+tmgapp-9976c98d8-tsjtq                      0/1     ContainerCreating   0          3m47s
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get pods
+NAME                                        READY   STATUS              RESTARTS   AGE
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get pods
+NAME                                        READY   STATUS              RESTARTS   AGE
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          139m
+tmgapp-9976c98d8-tsjtq                      0/1     ContainerCreating   0          4m22s
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get pods
+NAME                                        READY   STATUS              RESTARTS   AGE
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-778b475d84-2shnc                     1/1     Running             0          140m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+
+
+
+
+                                                     echo "Setting up the variables..."
+Setting up the variables...
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> $suffix = "tmggom"
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> $subscriptionId = (az account show | ConvertFrom-Json).id
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> $tenantId = (az account show | ConvertFrom-Json).tenantId
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> $location = "East US 2" # "uksouth" # 
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> $resourceGroupName = "RG-GOM-HML"
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> $aksName = "arck-tmg-hml-001"
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> $aksVersion = "1.23.8"
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> $keyVaultName = "kv-gom-hml"
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> $secret1Name = "dburl"
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> $secret1Alias = "dburl"
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> $identityName = "identity-aks-kv"
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> $secretProviderClassName = "secret-provider-kv"
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> $acrName = "crtmghml001"
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get pods -n csi-driver
+No resources found in csi-driver namespace.
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get pods -n kube-system    
+NAME                                         READY   STATUS    RESTARTS   AGE
+azure-ip-masq-agent-b6656                    1/1     Running   0          24d
+cloud-node-manager-2wcs8                     1/1     Running   0          24d
+coredns-87688dc49-qjrql                      1/1     Running   0          23d
+coredns-87688dc49-wb42q                      1/1     Running   0          24d
+coredns-autoscaler-84bdbbc855-zmf2q          1/1     Running   0          24d
+csi-azuredisk-node-9pdnf                     3/3     Running   0          15d
+csi-azurefile-node-cj9p2                     3/3     Running   0          2d5h
+csi-csi-secrets-store-provider-azure-lpm2g   1/1     Running   0          135m
+konnectivity-agent-56cc44958c-dhjfz          1/1     Running   0          23d
+konnectivity-agent-56cc44958c-wwc52          1/1     Running   0          23d
+kube-proxy-97k8f                             1/1     Running   0          7d6h
+metrics-server-6d594446f4-fcpdl              1/1     Running   0          24d
+metrics-server-6d594446f4-jrpwk              1/1     Running   0          24d
+secrets-store-csi-driver-bnkbw               3/3     Running   0          135m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> ^C
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> ^C
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> ^C
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl apply -f .\keyvault.yaml
+Warning: secrets-store.csi.x-k8s.io/v1alpha1 is deprecated. Use secrets-store.csi.x-k8s.io/v1 instead.
+secretproviderclass.secrets-store.csi.x-k8s.io/secret-provider-kv created
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> helm repo add aad-pod-identity https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts
+"aad-pod-identity" has been added to your repositories
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> helm install pod-identity aad-pod-identity/aad-pod-identity
+NAME: pod-identity
+LAST DEPLOYED: Fri Sep 16 14:32:38 2022
+NAMESPACE: hml
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+You have successfully installed AAD Pod Identity in your Kubernetes cluster!
+
+To verify that AAD Pod Identity has started in standard mode, run:
+  kubectl --namespace=hml get pods -l "app.kubernetes.io/component=mic"
+  kubectl --namespace=hml get pods -l "app.kubernetes.io/component=nmi"
+
+
+Now you can follow the demos to get familiar with AAD Pod Identity: https://azure.github.io/aad-pod-identity/docs/demo/
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get pods
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          7m6s
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          7m6s
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          7m6s
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          4m49s
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          161m
+tmgapp-9976c98d8-tsjtq                      0/1     ContainerCreating   0          26m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> az role assignment create --role "Managed Identity Operator" --assignee $aks.identityProfile.kubeletidentity.clientId --scope /subscriptions/$subscriptionId/resourcegroups/$($aks.nodeResourceGroup)
+argument --assignee: expected one argument
+
+Examples from AI knowledge base:
+az role assignment create --assignee 00000000-0000-0000-0000-000000000000 --role "Storage Account Key Operator Service Role" --scope $id
+Create a new role assignment for a user, group, or service principal. (autogenerated)
+
+az role assignment create --assignee sp_name --role a_role
+Create role assignment for an assignee.
+
+az aks show --name MyManagedCluster --resource-group MyResourceGroup
+https://docs.microsoft.com/en-US/cli/azure/role/assignment#az_role_assignment_create
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>   az role assignment create --role "Managed Identity Operator" --assignee $aks.identityProfile.kubeletidentity.clientId --scope /subscriptions/$subscriptionId/resourcegroups/$($aks.nodeResourceGroup)
+argument --assignee: expected one argument
+
+Examples from AI knowledge base:
+Create role assignment for an assignee.
+
+az aks show --name MyManagedCluster --resource-group MyResourceGroup
+
+https://docs.microsoft.com/en-US/cli/azure/role/assignment#az_role_assignment_create
+Read more about the command in reference docs
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>   
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> $aks = (az aks show -n $aksName -g $resourceGroupName | ConvertFrom-Json)
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> az role assignment create --role "Managed Identity Operator" --assignee $aks.identityProfile.kubeletidentity.clientId --scope /subscriptions/$subscriptionId/resourcegroups/$($aks.nodeResourceGroup)
+Failed to query 04bbade3-603c-42af-a3b4-f9fdd5dbda79 by invoking Graph API. If you don't have permission to query Graph API, please specify --assignee-object-id and --assignee-principal-type.
+Assuming 04bbade3-603c-42af-a3b4-f9fdd5dbda79 as an object ID.
+a1ecbf-49a8-4a57-9edd-ea85f6379f28/resourcegroups/MC_RG-GOM-HML_arck-tmg-hml-001_eastus2/providers/Microsoft.Authorization/roleAssignments/9f8d2cbf-d215-4ca7-bc91-2b19605d7b59' or the scope is invalid. If access was recently granted, please refresh your credentials.
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> az role assignment create --role "Managed Identity Operator" --assignee $aks.identityProfile.kubeletidentity.clientId --scope /subscriptions/$subscriptionId/resourcegroups/$($aks.nodeResourceGroup)^C
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          10m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          10m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          10m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          8m37s
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-778b475d84-2shnc                     1/1     Running             0          166m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          165m
+tmgapp-9976c98d8-tsjtq                      0/1     ContainerCreating   0          30m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> $identity = az identity create -g $resourceGroupName -n $identityName | ConvertFrom-Jso
+ConvertFrom-Jso : O termo 'ConvertFrom-Jso' não é reconhecido como nome de cmdlet, função, arquivo de script ou programa operável. Verifique a grafia do nome ou, se um caminho tiver sido incluído, veja se o        
+caminho está correto e tente novamente.
+No linha:1 caractere:73
++ ... ntity create -g $resourceGroupName -n $identityName | ConvertFrom-Jso
++                                                           ~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (ConvertFrom-Jso:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+ 
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> $identity = az identity create -g $resourceGroupName -n $identityName | ConvertFrom-Json
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> az keyvault show -n $keyVaultName -g $resourceGroupName      
+{
+  "id": "/subscriptions/b1a1ecbf-49a8-4a57-9edd-ea85f6379f28/resourceGroups/RG-GOM-HML/providers/Microsoft.KeyVault/vaults/kv-gom-hml",
+  "location": "eastus2",
+  "name": "kv-gom-hml",
+  "properties": {
+    "accessPolicies": [
+      {
+        "applicationId": null,
+        "objectId": "715ec44f-774c-4cc0-8225-44f887987314",
+        "permissions": {
+          "certificates": [
+            "Get",
+            "List",
+            "Update",
+            "Create",
+            "Import",
+            "Delete",
+            "Recover",
+            "Backup",
+            "Restore",
+            "ManageContacts",
+            "ManageIssuers",
+            "GetIssuers",
+            "ListIssuers",
+            "SetIssuers",
+            "DeleteIssuers"
+          ],
+          "keys": [
+            "Get",
+            "List",
+            "Update",
+            "Create",
+            "Import",
+            "Delete",
+            "Recover",
+            "Backup",
+            "Restore",
+            "GetRotationPolicy",
+            "SetRotationPolicy",
+            "Rotate"
+          ],
+          "secrets": [
+            "Get",
+            "List",
+            "Set",
+            "Delete",
+            "Recover",
+            "Backup",
+            "Restore"
+          ],
+          "storage": null
+        },
+        "tenantId": "a819a679-3a36-4ff2-83cc-47e62081f03f"
+      }
+    ],
+    "createMode": null,
+    "enablePurgeProtection": null,
+    "enableRbacAuthorization": true,
+    "enableSoftDelete": true,
+    "enabledForDeployment": false,
+    "enabledForDiskEncryption": false,
+    "enabledForTemplateDeployment": false,
+    "hsmPoolResourceId": null,
+    "networkAcls": null,
+    "privateEndpointConnections": null,
+    "provisioningState": "Succeeded",
+    "publicNetworkAccess": "Enabled",
+    "sku": {
+      "family": "A",
+    "softDeleteRetentionInDays": 90,
+    "tenantId": "a819a679-3a36-4ff2-83cc-47e62081f03f",
+    "vaultUri": "https://kv-gom-hml.vault.azure.net/"
+  },
+  "resourceGroup": "RG-GOM-HML",
+    "createdAt": "2022-08-29T17:31:42.512000+00:00",
+    "createdBy": "joaomendes@tmg.agr.br",
+    "createdByType": "User",
+    "lastModifiedAt": "2022-08-29T17:31:42.512000+00:00",
+    "lastModifiedBy": "joaomendes@tmg.agr.br",
+  },
+  "tags": {},
+  "type": "Microsoft.KeyVault/vaults"
+}
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> ^C
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> $keyVault = (az keyvault show -n $keyVaultName -g $resourceGroupName | ConvertFrom-Json)
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> az role assignment create --role "Reader" --assignee $identity.principalId --scope $keyVault.id
+Failed to query 6f2f4a2d-46f4-45ab-b8c2-1e5213488b30 by invoking Graph API. If you don't have permission to query Graph API, please specify --assignee-object-id and --assignee-principal-type.
+Assuming 6f2f4a2d-46f4-45ab-b8c2-1e5213488b30 as an object ID.
+The client 'thiago@agroforce.com.br' with object id 'cb26e9e0-8599-473b-96d0-f1a7fdee17a7' does not have authorization to perform action 'Microsoft.Authorization/roleAssignments/write' over scope '/subscriptions/b1a1ecbf-49a8-4a57-9edd-ea85f6379f28/resourceGroups/RG-GOM-HML/providers/Microsoft.KeyVault/vaults/kv-gom-hml/providers/Microsoft.Authorization/roleAssignments/c3732cb2-c765-4ca7-b69f-1c7fbd6f8d9a' or the scope is invalid. If access was recently granted, please refresh your credentials.
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> az role assignment create --role "Reader" --assignee $identity.principalId --scope $keyVault.id
+Failed to query 6f2f4a2d-46f4-45ab-b8c2-1e5213488b30 by invoking Graph API. If you don't have permission to query Graph API, please specify --assignee-object-id and --assignee-principal-type.
+Assuming 6f2f4a2d-46f4-45ab-b8c2-1e5213488b30 as an object ID.
+The client 'thiago@agroforce.com.br' with object id 'cb26e9e0-8599-473b-96d0-f1a7fdee17a7' does not have authorization to perform action 'Microsoft.Authorization/roleAssignments/write' over scope '/subscriptions/b1a1ecbf-49a8-4a57-9edd-ea85f6379f28/resourceGroups/RG-GOM-HML/providers/Microsoft.KeyVault/vaults/kv-gom-hml/providers/Microsoft.Authorization/roleAssignments/b49b8c6e-7354-4395-b070-6d2fc63dced6' or the scope is invalid. If access was recently granted, please refresh your credentials.
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> az role assignment create --role "Reader" --assignee $identity.principalId --scope $keyVault.id
+Failed to query 6f2f4a2d-46f4-45ab-b8c2-1e5213488b30 by invoking Graph API. If you don't have permission to query Graph API, please specify --assignee-object-id and --assignee-principal-type.
+Assuming 6f2f4a2d-46f4-45ab-b8c2-1e5213488b30 as an object ID.
+The client 'thiago@agroforce.com.br' with object id 'cb26e9e0-8599-473b-96d0-f1a7fdee17a7' does not have authorization to perform action 'Microsoft.Authorization/roleAssignments/write' over scope '/subscriptions/b1a1ecbf-49a8-4a57-9edd-ea85f6379f28/resourceGroups/RG-GOM-HML/providers/Microsoft.KeyVault/vaults/kv-gom-hml/providers/Microsoft.Authorization/roleAssignments/99e2fe8b-80ae-494b-9a23-147c30ac46a0' or the scope is invalid. If access was recently granted, please refresh your credentials.
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> az keyvault set-policy -n $keyVaultName --secret-permissions get --spn $identity.clientId
+The command failed with an unexpected error. Here is the traceback:
+Insufficient privileges to complete the operation.
+Traceback (most recent call last):
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/role/_msgrpah/_graph_client.py", line 52, in _send
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/util.py", line 993, in send_raw_request
+566346ce-4014-4407-85c8-95ce8d14cff9","client-request-id":"566346ce-4014-4407-85c8-95ce8d14cff9"}}})
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\knack/cli.py", line 231, in invoke
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 663, in execute
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 726, in _run_jobs_serially
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 697, in _run_job
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 333, in __call__
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/command_operation.py", line 121, in handler
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/keyvault/custom.py", line 915, in set_policy
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/keyvault/custom.py", line 894, in _object_id_args_helper
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/keyvault/custom.py", line 355, in _get_object_id
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/keyvault/custom.py", line 313, in _get_object_id_by_spn
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/role/_msgrpah/_graph_client.py", line 179, in service_principal_list
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/role/_msgrpah/_graph_client.py", line 55, in _send
+azure.cli.command_modules.role._msgrpah._graph_client.GraphError: Insufficient privileges to complete the operation.
+To open an issue, please run: 'az feedback'
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>  az role assignment create --role "Managed Identity Operator" --assignee $aks.servicePrincipalProfile.clientId --scope $identity.id
+Failed to query msi by invoking Graph API. If you don't have permission to query Graph API, please specify --assignee-object-id and --assignee-principal-type.
+The command failed with an unexpected error. Here is the traceback:
+Insufficient privileges to complete the operation.
+Traceback (most recent call last):
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/util.py", line 993, in send_raw_request
+azure.cli.core.azclierror.HTTPError: Forbidden({"error":{"code":"Authorization_RequestDenied","message":"Insufficient privileges to complete the operation.","innerError":{"date":"2022-09-16T17:48:19","request-id":"573558aa-699b-4fd8-9b92-853e1682af5d","client-request-id":"573558aa-699b-4fd8-9b92-853e1682af5d"}}})
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\knack/cli.py", line 231, in invoke
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 663, in execute
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 726, in _run_jobs_serially
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 697, in _run_job
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 333, in __call__
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/command_operation.py", line 121, in handler
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/role/custom.py", line 166, in create_role_assignment
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/role/custom.py", line 1521, in _resolve_object_id_and_type
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/role/_msgrpah/_graph_client.py", line 179, in service_principal_list
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/role/_msgrpah/_graph_client.py", line 55, in _send
+azure.cli.command_modules.role._msgrpah._graph_client.GraphError: Insufficient privileges to complete the operation.
+To open an issue, please run: 'az feedback'
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> az keyvault set-policy -n $keyVaultName --secret-permissions get --spn $identity.clientId
+The command failed with an unexpected error. Here is the traceback:
+Insufficient privileges to complete the operation.
+Traceback (most recent call last):
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/role/_msgrpah/_graph_client.py", line 52, in _send
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/util.py", line 993, in send_raw_request
+3648a19f-db58-40d1-ac49-f93aef8b5fa5","client-request-id":"3648a19f-db58-40d1-ac49-f93aef8b5fa5"}}})
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 663, in execute
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 726, in _run_jobs_serially
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/keyvault/custom.py", line 915, in set_policy
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/keyvault/custom.py", line 894, in _object_id_args_helper
+  File "D:\a\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/role/_msgrpah/_graph_client.py", line 55, in _send
+azure.cli.command_modules.role._msgrpah._graph_client.GraphError: Insufficient privileges to complete the operation.
+To open an issue, please run: 'az feedback'
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> echo $identity.id
+/subscriptions/b1a1ecbf-49a8-4a57-9edd-ea85f6379f28/resourcegroups/RG-GOM-HML/providers/Microsoft.ManagedIdentity/userAssignedIdentities/identity-aks-kv
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> echo $identity.clientId
+5d8b179f-b76d-42b0-a126-41389a30e800
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> arpp^C
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> ^C
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl apply -f .\app.deployment.yaml
+deployment.apps/tmgapp configured
+service/app unchanged
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get pods
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          21m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          21m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          18m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          4s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          176m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          175m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          21m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          21m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          21m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          19m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          16s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          176m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          176m
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          21m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          21m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          21m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          19m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          18s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          176m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          176m
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          21m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          21m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          21m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          19m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          20s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          176m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          176m
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          21m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          21m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          21m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          19m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          22s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          177m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          176m
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          21m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          21m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          21m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          19m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          23s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          177m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          176m
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          21m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          21m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          21m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          19m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          49s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          177m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          176m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          21m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          21m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          19m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          51s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          177m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          176m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get pods
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          21m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          21m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          19m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          53s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          177m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          176m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          21m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          21m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          21m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          19m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          55s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          177m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          176m
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          22m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          22m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          22m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          19m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          63s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          177m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          176m
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          22m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          22m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          22m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          19m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          64s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          177m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          176m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          22m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          22m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          19m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          66s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          177m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          176m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get pods
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          22m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          22m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          19m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          68s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          177m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          176m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          22m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          22m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          22m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          19m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          71s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          177m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          176m
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          22m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          22m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          22m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          19m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          72s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          177m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          176m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          22m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          19m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          74s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          177m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          176m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get pods
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          22m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          75s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          177m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          177m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get pods
+NAME                                        READY   STATUS              RESTARTS   AGE
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          78s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          177m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          177m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get pods
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          22m
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          80s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          177m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          177m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get pods
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          22m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          22m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          20m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          82s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          178m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          177m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          22m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          22m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          22m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          20m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          90s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          178m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          177m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          22m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          20m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          97s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          178m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          177m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get pods
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          22m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          22m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          20m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          99s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          178m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          177m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          22m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          22m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          22m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          20m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          101s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          178m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          177m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          23m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          23m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          20m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          2m7s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          178m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          177m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get pods
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          23m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          23m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          20m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          2m8s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          178m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          177m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get pods
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          23m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          23m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          23m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          20m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          2m11s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          178m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          177m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> kubectl get pods
+NAME                                        READY   STATUS              RESTARTS   AGE
+aad-pod-identity-mic-f6f668f44-8tks4        1/1     Running             0          23m
+aad-pod-identity-mic-f6f668f44-pgjr5        1/1     Running             0          23m
+aad-pod-identity-nmi-68l7w                  1/1     Running             0          23m
+aad-pod-identity-nmi-rw4hn                  1/1     Running             0          21m
+ingress-nginx-controller-5fbf49f7d7-fgvcr   1/1     Running             0          9d
+tmgapp-6967c4fd97-hxbpd                     0/1     ContainerCreating   0          2m47s
+tmgapp-778b475d84-2shnc                     1/1     Running             0          179m
+tmgapp-778b475d84-6hsnh                     1/1     Running             0          178m
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s>
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> 
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> 
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> 
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> history
+
+  Id CommandLine
+  -- -----------
+   1 kubectl apply -f .\app.deployment.yaml
+   2 kubectl apply -f .\app.deployment.yaml
+   3 kubectl get azureindentitybinding
+   4 kubectl get azureidentitybinding
+   5 kubectl get pods
+   6 kubectl get pods
+   7 kubectl get pods
+   8 kubectl get pods
+   9 kubectl get pods
+  10 kubectl get pods
+  11 kubectl get pods
+  12 kubectl get pods
+  13 kubectl get crd
+  14 echo "Setting up the variables..."
+  15 $suffix = "tmggom"
+  16 $subscriptionId = (az account show | ConvertFrom-Json).id
+  17 $tenantId = (az account show | ConvertFrom-Json).tenantId
+  18 $location = "East US 2" # "uksouth" #
+  19 $resourceGroupName = "RG-GOM-HML"
+  20 $aksName = "arck-tmg-hml-001"
+  21 $aksVersion = "1.23.8"
+  22 $keyVaultName = "kv-gom-hml"
+  23 $secret1Name = "dburl"
+  24 $secret1Alias = "dburl"
+  25 $identityName = "identity-aks-kv"
+  26 $identitySelector = "azure-kv"
+  27 $secretProviderClassName = "secret-provider-kv"
+  28 $acrName = "crtmghml001"
+  29 $isAKSWithManagedIdentity = "true"
+  30 kubectl get pods -n csi-driver
+  31 kubectl get pods -n kube-system
+  32 kubectl apply -f .\keyvault.yaml
+  33 helm repo add aad-pod-identity https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts
+  34 helm install pod-identity aad-pod-identity/aad-pod-identity
+  35 kubectl get pods
+  36 az role assignment create --role "Managed Identity Operator" --assignee $aks.identityProfile.kubeletidentity.clientId --scope /subscriptions/$subscriptionId/resourcegroups/$($aks.nodeResourceGroup)
+  37   az role assignment create --role "Managed Identity Operator" --assignee $aks.identityProfile.kubeletidentity.clientId --scope /subscriptions/$subscriptionId/resourcegroups/$($aks.nodeResourceGroup)
+  38 $aks = (az aks show -n $aksName -g $resourceGroupName | ConvertFrom-Json)
+  39 az role assignment create --role "Managed Identity Operator" --assignee $aks.identityProfile.kubeletidentity.clientId --scope /subscriptions/$subscriptionId/resourcegroups/$($aks.nodeResourceGroup)
+  40 kubectl get pods
+  41 $identity = az identity create -g $resourceGroupName -n $identityName | ConvertFrom-Jso
+  42 $identity = az identity create -g $resourceGroupName -n $identityName | ConvertFrom-Json
+  43 az keyvault show -n $keyVaultName -g $resourceGroupName
+  44 $keyVault = (az keyvault show -n $keyVaultName -g $resourceGroupName | ConvertFrom-Json)
+  45 az role assignment create --role "Reader" --assignee $identity.principalId --scope $keyVault.id
+  46 az role assignment create --role "Reader" --assignee $identity.principalId --scope $keyVault.id
+  47 az role assignment create --role "Reader" --assignee $identity.principalId --scope $keyVault.id
+  48 az keyvault set-policy -n $keyVaultName --secret-permissions get --spn $identity.clientId
+  49  az role assignment create --role "Managed Identity Operator" --assignee $aks.servicePrincipalProfile.clientId --scope $identity.id
+  50 az keyvault set-policy -n $keyVaultName --secret-permissions get --spn $identity.clientId
+  51 echo $identity.id
+  52 echo $identity.clientId
+  53 kubectl apply -f .\identity.yaml
+  54 kubectl apply -f .\app.deployment.yaml
+  55 kubectl get pods
+  56 kubectl get pods
+  57 kubectl get pods
+  58 kubectl get pods
+  59 kubectl get pods
+  60 kubectl get pods
+  61 kubectl get pods
+  62 kubectl get pods
+  63 kubectl get pods
+  64 kubectl get pods
+  65 kubectl get pods
+  66 kubectl get pods
+  67 kubectl get pods
+  68 kubectl get pods
+  69 kubectl get pods
+  70 kubectl get pods
+  71 kubectl get pods
+  72 kubectl get pods
+  73 kubectl get pods
+  74 kubectl get pods
+  75 kubectl get pods
+  76 kubectl get pods
+  77 kubectl get pods
+  78 kubectl get pods
+  79 kubectl get pods
+  80 kubectl get pods
+  81 kubectl get pods
+  82 kubectl get pods
+  83 kubectl get pods
+
+
+PS C:\Programacao\arquitetura\tmg\agroforce_tmg\k8s> https://www.youtube.com/watch?v=S2wzCD5L9Mo

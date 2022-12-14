@@ -19,7 +19,7 @@
 
 # misc
 .DS_Store
-*.pem
+
 
 # debug
 npm-debug.log*
@@ -44,3 +44,4 @@ src.zip
 # typescript
 *.tsbuildinfo
 
+k8s/secret.yaml

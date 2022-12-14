@@ -72,12 +72,12 @@ interface IData {
 }
 
 export default function NovoLocal({
-      local,
-      layoultEdit,
-      npe,
-      idCulture,
-      idSafra,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  local,
+  layoultEdit,
+  npe,
+  idCulture,
+  idSafra,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const tabsDropDowns = TabsDropDowns();
 
@@ -179,7 +179,7 @@ export default function NovoLocal({
   }
 
   useEffect(() => {
-    localMap.map((item) => {
+    localMap.map((item: any) => {
       if (item.id === idLocal) {
         setLat(Number(-item.latitude));
         setLng(Number(-item.longitude));
@@ -484,5 +484,9 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const layoultEdit = await resU.json();
   let local = await apiLocal.json();
   local = local.response;
-  return { props: { local, layoultEdit, npe, idCulture, idSafra } };
+  return {
+    props: {
+      local, layoultEdit, npe, idCulture, idSafra,
+    },
+  };
 };

@@ -336,7 +336,7 @@ export default function Listagem({
   function colums(columnOrder: any): any {
     const columnCampos: any = columnOrder.split(',');
     const tableFields: any = [];
-    Object.keys(columnCampos).forEach((item) => {
+    Object.keys(columnCampos).forEach((item: any) => {
       // if (columnCampos[item] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }

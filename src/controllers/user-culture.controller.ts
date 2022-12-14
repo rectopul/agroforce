@@ -23,7 +23,7 @@ export class UserCultureController {
 
       if (options.paramSelect) {
         const objSelect = options.paramSelect.split(',');
-        Object.keys(objSelect).forEach((item) => {
+        Object.keys(objSelect).forEach((item: any) => {
           select[objSelect[item]] = true;
         });
         select = { ...select };
@@ -107,7 +107,7 @@ export class UserCultureController {
       if (data !== null && data !== undefined) {
         const create: object | any = {};
         await this.delete(Number(data.userId));
-        Object.keys(data.cultureId).forEach((item) => {
+        Object.keys(data.cultureId).forEach((item: any) => {
           create.cultureId = Number(data.cultureId[item]);
           create.userId = Number(data.userId);
           create.created_by = data.created_by;

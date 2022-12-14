@@ -300,7 +300,7 @@ export default function Listagem({
   function colums(camposGerenciados: any): any {
     const columnCampos: any = camposGerenciados.split(',');
     const tableFields: any = [];
-    Object.keys(columnCampos).forEach((item) => {
+    Object.keys(columnCampos).forEach((item: any) => {
       if (columnCampos[item] === 'local') {
         tableFields.push(
           headerTableFactoryGlobal({
@@ -609,7 +609,7 @@ export default function Listagem({
   const handleRowSelection = (rowData: any) => {
     if (selectedNPE?.includes(rowData)) {
       rowData.tableData.checked = false;
-      setSelectedNPE(selectedNPE.filter((item) => item != rowData));
+      setSelectedNPE(selectedNPE.filter((item: any) => item != rowData));
     } else {
       rowData.tableData.checked = true;
       setSelectedNPE([...selectedNPE, rowData]);
