@@ -43,10 +43,8 @@ export class ImportDelimitationController {
     ];
     const validate: any = await validateHeaders(spreadSheet, headers);
     if (validate.length > 0) {
-      const responseStringError = validate.join('').replace(/undefined/g, '');
-
       await logImportController.update({
-        id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: responseStringError,
+        id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: validate,
       });
 
       return { status: 400, message: validate };
@@ -212,7 +210,7 @@ export class ImportDelimitationController {
         status: 1,
         state: 'INVALIDA',
         invalid_data: responseStringError,
-        updated_at: new Date(Date.now())
+        updated_at: new Date(Date.now()),
       });
       return { status: 400, message: responseStringError };
     } catch (error: any) {

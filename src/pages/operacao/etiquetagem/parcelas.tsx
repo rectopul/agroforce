@@ -934,8 +934,6 @@ export default function Listagem({
 
   async function reprint() {
     setIsLoading(true);
-    console.log('rowsSelected');
-    console.log([rowsSelected]);
     const idList = rowsSelected.map((item: any) => item.id);
 
     await experimentGenotipeService.update({

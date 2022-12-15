@@ -43,7 +43,7 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
-import ComponentLoading from "../../../../components/Loading";
+import ComponentLoading from '../../../../components/Loading';
 
 export interface IData {
   // allItens: any;
@@ -122,7 +122,7 @@ export default function AtualizarLocal({
     Number(pageBeforeEdit),
   );
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(0);
   // const [setArrowOrder] = useState<any>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -158,13 +158,14 @@ export default function AtualizarLocal({
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
-  const [orderBy, setOrderBy] = useState<string>(orderByserver);
-  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [typeOrder, setTypeOrder] = useState<string>('');
+
   const [fieldOrder, setFieldOrder] = useState<any>(null);
 
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
+    orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy
+  }&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IUpdateExperimento>({
     initialValues: {
@@ -302,6 +303,10 @@ export default function AtualizarLocal({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 100);
   }
 
   // function headerTableFactory(
@@ -686,7 +691,7 @@ export default function AtualizarLocal({
 
   return (
     <>
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Dados do experimento</title>
       </Head>
@@ -1109,7 +1114,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : '';
+    : 'desc';
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
