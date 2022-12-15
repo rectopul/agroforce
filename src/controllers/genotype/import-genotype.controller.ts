@@ -98,7 +98,6 @@ export class ImportGenotypeController {
     const safraController = new SafraController();
     const importController = new ImportController();
     const culturaController = new CulturaController();
-    const genotipoController = new GenotipoController();
     const tecnologiaController = new TecnologiaController();
 
     const responseIfError: any = [];
@@ -106,18 +105,6 @@ export class ImportGenotypeController {
     const nccValidate: any = [];
     try {
       const configModule: object | any = await importController.getAll(10);
-      if (spreadSheet[0]?.length < 30) {
-        return {
-          status: 400,
-          message: 'O numero de colunas e menor do que o esperado',
-        };
-      }
-      if (spreadSheet[0]?.length > 30) {
-        return {
-          status: 400,
-          message: 'O numero de colunas e maior do que o esperado',
-        };
-      }
 
       for (const row in spreadSheet) {
         if (row !== '0') {
@@ -479,7 +466,7 @@ export class ImportGenotypeController {
         status: 1,
         state: 'INVALIDA',
         invalid_data: responseStringError,
-        updated_at: new Date(Date.now())
+        updated_at: new Date(Date.now()),
       });
       return { status: 400, message: responseStringError };
     } catch (error: any) {
@@ -487,7 +474,7 @@ export class ImportGenotypeController {
         id: idLog,
         status: 1,
         state: 'FALHA',
-        updated_at: new Date(Date.now())
+        updated_at: new Date(Date.now()),
       });
       handleError('Genótipo controller', 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Genótipo' };
@@ -887,7 +874,7 @@ export class ImportGenotypeController {
         id: idLog,
         status: 1,
         state: 'FALHA',
-        updated_at: new Date(Date.now())
+        updated_at: new Date(Date.now()),
       });
       handleError('Genótipo controller', 'Save Import', error.message);
       return {

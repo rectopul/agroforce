@@ -40,12 +40,7 @@ export class LogImportController {
     try {
       if (data.reset) {
         const response = await this.logImportRepository.reset();
-        await this.create({
-          user_id: data.created_by,
-          table: 'LOGS',
-          status: 1,
-          state: 'CANCELAMENTO MANUAL',
-        });
+
         if (response) {
           return { status: 200, message: 'Reset realizado' };
         }

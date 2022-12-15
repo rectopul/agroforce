@@ -1157,15 +1157,17 @@ export default function Import({
                       <div />
 
                       <div className="h-12 flex items-left justify-left w-1/12">
-                        {/* <Button
+                        <Button
                           title="Exportar planilha de logs"
                           icon={<AiOutlineStop size={20} />}
                           bgColor="bg-blue-600"
+                          hidden={disabledButton}
                           textColor="white"
+                          disabled={disabledButton}
                           onClick={() => {
                             cancelImport();
                           }}
-                        /> */}
+                        />
                       </div>
                       <strong className="text-blue-600">
                         Total registrado:
