@@ -20,7 +20,6 @@ export class ExperimentGenotipeController {
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
-    parameters.OR = [];
     try {
       if (options.filterFoco) {
         parameters.foco = JSON.parse(
@@ -73,7 +72,7 @@ export class ExperimentGenotipeController {
       }
 
       if (options.filterGli) {
-        parameters.OR.push(JSON.parse(`{ "experiment": { "assay_list": {"gli": {"contains": "${options.filterGli}" } } } }`));
+        parameters.AND.push(JSON.parse(`{ "experiment": { "assay_list": {"gli": {"contains": "${options.filterGli}" } } } }`));
       }
 
       if (options.filterStatus) {
@@ -97,14 +96,14 @@ export class ExperimentGenotipeController {
       }
 
       if (options.filterLocal) {
-        parameters.OR.push(JSON.parse(
+        parameters.AND.push(JSON.parse(
           `{ "experiment": { "local": { "name_local_culture": { "contains": "${options.filterLocal}" } } } }`,
         ));
       }
 
       if (options.filterDelineamento) {
-        parameters.OR.push(JSON.parse(
-          `{ "experiment": { "delineamento": { "name": { "contains": "${options.filterLocal}" } } } }`,
+        parameters.AND.push(JSON.parse(
+          `{ "experiment": { "delineamento": { "name": { "contains": "${options.filterDelineamento}" } } } }`,
         ));
       }
 
@@ -368,10 +367,6 @@ export class ExperimentGenotipeController {
 
       if (parameters.AND.length === 0) {
         delete parameters.AND;
-      }
-
-      if (parameters.OR.length === 0) {
-        delete parameters.OR;
       }
 
       const response: object | any = await this.ExperimentGenotipeRepository.findAll(
