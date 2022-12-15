@@ -99,7 +99,6 @@ export class ImportExperimentGenotypeController {
             nca: String(spreadSheet[row][13]),
             take: 1,
           });
-          console.log('🚀 ~ file: import-experiment-genotype.controller.ts:86 ~ ImportExperimentGenotypeController ~ parcels', parcels);
 
           if (parcels.length === 0) {
             responseIfError[0]

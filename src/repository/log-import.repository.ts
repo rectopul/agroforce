@@ -60,12 +60,22 @@ export class LogImportRepository {
   }
 
   async reset() {
-    const result = await prisma.log_import.updateMany({
+    const first = await prisma.log_import.findMany({
       where: {
-        status: 2,
+        state: 'EM ANDAMENTO',
+      },
+      orderBy: {
+        id: 'desc',
+      },
+      take: 1,
+    });
+    const result = await prisma.log_import.update({
+      where: {
+        id: first[0]?.id,
       },
       data: {
         status: 1,
+        state: 'CANCELADO MANUALMENTE',
       },
     });
     return result;
