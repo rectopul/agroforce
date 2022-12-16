@@ -111,7 +111,7 @@ export class FocoController {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const focoAlreadyExists = await this.focoRepository.findByName(
-        { name: data.name, id_culture: data.id_culture, status: 1 },
+        { name: data.name, id_culture: data.id_culture },
       );
 
       if (focoAlreadyExists) return { status: 409, message: 'Foco já existe, favor checar registros inativos.' };
