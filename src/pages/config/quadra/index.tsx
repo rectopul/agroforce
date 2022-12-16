@@ -645,7 +645,7 @@ export default function Listagem({
         // Download
         XLSX.writeFile(workBook, "Quadras.xlsx");
       } else {
-        Swal.fire(response);
+        Swal.fire("Não existem registros para serem exportados, favor checar.");
       }
     });
     setLoading(false);

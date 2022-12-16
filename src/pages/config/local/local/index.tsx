@@ -13,6 +13,7 @@ import {
   Droppable,
   DropResult,
 } from "react-beautiful-dnd";
+import Swal from "sweetalert2";
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
@@ -647,6 +648,8 @@ export default function Listagem({
         });
         // Download
         XLSX.writeFile(workBook, "Lugar de Cultura.xlsx");
+      } else {
+        Swal.fire("Não existem registros para serem exportados, favor checar.");
       }
     });
     setLoading(false);

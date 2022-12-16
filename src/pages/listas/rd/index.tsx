@@ -25,7 +25,6 @@ import {
 import Spinner from "react-bootstrap/Spinner";
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { IoReloadSharp } from "react-icons/io5";
-
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line } from "react-icons/ri";
 import * as XLSX from "xlsx";
@@ -597,6 +596,8 @@ export default function Import({
         });
         // Download
         XLSX.writeFile(workBook, "Logs.xlsx");
+      } else {
+        Swal.fire("Não existem registros para serem exportados, favor checar.");
       }
     });
     setLoading(false);

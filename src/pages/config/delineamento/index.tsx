@@ -618,6 +618,8 @@ export default function Listagem({
         });
         // Download
         XLSX.writeFile(workBook, "Delineamento.xlsx");
+      } else {
+        Swal.fire("Não existem registros para serem exportados, favor checar.");
       }
     });
     setLoading(false);
