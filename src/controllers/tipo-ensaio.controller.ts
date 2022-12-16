@@ -108,7 +108,7 @@ export class TypeAssayController {
 
   async getByData(data: any) {
     try {
-      const response = await this.typeAssayRepository.findOneByData(data, 1);
+      const response = await this.typeAssayRepository.findOneByData(data);
       if (!response) {
         return { status: 404, response: [], message: 'Tipo de ensaio não encontrado' };
       }

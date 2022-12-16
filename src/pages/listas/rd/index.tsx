@@ -1153,7 +1153,9 @@ export default function Import({
                           title="Cancelar importação de planilha"
                           icon={<AiOutlineStop size={20} />}
                           bgColor="bg-blue-600"
+                          hidden={disabledButton}
                           textColor="white"
+                          disabled={disabledButton}
                           onClick={() => {
                             cancelImport();
                           }}
@@ -1336,7 +1338,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
     headers: { Authorization: `Bearer ${token}` },
   };
 
-  const { response: allLogs, total: totalItems } = await fetch(
+  const { response: allLogs = [], total: totalItems = 0 } = await fetch(
     urlParameters.toString(),
     requestOptions
   ).then((response) => response.json());

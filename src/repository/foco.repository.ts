@@ -18,7 +18,6 @@ export class FocoRepository {
       where: {
         name: data.name,
         id_culture: data.id_culture,
-        status: data.status,
       },
     });
     return result;

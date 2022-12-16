@@ -27,7 +27,6 @@ export default function NovoTipoEnsaio() {
   const { TabsDropDowns } = ITabs.default;
 
   const [loading, setLoading] = useState<boolean>(false);
-  
 
   const tabsDropDowns = TabsDropDowns();
 

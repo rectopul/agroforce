@@ -150,7 +150,8 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (assayList?.type_assay?.name !== spreadSheet[row][column]) {
+              } else if (assayList?.type_assay?.name.toUpperCase()
+                        !== spreadSheet[row][column].toUpperCase()) {
                 responseIfError[Number(column)]
                   += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
@@ -159,7 +160,8 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (assayList?.foco?.name !== spreadSheet[row][column]) {
+              } else if (assayList?.foco?.name.toUpperCase()
+                         !== spreadSheet[row][column].toUpperCase()) {
                 responseIfError[Number(column)]
                   += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
