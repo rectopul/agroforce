@@ -83,7 +83,7 @@ export default function Listagem({
       ? (tab.statusTab = true)
       : (tab.statusTab = false)
   );
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.parcelas || {
     id: 0,
     table_preferences:
@@ -122,10 +122,10 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("type_assay"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Tecnologia',
-      value: 'tecnologia',
-      defaultChecked: () => camposGerenciados.includes('tecnologia'),
+      name: "CamposGerenciados[]",
+      title: "Tecnologia",
+      value: "tecnologia",
+      defaultChecked: () => camposGerenciados.includes("tecnologia"),
     },
     {
       name: "CamposGerenciados[]",
@@ -503,8 +503,8 @@ export default function Listagem({
       if (columnOrder[item] === "tecnologia") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Tecnologia',
-            title: 'tecnologia.cod_tec',
+            name: "Tecnologia",
+            title: "tecnologia.cod_tec",
             orderList,
             fieldOrder,
             handleOrder,
@@ -733,9 +733,14 @@ export default function Listagem({
           });
           // Download
           XLSX.writeFile(workBook, "Parcelas.xlsx");
+        } else {
+          setLoading(false);
+          Swal.fire(
+            "Não existem registros para serem exportados, favor checar."
+          );
         }
       });
-      setLoading(false);
+    setLoading(false);
   };
 
   const replacementExcel = async (): Promise<void> => {
@@ -785,7 +790,7 @@ export default function Listagem({
           XLSX.writeFile(workBook, "Substituição-parcelas.xlsx");
         }
       });
-      setLoading(false);
+    setLoading(false);
   };
 
   // manage total pages
