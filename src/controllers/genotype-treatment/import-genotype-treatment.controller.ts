@@ -81,7 +81,6 @@ export class ImportGenotypeTreatmentController {
             filterStatusT: spreadSheet[row][7],
             filterGenotypeName: spreadSheet[row][8],
           });
-
           if (treatments.length === 0) {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tratamento de genótipo não encontrado, as chaves para encontra-lo são (

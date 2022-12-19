@@ -51,7 +51,7 @@ export class DepartamentController {
 
       if (options.paramSelect) {
         const objSelect = options.paramSelect.split(',');
-        Object.keys(objSelect).forEach((item) => {
+        Object.keys(objSelect).forEach((item: any) => {
           select[objSelect[item]] = true;
         });
         select = { ...select };

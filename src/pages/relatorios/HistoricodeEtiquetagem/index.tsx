@@ -27,9 +27,7 @@ import { removeCookies, setCookies } from "cookies-next";
 import { RequestInit } from "next/dist/server/web/spec-extension/request";
 import { BsTrashFill } from "react-icons/bs";
 import { UserPreferenceController } from "../../../controllers/user-preference.controller";
-import {
-  printhistoryService,
-} from "../../../services/print-history.service";
+import { printhistoryService } from "../../../services/print-history.service";
 import {
   AccordionFilter,
   Button,
@@ -440,7 +438,7 @@ export default function Listagem({
   function colums(camposGerenciados: any): any {
     const columnCampos: any = camposGerenciados.split(",");
     const tableFields: any = [];
-    Object.keys(columnCampos).forEach((item) => {
+    Object.keys(columnCampos).forEach((item: any) => {
       // if (columnCampos[item] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
@@ -780,6 +778,7 @@ export default function Listagem({
         // Download
         XLSX.writeFile(workBook, "NPE.xlsx");
       } else {
+        setLoading(false);
         Swal.fire("Não existem registros para serem exportados, favor checar.");
       }
     });

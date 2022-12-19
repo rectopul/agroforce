@@ -1,0 +1,22 @@
+apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
+kind: SecretProviderClass
+metadata:
+  name: secret-provider-kv
+spec:
+  provider: azure
+  parameters:
+    usePodIdentity: "true"
+    useVMManagedIdentity: "false"
+    userAssignedIdentityID: ""
+    keyvaultName: "kv-gom-hml"
+    cloudName: ""
+    objects:  |
+      array:
+        - |
+          objectName: dburl
+          objectAlias: dburl
+          objectType: secret
+          objectVersion: ""
+    resourceGroup: "RG-GOM-HML"
+    subscriptionId: "b1a1ecbf-49a8-4a57-9edd-ea85f6379f28"
+    tenantId: "a819a679-3a36-4ff2-83cc-47e62081f03f"

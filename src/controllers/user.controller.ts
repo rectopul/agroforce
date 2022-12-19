@@ -38,7 +38,7 @@ export class UserController {
 
       if (options.paramSelect) {
         const objSelect = options.paramSelect.split(',');
-        Object.keys(objSelect).forEach((item) => {
+        Object.keys(objSelect).forEach((item: any) => {
           select[objSelect[item]] = true;
         });
         select = { ...select };
@@ -190,7 +190,7 @@ export class UserController {
 
         if (response) {
           if (data.cultures) {
-            Object.keys(data.cultures).forEach((item) => {
+            Object.keys(data.cultures).forEach((item: any) => {
               data.cultures[item].profiles.forEach((profile: any) => {
                 this.userPermissionsController.post({
                   userId: response.id,
@@ -336,7 +336,7 @@ export class UserController {
 
         if (response.count > 0) {
           if (data.cultures) {
-            Object.keys(data.cultures).forEach((item) => {
+            Object.keys(data.cultures).forEach((item: any) => {
               data.cultures[item].profiles.forEach((profile: any) => {
                 this.userPermissionsController.post({
                   userId: data.id,

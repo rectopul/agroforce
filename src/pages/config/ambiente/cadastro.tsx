@@ -158,7 +158,7 @@ export default function NovoNPE({ local }: IData) {
   }
 
   useEffect(() => {
-    localMap.map((item) => {
+    localMap.map((item: any) => {
       if (item.id === idLocal) {
         setLat(Number(-item.latitude));
         setLng(Number(-item.longitude));

@@ -140,7 +140,7 @@ export class NpeController {
 
       if (options.paramSelect) {
         const objSelect = options.paramSelect.split(',');
-        Object.keys(objSelect).forEach((item) => {
+        Object.keys(objSelect).forEach((item: any) => {
           if (objSelect[item] === 'ensaio') {
             select.type_assay = true;
           } else {
