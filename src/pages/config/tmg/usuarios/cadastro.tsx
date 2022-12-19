@@ -168,7 +168,7 @@ export default function NovoUsuario({
       const auxObject: any = [];
       let auxObject2: any = [];
 
-      Object.keys(values.cultures).forEach((item) => {
+      Object.keys(values.cultures).forEach((item: any) => {
         input = document.querySelector(
           `select[name="profiles_${values.cultures[item]}"]`,
         );

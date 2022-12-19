@@ -306,7 +306,7 @@ export default function Listagem({
   function colums(camposGerenciados: any): any {
     const columnCampos: any = camposGerenciados.split(",");
     const tableFields: any = [];
-    Object.keys(columnCampos).forEach((item) => {
+    Object.keys(columnCampos).forEach((item: any) => {
       // if (columnCampos[item] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
@@ -618,6 +618,8 @@ export default function Listagem({
         });
         // Download
         XLSX.writeFile(workBook, "Delineamento.xlsx");
+      } else {
+        Swal.fire("Não existem registros para serem exportados, favor checar.");
       }
     });
     setLoading(false);
