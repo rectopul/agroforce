@@ -18,6 +18,7 @@ import {
   Droppable,
   DropResult,
 } from "react-beautiful-dnd";
+import { IoMdArrowBack } from "react-icons/io";
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { BsDownload } from "react-icons/bs";
 import {
@@ -698,7 +699,7 @@ export default function Listagem({
   return (
     <>
       <Head>
-        <title>Listagem de genótipos do ensaio</title>
+        <title>Seleção expe. para etiquetagem</title>
       </Head>
 
       {loading && <ComponentLoading text="" />}
@@ -892,17 +893,29 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    <div className="h-12 w-74 ml-0">
-                      <Button
-                        title="Salvar grupo de experimento"
-                        value="Salvar grupo de experimento"
-                        textColor="white"
-                        onClick={() => {
-                          setIsOpenModal(true);
-                        }}
-                        bgColor="bg-blue-600"
-                        icon={<RiArrowUpDownLine size={20} />}
-                      />
+                    <div className="flex">
+                      <div className="h-12 w-74 mr-2">
+                        <Button
+                          title="Salvar grupo de experimento"
+                          value="Salvar grupo de experimento"
+                          textColor="white"
+                          onClick={() => {
+                            setIsOpenModal(true);
+                          }}
+                          bgColor="bg-blue-600"
+                          icon={<RiArrowUpDownLine size={20} />}
+                        />
+                      </div>
+                      <div className="h-12 w-28 ml-0">
+                        <Button
+                          type="button"
+                          value="Voltar"
+                          bgColor="bg-red-600"
+                          textColor="white"
+                          icon={<IoMdArrowBack size={18} />}
+                          onClick={() => router.back()}
+                        />
+                      </div>
                     </div>
 
                     <strong className="text-blue-600">

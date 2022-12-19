@@ -614,7 +614,7 @@ export default function Listagem({
     <>
       {loading && <ComponentLoading text="" />}
       <Head>
-        <title>Listagem de experimentos</title>
+        <title>Seleção expe. para etiquetagem</title>
       </Head>
 
       <ModalConfirmation

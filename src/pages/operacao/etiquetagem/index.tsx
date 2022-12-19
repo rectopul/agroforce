@@ -743,13 +743,15 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
           <div className="flex flex-col px-4  justify-between">
             <header className="flex flex-col mt-2">
               <h2 className="mb-2 text-blue-600 text-xl font-medium">
-                Cadastrar grupo
+                Cadastrar grupo de etiquetagem
               </h2>
             </header>
-            <h2 style={{ marginTop: 25, marginBottom: 5 }}>Nome do grupo</h2>
+            <h2 style={{ marginTop: 25, marginBottom: 5 }}>
+              Nome do grupo de etiquetagem
+            </h2>
             <Input
               type="text"
-              placeholder="Nome do grupo"
+              placeholder="Nome do grupo de etiquetagem"
               id="inputName"
               name="inputName"
             />
