@@ -1167,21 +1167,10 @@ export const getServerSideProps: GetServerSideProps = async ({
   )?.response[0]?.itens_per_page) ?? 10;
 
   const idSafra = Number(req.cookies.safraId);
-  const pageBeforeEdit = req.cookies.pageBeforeEdit
-    ? req.cookies.pageBeforeEdit
-    : 0;
-  // const filterBeforeEdit = req.cookies.filterBeforeEdit
-  //   ? req.cookies.filterBeforeEdit
-  //   : '';
-  // const filterApplication = req.cookies.filterBeforeEdit
-  //   ? `${req.cookies.filterBeforeEdit}&idSafra=${idSafra}`
-  //   : '';
 
   const filterBeforeEdit = '';
   const filterApplication = '';
-
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  const pageBeforeEdit = 0;
 
   return {
     props: {

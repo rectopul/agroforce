@@ -758,7 +758,7 @@ export default function Listagem({
           Swal.fire(message);
         }
       });
-      setLoading(false);
+    setLoading(false);
   };
 
   // manage total pages
