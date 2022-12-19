@@ -826,6 +826,14 @@ export default function Listagem({
                             "selectedNPE",
                             JSON.stringify(selectedNPE)
                           );
+                          setCookies('pageBeforeEdit', currentPage?.toString());
+                          setCookies('filterBeforeEdit', filter);
+                          setCookies('filterBeforeEditTypeOrder', typeOrder);
+                          setCookies('filterBeforeEditOrderBy', orderBy);
+                          setCookies('filtersParams', filtersParams);
+                          setCookies('lastPage', 'atualizar');
+                          setCookies('takeBeforeEdit', take);
+                          setCookies('itensPage', itensPerPage);
                           router.push({
                             pathname: "/operacao/ambiente/experimento",
                           });
@@ -985,26 +993,9 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page;
-
   const { token } = req.cookies;
   const id_safra: any = req.cookies.safraId;
   const { cultureId } = req.cookies;
-
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : `filterStatus=1&safraId=${id_safra}`;
-
-  // removeCookies('filterBeforeEdit', { req, res });
-  // removeCookies('pageBeforeEdit', { req, res });
-
-  const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
-
-  const filterApplication = `filterStatus=1&safraId=${id_safra}`;
 
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
@@ -1017,21 +1008,35 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies("lastPage", { req, res });
   }
 
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
+    : 10;
+
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : `filterStatus=1&safraId=${id_safra}`;
+
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? `${req.cookies.filterBeforeEdit}`
+    : `filterStatus=1&safraId=${id_safra}`;
+
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : "desc";
+    : 'asc';
 
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : "";
-  // local.name_local_culture
+    : '';
 
-  removeCookies("filterBeforeEdit", { req, res });
-  removeCookies("pageBeforeEdit", { req, res });
-  removeCookies("filterBeforeEditTypeOrder", { req, res });
-  removeCookies("filterBeforeEditOrderBy", { req, res });
-  removeCookies("lastPage", { req, res });
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('takeBeforeEdit', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
 
+  const { publicRuntimeConfig } = getConfig();
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&safraId=${id_safra}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
@@ -1045,6 +1050,11 @@ export const getServerSideProps: GetServerSideProps = async ({
     urlParameters.toString(),
     requestOptions
   ).then((response) => response.json());
+
+  console.log('filterBeforeEdit');
+  console.log(filterBeforeEdit);
+  console.log('filterBeforeEdit');
+  console.log(filterBeforeEdit);
 
   return {
     props: {

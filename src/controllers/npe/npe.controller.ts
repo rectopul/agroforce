@@ -16,6 +16,7 @@ export class NpeController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: object | any) {
+    // console.log('🚀 ~ file: npe.controller.ts:19 ~ NpeController ~ getAll ~ options', options);
     const parameters: object | any = {};
     parameters.AND = [];
     let orderBy: object | any;
