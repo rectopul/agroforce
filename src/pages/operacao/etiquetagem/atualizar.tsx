@@ -637,7 +637,7 @@ export default function Listagem({
             onSubmit={() => {}}
           >
             <div className="w-full flex justify-between items-start gap-5 mt-1">
-              {nameGroupFieldFactory("name", "Nome do grupo de exp")}
+              {nameGroupFieldFactory("name", "Grupo de etiquetagem")}
               {updateFieldFactory("experimentAmount", "Qtde exp")}
               {updateFieldFactory("tagsToPrint", "Total etiq a imp")}
               {updateFieldFactory("tagsPrinted", "Total etiq imp")}

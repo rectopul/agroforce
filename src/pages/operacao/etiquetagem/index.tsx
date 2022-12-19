@@ -103,7 +103,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
       name: "CamposGerenciados[]",
-      title: "Nome do grupo de exp",
+      title: "Grupo de etiquetagem",
       value: "name",
       defaultChecked: () => camposGerenciados.includes("name"),
     },
@@ -468,7 +468,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       if (columnOrder[item] === "name") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Nome do grupo de exp",
+            name: "Grupo de etiquetagem",
             title: "name",
             orderList,
             fieldOrder,
@@ -724,7 +724,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       {loading && <ComponentLoading text="" />}
 
       <Head>
-        <title>Listagem de grupos de experimento</title>
+        <title>Listagem de Grupo de etiquetagem</title>
       </Head>
 
       <ModalConfirmation
@@ -847,7 +847,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                 >
                   {filterFieldFactory(
                     "filterExperimentGroup",
-                    "Nome do grupo de exp"
+                    "Grupo de etiquetagem"
                   )}
                   {/* {filterFieldFactory(
                     "filterQuantityExperiment",
