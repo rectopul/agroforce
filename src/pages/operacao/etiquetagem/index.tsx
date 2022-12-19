@@ -739,7 +739,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
         onPress={(e: any) => handleSubmit(e)}
         onCancel={() => setIsOpenModal(false)}
       >
-        <form className="flex flex-col">
+        <form className="flex flex-col" onSubmit={handleSubmit}>
           <div className="flex flex-col px-4  justify-between">
             <header className="flex flex-col mt-2">
               <h2 className="mb-2 text-blue-600 text-xl font-medium">
