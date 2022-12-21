@@ -103,7 +103,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
       name: 'CamposGerenciados[]',
-      title: 'Nome do grupo de exp',
+      title: 'Grupo de etiquetagem',
       value: 'name',
       defaultChecked: () => camposGerenciados.includes('name'),
     },
@@ -263,15 +263,17 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
     setCookies('filtersParamsOperation', parametersFilter);
 
-    await experimentGroupService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400) {
-        setExperimentGroup(response.response);
-        setTotalItems(response.total);
-        tableRef?.current?.dataManager?.changePageSize(
-          response.total >= take ? take : response.total,
-        );
-      }
-    })
+    await experimentGroupService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          setExperimentGroup(response.response);
+          setTotalItems(response.total);
+          tableRef?.current?.dataManager?.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+        }
+      })
       .catch((_) => {
         setLoading(false);
       });
@@ -441,7 +443,9 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
               }
               title={`Excluir ${rowData.name}`}
               type="button"
-              onClick={() => {deleteConfirmItem(rowData), setLoading(true)}}
+              onClick={() => {
+                deleteConfirmItem(rowData), setLoading(true);
+              }}
               rounder="rounded-full"
               bgColor={
                 rowData.status === 'ETIQ. EM ANDAMENTO'
@@ -465,7 +469,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       if (columnOrder[item] === 'name') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Nome do grupo de exp',
+            name: 'Grupo de etiquetagem',
             title: 'name',
             orderList,
             fieldOrder,
@@ -616,6 +620,9 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
         });
         // Download
         XLSX.writeFile(workBook, 'Grupos do experimento.xlsx');
+      } else {
+        setLoading(false);
+        Swal.fire('Não existem registros para serem exportados, favor checar.');
       }
     });
     setLoading(false);
@@ -714,11 +721,10 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
   return (
     <>
-      
       {loading && <ComponentLoading text="" />}
 
       <Head>
-        <title>Listagem de grupos de experimento</title>
+        <title>Listagem de Grupo de etiquetagem</title>
       </Head>
 
       <ModalConfirmation
@@ -733,19 +739,19 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
         onPress={(e: any) => handleSubmit(e)}
         onCancel={() => setIsOpenModal(false)}
       >
-        
-
-        <form className="flex flex-col">
+        <form className="flex flex-col" onSubmit={handleSubmit}>
           <div className="flex flex-col px-4  justify-between">
             <header className="flex flex-col mt-2">
               <h2 className="mb-2 text-blue-600 text-xl font-medium">
-                Cadastrar grupo
+                Cadastrar grupo de etiquetagem
               </h2>
             </header>
-            <h2 style={{ marginTop: 25, marginBottom: 5 }}>Nome do grupo</h2>
+            <h2 style={{ marginTop: 25, marginBottom: 5 }}>
+              Nome do grupo de etiquetagem
+            </h2>
             <Input
               type="text"
-              placeholder="Nome do grupo"
+              placeholder="Nome do grupo de etiquetagem"
               id="inputName"
               name="inputName"
             />
@@ -843,7 +849,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                 >
                   {filterFieldFactory(
                     'filterExperimentGroup',
-                    'Nome do grupo de exp',
+                    'Grupo de etiquetagem',
                   )}
                   {/* {filterFieldFactory(
                     "filterQuantityExperiment",
@@ -871,6 +877,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterQtdExpFrom"
                         name="filterQtdExpFrom"
@@ -878,6 +885,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                         defaultValue={checkValue('filterQtdExpFrom')}
                       />
                       <Input
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterQtdExpTo"
@@ -894,6 +902,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterTotalEtiqImprimirFrom"
                         name="filterTotalEtiqImprimirFrom"
@@ -901,6 +910,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                         defaultValue={checkValue('filterTotalEtiqImprimirFrom')}
                       />
                       <Input
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterTotalEtiqImprimirTo"
@@ -917,6 +927,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterTotalEtiqImpressasFrom"
                         name="filterTotalEtiqImpressasFrom"
@@ -926,6 +937,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                         )}
                       />
                       <Input
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterTotalEtiqImpressasTo"
@@ -942,6 +954,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterTotalEtiqFrom"
                         name="filterTotalEtiqFrom"
@@ -949,6 +962,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                         defaultValue={checkValue('filterTotalEtiqFrom')}
                       />
                       <Input
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterTotalEtiqTo"

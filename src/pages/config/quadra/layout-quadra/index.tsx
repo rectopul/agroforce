@@ -722,6 +722,8 @@ export default function Listagem({
         });
         // Download
         XLSX.writeFile(workBook, "Layout_Quadra.xlsx");
+      } else {
+        Swal.fire("Não existem registros para serem exportados, favor checar.");
       }
     });
     setLoading(false);

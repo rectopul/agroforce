@@ -310,7 +310,8 @@ export class ImportGenotypeController {
                     filterStatus: 1,
                   });
                   if (safras.length <= 0) {
-                    if (safras?.safraName !== spreadSheet[row][column]) {
+                    if (safras?.safraName?.toUpperCase()
+                          !== spreadSheet[row][column]?.toUpperCase()) {
                       responseIfError[Number(column)] += responseGenericFactory(
                         Number(column) + 1,
                         row,
@@ -320,7 +321,8 @@ export class ImportGenotypeController {
                     }
                   } else {
                     const { response }: IReturnObject = await safraController.getOne(idSafra);
-                    if (response.safraName !== spreadSheet[row][column]) {
+                    if (response.safraName?.toUpperCase()
+                           !== spreadSheet[row][column]?.toUpperCase()) {
                       responseIfError[Number(column)] += responseGenericFactory(
                         Number(column) + 1,
                         row,

@@ -18,6 +18,7 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
+import Swal from 'sweetalert2';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { RiCloseCircleFill, RiFileExcel2Line } from 'react-icons/ri';
 import { IoReloadSharp } from 'react-icons/io5';
@@ -707,9 +708,14 @@ export default function Listagem({
           });
           // Download
           XLSX.writeFile(workBook, 'Parcelas.xlsx');
+        } else {
+          setLoading(false);
+          Swal.fire(
+            'Não existem registros para serem exportados, favor checar.',
+          );
         }
       });
-      setLoading(false);
+    setLoading(false);
   };
 
   function handleTotalPages(): void {
@@ -1162,12 +1168,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterRepetitionFrom"
                         name="filterRepetitionFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterRepetitionTo"
@@ -1237,12 +1245,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterNtFrom"
                         name="filterNtFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNtTo"
@@ -1257,12 +1267,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterNpeFrom"
                         name="filterNpeFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNpeTo"

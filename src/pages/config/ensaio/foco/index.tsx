@@ -201,10 +201,9 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    const response = await focoService.getAll(parametersFilter)
-      .catch((_) => {
-        setLoading(false);
-      });
+    const response = await focoService.getAll(parametersFilter).catch((_) => {
+      setLoading(false);
+    });
     if (response) {
       setFocos(response?.response);
       setTotalItems(response?.total);
@@ -558,6 +557,8 @@ export default function Listagem({
         });
         // Download
         XLSX.writeFile(workBook, 'Focos.xlsx');
+      } else {
+        Swal.fire('Não existem registros para serem exportados, favor checar.');
       }
     });
     setLoading(false);
@@ -610,7 +611,7 @@ export default function Listagem({
         <div className="flex gap-2">
           <div className="w-full">
             <Input
-              type="text"
+              type="number"
               placeholder="De"
               id="filterGroupFrom"
               name="filterGroupFrom"
@@ -620,7 +621,7 @@ export default function Listagem({
           </div>
           <div className="w-full">
             <Input
-              type="text"
+              type="number"
               placeholder="Até"
               id="filterGroupTo"
               name="filterGroupTo"

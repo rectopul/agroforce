@@ -18,6 +18,7 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
+import { IoMdArrowBack } from 'react-icons/io';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { BsDownload } from 'react-icons/bs';
 import {
@@ -263,15 +264,17 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await experimentService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200 || response.status === 400) {
-        setExperiments(response.response);
-        setTotalItems(response.total);
-        tableRef.current.dataManager.changePageSize(
-          itemsTotal >= take ? take : itemsTotal,
-        );
-      }
-    })
+    await experimentService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          setExperiments(response.response);
+          setTotalItems(response.total);
+          tableRef.current.dataManager.changePageSize(
+            itemsTotal >= take ? take : itemsTotal,
+          );
+        }
+      })
       .catch((_) => {
         setLoading(false);
       });
@@ -615,9 +618,14 @@ export default function Listagem({
           });
           // Download
           XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
+        } else {
+          setLoading(false);
+          Swal.fire(
+            'Não existem registros para serem exportados, favor checar.',
+          );
         }
       });
-      setLoading(false);
+    setLoading(false);
   };
 
   function handleTotalPages(): void {
@@ -690,7 +698,7 @@ export default function Listagem({
   return (
     <>
       <Head>
-        <title>Listagem de genótipos do ensaio</title>
+        <title>Seleção expe. para etiquetagem</title>
       </Head>
 
       {loading && <ComponentLoading text="" />}
@@ -755,12 +763,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterRepetitionFrom"
                         name="filterRepetitionFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterRepetitionTo"
@@ -884,17 +894,29 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    <div className="h-12 w-74 ml-0">
-                      <Button
-                        title="Salvar grupo de experimento"
-                        value="Salvar grupo de experimento"
-                        textColor="white"
-                        onClick={() => {
-                          setIsOpenModal(true);
-                        }}
-                        bgColor="bg-blue-600"
-                        icon={<RiArrowUpDownLine size={20} />}
-                      />
+                    <div className="flex">
+                      <div className="h-12 w-74 mr-2">
+                        <Button
+                          title="Salvar grupo de experimento"
+                          value="Salvar grupo de experimento"
+                          textColor="white"
+                          onClick={() => {
+                            setIsOpenModal(true);
+                          }}
+                          bgColor="bg-blue-600"
+                          icon={<RiArrowUpDownLine size={20} />}
+                        />
+                      </div>
+                      <div className="h-12 w-28 ml-0">
+                        <Button
+                          type="button"
+                          value="Voltar"
+                          bgColor="bg-red-600"
+                          textColor="white"
+                          icon={<IoMdArrowBack size={18} />}
+                          onClick={() => router.back()}
+                        />
+                      </div>
                     </div>
 
                     <strong className="text-blue-600">

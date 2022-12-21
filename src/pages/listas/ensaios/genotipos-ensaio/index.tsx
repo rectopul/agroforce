@@ -241,7 +241,7 @@ export default function Listagem({
       filterBgmTo: checkValue('filterBgmTo'),
       filterBgmFrom: checkValue('filterBgmFrom'),
       filterBgmGenotypeTo: checkValue('filterBgmGenotypeTo'),
-      filterBgmGenotypeFrom: checkValue('filterBgmGenotypeFrom'), 
+      filterBgmGenotypeFrom: checkValue('filterBgmGenotypeFrom'),
       filterGmrTo: checkValue('filterGmrTo'),
       filterGmrFrom: checkValue('filterGmrFrom'),
       filterNtTo: checkValue('filterNtTo'),
@@ -743,9 +743,14 @@ export default function Listagem({
           });
           // Download
           XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
+        } else {
+          setLoading(false);
+          Swal.fire(
+            'Não existem registros para serem exportados, favor checar.',
+          );
         }
       });
-      setLoading(false);
+    setLoading(false);
   };
 
   const replacementExcel = async (): Promise<void> => {
@@ -789,7 +794,7 @@ export default function Listagem({
           XLSX.writeFile(workBook, 'Substituição-genótipos.xlsx');
         }
       });
-      setLoading(false);
+    setLoading(false);
   };
 
   // manage total pages
@@ -827,12 +832,11 @@ export default function Listagem({
 
   // Checking defualt values
   function checkValue(value: any) {
-    const parameter = tableGlobalFunctions.getValuesForFilter(
-      value,
-      filtersParams,
-    ).trim();
-    
-    return parameter; 	 	
+    const parameter = tableGlobalFunctions
+      .getValuesForFilter(value, filtersParams)
+      .trim();
+
+    return parameter;
   }
 
   function filterFieldFactory(title: string, name: string) {
@@ -969,7 +973,6 @@ export default function Listagem({
 
     return true;
   }
-
 
   return (
     <>
@@ -1261,12 +1264,14 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
+                        type="number"
                         placeholder="De"
                         id="filterGmrFrom"
                         name="filterGmrFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
+                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterGmrTo"
@@ -1422,14 +1427,12 @@ export default function Listagem({
                     </label>
                     <div className="flex">
                       <Input
-                        type="number"
                         placeholder="De"
                         id="filterNcaFrom"
                         name="filterNcaFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
-                        type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         id="filterNcaTo"

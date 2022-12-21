@@ -596,7 +596,7 @@ export default function Listagem({
         // Download
         XLSX.writeFile(workBook, 'Lotes.xlsx');
       } else {
-        Swal.fire(response);
+        Swal.fire('Não existem registros para serem exportados, favor checar.');
       }
     });
     setLoading(false);
@@ -875,14 +875,14 @@ export default function Listagem({
                       </label>
                       <div className="flex">
                         <Input
-                          type="int"
+                          type="number"
                           placeholder="De"
                           id="filterGmrFrom"
                           name="filterGmrFrom"
                           onChange={formik.handleChange}
                         />
                         <Input
-                          type="int"
+                          type="number"
                           style={{ marginLeft: 5 }}
                           placeholder="Até"
                           id="filterGmrTo"

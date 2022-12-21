@@ -829,8 +829,7 @@ export default function Listagem({
         // Download
         XLSX.writeFile(workBook, 'Genótipos.xlsx');
       } else {
-        // eslint-disable-next-line no-undef
-        Swal.fire(response);
+        Swal.fire('Não existem registros para serem exportados, favor checar.');
       }
     });
     setLoading(false);
