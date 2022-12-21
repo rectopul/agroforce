@@ -115,7 +115,8 @@ export class ImportTechnologyController {
                   response: responseCulture,
                 }: IReturnObject = await culturaController.getOneCulture(idCulture);
                 if (statusCulture === 200) {
-                  if ((responseCulture?.name)?.toUpperCase() !== spreadSheet[row][column]) {
+                  if ((responseCulture?.name)?.toUpperCase()
+                      !== spreadSheet[row][column]?.toUpperCase()) {
                     responseIfError[column]
                       += responseGenericFactory(
                         (Number(column) + 1),

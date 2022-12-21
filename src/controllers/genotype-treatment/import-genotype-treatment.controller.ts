@@ -86,10 +86,9 @@ export class ImportGenotypeTreatmentController {
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tratamento de genótipo não encontrado, as chaves para encontra-lo são (
                 FOCO, TIPO DE ENSAIO, TECNOLOGIA, GLI, BGM, NT, STATUS_T E GENÓTIPO
               ) </li> <br>`;
-          } else if (treatments[0]?.status_experiment === 'EXP. SORTEADO') {
+          } else if (treatments[0]?.status_experiment?.toUpperCase() === 'EXP. SORTEADO') {
             responseIfError[0]
               += `<li style="text-align:left"> A ${row}ª linha esta incorreta, o tratamento do genótipo já foi sorteado. </li> <br>`;
-
           }
           // if (treatments[0]?.status_experiment === 'SORTEADO') {
           //   responseIfError[0]
@@ -140,7 +139,8 @@ export class ImportGenotypeTreatmentController {
               } else {
                 const { status, response }: IReturnObject = await safraController.getOne(idSafra);
                 if (status === 200) {
-                  if (response?.safraName !== spreadSheet[row][column]) {
+                  if (response?.safraName?.toUpperCase()
+                         !== spreadSheet[row][column]?.toUpperCase()) {
                     responseIfError[Number(column)]
                     += responseGenericFactory(
                         (Number(column) + 1),

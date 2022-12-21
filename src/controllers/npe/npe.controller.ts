@@ -5,6 +5,7 @@ import { ReporteRepository } from '../../repository/reporte.repository';
 import { GroupController } from '../group.controller';
 import { prisma } from '../../pages/api/db/db';
 import { ExperimentController } from '../experiment/experiment.controller';
+// import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class NpeController {
   npeRepository = new NpeRepository();
@@ -16,12 +17,13 @@ export class NpeController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: object | any) {
-    // console.log('🚀 ~ file: npe.controller.ts:19 ~ NpeController ~ getAll ~ options', options);
+    console.log('🚀 ~ file: npe.controller.ts:19 ~ NpeController ~ getAll ~ options', options);
     const parameters: object | any = {};
     parameters.AND = [];
     let orderBy: object | any;
     let select: any = [];
     try {
+      // options = await removeEspecialAndSpace(options);
       if (options.filterStatus) {
         if (options.filterStatus !== '2') {
           if (options.filterStatus == '1') {
