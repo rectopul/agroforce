@@ -177,11 +177,11 @@ export class ExperimentController {
       if (options.gli) {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.gli}" } } }`));
       }
-      
+
       const take = (options.take) ? Number(options.take) : undefined;
-      
+
       const skip = (options.skip) ? Number(options.skip) : undefined;
-      
+
       if (options.orderBy) {
         if (!options.excel) {
           if (typeof options.orderBy !== 'string' || typeof options.typeOrder !== 'string') {

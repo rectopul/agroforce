@@ -74,7 +74,7 @@ export class ImportLayoutBlockController {
                 const {
                   response,
                 }: any = await culturaController.getOneCulture(Number(idCulture));
-                if (response?.name !== spreadSheet[row][column]) {
+                if (response?.name?.toUpperCase() !== spreadSheet[row][column]?.toUpperCase()) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     row,
@@ -404,7 +404,8 @@ export class ImportLayoutBlockController {
               for (const column in spreadSheet[row]) {
                 if (configModule.response[0]?.fields[column] === 'Esquema') {
                   if (spreadSheet[row][column] !== null) {
-                    if ((this.aux.esquema) && this.aux.esquema !== spreadSheet[row][column]) {
+                    if ((this.aux.esquema) && this.aux.esquema?.toUpperCase()
+                            !== spreadSheet[row][column]?.toUpperCase()) {
                       const layoutQuadra: any = await layoutQuadraController.getAll(
                         { status: 1, idCulture, esquema: spreadSheet[row][column] },
                       );

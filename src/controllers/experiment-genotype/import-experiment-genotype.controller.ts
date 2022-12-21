@@ -115,7 +115,8 @@ export class ImportExperimentGenotypeController {
               }
               const { status, response }: IReturnObject = await safraController.getOne(idSafra);
               if (status === 200) {
-                if (response?.safraName !== spreadSheet[row][column]) {
+                if (response?.safraName?.toUpperCase()
+                    !== spreadSheet[row][column]?.toUpperCase()) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                       (Number(column) + 1),

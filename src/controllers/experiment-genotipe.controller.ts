@@ -432,7 +432,7 @@ export class ExperimentGenotipeController {
 
   async deleteAll(idExperiment: number) {
     try {
-      const { response: parcelas }: any = await this.getAll(idExperiment);
+      const { response: parcelas }: any = await this.getAll({ idExperiment });
       const toDelete = parcelas.map((item: any) => item.id);
       const { status } = await this.printedHistoryController.deleteAll(toDelete);
       if (status === 200) {

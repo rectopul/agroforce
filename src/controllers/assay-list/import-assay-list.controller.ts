@@ -108,7 +108,7 @@ export class ImportAssayListController {
               const {
                 response,
               }: any = await culturaController.getOneCulture(Number(idCulture));
-              if (response?.name !== spreadSheet[row][column]) {
+              if (response?.name?.toUpperCase() !== spreadSheet[row][column]?.toUpperCase()) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
                   spreadSheet[row][spreadSheet[row].length - 1],

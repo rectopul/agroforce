@@ -77,7 +77,7 @@ export class ImportExperimentController {
             idSafra,
           });
           if (experiment?.length > 0) {
-            if (experiment[0].status !== 'IMPORTADO') {
+            if (experiment[0].status?.toUpperCase() !== 'IMPORTADO') {
               await logImportController.update({
                 id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: `Erro na linha ${Number(row) + 1}. Experimento já cadastrado e utilizado no sistema`,
               });
@@ -114,7 +114,7 @@ export class ImportExperimentController {
               const {
                 response,
               }: any = await culturaController.getOneCulture(Number(idCulture));
-              if (response?.name !== spreadSheet[row][column]) {
+              if (response?.name?.toUpperCase() !== spreadSheet[row][column]?.toUpperCase()) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
                   row,
@@ -130,7 +130,8 @@ export class ImportExperimentController {
               } else {
                 const { status, response }: IReturnObject = await safraController.getOne(idSafra);
                 if (status === 200) {
-                  if (response?.safraName !== spreadSheet[row][column]) {
+                  if (response?.safraName?.toUpperCase()
+                      !== spreadSheet[row][column]?.toUpperCase()) {
                     responseIfError[Number(column)]
                     += responseGenericFactory(
                         (Number(column) + 1),
@@ -150,8 +151,8 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (assayList?.type_assay?.name.toUpperCase()
-                        !== spreadSheet[row][column].toUpperCase()) {
+              } else if (assayList?.type_assay?.name?.toUpperCase()
+                        !== spreadSheet[row][column]?.toUpperCase()) {
                 responseIfError[Number(column)]
                   += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
@@ -160,8 +161,8 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (assayList?.foco?.name.toUpperCase()
-                         !== spreadSheet[row][column].toUpperCase()) {
+              } else if (assayList?.foco?.name?.toUpperCase()
+                         !== spreadSheet[row][column]?.toUpperCase()) {
                 responseIfError[Number(column)]
                   += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
@@ -183,7 +184,8 @@ export class ImportExperimentController {
                   // eslint-disable-next-line no-param-reassign
                   spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
                 }
-                if (assayList?.tecnologia?.cod_tec !== (spreadSheet[row][column].toString())) {
+                if (assayList?.tecnologia?.cod_tec?.toUpperCase()
+                     !== (spreadSheet[row][column]?.toString()?.toUpperCase())) {
                   responseIfError[Number(column)]
                   += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
                 }
