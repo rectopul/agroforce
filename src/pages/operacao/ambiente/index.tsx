@@ -36,6 +36,7 @@ import {
   FieldItemsPerPage,
 } from "../../../components";
 import * as ITabs from "../../../shared/utils/dropdown";
+import { functionsUtils } from "../../../shared/utils/functionsUtils";
 import { tableGlobalFunctions } from "../../../helpers";
 import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
 import ComponentLoading from "../../../components/Loading";
@@ -251,6 +252,25 @@ export default function Listagem({
       filterGrpTo,
       filterGrpFrom,
     }) => {
+      if (!functionsUtils?.isNumeric(filterNpeFrom)) {
+        return Swal.fire("O campo NPE Inicial não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterNpeFrom)) {
+        return Swal.fire("O campo NPE Inicial não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterNpeFinalFrom)) {
+        return Swal.fire("O campo NPE Final não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterNpeFinalTo)) {
+        return Swal.fire("O campo NPE Final não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterGrpFrom)) {
+        return Swal.fire("O campo GRP não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterGrpTo)) {
+        return Swal.fire("O campo GRP não pode ter ponto ou vírgula.");
+      }
+
       // &filterSafra=${filterSafra}
       const parametersFilter = `filterStatus=${filterStatus}&filterCodTecnologia=${filterCodTecnologia}&filterGrpTo=${filterGrpTo}&filterGrpFrom=${filterGrpFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&safraId=${id_safra}`;
       // await npeService
@@ -262,6 +282,7 @@ export default function Listagem({
       //     setCurrentPage(0);
       //   });
 
+      setLoading(true);
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
@@ -288,6 +309,7 @@ export default function Listagem({
             response.total >= take ? take : response.total
           );
         }
+        setLoading(false);
       })
       .catch((_) => {
         setLoading(false);
@@ -756,9 +778,7 @@ export default function Listagem({
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 15 }}>
                     <Button
-                      onClick={() => {
-                        setLoading(true);
-                      }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -826,14 +846,14 @@ export default function Listagem({
                             "selectedNPE",
                             JSON.stringify(selectedNPE)
                           );
-                          setCookies('pageBeforeEdit', currentPage?.toString());
-                          setCookies('filterBeforeEdit', filter);
-                          setCookies('filterBeforeEditTypeOrder', typeOrder);
-                          setCookies('filterBeforeEditOrderBy', orderBy);
-                          setCookies('filtersParams', filtersParams);
-                          setCookies('lastPage', 'atualizar');
-                          setCookies('takeBeforeEdit', take);
-                          setCookies('itensPage', itensPerPage);
+                          setCookies("pageBeforeEdit", currentPage?.toString());
+                          setCookies("filterBeforeEdit", filter);
+                          setCookies("filterBeforeEditTypeOrder", typeOrder);
+                          setCookies("filterBeforeEditOrderBy", orderBy);
+                          setCookies("filtersParams", filtersParams);
+                          setCookies("lastPage", "atualizar");
+                          setCookies("takeBeforeEdit", take);
+                          setCookies("itensPage", itensPerPage);
                           router.push({
                             pathname: "/operacao/ambiente/experimento",
                           });
@@ -1022,18 +1042,18 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : 'asc';
+    : "asc";
 
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : '';
+    : "";
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-  removeCookies('filterBeforeEditTypeOrder', { req, res });
-  removeCookies('takeBeforeEdit', { req, res });
-  removeCookies('filterBeforeEditOrderBy', { req, res });
-  removeCookies('lastPage', { req, res });
+  removeCookies("filterBeforeEdit", { req, res });
+  removeCookies("pageBeforeEdit", { req, res });
+  removeCookies("filterBeforeEditTypeOrder", { req, res });
+  removeCookies("takeBeforeEdit", { req, res });
+  removeCookies("filterBeforeEditOrderBy", { req, res });
+  removeCookies("lastPage", { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
@@ -1051,9 +1071,9 @@ export const getServerSideProps: GetServerSideProps = async ({
     requestOptions
   ).then((response) => response.json());
 
-  console.log('filterBeforeEdit');
+  console.log("filterBeforeEdit");
   console.log(filterBeforeEdit);
-  console.log('filterBeforeEdit');
+  console.log("filterBeforeEdit");
   console.log(filterBeforeEdit);
 
   return {

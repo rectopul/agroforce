@@ -46,6 +46,7 @@ import {
   userPreferencesService,
 } from "../../../services";
 import * as ITabs from "../../../shared/utils/dropdown";
+import { functionsUtils } from "../../../shared/utils/functionsUtils";
 import {
   IExperimentGroupFilter,
   IExperimentsGroup,
