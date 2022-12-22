@@ -46,6 +46,7 @@ import {
 import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
 import { typeAssayService, userPreferencesService } from "../../../../services";
 import * as ITabs from "../../../../shared/utils/dropdown";
+import { functionsUtils } from "../../../../shared/utils/functionsUtils";
 import { tableGlobalFunctions } from "../../../../helpers";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
 
@@ -203,6 +204,17 @@ export default function TipoEnsaio({
       filterSeedsTo,
       filterSeedsFrom,
     }) => {
+      if (!functionsUtils?.isNumeric(filterSeedsFrom)) {
+        return Swal.fire(
+          "O campo Quantidade de Sementes não pode ter ponto ou vírgula."
+        );
+      }
+      if (!functionsUtils?.isNumeric(filterSeedsTo)) {
+        return Swal.fire(
+          "O campo Quantidade de Sementes não pode ter ponto ou vírgula."
+        );
+      }
+
       const parametersFilter = `filterStatus=${
         filterStatus || 1
       }&filterName=${filterName}&filterProtocolName=${filterProtocolName}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&id_culture=${idCulture}&id_safra=${safraId}`;
@@ -210,6 +222,7 @@ export default function TipoEnsaio({
       setCookies("filterBeforeEdit", filtersParams);
       setFilter(parametersFilter);
       setCurrentPage(0);
+      setLoading(true);
       await callingApi(parametersFilter);
       setLoading(false);
       // await typeAssayService
@@ -822,9 +835,7 @@ export default function TipoEnsaio({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {
-                        setLoading(true);
-                      }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
