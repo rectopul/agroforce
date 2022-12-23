@@ -51,17 +51,17 @@ import { tableGlobalFunctions } from "../../../../helpers";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
 
 export default function TipoEnsaio({
-  allAssay,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  idSafra,
-  idCulture,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer,
-  orderByserver,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allAssay,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      idSafra,
+      idCulture,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      typeOrderServer,
+      orderByserver,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns("listas");
@@ -160,9 +160,8 @@ export default function TipoEnsaio({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == "tecnologia" ? "tecnologia.cod_tec" : orderBy
-  }&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == "tecnologia" ? "tecnologia.cod_tec" : orderBy
+    }&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IAssayListFilter>({
     initialValues: {
@@ -389,7 +388,7 @@ export default function TipoEnsaio({
                 icon={<BsTrashFill size={14} />}
                 title="Ensaio já associado a um experimento"
                 disabled
-                onClick={() => {}}
+                onClick={() => { }}
                 bgColor="bg-gray-600"
                 textColor="white"
               />
@@ -694,6 +693,7 @@ export default function TipoEnsaio({
           type="text"
           placeholder={name}
           id={title}
+          defaultValue={checkValue(title)}
           name={title}
           onChange={formik.handleChange}
         />
@@ -763,6 +763,7 @@ export default function TipoEnsaio({
                         id="filterTratFrom"
                         name="filterTratFrom"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterTratFrom")}
                       />
                       <Input
                         style={{ marginLeft: 8 }}
@@ -771,6 +772,7 @@ export default function TipoEnsaio({
                         id="filterTratTo"
                         name="filterTratTo"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterTratTo")}
                       />
                     </div>
                   </div>
@@ -994,7 +996,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
-
+  console.log("lastPage RR  ", lastPageServer)
   if (lastPageServer == undefined || lastPageServer == "No") {
     removeCookies("filterBeforeEdit", { req, res });
     removeCookies("pageBeforeEdit", { req, res });

@@ -39,7 +39,7 @@ export class GenotypeTreatmentRepository extends BaseRepository {
     return result;
   }
 
-  async replaceGenotype(idList: any, idLote:any, idGenotype: number) {
+  async replaceGenotype(idList: any, idLote: any, idGenotype: number) {
     const result = await this.getPrisma().genotype_treatment.updateMany({
       where: {
         id: {

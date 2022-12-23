@@ -2,7 +2,7 @@ import { capitalize } from '@mui/material';
 import { useFormik } from 'formik';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IoMdArrowBack } from 'react-icons/io';
 import { RiPlantLine } from 'react-icons/ri';
 import { cultureService } from 'src/services';
@@ -10,6 +10,7 @@ import Swal from 'sweetalert2';
 import { Button, Content, Input } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import ComponentLoading from '../../../../components/Loading';
+import { setCookies } from 'cookies-next';
 
 interface ICreateCulture {
   name: string;
@@ -18,7 +19,7 @@ interface ICreateCulture {
   created_by: number;
 }
 
-export default function Cadastro() {
+export default function Cadastro(props) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -28,7 +29,7 @@ export default function Cadastro() {
   const router = useRouter();
 
   const [loading, setLoading] = useState<boolean>(false);
-  
+
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const formik = useFormik<ICreateCulture>({
@@ -66,6 +67,10 @@ export default function Cadastro() {
     },
   });
 
+  // useEffect(() => {
+  //   setCookies('lastPage', 'cadastro');
+  // })
+
   function validateInputs(values: any) {
     if (!values.name || !values.desc) {
       const inputName: any = document.getElementById('name');
@@ -82,7 +87,7 @@ export default function Cadastro() {
 
   return (
     <>
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Cadastro de cultura</title>
       </Head>
@@ -167,7 +172,7 @@ export default function Cadastro() {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<RiPlantLine size={20} />}
-                onClick={() => {setLoading(true);}}
+                onClick={() => { setLoading(true); }}
               />
             </div>
           </div>

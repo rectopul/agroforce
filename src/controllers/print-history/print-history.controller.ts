@@ -3,6 +3,7 @@ import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { PrintHistoryRepository } from '../../repository/print-history.repository';
 import { IReturnObject } from '../../interfaces/shared/Import.interface';
 import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 
 export class PrintHistoryController {
   printHistoryRepository = new PrintHistoryRepository();
@@ -25,19 +26,31 @@ export class PrintHistoryController {
     try {
       const experimentGenotipeController = new ExperimentGenotipeController();
 
-      idList.map(async (id: number) => {
-        const { response }: IReturnObject = await this.getAll({ experimentGenotypeId: id });
-        const {
-          response: parcela,
-        }: IReturnObject = await experimentGenotipeController.getOne(id);
-        const changes = response?.length || 0;
-        await this.printHistoryRepository.create({
-          experimentGenotypeId: id,
-          changes,
-          status: parcela?.status,
-          userId,
+      const transactionConfig = new TransactionConfig();
+      const printHistoryRepositoryTransaction = new PrintHistoryRepository();
+      printHistoryRepositoryTransaction.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+      try {
+        await transactionConfig.transactionScope.run(async () => {
+          for (const row in idList) {
+            console.log(idList[row]);
+            const { response }: IReturnObject = await this.getAll({ experimentGenotypeId: idList[row] });
+            const {
+              response: parcela,
+            }: IReturnObject = await experimentGenotipeController.getOne(idList[row]);
+            const changes = response?.length || 0;
+            const data = {
+              experimentGenotypeId: idList[row],
+              changes,
+              status: parcela?.status,
+              userId,
+            }
+            await printHistoryRepositoryTransaction.createTransaction(data);
+          }
         });
-      });
+      } catch (error: any) {
+        handleError('Controlador de histórico de impressão', 'Create', error.message);
+        throw new Error('[Controller] - Criar erro de histórico de impressão');
+      }
     } catch (error: any) {
       handleError('Histórico de impressão Controller', 'Create', error.message);
       throw new Error('[Controller] - Create Histórico de impressão erro');

@@ -60,21 +60,21 @@ import ComponentLoading from "../../../../components/Loading";
 type IAssayListUpdate = Omit<IAssayList, "id_safra" | "period">;
 
 export default function AtualizarTipoEnsaio({
-  allGenotypeTreatment,
-  totalItens,
-  itensPerPage,
-  treatmentsFilterApplication,
-  experimentFilterApplication,
-  idAssayList,
-  idSafra,
-  assayList,
-  allExperiments,
-  totalExperiments,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  orderByserver,
-  typeOrderServer,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allGenotypeTreatment,
+      totalItens,
+      itensPerPage,
+      treatmentsFilterApplication,
+      experimentFilterApplication,
+      idAssayList,
+      idSafra,
+      assayList,
+      allExperiments,
+      totalExperiments,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      orderByserver,
+      typeOrderServer,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns("listas");
@@ -129,9 +129,8 @@ export default function AtualizarTipoEnsaio({
   const [orderType, setOrderType] = useState<string>("");
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
   const [loading, setLoading] = useState<boolean>(false);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == "tecnologia" ? "tecnologia.cod_tec" : orderBy
-  }&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == "tecnologia" ? "tecnologia.cod_tec" : orderBy
+    }&typeOrder=${typeOrder}`;
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
     { name: "CamposGerenciados[]", title: "Safra", value: "safra" },
@@ -199,9 +198,8 @@ export default function AtualizarTipoEnsaio({
       id: assayList?.id,
       foco: assayList?.foco?.name,
       type_assay: assayList?.type_assay?.name,
-      tecnologia: `${assayList?.tecnologia?.cod_tec || ""} ${
-        assayList?.tecnologia?.name || ""
-      }`,
+      tecnologia: `${assayList?.tecnologia?.cod_tec || ""} ${assayList?.tecnologia?.name || ""
+        }`,
       gli: assayList?.gli,
       bgm: assayList?.bgm || "",
       status: assayList?.status,
@@ -227,7 +225,7 @@ export default function AtualizarTipoEnsaio({
   });
 
   async function callingApi(parametersFilter: any) {
-    setCookies("filterBeforeEdit", parametersFilter);
+    // setCookies("filterBeforeEdit", parametersFilter);
     setCookies("filterBeforeEditTypeOrder", typeOrder);
     setCookies("filterBeforeEditOrderBy", orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
@@ -1098,7 +1096,7 @@ export default function AtualizarTipoEnsaio({
                           }
                           textColor="white"
                           onClick={() => setTable("genotipo")}
-                          // icon={<FaSortAmountUpAlt size={20} />}
+                        // icon={<FaSortAmountUpAlt size={20} />}
                         />
                       </div>
                       <div style={{ width: 10 }} />
@@ -1113,7 +1111,7 @@ export default function AtualizarTipoEnsaio({
                           }
                           textColor="white"
                           onClick={() => setTable("experimentos")}
-                          // icon={<FaSortAmountUpAlt size={20} />}
+                        // icon={<FaSortAmountUpAlt size={20} />}
                         />
                       </div>
                     </div>
@@ -1173,61 +1171,61 @@ export default function AtualizarTipoEnsaio({
                                     </div>
                                     {table === "genotipo"
                                       ? generatesProps.map(
-                                          (generate, index) => (
-                                            <Draggable
-                                              key={index}
-                                              draggableId={String(
-                                                generate.title
-                                              )}
-                                              index={index}
-                                            >
-                                              {(dragProps) => (
-                                                <li
-                                                  ref={dragProps.innerRef}
-                                                  {...dragProps.draggableProps}
-                                                  {...dragProps.dragHandleProps}
-                                                >
-                                                  <CheckBox
-                                                    name={generate.name}
-                                                    title={generate.title?.toString()}
-                                                    value={generate.value}
-                                                    defaultChecked={camposGerenciados.includes(
-                                                      generate.value as string
-                                                    )}
-                                                  />
-                                                </li>
-                                              )}
-                                            </Draggable>
-                                          )
+                                        (generate, index) => (
+                                          <Draggable
+                                            key={index}
+                                            draggableId={String(
+                                              generate.title
+                                            )}
+                                            index={index}
+                                          >
+                                            {(dragProps) => (
+                                              <li
+                                                ref={dragProps.innerRef}
+                                                {...dragProps.draggableProps}
+                                                {...dragProps.dragHandleProps}
+                                              >
+                                                <CheckBox
+                                                  name={generate.name}
+                                                  title={generate.title?.toString()}
+                                                  value={generate.value}
+                                                  defaultChecked={camposGerenciados.includes(
+                                                    generate.value as string
+                                                  )}
+                                                />
+                                              </li>
+                                            )}
+                                          </Draggable>
                                         )
+                                      )
                                       : generatesPropsExperiments.map(
-                                          (generate, index) => (
-                                            <Draggable
-                                              key={index}
-                                              draggableId={String(
-                                                generate.title
-                                              )}
-                                              index={index}
-                                            >
-                                              {(dragProps) => (
-                                                <li
-                                                  ref={dragProps.innerRef}
-                                                  {...dragProps.draggableProps}
-                                                  {...dragProps.dragHandleProps}
-                                                >
-                                                  <CheckBox
-                                                    name={generate.name}
-                                                    title={generate.title?.toString()}
-                                                    value={generate.value}
-                                                    defaultChecked={experimentsCamposGerenciados.includes(
-                                                      generate.value as string
-                                                    )}
-                                                  />
-                                                </li>
-                                              )}
-                                            </Draggable>
-                                          )
-                                        )}
+                                        (generate, index) => (
+                                          <Draggable
+                                            key={index}
+                                            draggableId={String(
+                                              generate.title
+                                            )}
+                                            index={index}
+                                          >
+                                            {(dragProps) => (
+                                              <li
+                                                ref={dragProps.innerRef}
+                                                {...dragProps.draggableProps}
+                                                {...dragProps.dragHandleProps}
+                                              >
+                                                <CheckBox
+                                                  name={generate.name}
+                                                  title={generate.title?.toString()}
+                                                  value={generate.value}
+                                                  defaultChecked={experimentsCamposGerenciados.includes(
+                                                    generate.value as string
+                                                  )}
+                                                />
+                                              </li>
+                                            )}
+                                          </Draggable>
+                                        )
+                                      )}
                                     {provided.placeholder}
                                   </ul>
                                 )}
@@ -1350,11 +1348,11 @@ export const getServerSideProps: GetServerSideProps = async ({
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
 
   if (lastPageServer == undefined || lastPageServer == "No") {
-    removeCookies("filterBeforeEdit", { req, res });
-    removeCookies("pageBeforeEdit", { req, res });
+    // removeCookies("filterBeforeEdit", { req, res });
+    // removeCookies("pageBeforeEdit", { req, res });
     removeCookies("filterBeforeEditTypeOrder", { req, res });
     removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });
+    // removeCookies("lastPage", { req, res });
   }
 
   // RR
@@ -1371,9 +1369,9 @@ export const getServerSideProps: GetServerSideProps = async ({
   const experimentFilterApplication = `&id_safra=${idSafra}&id_assay_list=${idAssay}`;
 
   // RR
-  removeCookies("filterBeforeEditTypeOrder", { req, res });
-  removeCookies("filterBeforeEditOrderBy", { req, res });
-  removeCookies("lastPage", { req, res });
+  // removeCookies("filterBeforeEditTypeOrder", { req, res });
+  // removeCookies("filterBeforeEditOrderBy", { req, res });
+  // removeCookies("lastPage", { req, res });
 
   const idAssayList = Number(query.id);
   const baseUrlExperiment = `${publicRuntimeConfig.apiUrl}/experiment`;

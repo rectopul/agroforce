@@ -83,16 +83,16 @@ interface IUpdateExperimento {
 }
 
 export default function AtualizarLocal({
-  experimento,
-  allItens,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idExperiment,
-  pageBeforeEdit,
-  typeOrderServer, // RR
-  orderByserver, // RR
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      experimento,
+      allItens,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idExperiment,
+      pageBeforeEdit,
+      typeOrderServer, // RR
+      orderByserver, // RR
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -163,18 +163,16 @@ export default function AtualizarLocal({
 
   const [fieldOrder, setFieldOrder] = useState<any>(null);
 
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy
-  }&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy
+    }&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IUpdateExperimento>({
     initialValues: {
       id: experimento.id,
       foco: experimento.assay_list?.foco.name,
       ensaio: experimento.assay_list?.type_assay.name,
-      tecnologia: `${experimento?.assay_list?.tecnologia?.cod_tec || ''} ${
-        experimento?.assay_list?.tecnologia?.name || ''
-      }`,
+      tecnologia: `${experimento?.assay_list?.tecnologia?.cod_tec || ''} ${experimento?.assay_list?.tecnologia?.name || ''
+        }`,
       gli: experimento.assay_list?.gli,
       experimentName: experimento?.experimentName,
       bgm: experimento.assay_list?.bgm || '',
@@ -209,7 +207,7 @@ export default function AtualizarLocal({
 
   // Calling common API
   async function getTreatments(parametersFilter: any) {
-    setCookies('filterBeforeEdit', parametersFilter);
+    // setCookies('filterBeforeEdit', parametersFilter);
     setCookies('filterBeforeEditTypeOrder', typeOrder);
     setCookies('filterBeforeEditOrderBy', orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
@@ -884,7 +882,7 @@ export default function AtualizarLocal({
                     bgColor="bg-blue-600"
                     textColor="white"
                     icon={<RiOrganizationChart size={18} />}
-                    onClick={() => {}}
+                    onClick={() => { }}
                   />
                 </div>
               </div>
@@ -1071,7 +1069,7 @@ export default function AtualizarLocal({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>
@@ -1121,13 +1119,13 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? req.cookies.filterBeforeEditOrderBy
     : '';
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  // removeCookies('filterBeforeEdit', { req, res });
+  // removeCookies('pageBeforeEdit', { req, res });
 
   // RR
   removeCookies('filterBeforeEditTypeOrder', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });
-  removeCookies('lastPage', { req, res });
+  // removeCookies('lastPage', { req, res });
 
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/experiment`;
   const experimento = await fetch(
