@@ -19,7 +19,7 @@ interface ICreateCulture {
   created_by: number;
 }
 
-export default function Cadastro(props) {
+export default function Cadastro() {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
