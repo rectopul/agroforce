@@ -89,10 +89,20 @@ function getFileExtension(filename: string) {
   return filename?.slice(((filename?.lastIndexOf(".") - 1) >>> 0) + 2);
 }
 
+function isNumeric(value: any) {
+  if (String(value)?.length > 0) {
+    var regex = /^[0-9]+$/;
+    return regex.test(value);
+  } else {
+    return true;
+  }
+}
+
 export const functionsUtils = {
   validationCPF,
   Crypto,
   countChildrenForSafra,
   formatDate,
   getFileExtension,
+  isNumeric,
 };

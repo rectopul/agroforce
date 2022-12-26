@@ -38,6 +38,7 @@ import { UserPreferenceController } from "../../../../controllers/user-preferenc
 import { safraService, userPreferencesService } from "../../../../services";
 import { tableGlobalFunctions } from "../../../../helpers";
 import ITabs from "../../../../shared/utils/dropdown";
+import { functionsUtils } from "../../../../shared/utils/functionsUtils";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
 import ComponentLoading from "../../../../components/Loading";
 
@@ -192,6 +193,15 @@ export default function Listagem({
       //       setCurrentPage(0);
       //     });
 
+      if (!functionsUtils?.isNumeric(filterYearFrom)) {
+        Swal.fire("O campo Ano não pode ter ponto ou vírgula.");
+        return;
+      }
+      if (!functionsUtils?.isNumeric(filterYearTo)) {
+        Swal.fire("O campo Ano não pode ter ponto ou vírgula.");
+        return;
+      }
+
       const parametersFilter = `filterStatus=${
         filterStatus || 2
       }&filterSafra=${filterSafra}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
@@ -205,6 +215,8 @@ export default function Listagem({
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
+    setLoading(true);
+
     setCookies("filterBeforeEdit", parametersFilter);
     setCookies("filterBeforeEditTypeOrder", typeOrder);
     setCookies("filterBeforeEditOrderBy", orderBy);
@@ -222,6 +234,7 @@ export default function Listagem({
             response.total >= take ? take : response.total
           );
         }
+        setLoading(false);
       })
       .catch((_) => {
         setLoading(false);
@@ -767,9 +780,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
                       type="submit"
-                      onClick={() => {
-                        setLoading(true);
-                      }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

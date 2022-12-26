@@ -39,6 +39,7 @@ import {
   ButtonToogleConfirmation,
 } from "../../../../components";
 import * as ITabs from "../../../../shared/utils/dropdown";
+import { functionsUtils } from "../../../../shared/utils/functionsUtils";
 import { tableGlobalFunctions } from "../../../../helpers";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
 import ComponentLoading from "../../../../components/Loading";
@@ -245,6 +246,25 @@ export default function Listagem({
       filterParcelTo,
       filterParcelFrom,
     }) => {
+      if (!functionsUtils?.isNumeric(filterPopFrom)) {
+        return Swal.fire("O campo Tiros não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterShotsTo)) {
+        return Swal.fire("O campo Tiros não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterShotsFrom)) {
+        return Swal.fire("O campo Disparos não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterShotsTo)) {
+        return Swal.fire("O campo Disparos não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterParcelFrom)) {
+        return Swal.fire("O campo Parcelas não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterParcelTo)) {
+        return Swal.fire("O campo Parcelas não pode ter ponto ou vírgula.");
+      }
+
       const parametersFilter = `filterStatus=${filterStatus}&filterEsquema=${filterEsquema}&filterDisparos=${filterDisparos}&filterTiros=${filterTiros}&filterPlantadeira=${filterPlantadeira}&filterParcelas=${filterParcelas}&filterShotsTo=${filterShotsTo}&filterShotsFrom=${filterShotsFrom}&filterPopTo=${filterPopTo}&filterPopFrom=${filterPopFrom}&filterParcelTo=${filterParcelTo}&filterParcelFrom=${filterParcelFrom}`;
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEdit', filtersParams);
@@ -255,6 +275,8 @@ export default function Listagem({
       //     setFilter(parametersFilter);
       //     setQuadra(response.response);
       //   });
+
+      setLoading(true);
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
@@ -914,9 +936,7 @@ export default function Listagem({
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
-                      onClick={() => {
-                        setLoading(true);
-                      }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

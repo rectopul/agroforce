@@ -222,10 +222,10 @@ export default function Listagem({
                 rowData.status === "ETIQ. EM ANDAMENTO" ||
                 rowData.status === "ETIQ. FINALIZADA"
               }
-              title={`Excluir ${rowData.name}`}
+              title={`Excluir ${rowData.experimentName}`}
               type="button"
               onClick={() => {
-                deleteConfirmItem(rowData), setLoading(true);
+                deleteConfirmItem(rowData);
               }}
               rounder="rounded-full"
               bgColor={
@@ -548,10 +548,10 @@ export default function Listagem({
   async function deleteConfirmItem(item: any) {
     setItemSelectedDelete(item);
     setIsOpenModalConfirm(true);
-    setLoading(false);
   }
 
   async function deleteItem() {
+    setLoading(true);
     setIsOpenModalConfirm(false);
 
     const { status, message } = await experimentService.update({
@@ -561,11 +561,14 @@ export default function Listagem({
     });
     if (status === 200) {
       handlePagination();
+      handleTotalPages();
+      setLoading(false);
     } else {
       Swal.fire({
         html: message,
         width: "800",
       });
+      setLoading(false);
     }
   }
 
@@ -619,7 +622,7 @@ export default function Listagem({
 
       <ModalConfirmation
         isOpen={isOpenModalConfirm}
-        text={`Tem certeza que deseja deletar o item ${itemSelectedDelete?.name}?`}
+        text={`Tem certeza que deseja deletar o item ${itemSelectedDelete?.experimentName}?`}
         onPress={deleteItem}
         onCancel={() => setIsOpenModalConfirm(false)}
       />
@@ -670,7 +673,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 0,
                 },
-                showSelectAllCheckbox: false,
+                showSelectAllCheckbox: true,
                 selection: true,
                 selectionProps: (rowData: any) => {
                   const selectable = selectableFilter(rowData);
