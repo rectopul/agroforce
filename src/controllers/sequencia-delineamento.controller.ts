@@ -122,7 +122,7 @@ export class SequenciaDelineamentoController {
       const select = {
         id: true,
         id_delineamento: true,
-        delineamento: { select: { name: true } },
+        delineamento: { select: { name: true, culture: true } },
         repeticao: true,
         sorteio: true,
         nt: true,

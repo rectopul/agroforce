@@ -600,13 +600,35 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     setLoading(true);
     await experimentGroupService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
+        response.map((item: any) => {
+          const newItem = item;
+
+          newItem.SAFRA = item.safra.safraName;
+          newItem.GRUPO = item.name;
+          newItem.QTDE_EXP = item.experimentAmount;
+          newItem.ETIQ_A_IMPRIMIR = item.tagsToPrint;
+          newItem.ETIQ_IMPRESSAS = item.tagsPrinted;
+          newItem.TOTAL_ETIQUETAS = item.totalTags;
+          newItem.STATUS = item.status;
+
+          delete newItem.id;
+          delete newItem.safraId;
+          delete newItem.safra;
+          delete newItem.name;
+          delete newItem.experimentAmount;
+          delete newItem.tagsToPrint;
+          delete newItem.tagsPrinted;
+          delete newItem.totalTags;
+          delete newItem.status;
+          delete newItem.experiment;
+          delete newItem.created_at;
+          delete newItem.updated_at;
+          delete newItem.createdBy;
+          return newItem;
+        });
         const workSheet = XLSX.utils.json_to_sheet(response);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(
-          workBook,
-          workSheet,
-          'Grupos do experimento',
-        );
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'grupos-de-experimento');
 
         // Buffer
         XLSX.write(workBook, {
@@ -619,9 +641,8 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'Grupos do experimento.xlsx');
+        XLSX.writeFile(workBook, 'Grupos do Experimento.xlsx');
       } else {
-        setLoading(false);
         Swal.fire('Não existem registros para serem exportados, favor checar.');
       }
     });

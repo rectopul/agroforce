@@ -527,6 +527,8 @@ export default function Listagem({
           } else {
             row.status = 'Ativo' as any;
           }
+
+          row.CULTURA = row?.culture?.name;
           row.NOME = row?.name;
           row.GRUPO = row?.group.group;
           row.STATUS = row?.status;
@@ -536,6 +538,7 @@ export default function Listagem({
           delete row.status;
           delete row.id_culture;
           delete row.tableData;
+          delete row.culture;
           delete row.id;
 
           return row;

@@ -92,6 +92,7 @@ export class ExperimentGroupController {
       const select = {
         id: true,
         name: true,
+        safra: true,
         experimentAmount: true,
         tagsToPrint: true,
         tagsPrinted: true,

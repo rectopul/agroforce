@@ -39,6 +39,7 @@ export class FocoController {
       const select = {
         id: true,
         id_culture: true,
+        culture: true,
         name: true,
         group: true,
         status: true,

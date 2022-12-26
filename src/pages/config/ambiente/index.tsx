@@ -731,6 +731,7 @@ export default function Listagem({
             row.status = 'Ativo';
           }
 
+          row.CULTURA = row.safra?.culture?.name;
           row.SAFRA = row.safra?.safraName;
           row.FOCO = row.foco?.name;
           row.TIPO_ENSAIO = row.type_assay?.name;
