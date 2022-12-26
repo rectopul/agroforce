@@ -3,6 +3,7 @@ import { ReporteRepository } from '../repository/reporte.repository';
 import { countDelimitation } from '../shared/utils/counts';
 import handleError from '../shared/utils/handleError';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
+import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 
 export class SequenciaDelineamentoController {
   private SequenciaDelineamentoRepository = new SequenciaDelineamentoRepository();
@@ -69,6 +70,7 @@ export class SequenciaDelineamentoController {
     parameters.AND = [];
     let orderBy: object | any;
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
         if (options.filterRepetitionFrom && options.filterRepetitionTo) {
           parameters.repeticao = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);
