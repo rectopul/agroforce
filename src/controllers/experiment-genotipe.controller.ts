@@ -5,6 +5,7 @@ import { ExperimentGroupController } from './experiment-group/experiment-group.c
 import { ExperimentController } from './experiment/experiment.controller';
 import { PrintHistoryController } from './print-history/print-history.controller';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
+import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 
 export class ExperimentGenotipeController {
   private ExperimentGenotipeRepository = new ExperimentGenotipeRepository();
@@ -20,6 +21,7 @@ export class ExperimentGenotipeController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterFoco) {
         parameters.foco = JSON.parse(
           `{ "name": { "contains": "${options.filterFoco}" } }`,

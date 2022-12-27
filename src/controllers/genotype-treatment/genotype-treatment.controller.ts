@@ -3,6 +3,7 @@ import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import handleError from '../../shared/utils/handleError';
 import { GenotypeTreatmentRepository } from '../../repository/genotype-treatment/genotype-treatment.repository';
 import { countTreatmentsNumber } from '../../shared/utils/counts';
+import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class GenotypeTreatmentController {
   genotypeTreatmentRepository = new GenotypeTreatmentRepository();
@@ -13,6 +14,7 @@ export class GenotypeTreatmentController {
     parameters.AND = [];
     parameters.OR = [];
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterStatus) {
         const statusParams = options.filterStatus?.split(',');
         parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[0]}" } } }`));

@@ -2,6 +2,7 @@ import handleError from '../shared/utils/handleError';
 import { FocoRepository } from '../repository/foco.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
+import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 
 export class FocoController {
   public readonly required = 'Campo obrigatório';
@@ -14,6 +15,7 @@ export class FocoController {
     const parameters: object | any = {};
     let orderBy: object | any;
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }

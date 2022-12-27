@@ -1,6 +1,7 @@
 import { SafraRepository } from '../repository/safra.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
 import handleError from '../shared/utils/handleError';
+import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 
 interface Safra {
   id: number;
@@ -24,9 +25,9 @@ export class SafraController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: safra.controller.ts:27 ~ SafraController ~ getAll ~ options', options);
     const parameters: object | any = {};
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterStatus) {
         if (options.filterStatus != '2') {
           parameters.status = Number(options.filterStatus);
