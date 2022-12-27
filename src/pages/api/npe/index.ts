@@ -2,8 +2,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { NpeController } from '../../../controllers/npe/npe.controller';
 import { apiHandler } from '../../../helpers/api';
 
-export default apiHandler(handler);
-
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const npeController = new NpeController();
   switch (req.method) {
@@ -31,3 +29,5 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
+
+export default apiHandler(handler);

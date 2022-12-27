@@ -605,7 +605,7 @@ model experiment_genotipe {
   id_seq_delineamento Int
   blockLayoutId       Int?
   idLote              Int?
-  groupId             Int?      
+  groupId             Int?
   gli                 String
   rep                 Int
   nt                  Int
@@ -652,8 +652,8 @@ model PrintHistory {
   experimentGenotypeId Int
   status               String
   userId               Int
-  changes              Int?
-  changedAt            DateTime @default(now())
+  modulo               String   @default("ETIQUETAGEM")
+  createdAt            DateTime @default(now())
 
   user                user                @relation(fields: [userId], references: [id])
   experiment_genotipe experiment_genotipe @relation(fields: [experimentGenotypeId], references: [id])

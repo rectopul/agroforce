@@ -1071,10 +1071,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     requestOptions,
   ).then((response) => response.json());
 
-  console.log('filterBeforeEdit');
-  console.log(filterBeforeEdit);
-  console.log('filterBeforeEdit');
-  console.log(filterBeforeEdit);
 
   return {
     props: {
