@@ -789,6 +789,8 @@ export default function Listagem({
     setValidateNcaTwo("bg-gray-300");
     setParcelasToPrint([]);
     // setIsOpenModal(!isOpenModal);
+    (document.getElementById("inputCode") as HTMLInputElement).value = "";
+    (inputRef?.current as any)?.focus();
   }
 
   async function handleSubmit() {
@@ -930,6 +932,22 @@ export default function Listagem({
     }
   }
 
+  useEffect(() => {
+    document.addEventListener("keydown", (e) => onPressEscape(e));
+
+    return () => {
+      document.removeEventListener("keydown", (e) => console.log(e));
+    };
+  }, []);
+
+  function onPressEscape(e: any) {
+    if (e?.keyCode === 27) cleanState();
+  }
+
+  function onPressKey(e: any) {
+    if (e?.charCode === 13 || e?.charCode === 10) validateInput();
+  }
+
   async function validateInput() {
     const inputCode: any = (
       document.getElementById("inputCode") as HTMLInputElement
@@ -1024,7 +1042,7 @@ export default function Listagem({
           shadow-lg
           shadow-gray-900/50"
       >
-        <form className="flex flex-col">
+        <form className="flex flex-col" onSubmit={(e) => e.preventDefault()}>
           <header className="flex flex-col mt-2">
             <h2 className="mb-2 text-blue-600 text-xl font-medium">
               {`Total NCA encontrado(s) no grupo: ${totalMatch}`}
@@ -1044,20 +1062,35 @@ export default function Listagem({
             />
           </button>
 
-          <div className="w-44">
-            <InputRef
-              type="text"
-              placeholder="Código de barras (NCA)"
-              disabled={
-                validateNcaOne === "bg-red-600" ||
-                validateNcaTwo === "bg-red-600"
-              }
-              id="inputCode"
-              name="inputCode"
-              maxLength={13}
-              onChange={validateInput}
-              ref={inputRef}
-            />
+          <div className="w-72 flex">
+            <div className="w-44">
+              <InputRef
+                type="text"
+                placeholder="Código de barras (NCA)"
+                // disabled={
+                //   validateNcaOne === "bg-red-600" ||
+                //   validateNcaTwo === "bg-red-600"
+                // }
+                id="inputCode"
+                name="inputCode"
+                maxLength={13}
+                //onChange={validateInput}
+                onKeyPress={onPressKey}
+                ref={inputRef}
+              />
+            </div>
+            <div className="w-20 h-7 ml-2">
+              {(validateNcaOne === "bg-red-600" ||
+                validateNcaTwo === "bg-red-600") && (
+                <Button
+                  title="Limpar"
+                  value="Limpar"
+                  textColor="white"
+                  onClick={() => cleanState()}
+                  bgColor="bg-blue-600"
+                />
+              )}
+            </div>
           </div>
 
           <div className="flex flex-1 mt-5">
