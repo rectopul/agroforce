@@ -4,6 +4,7 @@ import {
 import { CulturaRepository } from '../repository/culture.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
 import handleError from '../shared/utils/handleError';
+import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 
 interface CultureDTO {
   id: number;
@@ -25,6 +26,7 @@ export class CulturaController {
   reporteRepository = new ReporteRepository();
 
   async getAllCulture(options: any) {
+    options = await removeEspecialAndSpace(options);
     const parameters: object | any = {};
     let take;
     let skip;

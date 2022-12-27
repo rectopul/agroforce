@@ -1,5 +1,6 @@
 import { TecnologiaRepository } from '../../repository/tecnologia.repository';
 import handleError from '../../shared/utils/handleError';
+import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class TecnologiaController {
   tecnologiaRepository = new TecnologiaRepository();
@@ -7,6 +8,7 @@ export class TecnologiaController {
   async getAll(options: object | any) {
     const parameters: object | any = {};
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterName) {
         parameters.name = JSON.parse(`{ "contains":"${options.filterName}" }`);
       }

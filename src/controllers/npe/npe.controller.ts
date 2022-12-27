@@ -5,6 +5,7 @@ import { ReporteRepository } from '../../repository/reporte.repository';
 import { GroupController } from '../group.controller';
 import { prisma } from '../../pages/api/db/db';
 import { ExperimentController } from '../experiment/experiment.controller';
+import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 // import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class NpeController {
@@ -22,7 +23,7 @@ export class NpeController {
     let orderBy: object | any;
     let select: any = [];
     try {
-      // options = await removeEspecialAndSpace(options);
+      options = await removeEspecialAndSpace(options);
       if (options.filterStatus) {
         if (options.filterStatus !== '2') {
           if (options.filterStatus == '1') {

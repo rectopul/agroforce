@@ -2,43 +2,43 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import React, { useRef } from 'react';
-import { removeCookies, setCookies } from 'cookies-next';
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import getConfig from 'next/config';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import React, { useRef } from "react";
+import { removeCookies, setCookies } from "cookies-next";
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from 'react-beautiful-dnd';
-import { IoMdArrowBack } from 'react-icons/io';
-import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { BsDownload } from 'react-icons/bs';
+} from "react-beautiful-dnd";
+import { IoMdArrowBack } from "react-icons/io";
+import { BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { BsDownload } from "react-icons/bs";
 import {
   RiArrowUpDownLine,
   RiCloseCircleFill,
   RiFileExcel2Line,
-} from 'react-icons/ri';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import Modal from 'react-modal';
-import * as XLSX from 'xlsx';
-import Swal from 'sweetalert2';
-import readXlsxFile from 'read-excel-file';
+} from "react-icons/ri";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import Modal from "react-modal";
+import * as XLSX from "xlsx";
+import Swal from "sweetalert2";
+import readXlsxFile from "read-excel-file";
 import {
   ITreatment,
   ITreatmentFilter,
   ITreatmentGrid,
-} from '../../../interfaces/listas/ensaio/genotype-treatment.interface';
-import { IGenerateProps } from '../../../interfaces/shared/generate-props.interface';
-import ComponentLoading from '../../../components/Loading';
+} from "../../../interfaces/listas/ensaio/genotype-treatment.interface";
+import { IGenerateProps } from "../../../interfaces/shared/generate-props.interface";
+import ComponentLoading from "../../../components/Loading";
 
 import {
   AccordionFilter,
@@ -50,19 +50,20 @@ import {
   Select,
   FieldItemsPerPage,
   SelectMultiple,
-} from '../../../components';
-import { UserPreferenceController } from '../../../controllers/user-preference.controller';
+} from "../../../components";
+import { UserPreferenceController } from "../../../controllers/user-preference.controller";
 import {
   experimentService,
   importService,
   userPreferencesService,
-} from '../../../services';
-import * as ITabs from '../../../shared/utils/dropdown';
-import { IReturnObject } from '../../../interfaces/shared/Import.interface';
+} from "../../../services";
+import * as ITabs from "../../../shared/utils/dropdown";
+import { functionsUtils } from "../../../shared/utils/functionsUtils";
+import { IReturnObject } from "../../../interfaces/shared/Import.interface";
 // import { fetchWrapper } from "../../../helpers";
-import { IExperiments } from '../../../interfaces/listas/experimento/experimento.interface';
-import { tableGlobalFunctions } from '../../../helpers';
-import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
+import { IExperiments } from "../../../interfaces/listas/experimento/experimento.interface";
+import { tableGlobalFunctions } from "../../../helpers";
+import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
 
 interface IFilter {
   filterFoco: string;
@@ -95,18 +96,20 @@ export default function Listagem({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
-  const tabsEtiquetagemMenu = tabsOperation.map((i: any) => (i.titleTab === 'ETIQUETAGEM' ? { ...i, statusTab: true } : i));
+  const tabsEtiquetagemMenu = tabsOperation.map((i: any) =>
+    i.titleTab === "ETIQUETAGEM" ? { ...i, statusTab: true } : i
+  );
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.experimento || {
     id: 0,
     table_preferences:
-      'id,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status,action',
+      "id,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status,action",
   };
 
   const tableRef = useRef<any>(null);
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+    preferences.table_preferences
   );
   const [experiments, setExperiments] = useState<ITreatment[] | any>([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -117,48 +120,48 @@ export default function Listagem({
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    { name: 'CamposGerenciados[]', title: 'Foco', value: 'foco' },
-    { name: 'CamposGerenciados[]', title: 'Ensaio', value: 'type_assay' },
-    { name: 'CamposGerenciados[]', title: 'GLI', value: 'gli' },
+    { name: "CamposGerenciados[]", title: "Foco", value: "foco" },
+    { name: "CamposGerenciados[]", title: "Ensaio", value: "type_assay" },
+    { name: "CamposGerenciados[]", title: "GLI", value: "gli" },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Nome do experimento',
-      value: 'experimentName',
+      name: "CamposGerenciados[]",
+      title: "Nome do experimento",
+      value: "experimentName",
     },
-    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
-    { name: 'CamposGerenciados[]', title: 'Época', value: 'period' },
+    { name: "CamposGerenciados[]", title: "Tecnologia", value: "tecnologia" },
+    { name: "CamposGerenciados[]", title: "Época", value: "period" },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Delineamento',
-      value: 'delineamento',
+      name: "CamposGerenciados[]",
+      title: "Delineamento",
+      value: "delineamento",
     },
-    { name: 'CamposGerenciados[]', title: 'Rep', value: 'repetitionsNumber' },
-    { name: 'CamposGerenciados[]', title: 'Status EXP', value: 'status' },
+    { name: "CamposGerenciados[]", title: "Rep", value: "repetitionsNumber" },
+    { name: "CamposGerenciados[]", title: "Status EXP", value: "status" },
     // { name: "CamposGerenciados[]", title: "Ação", value: "action" },
   ]);
 
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
     {
-      name: 'StatusCheckbox',
-      title: 'IMPORTADO ',
-      value: 'importado',
-      defaultChecked: () => camposGerenciados.includes('importado'),
+      name: "StatusCheckbox",
+      title: "IMPORTADO ",
+      value: "importado",
+      defaultChecked: () => camposGerenciados.includes("importado"),
     },
     {
-      name: 'StatusCheckbox',
-      title: 'SORTEADO',
-      value: 'sorteado',
-      defaultChecked: () => camposGerenciados.includes('sorteado'),
+      name: "StatusCheckbox",
+      title: "SORTEADO",
+      value: "sorteado",
+      defaultChecked: () => camposGerenciados.includes("sorteado"),
     },
   ]);
   const [statusFilterSelected, setStatusFilterSelected] = useState<any>([]);
 
   // const [orderBy, setOrderBy] = useState<string>("");
-  const [orderType, setOrderType] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -177,19 +180,19 @@ export default function Listagem({
 
   const formik = useFormik<IFilter>({
     initialValues: {
-      filterFoco: '',
-      filterTypeAssay: '',
-      filterGli: '',
-      filterExperimentName: '',
-      filterTecnologia: '',
-      filterCod: '',
-      filterPeriod: '',
-      filterDelineamento: '',
-      filterRepetition: '',
-      filterRepetitionTo: '',
-      filterRepetitionFrom: '',
-      orderBy: '',
-      typeOrder: '',
+      filterFoco: "",
+      filterTypeAssay: "",
+      filterGli: "",
+      filterExperimentName: "",
+      filterTecnologia: "",
+      filterCod: "",
+      filterPeriod: "",
+      filterDelineamento: "",
+      filterRepetition: "",
+      filterRepetitionTo: "",
+      filterRepetitionFrom: "",
+      orderBy: "",
+      typeOrder: "",
     },
     onSubmit: async ({
       filterFoco,
@@ -202,10 +205,14 @@ export default function Listagem({
       filterDelineamento,
       filterRepetition,
     }) => {
+      if (!functionsUtils?.isNumeric(filterPeriod)) {
+        return Swal.fire("O campo Época não pode ter ponto ou vírgula.");
+      }
+
       const allCheckBox: any = document.querySelectorAll(
-        "input[name='StatusCheckbox']",
+        "input[name='StatusCheckbox']"
       );
-      let selecionados = '';
+      let selecionados = "";
       for (let i = 0; i < allCheckBox.length; i += 1) {
         if (allCheckBox[i].checked) {
           selecionados += `${allCheckBox[i].value},`;
@@ -246,9 +253,10 @@ export default function Listagem({
       //     );
       //   });
 
-      const filterStatus = 'SORTEADO';
+      const filterStatus = "SORTEADO";
       const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterCod=${filterCod}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterExperimentStatus=SORTEADO`;
 
+      setLoading(true);
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
@@ -257,12 +265,12 @@ export default function Listagem({
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
-    setCookies('filterBeforeEdit', parametersFilter);
-    setCookies('filterBeforeEditTypeOrder', typeOrder);
-    setCookies('filterBeforeEditOrderBy', orderBy);
+    setCookies("filterBeforeEdit", parametersFilter);
+    setCookies("filterBeforeEditTypeOrder", typeOrder);
+    setCookies("filterBeforeEditOrderBy", orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies('filtersParams', parametersFilter);
+    setCookies("filtersParams", parametersFilter);
 
     await experimentService
       .getAll(parametersFilter)
@@ -271,9 +279,10 @@ export default function Listagem({
           setExperiments(response.response);
           setTotalItems(response.total);
           tableRef.current.dataManager.changePageSize(
-            itemsTotal >= take ? take : itemsTotal,
+            itemsTotal >= take ? take : itemsTotal
           );
         }
+        setLoading(false);
       })
       .catch((_) => {
         setLoading(false);
@@ -288,7 +297,7 @@ export default function Listagem({
   async function handleOrder(
     column: string,
     order: number,
-    name: any,
+    name: any
   ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
@@ -328,9 +337,8 @@ export default function Listagem({
     // }
 
     // Gobal manage orders
-    const {
-      typeOrderG, columnG, orderByG, arrowOrder,
-    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    const { typeOrderG, columnG, orderByG, arrowOrder } =
+      await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setFieldOrder(name);
     setTypeOrder(typeOrderG);
@@ -384,47 +392,47 @@ export default function Listagem({
   // }
 
   function orderColumns(columnsOrder: string): Array<object> {
-    const columnOrder: any = columnsOrder.split(',');
+    const columnOrder: any = columnsOrder.split(",");
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((index: any) => {
-      if (columnOrder[index] === 'foco') {
+      if (columnOrder[index] === "foco") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Foco',
-            title: 'assay_list.foco.name',
+            name: "Foco",
+            title: "assay_list.foco.name",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnOrder[index] === 'type_assay') {
+      if (columnOrder[index] === "type_assay") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Ensaio',
-            title: 'assay_list.type_assay.name',
+            name: "Ensaio",
+            title: "assay_list.type_assay.name",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnOrder[index] === 'gli') {
+      if (columnOrder[index] === "gli") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'GLI',
-            title: 'assay_list.gli',
+            name: "GLI",
+            title: "assay_list.gli",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnOrder[index] === 'tecnologia') {
+      if (columnOrder[index] === "tecnologia") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Tecnologia',
-            title: 'assay_list.tecnologia.name',
+            name: "Tecnologia",
+            title: "assay_list.tecnologia.name",
             orderList,
             fieldOrder,
             handleOrder,
@@ -433,62 +441,62 @@ export default function Listagem({
                 {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
               </div>
             ),
-          }),
+          })
         );
       }
-      if (columnOrder[index] === 'experimentName') {
+      if (columnOrder[index] === "experimentName") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Nome experimento',
-            title: 'experimentName',
+            name: "Nome experimento",
+            title: "experimentName",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnOrder[index] === 'period') {
+      if (columnOrder[index] === "period") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Época',
-            title: 'period',
+            name: "Época",
+            title: "period",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnOrder[index] === 'delineamento') {
+      if (columnOrder[index] === "delineamento") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Delineamento',
-            title: 'delineamento.name',
+            name: "Delineamento",
+            title: "delineamento.name",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnOrder[index] === 'repetitionsNumber') {
+      if (columnOrder[index] === "repetitionsNumber") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Rep',
-            title: 'repetitionsNumber',
+            name: "Rep",
+            title: "repetitionsNumber",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnOrder[index] === 'status') {
+      if (columnOrder[index] === "status") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Status EXP',
-            title: 'status',
+            name: "Status EXP",
+            title: "status",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
     });
@@ -499,7 +507,7 @@ export default function Listagem({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
+    let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -522,7 +530,7 @@ export default function Listagem({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
       userLogado.preferences.experimento = {
         id: preferences.id,
@@ -533,7 +541,7 @@ export default function Listagem({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -604,24 +612,24 @@ export default function Listagem({
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
+          XLSX.utils.book_append_sheet(workBook, workSheet, "Tratamentos");
 
           // Buffer
           XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
-            type: 'buffer',
+            bookType: "xlsx", // xlsx
+            type: "buffer",
           });
           // Binary
           XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
-            type: 'binary',
+            bookType: "xlsx", // xlsx
+            type: "binary",
           });
           // Download
-          XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
+          XLSX.writeFile(workBook, "Tratamentos-genótipo.xlsx");
         } else {
           setLoading(false);
           Swal.fire(
-            'Não existem registros para serem exportados, favor checar.',
+            "Não existem registros para serem exportados, favor checar."
           );
         }
       });
@@ -677,14 +685,14 @@ export default function Listagem({
 
   async function handleSubmit() {
     const experimentsSelected = rowsSelected.map(
-      (item: IExperiments) => item.id,
+      (item: IExperiments) => item.id
     );
     const { status }: IReturnObject = await experimentService.update({
       idList: experimentsSelected,
       experimentGroupId: Number(experimentGroupId),
     });
     if (status !== 200) {
-      Swal.fire('Erro ao associar experimentos');
+      Swal.fire("Erro ao associar experimentos");
     } else {
       router.back();
     }
@@ -736,14 +744,14 @@ export default function Listagem({
                                         pb-8
                                         "
                 >
-                  {filterFieldFactory('filterFoco', 'Foco')}
-                  {filterFieldFactory('filterTypeAssay', 'Ensaio')}
-                  {filterFieldFactory('filterGli', 'GLI')}
+                  {filterFieldFactory("filterFoco", "Foco")}
+                  {filterFieldFactory("filterTypeAssay", "Ensaio")}
+                  {filterFieldFactory("filterGli", "GLI")}
                   {filterFieldFactory(
-                    'filterExperimentName',
-                    'Nome Experimento',
+                    "filterExperimentName",
+                    "Nome Experimento"
                   )}
-                  {filterFieldFactory('filterCod', 'Cod Tec')}
+                  {filterFieldFactory("filterCod", "Cod Tec")}
                 </div>
 
                 <div
@@ -753,9 +761,9 @@ export default function Listagem({
                                         pb-2
                                         "
                 >
-                  {filterFieldFactory('filterTecnologia', 'Nome Tecnologia')}
-                  {filterFieldFactory('filterPeriod', 'Época')}
-                  {filterFieldFactory('filterDelineamento', 'Delineamento')}
+                  {filterFieldFactory("filterTecnologia", "Nome Tecnologia")}
+                  {filterFieldFactory("filterPeriod", "Época")}
+                  {filterFieldFactory("filterDelineamento", "Delineamento")}
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -856,7 +864,7 @@ export default function Listagem({
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
               tableRef={tableRef}
-              style={{ background: '#f9fafb' }}
+              style={{ background: "#f9fafb" }}
               columns={columns}
               data={experiments}
               options={{
@@ -865,7 +873,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 0,
                 },
-                rowStyle: { background: '#f9fafb', height: 35 },
+                rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: Number(take),
@@ -873,8 +881,8 @@ export default function Listagem({
               localization={{
                 body: {
                   emptyDataSourceMessage: tableMessage
-                    ? 'Nenhum experimento encontrado!'
-                    : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
+                    ? "Nenhum experimento encontrado!"
+                    : "ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.",
                 },
               }}
               onChangeRowsPerPage={() => {}}
@@ -920,9 +928,7 @@ export default function Listagem({
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
+                      Total registrado: {itemsTotal}
                     </strong>
 
                     <div
@@ -969,7 +975,7 @@ export default function Listagem({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value,
+                                                generate.value
                                               )}
                                             />
                                           </li>
@@ -998,58 +1004,59 @@ export default function Listagem({
                     </div>
                   </div>
                 ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => setCurrentPage(0)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {Array(1)
-                      .fill('')
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(pages - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(0)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage < 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(pages - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                   ) as any,
               }}
             />
@@ -1071,14 +1078,14 @@ export const getServerSideProps: GetServerSideProps = async ({
   )?.response[0]?.itens_per_page;
 
   // Last page
-  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
 
-  if (lastPageServer == undefined || lastPageServer == 'No') {
-    removeCookies('filterBeforeEdit', { req, res });
-    removeCookies('pageBeforeEdit', { req, res });
-    removeCookies('filterBeforeEditTypeOrder', { req, res });
-    removeCookies('filterBeforeEditOrderBy', { req, res });
-    removeCookies('lastPage', { req, res });
+  if (lastPageServer == undefined || lastPageServer == "No") {
+    removeCookies("filterBeforeEdit", { req, res });
+    removeCookies("pageBeforeEdit", { req, res });
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("lastPage", { req, res });
   }
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
@@ -1086,17 +1093,17 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : '';
+    : "";
 
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : 'desc';
+    : "desc";
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : 'assay_list.foco.name';
+    : "assay_list.foco.name";
 
   const { token } = req.cookies;
   const idCulture = req.cookies.cultureId;
@@ -1106,25 +1113,26 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { publicRuntimeConfig } = getConfig();
   const baseUrlExperimento = `${publicRuntimeConfig.apiUrl}/experiment`;
 
-  const filterApplication = req.cookies.filterBeforeEdit
-    || `&id_culture=${idCulture}&id_safra=${idSafra}&filterExperimentStatus=SORTEADO`;
+  const filterApplication =
+    req.cookies.filterBeforeEdit ||
+    `&id_culture=${idCulture}&id_safra=${idSafra}&filterExperimentStatus=SORTEADO`;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies("filterBeforeEdit", { req, res });
+  removeCookies("pageBeforeEdit", { req, res });
 
   const param = `&id_culture=${idCulture}&id_safra=${idSafra}&filterExperimentStatus=SORTEADO`;
 
   const urlParametersExperiment: any = new URL(baseUrlExperimento);
   urlParametersExperiment.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
   const { response: allExperiments = [], total: totalItems = 0 } = await fetch(
     urlParametersExperiment.toString(),
-    requestOptions,
+    requestOptions
   ).then((response) => response.json());
 
   return {

@@ -52,6 +52,7 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 
+
 export default function TipoEnsaio({
   allAssay,
   itensPerPage,
@@ -189,6 +190,14 @@ export default function TipoEnsaio({
       filterTreatmentNumber,
       filterStatusAssay,
     }) => {
+      if (!functionsUtils?.isNumeric(filterTratFrom)) {
+        return Swal.fire("O campo Nº de trat não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterTratTo)) {
+        return Swal.fire("O campo Nº de trat não pode ter ponto ou vírgula.");
+      }
+
+      setLoading(true);
       const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterTechnology=${filterTechnology}&filterTreatmentNumber=${filterTreatmentNumber}&filterStatusAssay=${filterStatusAssay}&id_safra=${idSafra}&filterTratTo=${filterTratTo}&filterTratFrom=${filterTratFrom}&filterCod=${filterCod}&id_culture=${idCulture}`;
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -217,6 +226,7 @@ export default function TipoEnsaio({
             response.total >= take ? take : response.total,
           );
         }
+        setLoading(false);
       })
       .catch((_) => {
         setLoading(false);
@@ -782,9 +792,7 @@ export default function TipoEnsaio({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {
-                        setLoading(true);
-                      }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

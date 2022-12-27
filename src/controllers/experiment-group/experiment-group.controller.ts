@@ -4,6 +4,7 @@ import { ExperimentGroupRepository } from '../../repository/experiment-group.rep
 import { IExperiments } from '../../interfaces/listas/experimento/experimento.interface';
 import { ExperimentController } from '../experiment/experiment.controller';
 import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
+import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class ExperimentGroupController {
   experimentGroupRepository = new ExperimentGroupRepository();
@@ -14,6 +15,7 @@ export class ExperimentGroupController {
     const parameters: object | any = {};
     let orderBy: object | any;
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterExperimentGroup) {
         parameters.name = JSON.parse(`{"contains":"${options.filterExperimentGroup}"}`);
       }

@@ -60,6 +60,7 @@ import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
 
+
 export default function Listagem({
   // assaySelect,
   genotypeSelect,
@@ -297,6 +298,25 @@ export default function Listagem({
       filterExperimentName,
       filterPlacingPlace,
     }) => {
+      if (!functionsUtils?.isNumeric(filterRepFrom)) {
+        return Swal.fire("O campo REP EXP não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterRepTo)) {
+        return Swal.fire("O campo REP EXP não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterNtFrom)) {
+        return Swal.fire("O campo NT não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterNtTo)) {
+        return Swal.fire("O campo NT não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterNpeFrom)) {
+        return Swal.fire("O campo NPE não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterNpeTo)) {
+        return Swal.fire("O campo NPE não pode ter ponto ou vírgula.");
+      }
+
       const allCheckBox: any = document.querySelectorAll(
         "input[name='StatusCheckbox']",
       );
@@ -325,6 +345,7 @@ export default function Listagem({
       //         tableRef.current.dataManager.changePageSize(allTotal >= take ? take : allTotal);
       //     });
 
+      setLoading(true);
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
@@ -353,6 +374,7 @@ export default function Listagem({
             response.total >= take ? take : response.total,
           );
         }
+        setLoading(false);
       })
       .catch((_) => {
         setLoading(false);
@@ -1375,9 +1397,7 @@ export default function Listagem({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {
-                        setLoading(true);
-                      }}
+                      onClick={() => {}}
                       value="Filtrar"
                       type="submit"
                       bgColor="bg-blue-600"

@@ -2,6 +2,7 @@ import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import handleError from '../../shared/utils/handleError';
 import { ReporteRepository } from '../../repository/reporte.repository';
 import { prisma } from '../../pages/api/db/db';
+import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class ReporteController {
   reporteRepository = new ReporteRepository();
@@ -10,6 +11,7 @@ export class ReporteController {
     const parameters: object | any = {};
     let orderBy: object | any = {};
     try {
+      options = await removeEspecialAndSpace(options);
       const select = {
         id: true,
         madeBy: true,

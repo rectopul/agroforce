@@ -46,6 +46,7 @@ import { tableGlobalFunctions } from '../../../helpers';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../components/Loading';
 
+
 interface IDelineamentoProps {
   id: number | any;
   name: string | any;
@@ -214,6 +215,23 @@ export default function Listagem({
       filterTratRepetitionTo,
       filterTratRepetitionFrom,
     }) => {
+      if (!functionsUtils?.isNumeric(filterRepetitionFrom)) {
+        return Swal.fire("O campo Repetição não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterRepetitionTo)) {
+        return Swal.fire("O campo Repetição não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterTratRepetitionFrom)) {
+        return Swal.fire(
+          "O campo Trat Repetição não pode ter ponto ou vírgula."
+        );
+      }
+      if (!functionsUtils?.isNumeric(filterTratRepetitionTo)) {
+        return Swal.fire(
+          "O campo Trat Repetição não pode ter ponto ou vírgula."
+        );
+      }
+
       const parametersFilter = `filterStatus=${
         filterStatus || 1
       }&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}&filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterTratRepetitionTo=${filterTratRepetitionTo}&filterTratRepetitionFrom=${filterTratRepetitionFrom}`;
@@ -228,6 +246,7 @@ export default function Listagem({
       //     setCurrentPage(0);
       //   });
 
+      setLoading(true);
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
@@ -782,9 +801,7 @@ export default function Listagem({
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
-                      onClick={() => {
-                        setLoading(true);
-                      }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

@@ -43,6 +43,7 @@ import {
 import { quadraService, userPreferencesService } from "../../../services";
 import { UserPreferenceController } from "../../../controllers/user-preference.controller";
 import ITabs from "../../../shared/utils/dropdown";
+import { functionsUtils } from "../../../shared/utils/functionsUtils";
 import { tableGlobalFunctions } from "../../../helpers";
 import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
 import ComponentLoading from "../../../components/Loading";
@@ -192,6 +193,13 @@ export default function Listagem({
       filterPFrom,
       filterPreparation,
     }) => {
+      if (!functionsUtils?.isNumeric(filterPFrom)) {
+        return Swal.fire("O campo Linha P não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterPTo)) {
+        return Swal.fire("O campo Linha P não pode ter ponto ou vírgula.");
+      }
+
       const parametersFilter = `filterStatus=${filterStatus}&filterPreparation=${filterPreparation}&filterSearch=${filterSearch}&filterSchema=${filterSchema}&filterPTo=${filterPTo}&filterPFrom=${filterPFrom}`;
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEdit', filtersParams);
@@ -204,6 +212,7 @@ export default function Listagem({
       //     setCurrentPage(0);
       //   });
 
+      setLoading(true);
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
@@ -230,6 +239,7 @@ export default function Listagem({
             response.total >= take ? take : response.total
           );
         }
+        setLoading(false);
       })
       .catch((_) => {
         setLoading(false);
@@ -933,9 +943,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
                       type="submit"
-                      onClick={() => {
-                        setLoading(true);
-                      }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

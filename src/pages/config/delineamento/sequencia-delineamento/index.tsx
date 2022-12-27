@@ -51,6 +51,7 @@ import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
 
+
 interface IFilter {
   filterStatus: object | any;
   filterSearch: string | any;
@@ -198,6 +199,31 @@ export default function Listagem({
       filterBlockTo,
       filterBlockFrom,
     }) => {
+      if (!functionsUtils?.isNumeric(filterRepetitionFrom)) {
+        return Swal.fire("O campo Repetição não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterRepetitionTo)) {
+        return Swal.fire("O campo Repetição não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterOrderFrom)) {
+        return Swal.fire("O campo Ordem não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterOrderTo)) {
+        return Swal.fire("O campo Ordem não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterNtFrom)) {
+        return Swal.fire("O campo NT não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterNtFrom)) {
+        return Swal.fire("O campo NT não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterBlockFrom)) {
+        return Swal.fire("O campo Bloco não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterBlockTo)) {
+        return Swal.fire("O campo Bloco não pode ter ponto ou vírgula.");
+      }
+
       const parametersFilter = `&filterSearch=${filterSearch}&filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterOrderTo=${filterOrderTo}&filterOrderFrom=${filterOrderFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterBlockTo=${filterBlockTo}&filterBlockFrom=${filterBlockFrom}&id_delineamento=${idDelineamento}`;
       // await sequenciaDelineamentoService
       //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
@@ -208,6 +234,7 @@ export default function Listagem({
       //     setCurrentPage(0);
       //   });
 
+      setLoading(true);
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
@@ -234,6 +261,7 @@ export default function Listagem({
             response.total >= take ? take : response.total,
           );
         }
+        setLoading(false);
       })
       .catch((_) => {
         setLoading(false);
@@ -811,9 +839,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => {
-                        setLoading(true);
-                      }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

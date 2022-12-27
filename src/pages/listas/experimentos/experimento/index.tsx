@@ -44,6 +44,7 @@ import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
 
+
 interface IFilter {
   filterFoco: string;
   filterTypeAssay: string;
@@ -241,6 +242,16 @@ export default function Listagem({
       filterRepetitionTo,
       filterRepetitionFrom,
     }) => {
+      if (!functionsUtils?.isNumeric(filterPeriod)) {
+        return Swal.fire("O campo Época não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterRepetitionFrom)) {
+        return Swal.fire("O campo Rep não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterRepetitionTo)) {
+        return Swal.fire("O campo Rep não pode ter ponto ou vírgula.");
+      }
+
       const allCheckBox: any = document.querySelectorAll(
         "input[name='StatusCheckbox']",
       );
@@ -257,6 +268,7 @@ export default function Listagem({
 
       const parametersFilter = `filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterCodTec=${filterCodTec}&filterExperimentStatus=${filterExperimentStatus}&id_culture=${cultureId}`;
 
+      setLoading(true);
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
@@ -288,6 +300,7 @@ export default function Listagem({
             response.total >= take ? take : response.total,
           );
         }
+        setLoading(false);
       })
       .catch((_) => {
         setLoading(false);
@@ -1008,9 +1021,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => {
-                        setLoading(true);
-                      }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
