@@ -273,6 +273,7 @@ export class NpeController {
   }
 
   async update(data: any) {
+    console.log('🚀 ~ file: npe.controller.ts:276 ~ NpeController ~ update ~ data', data);
     try {
       if (data) {
         const operation = data.status === 1 ? 'Ativação' : 'Inativação';
