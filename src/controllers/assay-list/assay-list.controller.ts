@@ -61,7 +61,7 @@ export class AssayListController {
         id_safra: true,
         type_assay: { select: { name: true } },
         tecnologia: { select: { name: true, cod_tec: true } },
-        safra: { select: { safraName: true } },
+        safra: { select: { safraName: true, culture: true } },
         genotype_treatment: true,
         treatmentsNumber: true,
         gli: true,

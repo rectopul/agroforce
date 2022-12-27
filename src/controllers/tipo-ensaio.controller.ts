@@ -37,6 +37,7 @@ export class TypeAssayController {
       const select = {
         id: true,
         name: true,
+        culture: true,
         protocol_name: true,
         envelope: {
           select: {
@@ -72,6 +73,7 @@ export class TypeAssayController {
         skip,
         orderBy,
       );
+      console.log('🚀 ~ file: tipo-ensaio.controller.ts:74 ~ TypeAssayController ~ getAll ~ response', response);
 
       response.map((item: any) => {
         item.envelope.map((envelope: any) => {

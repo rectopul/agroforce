@@ -158,7 +158,7 @@ export class NpeController {
           localId: true,
           prox_npe: true,
           local: { select: { name_local_culture: true } },
-          safra: { select: { safraName: true } },
+          safra: { select: { safraName: true, culture: true } },
           foco: { select: { name: true, id: true } },
           epoca: true,
           tecnologia: { select: { name: true, id: true, cod_tec: true } },

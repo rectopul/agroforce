@@ -17,6 +17,7 @@ export class ExperimentGenotipeController {
   private printedHistoryController = new PrintHistoryController();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: experiment-genotipe.controller.ts:19 ~ ExperimentGenotipeController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
@@ -208,7 +209,7 @@ export class ExperimentGenotipeController {
 
       const select = {
         id: true,
-        safra: { select: { safraName: true } },
+        safra: { select: { safraName: true, culture: true } },
         foco: { select: { name: true } },
         type_assay: { select: { name: true, envelope: true } },
         tecnologia: { select: { name: true, cod_tec: true } },
@@ -250,6 +251,7 @@ export class ExperimentGenotipeController {
                 safra: {
                   select: {
                     safraName: true,
+                    culture: true,
                   },
                 },
               },

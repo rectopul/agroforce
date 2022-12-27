@@ -116,6 +116,7 @@ export class ExperimentController {
             safra: {
               select: {
                 safraName: true,
+                culture: true,
               },
             },
           },
@@ -211,7 +212,7 @@ export class ExperimentController {
         const newItem = item;
         newItem.countNT = functionsUtils
           .countChildrenForSafra(item.assay_list.genotype_treatment, Number(options.idSafra));
-        newItem.npeQT = item.countNT * item.repetitionsNumber;
+        newItem.npeQT = item.experiment_genotipe.length;
         newItem.seq_delineamento = item.delineamento.sequencia_delineamento.filter(
           (x: any) => x.nt <= item.countNT && x.repeticao <= item.repetitionsNumber,
         );

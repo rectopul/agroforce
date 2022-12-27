@@ -194,6 +194,7 @@ export class LoteController {
             name_main: true,
             gmr: true,
             bgm: true,
+            culture: true,
             tecnologia: {
               select:
               {

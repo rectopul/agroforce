@@ -417,21 +417,34 @@ export default function Listagem({
     setLoading(true);
     await experimentService.getAll(filter).then(({ status, response }: any) => {
       if (status === 200) {
-        const newData = response.map((item: any) => {
+        response.map((item: any) => {
           const newItem = item;
+          newItem.CULTURA = item.assay_list?.safra?.culture?.name;
           newItem.SAFRA = item.assay_list?.safra?.safraName;
           newItem.FOCO = item.assay_list?.foco.name;
-          newItem.ENSAIO = item.assay_list?.type_assay.name;
+          newItem.TIPO_DE_ENSAIO = item.assay_list?.type_assay.name;
+          newItem.TECNOLOGIA = `${item.assay_list?.tecnologia.cod_tec} ${item.assay_list?.tecnologia.name}`;
           newItem.GLI = item.assay_list?.gli;
           newItem.NOME_DO_EXPERIMENTO = item?.experimentName;
-          newItem.TECNOLOGIA = item.assay_list?.tecnologia.name;
-          newItem.ÉPOCA = item?.period;
-          newItem.DELINEAMENTO = item.delineamento?.name;
-          newItem.REPETIÇÃO = item.delineamento?.repeticao;
+          newItem.BGM = item.assay_list?.bgm;
           newItem.STATUS_ENSAIO = item.assay_list?.status;
+          newItem.PLANTIO = newItem.local?.name_local_culture;
+          newItem.DELINEAMENTO = item.delineamento?.name;
+          newItem.DENSIDADE = item?.density;
+          newItem.REP = item.repetitionsNumber;
+          newItem.ÉPOCA = item?.period;
+          newItem.ORDEM_SORTEIO = item?.orderDraw;
+          newItem.NLP = item?.nlp;
+          newItem.CLP = item?.clp;
+          newItem.OBSERVAÇÕES = item?.comments;
+          newItem.COUNT_NT = newItem.countNT;
+          newItem.NPE_QT = newItem.npeQT;
 
-          delete newItem.experimentGroupId;
+          delete newItem.id;
+          delete newItem.safra;
           delete newItem.experiment_genotipe;
+          delete newItem.seq_delineamento;
+          delete newItem.experimentGroupId;
           delete newItem.countNT;
           delete newItem.npeQT;
           delete newItem.local;
@@ -448,11 +461,10 @@ export default function Listagem({
           delete newItem.experimentName;
           delete newItem.type_assay;
           delete newItem.idSafra;
-          delete newItem.id;
           delete newItem.assay_list;
           return newItem;
         });
-        const workSheet = XLSX.utils.json_to_sheet(newData);
+        const workSheet = XLSX.utils.json_to_sheet(response);
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'Experimentos');
 
@@ -551,6 +563,7 @@ export default function Listagem({
   async function deleteItem() {
     setLoading(true);
     setIsOpenModalConfirm(false);
+    setLoading(true);
 
     const { status, message } = await experimentService.update({
       id: itemSelectedDelete?.id,

@@ -52,6 +52,7 @@ export class DelineamentoController {
       const select = {
         id: true,
         name: true,
+        culture: true,
         repeticao: true,
         trat_repeticao: true,
         status: true,

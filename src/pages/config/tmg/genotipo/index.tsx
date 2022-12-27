@@ -767,8 +767,6 @@ export default function Listagem({
           row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.name}`;
 
           row.CULTURA = row.culture.desc;
-          row.ID_S1 = row.id_s1;
-          row.ID_DADOS = row.id_dados;
           row.NOME_GENÓTIPO = row.name_genotipo;
           row.NOME_PRINCIPAL = row.name_main;
           row.NOME_PÚBLICO = row.name_public;
