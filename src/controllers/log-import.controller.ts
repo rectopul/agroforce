@@ -2,6 +2,7 @@ import handleError from '../shared/utils/handleError';
 import { functionsUtils } from '../shared/utils/functionsUtils';
 import { LogImportRepository } from '../repository/log-import.repository';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
+import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 
 export class LogImportController {
   public readonly required = 'Campo obrigatório';
@@ -67,6 +68,7 @@ export class LogImportController {
     parameters.AND = [];
     let orderBy: string;
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterUser) {
         parameters.user = JSON.parse(`{"name": {"contains":"${options.filterUser}"} }`);
       }

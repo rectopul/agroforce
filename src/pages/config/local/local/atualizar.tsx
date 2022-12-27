@@ -355,15 +355,42 @@ export default function AtualizarLocal({
     await unidadeCulturaService.getAll(filterApplication).then((response) => {
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
-          row.SAFRA = row.safra.safraName;
+          let dtHours: string;
+          let dtMinutes: string;
+          let dtSeconds: string;
+
+          row.dt_export = new Date(row.dt_export);
+
+          if (String(row.dt_export.getHours()).length === 1) {
+            dtHours = `0${String(row.dt_export.getHours())}`;
+          } else {
+            dtHours = String(row.dt_export.getHours());
+          }
+          if (String(row.dt_export.getMinutes()).length === 1) {
+            dtMinutes = `0${String(row.dt_export.getMinutes())}`;
+          } else {
+            dtMinutes = String(row.dt_export.getMinutes());
+          }
+          if (String(row.dt_export.getSeconds()).length === 1) {
+            dtSeconds = `0${String(row.dt_export.getSeconds())}`;
+          } else {
+            dtSeconds = String(row.dt_export.getSeconds());
+          }
+
+          row.EXPORT = `${row.dt_export.toLocaleDateString(
+            'pt-BR',
+          )} ${dtHours}:${dtMinutes}:${dtSeconds}`;
+
           row.NOME_LOCAL_CULTURA = row.local.name_local_culture;
           row.NOME_UNIDADE_CULTURA = row.name_unity_culture;
           row.ANO = row.year;
+          row.DT_EXPORT = row.EXPORT;
 
-          delete row.safra;
           delete row.name_unity_culture;
           delete row.year;
+          delete row.dt_export;
           delete row.id;
+          delete row.EXPORT;
           delete row.id_unity_culture;
           delete row.id_local;
           delete row.local;

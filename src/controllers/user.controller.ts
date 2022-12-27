@@ -5,6 +5,7 @@ import { UserRepository } from '../repository/user.repository';
 import { UserCultureController } from './user-culture.controller';
 import { UserPermissionController } from './user-permission.controller';
 import { ReporteRepository } from '../repository/reporte.repository';
+import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 
 export class UserController {
   userRepository = new UserRepository();
@@ -18,12 +19,15 @@ export class UserController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: user.controller.ts:22 ~ UserController ~ getAll ~ options', options);
+
     const parameters: object | any = {};
     let take;
     let skip;
     let orderBy: object | any;
     let select: any = [];
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterStatus) {
         if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
       }

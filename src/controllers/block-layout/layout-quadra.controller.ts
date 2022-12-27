@@ -1,6 +1,7 @@
 import { LayoutQuadraRepository } from '../../repository/layout-quadra.repository';
 import { ReporteRepository } from '../../repository/reporte.repository';
 import handleError from '../../shared/utils/handleError';
+import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 import { LayoutChildrenController } from '../layout-children.controller';
 
 export class LayoutQuadraController {
@@ -13,6 +14,7 @@ export class LayoutQuadraController {
   async getAll(options: object | any) {
     const parameters: object | any = {};
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterShotsFrom || options.filterShotsTo) {
         if (options.filterShotsFrom && options.filterShotsTo) {
           parameters.disparos = JSON.parse(`{"gte": ${Number(options.filterShotsFrom)}, "lte": ${Number(options.filterShotsTo)} }`);

@@ -2,6 +2,7 @@ import handleError from '../../shared/utils/handleError';
 import { GenotipoRepository } from '../../repository/genotipo.repository';
 import { functionsUtils } from '../../shared/utils/functionsUtils';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
+import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class GenotipoController {
   genotipoRepository = new GenotipoRepository();
@@ -12,6 +13,7 @@ export class GenotipoController {
     let orderBy: object | any;
     let select: any = [];
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterGenotipo) {
         parameters.name_genotipo = JSON.parse(`{"contains":"${options.filterGenotipo}"}`);
       }

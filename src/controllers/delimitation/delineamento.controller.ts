@@ -1,6 +1,7 @@
 import { DelineamentoRepository } from '../../repository/delineamento.repository';
 import { ReporteRepository } from '../../repository/reporte.repository';
 import handleError from '../../shared/utils/handleError';
+import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class DelineamentoController {
   Repository = new DelineamentoRepository();
@@ -11,6 +12,7 @@ export class DelineamentoController {
     const parameters: object | any = {};
 
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
         if (options.filterRepetitionFrom && options.filterRepetitionTo) {
           parameters.repeticao = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);
@@ -50,6 +52,7 @@ export class DelineamentoController {
       const select = {
         id: true,
         name: true,
+        culture: true,
         repeticao: true,
         trat_repeticao: true,
         status: true,

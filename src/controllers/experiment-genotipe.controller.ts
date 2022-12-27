@@ -5,6 +5,7 @@ import { ExperimentGroupController } from './experiment-group/experiment-group.c
 import { ExperimentController } from './experiment/experiment.controller';
 import { PrintHistoryController } from './print-history/print-history.controller';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
+import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 
 export class ExperimentGenotipeController {
   private ExperimentGenotipeRepository = new ExperimentGenotipeRepository();
@@ -16,10 +17,12 @@ export class ExperimentGenotipeController {
   private printedHistoryController = new PrintHistoryController();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: experiment-genotipe.controller.ts:19 ~ ExperimentGenotipeController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterFoco) {
         parameters.foco = JSON.parse(
           `{ "name": { "contains": "${options.filterFoco}" } }`,
@@ -206,7 +209,7 @@ export class ExperimentGenotipeController {
 
       const select = {
         id: true,
-        safra: { select: { safraName: true } },
+        safra: { select: { safraName: true, culture: true } },
         foco: { select: { name: true } },
         type_assay: { select: { name: true, envelope: true } },
         tecnologia: { select: { name: true, cod_tec: true } },
@@ -248,6 +251,7 @@ export class ExperimentGenotipeController {
                 safra: {
                   select: {
                     safraName: true,
+                    culture: true,
                   },
                 },
               },
