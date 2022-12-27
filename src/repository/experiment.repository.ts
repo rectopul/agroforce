@@ -149,6 +149,7 @@ export class ExperimentRepository extends BaseRepository {
   }
 
   async relationGroup({ idList, experimentGroupId, status }: any): Promise<any> {
+
     const result = await prisma.experiment.updateMany({
       where: {
         id: {

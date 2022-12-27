@@ -4,6 +4,7 @@ import {
 import { DepartamentRepository } from '../repository/departament.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
 import handleError from '../shared/utils/handleError';
+import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 
 interface DepartmentDTO {
   id: number;
@@ -40,6 +41,7 @@ export class DepartamentController {
     let select: any = [];
 
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }

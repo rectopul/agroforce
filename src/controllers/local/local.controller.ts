@@ -1,5 +1,6 @@
 import handleError from '../../shared/utils/handleError';
 import { LocalRepository } from '../../repository/local.repository';
+import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class LocalController {
   localRepository = new LocalRepository();
@@ -8,6 +9,7 @@ export class LocalController {
     const parameters: object | any = {};
     let select: any = [];
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterNameLocalCulture) {
         parameters.name_local_culture = JSON.parse(`{ "contains":"${options.filterNameLocalCulture}" }`);
       }

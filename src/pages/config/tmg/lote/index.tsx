@@ -38,6 +38,7 @@ import {
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import { loteService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
+import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
 
@@ -238,10 +239,20 @@ export default function Listagem({
       //   setCurrentPage(0);
       // });
 
+      if (!functionsUtils?.isNumeric(filterYearFrom)) {
+        Swal.fire('O campo Ano não pode ter ponto ou vírgula.');
+        return;
+      }
+      if (!functionsUtils?.isNumeric(filterYearTo)) {
+        Swal.fire('O campo Ano não pode ter ponto ou vírgula.');
+        return;
+      }
+
       const parametersFilter = `&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterWeightTo=${filterWeightTo}&filterWeightFrom=${filterWeightFrom}&filterSeedTo=${filterSeedTo}&filterSeedFrom=${filterSeedFrom}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterGmrFrom=${filterGmrFrom}&filterGmrTo=${filterGmrTo}&filterCodLoteFrom=${filterCodLoteFrom}&filterCodLoteTo=${filterCodLoteTo}&filterNccFrom=${filterNccFrom}&filterNccTo=${filterNccTo}&filterFase=${filterFase}&filterPeso=${filterPeso}&filterSeeds=${filterSeeds}&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterGmr=${filterGmr}&filterBgm=${filterBgm}&filterTecnologiaCod=${filterTecnologiaCod}&filterTecnologiaDesc=${filterTecnologiaDesc}&id_culture=${idCulture}&id_safra=${idSafra}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
+      setLoading(true);
       await callingApi(parametersFilter);
       setLoading(false);
     },
@@ -546,8 +557,35 @@ export default function Listagem({
             'pt-BR',
           )} ${hours}:${minutes}:${seconds}`;
 
+          let dtHours: string;
+          let dtMinutes: string;
+          let dtSeconds: string;
+
+          newItem.dt_export = new Date(newItem.dt_export);
+
+          if (String(newItem.dt_export.getHours()).length === 1) {
+            dtHours = `0${String(newItem.dt_export.getHours())}`;
+          } else {
+            dtHours = String(newItem.dt_export.getHours());
+          }
+          if (String(newItem.dt_export.getMinutes()).length === 1) {
+            dtMinutes = `0${String(newItem.dt_export.getMinutes())}`;
+          } else {
+            dtMinutes = String(newItem.dt_export.getMinutes());
+          }
+          if (String(newItem.dt_export.getSeconds()).length === 1) {
+            dtSeconds = `0${String(newItem.dt_export.getSeconds())}`;
+          } else {
+            dtSeconds = String(newItem.dt_export.getSeconds());
+          }
+
+          newItem.EXPORT = `${newItem.dt_export.toLocaleDateString(
+            'pt-BR',
+          )} ${dtHours}:${dtMinutes}:${dtSeconds}`;
+
           newItem.ID_S2 = item?.id_s2;
           newItem.ID_DADOS = item?.id_dados;
+          newItem.CULTURA = item?.genotipo.culture.name;
           newItem.ANO = item?.year;
           newItem.SAFRA = item?.safra.safraName;
           newItem.COD_LOTE = item?.cod_lote;
@@ -555,12 +593,13 @@ export default function Listagem({
           newItem.FASE = item?.fase;
           newItem.PESO = item?.peso;
           newItem.QUANT_SEMENTES = item?.quant_sementes;
-          newItem.DATA = newItem.DT;
+          newItem.DT_GOM = newItem.DT;
           newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
           newItem.NOME_PRINCIPAL = item?.genotipo.name_main;
           newItem.GMR = item?.genotipo.gmr;
           newItem.BGM = item?.genotipo.bgm;
           newItem.TECNOLOGIA = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
+          newItem.DT_EXPORT = newItem.EXPORT;
 
           delete newItem.quant_sementes;
           delete newItem.peso;
@@ -571,6 +610,8 @@ export default function Listagem({
           delete newItem.id_s2;
           delete newItem.id_dados;
           delete newItem.DT;
+          delete newItem.EXPORT;
+          delete newItem.dt_export;
           delete newItem.id;
           delete newItem.id_genotipo;
           delete newItem.genotipo;
@@ -929,9 +970,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => {
-                        setLoading(true);
-                      }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

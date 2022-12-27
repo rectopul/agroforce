@@ -42,6 +42,7 @@ import {
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import { genotipoService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
+import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
 
@@ -242,10 +243,20 @@ export default function Listagem({
       filterLotsTo,
       filterLotsFrom,
     }) => {
+      if (!functionsUtils?.isNumeric(filterLotsFrom)) {
+        Swal.fire('O campo Lote não pode ter ponto ou vírgula.');
+        return;
+      }
+      if (!functionsUtils?.isNumeric(filterLotsTo)) {
+        Swal.fire('O campo Lote não pode ter ponto ou vírgula.');
+        return;
+      }
+
       const parametersFilter = `&filterGenotipo=${filterGenotipo}&filterMainName=${filterMainName}&filterCruza=${filterCruza}&filterCodTecnologia=${filterCodTecnologia}&filterTecnologiaDesc=${filterTecnologiaDesc}&filterGmr=${filterGmr}&filterGmrRangeFrom=${filterGmrRangeFrom}&filterGmrRangeTo=${filterGmrRangeTo}&filterLotsTo=${filterLotsTo}&filterLotsFrom=${filterLotsFrom}&id_culture=${idCulture}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
+      setLoading(true);
       await callingApi(parametersFilter);
       setLoading(false);
     },
@@ -756,8 +767,6 @@ export default function Listagem({
           row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.name}`;
 
           row.CULTURA = row.culture.desc;
-          row.ID_S1 = row.id_s1;
-          row.ID_DADOS = row.id_dados;
           row.NOME_GENÓTIPO = row.name_genotipo;
           row.NOME_PRINCIPAL = row.name_main;
           row.NOME_PÚBLICO = row.name_public;
@@ -1015,9 +1024,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => {
-                        setLoading(true);
-                      }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

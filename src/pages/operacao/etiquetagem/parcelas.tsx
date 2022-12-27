@@ -669,25 +669,29 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
+
     await experimentGenotipeService
       .getAll(filter)
       .then(({ status, response }) => {
         if (status === 200) {
           const newData = response.map((item: any) => {
             const newItem: any = {};
-
+            newItem.CULTURA = item.safra.culture.name;
+            newItem.SAFRA = item.safra.safraName;
             newItem.FOCO = item.foco.name;
             newItem.ENSAIO = item.type_assay.name;
-            newItem.TECNOLOGIA = item.tecnologia.name;
+            newItem.TECNOLOGIA = `${item.tecnologia.cod_tec} ${item.tecnologia.name}`;
             newItem.GLI = item.gli;
             newItem.EXPERIMENTO = item.experiment.experimentName;
             newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
+            newItem.DELINEAMENTO = item.experiment.delineamento.name;
             newItem.REP = item.rep;
-            newItem.STATUS = item.status;
             newItem.NT = item.nt;
             newItem.NPE = item.npe;
+            newItem.STATUS_T = item.status_t;
             newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
             newItem.NCA = item.nca;
+            newItem.STATUS_EXP = item.experiment.status;
 
             delete newItem.id;
             return newItem;
@@ -730,9 +734,9 @@ export default function Listagem({
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&experimentGroupId=${experimentGroupId}&orderBy=${orderBy}&typeOrder=${orderType}`;
+      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
     } else {
-      parametersFilter = `skip=${skip}&take=${take}&experimentGroupId=${experimentGroupId}`;
+      parametersFilter = `skip=${skip}&take=${take}`;
     }
 
     if (filter) {
@@ -1564,7 +1568,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   // const filterApplication =
   //   req.cookies.filterBeforeEdit ||
   //   `&id_culture=${idCulture}&id_safra=${idSafra}`;
-  const filterApplication = `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const filterApplication = `&id_culture=${idCulture}&id_safra=${idSafra}&experimentGroupId=${experimentGroupId}`;
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 

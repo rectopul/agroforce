@@ -3,6 +3,7 @@ import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { LoteRepository } from '../repository/lote.repository';
 import { GenotipoController } from './genotype/genotipo.controller';
 import { countLotesNumber } from '../shared/utils/counts';
+import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 
 export class LoteController {
   loteRepository = new LoteRepository();
@@ -63,6 +64,7 @@ export class LoteController {
     let orderBy: object | any = '';
     parameters.AND = [];
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterYearFrom || options.filterYearTo) {
         if (options.filterYearFrom && options.filterYearTo) {
           parameters.year = JSON.parse(`{"gte": ${Number(options.filterYearFrom)}, "lte": ${Number(options.filterYearTo)} }`);
@@ -192,6 +194,7 @@ export class LoteController {
             name_main: true,
             gmr: true,
             bgm: true,
+            culture: true,
             tecnologia: {
               select:
               {

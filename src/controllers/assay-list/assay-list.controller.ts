@@ -4,6 +4,7 @@ import { AssayListRepository } from '../../repository/assay-list.repository';
 import { ReporteRepository } from '../../repository/reporte.repository';
 import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';
 import { functionsUtils } from '../../shared/utils/functionsUtils';
+import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class AssayListController {
   assayListRepository = new AssayListRepository();
@@ -17,6 +18,7 @@ export class AssayListController {
     parameters.AND = [];
     let orderBy: object | any;
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterFoco) {
         parameters.foco = JSON.parse(`{ "name": { "contains": "${options.filterFoco}" } }`);
       }
@@ -59,7 +61,7 @@ export class AssayListController {
         id_safra: true,
         type_assay: { select: { name: true } },
         tecnologia: { select: { name: true, cod_tec: true } },
-        safra: { select: { safraName: true } },
+        safra: { select: { safraName: true, culture: true } },
         genotype_treatment: true,
         treatmentsNumber: true,
         gli: true,
