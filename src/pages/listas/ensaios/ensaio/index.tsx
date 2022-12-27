@@ -51,7 +51,7 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
-
+import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 
 export default function TipoEnsaio({
   allAssay,
@@ -191,10 +191,10 @@ export default function TipoEnsaio({
       filterStatusAssay,
     }) => {
       if (!functionsUtils?.isNumeric(filterTratFrom)) {
-        return Swal.fire("O campo Nº de trat não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo Nº de trat não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterTratTo)) {
-        return Swal.fire("O campo Nº de trat não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo Nº de trat não pode ter ponto ou vírgula.');
       }
 
       setLoading(true);

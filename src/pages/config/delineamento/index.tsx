@@ -45,7 +45,7 @@ import * as ITabs from '../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../helpers';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../components/Loading';
-
+import { functionsUtils } from '../../../shared/utils/functionsUtils';
 
 interface IDelineamentoProps {
   id: number | any;
@@ -216,19 +216,19 @@ export default function Listagem({
       filterTratRepetitionFrom,
     }) => {
       if (!functionsUtils?.isNumeric(filterRepetitionFrom)) {
-        return Swal.fire("O campo Repetição não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo Repetição não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterRepetitionTo)) {
-        return Swal.fire("O campo Repetição não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo Repetição não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterTratRepetitionFrom)) {
         return Swal.fire(
-          "O campo Trat Repetição não pode ter ponto ou vírgula."
+          'O campo Trat Repetição não pode ter ponto ou vírgula.',
         );
       }
       if (!functionsUtils?.isNumeric(filterTratRepetitionTo)) {
         return Swal.fire(
-          "O campo Trat Repetição não pode ter ponto ou vírgula."
+          'O campo Trat Repetição não pode ter ponto ou vírgula.',
         );
       }
 

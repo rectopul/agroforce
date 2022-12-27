@@ -43,7 +43,7 @@ import ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
-
+import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 
 interface IFilter {
   filterFoco: string;
@@ -243,13 +243,13 @@ export default function Listagem({
       filterRepetitionFrom,
     }) => {
       if (!functionsUtils?.isNumeric(filterPeriod)) {
-        return Swal.fire("O campo Época não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo Época não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterRepetitionFrom)) {
-        return Swal.fire("O campo Rep não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo Rep não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterRepetitionTo)) {
-        return Swal.fire("O campo Rep não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo Rep não pode ter ponto ou vírgula.');
       }
 
       const allCheckBox: any = document.querySelectorAll(

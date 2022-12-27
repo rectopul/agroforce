@@ -50,7 +50,7 @@ import { typeAssayService, userPreferencesService } from '../../../../services';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
-
+import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 
 interface ITypeAssayProps {
   id: number;
@@ -206,12 +206,12 @@ export default function TipoEnsaio({
     }) => {
       if (!functionsUtils?.isNumeric(filterSeedsFrom)) {
         return Swal.fire(
-          "O campo Quantidade de Sementes não pode ter ponto ou vírgula."
+          'O campo Quantidade de Sementes não pode ter ponto ou vírgula.',
         );
       }
       if (!functionsUtils?.isNumeric(filterSeedsTo)) {
         return Swal.fire(
-          "O campo Quantidade de Sementes não pode ter ponto ou vírgula."
+          'O campo Quantidade de Sementes não pode ter ponto ou vírgula.',
         );
       }
 

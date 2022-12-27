@@ -59,7 +59,7 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
-
+import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 
 export default function Listagem({
   // assaySelect,
@@ -299,22 +299,22 @@ export default function Listagem({
       filterPlacingPlace,
     }) => {
       if (!functionsUtils?.isNumeric(filterRepFrom)) {
-        return Swal.fire("O campo REP EXP não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo REP EXP não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterRepTo)) {
-        return Swal.fire("O campo REP EXP não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo REP EXP não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterNtFrom)) {
-        return Swal.fire("O campo NT não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo NT não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterNtTo)) {
-        return Swal.fire("O campo NT não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo NT não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterNpeFrom)) {
-        return Swal.fire("O campo NPE não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo NPE não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterNpeTo)) {
-        return Swal.fire("O campo NPE não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo NPE não pode ter ponto ou vírgula.');
       }
 
       const allCheckBox: any = document.querySelectorAll(

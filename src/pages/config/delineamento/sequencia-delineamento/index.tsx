@@ -50,7 +50,7 @@ import ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
-
+import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 
 interface IFilter {
   filterStatus: object | any;
@@ -200,28 +200,28 @@ export default function Listagem({
       filterBlockFrom,
     }) => {
       if (!functionsUtils?.isNumeric(filterRepetitionFrom)) {
-        return Swal.fire("O campo Repetição não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo Repetição não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterRepetitionTo)) {
-        return Swal.fire("O campo Repetição não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo Repetição não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterOrderFrom)) {
-        return Swal.fire("O campo Ordem não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo Ordem não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterOrderTo)) {
-        return Swal.fire("O campo Ordem não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo Ordem não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterNtFrom)) {
-        return Swal.fire("O campo NT não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo NT não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterNtFrom)) {
-        return Swal.fire("O campo NT não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo NT não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterBlockFrom)) {
-        return Swal.fire("O campo Bloco não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo Bloco não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterBlockTo)) {
-        return Swal.fire("O campo Bloco não pode ter ponto ou vírgula.");
+        return Swal.fire('O campo Bloco não pode ter ponto ou vírgula.');
       }
 
       const parametersFilter = `&filterSearch=${filterSearch}&filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterOrderTo=${filterOrderTo}&filterOrderFrom=${filterOrderFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterBlockTo=${filterBlockTo}&filterBlockFrom=${filterBlockFrom}&id_delineamento=${idDelineamento}`;
