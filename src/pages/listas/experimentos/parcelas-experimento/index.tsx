@@ -782,11 +782,10 @@ export default function Listagem({
         if (status === 200) {
           const newData = response.map((item: any) => {
             const newItem: any = {};
-            newItem.CULTURA = item.safra.culture.name;
             newItem.SAFRA = item.safra.safraName;
             newItem.FOCO = item.foco.name;
             newItem.ENSAIO = item.type_assay.name;
-            newItem.TECNOLOGIA = `${item.tecnologia.cod_tec} ${item.tecnologia.name}`;
+            newItem.TECNOLOGIA = item.tecnologia.cod_tec;
             newItem.GLI = item.gli;
             newItem.EXPERIMENTO = item.experiment.experimentName;
             newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
@@ -884,6 +883,14 @@ export default function Listagem({
       filtersParams,
     );
     return parameter;
+  }
+
+  function selectableFilter(rowData: any) {
+    if (isOpenModal || rowData?.status === 'IMPRESSO') {
+      return false;
+    }
+
+    return true;
   }
 
   async function readExcel(value: any) {
@@ -1419,7 +1426,14 @@ export default function Listagem({
               data={treatments}
               options={{
                 selection: true,
-                selectionProps: (rowData: any) => isOpenModal && { disabled: rowData },
+                selectionProps: (rowData: any) => {
+                  const selectable = selectableFilter(rowData);
+                  rowData.tableData.disabled = !selectable;
+                  return {
+                    disabled: !selectable,
+                  };
+                },
+                // selectionProps: (rowData: any) => isOpenModal && { disabled: rowData },
                 showTitle: false,
                 headerStyle: {
                   zIndex: 0,

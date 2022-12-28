@@ -605,6 +605,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
         response.map((item: any) => {
           const newItem = item;
 
+          newItem.CULTURA = item.safra.culture.name;
           newItem.SAFRA = item.safra.safraName;
           newItem.GRUPO = item.name;
           newItem.QTDE_EXP = item.experimentAmount;

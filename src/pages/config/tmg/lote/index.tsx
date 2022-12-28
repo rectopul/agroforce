@@ -583,8 +583,6 @@ export default function Listagem({
             'pt-BR',
           )} ${dtHours}:${dtMinutes}:${dtSeconds}`;
 
-          newItem.ID_S2 = item?.id_s2;
-          newItem.ID_DADOS = item?.id_dados;
           newItem.CULTURA = item?.genotipo.culture.name;
           newItem.ANO = item?.year;
           newItem.SAFRA = item?.safra.safraName;
