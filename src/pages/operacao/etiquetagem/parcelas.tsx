@@ -304,6 +304,8 @@ export default function Listagem({
       // const filterStatusT = selecionados.substr(0, selecionados.length - 1);
       const filterStatus = statusFilterSelected?.join(",");
 
+      setLoading(true);
+
       // Call filter with there parameter
       const parametersFilter = await tableGlobalFunctions.handleFilterParameter(
         "parcelas",
@@ -340,7 +342,9 @@ export default function Listagem({
           tableRef.current.dataManager.changePageSize(
             itemsTotal >= take ? take : itemsTotal
           );
-        });
+          setLoading(false);
+        })
+        .catch((e) => setLoading(false));
     },
   });
 
@@ -1012,6 +1016,8 @@ export default function Listagem({
       <Head>
         <title>Listagem de parcelas</title>
       </Head>
+
+      {loading && <LoadingComponent text="" />}
 
       {isLoading && (
         <LoadingComponent text="Gerando etiquetas para impressão..." />

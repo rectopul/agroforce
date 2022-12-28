@@ -61,9 +61,10 @@ export default function NovoTipoEnsaio() {
         Swal.fire(
           "Preencha todos os campos obrigatórios destacados em vermelho."
         );
-        setLoading(false);
         return;
       }
+
+      setLoading(true);
 
       await typeAssayService
         .create({
@@ -82,7 +83,8 @@ export default function NovoTipoEnsaio() {
             setLoading(false);
             Swal.fire(response.message);
           }
-        });
+        })
+        .catch((e) => setLoading(false));
     },
   });
 
@@ -90,10 +92,11 @@ export default function NovoTipoEnsaio() {
 
   return (
     <>
-      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Novo Tipo Ensaio</title>
       </Head>
+
+      {loading && <ComponentLoading />}
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
@@ -146,9 +149,7 @@ export default function NovoTipoEnsaio() {
                 bgColor="bg-blue-600"
                 icon={<RiOrganizationChart size={18} />}
                 textColor="white"
-                onClick={() => {
-                  setLoading(true);
-                }}
+                onClick={() => {}}
               />
             </div>
           </div>

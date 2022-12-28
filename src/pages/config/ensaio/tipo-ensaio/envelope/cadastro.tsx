@@ -10,6 +10,7 @@ import { GetServerSideProps } from "next";
 import getConfig from "next/config";
 import { envelopeService } from "src/services";
 import { Button, Content, Select, Input } from "../../../../../components";
+import ComponentLoading from "../../../../../components/Loading";
 import * as ITabs from "../../../../../shared/utils/dropdown";
 
 interface ICreateTypeAssay {
@@ -31,6 +32,8 @@ export default function Cadastro({ safra, id_type_assay }: any) {
   const router = useRouter();
   const [checkInput, setCheckInput] = useState("text-black");
 
+  const [loading, setLoading] = useState<boolean>(false);
+
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
 
   const formik = useFormik<ICreateTypeAssay>({
@@ -49,6 +52,8 @@ export default function Cadastro({ safra, id_type_assay }: any) {
         return;
       }
 
+      setLoading(true);
+
       await envelopeService
         .create({
           id_safra: Number(safra.id),
@@ -59,11 +64,14 @@ export default function Cadastro({ safra, id_type_assay }: any) {
         .then((response) => {
           if (response.status === 200) {
             Swal.fire("Envelope cadastrado com sucesso!");
+            setLoading(false);
             router.back();
           } else {
             Swal.fire(response.message);
+            setLoading(false);
           }
-        });
+        })
+        .catch((e) => setLoading(false));
     },
   });
 
@@ -82,6 +90,8 @@ export default function Cadastro({ safra, id_type_assay }: any) {
       <Head>
         <title>Novo Envelope</title>
       </Head>
+
+      {loading && <ComponentLoading />}
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
