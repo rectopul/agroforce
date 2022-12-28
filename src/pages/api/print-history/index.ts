@@ -1,28 +1,23 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { NpeController } from '../../../controllers/npe/npe.controller';
+import { PrintHistoryController } from '../../../controllers/print-history/print-history.controller';
 import { apiHandler } from '../../../helpers/api';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const npeController = new NpeController();
+  const printHistoryController = new PrintHistoryController();
   switch (req.method) {
     case 'GET': {
-      const result = await npeController.getAll(req.query);
+      const result = await printHistoryController.getAll(req.query);
       res.status(200).json(result);
       break;
     }
     case 'POST': {
-      const resultPost = await npeController.create(req.body);
+      const resultPost = await printHistoryController.create(req.body);
       res.status(200).json(resultPost);
       break;
     }
     case 'PUT': {
-      const resultPut = await npeController.update(req.body);
+      const resultPut = await printHistoryController.update(req.body);
       res.status(200).json(resultPut);
-      break;
-    }
-    case 'DELETE': {
-      const resultDelete = await npeController.delete(req.body);
-      res.status(200).json(resultDelete);
       break;
     }
     default:
