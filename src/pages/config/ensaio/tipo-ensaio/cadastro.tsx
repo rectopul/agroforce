@@ -1,19 +1,17 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { capitalize } from '@mui/material';
-import { useFormik } from 'formik';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { IoMdArrowBack } from 'react-icons/io';
-import { RiOrganizationChart } from 'react-icons/ri';
-import Swal from 'sweetalert2';
-import { useState } from 'react';
-import { typeAssayService } from '../../../../services/tipo-ensaio.service';
-import {
-  Button, Content, Input, Select,
-} from '../../../../components';
-import * as ITabs from '../../../../shared/utils/dropdown';
-import ComponentLoading from '../../../../components/Loading';
+import { capitalize } from "@mui/material";
+import { useFormik } from "formik";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { IoMdArrowBack } from "react-icons/io";
+import { RiOrganizationChart } from "react-icons/ri";
+import Swal from "sweetalert2";
+import { useState } from "react";
+import { typeAssayService } from "../../../../services/tipo-ensaio.service";
+import { Button, Content, Input, Select } from "../../../../components";
+import * as ITabs from "../../../../shared/utils/dropdown";
+import ComponentLoading from "../../../../components/Loading";
 
 interface ITypeAssayProps {
   id_culture: number;
@@ -30,35 +28,39 @@ export default function NovoTipoEnsaio() {
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === "ENSAIO" ? (tab.statusTab = true) : (tab.statusTab = false)
+  );
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
 
   const router = useRouter();
 
   function validateInputs(values: any) {
     if (!values.name) {
-      const inputName: any = document.getElementById('name');
-      inputName.style.borderColor = 'red';
+      const inputName: any = document.getElementById("name");
+      inputName.style.borderColor = "red";
     } else {
-      const inputName: any = document.getElementById('name');
-      inputName.style.borderColor = '';
+      const inputName: any = document.getElementById("name");
+      inputName.style.borderColor = "";
     }
   }
 
   const formik = useFormik<ITypeAssayProps>({
     initialValues: {
       id_culture: Number(culture),
-      name: '',
-      protocolName: 'Avanço',
+      name: "",
+      protocolName: "Avanço",
       created_by: userLogado.id,
       status: 1,
     },
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name) {
-        Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
+        Swal.fire(
+          "Preencha todos os campos obrigatórios destacados em vermelho."
+        );
         setLoading(false);
         return;
       }
@@ -66,14 +68,14 @@ export default function NovoTipoEnsaio() {
       await typeAssayService
         .create({
           id_culture: Number(culture),
-          name: capitalize(values.name),
+          name: capitalize(values.name?.trim()),
           protocol_name: values.protocolName,
           created_by: Number(userLogado.id),
           status: 1,
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire('Tipo de Ensaio cadastrado com sucesso!');
+            Swal.fire("Tipo de Ensaio cadastrado com sucesso!");
             setLoading(false);
             router.back();
           } else {
@@ -84,7 +86,7 @@ export default function NovoTipoEnsaio() {
     },
   });
 
-  const protocols = [{ name: 'Avanço' }, { name: 'Produtividade' }];
+  const protocols = [{ name: "Avanço" }, { name: "Produtividade" }];
 
   return (
     <>
@@ -144,7 +146,9 @@ export default function NovoTipoEnsaio() {
                 bgColor="bg-blue-600"
                 icon={<RiOrganizationChart size={18} />}
                 textColor="white"
-                onClick={() => { setLoading(true); }}
+                onClick={() => {
+                  setLoading(true);
+                }}
               />
             </div>
           </div>
