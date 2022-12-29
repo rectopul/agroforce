@@ -184,6 +184,16 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
         userId: user.id, module_id: 29,
       });
       preferences.etiquetagem = preferences.etiquetagem.response[0];
+
+      preferences.parcelas = await PreferencesControllers.getAll({
+        userId: user.id, module_id: 30,
+      });
+      preferences.parcelas = preferences.parcelas.response[0];
+
+      preferences.historico_etiquetagem = await PreferencesControllers.getAll({
+        userId: user.id, module_id: 31,
+      });
+      preferences.historico_etiquetagem = preferences.historico_etiquetagem.response[0];
     }
 
     if (!user) throw new Error('Login ou senha é invalida!');

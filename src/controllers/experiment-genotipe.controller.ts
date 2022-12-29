@@ -5,6 +5,7 @@ import { ExperimentGroupController } from './experiment-group/experiment-group.c
 import { ExperimentController } from './experiment/experiment.controller';
 import { PrintHistoryController } from './print-history/print-history.controller';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
+import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 
 export class ExperimentGenotipeController {
   private ExperimentGenotipeRepository = new ExperimentGenotipeRepository();
@@ -20,6 +21,7 @@ export class ExperimentGenotipeController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterFoco) {
         parameters.foco = JSON.parse(
           `{ "name": { "contains": "${options.filterFoco}" } }`,
@@ -206,7 +208,7 @@ export class ExperimentGenotipeController {
 
       const select = {
         id: true,
-        safra: { select: { safraName: true } },
+        safra: { select: { safraName: true, culture: true } },
         foco: { select: { name: true } },
         type_assay: { select: { name: true, envelope: true } },
         tecnologia: { select: { name: true, cod_tec: true } },
@@ -248,6 +250,7 @@ export class ExperimentGenotipeController {
                 safra: {
                   select: {
                     safraName: true,
+                    culture: true,
                   },
                 },
               },
@@ -423,7 +426,7 @@ export class ExperimentGenotipeController {
         response.experimentGroupId,
         parcelas?.idExperiment,
       );
-      await this.printedHistoryController.create({ idList, userId });
+      await this.printedHistoryController.create({ idList, userId, status });
     } catch (error: any) {
       handleError('Parcelas controller', 'Update', error.message);
       throw new Error('[Controller] - Update Parcelas erro');
@@ -432,17 +435,11 @@ export class ExperimentGenotipeController {
 
   async deleteAll(idExperiment: number) {
     try {
-      const { response: parcelas }: any = await this.getAll({ idExperiment });
-      const toDelete = parcelas.map((item: any) => item.id);
-      const { status } = await this.printedHistoryController.deleteAll(toDelete);
-      if (status === 200) {
-        const response = await this.ExperimentGenotipeRepository.deleteAll(Number(idExperiment));
-        if (response) {
-          return { status: 200, message: 'Parcelas excluídos' };
-        }
-        return { status: 400, message: 'Parcelas não excluídos' };
+      const response = await this.ExperimentGenotipeRepository.deleteAll(Number(idExperiment));
+      if (response) {
+        return { status: 200, message: 'Parcelas excluídos' };
       }
-      return { status: 400, message: 'Histórico de importação não excluídos' };
+      return { status: 400, message: 'Parcelas não excluídos' };
     } catch (error: any) {
       handleError('Parcelas controller', 'DeleteAll', error.message);
       throw new Error('[Controller] - DeleteAll Parcelas erro');

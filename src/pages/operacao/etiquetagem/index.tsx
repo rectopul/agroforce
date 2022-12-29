@@ -48,6 +48,7 @@ import {
   userPreferencesService,
 } from '../../../services';
 import * as ITabs from '../../../shared/utils/dropdown';
+import { functionsUtils } from '../../../shared/utils/functionsUtils';
 import {
   IExperimentGroupFilter,
   IExperimentsGroup,
@@ -349,26 +350,27 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   async function deleteConfirmItem(item: any) {
     setItemSelectedDelete(item);
     setIsOpenModalConfirm(true);
-    setLoading(false);
   }
 
   async function deleteItem() {
-    setIsLoading(true);
     setIsOpenModalConfirm(false);
+    setIsLoading(true);
 
     const { status, message } = await experimentGroupService.deleted(
       itemSelectedDelete?.id,
     );
     if (status === 200) {
-      router.reload();
+      // router.reload();
+      handlePagination();
+      handleTotalPages();
+      setLoading(false);
     } else {
       Swal.fire({
         html: message,
         width: '800',
       });
+      setLoading(false);
     }
-
-    setIsLoading(false);
   }
 
   // function headerTableFactory(name: string, title: string) {
@@ -444,7 +446,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
               title={`Excluir ${rowData.name}`}
               type="button"
               onClick={() => {
-                deleteConfirmItem(rowData), setLoading(true);
+                deleteConfirmItem(rowData);
               }}
               rounder="rounded-full"
               bgColor={
@@ -600,13 +602,35 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     setLoading(true);
     await experimentGroupService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
+        response.map((item: any) => {
+          const newItem = item;
+
+          newItem.SAFRA = item.safra.safraName;
+          newItem.GRUPO = item.name;
+          newItem.QTDE_EXP = item.experimentAmount;
+          newItem.ETIQ_A_IMPRIMIR = item.tagsToPrint;
+          newItem.ETIQ_IMPRESSAS = item.tagsPrinted;
+          newItem.TOTAL_ETIQUETAS = item.totalTags;
+          newItem.STATUS = item.status;
+
+          delete newItem.id;
+          delete newItem.safraId;
+          delete newItem.safra;
+          delete newItem.name;
+          delete newItem.experimentAmount;
+          delete newItem.tagsToPrint;
+          delete newItem.tagsPrinted;
+          delete newItem.totalTags;
+          delete newItem.status;
+          delete newItem.experiment;
+          delete newItem.created_at;
+          delete newItem.updated_at;
+          delete newItem.createdBy;
+          return newItem;
+        });
         const workSheet = XLSX.utils.json_to_sheet(response);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(
-          workBook,
-          workSheet,
-          'Grupos do experimento',
-        );
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'grupos-de-experimento');
 
         // Buffer
         XLSX.write(workBook, {
@@ -1238,123 +1262,54 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  // const PreferencesControllers = new UserPreferenceController();
-  // const itensPerPage = await (
-  //   await PreferencesControllers.getConfigGerais()
-  // )?.response[0]?.itens_per_page;
-
-  // const pageBeforeEdit = req.cookies.pageBeforeEdit
-  //   ? req.cookies.pageBeforeEdit
-  //   : 0;
-
-  // const { token } = req.cookies;
-  // const { safraId } = req.cookies;
-  // const { cultureId } = req.cookies;
-  // const { publicRuntimeConfig } = getConfig();
-  // const baseUrlExperimentGroup = `${publicRuntimeConfig.apiUrl}/experiment-group`;
-
-  // const filterBeforeEdit = req.cookies.filterBeforeEdit
-  //   ? req.cookies.filterBeforeEdit
-  //   : `safraId=${safraId}&id_culture=${cultureId}`;
-  // //Last page
-  // const lastPageServer = req.cookies.lastPage
-  // ? req.cookies.lastPage
-  // : "No";
-
-  // // if(lastPageServer == undefined || lastPageServer == "No"){
-  // //   removeCookies('filterBeforeEditOperation', { req, res });
-  // //   removeCookies('pageBeforeEditOperation', { req, res });
-  // //   removeCookies("filterBeforeEditTypeOrder", { req, res });
-  // //   removeCookies("filterBeforeEditOrderBy", { req, res });
-  // //   removeCookies("lastPage", { req, res });
-  // // }
-
-  // //RR
-  // const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
-  // ? req.cookies.filterBeforeEditTypeOrder
-  // : "desc";
-
-  // //RR
-  // const orderByserver = req.cookies.filterBeforeEditOrderBy
-  // ? req.cookies.filterBeforeEditOrderBy
-  // : "name";
-
-  // const filterApplication = req.cookies.filterBeforeEdit || `safraId=${safraId}&id_culture=${cultureId}`;
-
-  // // removeCookies('filterBeforeEditOperation', { req, res });
-  // // removeCookies('pageBeforeEditOperation', { req, res });
-
-  // // //RR
-  // // removeCookies("filterBeforeEditTypeOrder", { req, res });
-  // // removeCookies("filterBeforeEditOrderBy", { req, res });
-  // // removeCookies("lastPage", { req, res });
-
-  // const param = `&safraId=${safraId}&id_culture=${cultureId}`;
-
-  // const urlExperimentGroup: any = new URL(baseUrlExperimentGroup);
-  // urlExperimentGroup.search = new URLSearchParams(param).toString();
-  // const requestOptions = {
-  //   method: 'GET',
-  //   credentials: 'include',
-  //   headers: { Authorization: `Bearer ${token}` },
-  // } as RequestInit | undefined;
-
-  // const { response: allExperimentGroup = [], total: totalItems = 0 } = await fetch(
-  //   urlExperimentGroup.toString(),
-  //   requestOptions,
-  // ).then((response) => response.json());
-
-  const PreferencesControllers = new UserPreferenceController();
-  // eslint-disable-next-line max-len
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) ?? 10;
-
   const { token } = req.cookies;
+  const idSafra: any = req.cookies.safraId;
   const { cultureId } = req.cookies;
 
-  const idSafra = Number(req.cookies.safraId);
-  const pageBeforeEdit = req.cookies.pageBeforeEditOperation
-    ? req.cookies.pageBeforeEditOperation
-    : 0;
-
   // Last page
-  const lastPageServer = req.cookies.lastPageOperation
-    ? req.cookies.lastPageOperation
-    : 'No';
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
   if (lastPageServer == undefined || lastPageServer == 'No') {
-    removeCookies('filterBeforeEditOperation', { req, res });
-    removeCookies('pageBeforeEditOperation', { req, res });
-    removeCookies('filterBeforeEditTypeOrderOperation', { req, res });
-    removeCookies('filterBeforeEditOrderByOperation', { req, res });
-    removeCookies('lastPageOperation', { req, res });
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
   }
 
-  const filterBeforeEdit = req.cookies.filterBeforeEditOperation
-    ? req.cookies.filterBeforeEditOperation
+  const pageBeforeEdit = req.cookies.pageBeforeEdit
+    ? req.cookies.pageBeforeEdit
+    : 0;
+
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
+    : 10;
+
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
     : `safraId=${idSafra}&id_culture=${cultureId}`;
 
-  const filterApplication = req.cookies.filterBeforeEditOperation
-    ? `${req.cookies.filterBeforeEditOperation}`
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? `${req.cookies.filterBeforeEdit}`
     : `safraId=${idSafra}&id_culture=${cultureId}`;
 
-  const typeOrderServer = req.cookies.filterBeforeEditTypeOrderOperation
-    ? req.cookies.filterBeforeEditTypeOrderOperation
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+    ? req.cookies.filterBeforeEditTypeOrder
     : 'desc';
 
-  const orderByserver = req.cookies.filterBeforeEditOrderByOperation
-    ? req.cookies.filterBeforeEditOrderByOperation
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
     : 'experimentAmount';
 
-  // removeCookies("filterBeforeEditOperation", { req, res });
-  // removeCookies("pageBeforeEditOperation", { req, res });
-  // removeCookies("filterBeforeEditTypeOrderOperation", { req, res });
-  // removeCookies("filterBeforeEditOrderByOperation", { req, res });
-  // removeCookies("lastPageOperation", { req, res });
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('takeBeforeEdit', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/experiment`;
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/experiment-group`;
 
   const param = `skip=0&take=${itensPerPage}&safraId=${idSafra}&id_culture=${cultureId}`;
 
@@ -1365,7 +1320,10 @@ export const getServerSideProps: GetServerSideProps = async ({
     credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
-  const { response: allExperimentGroup = [], total: totalItems = 0 } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
+  const {
+    response: allExperimentGroup = [],
+    total: totalItems = 0,
+  } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
 
   const safraId = idSafra;
 

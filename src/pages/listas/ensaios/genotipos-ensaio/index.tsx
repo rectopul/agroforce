@@ -58,6 +58,7 @@ import {
   userPreferencesService,
 } from '../../../../services';
 import * as ITabs from '../../../../shared/utils/dropdown';
+import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
@@ -273,6 +274,19 @@ export default function Listagem({
       // filterStatus,
       filterCodTec,
     }) => {
+      if (!functionsUtils?.isNumeric(filterBgmFrom)) {
+        return Swal.fire('O campo BGM_Ens não pode ter ponto ou vírgula.');
+      }
+      if (!functionsUtils?.isNumeric(filterBgmTo)) {
+        return Swal.fire('O campo BGM_Ens não pode ter ponto ou vírgula.');
+      }
+      if (!functionsUtils?.isNumeric(filterNtFrom)) {
+        return Swal.fire('O campo NT não pode ter ponto ou vírgula.');
+      }
+      if (!functionsUtils?.isNumeric(filterNtTo)) {
+        return Swal.fire('O campo NT não pode ter ponto ou vírgula.');
+      }
+
       const allCheckBox: any = document.querySelectorAll(
         "input[name='StatusCheckbox']",
       );
@@ -1447,9 +1461,7 @@ export default function Listagem({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {
-                        setLoading(true);
-                      }}
+                      onClick={() => {}}
                       value="Filtrar"
                       type="submit"
                       bgColor="bg-blue-600"

@@ -5,6 +5,7 @@ import { ReporteRepository } from '../../repository/reporte.repository';
 import { GroupController } from '../group.controller';
 import { prisma } from '../../pages/api/db/db';
 import { ExperimentController } from '../experiment/experiment.controller';
+import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 // import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class NpeController {
@@ -17,13 +18,12 @@ export class NpeController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: object | any) {
-    console.log('🚀 ~ file: npe.controller.ts:19 ~ NpeController ~ getAll ~ options', options);
     const parameters: object | any = {};
     parameters.AND = [];
     let orderBy: object | any;
     let select: any = [];
     try {
-      // options = await removeEspecialAndSpace(options);
+      options = await removeEspecialAndSpace(options);
       if (options.filterStatus) {
         if (options.filterStatus !== '2') {
           if (options.filterStatus == '1') {
@@ -158,7 +158,7 @@ export class NpeController {
           localId: true,
           prox_npe: true,
           local: { select: { name_local_culture: true } },
-          safra: { select: { safraName: true } },
+          safra: { select: { safraName: true, culture: true } },
           foco: { select: { name: true, id: true } },
           epoca: true,
           tecnologia: { select: { name: true, id: true, cod_tec: true } },
@@ -273,6 +273,7 @@ export class NpeController {
   }
 
   async update(data: any) {
+    console.log('🚀 ~ file: npe.controller.ts:276 ~ NpeController ~ update ~ data', data);
     try {
       if (data) {
         const operation = data.status === 1 ? 'Ativação' : 'Inativação';

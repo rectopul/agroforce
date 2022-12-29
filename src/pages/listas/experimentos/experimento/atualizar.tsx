@@ -551,45 +551,64 @@ export default function AtualizarLocal({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    if (!filterApplication.includes('paramSelect')) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_experimento=${idExperiment}`;
-    }
-    // await materiaisService.getAll(filterApplication).then((response) => {
-    //   if (response.status === 200) {
-    //     const newData = response.response.map((row: { status: any }) => {
-    //       if (row.status === 0) {
-    //         row.status = 'Inativo';
-    //       } else {
-    //         row.status = 'Ativo';
-    //       }
+    // const newResponse: any = [];
+    // let newTake = 500;
+    // while (newTake < total) {
+    //   experimentGenotipeService.getAll(`${filter}&take=${newTake}&skip=${Number(newTake - 500)}`).then(({ response }: any) => {
+    //     newResponse.push(response);
+    //   });
+    //   newTake += 500;
+    //   console.log(newResponse);
+    // }
+    await experimentGenotipeService
+      .getAll(filter)
+      .then(({ status, response }) => {
+        if (status === 200) {
+          const newData = response.map((item: any) => {
+            const newItem: any = {};
+            newItem.CULTURA = item.safra.culture.name;
+            newItem.SAFRA = item.safra.safraName;
+            newItem.FOCO = item.foco.name;
+            newItem.ENSAIO = item.type_assay.name;
+            newItem.TECNOLOGIA = `${item.tecnologia.cod_tec} ${item.tecnologia.name}`;
+            newItem.GLI = item.gli;
+            newItem.EXPERIMENTO = item.experiment.experimentName;
+            newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
+            newItem.DELINEAMENTO = item.experiment.delineamento.name;
+            newItem.REP = item.rep;
+            newItem.NT = item.nt;
+            newItem.NPE = item.npe;
+            newItem.STATUS_T = item.status_t;
+            newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
+            newItem.NCA = item.nca;
+            newItem.STATUS_EXP = item.experiment.status;
 
-    //       return row;
-    //     });
+            delete newItem.id;
+            return newItem;
+          });
+          const workSheet = XLSX.utils.json_to_sheet(newData);
+          const workBook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'Parcelas');
 
-    //     newData.map((item: any) => {
-    //       item.foco = item.foco?.name;
-    //       item.safra = item.safra?.safraName;
-    //       return item;
-    //     });
-
-    //     const workSheet = XLSX.utils.json_to_sheet(newData);
-    //     const workBook = XLSX.utils.book_new();
-    //     XLSX.utils.book_append_sheet(workBook, workSheet, 'materiais');
-
-    //     // Buffer
-    //     XLSX.write(workBook, {
-    //       bookType: 'xlsx', // xlsx
-    //       type: 'buffer',
-    //     });
-    //     // Binary
-    //     XLSX.write(workBook, {
-    //       bookType: 'xlsx', // xlsx
-    //       type: 'binary',
-    //     });
-    //     // Download
-    //     XLSX.writeFile(workBook, 'unidade-cultura.xlsx');
-    //   }
-    // });
+          // Buffer
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
+          });
+          // Binary
+          XLSX.write(workBook, {
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
+          });
+          // Download
+          XLSX.writeFile(workBook, 'Parcelas.xlsx');
+        } else {
+          setLoading(false);
+          Swal.fire(
+            'Não existem registros para serem exportados, favor checar.',
+          );
+        }
+      });
     setLoading(false);
   };
 

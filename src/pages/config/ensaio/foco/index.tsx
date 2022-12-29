@@ -48,6 +48,7 @@ import { UserPreferenceController } from '../../../../controllers/user-preferenc
 import { userPreferencesService } from '../../../../services';
 import { focoService } from '../../../../services/foco.service';
 import ITabs from '../../../../shared/utils/dropdown';
+import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
@@ -181,10 +182,23 @@ export default function Listagem({
       //     setCurrentPage(0);
       //   });
 
-      const parametersFilter = `filterStatus=${filterStatus || 1
-        }&filterSearch=${filterSearch}&filterGroupTo=${filterGroupTo}&filterGroupFrom=${filterGroupFrom}&id_culture=${cultureId}&id_safra=${safraId}`;
+      if (!functionsUtils?.isNumeric(filterGroupFrom)) {
+        return Swal.fire(
+          'O campo Faixa de grupos não pode ter ponto ou vírgula.',
+        );
+      }
+      if (!functionsUtils?.isNumeric(filterGroupTo)) {
+        return Swal.fire(
+          'O campo Faixa de grupos não pode ter ponto ou vírgula.',
+        );
+      }
+
+      const parametersFilter = `filterStatus=${
+        filterStatus || 1
+      }&filterSearch=${filterSearch}&filterGroupTo=${filterGroupTo}&filterGroupFrom=${filterGroupFrom}&id_culture=${cultureId}&id_safra=${safraId}`;
       setFilter(parametersFilter);
       setCurrentPage(0);
+      setLoading(true);
       await callingApi(parametersFilter);
       setLoading(false);
     },
@@ -524,6 +538,8 @@ export default function Listagem({
           } else {
             row.status = 'Ativo' as any;
           }
+
+          row.CULTURA = row?.culture?.name;
           row.NOME = row?.name;
           row.GRUPO = row?.group.group;
           row.STATUS = row?.status;
@@ -533,6 +549,7 @@ export default function Listagem({
           delete row.status;
           delete row.id_culture;
           delete row.tableData;
+          delete row.culture;
           delete row.id;
 
           return row;
@@ -702,9 +719,7 @@ export default function Listagem({
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
-                      onClick={() => {
-                        setLoading(true);
-                      }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

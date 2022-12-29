@@ -2,6 +2,7 @@ import handleError from '../../shared/utils/handleError';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { QuadraRepository } from '../../repository/quadra.repository';
 import { ReporteRepository } from '../../repository/reporte.repository';
+import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class QuadraController {
   quadraRepository = new QuadraRepository();
@@ -13,6 +14,7 @@ export class QuadraController {
     let orderBy: object | any;
     let select: any = [];
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }

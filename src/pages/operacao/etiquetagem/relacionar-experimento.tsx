@@ -58,6 +58,7 @@ import {
   userPreferencesService,
 } from '../../../services';
 import * as ITabs from '../../../shared/utils/dropdown';
+import { functionsUtils } from '../../../shared/utils/functionsUtils';
 import { IReturnObject } from '../../../interfaces/shared/Import.interface';
 // import { fetchWrapper } from "../../../helpers";
 import { IExperiments } from '../../../interfaces/listas/experimento/experimento.interface';
@@ -202,6 +203,10 @@ export default function Listagem({
       filterDelineamento,
       filterRepetition,
     }) => {
+      if (!functionsUtils?.isNumeric(filterPeriod)) {
+        return Swal.fire('O campo Época não pode ter ponto ou vírgula.');
+      }
+
       const allCheckBox: any = document.querySelectorAll(
         "input[name='StatusCheckbox']",
       );
@@ -249,6 +254,7 @@ export default function Listagem({
       const filterStatus = 'SORTEADO';
       const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterCod=${filterCod}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterExperimentStatus=SORTEADO`;
 
+      setLoading(true);
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
@@ -274,6 +280,7 @@ export default function Listagem({
             itemsTotal >= take ? take : itemsTotal,
           );
         }
+        setLoading(false);
       })
       .catch((_) => {
         setLoading(false);

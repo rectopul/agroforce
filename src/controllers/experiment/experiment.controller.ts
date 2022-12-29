@@ -8,6 +8,7 @@ import { functionsUtils } from '../../shared/utils/functionsUtils';
 import { IReturnObject } from '../../interfaces/shared/Import.interface';
 import { ExperimentGroupController } from '../experiment-group/experiment-group.controller';
 import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
+import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -21,6 +22,7 @@ export class ExperimentController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
         if (options.filterRepetitionFrom && options.filterRepetitionTo) {
           parameters.repetitionsNumber = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);
@@ -114,6 +116,7 @@ export class ExperimentController {
             safra: {
               select: {
                 safraName: true,
+                culture: true,
               },
             },
           },
@@ -209,7 +212,7 @@ export class ExperimentController {
         const newItem = item;
         newItem.countNT = functionsUtils
           .countChildrenForSafra(item.assay_list.genotype_treatment, Number(options.idSafra));
-        newItem.npeQT = item.countNT * item.repetitionsNumber;
+        newItem.npeQT = item.experiment_genotipe.length;
         newItem.seq_delineamento = item.delineamento.sequencia_delineamento.filter(
           (x: any) => x.nt <= item.countNT && x.repeticao <= item.repetitionsNumber,
         );
@@ -273,7 +276,12 @@ export class ExperimentController {
       const experimentGenotipeController = new ExperimentGenotipeController();
       if (data.idList) {
         await this.experimentRepository.relationGroup(data);
-        const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
+        if (data.experimentGroupId) {
+          const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
+          await this.setParcelasStatus(idList);
+          return { status: 200, message: 'Experimento atualizado' };
+        }
+        const idList = await this.countExperimentGroupChildren(Number(data.newGroupId));
         await this.setParcelasStatus(idList);
         return { status: 200, message: 'Experimento atualizado' };
       }

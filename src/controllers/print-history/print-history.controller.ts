@@ -22,7 +22,7 @@ export class PrintHistoryController {
     }
   }
 
-  async create({ idList, userId }: any) {
+  async create({ idList, userId, status }: any) {
     try {
       const experimentGenotipeController = new ExperimentGenotipeController();
 
@@ -75,7 +75,9 @@ export class PrintHistoryController {
   }
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: print-history.controller.ts:65 ~ PrintHistoryController ~ getAll ~ options', options);
     const parameters: object | any = {};
+    parameters.AND = [];
     let orderBy: object | any = '';
     try {
       const select = {
@@ -83,8 +85,29 @@ export class PrintHistoryController {
         experimentGenotypeId: true,
         status: true,
         userId: true,
-        changedAt: true,
+        modulo: true,
+        createdAt: true,
+        user: true,
+        experiment_genotipe: true,
       };
+
+      if (options.filterMadeBy) {
+        parameters.user = JSON.parse(`{ "name": { "contains":"${options.filterMadeBy}" } }`);
+      }
+
+      if (options.filterOperation) {
+        parameters.status = JSON.parse(`{ "contains":"${options.filterOperation}" }`);
+      }
+
+      if (options.filterStartDate) {
+        const newStartDate = new Date(options.filterStartDate);
+        parameters.AND.push({ createdAt: { gte: newStartDate } });
+      }
+
+      if (options.filterEndDate) {
+        const newEndDate = new Date(options.filterEndDate);
+        parameters.AND.push({ createdAt: { lte: newEndDate } });
+      }
 
       if (options.id) {
         parameters.id = Number(options.id);
@@ -111,6 +134,7 @@ export class PrintHistoryController {
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
+      console.log('🚀 ~ file: print-history.controller.ts:68 ~ PrintHistoryController ~ getAll ~ parameters', parameters);
       const response: object | any = await this.printHistoryRepository.findAll(
         parameters,
         select,

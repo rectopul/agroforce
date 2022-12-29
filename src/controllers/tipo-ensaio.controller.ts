@@ -3,6 +3,7 @@ import handleError from '../shared/utils/handleError';
 import { TypeAssayRepository } from '../repository/tipo-ensaio.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
+import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 
 export class TypeAssayController {
   typeAssayRepository = new TypeAssayRepository();
@@ -14,6 +15,7 @@ export class TypeAssayController {
     let orderBy: object | any;
     parameters.AND = [];
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }
@@ -35,6 +37,7 @@ export class TypeAssayController {
       const select = {
         id: true,
         name: true,
+        culture: true,
         protocol_name: true,
         envelope: {
           select: {

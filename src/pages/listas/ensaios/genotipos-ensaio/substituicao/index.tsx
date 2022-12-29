@@ -42,6 +42,7 @@ import {
 } from '../../../../../services';
 import { UserPreferenceController } from '../../../../../controllers/user-preference.controller';
 import ITabs from '../../../../../shared/utils/dropdown';
+import { functionsUtils } from '../../../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../../components/Loading';
 
@@ -234,6 +235,13 @@ export default function Listagem({
       filterCodTec,
       filterNameTec,
     }) => {
+      if (!functionsUtils?.isNumeric(filterSeedsFrom)) {
+        return Swal.fire('O campo Qnt Sementes não pode ter ponto ou vírgula.');
+      }
+      if (!functionsUtils?.isNumeric(filterSeedsTo)) {
+        return Swal.fire('O campo Qnt Sementes não pode ter ponto ou vírgula.');
+      }
+
       const tempParams: any = [];
       if (treatmentsOptionSelected == 'nca') {
         checkedTreatments.forEach((item: any) => {
@@ -257,6 +265,7 @@ export default function Listagem({
           tableRef?.current?.dataManager?.changePageSize(
             allTotal >= take ? take : allTotal,
           );
+          setLoading(false);
         })
         .catch((_) => {
           setLoading(false);
@@ -910,9 +919,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6 ml-2">
                     <Button
                       type="submit"
-                      onClick={() => {
-                        setLoading(true);
-                      }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
