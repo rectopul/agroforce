@@ -79,15 +79,16 @@ interface IData {
 }
 
 export default function Listagem({
-  allCultures,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer, // RR
-  orderByserver, // RR
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allCultures,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      typeOrderServer, // RR
+      orderByserver, // RR
+      // filterParams,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tableRef = useRef<any>(null);
@@ -162,9 +163,8 @@ export default function Listagem({
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
   const [fieldOrder, setFieldOrder] = useState<any>(null);
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -191,8 +191,13 @@ export default function Listagem({
     setCookies("filterBeforeEditOrderBy", orderBy);
 
     parametersFilter = `${parametersFilter}&${pathExtra}`;
+    // parametersFilter = filterParams
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
+    // if (filterParams != "") {
+    //   setFiltersParams(filterParams);
+    //   setCookies("filtersParams", filterParams);
+    // }
 
     await cultureService
       .getAll(parametersFilter)
@@ -706,9 +711,16 @@ export default function Listagem({
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {
+                          setCookies("pageBeforeEdit", currentPage?.toString());
+                          setCookies("filterBeforeEdit", filter);
+                          setCookies("filterBeforeEditTypeOrder", typeOrder);
+                          setCookies("filterBeforeEditOrderBy", orderBy);
+                          setCookies("filtersParams", filtersParams);
+                          setCookies("takeBeforeEdit", take);
+                          setCookies('lastPage', 'cadastro');
                           router.push("cultura/cadastro");
                         }}
-                        href="cultura/cadastro"
+                        // href="cultura/cadastro"
                         icon={<RiPlantLine size={20} />}
                       />
                     </div>
@@ -857,7 +869,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { token } = req.cookies;
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
-
+  console.log('lastPageServer', lastPageServer);
   if (lastPageServer == undefined || lastPageServer == "No") {
     removeCookies("filterBeforeEdit", { req, res });
     removeCookies("pageBeforeEdit", { req, res });
@@ -867,7 +879,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies("lastPage", { req, res });
     // setCookies('filterParams','');
   }
-
   const itensPerPage = req.cookies.takeBeforeEdit
     ? req.cookies.takeBeforeEdit
     : 10;
@@ -900,7 +911,9 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies("filterBeforeEditOrderBy", { req, res });
   removeCookies("lastPage", { req, res });
   removeCookies("filtersParams", { req, res });
-  setCookies("filterParams", "");
+
+  // const filterParams = req.cookies.filtersParams ? req.cookies.filtersParams : "";
+  // setCookies("filterParams", filterParams);
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/culture`;
@@ -926,6 +939,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       filterBeforeEdit,
       orderByserver, // RR
       typeOrderServer, // RR
+      // filterParams,
     },
   };
 };
