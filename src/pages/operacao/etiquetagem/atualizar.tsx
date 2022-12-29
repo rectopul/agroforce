@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable camelcase */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
@@ -79,6 +80,7 @@ export default function Listagem({
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
+  const [experimentAdd, setExperimentAdd] = useState<boolean>();
 
   const [itemsTotal, setTotalItems] = useState<number>(0);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -617,6 +619,16 @@ export default function Listagem({
     handleTotalPages();
   }, [currentPage]);
 
+  async function validateAddExperiment() {
+    const { response } = await experimentGroupService.getAll({ id: experimentGroupId });
+    if (response[0].status === 'ETIQ. NÃO INICIADA') {
+      setExperimentAdd(false);
+    }
+    setExperimentAdd(true);
+  }
+
+  validateAddExperiment();
+
   function selectableFilter(rowData: any) {
     if (
       rowData?.status === 'ETIQ. EM ANDAMENTO'
@@ -741,6 +753,8 @@ export default function Listagem({
                             );
                           }}
                           bgColor="bg-blue-600"
+                          // bgColor={experimentGroup?.status === 'ETIQ. EM ANDAMENTO' ? 'bg-gray-400' : 'bg-blue-600'}
+                          // disabled={experimentGroup?.status === 'ETIQ. EM ANDAMENTO'}
                         />
                       </div>
                       <div className="h-12 w-12 ml-2">

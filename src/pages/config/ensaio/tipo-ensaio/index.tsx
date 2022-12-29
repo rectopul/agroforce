@@ -639,7 +639,7 @@ export default function TipoEnsaio({
             newRow.NOME = newRow.name;
             newRow.NOME_PROTOCOLO = newRow.protocol_name;
             newRow.QUANT_SEMENTES = newRow.envelope;
-            newRow.SAFRA = newRow.envelope?.[0].safra.safraName;
+            newRow.SAFRA = newRow.envelope ? newRow.envelope[0]?.safra.safraName : '';
             newRow.STATUS = newRow.status;
 
             delete newRow.name;

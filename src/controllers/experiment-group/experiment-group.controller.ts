@@ -94,7 +94,12 @@ export class ExperimentGroupController {
       const select = {
         id: true,
         name: true,
-        safra: true,
+        safra: {
+          select: {
+            safraName: true,
+            culture: true,
+          },
+        },
         experimentAmount: true,
         tagsToPrint: true,
         tagsPrinted: true,
@@ -119,6 +124,8 @@ export class ExperimentGroupController {
         skip,
         orderBy,
       );
+
+      console.log('🚀 ~ file: experiment-group.controller.ts:17 ~ ExperimentGroupController ~ getAll ~ parameters', response);
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
