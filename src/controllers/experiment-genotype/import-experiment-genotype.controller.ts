@@ -102,8 +102,12 @@ export class ImportExperimentGenotypeController {
 
           if (parcels.length === 0) {
             responseIfError[0]
-              += `<li style="text-align:left"> A ${row}ª linha esta incorreta, parcela do experimento não encontrada, as chaves para encontra-lo são (
-                FOCO, TIPO DE ENSAIO, TECNOLOGIA, GLI, NOME DO EXPERIMENTO, LOCAL, DELINEAMENTO, REP, NT, NPE, STATUS_T, GENÓTIPO E NCA
+            += `<li style="text-align:left"> A ${row}ª linha esta incorreta, parcela do experimento não encontrada, as chaves para encontra-lo são (
+              FOCO, TIPO DE ENSAIO, TECNOLOGIA, GLI, NOME DO EXPERIMENTO, LOCAL, DELINEAMENTO, REP, NT, NPE, STATUS_T, GENÓTIPO E NCA
+              ) </li> <br>`;
+          } else if (parcels[0].status === 'IMPRESSO') {
+            responseIfError[0]
+            += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a parcela já foi impressa e não pode ser substituída
               ) </li> <br>`;
           }
 

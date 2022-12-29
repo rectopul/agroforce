@@ -62,21 +62,21 @@ import ComponentLoading from '../../../../components/Loading';
 type IAssayListUpdate = Omit<IAssayList, 'id_safra' | 'period'>;
 
 export default function AtualizarTipoEnsaio({
-  allGenotypeTreatment,
-  totalItens,
-  itensPerPage,
-  treatmentsFilterApplication,
-  experimentFilterApplication,
-  idAssayList,
-  idSafra,
-  assayList,
-  allExperiments,
-  totalExperiments,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  orderByserver,
-  typeOrderServer,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allGenotypeTreatment,
+      totalItens,
+      itensPerPage,
+      treatmentsFilterApplication,
+      experimentFilterApplication,
+      idAssayList,
+      idSafra,
+      assayList,
+      allExperiments,
+      totalExperiments,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      orderByserver,
+      typeOrderServer,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -197,9 +197,8 @@ export default function AtualizarTipoEnsaio({
       id: assayList?.id,
       foco: assayList?.foco?.name,
       type_assay: assayList?.type_assay?.name,
-      tecnologia: `${assayList?.tecnologia?.cod_tec || ''} ${
-        assayList?.tecnologia?.name || ''
-      }`,
+      tecnologia: `${assayList?.tecnologia?.cod_tec || ''} ${assayList?.tecnologia?.name || ''
+        }`,
       gli: assayList?.gli,
       bgm: assayList?.bgm || '',
       status: assayList?.status,
@@ -225,7 +224,7 @@ export default function AtualizarTipoEnsaio({
   });
 
   async function callingApi(parametersFilter: any) {
-    setCookies('filterBeforeEdit', parametersFilter);
+    // setCookies('filterBeforeEdit', parametersFilter);
     setCookies('filterBeforeEditTypeOrder', typeOrder);
     setCookies('filterBeforeEditOrderBy', orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
@@ -1135,7 +1134,7 @@ export default function AtualizarTipoEnsaio({
                             table === 'genotipo' ? 'bg-blue-600' : 'bg-gray-600'
                           }
                           textColor="white"
-                          onClick={() => setTable('genotipo')}
+                          onClick={() => setTable("genotipo")}
                           // icon={<FaSortAmountUpAlt size={20} />}
                         />
                       </div>
@@ -1151,7 +1150,7 @@ export default function AtualizarTipoEnsaio({
                           }
                           textColor="white"
                           onClick={() => setTable('experimentos')}
-                          // icon={<FaSortAmountUpAlt size={20} />}
+                        // icon={<FaSortAmountUpAlt size={20} />}
                         />
                       </div>
                     </div>
@@ -1386,11 +1385,11 @@ export const getServerSideProps: GetServerSideProps = async ({
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
   if (lastPageServer == undefined || lastPageServer == 'No') {
-    removeCookies('filterBeforeEdit', { req, res });
-    removeCookies('pageBeforeEdit', { req, res });
+    // removeCookies('filterBeforeEdit', { req, res });
+    // removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
-    removeCookies('lastPage', { req, res });
+    // removeCookies('lastPage', { req, res });
   }
 
   // RR
@@ -1407,9 +1406,9 @@ export const getServerSideProps: GetServerSideProps = async ({
   const experimentFilterApplication = `&id_safra=${idSafra}&id_assay_list=${idAssay}`;
 
   // RR
-  removeCookies('filterBeforeEditTypeOrder', { req, res });
-  removeCookies('filterBeforeEditOrderBy', { req, res });
-  removeCookies('lastPage', { req, res });
+  // removeCookies('filterBeforeEditTypeOrder', { req, res });
+  // removeCookies('filterBeforeEditOrderBy', { req, res });
+  // removeCookies('lastPage', { req, res });
 
   const idAssayList = Number(query.id);
   const baseUrlExperiment = `${publicRuntimeConfig.apiUrl}/experiment`;

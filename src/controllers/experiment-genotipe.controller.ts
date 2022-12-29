@@ -17,7 +17,7 @@ export class ExperimentGenotipeController {
   private printedHistoryController = new PrintHistoryController();
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: experiment-genotipe.controller.ts:19 ~ ExperimentGenotipeController ~ getAll ~ options', options);
+    console.log('🚀 ~ file: experiment-genotipe.controller.ts:20 ~ ExperimentGenotipeController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
@@ -427,7 +427,7 @@ export class ExperimentGenotipeController {
         response.experimentGroupId,
         parcelas?.idExperiment,
       );
-      await this.printedHistoryController.create({ idList, userId });
+      await this.printedHistoryController.create({ idList, userId, status });
     } catch (error: any) {
       handleError('Parcelas controller', 'Update', error.message);
       throw new Error('[Controller] - Update Parcelas erro');
@@ -436,17 +436,11 @@ export class ExperimentGenotipeController {
 
   async deleteAll(idExperiment: number) {
     try {
-      const { response: parcelas }: any = await this.getAll({ idExperiment });
-      const toDelete = parcelas.map((item: any) => item.id);
-      const { status } = await this.printedHistoryController.deleteAll(toDelete);
-      if (status === 200) {
-        const response = await this.ExperimentGenotipeRepository.deleteAll(Number(idExperiment));
-        if (response) {
-          return { status: 200, message: 'Parcelas excluídos' };
-        }
-        return { status: 400, message: 'Parcelas não excluídos' };
+      const response = await this.ExperimentGenotipeRepository.deleteAll(Number(idExperiment));
+      if (response) {
+        return { status: 200, message: 'Parcelas excluídos' };
       }
-      return { status: 400, message: 'Histórico de importação não excluídos' };
+      return { status: 400, message: 'Parcelas não excluídos' };
     } catch (error: any) {
       handleError('Parcelas controller', 'DeleteAll', error.message);
       throw new Error('[Controller] - DeleteAll Parcelas erro');

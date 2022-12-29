@@ -149,8 +149,7 @@ export default function Listagem({
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
   const [fieldOrder, setFieldOrder] = useState<any>(null);
 
-  const pathExtra = `skip=${
-    currentPage * Number(take)
+  const pathExtra = `skip=${currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const filterStatusBeforeEdit = filterBeforeEdit.split('');
@@ -238,8 +237,7 @@ export default function Listagem({
   }, [typeOrder]);
 
   async function handleStatus(data: any) {
-    const params = `filterStatus=${1}&id_culture=${cultureId}&id_safra=${safraId}&filterSearch=${
-      data.name
+    const params = `filterStatus=${1}&id_culture=${cultureId}&id_safra=${safraId}&filterSearch=${data.name
     }`;
 
     await handleStatusGlobal({
@@ -770,8 +768,17 @@ export default function Listagem({
                         value="Cadastrar Foco"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
-                        href="foco/cadastro"
+                        onClick={() => {
+                          setCookies('pageBeforeEdit', currentPage?.toString());
+                          setCookies('filterBeforeEdit', filter);
+                          setCookies('filterBeforeEditTypeOrder', typeOrder);
+                          setCookies('filterBeforeEditOrderBy', orderBy);
+                          setCookies('filtersParams', filtersParams);
+                          setCookies('takeBeforeEdit', take);
+                          setCookies('lastPage', 'cadastro');
+                          router.push('foco/cadastro ');
+                        }}
+                        // href="foco/cadastro"
                         icon={<FaSearchPlus size={20} />}
                       />
                     </div>
@@ -904,7 +911,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

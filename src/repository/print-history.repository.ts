@@ -1,6 +1,6 @@
 import { prisma } from '../pages/api/db/db';
-
-export class PrintHistoryRepository {
+import { BaseRepository } from './base-repository';
+export class PrintHistoryRepository extends BaseRepository {
   async create(data: any) {
     const result = await prisma.printHistory.create({ data });
     return result;

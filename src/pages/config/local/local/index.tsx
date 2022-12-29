@@ -606,7 +606,6 @@ export default function Listagem({
             'pt-BR',
           )} ${hours}:${minutes}:${seconds}`;
 
-          row.CULTURA = row?.culture?.name;
           row.NOME_LUGAR_CULTURA = row.name_local_culture;
           row.RÓTULO = row.label;
           row.MLOC = row.mloc;

@@ -91,17 +91,17 @@ interface IData {
 }
 
 export default function TipoEnsaio({
-  allTypeAssay,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  idCulture,
-  safraId,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer, // RR
-  orderByserver, // RR
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allTypeAssay,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      idCulture,
+      safraId,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      typeOrderServer, // RR
+      orderByserver, // RR
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState<boolean>(false);
   const { TabsDropDowns } = ITabs.default;
 
@@ -175,9 +175,8 @@ export default function TipoEnsaio({
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [selectedModal, setSelectedModal] = useState<any>(null);
 
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const filters = [
     { id: 2, name: 'Todos' },
@@ -469,7 +468,7 @@ export default function TipoEnsaio({
                 <Button
                   title={`Atualizar ${rowData.name}`}
                   icon={<BiEdit size={14} />}
-                  onClick={() => {}}
+                  onClick={() => { }}
                   bgColor="bg-blue-600"
                   textColor="white"
                   href={`/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`}
@@ -639,7 +638,7 @@ export default function TipoEnsaio({
             newRow.NOME = newRow.name;
             newRow.NOME_PROTOCOLO = newRow.protocol_name;
             newRow.QUANT_SEMENTES = newRow.envelope;
-            newRow.SAFRA = newRow.envelope?.[0].safra.safraName;
+            newRow.SAFRA = newRow.envelope ? newRow.envelope[0]?.safra.safraName : '';
             newRow.STATUS = newRow.status;
 
             delete newRow.name;
@@ -863,8 +862,17 @@ export default function TipoEnsaio({
                         value="Cadastrar Tipo Ensaio"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => {}}
-                        href="/config/ensaio/tipo-ensaio/cadastro"
+                        onClick={() => {
+                          setCookies("pageBeforeEdit", currentPage?.toString());
+                          setCookies("filterBeforeEdit", filter);
+                          setCookies("filterBeforeEditTypeOrder", typeOrder);
+                          setCookies("filterBeforeEditOrderBy", orderBy);
+                          setCookies("filtersParams", filtersParams);
+                          setCookies("takeBeforeEdit", take);
+                          setCookies('lastPage', 'cadastro');
+                          router.push("tipo-ensaio/cadastro ");
+                        }}
+                        // href="/config/ensaio/tipo-ensaio/cadastro"
                         icon={<RiOrganizationChart size={20} />}
                       />
                     </div>
