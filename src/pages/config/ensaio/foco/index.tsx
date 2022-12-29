@@ -89,16 +89,16 @@ interface IData {
 }
 
 export default function Listagem({
-      totalItems,
-      itensPerPage,
-      cultureId,
-      safraId,
-      filterApplication,
-      pageBeforeEdit,
-      filterBeforeEdit,
-      typeOrderServer,
-      orderByserver,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  totalItems,
+  itensPerPage,
+  cultureId,
+  safraId,
+  filterApplication,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  typeOrderServer,
+  orderByserver,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tableRef = useRef<any>(null);
@@ -150,7 +150,7 @@ export default function Listagem({
   const [fieldOrder, setFieldOrder] = useState<any>(null);
 
   const pathExtra = `skip=${currentPage * Number(take)
-    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
@@ -238,7 +238,7 @@ export default function Listagem({
 
   async function handleStatus(data: any) {
     const params = `filterStatus=${1}&id_culture=${cultureId}&id_safra=${safraId}&filterSearch=${data.name
-      }`;
+    }`;
 
     await handleStatusGlobal({
       id: data?.id,
@@ -769,14 +769,14 @@ export default function Listagem({
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {
-                          setCookies("pageBeforeEdit", currentPage?.toString());
-                          setCookies("filterBeforeEdit", filter);
-                          setCookies("filterBeforeEditTypeOrder", typeOrder);
-                          setCookies("filterBeforeEditOrderBy", orderBy);
-                          setCookies("filtersParams", filtersParams);
-                          setCookies("takeBeforeEdit", take);
+                          setCookies('pageBeforeEdit', currentPage?.toString());
+                          setCookies('filterBeforeEdit', filter);
+                          setCookies('filterBeforeEditTypeOrder', typeOrder);
+                          setCookies('filterBeforeEditOrderBy', orderBy);
+                          setCookies('filtersParams', filtersParams);
+                          setCookies('takeBeforeEdit', take);
                           setCookies('lastPage', 'cadastro');
-                          router.push("foco/cadastro ");
+                          router.push('foco/cadastro ');
                         }}
                         // href="foco/cadastro"
                         icon={<FaSearchPlus size={20} />}
