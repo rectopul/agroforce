@@ -797,13 +797,13 @@ export default function Listagem({
     (inputRef?.current as any)?.focus();
   }
 
-  async function handleSubmit() {
-    const inputCode: any = (
-      document.getElementById("inputCode") as HTMLInputElement
-    )?.value;
+  async function handleSubmit(inputCode: any) {
+    // const inputCode: any = (
+    //   document.getElementById("inputCode") as HTMLInputElement
+    // )?.value;
     let countNca = 0;
     parcelas.map((item: any) => {
-      if (item.nca === inputCode) {
+      if (item.nca == inputCode) {
         setParcelasToPrint((current: any) => [...current, item.id]);
         countNca += 1;
         setGenotypeNameOne(item?.genotipo?.name_genotipo);
@@ -831,15 +831,15 @@ export default function Listagem({
     }
   }
 
-  async function verifyAgain() {
-    const inputCode: any = (
-      document.getElementById("inputCode") as HTMLInputElement
-    )?.value;
+  async function verifyAgain(inputCode: any) {
+    // const inputCode: any = (
+    //   document.getElementById("inputCode") as HTMLInputElement
+    // )?.value;
     let countNca = 0;
     let secondNca = "";
 
     parcelas.map((item: any) => {
-      if (item.nca === inputCode) {
+      if (item.nca == inputCode) {
         setGenotypeNameTwo(item?.genotipo?.name_genotipo);
         secondNca = item.nca;
         setNcaTwo(item.nca);
@@ -874,7 +874,7 @@ export default function Listagem({
       cleanState();
       // setIsOpenModal(false);
 
-      const parcelsByNCA = parcelas.filter((i: any) => i.nca === inputCode);
+      const parcelsByNCA = parcelas.filter((i: any) => i.nca == inputCode);
       const parcels = parcelsByNCA.map((i: any) => ({
         ...i,
         envelope: i?.type_assay?.envelope?.filter(
@@ -895,13 +895,13 @@ export default function Listagem({
     setIsLoading(false);
   }
 
-  async function writeOff() {
-    const inputCode: any = (
-      document.getElementById("inputCode") as HTMLInputElement
-    )?.value;
+  async function writeOff(inputCode: any) {
+    // const inputCode: any = (
+    //   document.getElementById("inputCode") as HTMLInputElement
+    // )?.value;
     if (!doubleVerify) {
       let colorVerify = "";
-      if (inputCode === writeOffNca) {
+      if (inputCode == writeOffNca) {
         colorVerify = "bg-green-600";
         setValidateNcaOne("bg-green-600");
       } else {
@@ -916,7 +916,7 @@ export default function Listagem({
       }
     } else {
       let colorVerify = "";
-      if (inputCode === writeOffNca) {
+      if (inputCode == writeOffNca) {
         colorVerify = "bg-green-600";
         setValidateNcaTwo("bg-green-600");
       } else {
@@ -952,17 +952,43 @@ export default function Listagem({
     if (e?.charCode === 13 || e?.charCode === 10) validateInput();
   }
 
+  function generateEAN13digit(code: any) {
+    let sum = 0;
+    for (let i = 11; i >= 0; i--) {
+      sum += parseInt(code[i]) * (i % 2 == 0 ? 1 : 3);
+    }
+    return (10 - (sum % 10)) % 10;
+  }
+
   async function validateInput() {
     const inputCode: any = (
       document.getElementById("inputCode") as HTMLInputElement
     )?.value;
-    if (inputCode.length === 12) {
+    if (inputCode?.length === 13) {
+      const lastNumber = parseInt(inputCode?.substring(12, 13));
+      const withoutDigit = parseInt(inputCode?.substring(0, 12));
+
       if (dismiss) {
-        writeOff();
+        if (generateEAN13digit(inputCode) !== lastNumber) {
+          setValidateNcaOne("bg-red-600");
+          return;
+        }
+
+        writeOff(withoutDigit);
       } else if (doubleVerify) {
-        verifyAgain();
+        if (generateEAN13digit(inputCode) !== lastNumber) {
+          setValidateNcaTwo("bg-red-600");
+          return;
+        }
+
+        verifyAgain(withoutDigit);
       } else {
-        handleSubmit();
+        if (generateEAN13digit(inputCode) !== lastNumber) {
+          setValidateNcaOne("bg-red-600");
+          return;
+        }
+
+        handleSubmit(withoutDigit);
       }
     }
   }
@@ -1089,6 +1115,7 @@ export default function Listagem({
               {(validateNcaOne === "bg-red-600" ||
                 validateNcaTwo === "bg-red-600") && (
                 <Button
+                  type="button"
                   title="Limpar"
                   value="Limpar"
                   textColor="white"
