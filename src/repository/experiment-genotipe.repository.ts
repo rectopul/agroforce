@@ -51,7 +51,7 @@ export class ExperimentGenotipeRepository extends BaseRepository {
     return result;
   }
 
-  async replaceLote(idList: any, ncc :any, idLote: any, genetic_id: any) {
+  async replaceLote(idList: any, ncc: any, idLote: any, genetic_id: any) {
     const result = await prisma.experiment_genotipe.updateMany({
       where: {
         id: {
@@ -95,7 +95,8 @@ export class ExperimentGenotipeRepository extends BaseRepository {
     return result;
   }
 
-  async printed(idList: number, status: string) {
+  async printed(idList: number, status: string): Promise<any> {
+    console.log('In repository');
     const result = await prisma.experiment_genotipe.updateMany({
       where: {
         id: {

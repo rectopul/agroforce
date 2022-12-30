@@ -253,44 +253,57 @@ export default function Listagem({
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const formik = useFormik<IFilter>({
+  const formik = useFormik<any>({
     initialValues: {
       filterFoco: "",
       filterTypeAssay: "",
-      filterNameTec: "",
-      filterCodTec: "",
+      filterTechnology: "",
       filterGli: "",
-      filterExperimentName: "",
-      filterLocal: "",
-      filterRepetitionFrom: "",
-      filterRepetitionTo: "",
+      filterBgm: "",
+      filterTreatmentsNumber: "",
       filterStatus: "",
-      filterNtFrom: "",
-      filterNtTo: "",
-      filterNpeFrom: "",
-      filterNpeTo: "",
+      filterStatusAssay: "",
       filterGenotypeName: "",
-      filterNca: "",
+      filterNcaTo: "",
+      filterNcaFrom: "",
       orderBy: "",
       typeOrder: "",
+      filterBgmTo: "",
+      filterBgmFrom: "",
+      filterNtTo: "",
+      filterNtFrom: "",
+      filterNpeTo: "",
+      filterNpeFrom: "",
+      filterRepTo: "",
+      filterRepFrom: "",
+      filterStatusT: "",
+      filterCodTec: "",
+      filterExperimentName: "",
+      filterPlacingPlace: "",
     },
     onSubmit: async ({
       filterFoco,
       filterTypeAssay,
-      filterNameTec,
-      filterCodTec,
+      filterTechnology,
       filterGli,
-      filterExperimentName,
-      filterLocal,
-      filterRepetitionFrom,
-      filterRepetitionTo,
-      // filterStatus,
-      filterNtFrom,
-      filterNtTo,
-      filterNpeFrom,
-      filterNpeTo,
+      filterBgm,
+      filterTreatmentsNumber,
+      filterStatusAssay,
       filterGenotypeName,
-      filterNca,
+      filterNcaTo,
+      filterNcaFrom,
+      filterBgmTo,
+      filterBgmFrom,
+      filterNtTo,
+      filterNtFrom,
+      filterNpeTo,
+      filterNpeFrom,
+      filterRepTo,
+      filterRepFrom,
+      filterStatusT,
+      filterCodTec,
+      filterExperimentName,
+      filterPlacingPlace,
     }) => {
       const allCheckBox: any = document.querySelectorAll(
         "input[name='StatusCheckbox']"
@@ -307,26 +320,7 @@ export default function Listagem({
       setLoading(true);
 
       // Call filter with there parameter
-      const parametersFilter = await tableGlobalFunctions.handleFilterParameter(
-        "parcelas",
-        filterFoco,
-        filterTypeAssay,
-        filterNameTec,
-        filterCodTec,
-        filterGli,
-        filterExperimentName,
-        filterLocal,
-        filterRepetitionFrom,
-        filterRepetitionTo,
-        filterStatus,
-        filterNtFrom,
-        filterNtTo,
-        filterNpeFrom,
-        filterNpeTo,
-        filterGenotypeName,
-        filterNca,
-        idSafra
-      );
+      const parametersFilter = `&filterStatusT=${filterStatusT}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNcaTo=${filterNcaTo}&filterNcaFrom=${filterNcaFrom}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterCodTec=${filterCodTec}&filterExperimentName=${filterExperimentName}&filterRepTo=${filterRepTo}&filterRepFrom=${filterRepFrom}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterPlacingPlace=${filterPlacingPlace}`;
 
       setFiltersParams(parametersFilter);
       setFilter(parametersFilter);
@@ -1106,7 +1100,7 @@ export default function Listagem({
                 id="inputCode"
                 name="inputCode"
                 maxLength={13}
-                //onChange={validateInput}
+                // onChange={validateInput}
                 onKeyPress={onPressKey}
                 ref={inputRef}
               />
@@ -1198,69 +1192,82 @@ export default function Listagem({
           gap-4
         "
         >
-          <AccordionFilter title="Filtrar parcelas">
+          <AccordionFilter title="Filtrar parcelas dos experimentos">
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
-                                    w-full
-                                    items-center
-                                    px-4
-                                    bg-white
-                                    "
+                  w-full
+                  items-center
+                  px-1
+                  bg-white
+                "
                 onSubmit={formik.handleSubmit}
               >
                 <div
                   className="w-full h-full
-                                        flex
-                                        justify-center
-                                        pb-8
-                                        "
+                  flex
+
+                  pb-8
+                "
                 >
                   {filterFieldFactory("filterFoco", "Foco")}
                   {filterFieldFactory("filterTypeAssay", "Ensaio")}
-                  {filterFieldFactory("filterCod", "Cod Tec")}
-                  {filterFieldFactory("filterTecnologia", "Nome Tecnologia")}
-                  {filterFieldFactory("filterGli", "GLI")}
-                  {filterFieldFactory(
-                    "filterExperimentName",
-                    "Nome experimento"
-                  )}
-                  {filterFieldFactory("filterLocal", "Lugar de plantio")}
-                </div>
 
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Cod Tec
+                    </label>
+                    <div className="flex">
+                      <Input
+                        size={7}
+                        type="number"
+                        placeholder="Cod Tec"
+                        id="filterCodTec"
+                        name="filterCodTec"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  {filterFieldFactory("filterTechnology", "Nome Tec")}
+                  {filterFieldFactory("filterGli", "GLI")}
+                  {filterFieldFactory("filterExperimentName", "Experimento")}
+                  {filterFieldFactory("filterPlacingPlace", "Lugar plantio")}
+                </div>
                 <div
                   className="w-full h-full
-                                        flex
-                                        justify-center
-                                        pb-2
-                                        "
+                  flex
+                  justify-center
+                  pt-0
+                  pb-0
+                  "
                 >
-                  <div className="h-6 w-full ml-4">
+                  <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Repetição
+                      REP EXP
                     </label>
                     <div className="flex">
                       <Input
                         type="number"
                         placeholder="De"
-                        id="filterRepetitionFrom"
-                        name="filterRepetitionFrom"
+                        id="filterRepFrom"
+                        name="filterRepFrom"
                         onChange={formik.handleChange}
                       />
                       <Input
                         type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
-                        id="filterRepetitionTo"
-                        name="filterRepetitionTo"
+                        id="filterRepTo"
+                        name="filterRepTo"
                         onChange={formik.handleChange}
                       />
                     </div>
                   </div>
 
-                  <div className="h-10 w-full ml-2">
+                  <div className="h-10 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status da parcela
+                      Status EXP
                     </label>
                     <SelectMultiple
                       data={statusFilter.map((i: any) => i.title)}
@@ -1269,72 +1276,7 @@ export default function Listagem({
                     />
                   </div>
 
-                  {/* <div className="h-10 w-full ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status da parcela
-                    </label>
-                    <AccordionFilter>
-                      <DragDropContext onDragEnd={handleOnDragEnd}>
-                        <Droppable droppableId="characters">
-                          {(provided) => (
-                            <ul
-                              className="w-1/2 h-full characters"
-                              {...provided.droppableProps}
-                              ref={provided.innerRef}
-                            >
-                              {statusImp.map((generate, index) => (
-                                <Draggable
-                                  key={index}
-                                  draggableId={String(generate.title)}
-                                  index={index}
-                                >
-                                  {(providers) => (
-                                    <li
-                                      ref={providers.innerRef}
-                                      {...providers.draggableProps}
-                                      {...providers.dragHandleProps}
-                                    >
-                                      <CheckBox
-                                        name={generate.name}
-                                        title={generate.title?.toString()}
-                                        value={generate.value}
-                                        defaultChecked={false}
-                                      />
-                                    </li>
-                                  )}
-                                </Draggable>
-                              ))}
-                              {provided.placeholder}
-                            </ul>
-                          )}
-                        </Droppable>
-                      </DragDropContext>
-                    </AccordionFilter>
-                  </div> */}
-
-                  <div className="h-6 w-full ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      NT
-                    </label>
-                    <div className="flex">
-                      <Input
-                        type="number"
-                        placeholder="De"
-                        id="filterNtFrom"
-                        name="filterNtFrom"
-                        onChange={formik.handleChange}
-                      />
-                      <Input
-                        type="number"
-                        style={{ marginLeft: 8 }}
-                        placeholder="Até"
-                        id="filterNtTo"
-                        name="filterNtTo"
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
-                  <div className="h-6 w-full ml-2">
+                  <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       NPE
                     </label>
@@ -1356,21 +1298,56 @@ export default function Listagem({
                       />
                     </div>
                   </div>
-                  {filterFieldFactory("filterGenotypeName", "Nome do genotipo")}
-                  {filterFieldFactory("filterNca", "NCA")}
+
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Nome do genótipo
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="Nome do genótipo"
+                        id="filterGenotypeName"
+                        name="filterGenotypeName"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NCA
+                    </label>
+                    <div className="flex">
+                      <Input
+                        type="text"
+                        placeholder="De"
+                        id="filterNcaFrom"
+                        name="filterNcaFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        type="text"
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterNcaTo"
+                        name="filterNcaTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
 
                   <FieldItemsPerPage
-                    widthClass="w-full"
                     selected={take}
                     onChange={setTake}
+                    widthClass="w-1/2"
                   />
 
-                  <div style={{ width: 50 }} />
+                  <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      type="submit"
                       onClick={() => {}}
                       value="Filtrar"
+                      type="submit"
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<BiFilterAlt size={20} />}

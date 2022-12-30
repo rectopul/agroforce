@@ -20,20 +20,44 @@ export class ExperimentGroupController {
         parameters.name = JSON.parse(`{"contains":"${options.filterExperimentGroup}"}`);
       }
 
-      if (options.filterQuantityExperiment) {
-        parameters.experimentAmount = Number(options.filterQuantityExperiment);
+      if (options.filterQtdExpTo || options.filterQtdExpFrom) {
+        if (options.filterQtdExpTo && options.filterQtdExpFrom) {
+          parameters.experimentAmount = JSON.parse(`{"gte": ${Number(options.filterQtdExpTo)}, "lte": ${Number(options.filterQtdExpFrom)} }`);
+        } else if (options.filterQtdExpTo) {
+          parameters.experimentAmount = JSON.parse(`{"gte": ${Number(options.filterQtdExpTo)} }`);
+        } else if (options.filterQtdExpFrom) {
+          parameters.experimentAmount = JSON.parse(`{"lte": ${Number(options.filterQtdExpFrom)} }`);
+        }
       }
 
-      if (options.filterTagsToPrint) {
-        parameters.tagsToPrint = Number(options.filterTagsToPrint);
+      if (options.filterTotalEtiqImprimirTo || options.filterTotalEtiqImprimirFrom) {
+        if (options.filterTotalEtiqImprimirTo && options.filterTotalEtiqImprimirFrom) {
+          parameters.tagsToPrint = JSON.parse(`{"gte": ${Number(options.filterTotalEtiqImprimirTo)}, "lte": ${Number(options.filterTotalEtiqImprimirFrom)} }`);
+        } else if (options.filterTotalEtiqImprimirTo) {
+          parameters.tagsToPrint = JSON.parse(`{"gte": ${Number(options.filterTotalEtiqImprimirTo)} }`);
+        } else if (options.filterTotalEtiqImprimirFrom) {
+          parameters.tagsToPrint = JSON.parse(`{"lte": ${Number(options.filterTotalEtiqImprimirFrom)} }`);
+        }
       }
 
-      if (options.filterTagsPrinted) {
-        parameters.tagsPrinted = Number(options.filterTagsPrinted);
+      if (options.filterTotalEtiqImpressasTo || options.filterTotalEtiqImpressasFrom) {
+        if (options.filterTotalEtiqImpressasTo && options.filterTotalEtiqImpressasFrom) {
+          parameters.tagsPrinted = JSON.parse(`{"gte": ${Number(options.filterTotalEtiqImpressasTo)}, "lte": ${Number(options.filterTotalEtiqImpressasFrom)} }`);
+        } else if (options.filterTotalEtiqImpressasTo) {
+          parameters.tagsPrinted = JSON.parse(`{"gte": ${Number(options.filterTotalEtiqImpressasTo)} }`);
+        } else if (options.filterTotalEtiqImpressasFrom) {
+          parameters.tagsPrinted = JSON.parse(`{"lte": ${Number(options.filterTotalEtiqImpressasFrom)} }`);
+        }
       }
 
-      if (options.filterTotalTags) {
-        parameters.totalTags = Number(options.filterTotalTags);
+      if (options.filterTotalEtiqTo || options.filterTotalEtiqFrom) {
+        if (options.filterTotalEtiqTo && options.filterTotalEtiqFrom) {
+          parameters.totalTags = JSON.parse(`{"gte": ${Number(options.filterTotalEtiqTo)}, "lte": ${Number(options.filterTotalEtiqFrom)} }`);
+        } else if (options.filterTotalEtiqTo) {
+          parameters.totalTags = JSON.parse(`{"gte": ${Number(options.filterTotalEtiqTo)} }`);
+        } else if (options.filterTotalEtiqFrom) {
+          parameters.totalTags = JSON.parse(`{"lte": ${Number(options.filterTotalEtiqFrom)} }`);
+        }
       }
 
       if (options.safraId) {
@@ -94,7 +118,12 @@ export class ExperimentGroupController {
       const select = {
         id: true,
         name: true,
-        safra: true,
+        safra: {
+          select: {
+            safraName: true,
+            culture: true,
+          },
+        },
         experimentAmount: true,
         tagsToPrint: true,
         tagsPrinted: true,

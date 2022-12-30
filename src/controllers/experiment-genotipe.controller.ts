@@ -172,15 +172,9 @@ export class ExperimentGenotipeController {
 
       if (options.filterNtFrom || options.filterNtTo) {
         if (options.filterNtFrom && options.filterNtTo) {
-          parameters.nt = JSON.parse(
-            `{"gte": ${Number(options.filterNtFrom)}, "lte": ${Number(
-              options.filterNtTo,
-            )} }`,
-          );
+          parameters.nt = JSON.parse(`{"gte": ${Number(options.filterNtFrom)}, "lte": ${Number(options.filterNtTo)} }`);
         } else if (options.filterNtFrom) {
-          parameters.nt = JSON.parse(
-            `{"gte": ${Number(options.filterNtFrom)} }`,
-          );
+          parameters.nt = JSON.parse(`{"gte": ${Number(options.filterNtFrom)} }`);
         } else if (options.filterNtTo) {
           parameters.nt = JSON.parse(`{"lte": ${Number(options.filterNtTo)} }`);
         }
@@ -341,9 +335,9 @@ export class ExperimentGenotipeController {
       }
 
       if (options.npe) {
-        if (typeof options.npe === 'number') {
-          parameters.npe = Number(options.npe);
-        }
+        // if (typeof options.npe === 'number') {
+        parameters.npe = Number(options.npe);
+        // }
       }
 
       if (options.idExperiment) {
@@ -435,11 +429,17 @@ export class ExperimentGenotipeController {
 
   async deleteAll(idExperiment: number) {
     try {
-      const response = await this.ExperimentGenotipeRepository.deleteAll(Number(idExperiment));
-      if (response) {
-        return { status: 200, message: 'Parcelas excluídos' };
+      const parcelsToDelete: any = await this.getAll({ idExperiment });
+      const idList = parcelsToDelete[0]?.map(async (parcela: any) => parcela.id);
+      const { status } = await this.printedHistoryController.deleteAll(idList);
+      if (status === 200) {
+        const response = await this.ExperimentGenotipeRepository.deleteAll(Number(idExperiment));
+        if (response) {
+          return { status: 200, message: 'Parcelas excluídos' };
+        }
+        return { status: 400, message: 'Parcelas não excluídos' };
       }
-      return { status: 400, message: 'Parcelas não excluídos' };
+      return { status: 400, message: 'Erro ao excluir parcelas' };
     } catch (error: any) {
       handleError('Parcelas controller', 'DeleteAll', error.message);
       throw new Error('[Controller] - DeleteAll Parcelas erro');

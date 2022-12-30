@@ -79,15 +79,15 @@ interface IData {
 }
 
 export default function Listagem({
-  allUsers,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer, // RR
-  orderByserver, // RR
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allUsers,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      typeOrderServer, // RR
+      orderByserver, // RR
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tableRef = useRef<any>(null);
@@ -97,7 +97,7 @@ export default function Listagem({
 
   tabsDropDowns.map((tab) =>
     tab.titleTab === "TMG" &&
-    tab.data.map((i) => i.labelDropDown === "Usuários")
+      tab.data.map((i) => i.labelDropDown === "Usuários")
       ? (tab.statusTab = true)
       : (tab.statusTab = false)
   );
@@ -168,9 +168,8 @@ export default function Listagem({
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
   const [fieldOrder, setFieldOrder] = useState<any>(null);
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const filters = [
     { id: 2, name: "Todos" },
@@ -205,9 +204,8 @@ export default function Listagem({
       //     setCurrentPage(0);
       //   });
 
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterName=${filterName}&filterLogin=${filterLogin}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterName=${filterName}&filterLogin=${filterLogin}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -829,6 +827,13 @@ export default function Listagem({
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {
+                          setCookies("pageBeforeEdit", currentPage?.toString());
+                          setCookies("filterBeforeEdit", filter);
+                          setCookies("filterBeforeEditTypeOrder", typeOrder);
+                          setCookies("filterBeforeEditOrderBy", orderBy);
+                          setCookies("filtersParams", filtersParams);
+                          setCookies("takeBeforeEdit", take);
+                          setCookies('lastPage', 'cadastro');
                           router.push("usuarios/cadastro");
                         }}
                         icon={<FiUserPlus size={20} />}

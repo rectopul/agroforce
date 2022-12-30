@@ -3,6 +3,7 @@ import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { UnidadeCulturaRepository } from '../../repository/unidade-cultura.repository';
 import { IReturnObject } from '../../interfaces/shared/Import.interface';
 import { SafraController } from '../safra.controller';
+import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class UnidadeCulturaController {
   public readonly required = 'Campo obrigatório';
@@ -15,6 +16,7 @@ export class UnidadeCulturaController {
     const parameters: object | any = {};
     let orderBy: object | any;
     try {
+      options = await removeEspecialAndSpace(options);
       if (options.filterNameUnityCulture) {
         parameters.name_unity_culture = JSON.parse(`{ "contains": "${options.filterNameUnityCulture}" }`);
       }

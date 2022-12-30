@@ -1,7 +1,14 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable guard-for-in */
+/* eslint-disable no-console */
+/* eslint-disable no-await-in-loop */
+/* eslint-disable max-len */
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import handleError from '../../shared/utils/handleError';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { PrintHistoryRepository } from '../../repository/print-history.repository';
 import { IReturnObject } from '../../interfaces/shared/Import.interface';
+import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
 
 export class PrintHistoryController {
   printHistoryRepository = new PrintHistoryRepository();
@@ -22,22 +29,31 @@ export class PrintHistoryController {
 
   async create({ idList, userId, status }: any) {
     try {
-      idList.map(async (id: number) => {
-        const {
-          response,
-        }: IReturnObject = await this.getAll({ experimentGenotypeId: id });
-        if (response.total > 0) {
-          status = 'REIMPRESSO';
-        } else if (response[0]?.status === 'REIMPRESSO'
-        || response[0]?.status === 'IMPRESSO') {
-          status = 'BAIXA';
-        }
-        await this.printHistoryRepository.create({
-          experimentGenotypeId: id,
-          status,
-          userId,
+      const transactionConfig = new TransactionConfig();
+      const printHistoryRepositoryTransaction = new PrintHistoryRepository();
+      printHistoryRepositoryTransaction.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+      try {
+        await transactionConfig.transactionScope.run(async () => {
+          for (const row in idList) {
+            const { response }: IReturnObject = await this.getAll({ experimentGenotypeId: idList[row] });
+            if (response.total > 0) {
+              status = 'REIMPRESSO';
+            } else if (response[0]?.status === 'REIMPRESSO'
+                    || response[0]?.status === 'IMPRESSO') {
+              status = 'BAIXA';
+            }
+            const data = {
+              experimentGenotypeId: idList[row],
+              status,
+              userId,
+            };
+            await printHistoryRepositoryTransaction.createTransaction(data);
+          }
         });
-      });
+      } catch (error: any) {
+        handleError('Controlador de histórico de impressão', 'Create', error.message);
+        throw new Error('[Controller] - Criar erro de histórico de impressão');
+      }
     } catch (error: any) {
       handleError('Histórico de impressão Controller', 'Create', error.message);
       throw new Error('[Controller] - Create Histórico de impressão erro');
@@ -62,7 +78,6 @@ export class PrintHistoryController {
   }
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: print-history.controller.ts:65 ~ PrintHistoryController ~ getAll ~ options', options);
     const parameters: object | any = {};
     parameters.AND = [];
     let orderBy: object | any = '';
@@ -121,7 +136,6 @@ export class PrintHistoryController {
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
-      console.log('🚀 ~ file: print-history.controller.ts:68 ~ PrintHistoryController ~ getAll ~ parameters', parameters);
       const response: object | any = await this.printHistoryRepository.findAll(
         parameters,
         select,

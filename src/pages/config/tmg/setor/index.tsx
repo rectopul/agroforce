@@ -72,15 +72,15 @@ interface IData {
 }
 
 export default function Listagem({
-  allDepartments,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer,
-  orderByserver,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allDepartments,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      typeOrderServer,
+      orderByserver,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tableRef = useRef<any>(null);
@@ -135,9 +135,8 @@ export default function Listagem({
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
   const [fieldOrder, setFieldOrder] = useState<any>(null);
 
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const columns = columnsOrder(camposGerenciados);
 
@@ -164,9 +163,8 @@ export default function Listagem({
       //     setCurrentPage(0);
       //   });
 
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterSearch=${filterSearch}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterSearch=${filterSearch}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -657,6 +655,13 @@ export default function Listagem({
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {
+                          setCookies("pageBeforeEdit", currentPage?.toString());
+                          setCookies("filterBeforeEdit", filter);
+                          setCookies("filterBeforeEditTypeOrder", typeOrder);
+                          setCookies("filterBeforeEditOrderBy", orderBy);
+                          setCookies("filtersParams", filtersParams);
+                          setCookies("takeBeforeEdit", take);
+                          setCookies('lastPage', 'cadastro');
                           router.push("setor/cadastro");
                         }}
                         icon={<HiOutlineOfficeBuilding size={20} />}

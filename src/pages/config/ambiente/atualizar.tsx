@@ -122,17 +122,18 @@ export default function NovoLocal({
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.prox_npe) {
+        Swal.fire('Preencha o Prox NPE');
         return;
       }
 
       const parametersFilter = `filterStatus=1&npei=${values.prox_npe}`;
       await npeService.getAll(parametersFilter).then(async (response) => {
         if (response.total <= 0) {
-          const paramFilter = `id_culture=${idCulture}&id_safra=${idSafra}&npe=${values.prox_npe}`;
+          const paramFilter = `id_culture=${idCulture}&id_safra=${idSafra}&npe=${values.prox_npe}&take=${1}`;
           await experimentGenotipeService
             .getAll(paramFilter)
-            .then(async (response) => {
-              if (response.total <= 0) {
+            .then(async (parcelas: any) => {
+              if (parcelas.total <= 0) {
                 await npeService
                   .update({
                     id: values.id,
@@ -141,12 +142,12 @@ export default function NovoLocal({
                     npei_i: values.prox_npe,
                     edited: 1,
                   })
-                  .then((response) => {
-                    if (response.status === 200) {
+                  .then((data: any) => {
+                    if (data.status === 200) {
                       Swal.fire('NPE atualizado com sucesso!');
                       router.back();
                     } else {
-                      Swal.fire(response.message);
+                      Swal.fire(data.message);
                     }
                   });
               } else {
