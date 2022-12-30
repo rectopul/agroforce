@@ -468,7 +468,7 @@ export default function Listagem({
         });
         const workSheet = XLSX.utils.json_to_sheet(response);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'Experimentos');
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'exp-para-etiquetagem');
 
         // Buffer
         XLSX.write(workBook, {
@@ -481,7 +481,7 @@ export default function Listagem({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'Experimentos.xlsx');
+        XLSX.writeFile(workBook, 'Exp. para etiquetagem.xlsx');
       } else {
         setLoading(false);
         Swal.fire('Não existem registros para serem exportados, favor checar.');

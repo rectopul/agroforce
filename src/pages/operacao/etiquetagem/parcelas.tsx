@@ -696,7 +696,7 @@ export default function Listagem({
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Parcelas');
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'Parcelas de expe. etiquetagem');
 
           // Buffer
           XLSX.write(workBook, {
@@ -709,7 +709,7 @@ export default function Listagem({
             type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, 'Parcelas.xlsx');
+          XLSX.writeFile(workBook, 'Parcelas de expe. etiquetagem.xlsx');
         } else {
           setLoading(false);
           Swal.fire(

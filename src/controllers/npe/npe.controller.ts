@@ -112,11 +112,11 @@ export class NpeController {
 
       if (options.filterNpeFinalFrom || options.filterNpeFinalTo) {
         if (options.filterNpeFinalFrom && options.filterNpeFinalTo) {
-          parameters.npef = JSON.parse(`{"gte": ${Number(options.filterNpeFinalFrom)}, "lte": ${Number(options.filterNpeFinalTo)} }`);
+          parameters.prox_npe = JSON.parse(`{"gte": ${Number(options.filterNpeFinalFrom)}, "lte": ${Number(options.filterNpeFinalTo)} }`);
         } else if (options.filterNpeFinalFrom) {
-          parameters.npef = JSON.parse(`{"gte": ${Number(options.filterNpeFinalFrom)} }`);
+          parameters.prox_npe = JSON.parse(`{"gte": ${Number(options.filterNpeFinalFrom)} }`);
         } else if (options.filterNpeFinalTo) {
-          parameters.npef = JSON.parse(`{"lte": ${Number(options.filterNpeFinalTo)} }`);
+          parameters.prox_npe = JSON.parse(`{"lte": ${Number(options.filterNpeFinalTo)} }`);
         }
       }
 

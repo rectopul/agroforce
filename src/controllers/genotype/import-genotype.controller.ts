@@ -806,12 +806,12 @@ export class ImportGenotypeController {
                     gmr: this.aux.gmr,
                     bgm: this.aux.bgm,
                     cruza: this.aux.cruza,
-                    progenitor_f_direto: String(this.aux.progenitor_f_direto),
-                    progenitor_m_direto: String(this.aux.progenitor_m_direto),
-                    progenitor_f_origem: String(this.aux.progenitor_f_origem),
-                    progenitor_m_origem: String(this.aux.progenitor_m_origem),
-                    progenitores_origem: String(this.aux.progenitores_origem),
-                    parentesco_completo: String(this.aux.parentesco_completo),
+                    progenitor_f_direto: this.aux.progenitor_f_direto ? String(this.aux.progenitor_f_direto) : undefined,
+                    progenitor_m_direto: this.aux.progenitor_m_direto ? String(this.aux.progenitor_m_direto) : undefined,
+                    progenitor_f_origem: this.aux.progenitor_f_origem ? String(this.aux.progenitor_f_origem) : undefined,
+                    progenitor_m_origem: this.aux.progenitor_m_origem ? String(this.aux.progenitor_m_origem) : undefined,
+                    progenitores_origem: this.aux.progenitores_origem ? String(this.aux.progenitores_origem) : undefined,
+                    parentesco_completo: this.aux.parentesco_completo ? String(this.aux.parentesco_completo) : undefined,
                     created_by: createdBy,
                   });
 
