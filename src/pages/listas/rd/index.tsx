@@ -567,12 +567,15 @@ export default function Import({
         response.map((item: any) => {
           const newItem = item;
 
+          newItem.CULTURA = item.safra.culture.name;
+          newItem.SAFRA = item.safra.safraName;
           newItem.USUÁRIO = item.user.name;
           newItem.TABELA = item.table;
           newItem.STATUS = item.state;
           newItem.INICIO_EM = item.created_at;
           newItem.FIM_EM = item.updated_at;
 
+          delete newItem.safra;
           delete newItem.user;
           delete newItem.table;
           delete newItem.state;
@@ -1330,8 +1333,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
   const idSafra = Number(req.cookies.safraId);
   const idCulture = Number(req.cookies.cultureId);
 
-  const filterApplication = '';
-  const param = `skip=0&take=${itensPerPage}`;
+  const filterApplication = `&idSafra=${idSafra}`;
+  const param = `skip=0&take=${itensPerPage}&idSafra=${idSafra}`;
 
   const urlParameters: any = new URL(
     `${publicRuntimeConfig.apiUrl}/log-import`,

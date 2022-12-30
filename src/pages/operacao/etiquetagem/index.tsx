@@ -193,19 +193,9 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
   // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}`;
 
-  const formik = useFormik<IExperimentGroupFilter>({
+  const formik = useFormik<any>({
     initialValues: {
-      // filterExperimentGroup: checkValue('filterExperimentGroup'),
-      // filterQuantityExperiment: checkValue('filterQuantityExperiment'),
-      // filterTagsToPrint: checkValue('filterTagsToPrint'),
-      // filterTagsPrinted: checkValue('filterTagsPrinted'),
-      // filterTotalTags: checkValue('filterTotalTags'),
-      // filterStatus: checkValue('filterStatus'),
       filterExperimentGroup: checkValue('filterExperimentGroup'),
-      filterQuantityExperiment: checkValue('filterQuantityExperiment'),
-      filterTagsToPrint: checkValue('filterTagsToPrint'),
-      filterTagsPrinted: checkValue('filterTagsPrinted'),
-      filterTotalTags: checkValue('filterTotalTags'),
       filterStatus: checkValue('filterStatus'),
       filterQtdExpFrom: checkValue('filterQtdExpFrom'),
       filterQtdExpTo: checkValue('filterQtdExpTo'),
@@ -218,10 +208,6 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     },
     onSubmit: async ({
       filterExperimentGroup,
-      filterQuantityExperiment,
-      filterTagsToPrint,
-      filterTagsPrinted,
-      filterTotalTags,
       filterQtdExpTo,
       filterQtdExpFrom,
       filterTotalEtiqImprimirTo,
@@ -233,7 +219,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
       // filterStatus,
     }) => {
       const filterStatus = statusFilterSelected?.join(',');
-      const parametersFilter = `&filterExperimentGroup=${filterExperimentGroup}&filterQuantityExperiment=${filterQuantityExperiment}&filterTagsToPrint=${filterTagsToPrint}&filterTagsPrinted=${filterTagsPrinted}&filterTotalTags=${filterTotalTags}&filterStatus=${filterStatus}&safraId=${safraId}&id_culture=${cultureId}`;
+      const parametersFilter = `&filterExperimentGroup=${filterExperimentGroup}&filterQtdExpTo=${filterQtdExpTo}&filterQtdExpFrom=${filterQtdExpFrom}&filterTotalEtiqImprimirTo=${filterTotalEtiqImprimirTo}&filterTotalEtiqImprimirFrom=${filterTotalEtiqImprimirFrom}&filterTotalEtiqImpressasTo=${filterTotalEtiqImpressasTo}&filterTotalEtiqImpressasFrom=${filterTotalEtiqImpressasFrom}&filterTotalEtiqTo=${filterTotalEtiqTo}&filterTotalEtiqFrom=${filterTotalEtiqFrom}&filterStatus=${filterStatus}&safraId=${safraId}&id_culture=${cultureId}`;
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEditOperation', filtersParams);
       // await experimentGroupService

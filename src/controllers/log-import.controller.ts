@@ -64,6 +64,7 @@ export class LogImportController {
   }
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: log-import.controller.ts:67 ~ LogImportController ~ getAll ~ options', options);
     const parameters: object | any = {};
     parameters.AND = [];
     let orderBy: string;
@@ -83,12 +84,12 @@ export class LogImportController {
 
       if (options.filterEndFinishDate) {
         const newStartDate = new Date(options.filterEndFinishDate);
-        parameters.AND.push({ updated_at: { gte: newStartDate } });
+        parameters.AND.push({ updated_at: { lte: newStartDate } });
       }
 
       if (options.filterStartFinishDate) {
         const newEndDate = new Date(options.filterStartFinishDate);
-        parameters.AND.push({ updated_at: { lte: newEndDate } });
+        parameters.AND.push({ updated_at: { gte: newEndDate } });
       }
 
       if (options.filterStartDate) {
@@ -106,11 +107,21 @@ export class LogImportController {
         user: { select: { name: true } },
         table: true,
         state: true,
+        safra: {
+          select: {
+            culture: true,
+            safraName: true,
+          },
+        },
         status: true,
         invalid_data: true,
         created_at: true,
         updated_at: true,
       };
+
+      if (options.idSafra) {
+        parameters.idSafra = Number(options.idSafra);
+      }
 
       if (options.status) {
         parameters.status = Number(options.status);
