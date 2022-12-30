@@ -64,7 +64,6 @@ export class LogImportController {
   }
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: log-import.controller.ts:67 ~ LogImportController ~ getAll ~ options', options);
     const parameters: object | any = {};
     parameters.AND = [];
     let orderBy: string;
@@ -82,14 +81,14 @@ export class LogImportController {
         parameters.state = JSON.parse(`{"contains":"${options.filterState}"}`);
       }
 
-      if (options.filterEndFinishDate) {
-        const newStartDate = new Date(options.filterEndFinishDate);
-        parameters.AND.push({ updated_at: { lte: newStartDate } });
-      }
-
       if (options.filterStartFinishDate) {
         const newEndDate = new Date(options.filterStartFinishDate);
         parameters.AND.push({ updated_at: { gte: newEndDate } });
+      }
+
+      if (options.filterEndFinishDate) {
+        const newStartDate = new Date(options.filterEndFinishDate);
+        parameters.AND.push({ updated_at: { lte: newStartDate } });
       }
 
       if (options.filterStartDate) {

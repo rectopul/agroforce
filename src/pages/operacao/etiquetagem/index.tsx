@@ -617,7 +617,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
         });
         const workSheet = XLSX.utils.json_to_sheet(response);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'grupos-de-experimento');
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'Listagem-grupo-de-etiquetagem');
 
         // Buffer
         XLSX.write(workBook, {
@@ -630,7 +630,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'Grupos do experimento.xlsx');
+        XLSX.writeFile(workBook, 'Listagem grupo de etiquetagem.xlsx');
       } else {
         setLoading(false);
         Swal.fire('Não existem registros para serem exportados, favor checar.');

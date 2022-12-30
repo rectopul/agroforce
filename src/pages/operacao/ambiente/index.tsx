@@ -15,7 +15,9 @@ import {
   AiOutlineArrowUp,
   AiTwotoneStar,
 } from 'react-icons/ai';
-import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import {
+  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+} from 'react-icons/bi';
 import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { Router, useRouter } from 'next/router';
 import { IoReloadSharp } from 'react-icons/io5';
@@ -34,6 +36,7 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
+  ButtonDeleteConfirmation,
 } from '../../../components';
 import * as ITabs from '../../../shared/utils/dropdown';
 import { functionsUtils } from '../../../shared/utils/functionsUtils';
@@ -120,7 +123,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.npe || {
     id: 0,
     table_preferences:
-      'id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef,grp',
+      'id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef,prox_npe,grp,status',
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
@@ -186,9 +189,21 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
+      title: 'Prox NPE ',
+      value: 'prox_npe',
+      defaultChecked: () => camposGerenciados.includes('prox_npe'),
+    },
+    {
+      name: 'CamposGerenciados[]',
       title: 'GRP',
       value: 'grp',
       defaultChecked: () => camposGerenciados.includes('grp'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Ação',
+      value: 'status',
+      defaultChecked: () => camposGerenciados.includes('status'),
     },
   ]);
 
@@ -319,6 +334,90 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
+  async function deleteItem(data: any) {
+    setLoading(true);
+
+    const { status, message } = await npeService.deleted({
+      id: data?.id,
+      userId: userLogado.id,
+    });
+    if (status === 200) {
+      // router.reload();
+      handlePagination();
+      setLoading(false);
+    } else {
+      Swal.fire({
+        html: message,
+        width: '800',
+      });
+    }
+  }
+
+  function statusHeaderFactory() {
+    return {
+      title: 'Ação',
+      field: 'status',
+      sorting: false,
+      searchable: false,
+      filterPlaceholder: 'Filtrar por status',
+      render: (rowData: any) => (
+        <div className="h-7 flex">
+          <div className="h-7">
+            <Button
+              icon={<BiEdit size={14} />}
+              bgColor={rowData.edited === 1 ? 'bg-blue-900' : 'bg-blue-600'}
+              textColor="white"
+              title="Editar"
+              onClick={() => {
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('lastPage', 'atualizar');
+                setCookies('itensPage', itensPerPage);
+                setCookies('takeBeforeEdit', take);
+                router.push(`/operacao/ambiente/atualizar?id=${rowData.id}`);
+              }}
+            />
+          </div>
+          <div style={{ width: 5 }} />
+          <ButtonDeleteConfirmation
+            data={rowData}
+            keyName={rowData?.local?.name_local_culture}
+            onPress={deleteItem}
+            disabled={rowData.status === 3}
+          />
+          {/* {rowData.status === 1 || rowData.status === 3 ? (
+            <div>
+              <Button
+                title={rowData.status === 3 ? '' : 'Ativo'}
+                icon={<BsTrashFill size={14} />}
+                onClick={() => deleteItem(rowData.id)}
+                bgColor={rowData.status === 3 ? 'bg-gray-400' : 'bg-red-600'}
+                textColor="white"
+                disabled={rowData.status === 3}
+              />
+            </div>
+          ) : (
+            <div className="h-7 flex">
+              <div className="h-7" />
+              <div>
+                <Button
+                  title="Inativo"
+                  icon={<BsTrashFill size={14} />}
+                  onClick={async () => deleteItem(rowData.id)}
+                  bgColor="bg-red-800"
+                  textColor="white"
+                />
+              </div>
+            </div>
+          )} */}
+        </div>
+      ),
+    };
+  }
+
   function colums(camposGerenciados: any): any {
     const columnCampos: any = camposGerenciados.split(',');
     const tableFields: any = [];
@@ -418,6 +517,18 @@ export default function Listagem({
           }),
         );
       }
+      if (columnCampos[item] === 'prox_npe') {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            type: 'int',
+            name: 'Prox NPE',
+            title: 'prox_npe',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
+      }
       if (columnCampos[item] === 'grp') {
         tableFields.push(
           headerTableFactoryGlobal({
@@ -428,6 +539,9 @@ export default function Listagem({
             handleOrder,
           }),
         );
+      }
+      if (columnCampos[item] === 'status') {
+        tableFields.push(statusHeaderFactory());
       }
     });
     return tableFields;
@@ -511,7 +625,7 @@ export default function Listagem({
     setGeneratesProps(items);
   }
 
-  const downloadExcel = async (): Promise<void> => {
+  const downloadExcel_old = async (): Promise<void> => {
     setLoading(true);
     if (!filterApplication.includes('paramSelect')) {
       filterApplication += `&paramSelect=${camposGerenciados}`;
@@ -572,6 +686,75 @@ export default function Listagem({
         XLSX.writeFile(workBook, 'NPE.xlsx');
       } else {
         setLoading(false);
+        Swal.fire('Não existem registros para serem exportados, favor checar.');
+      }
+    });
+    setLoading(false);
+  };
+
+  const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
+    await npeService.getAll(filter).then(({ status, response }) => {
+      if (status === 200) {
+        const newData = response.map((row: any) => {
+          delete row.avatar;
+          if (row.status === 0) {
+            row.status = 'Inativo';
+          } else {
+            row.status = 'Ativo';
+          }
+
+          row.CULTURA = row.safra?.culture?.name;
+          row.SAFRA = row.safra?.safraName;
+          row.FOCO = row.foco?.name;
+          row.TIPO_ENSAIO = row.type_assay?.name;
+          row.TECNOLOGIA = `${row.tecnologia?.cod_tec} ${row.tecnologia?.name}`;
+          row.LOCAL = row.local?.name_local_culture;
+          row.NPEI = row.npei;
+          row.ÉPOCA = row?.epoca;
+          row.GRUPO = row.group.group;
+          row.PROX_NPE = row.prox_npe;
+
+          delete row.nextAvailableNPE;
+          delete row.prox_npe;
+
+          delete row.edited;
+          delete row.local;
+          delete row.safra;
+          delete row.foco;
+          delete row.epoca;
+          delete row.tecnologia;
+          delete row.type_assay;
+          delete row.group;
+          delete row.npei;
+          delete row.npei_i;
+          delete row.status;
+          delete row.nextNPE;
+          delete row.npeQT;
+          delete row.localId;
+          delete row.safraId;
+          delete row.npef;
+          delete row.id;
+          return row;
+        });
+
+        const workSheet = XLSX.utils.json_to_sheet(newData);
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'npe');
+
+        // Buffer
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
+        });
+        // Binary
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
+        });
+        // Download
+        XLSX.writeFile(workBook, 'NPE.xlsx');
+      } else {
         Swal.fire('Não existem registros para serem exportados, favor checar.');
       }
     });
@@ -743,6 +926,29 @@ export default function Listagem({
                         type="number"
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
+                        id="filterNpeFinalTo"
+                        name="filterNpeFinalTo"
+                        onChange={formik.handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/3 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Prox NPE
+                    </label>
+                    <div className="flex">
+                      <Input
+                        placeholder="De"
+                        type="number"
+                        id="filterNpeFinalFrom"
+                        name="filterNpeFinalFrom"
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        type="number"
                         id="filterNpeFinalTo"
                         name="filterNpeFinalTo"
                         onChange={formik.handleChange}
@@ -1070,7 +1276,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     urlParameters.toString(),
     requestOptions,
   ).then((response) => response.json());
-
 
   return {
     props: {
