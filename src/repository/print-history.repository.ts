@@ -1,5 +1,6 @@
 import { prisma } from '../pages/api/db/db';
 import { BaseRepository } from './base-repository';
+
 export class PrintHistoryRepository extends BaseRepository {
   async create(data: any) {
     const result = await prisma.printHistory.create({ data });
@@ -45,7 +46,7 @@ export class PrintHistoryRepository extends BaseRepository {
   async deleteMany(idList: any) {
     const result = await prisma.printHistory.deleteMany({
       where: {
-        id: {
+        experimentGenotypeId: {
           in: idList,
         },
       },

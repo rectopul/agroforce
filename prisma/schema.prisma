@@ -84,6 +84,7 @@ model safra {
   quadra              quadra[]
   experiment_genotipe experiment_genotipe[]
   ExperimentGroup     ExperimentGroup[]
+  log_import          log_import[]
 
   @@unique([safraName, id_culture])
 }
@@ -522,6 +523,7 @@ model experiment {
 
 model log_import {
   id           Int       @id @default(autoincrement())
+  idSafra      Int
   user_id      Int
   table        String
   status       Int       @default(2)
@@ -531,7 +533,9 @@ model log_import {
   invalid_data String?   @db.LongText
   executeTime  String?
   totalRecords Int?
-  user         user      @relation(fields: [user_id], references: [id])
+
+  safra safra @relation(fields: [idSafra], references: [id])
+  user  user  @relation(fields: [user_id], references: [id])
 }
 
 model assay_list {

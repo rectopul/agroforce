@@ -152,6 +152,7 @@ export class ImportController {
       table: String(data.spreadSheet[1][0]),
       totalRecords: (data.spreadSheet.length - 1),
       state: 'EM ANDAMENTO',
+      idSafra: data.idSafra,
     });
     try {
       if (status === 400) {
@@ -218,6 +219,7 @@ export class ImportController {
       table: data.table,
       totalRecords: (data.spreadSheet.length - 1),
       state: 'EM ANDAMENTO',
+      idSafra: data.idSafra,
     });
     try {
       // await importblob(data.files[0]);

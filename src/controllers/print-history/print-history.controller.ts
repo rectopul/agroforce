@@ -78,7 +78,6 @@ export class PrintHistoryController {
   }
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: print-history.controller.ts:65 ~ PrintHistoryController ~ getAll ~ options', options);
     const parameters: object | any = {};
     parameters.AND = [];
     let orderBy: object | any = '';
@@ -137,7 +136,6 @@ export class PrintHistoryController {
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
 
-      console.log('🚀 ~ file: print-history.controller.ts:68 ~ PrintHistoryController ~ getAll ~ parameters', parameters);
       const response: object | any = await this.printHistoryRepository.findAll(
         parameters,
         select,
