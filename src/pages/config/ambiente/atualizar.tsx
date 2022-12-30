@@ -128,7 +128,7 @@ export default function NovoLocal({
       const parametersFilter = `filterStatus=1&npei=${values.prox_npe}`;
       await npeService.getAll(parametersFilter).then(async (response) => {
         if (response.total <= 0) {
-          const paramFilter = `id_culture=${idCulture}&id_safra=${idSafra}&npe=${values.prox_npe}`;
+          const paramFilter = `id_culture=${idCulture}&id_safra=${idSafra}&npe=${values.prox_npe}&take=${1}`;
           await experimentGenotipeService
             .getAll(paramFilter)
             .then(async (response) => {
