@@ -193,7 +193,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
   // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}`;
 
-  const formik = useFormik<IExperimentGroupFilter>({
+  const formik = useFormik<any>({
     initialValues: {
       filterExperimentGroup: checkValue('filterExperimentGroup'),
       filterStatus: checkValue('filterStatus'),
