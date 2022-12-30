@@ -720,7 +720,6 @@ export default function Listagem({
     //     newResponse.push(response);
     //   });
     //   newTake += 500;
-    //   console.log(newResponse);
     // }
     await experimentGenotipeService
       .getAll(filter)

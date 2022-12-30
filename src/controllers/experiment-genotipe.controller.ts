@@ -17,6 +17,7 @@ export class ExperimentGenotipeController {
   private printedHistoryController = new PrintHistoryController();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: experiment-genotipe.controller.ts:20 ~ ExperimentGenotipeController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
@@ -372,6 +373,7 @@ export class ExperimentGenotipeController {
         skip,
         orderBy,
       );
+      console.log('🚀 ~ file: experiment-genotipe.controller.ts:376 ~ ExperimentGenotipeController ~ getAll ~ response', response);
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };

@@ -725,6 +725,7 @@ export default function Listagem({
         if (status === 200) {
           const newData = response.map((item: any) => {
             const newItem: any = {};
+            newItem.CULTURA = item.safra.culture.name;
             newItem.SAFRA = item.safra.safraName;
             newItem.FOCO = item.assay_list.foco.name;
             newItem.ENSAIO = item.assay_list.type_assay.name;
@@ -733,7 +734,7 @@ export default function Listagem({
             newItem.GLI = item.assay_list.gli;
             newItem.BGM = item.assay_list.bgm;
             newItem.BGM_Genótipo = item.genotipo.bgm;
-            newItem.GMT = item.genotipo.gmr;
+            newItem.GMR_GEN = item.genotipo.gmr;
             newItem.NT = item.treatments_number;
             newItem.STATUS_T = item.status;
             newItem.STATUS_ENSAIO = item.assay_list.status;

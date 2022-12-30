@@ -18,7 +18,6 @@ export function SelectAutoCompleteMaterial({
           <TextField
             {...params}
             value={value}
-            //onChange={(e) => console.log(e.target.value)}
             onSelect={(e) => onChange(e.target.value)}
           />
         )}

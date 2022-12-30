@@ -869,7 +869,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { token } = req.cookies;
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
-  console.log('lastPageServer', lastPageServer);
   if (lastPageServer == undefined || lastPageServer == "No") {
     removeCookies("filterBeforeEdit", { req, res });
     removeCookies("pageBeforeEdit", { req, res });

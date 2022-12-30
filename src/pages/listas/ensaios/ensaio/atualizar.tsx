@@ -62,21 +62,21 @@ import ComponentLoading from '../../../../components/Loading';
 type IAssayListUpdate = Omit<IAssayList, 'id_safra' | 'period'>;
 
 export default function AtualizarTipoEnsaio({
-      allGenotypeTreatment,
-      totalItens,
-      itensPerPage,
-      treatmentsFilterApplication,
-      experimentFilterApplication,
-      idAssayList,
-      idSafra,
-      assayList,
-      allExperiments,
-      totalExperiments,
-      pageBeforeEdit,
-      filterBeforeEdit,
-      orderByserver,
-      typeOrderServer,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allGenotypeTreatment,
+  totalItens,
+  itensPerPage,
+  treatmentsFilterApplication,
+  experimentFilterApplication,
+  idAssayList,
+  idSafra,
+  assayList,
+  allExperiments,
+  totalExperiments,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  orderByserver,
+  typeOrderServer,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -161,7 +161,7 @@ export default function AtualizarTipoEnsaio({
     { name: 'CamposGerenciados[]', title: 'OBS', value: 'comments' },
     {
       name: 'CamposGerenciados[]',
-      title: 'Status Trat.',
+      title: 'Status exp.',
       value: 'status_experiment',
     },
   ]);
@@ -198,7 +198,7 @@ export default function AtualizarTipoEnsaio({
       foco: assayList?.foco?.name,
       type_assay: assayList?.type_assay?.name,
       tecnologia: `${assayList?.tecnologia?.cod_tec || ''} ${assayList?.tecnologia?.name || ''
-        }`,
+      }`,
       gli: assayList?.gli,
       bgm: assayList?.bgm || '',
       status: assayList?.status,
@@ -500,7 +500,7 @@ export default function AtualizarTipoEnsaio({
       if (columnOrder[index] === 'status_experiment') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Status Trat',
+            name: 'Status exp.',
             title: 'status_experiment',
             orderList,
             fieldOrder,
@@ -736,9 +736,12 @@ export default function AtualizarTipoEnsaio({
         if (status === 200) {
           const newData = response.map((row: any) => {
             const newRow = row;
+            newRow.CULTURA = row.safra.culture.name;
             newRow.SAFRA = row.safra.safraName;
             newRow.FASE = newRow.lote?.fase;
+            newRow.ENSAIO = newRow.assay_list.type_assay.name;
             newRow.TECNOLOGIA = `${newRow.genotipo?.tecnologia.cod_tec} ${newRow.genotipo?.tecnologia.name}`;
+            newRow.GLI = newRow.assay_list.gli;
             newRow.NT = newRow.treatments_number;
             newRow.NOME_GENOTIPO = newRow.genotipo?.name_genotipo;
             newRow.GMR_GENOTIPO = newRow.genotipo?.gmr;
@@ -1134,7 +1137,7 @@ export default function AtualizarTipoEnsaio({
                             table === 'genotipo' ? 'bg-blue-600' : 'bg-gray-600'
                           }
                           textColor="white"
-                          onClick={() => setTable("genotipo")}
+                          onClick={() => setTable('genotipo')}
                           // icon={<FaSortAmountUpAlt size={20} />}
                         />
                       </div>
