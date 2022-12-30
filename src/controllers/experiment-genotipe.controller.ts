@@ -342,9 +342,9 @@ export class ExperimentGenotipeController {
       }
 
       if (options.npe) {
-        if (typeof options.npe === 'number') {
-          parameters.npe = Number(options.npe);
-        }
+        // if (typeof options.npe === 'number') {
+        parameters.npe = Number(options.npe);
+        // }
       }
 
       if (options.idExperiment) {
