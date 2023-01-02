@@ -1,24 +1,27 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { useFormik } from "formik";
-import Head from "next/head";
-import getConfig from "next/config";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
-import Swal from "sweetalert2";
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { useFormik } from 'formik';
+import Head from 'next/head';
+import getConfig from 'next/config';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
+import Swal from 'sweetalert2';
 import {
   experimentGenotipeService,
   layoutQuadraService,
   npeService,
-} from "src/services";
-import InputMask from "react-input-mask";
+} from 'src/services';
+import InputMask from 'react-input-mask';
 
-import { IoMdArrowBack } from "react-icons/io";
-import { MdDateRange } from "react-icons/md";
-import npe from "src/pages/api/npe";
-import { Content, Input, Select, Button } from "../../../components";
+import { IoMdArrowBack } from 'react-icons/io';
+import { MdDateRange } from 'react-icons/md';
+import npe from 'src/pages/api/npe';
+import {
+  Content, Input, Select, Button,
+} from '../../../components';
 
-import * as ITabs from "../../../shared/utils/dropdown";
+import * as ITabs from '../../../shared/utils/dropdown';
+import ComponentLoading from '../../../components/Loading';
 
 interface ILayoultProps {
   id: number | any;
@@ -78,21 +81,20 @@ export default function NovoLocal({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
-  const tabsOperationMenu = tabsOperation.map((i) =>
-    i.titleTab === "AMBIENTE"
-      ? { ...i, statusTab: true }
-      : { ...i, statubsTab: false }
-  );
+  const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE'
+    ? { ...i, statusTab: true }
+    : { ...i, statubsTab: false }));
 
   const [localMap, setIdLocalMap] = useState<ILocal[]>(() => local);
   const [idLocal, setIdLocal] = useState<number>(layoultEdit.localId);
   const [lat, setLat] = useState<number>(0);
   const [lng, setLng] = useState<number>(0);
-  const [titleLocal, setTitleLocal] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [titleLocal, setTitleLocal] = useState<string>('');
 
   const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: "AIzaSyD2fT6h_lQHgdj4_TgbwV6uDfZ23Hj0vKg",
+    id: 'google-map-script',
+    googleMapsApiKey: 'AIzaSyD2fT6h_lQHgdj4_TgbwV6uDfZ23Hj0vKg',
   });
 
   const position = {
@@ -100,7 +102,7 @@ export default function NovoLocal({
     lng,
   };
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const locais: object | any = [];
   const router = useRouter();
   const formik = useFormik<INpeProps>({
@@ -142,21 +144,25 @@ export default function NovoLocal({
                   })
                   .then((response) => {
                     if (response.status === 200) {
-                      Swal.fire("NPE atualizado com sucesso!");
+                      Swal.fire('NPE atualizado com sucesso!');
+                      setLoading(false);
                       router.back();
                     } else {
+                      setLoading(false);
                       Swal.fire(response.message);
                     }
                   });
               } else {
+                setLoading(false);
                 Swal.fire(
-                  "Não foi possível atualizar o prox npe, o prox npe inserido já foi usado pela parcela."
+                  'Não foi possível atualizar o prox npe, o prox npe inserido já foi usado pela parcela.',
                 );
               }
             });
         } else {
+          setLoading(false);
           Swal.fire(
-            "Não é possível atualizar o prox npe, o prox npe inserido já é consumido por outro npe."
+            'Não é possível atualizar o prox npe, o prox npe inserido já é consumido por outro npe.',
           );
         }
       });
@@ -169,11 +175,11 @@ export default function NovoLocal({
 
   function validateInputs(values: any) {
     if (!values.prox_npe) {
-      const inputesquema: any = document.getElementById("prox_npe");
-      inputesquema.style.borderColor = "red";
+      const inputesquema: any = document.getElementById('prox_npe');
+      inputesquema.style.borderColor = 'red';
     } else {
-      const inputesquema: any = document.getElementById("prox_npe");
-      inputesquema.style.borderColor = "";
+      const inputesquema: any = document.getElementById('prox_npe');
+      inputesquema.style.borderColor = '';
     }
   }
 
@@ -192,6 +198,7 @@ export default function NovoLocal({
 
   return (
     <>
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Atualizar Ambiente</title>
       </Head>
@@ -235,7 +242,7 @@ export default function NovoLocal({
                 onChange={formik.handleChange}
                 value={formik.values.safra}
                 disabled
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
               />
             </div>
             <div className="w-full">
@@ -250,7 +257,7 @@ export default function NovoLocal({
                 onChange={formik.handleChange}
                 value={formik.values.local}
                 disabled
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
               />
             </div>
             <div className="w-full">
@@ -265,13 +272,13 @@ export default function NovoLocal({
                 onChange={formik.handleChange}
                 value={
                   formik.values.status == 3
-                    ? "SORTEADO"
+                    ? 'SORTEADO'
                     : formik.values.status == 1
-                    ? "IMPORTADO"
-                    : "INACTIVE"
+                      ? 'IMPORTADO'
+                      : 'INACTIVE'
                 }
                 disabled
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
               />
             </div>
           </div>
@@ -296,7 +303,7 @@ export default function NovoLocal({
                 onChange={formik.handleChange}
                 value={formik.values.foco}
                 disabled
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
               />
             </div>
             <div className="w-1/2">
@@ -311,7 +318,7 @@ export default function NovoLocal({
                 onChange={formik.handleChange}
                 value={formik.values.epoca}
                 disabled
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
               />
             </div>
 
@@ -327,7 +334,7 @@ export default function NovoLocal({
                 onChange={formik.handleChange}
                 value={formik.values.type_assay}
                 disabled
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
               />
             </div>
             <div className="w-1/3">
@@ -343,7 +350,7 @@ export default function NovoLocal({
                 onChange={formik.handleChange}
                 value={formik.values.cod_tec}
                 disabled
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
               />
             </div>
             <div className="w-full">
@@ -358,7 +365,7 @@ export default function NovoLocal({
                 onChange={formik.handleChange}
                 value={formik.values.tecnologia}
                 disabled
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
               />
             </div>
           </div>
@@ -383,7 +390,7 @@ export default function NovoLocal({
                 onChange={formik.handleChange}
                 value={formik.values.npei}
                 disabled
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
               />
             </div>
             <div className="w-full">
@@ -398,7 +405,7 @@ export default function NovoLocal({
                 onChange={formik.handleChange}
                 value={formik.values.npef}
                 disabled
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
               />
             </div>
             <div className="w-full">
@@ -446,7 +453,7 @@ export default function NovoLocal({
                 bgColor="bg-blue-600"
                 icon={<MdDateRange size={18} />}
                 textColor="white"
-                onClick={() => {}}
+                onClick={() => { setLoading(true); }}
               />
             </div>
           </div>
@@ -467,8 +474,8 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const idSafra = context.req.cookies.safraId;
 
   const requestOptions: RequestInit | undefined = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   };
 
@@ -476,7 +483,7 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const resU = await fetch(`${baseUrlLayout}/47`, requestOptions);
   const apiNpe = await fetch(
     `${baseUrlNpe}/${context.query.id}`,
-    requestOptions
+    requestOptions,
   );
 
   const npe = await apiNpe.json();
