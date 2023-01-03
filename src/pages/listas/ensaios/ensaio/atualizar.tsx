@@ -1431,7 +1431,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     `${baseUrlAssayList}/${query.id}`,
     requestOptions,
   ).then((response) => response.json());
-
   return {
     props: {
       allGenotypeTreatment,

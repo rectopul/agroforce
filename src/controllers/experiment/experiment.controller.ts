@@ -18,6 +18,7 @@ export class ExperimentController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: experiment.controller.ts:21 ~ ExperimentController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
@@ -200,6 +201,7 @@ export class ExperimentController {
           }
         }
       }
+
       const response: object | any = await this.experimentRepository.findAll(
         parameters,
         select,
