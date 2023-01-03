@@ -6,8 +6,10 @@ import { ExperimentController } from './experiment/experiment.controller';
 import { PrintHistoryController } from './print-history/print-history.controller';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
+import * as XLSX from 'xlsx';
 
 export class ExperimentGenotipeController {
+
   private ExperimentGenotipeRepository = new ExperimentGenotipeRepository();
 
   private experimentController = new ExperimentController();
@@ -22,6 +24,10 @@ export class ExperimentGenotipeController {
     parameters.AND = [];
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const sheet = await this.createXls(options);
+        return { status: 200, response: sheet };;
+      }
       if (options.filterFoco) {
         parameters.foco = JSON.parse(
           `{ "name": { "contains": "${options.filterFoco}" } }`,
@@ -446,6 +452,7 @@ export class ExperimentGenotipeController {
     }
   }
 
+
   async relateLayout({ id, blockLayoutId, status }: any) {
     try {
       const parcela: any = await this.getOne(Number(id));
@@ -530,5 +537,85 @@ export class ExperimentGenotipeController {
         '[Controller] - Erro ao criar esboço de tratamento do experimento',
       );
     }
+  }
+
+  async createXls(options: any) {
+    try {
+      console.log('createXls experimentGenotipe controller');
+      delete options.createFile;
+      options.take = 1000;
+
+      const { response, status } = await this.getAll(options);
+
+      const newData = response.map((item: any) => {
+        const newItem: any = {};
+        newItem.CULTURA = item.safra.culture.name;
+        newItem.SAFRA = item.safra.safraName;
+        newItem.FOCO = item.foco.name;
+        newItem.ENSAIO = item.type_assay.name;
+        newItem.TECNOLOGIA = `${item.tecnologia.cod_tec} ${item.tecnologia.name}`;
+        newItem.GLI = item.gli;
+        newItem.EXPERIMENTO = item.experiment.experimentName;
+        newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
+        newItem.DELINEAMENTO = item.experiment.delineamento.name;
+        newItem.REP = item.rep;
+        newItem.NT = item.nt;
+        newItem.NPE = item.npe;
+        newItem.STATUS_T = item.status_t;
+        newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
+        newItem.NCA = item.nca;
+        newItem.STATUS_EXP = item.experiment.status;
+
+        delete newItem.id;
+        return newItem;
+      });
+
+      let workSheet: any = XLSX.utils.json_to_sheet(newData);
+
+      let res = response;
+
+      options.skip = 1000;
+      while (res.length > 0) {
+
+        await this.getAll(options).then(({ status, response }) => {
+          // logic
+          const newData = response.map((item: any) => {
+            const newItem: any = {};
+            newItem.CULTURA = item.safra.culture.name;
+            newItem.SAFRA = item.safra.safraName;
+            newItem.FOCO = item.foco.name;
+            newItem.ENSAIO = item.type_assay.name;
+            newItem.TECNOLOGIA = `${item.tecnologia.cod_tec} ${item.tecnologia.name}`;
+            newItem.GLI = item.gli;
+            newItem.EXPERIMENTO = item.experiment.experimentName;
+            newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
+            newItem.DELINEAMENTO = item.experiment.delineamento.name;
+            newItem.REP = item.rep;
+            newItem.NT = item.nt;
+            newItem.NPE = item.npe;
+            newItem.STATUS_T = item.status_t;
+            newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
+            newItem.NCA = item.nca;
+            newItem.STATUS_EXP = item.experiment.status;
+
+            delete newItem.id;
+            return newItem;
+          });
+
+          workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
+          // logic
+          res = response;
+
+          options.skip += 1000;
+        })
+      }
+
+
+
+      return workSheet;
+    } catch (error) {
+      console.log(error);
+    }
+
   }
 }

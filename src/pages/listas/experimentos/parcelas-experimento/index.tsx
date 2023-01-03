@@ -30,6 +30,8 @@ import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import readXlsxFile from 'read-excel-file';
+import XLSXWriteStream from '@atomictech/xlsx-write-stream';
+import * as fs from 'fs';
 import { experimentGenotipeService } from 'src/services/experiment-genotipe.service';
 import {
   ITreatment,
@@ -60,17 +62,18 @@ import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
 import { functionsUtils } from '../../../../shared/utils/functionsUtils';
+import { ExperimentGenotipeController } from 'src/controllers/experiment-genotipe.controller';
 
 export default function Listagem({
-  // assaySelect,
-  genotypeSelect,
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  filterBeforeEdit,
-  typeOrderServer,
-  orderByserver,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      // assaySelect,
+      genotypeSelect,
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      filterBeforeEdit,
+      typeOrderServer,
+      orderByserver,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState<boolean>(false);
   const { TabsDropDowns } = ITabs.default;
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -238,9 +241,8 @@ export default function Listagem({
   //   orderBy == "tecnologia" ? "genotipo.tecnologia.cod_tec" : orderBy
   // }&typeOrder=${typeOrder}`; // RR
 
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const [nccIsValid, setNccIsValid] = useState<boolean>(false);
   const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
@@ -722,36 +724,62 @@ export default function Listagem({
     //   newTake += 500;
     //   console.log(newResponse);
     // }
+
+    let skip = 0;
+    let take = 10;
+    // &createFile=true
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+    // await experimentGenotipeService
+    //   .getAll(filterParam)
+    //   .then(async ({ status, response }) => {
+    //     skip = 1000;
+    //     let res = response;
+    //     // writestream
+    //     while (res.length > 0) {
+    //       const filterParam1 = `${filter}&skip=${skip}&take=${take}`;
+    //       await experimentGenotipeService.getAll(filterParam1).then(({ status, response }) => {
+    //         // logic
+    //         console.log(response);
+    //         res = response;
+    //         skip += 1000;
+    //       })
+    //     }
+    //   })
+    console.log(filterParam);
     await experimentGenotipeService
-      .getAll(filter)
+      .getAll(filterParam)
       .then(({ status, response }) => {
+        // console.log('parcelas do experimento', response)
         if (status === 200) {
-          const newData = response.map((item: any) => {
-            const newItem: any = {};
-            newItem.CULTURA = item.safra.culture.name;
-            newItem.SAFRA = item.safra.safraName;
-            newItem.FOCO = item.foco.name;
-            newItem.ENSAIO = item.type_assay.name;
-            newItem.TECNOLOGIA = `${item.tecnologia.cod_tec} ${item.tecnologia.name}`;
-            newItem.GLI = item.gli;
-            newItem.EXPERIMENTO = item.experiment.experimentName;
-            newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
-            newItem.DELINEAMENTO = item.experiment.delineamento.name;
-            newItem.REP = item.rep;
-            newItem.NT = item.nt;
-            newItem.NPE = item.npe;
-            newItem.STATUS_T = item.status_t;
-            newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
-            newItem.NCA = item.nca;
-            newItem.STATUS_EXP = item.experiment.status;
+          // const expGenCon = new ExperimentGenotipeController();
+          // expGenCon.createXls();
+          // const newData = response.map((item: any) => {
+          //   const newItem: any = {};
+          //   newItem.CULTURA = item.safra.culture.name;
+          //   newItem.SAFRA = item.safra.safraName;
+          //   newItem.FOCO = item.foco.name;
+          //   newItem.ENSAIO = item.type_assay.name;
+          //   newItem.TECNOLOGIA = `${item.tecnologia.cod_tec} ${item.tecnologia.name}`;
+          //   newItem.GLI = item.gli;
+          //   newItem.EXPERIMENTO = item.experiment.experimentName;
+          //   newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
+          //   newItem.DELINEAMENTO = item.experiment.delineamento.name;
+          //   newItem.REP = item.rep;
+          //   newItem.NT = item.nt;
+          //   newItem.NPE = item.npe;
+          //   newItem.STATUS_T = item.status_t;
+          //   newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
+          //   newItem.NCA = item.nca;
+          //   newItem.STATUS_EXP = item.experiment.status;
 
-            delete newItem.id;
-            return newItem;
-          });
-          const workSheet = XLSX.utils.json_to_sheet(newData);
+          //   delete newItem.id;
+          //   return newItem;
+          // });
+
+          // let workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Parcelas');
-
+          // workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
+          XLSX.utils.book_append_sheet(workBook, response, 'Parcelas');
           // Buffer
           XLSX.write(workBook, {
             bookType: 'xlsx', // xlsx
@@ -1397,7 +1425,7 @@ export default function Listagem({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       type="submit"
                       bgColor="bg-blue-600"
@@ -1437,7 +1465,7 @@ export default function Listagem({
                     : '',
                 },
               }}
-              onChangeRowsPerPage={(e: any) => {}}
+              onChangeRowsPerPage={(e: any) => { }}
               onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (
@@ -1610,7 +1638,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>
@@ -1674,6 +1702,26 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('lastPage', { req, res });
 
   const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}`;
+
+  // test code
+
+  // // [optional] Define some header
+  // const columns = ['A Number Column', 'A Text Column', 'A Date Column', 'A Boolean Column', 'Another Boolean Column', 'Another Text Column'];
+
+  // // Initialize the writer
+  // const xlsxWriter = new XLSXWriteStream({ header: true, columns });
+
+  // // Pipe the writer into a Stream.Writable output stream in order to retrieve XLSX file data,
+  // // write it into file or send it as HTTP response.
+  // const writeStream = fs.createWriteStream('file.xlsx');
+  // xlsxWriter.pipe(writeStream);
+
+  // // Write rows one by one with
+  // const row = [1, '02', new Date('2015-10-21T16:29:00.000Z'), true, false, '🦄'];
+  // xlsxWriter.write(row);
+  // xlsxWriter.end(); // Do not forget to end the stream!
+
+  // test code end
 
   const urlParametersAssay: any = new URL(baseUrlAssay);
   const urlParametersTreatment: any = new URL(baseUrlTreatment);
