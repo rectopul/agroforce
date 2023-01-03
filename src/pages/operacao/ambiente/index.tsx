@@ -1033,36 +1033,56 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    <div className="h-12">
-                      <Button
-                        title="Gerar sorteio"
-                        value="Gerar sorteio"
-                        bgColor={
-                          selectedNPE?.length <= 0
-                            ? "bg-gray-400"
-                            : "bg-blue-600"
-                        }
-                        textColor="white"
-                        disabled={selectedNPE.length <= 0}
-                        onClick={() => {
-                          selectedNPE.sort((a, b) => a.prox_npe - b.prox_npe);
-                          localStorage.setItem(
-                            "selectedNPE",
-                            JSON.stringify(selectedNPE)
-                          );
-                          setCookies("pageBeforeEdit", currentPage?.toString());
-                          setCookies("filterBeforeEdit", filter);
-                          setCookies("filterBeforeEditTypeOrder", typeOrder);
-                          setCookies("filterBeforeEditOrderBy", orderBy);
-                          setCookies("filtersParams", filtersParams);
-                          setCookies("lastPage", "atualizar");
-                          setCookies("takeBeforeEdit", take);
-                          setCookies("itensPage", itensPerPage);
-                          router.push({
-                            pathname: "/operacao/ambiente/experimento",
-                          });
-                        }}
-                      />
+                    <div className="flex">
+                      <div className="h-12">
+                        <Button
+                          title="Importar"
+                          value="Importar"
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => {
+                            window.open(
+                              "/listas/rd?importar=ambiente",
+                              "_blank"
+                            );
+                          }}
+                          icon={<RiFileExcel2Line size={20} />}
+                        />
+                      </div>
+                      <div className="h-12 ml-2">
+                        <Button
+                          title="Gerar sorteio"
+                          value="Gerar sorteio"
+                          bgColor={
+                            selectedNPE?.length <= 0
+                              ? "bg-gray-400"
+                              : "bg-blue-600"
+                          }
+                          textColor="white"
+                          disabled={selectedNPE.length <= 0}
+                          onClick={() => {
+                            selectedNPE.sort((a, b) => a.prox_npe - b.prox_npe);
+                            localStorage.setItem(
+                              "selectedNPE",
+                              JSON.stringify(selectedNPE)
+                            );
+                            setCookies(
+                              "pageBeforeEdit",
+                              currentPage?.toString()
+                            );
+                            setCookies("filterBeforeEdit", filter);
+                            setCookies("filterBeforeEditTypeOrder", typeOrder);
+                            setCookies("filterBeforeEditOrderBy", orderBy);
+                            setCookies("filtersParams", filtersParams);
+                            setCookies("lastPage", "atualizar");
+                            setCookies("takeBeforeEdit", take);
+                            setCookies("itensPage", itensPerPage);
+                            router.push({
+                              pathname: "/operacao/ambiente/experimento",
+                            });
+                          }}
+                        />
+                      </div>
                     </div>
 
                     <strong className="text-blue-600">

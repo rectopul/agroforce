@@ -1032,7 +1032,19 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    <div className="h-12" />
+                    <div className="h-12">
+                      <Button
+                        title="Importar"
+                        value="Importar"
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        onClick={() => {
+                          window.open("/listas/rd?importar=rd", "_blank");
+                        }}
+                        icon={<RiFileExcel2Line size={20} />}
+                      />
+                    </div>
+
                     <strong className="text-blue-600">
                       Total registrado: {itemsTotal}
                     </strong>
