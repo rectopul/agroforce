@@ -30,8 +30,6 @@ import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import readXlsxFile from 'read-excel-file';
-import XLSXWriteStream from '@atomictech/xlsx-write-stream';
-import * as fs from 'fs';
 import { experimentGenotipeService } from 'src/services/experiment-genotipe.service';
 import {
   ITreatment,
