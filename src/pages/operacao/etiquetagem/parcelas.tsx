@@ -699,7 +699,11 @@ export default function Listagem({
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Parcelas de expe. etiquetagem');
+          XLSX.utils.book_append_sheet(
+            workBook,
+            workSheet,
+            "Parcelas de expe. etiquetagem"
+          );
 
           // Buffer
           XLSX.write(workBook, {
@@ -712,8 +716,7 @@ export default function Listagem({
             type: "binary",
           });
           // Download
-          XLSX.writeFile(workBook, 'Parcelas de expe. etiquetagem.xlsx');
-
+          XLSX.writeFile(workBook, "Parcelas de expe. etiquetagem.xlsx");
         } else {
           setLoading(false);
           Swal.fire(
@@ -732,7 +735,11 @@ export default function Listagem({
     }
   }
 
-  async function handlePagination(): Promise<void> {
+  async function handlePagination(page: any): Promise<void> {
+    setCurrentPage(page);
+
+    console.log("chamou");
+
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
@@ -1015,9 +1022,13 @@ export default function Listagem({
   }
 
   useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+    handlePagination(0);
+  }, []);
+
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   function openModal() {
     setIsOpenModal(true);
@@ -1533,14 +1544,14 @@ export default function Listagem({
                       {...props}
                     >
                       <Button
-                        onClick={() => setCurrentPage(0)}
+                        onClick={() => handlePagination(0)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdFirstPage size={18} />}
                         disabled={currentPage < 1}
                       />
                       <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
+                        onClick={() => handlePagination(currentPage - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiLeftArrow size={15} />}
@@ -1551,7 +1562,7 @@ export default function Listagem({
                         .map((value, index) => (
                           <Button
                             key={index}
-                            onClick={() => setCurrentPage(index)}
+                            onClick={() => handlePagination(index)}
                             value={`${currentPage + 1}`}
                             bgColor="bg-blue-600"
                             textColor="white"
@@ -1559,14 +1570,14 @@ export default function Listagem({
                           />
                         ))}
                       <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
+                        onClick={() => handlePagination(currentPage + 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiRightArrow size={15} />}
                         disabled={currentPage + 1 >= pages}
                       />
                       <Button
-                        onClick={() => setCurrentPage(pages - 1)}
+                        onClick={() => handlePagination(pages - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdLastPage size={18} />}
