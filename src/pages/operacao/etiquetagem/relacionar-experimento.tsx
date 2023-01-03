@@ -216,48 +216,14 @@ export default function Listagem({
           selecionados += `${allCheckBox[i].value},`;
         }
       }
-      // const filterStatus = selecionados.substr(0, selecionados.length - 1);
-      // const filterStatus = statusFilterSelected?.join(",");
 
-      // // Call filter with there parameter
-      // const parametersFilter = await fetchWrapper.handleFilterParameter(
-      //   "experimento",
-      //   filterFoco,
-      //   filterTypeAssay,
-      //   filterGli,
-      //   filterExperimentName,
-      //   filterTecnologia,
-      //   filterCod,
-      //   filterPeriod,
-      //   filterDelineamento,
-      //   filterRepetition,
-      //   filterStatus,
-      //   idSafra
-      // );
-
-      // setFiltersParams(parametersFilter);
-      // setFilter(parametersFilter);
-      // setCookies("filterBeforeEdit", filter);
-
-      // await experimentService
-      //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      //   .then((response) => {
-      //     setFilter(parametersFilter);
-      //     setExperiments(response.response);
-      //     setTotalItems(response.total);
-      //     setCurrentPage(0);
-      //     tableRef.current.dataManager.changePageSize(
-      //       itemsTotal >= take ? take : itemsTotal
-      //     );
-      //   });
-
-      const filterStatus = 'SORTEADO';
       const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterCod=${filterCod}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterExperimentStatus=SORTEADO`;
 
       setLoading(true);
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
@@ -273,7 +239,9 @@ export default function Listagem({
     await experimentService
       .getAll(parametersFilter)
       .then((response) => {
-        if (response.status === 200 || response.status === 400) {
+        if (response.status === 200
+          || (response.status === 400 && response.total === 0)
+        ) {
           setExperiments(response.response);
           setTotalItems(response.total);
           tableRef.current.dataManager.changePageSize(
@@ -567,28 +535,32 @@ export default function Listagem({
         if (status === 200) {
           const newData = response.map((item: any) => {
             const newItem = item;
-            newItem.Safra = item.assay_list?.safra?.safraName;
-            newItem.Foco = item.assay_list?.foco.name;
-            newItem.TipoDeEnsaio = item.assay_list?.type_assay.name;
-            newItem.Tecnologia = item.assay_list?.tecnologia.name;
-            newItem.Gli = item.assay_list?.gli;
-            newItem.NomeDoExperimento = item?.experimentName;
-            newItem.Bgm = item.assay_list?.bgm;
-            newItem.StatusEnsaio = item.assay_list?.status;
-            newItem.Plantio = newItem.local?.name_local_culture;
-            newItem.Delineamento = item.delineamento?.name;
-            newItem.Repetição = item.delineamento?.repeticao;
-            newItem.Densidade = item?.density;
-            newItem.NumeroDeRepetições = item.repetitionsNumber;
-            newItem.Época = item?.period;
-            newItem.OrdemSorteio = item?.orderDraw;
-            newItem.Nlp = item?.nlp;
-            newItem.Clp = item?.clp;
-            newItem.Eel = item?.eel;
-            newItem.Observações = item?.comments;
-            newItem.CountNT = newItem.countNT;
-            newItem.NpeQT = newItem.npeQT;
+            newItem.CULTURA = item.assay_list?.safra?.culture?.name;
+            newItem.SAFRA = item.assay_list?.safra?.safraName;
+            newItem.FOCO = item.assay_list?.foco.name;
+            newItem.TIPO_DE_ENSAIO = item.assay_list?.type_assay.name;
+            newItem.TECNOLOGIA = `${item.assay_list?.tecnologia.cod_tec} ${item.assay_list?.tecnologia.name}`;
+            newItem.GLI = item.assay_list?.gli;
+            newItem.NOME_DO_EXPERIMENTO = item?.experimentName;
+            newItem.BGM = item.assay_list?.bgm;
+            newItem.STATUS_ENSAIO = item.assay_list?.status;
+            newItem.PLANTIO = newItem.local?.name_local_culture;
+            newItem.DELINEAMENTO = item.delineamento?.name;
+            newItem.DENSIDADE = item?.density;
+            newItem.REP = item.repetitionsNumber;
+            newItem.ÉPOCA = item?.period;
+            newItem.ORDEM_SORTEIO = item?.orderDraw;
+            newItem.NLP = item?.nlp;
+            newItem.CLP = item?.clp;
+            newItem.OBSERVAÇÕES = item?.comments;
+            newItem.COUNT_NT = newItem.countNT;
+            newItem.NPE_QT = newItem.npeQT;
 
+            delete newItem.id;
+            delete newItem.safra;
+            delete newItem.experiment_genotipe;
+            delete newItem.seq_delineamento;
+            delete newItem.experimentGroupId;
             delete newItem.countNT;
             delete newItem.npeQT;
             delete newItem.local;
@@ -605,13 +577,12 @@ export default function Listagem({
             delete newItem.experimentName;
             delete newItem.type_assay;
             delete newItem.idSafra;
-            delete newItem.id;
             delete newItem.assay_list;
             return newItem;
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'seleção-expe.-para-etiquetagem');
 
           // Buffer
           XLSX.write(workBook, {
@@ -624,7 +595,7 @@ export default function Listagem({
             type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
+          XLSX.writeFile(workBook, 'Seleção expe. para etiquetagem.xlsx');
         } else {
           setLoading(false);
           Swal.fire(
@@ -642,26 +613,6 @@ export default function Listagem({
   }
 
   async function handlePagination(): Promise<void> {
-    // const skip = currentPage * Number(take);
-    // let parametersFilter;
-    // if (orderType) {
-    //   parametersFilter = `skip=${skip}&take=${take}&status=${"SORTEADO"}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    // } else {
-    //   parametersFilter = `skip=${skip}&take=${take}&status=${"SORTEADO"}`;
-    // }
-
-    // if (filter) {
-    //   parametersFilter = `${parametersFilter}&${filter}`;
-    // }
-
-    // await experimentService
-    //   .getAll(parametersFilter)
-    //   .then(({ status, response }: IReturnObject) => {
-    //     if (status === 200) {
-    //       setExperiments(response);
-    //     }
-    //   });
-
     await callingApi(filter); // handle pagination globly
   }
 
@@ -787,60 +738,6 @@ export default function Listagem({
                     </div>
                   </div>
 
-                  {/* <div className="h-10 w-1/2 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status EXP.
-                    </label>
-                    <SelectMultiple
-                      data={statusFilter.map((i: any) => i.title)}
-                      values={statusFilterSelected}
-                      onChange={(e: any) => setStatusFilterSelected(e)}
-                    />
-                  </div> */}
-
-                  {/* <div className="h-10 w-1/2 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status EXP.
-                    </label>
-                    <AccordionFilter>
-                      <DragDropContext onDragEnd={handleOnDragEnd}>
-                        <Droppable droppableId="characters">
-                          {(provided) => (
-                            <ul
-                              className="w-1/2 h-full characters"
-                              {...provided.droppableProps}
-                              ref={provided.innerRef}
-                            >
-                              {statusFilter.map((generate, index) => (
-                                <Draggable
-                                  key={index}
-                                  draggableId={String(generate.title)}
-                                  index={index}
-                                >
-                                  {(providers) => (
-                                    <li
-                                      ref={providers.innerRef}
-                                      {...providers.draggableProps}
-                                      {...providers.dragHandleProps}
-                                    >
-                                      <CheckBox
-                                        name={generate.name}
-                                        title={generate.title?.toString()}
-                                        value={generate.value}
-                                        defaultChecked={false}
-                                      />
-                                    </li>
-                                  )}
-                                </Draggable>
-                              ))}
-                              {provided.placeholder}
-                            </ul>
-                          )}
-                        </Droppable>
-                      </DragDropContext>
-                    </AccordionFilter>
-                  </div> */}
-
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
                   <div style={{ width: 40 }} />
@@ -877,14 +774,6 @@ export default function Listagem({
                 filtering: false,
                 pageSize: Number(take),
               }}
-              localization={{
-                body: {
-                  emptyDataSourceMessage: tableMessage
-                    ? 'Nenhum experimento encontrado!'
-                    : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
-                },
-              }}
-              onChangeRowsPerPage={() => {}}
               onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (

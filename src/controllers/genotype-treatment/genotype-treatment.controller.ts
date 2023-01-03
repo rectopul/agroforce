@@ -149,6 +149,7 @@ export class GenotypeTreatmentController {
           select: {
             id: true,
             safraName: true,
+            culture: true,
           },
         },
         genotipo: {

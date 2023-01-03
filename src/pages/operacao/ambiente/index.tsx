@@ -360,7 +360,7 @@ export default function Listagem({
       sorting: false,
       searchable: false,
       filterPlaceholder: "Filtrar por status",
-      render: (rowData: INpeProps) => (
+      render: (rowData: any) => (
         <div className="h-7 flex">
           <div className="h-7">
             <Button

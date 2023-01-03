@@ -261,7 +261,6 @@ export default function Listagem({
           selecionados += `${allCheckBox[i].value},`;
         }
       }
-      // const filterStatus = selecionados.substr(0, selecionados.length - 1);
       const filterExperimentStatus = statusFilterSelected
         ?.join(",")
         ?.toLowerCase();
@@ -787,18 +786,6 @@ export default function Listagem({
   }
 
   async function handlePagination(): Promise<void> {
-    // // manage using comman function
-    // const { parametersFilter, currentPages } = await fetchWrapper.handlePaginationGlobal(currentPage, take, filtersParams);
-
-    // await experimentService.getAll(`${parametersFilter}&idSafra=${idSafra}`).then(({ status, response }: any) => {
-    //   if (status === 200) {
-    //     setExperimento(response);
-    //     // setFiltersParams(parametersFilter);
-    //     // setTotalItems(response.total); //Set new total records
-    //     // setCurrentPage(currentPages); //Set new current page
-    //     setTimeout(removestate, 10000); // Remove State
-    //   }
-    // });
     await callingApi(filter); // handle pagination globly
   }
 
@@ -959,60 +946,6 @@ export default function Listagem({
                       onChange={(e: any) => setStatusFilterSelected(e)}
                     />
                   </div>
-
-                  {/* <div className="h-10 w-full ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status do Experimento
-                    </label> */}
-                  {/* <div style={{ display: 'flex', flexDirection: 'row' }}>
-                      {statusFilter.map((generate, index) => (
-                        <CheckBox
-                          key={index}
-                          name={generate.name}
-                          title={generate.title?.toString()}
-                          value={generate.value}
-                          defaultChecked={false}
-                        />
-                      ))}
-                    </div> */}
-                  {/* <AccordionFilter>
-                      <DragDropContext onDragEnd={handleOnDragEnd}>
-                        <Droppable droppableId="characters">
-                          {(provided) => (
-                            <ul
-                              className="w-1/2 h-full characters"
-                              {...provided.droppableProps}
-                              ref={provided.innerRef}
-                            >
-                              {statusFilter.map((generate, index) => (
-                                <Draggable
-                                  key={index}
-                                  draggableId={String(generate.title)}
-                                  index={index}
-                                >
-                                  {(providers) => (
-                                    <li
-                                      ref={providers.innerRef}
-                                      {...providers.draggableProps}
-                                      {...providers.dragHandleProps}
-                                    >
-                                      <CheckBox
-                                        name={generate.name}
-                                        title={generate.title?.toString()}
-                                        value={generate.value}
-                                        defaultChecked={false}
-                                      />
-                                    </li>
-                                  )}
-                                </Draggable>
-                              ))}
-                              {provided.placeholder}
-                            </ul>
-                          )}
-                        </Droppable>
-                      </DragDropContext>
-                    </AccordionFilter> */}
-                  {/* </div> */}
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
