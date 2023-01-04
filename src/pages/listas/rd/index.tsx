@@ -798,7 +798,7 @@ export default function Import({
                 )}
 
                 {(Router?.importar == "subs_ensaio" || !Router.importar) && (
-                  <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-24 items-center">
+                  <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
                     <div className=" h-20 w-20 flex items-center mr-1">
                       <Button
                         textColor="white"

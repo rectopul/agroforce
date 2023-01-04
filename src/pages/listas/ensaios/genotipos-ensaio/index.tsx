@@ -821,31 +821,31 @@ export default function Listagem({
     }
   }
 
-  async function handlePagination(): Promise<void> {
-    // const skip = currentPage * Number(take);
-    // let parametersFilter;
-    // if (orderType) {
-    //   parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    // } else {
-    //   parametersFilter = `skip=${skip}&take=${take}`;
-    // }
+  //async function handlePagination(): Promise<void> {
+  // const skip = currentPage * Number(take);
+  // let parametersFilter;
+  // if (orderType) {
+  //   parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
+  // } else {
+  //   parametersFilter = `skip=${skip}&take=${take}`;
+  // }
 
-    // if (filter) {
-    //   parametersFilter = `${parametersFilter}&${filter}`;
-    // }
-    // await genotypeTreatmentService
-    //   .getAll(parametersFilter)
-    //   .then(({ status, response, total }) => {
-    //     if (status === 200) {
-    //       setTreatments(response);
-    //       setTotalItems(total);
-    //       setAfterFilter(true);
-    //       setCurrentPage(0);
-    //     }
-    //   });
+  // if (filter) {
+  //   parametersFilter = `${parametersFilter}&${filter}`;
+  // }
+  // await genotypeTreatmentService
+  //   .getAll(parametersFilter)
+  //   .then(({ status, response, total }) => {
+  //     if (status === 200) {
+  //       setTreatments(response);
+  //       setTotalItems(total);
+  //       setAfterFilter(true);
+  //       setCurrentPage(0);
+  //     }
+  //   });
 
-    await callingApi(filter); // handle pagination globly
-  }
+  //await callingApi(filter); // handle pagination globly
+  //}
 
   // Checking defualt values
   function checkValue(value: any) {
@@ -965,10 +965,15 @@ export default function Listagem({
     }
   }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
+
+  async function handlePagination(page: any) {
+    setCurrentPage(page);
+    await callingApi(filter); // handle pagination globly
+  }
 
   function removeSameItems(data: any) {
     const newList: any = [];
@@ -1654,14 +1659,14 @@ export default function Listagem({
                       {...props}
                     >
                       <Button
-                        onClick={() => setCurrentPage(0)}
+                        onClick={() => handlePagination(0)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdFirstPage size={18} />}
                         disabled={currentPage < 1}
                       />
                       <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
+                        onClick={() => handlePagination(currentPage - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiLeftArrow size={15} />}
@@ -1672,7 +1677,7 @@ export default function Listagem({
                         .map((value, index) => (
                           <Button
                             key={index}
-                            onClick={() => setCurrentPage(index)}
+                            onClick={() => handlePagination(index)}
                             value={`${currentPage + 1}`}
                             bgColor="bg-blue-600"
                             textColor="white"
@@ -1680,14 +1685,14 @@ export default function Listagem({
                           />
                         ))}
                       <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
+                        onClick={() => handlePagination(currentPage + 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiRightArrow size={15} />}
                         disabled={currentPage + 1 >= pages}
                       />
                       <Button
-                        onClick={() => setCurrentPage(pages - 1)}
+                        onClick={() => handlePagination(pages - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdLastPage size={18} />}
