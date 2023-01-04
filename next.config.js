@@ -12,7 +12,7 @@ const nextConfig = {
         : process.env.COPYMOD == "tmg"
         ? "http://20.94.100.241/"
         : process.env.COPYMOD == "tmgdns-qa"
-        ? "http://gom-qa.tmg.agr.br/"    
+        ? "http://gom-qa.tmg.agr.br/"
         : process.env.COPYMOD * 1 == 2
         ? "https://server.seedsforce.com.br:18602/"
         : "https://server.seedsforce.com.br:18601/", // production
@@ -22,7 +22,7 @@ const nextConfig = {
         : process.env.COPYMOD == "tmg"
         ? "http://20.94.100.241/api"
         : process.env.COPYMOD == "tmgdns-qa"
-        ? "http://gom-qa.tmg.agr.br/api"    
+        ? "http://gom-qa.tmg.agr.br/api"
         : process.env.COPYMOD * 1 == 2
         ? "https://server.seedsforce.com.br:18602/api"
         : "https://server.seedsforce.com.br:18601/api", // production api
@@ -33,6 +33,9 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   presets: ["next/babel"],
+
+  //evitar o render duplo do useEffect no modo desenvolvimento
+  reactStrictMode: false,
 };
 
 module.exports = nextConfig;

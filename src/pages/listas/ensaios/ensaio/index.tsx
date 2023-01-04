@@ -208,6 +208,8 @@ export default function TipoEnsaio({
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
+    console.log('chamou');
+
     setFilter(parametersFilter);
     setCookies('filterBeforeEdit', parametersFilter);
     setCookies('filterBeforeEditTypeOrder', typeOrder);
@@ -321,7 +323,7 @@ export default function TipoEnsaio({
       userId: userLogado.id,
     });
     if (status === 200) {
-      handlePagination();
+      handlePagination(currentPage);
       setLoading(false);
     } else {
       Swal.fire({
@@ -665,7 +667,7 @@ export default function TipoEnsaio({
     }
   }
 
-  async function handlePagination(): Promise<void> {
+  async function handlePagination(page: any): Promise<void> {
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
@@ -683,6 +685,7 @@ export default function TipoEnsaio({
     //   }
     // });
 
+    setCurrentPage(page);
     await callingApi(filter); // handle pagination globly
   }
 
@@ -713,10 +716,10 @@ export default function TipoEnsaio({
     );
   }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   return (
     <>
