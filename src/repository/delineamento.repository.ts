@@ -1,5 +1,5 @@
 import { prisma } from '../pages/api/db/db';
-import {BaseRepository} from './base-repository';
+import { BaseRepository } from './base-repository';
 
 export class DelineamentoRepository extends BaseRepository {
   async findOne(id: number) {
@@ -21,6 +21,7 @@ export class DelineamentoRepository extends BaseRepository {
       select, skip, take, where, orderBy: order,
     });
     Result.total = count;
+
     return Result;
   }
 

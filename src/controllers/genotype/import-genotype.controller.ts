@@ -409,7 +409,7 @@ export class ImportGenotypeController {
                   spreadSheet[0][column],
                 );
               } else {
-                spreadSheet[row][column] = spreadSheet[row][column].replace(/\.\d+/, '');
+                spreadSheet[row][column] = `${spreadSheet[row][column].split('.')[0]}Z`;
                 // eslint-disable-next-line no-param-reassign
                 spreadSheet[row][column] = new Date(spreadSheet[row][column]);
                 const { status, response }: IReturnObject = await loteController.getAll({
