@@ -1311,7 +1311,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     response: allExperimentGroup = [],
     total: totalItems = 0,
   } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
-
   const safraId = idSafra;
 
   return {

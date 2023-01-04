@@ -1023,6 +1023,9 @@ export const getServerSideProps: GetServerSideProps = async ({
     requestOptions,
   ).then((response) => response.json());
 
+  // const allExperiments = []
+  // const totalItems = 0
+
   return {
     props: {
       allExperiments,

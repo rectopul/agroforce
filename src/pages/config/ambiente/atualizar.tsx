@@ -15,32 +15,12 @@ import InputMask from 'react-input-mask';
 
 import { IoMdArrowBack } from 'react-icons/io';
 import { MdDateRange } from 'react-icons/md';
-import npe from 'src/pages/api/npe';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import {
   Content, Input, Select, Button,
 } from '../../../components';
 
 import * as ITabs from '../../../shared/utils/dropdown';
-
-interface ILayoultProps {
-  id: number | any;
-  esquema: string | any;
-  op: string | any;
-  semente_metros: number | any;
-  disparos: number | any;
-  divisor: number | any;
-  largura: number | any;
-  comp_fisico: number | any;
-  comp_parcela: number | any;
-  comp_corredor: number | any;
-  t4_inicial: number | any;
-  t4_final: number | any;
-  df_inicial: number | any;
-  df_final: number | any;
-  localId: number | any;
-  created_by: number | any;
-  status: number;
-}
 
 interface INpeProps {
   id: number | any;
@@ -57,23 +37,7 @@ interface INpeProps {
   prox_npe: number | any;
 }
 
-interface ILocal {
-  id: number;
-  name: string;
-  latitude: string;
-  longitude: string;
-  status: number;
-}
-
-interface IData {
-  local: object | any;
-  layoultEdit: ILayoultProps;
-  npe: object | any;
-}
-
 export default function NovoLocal({
-  local,
-  layoultEdit,
   npe,
   idCulture,
   idSafra,
@@ -85,12 +49,6 @@ export default function NovoLocal({
     ? (tab.statusTab = true)
     : (tab.statusTab = false)));
 
-  const [localMap, setIdLocalMap] = useState<ILocal[]>(() => local);
-  const [idLocal, setIdLocal] = useState<number>(layoultEdit.localId);
-  const [lat, setLat] = useState<number>(0);
-  const [lng, setLng] = useState<number>(0);
-  const [titleLocal, setTitleLocal] = useState<string>('');
-
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: 'AIzaSyD2fT6h_lQHgdj4_TgbwV6uDfZ23Hj0vKg',
@@ -100,7 +58,7 @@ export default function NovoLocal({
     lat,
     lng,
   };
-
+  console.log(npe);
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const locais: object | any = [];
   const router = useRouter();
@@ -128,7 +86,7 @@ export default function NovoLocal({
 
       const parametersFilter = `filterStatus=1&npei=${values.prox_npe}`;
       await npeService.getAll(parametersFilter).then(async (response) => {
-        if (response.total <= 0) {
+        if (response.total <= 0 || npe?.id === response[0]?.id) {
           const paramFilter = `id_culture=${idCulture}&id_safra=${idSafra}&npe=${values.prox_npe}&take=${1}`;
           await experimentGenotipeService
             .getAll(paramFilter)
@@ -158,15 +116,11 @@ export default function NovoLocal({
             });
         } else {
           Swal.fire(
-            'Não é possível atualizar o prox npe, o prox npe inserido já é consumido por outro npe.',
+            'Não é possível atualizar o prox npe, o prox npe inserido já é  por outro npe.',
           );
         }
       });
     },
-  });
-
-  local.map((value: string | object | any) => {
-    locais.push({ id: value.id, name: value.name });
   });
 
   function validateInputs(values: any) {
@@ -178,19 +132,6 @@ export default function NovoLocal({
       inputesquema.style.borderColor = '';
     }
   }
-
-  useEffect(() => {
-    localMap.map((item: any) => {
-      if (item.id === idLocal) {
-        setLat(Number(-item.latitude));
-        setLng(Number(-item.longitude));
-        setTitleLocal(item.name);
-      } else {
-        lat;
-        lng;
-      }
-    });
-  }, [idLocal]);
 
   return (
     <>
@@ -460,8 +401,6 @@ export default function NovoLocal({
 
 export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { publicRuntimeConfig } = getConfig();
-  const baseUrlLayout = `${publicRuntimeConfig.apiUrl}/layout-quadra`;
-  const baseUrlLocal = `${publicRuntimeConfig.apiUrl}/local`;
   const baseUrlNpe = `${publicRuntimeConfig.apiUrl}/npe`;
 
   const { token } = context.req.cookies;
@@ -474,20 +413,14 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
     headers: { Authorization: `Bearer ${token}` },
   };
 
-  const apiLocal = await fetch(baseUrlLocal, requestOptions);
-  const resU = await fetch(`${baseUrlLayout}/47`, requestOptions);
-  const apiNpe = await fetch(
+  const { response: npe } = await fetch(
     `${baseUrlNpe}/${context.query.id}`,
     requestOptions,
-  );
+  ).then((response) => response.json());
 
-  const npe = await apiNpe.json();
-  const layoultEdit = await resU.json();
-  let local = await apiLocal.json();
-  local = local.response;
   return {
     props: {
-      local, layoultEdit, npe, idCulture, idSafra,
+      npe, idCulture, idSafra,
     },
   };
 };

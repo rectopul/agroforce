@@ -706,14 +706,15 @@ export default function Listagem({
 
           row.CULTURA = row.safra?.culture?.name;
           row.SAFRA = row.safra?.safraName;
+          row.LOCAL = row.local?.name_local_culture;
           row.FOCO = row.foco?.name;
           row.TIPO_ENSAIO = row.type_assay?.name;
           row.TECNOLOGIA = `${row.tecnologia?.cod_tec} ${row.tecnologia?.name}`;
-          row.LOCAL = row.local?.name_local_culture;
-          row.NPEI = row.npei;
           row.ÉPOCA = row?.epoca;
-          row.GRUPO = row.group.group;
+          row.NPEI = row.npei;
+          row.NPE_FINAL = row.npef;
           row.PROX_NPE = row.prox_npe;
+          row.GRUPO = row.group.group;
 
           delete row.nextAvailableNPE;
           delete row.prox_npe;

@@ -1779,7 +1779,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     `${urlParametersAssay.toString()}/?id_culture=${idCulture}&id_safra=${idSafra}`,
     requestOptions,
   ).then((response) => response.json());
-
   const assaySelect = allAssay?.map((item: any) => {
     const newItem: any = {};
     newItem.id = item.gli;
