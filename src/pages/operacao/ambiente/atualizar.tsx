@@ -8,14 +8,12 @@ import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import Swal from 'sweetalert2';
 import {
   experimentGenotipeService,
-  layoutQuadraService,
   npeService,
 } from 'src/services';
 import InputMask from 'react-input-mask';
 
 import { IoMdArrowBack } from 'react-icons/io';
 import { MdDateRange } from 'react-icons/md';
-import npe from 'src/pages/api/npe';
 import {
   Content, Input, Select, Button,
 } from '../../../components';
@@ -96,11 +94,6 @@ export default function NovoLocal({
     id: 'google-map-script',
     googleMapsApiKey: 'AIzaSyD2fT6h_lQHgdj4_TgbwV6uDfZ23Hj0vKg',
   });
-
-  const position = {
-    lat,
-    lng,
-  };
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const locais: object | any = [];
