@@ -101,6 +101,16 @@ export class LogImportController {
         parameters.AND.push({ created_at: { lte: newEndDate } });
       }
 
+      // if (options.filterStartDate || options.filterEndDate) {
+      //   if (options.filterStartDate && options.filterEndDate) {
+      //     parameters.AND.push(JSON.parse(` { "created_at": {"gte": ${new Date(options.filterStartDate)}, "lte": ${new Date(options.filterEndDate)} } }`));
+      //   } else if (options.filterStartDate) {
+      //     parameters.AND.push(JSON.parse(` { "created_at": {"gte": ${new Date(options.filterStartDate)} } }`));
+      //   } else if (options.filterEndDate) {
+      //     parameters.AND.push(JSON.parse(` { "created_at": {"lte": ${new Date(options.filterEndDate)}}  }`));
+      //   }
+      // }
+
       const select = {
         id: true,
         user: { select: { name: true } },

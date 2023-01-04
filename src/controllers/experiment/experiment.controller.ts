@@ -200,7 +200,6 @@ export class ExperimentController {
           }
         }
       }
-
       const response: object | any = await this.experimentRepository.findAll(
         parameters,
         select,
