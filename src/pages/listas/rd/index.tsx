@@ -130,8 +130,6 @@ export default function Import({
         .then(async (rows) => {
           setImportLoading(true);
 
-          // await importblob(value.files[0]);
-
           if (moduleId) {
             const { message } = await importService.validate({
               spreadSheet: rows,
@@ -141,8 +139,6 @@ export default function Import({
               idCulture,
               table,
               disabledButton,
-              // file: ImputtoBase64(value.files[0]),
-              // name:value.files[0].name,
             });
             setImportLoading(false);
             handlePagination();
@@ -160,8 +156,6 @@ export default function Import({
               idCulture,
               table,
               disabledButton,
-              // file: ImputtoBase64(value.files[0]),
-              // name:value.files[0].name,
             });
             setImportLoading(false);
             handlePagination();

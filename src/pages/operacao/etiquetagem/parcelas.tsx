@@ -889,7 +889,7 @@ export default function Listagem({
         cleanState();
         (document.getElementById("inputCode") as HTMLInputElement).value = "";
         setTimeout(() => (inputRef?.current as any)?.focus(), 2000);
-        handlePagination();
+        handlePagination(currentPage);
         // router.push("imprimir");
       }
     }
@@ -932,7 +932,7 @@ export default function Listagem({
           userId: userLogado.id,
         });
         cleanState();
-        handlePagination();
+        handlePagination(currentPage);
         setIsOpenModal(false);
       }
     }
@@ -1015,7 +1015,7 @@ export default function Listagem({
       localStorage.setItem("parcelasToPrint", JSON.stringify(parcels));
       // router.push("imprimir");
       window.open("imprimir", "_blank");
-      handlePagination();
+      handlePagination(currentPage);
     }
 
     setIsLoading(false);

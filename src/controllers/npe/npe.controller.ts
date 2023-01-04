@@ -200,6 +200,7 @@ export class NpeController {
         });
       }
 
+
       if (!response || response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhuma NPE cadastrada',

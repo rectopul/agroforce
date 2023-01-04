@@ -818,7 +818,7 @@ export default function AtualizarTipoEnsaio({
             newItem.ORDEM_SORTEIO = item?.orderDraw;
             newItem.NLP = item?.nlp;
             newItem.CLP = item?.clp;
-            newItem.OBSERVAÇÕES = item?.comments;
+            newItem.OBS = item?.comments;
             newItem.COUNT_NT = newItem.countNT;
             newItem.NPE_QT = newItem.npeQT;
 
@@ -1022,7 +1022,7 @@ export default function AtualizarTipoEnsaio({
             <div className="w-full flex justify-between items-start gap-5 mt-3">
               <div className="w-full h-10">
                 <label className="block text-gray-900 text-sm font-bold mb-0">
-                  Observações
+                  Comentários
                 </label>
                 <textarea
                   className="shadow
@@ -1431,7 +1431,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     `${baseUrlAssayList}/${query.id}`,
     requestOptions,
   ).then((response) => response.json());
-
   return {
     props: {
       allGenotypeTreatment,
