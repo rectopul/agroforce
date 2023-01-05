@@ -440,7 +440,7 @@ export default function Listagem({
       userId: userLogado.id,
     });
     if (status === 200) {
-      handlePagination();
+      handlePagination(currentPage);
       setLoading(false);
     } else {
       Swal.fire({
