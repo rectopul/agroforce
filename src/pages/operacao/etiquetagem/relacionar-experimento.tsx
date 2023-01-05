@@ -533,7 +533,7 @@ export default function Listagem({
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
     await experimentService
-      .getAll(filter)
+      .getAll(`${filter}&excel=${true}`)
       .then(({ status, response }: IReturnObject) => {
         if (status === 200) {
           const newData = response.map((item: any) => {

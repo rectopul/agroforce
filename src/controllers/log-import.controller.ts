@@ -81,35 +81,25 @@ export class LogImportController {
         parameters.state = JSON.parse(`{"contains":"${options.filterState}"}`);
       }
 
-      if (options.filterStartFinishDate) {
-        const newEndDate = new Date(options.filterStartFinishDate);
-        parameters.AND.push({ updated_at: { gte: newEndDate } });
+      if (options.filterStartDate || options.filterEndDate) {
+        if (options.filterStartDate && options.filterEndDate) {
+          parameters.AND.push({ created_at: { gte: new Date(`${options.filterStartDate}T00:00:00.000z`), lte: new Date(`${options.filterEndDate}T23:59:59.999z`) } });
+        } else if (options.filterStartDate) {
+          parameters.AND.push({ created_at: { gte: new Date(`${options.filterStartDate}T00:00:00.000z`) } });
+        } else if (options.filterEndDate) {
+          parameters.AND.push({ created_at: { lte: new Date(`${options.filterEndDate}T23:59:59.999z`) } });
+        }
       }
 
-      if (options.filterEndFinishDate) {
-        const newStartDate = new Date(options.filterEndFinishDate);
-        parameters.AND.push({ updated_at: { lte: newStartDate } });
+      if (options.filterStartFinishDate || options.filterEndFinishDate) {
+        if (options.filterStartFinishDate && options.filterEndFinishDate) {
+          parameters.AND.push({ created_at: { gte: new Date(`${options.filterStartFinishDate}T00:00:00.000z`), lte: new Date(`${options.filterEndFinishDate}T23:59:59.999z`) } });
+        } else if (options.filterStartFinishDate) {
+          parameters.AND.push({ created_at: { gte: new Date(`${options.filterStartFinishDate}T00:00:00.000z`) } });
+        } else if (options.filterEndFinishDate) {
+          parameters.AND.push({ created_at: { lte: new Date(`${options.filterEndFinishDate}T23:59:59.999z`) } });
+        }
       }
-
-      if (options.filterStartDate) {
-        const newStartDate = new Date(options.filterStartDate);
-        parameters.AND.push({ created_at: { gte: newStartDate } });
-      }
-
-      if (options.filterEndDate) {
-        const newEndDate = new Date(options.filterEndDate);
-        parameters.AND.push({ created_at: { lte: newEndDate } });
-      }
-
-      // if (options.filterStartDate || options.filterEndDate) {
-      //   if (options.filterStartDate && options.filterEndDate) {
-      //     parameters.AND.push(JSON.parse(` { "created_at": {"gte": ${new Date(options.filterStartDate)}, "lte": ${new Date(options.filterEndDate)} } }`));
-      //   } else if (options.filterStartDate) {
-      //     parameters.AND.push(JSON.parse(` { "created_at": {"gte": ${new Date(options.filterStartDate)} } }`));
-      //   } else if (options.filterEndDate) {
-      //     parameters.AND.push(JSON.parse(` { "created_at": {"lte": ${new Date(options.filterEndDate)}}  }`));
-      //   }
-      // }
 
       const select = {
         id: true,

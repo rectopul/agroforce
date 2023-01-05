@@ -702,7 +702,7 @@ export default function Listagem({
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
     await experimentService
-      .getAll(filter)
+      .getAll(`${filter}&excel=${true}`)
       .then(({ status, response, message }: any) => {
         if (status === 200) {
           response.map((item: any) => {
