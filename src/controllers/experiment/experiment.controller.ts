@@ -74,69 +74,134 @@ export class ExperimentController {
         parameters.experimentGroupId = Number(options.experimentGroupId);
       }
 
-      const select = {
-        id: true,
-        idSafra: true,
-        density: true,
-        safra: true,
-        repetitionsNumber: true,
-        experimentGroupId: true,
-        period: true,
-        nlp: true,
-        clp: true,
-        experimentName: true,
-        comments: true,
-        orderDraw: true,
-        status: true,
-        assay_list: {
-          select: {
-            gli: true,
-            bgm: true,
-            status: true,
-            genotype_treatment: { include: { genotipo: true, lote: true } },
-            tecnologia: {
-              select: {
-                name: true,
-                id: true,
-                cod_tec: true,
+      let select = {};
+      if (options.excel) {
+        select = {
+          id: true,
+          idSafra: true,
+          density: true,
+          safra: true,
+          repetitionsNumber: true,
+          experimentGroupId: true,
+          period: true,
+          nlp: true,
+          clp: true,
+          experimentName: true,
+          comments: true,
+          orderDraw: true,
+          status: true,
+          assay_list: {
+            select: {
+              gli: true,
+              bgm: true,
+              status: true,
+              genotype_treatment: { include: { genotipo: true, lote: true } },
+              tecnologia: {
+                select: {
+                  name: true,
+                  id: true,
+                  cod_tec: true,
+                },
               },
-            },
-            foco: {
-              select: {
-                name: true,
-                id: true,
+              foco: {
+                select: {
+                  name: true,
+                  id: true,
+                },
               },
-            },
-            type_assay: {
-              select: {
-                name: true,
-                id: true,
+              type_assay: {
+                select: {
+                  name: true,
+                  id: true,
+                },
               },
-            },
-            safra: {
-              select: {
-                safraName: true,
-                culture: true,
+              safra: {
+                select: {
+                  safraName: true,
+                  culture: true,
+                },
               },
             },
           },
-        },
-        local: {
-          select: {
-            name_local_culture: true,
-            cultureUnity: true,
+          local: {
+            select: {
+              name_local_culture: true,
+              cultureUnity: true,
+            },
           },
-        },
-        delineamento: {
-          select: {
-            name: true,
-            repeticao: true,
-            id: true,
-            sequencia_delineamento: true,
+          delineamento: {
+            select: {
+              name: true,
+              repeticao: true,
+              id: true,
+              sequencia_delineamento: true,
+            },
           },
-        },
-        experiment_genotipe: true,
-      };
+          experiment_genotipe: true,
+        };
+      } else {
+        select = {
+          id: true,
+          idSafra: true,
+          density: true,
+          safra: true,
+          repetitionsNumber: true,
+          experimentGroupId: true,
+          period: true,
+          nlp: true,
+          clp: true,
+          experimentName: true,
+          comments: true,
+          orderDraw: true,
+          status: true,
+          assay_list: {
+            select: {
+              gli: true,
+              bgm: true,
+              status: true,
+              genotype_treatment: { include: { genotipo: true, lote: true } },
+              tecnologia: {
+                select: {
+                  name: true,
+                  id: true,
+                  cod_tec: true,
+                },
+              },
+              foco: {
+                select: {
+                  name: true,
+                  id: true,
+                },
+              },
+              type_assay: {
+                select: {
+                  name: true,
+                  id: true,
+                },
+              },
+              safra: {
+                select: {
+                  safraName: true,
+                  culture: true,
+                },
+              },
+            },
+          },
+          local: {
+            select: {
+              name_local_culture: true,
+              cultureUnity: true,
+            },
+          },
+          delineamento: {
+            select: {
+              name: true,
+              repeticao: true,
+              id: true,
+            },
+          },
+        };
+      }
 
       if (options.idSafra) {
         parameters.idSafra = Number(options.idSafra);
@@ -200,7 +265,6 @@ export class ExperimentController {
           }
         }
       }
-
       const response: object | any = await this.experimentRepository.findAll(
         parameters,
         select,
@@ -209,16 +273,19 @@ export class ExperimentController {
         orderBy,
       );
 
-      response.map(async (item: any) => {
-        const newItem = item;
-        newItem.countNT = functionsUtils
-          .countChildrenForSafra(item.assay_list.genotype_treatment, Number(options.idSafra));
-        newItem.npeQT = item.experiment_genotipe.length;
-        newItem.seq_delineamento = item.delineamento.sequencia_delineamento.filter(
-          (x: any) => x.nt <= item.countNT && x.repeticao <= item.repetitionsNumber,
-        );
-        return newItem;
-      });
+      if (options.excel) {
+        response.map(async (item: any) => {
+          const newItem = item;
+          newItem.countNT = functionsUtils
+            .countChildrenForSafra(item.assay_list.genotype_treatment, Number(options.idSafra));
+          newItem.npeQT = item.experiment_genotipe.length;
+          newItem.seq_delineamento = item.delineamento.sequencia_delineamento.filter(
+            (x: any) => x.nt <= item.countNT && x.repeticao <= item.repetitionsNumber,
+          );
+          return newItem;
+        });
+      }
+
       if (response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhum experimento encontrado',
