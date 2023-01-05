@@ -796,7 +796,7 @@ export default function AtualizarTipoEnsaio({
 
   const downloadExcelExperiments = async (): Promise<void> => {
     await experimentService
-      .getAll(experimentFilterApplication)
+      .getAll(`${experimentFilterApplication}&excel=${true}`)
       .then(({ status, response }) => {
         if (status === 200) {
           const newData = response.map((item: any) => {

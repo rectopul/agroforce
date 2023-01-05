@@ -435,6 +435,7 @@ export default function NovoLocal({
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
                 onClick={() => {
+                  setLoading(true);
                   router.back();
                 }}
               />
