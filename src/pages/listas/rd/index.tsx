@@ -695,6 +695,44 @@ export default function Import({
     }
   }
 
+  const ComponentImport = ({
+    title,
+    table,
+    moduleId,
+    disabled = false,
+  }: any) => {
+    return (
+      <div className="m-4 grid grid-cols-3 gap-4 h-20 items-center">
+        <div className="h-16 w-16 flex items-center mr-1">
+          <Button
+            textColor="white"
+            bgColor={bgColor}
+            title={
+              disabledButton
+                ? "Outra planilha já esta sendo importada"
+                : "Upload"
+            }
+            rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
+            onClick={() => readExcel(moduleId, table)}
+            icon={<IoIosCloudUpload size={30} />}
+            disabled={disabledButton || disabled}
+            type="button"
+          />
+        </div>
+        <div className="col-span-2" style={{ marginLeft: "-12%" }}>
+          <span className="font-bold text-sm">{title}</span>
+          <Input
+            disabled={disabled}
+            type="file"
+            required
+            id={`inputFile-${moduleId}`}
+            name={`inputFile-${moduleId}`}
+          />
+        </div>
+      </div>
+    );
+  };
+
   useEffect(() => {
     handlePagination();
     handleTotalPages();
@@ -735,166 +773,40 @@ export default function Import({
 
               <TabPanel value={value} index={0}>
                 {(Router?.importar == "rd" || !Router.importar) && (
-                  <div className="m-4 grid grid-cols-3 gap-4 h-20 items-center">
-                    <div className="h-20 w-20 flex items-center mr-1">
-                      <Button
-                        textColor="white"
-                        bgColor={bgColor}
-                        title={
-                          disabledButton
-                            ? "Outra planilha já esta sendo importada"
-                            : "Upload"
-                        }
-                        rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                        onClick={() => readExcel(0, "")}
-                        icon={<IoIosCloudUpload size={40} />}
-                        disabled={disabledButton}
-                        type="button"
-                      />
-                    </div>
-                    <div className="col-span-2" style={{ marginLeft: "-12%" }}>
-                      <span className="font-bold">Cadastros RD</span>
-                      <Input
-                        type="file"
-                        required
-                        id="inputFile-0"
-                        name="inputFile-0"
-                      />
-                    </div>
-                  </div>
+                  <ComponentImport title="Cadastros RD" table="" moduleId={0} />
                 )}
 
                 {(Router?.importar == "ensaio" || !Router?.importar) && (
-                  <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
-                    <div className=" h-20 w-20 flex items-center mr-1">
-                      <Button
-                        textColor="white"
-                        bgColor={bgColor}
-                        title={
-                          disabledButton
-                            ? "Outra planilha já esta sendo importada"
-                            : "Upload"
-                        }
-                        rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                        onClick={() => readExcel(26, "ASSAY_LIST")}
-                        icon={<IoIosCloudUpload size={40} />}
-                        disabled={disabledButton}
-                        type="button"
-                      />
-                    </div>
-                    <div className="col-span-2" style={{ marginLeft: "-12%" }}>
-                      <span className="font-bold">
-                        Importar Lista de Ensaio
-                      </span>
-
-                      <Input
-                        type="file"
-                        required
-                        id="inputFile-26"
-                        name="inputFile-26"
-                      />
-                    </div>
-                  </div>
+                  <ComponentImport
+                    title="Importar Lista de Ensaio"
+                    table="ASSAY_LIST"
+                    moduleId={26}
+                  />
                 )}
 
                 {(Router?.importar == "subs_ensaio" || !Router.importar) && (
-                  <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
-                    <div className=" h-20 w-20 flex items-center mr-1">
-                      <Button
-                        textColor="white"
-                        title={
-                          disabledButton
-                            ? "Outra planilha já esta sendo importada"
-                            : "Upload"
-                        }
-                        bgColor={bgColor}
-                        rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                        onClick={() => readExcel(27, "GENOTYPE_TREATMENT")}
-                        icon={<IoIosCloudUpload size={40} />}
-                        disabled={disabledButton}
-                        type="button"
-                      />
-                    </div>
-                    <div className="col-span-2" style={{ marginLeft: "-12%" }}>
-                      <span className="font-bold">
-                        Importar Subs. de genótipo/nca Ensaio
-                      </span>
-
-                      <Input
-                        type="file"
-                        required
-                        id="inputFile-27"
-                        name="inputFile-27"
-                      />
-                    </div>
-                  </div>
+                  <ComponentImport
+                    title="Importar Subs. de genótipo/nca Ensaio"
+                    table="GENOTYPE_TREATMENT"
+                    moduleId={27}
+                  />
                 )}
 
                 {(Router?.importar == "experimento" || !Router.importar) && (
-                  <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
-                    <div className=" h-20 w-20 flex items-center mr-1">
-                      <Button
-                        textColor="white"
-                        title={
-                          disabledButton
-                            ? "Outra planilha já esta sendo importada"
-                            : "Upload"
-                        }
-                        bgColor={bgColor}
-                        rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                        onClick={() => readExcel(22, "EXPERIMENT")}
-                        icon={<IoIosCloudUpload size={40} />}
-                        disabled={disabledButton}
-                        type="button"
-                      />
-                    </div>
-                    <div className="col-span-2" style={{ marginLeft: "-12%" }}>
-                      <span className="font-bold">
-                        Importar Lista de Experimento
-                      </span>
-
-                      <Input
-                        type="file"
-                        required
-                        id="inputFile-22"
-                        name="inputFile-22"
-                      />
-                    </div>
-                  </div>
+                  <ComponentImport
+                    title="Importar Lista de Experimento"
+                    table="EXPERIMENT"
+                    moduleId={22}
+                  />
                 )}
 
                 {(Router?.importar == "subs_experimento" ||
                   !Router.importar) && (
-                  <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
-                    <div className=" h-20 w-20 flex items-center mr-1">
-                      <Button
-                        textColor="white"
-                        title={
-                          disabledButton
-                            ? "Outra planilha já esta sendo importada"
-                            : "Upload"
-                        }
-                        bgColor={bgColor}
-                        rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                        onClick={() => readExcel(30, "PARCELS")}
-                        icon={<IoIosCloudUpload size={40} />}
-                        disabled={disabledButton}
-                        type="button"
-                      />
-                    </div>
-                    <div className="col-span-2" style={{ marginLeft: "-12%" }}>
-                      <span className="font-bold">
-                        Importar Subs. de genótipo/nca Experimento
-                      </span>
-
-                      <Input
-                        type="file"
-                        required
-                        id="inputFile-30"
-                        name="inputFile-30"
-                      />
-                    </div>
-                  </div>
+                  <ComponentImport
+                    title="Importar Subs. de genótipo/nca Experimento"
+                    table="PARCELS"
+                    moduleId={30}
+                  />
                 )}
 
                 <div className="h-10" />
@@ -902,163 +814,54 @@ export default function Import({
 
               <TabPanel value={value} index={1}>
                 {(Router?.importar == "delineamento" || !Router.importar) && (
-                  <div className="m-4 grid grid-cols-3 gap-4 h-20 items-center">
-                    <div className="h-20 w-20 flex items-center mr-1">
-                      <Button
-                        textColor="white"
-                        bgColor={bgColor}
-                        title={
-                          disabledButton
-                            ? "Outra planilha já esta sendo importada"
-                            : "Upload"
-                        }
-                        rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                        onClick={() => readExcel(7, "DELIMITATION")}
-                        icon={<IoIosCloudUpload size={40} />}
-                        disabled={disabledButton}
-                        type="button"
-                      />
-                    </div>
-                    <div className="col-span-2" style={{ marginLeft: "-12%" }}>
-                      <span className="font-bold">Importar Delineamento</span>
-
-                      <Input
-                        type="file"
-                        required
-                        id="inputFile-7"
-                        name="inputFile-7"
-                      />
-                    </div>
-                  </div>
+                  <ComponentImport
+                    title="Importar Delineamento"
+                    table="DELIMITATION"
+                    moduleId={7}
+                  />
                 )}
 
                 {(Router?.importar == "ambiente" || !Router.importar) && (
-                  <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
-                    <div className=" h-20 w-20 flex items-center mr-1">
-                      <Button
-                        textColor="white"
-                        bgColor={bgColor}
-                        title={
-                          disabledButton
-                            ? "Outra planilha já esta sendo importada"
-                            : "Upload"
-                        }
-                        rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                        onClick={() => readExcel(14, "NPE")}
-                        icon={<IoIosCloudUpload size={40} />}
-                        disabled={disabledButton}
-                        type="button"
-                      />
-                    </div>
-                    <div className="col-span-2" style={{ marginLeft: "-12%" }}>
-                      <span className="font-bold">Importar Ambiente</span>
-
-                      <Input
-                        type="file"
-                        required
-                        id="inputFile-14"
-                        name="inputFile-14"
-                      />
-                    </div>
-                  </div>
+                  <ComponentImport
+                    title="Importar Ambiente"
+                    table="NPE"
+                    moduleId={14}
+                  />
                 )}
 
                 {(Router?.importar == "layout_quadra" || !Router.importar) && (
-                  <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
-                    <div className=" h-20 w-20 flex items-center mr-1">
-                      <Button
-                        textColor="white"
-                        bgColor={bgColor}
-                        title={
-                          disabledButton
-                            ? "Outra planilha já esta sendo importada"
-                            : "Upload"
-                        }
-                        rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                        onClick={() => readExcel(5, "BLOCK_LAYOUT")}
-                        icon={<IoIosCloudUpload size={40} />}
-                        disabled={disabledButton}
-                        type="button"
-                      />
-                    </div>
-                    <div className="col-span-2" style={{ marginLeft: "-12%" }}>
-                      <span className="font-bold">
-                        Importar Layout de quadra
-                      </span>
-
-                      <Input
-                        type="file"
-                        required
-                        id="inputFile-5"
-                        name="inputFile-5"
-                      />
-                    </div>
-                  </div>
+                  <ComponentImport
+                    title="Importar Layout de quadra"
+                    table="BLOCK_LAYOUT"
+                    moduleId={5}
+                  />
                 )}
 
                 {(Router?.importar == "quadra" || !Router.importar) && (
-                  <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
-                    <div className=" h-20 w-20 flex items-center mr-1">
-                      <Button
-                        textColor="white"
-                        bgColor={bgColor}
-                        title={
-                          disabledButton
-                            ? "Outra planilha já esta sendo importada"
-                            : "Upload"
-                        }
-                        rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                        onClick={() => readExcel(17, "BLOCK")}
-                        icon={<IoIosCloudUpload size={40} />}
-                        disabled={disabledButton}
-                        type="button"
-                      />
-                    </div>
-                    <div className="col-span-2" style={{ marginLeft: "-12%" }}>
-                      <span className="font-bold">Importar Quadra</span>
-
-                      <Input
-                        type="file"
-                        required
-                        id="inputFile-17"
-                        name="inputFile-17"
-                      />
-                    </div>
-                  </div>
+                  <ComponentImport
+                    title="Importar Quadra"
+                    table="BLOCK"
+                    moduleId={17}
+                  />
                 )}
 
                 {(Router?.importar == "alocacao_quadra" ||
                   !Router.importar) && (
-                  <div className="m-4 grid grid-cols-3 mt-10 gap-4 h-20 items-center">
-                    <div className=" h-20 w-20 flex items-center mr-1">
-                      <Button
-                        textColor="white"
-                        bgColor={bgColor}
-                        title={
-                          disabledButton
-                            ? "Outra planilha já esta sendo importada"
-                            : "Upload"
-                        }
-                        rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
-                        onClick={() => readExcel(31, "ALLOCATION")}
-                        icon={<IoIosCloudUpload size={40} />}
-                        disabled={disabledButton}
-                        type="button"
-                      />
-                    </div>
-                    <div className="col-span-2" style={{ marginLeft: "-12%" }}>
-                      <span className="font-bold">
-                        Importar Alocação de Quadra
-                      </span>
+                  <ComponentImport
+                    title="Importar Alocação de quadra"
+                    table="ALLOCATION"
+                    moduleId={31}
+                  />
+                )}
 
-                      <Input
-                        type="file"
-                        required
-                        id="inputFile-31"
-                        name="inputFile-31"
-                      />
-                    </div>
-                  </div>
+                {(Router?.importar == "etiquetas_impressas" ||
+                  !Router.importar) && (
+                  <ComponentImport
+                    disabled
+                    title="Importar Etiquetas Impressas"
+                    table="TAG_PRINTED" //AINDA NÃO SEI NOME CORRETO
+                    moduleId={0} //AINDA NÃO SEI CODIGO CORRETO
+                  />
                 )}
               </TabPanel>
             </Box>
