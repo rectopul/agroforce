@@ -1,9 +1,9 @@
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 
-import TagPrint from '../../../../components/TagPrint';
+import TagPrint from "../../../../components/TagPrint";
 
 function PrintToTag() {
   const router = useRouter();
@@ -11,15 +11,17 @@ function PrintToTag() {
   const [tagType, setTagType] = useState(1);
   const [data, setData] = useState([]);
 
-  const parcelsToPrint = JSON.parse(localStorage.getItem('parcelasToPrint') as string);
+  const parcelsToPrint = JSON.parse(
+    localStorage.getItem("parcelasToPrint") as string
+  );
 
   useEffect(() => {
     if (parcelsToPrint?.length > 0) {
       setData(parcelsToPrint);
     } else {
-      Swal.fire('Não existe parcelas para imprimir.');
+      Swal.fire("Não existe parcelas para imprimir.");
       Swal.fire({
-        title: 'Não existe parcelas para imprimir.',
+        title: "Não existe parcelas para imprimir.",
       }).then((result) => {
         if (result.isConfirmed) {
           router.back();
@@ -31,7 +33,7 @@ function PrintToTag() {
   useEffect(() => {
     if (data?.length > 0) {
       window.print();
-      localStorage.removeItem('parcelasToPrint');
+      localStorage.removeItem("parcelasToPrint");
     }
   }, [data]);
 

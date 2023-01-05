@@ -1,16 +1,18 @@
-import Head from 'next/head';
-import Image from 'next/image';
-import { useRouter } from 'next/router';
-import { useQRCode } from 'next-qrcode';
-import { IoMdArrowBack } from 'react-icons/io';
+import Head from "next/head";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import { useQRCode } from "next-qrcode";
+import { IoMdArrowBack } from "react-icons/io";
 
-import styles from './styles.module.css';
-import Etiqueta from './etiqueta';
-import BarCode from './barcode';
+import { functionsUtils } from "../../shared/utils/functionsUtils";
 
-import maoDireita from '../../../public/images/mao-direito.png';
-import maoEsquerda from '../../../public/images/mao-esquerdo.png';
-import algodao from '../../../public/images/algodao.png';
+import styles from "./styles.module.css";
+import Etiqueta from "./etiqueta";
+import BarCode from "./barcode";
+
+import maoDireita from "../../../public/images/mao-direito.png";
+import maoEsquerda from "../../../public/images/mao-esquerdo.png";
+import algodao from "../../../public/images/algodao.png";
 
 interface TagPrintProps {
   tagType: number;
@@ -23,24 +25,27 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
 
   const random = (max = 30, min = 10) => Math.floor(Math.random() * max) + min;
 
+  function generateEAN8(npe: any) {
+    let ean8 = `${npe}${functionsUtils?.generateDigitEAN8(npe)}`;
+    return ean8;
+  }
+
   if (tagType === 1) {
     const listTags = data.map((item: any) => (
       <div className="etiquetaModelo1">
         <div className="flexRow" style={{ fontSize: 16 }}>
           <div className="flex1">{item?.npe}</div>
-          <div className="flex1">{item?.nca && (<BarCode valor={item?.nca} />)}</div>
+          <div className="flex1">
+            {/* {item?.nca && <BarCode valor={generateEAN8(item?.npe)} />} */}
+            {item?.nca && <BarCode valor={item?.npe} />}
+          </div>
         </div>
         <div className="flexRow" style={{ fontSize: 9 }}>
-          <div className="flex1">
-            {item?.genotipo?.name_genotipo}
-          </div>
+          <div className="flex1">{item?.genotipo?.name_genotipo}</div>
           <div>{item?.nca}</div>
         </div>
         <div style={{ fontSize: 7.5 }}>
-          {item?.experiment?.local?.name_local_culture}
-          -
-          {item?.gli}
-          -
+          {item?.experiment?.local?.name_local_culture}-{item?.gli}-
           {item?.envelope}
           MTS
         </div>
@@ -48,10 +53,14 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
     ));
 
     return (
-      <div className="todasEtiquetas" style={{ backgroundColor: 'white' }}>
+      <div className="todasEtiquetas" style={{ backgroundColor: "white" }}>
         <div className="notPrint">
-          <div style={{ justifyContent: 'flex-start' }}>
-            <a onClick={() => router.back()} className={styles.card} style={{ padding: 10 }}>
+          <div style={{ justifyContent: "flex-start" }}>
+            <a
+              onClick={() => router.back()}
+              className={styles.card}
+              style={{ padding: 10 }}
+            >
               <IoMdArrowBack size={25} />
               <h2 style={{ margin: 10 }}>Voltar</h2>
             </a>
@@ -84,30 +93,27 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
               width={50}
               height={35}
             />
-            <div style={{ fontSize: 24 }}>
-              {random(0, 9)}
-              A
-            </div>
+            <div style={{ fontSize: 24 }}>{random(0, 9)}A</div>
           </div>
         </div>
       </div>
     ));
 
     return (
-      <div className="todasEtiquetas" style={{ backgroundColor: 'white' }}>
+      <div className="todasEtiquetas" style={{ backgroundColor: "white" }}>
         <div className="notPrint">
-          <div style={{ justifyContent: 'flex-start' }}>
-            <a onClick={() => router.back()} className={styles.card} style={{ padding: 10 }}>
+          <div style={{ justifyContent: "flex-start" }}>
+            <a
+              onClick={() => router.back()}
+              className={styles.card}
+              style={{ padding: 10 }}
+            >
               <IoMdArrowBack size={25} />
               <h2 style={{ margin: 0 }}>Voltar</h2>
             </a>
           </div>
         </div>
-        <Etiqueta
-          folhaHeight={24}
-          etiquetaHeight={24}
-          etiquetas={listTags}
-        />
+        <Etiqueta folhaHeight={24} etiquetaHeight={24} etiquetas={listTags} />
       </div>
     );
   }
@@ -116,41 +122,42 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
     const listTags = data.map(() => (
       <div className="etiquetaModelo3">
         <div className="flexColumn" style={{ fontSize: 16 }}>
-          <div style={{ textAlign: 'center', fontSize: 34 }}>MTG</div>
-          <div style={{ textAlign: 'center', fontSize: 50 }}>HORTA</div>
-          <div style={{ textAlign: 'center', fontSize: 26 }}>QM-31</div>
-          <div style={{ textAlign: 'center', fontSize: 22 }}>
+          <div style={{ textAlign: "center", fontSize: 34 }}>MTG</div>
+          <div style={{ textAlign: "center", fontSize: 50 }}>HORTA</div>
+          <div style={{ textAlign: "center", fontSize: 26 }}>QM-31</div>
+          <div style={{ textAlign: "center", fontSize: 22 }}>
             16X04(P4)T-2021
           </div>
-          <div style={{ textAlign: 'center', fontSize: 30 }}>CX:1A</div>
+          <div style={{ textAlign: "center", fontSize: 30 }}>CX:1A</div>
           <div
             style={{
-              position: 'absolute',
+              position: "absolute",
               left: 0,
               bottom: 0,
             }}
           >
             <Canvas
-              text={
-                  `${random(999999999999, 100000000000)}TEXTO_MTG_HORTA_QM-31`
-                }
+              text={`${random(
+                999999999999,
+                100000000000
+              )}TEXTO_MTG_HORTA_QM-31`}
               options={{
-                type: 'image/jpeg',
+                type: "image/jpeg",
                 quality: 0.3,
-                level: 'M',
+                level: "M",
                 margin: 3,
                 scale: 4,
                 width: 80,
                 color: {
-                  dark: '#000000FF',
-                  light: '#FFFFFFFF',
+                  dark: "#000000FF",
+                  light: "#FFFFFFFF",
                 },
               }}
             />
           </div>
           <div
             style={{
-              position: 'absolute',
+              position: "absolute",
               right: 0,
               bottom: 0,
             }}
@@ -159,10 +166,10 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
           </div>
           <div
             style={{
-              position: 'absolute',
+              position: "absolute",
               right: 0,
               top: 0,
-              textAlign: 'center',
+              textAlign: "center",
             }}
           >
             <Image src={algodao} width={50} height={50} />
@@ -174,10 +181,14 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
     ));
 
     return (
-      <div className="todasEtiquetas" style={{ backgroundColor: 'white' }}>
+      <div className="todasEtiquetas" style={{ backgroundColor: "white" }}>
         <div className="notPrint">
-          <div style={{ justifyContent: 'flex-start' }}>
-            <a onClick={() => router.back()} className={styles.card} style={{ padding: 10 }}>
+          <div style={{ justifyContent: "flex-start" }}>
+            <a
+              onClick={() => router.back()}
+              className={styles.card}
+              style={{ padding: 10 }}
+            >
               <IoMdArrowBack size={25} />
               <h2 style={{ margin: 0 }}>Voltar</h2>
             </a>

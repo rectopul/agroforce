@@ -98,6 +98,34 @@ function isNumeric(value: any) {
   }
 }
 
+function generateDigitEAN13(code: any) {
+  let sum = 0;
+  for (let i = 11; i >= 0; i--) {
+    sum += parseInt(code[i]) * (i % 2 == 0 ? 1 : 3);
+  }
+  return (10 - (sum % 10)) % 10;
+}
+
+function generateDigitEAN8(code: any) {
+  let sum1 = 0;
+  let sum2 = 0;
+
+  for (let i = 6; i >= 0; i--) {
+    if (i % 2 != 0) {
+      sum1 += parseInt(code[i]);
+    } else {
+      sum2 += parseInt(code[i]);
+    }
+  }
+  sum2 = sum2 * 3;
+
+  let sum = sum1 + sum2;
+  let checkSum = 10 - (sum % 10);
+  if (checkSum == 10) checkSum = 0;
+
+  return checkSum;
+}
+
 export const functionsUtils = {
   validationCPF,
   Crypto,
@@ -105,4 +133,6 @@ export const functionsUtils = {
   formatDate,
   getFileExtension,
   isNumeric,
+  generateDigitEAN13,
+  generateDigitEAN8,
 };
