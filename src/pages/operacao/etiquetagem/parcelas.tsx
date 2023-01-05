@@ -335,7 +335,7 @@ export default function Listagem({
           setTotalItems(response.total);
           setCurrentPage(0);
           tableRef.current.dataManager.changePageSize(
-            itemsTotal >= take ? take : itemsTotal
+            response.total >= take ? take : response.total
           );
           setLoading(false);
         })

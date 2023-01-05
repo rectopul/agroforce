@@ -1078,7 +1078,7 @@ export default function Import({
                   className="flex flex-col
                       w-full
                       items-center
-                      px-2
+                      px-0
                       bg-white
                     "
                   onSubmit={formik.handleSubmit}
@@ -1092,6 +1092,23 @@ export default function Import({
                   >
                     {filterFieldFactory("filterUser", "Usuário")}
                     {filterFieldFactory("filterTable", "Tabela")}
+                    {filterFieldFactory("filterState", "Status")}
+
+                    <FieldItemsPerPage
+                      label="Itens"
+                      selected={take}
+                      onChange={setTake}
+                    />
+                  </div>
+
+                  <div
+                    className="w-full h-full
+                      flex
+                      justify-center
+                      pb-0
+                      mt-8
+                    "
+                  >
                     <div className="h-10 w-1/2 ml-2">
                       <label className="block text-gray-900 text-sm font-bold mb-1">
                         Inicio De:
@@ -1137,14 +1154,6 @@ export default function Import({
                         onChange={formik.handleChange}
                       />
                     </div>
-
-                    {filterFieldFactory("filterState", "Status")}
-
-                    <FieldItemsPerPage
-                      label="Itens"
-                      selected={take}
-                      onChange={setTake}
-                    />
 
                     <div style={{ width: 40 }} />
                     <div className="h-7 w-32 mt-6">
