@@ -13,7 +13,9 @@ export class UnidadeCulturaController {
   safraController = new SafraController();
 
   async getAll(options: any) {
-    const parameters: object | any = {};
+    console.log('🚀 ~ file: unidade-cultura.controller.ts:16 ~ UnidadeCulturaController ~ getAll ~ options', options);
+    const parameters: any = {};
+    parameters.AND = [];
     let orderBy: object | any;
     try {
       options = await removeEspecialAndSpace(options);
@@ -36,31 +38,31 @@ export class UnidadeCulturaController {
       }
 
       if (options.filterNameLocalCulture) {
-        parameters.local = JSON.parse(`{ "name_local_culture": { "contains": "${options.filterNameLocalCulture}" } }`);
+        parameters.AND.push(JSON.parse(`{ "local": { "name_local_culture": { "contains": "${options.filterNameLocalCulture}" } } }`));
       }
 
       if (options.filterLabel) {
-        parameters.local = JSON.parse(`{ "label": { "contains": "${options.filterLabel}" } }`);
+        parameters.AND.push(JSON.parse(`{ "local": { "label": { "contains": "${options.filterLabel}" } } }`));
       }
 
       if (options.filterMloc) {
-        parameters.local = JSON.parse(`{ "mloc": { "contains": "${options.filterMloc}" } }`);
+        parameters.AND.push(JSON.parse(`{ "local": { "mloc": { "contains": "${options.filterMloc}" } } }`));
       }
 
       if (options.filterAdress) {
-        parameters.local = JSON.parse(`{ "adress": {"contains": "${options.filterAdress}" } }`);
+        parameters.AND.push(JSON.parse(`{ "local": { "adress": {"contains": "${options.filterAdress}" } } }`));
       }
 
       if (options.filterLabelCountry) {
-        parameters.local = JSON.parse(`{ "label_country": {"contains": "${options.filterLabelCountry}" } }`);
+        parameters.AND.push(JSON.parse(`{ "local": { "label_country": {"contains": "${options.filterLabelCountry}" } } }`));
       }
 
       if (options.filterLabelRegion) {
-        parameters.local = JSON.parse(`{ "label_region": {"contains": "${options.filterLabelRegion}" } }`);
+        parameters.AND.push(JSON.parse(`{ "local": { "label_region": {"contains": "${options.filterLabelRegion}" } } }`));
       }
 
       if (options.filterNameLocality) {
-        parameters.local = JSON.parse(`{ "name_locality": {"contains": "${options.filterNameLocality}" } }`);
+        parameters.AND.push(JSON.parse(`{ "local": { "name_locality": {"contains": "${options.filterNameLocality}" } } }`));
       }
 
       const select = {
