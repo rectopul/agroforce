@@ -700,12 +700,12 @@ export default function Import({
     }
   }
 
-  const ComponentImport = ({
+  function ComponentImport({
     title,
     table,
     moduleId,
     disabled = false,
-  }: any) => {
+  }: any) {
     return (
       <div className="m-4 grid grid-cols-3 gap-4 h-20 items-center">
         <div className="h-16 w-16 flex items-center mr-1">
@@ -714,8 +714,8 @@ export default function Import({
             bgColor={bgColor}
             title={
               disabledButton
-                ? "Outra planilha já esta sendo importada"
-                : "Upload"
+                ? 'Outra planilha já esta sendo importada'
+                : 'Upload'
             }
             rounder="rounded-md rounded-bl-full rounded-br-full rounded-tr-full rounded-tl-full"
             onClick={() => readExcel(moduleId, table)}
@@ -724,7 +724,7 @@ export default function Import({
             type="button"
           />
         </div>
-        <div className="col-span-2" style={{ marginLeft: "-12%" }}>
+        <div className="col-span-2" style={{ marginLeft: '-12%' }}>
           <span className="font-bold text-sm">{title}</span>
           <Input
             disabled={disabled}
@@ -736,7 +736,7 @@ export default function Import({
         </div>
       </div>
     );
-  };
+  }
 
   useEffect(() => {
     handlePagination();
@@ -777,11 +777,11 @@ export default function Import({
               </Box>
 
               <TabPanel value={value} index={0}>
-                {(Router?.importar == "rd" || !Router.importar) && (
+                {(Router?.importar == 'rd' || !Router.importar) && (
                   <ComponentImport title="Cadastros RD" table="" moduleId={0} />
                 )}
 
-                {(Router?.importar == "ensaio" || !Router?.importar) && (
+                {(Router?.importar == 'ensaio' || !Router?.importar) && (
                   <ComponentImport
                     title="Importar Lista de Ensaio"
                     table="ASSAY_LIST"
@@ -789,7 +789,7 @@ export default function Import({
                   />
                 )}
 
-                {(Router?.importar == "subs_ensaio" || !Router.importar) && (
+                {(Router?.importar == 'subs_ensaio' || !Router.importar) && (
                   <ComponentImport
                     title="Importar Subs. de genótipo/nca Ensaio"
                     table="GENOTYPE_TREATMENT"
@@ -797,7 +797,7 @@ export default function Import({
                   />
                 )}
 
-                {(Router?.importar == "experimento" || !Router.importar) && (
+                {(Router?.importar == 'experimento' || !Router.importar) && (
                   <ComponentImport
                     title="Importar Lista de Experimento"
                     table="EXPERIMENT"
@@ -805,8 +805,8 @@ export default function Import({
                   />
                 )}
 
-                {(Router?.importar == "subs_experimento" ||
-                  !Router.importar) && (
+                {(Router?.importar == 'subs_experimento'
+                  || !Router.importar) && (
                   <ComponentImport
                     title="Importar Subs. de genótipo/nca Experimento"
                     table="PARCELS"
@@ -818,7 +818,7 @@ export default function Import({
               </TabPanel>
 
               <TabPanel value={value} index={1}>
-                {(Router?.importar == "delineamento" || !Router.importar) && (
+                {(Router?.importar == 'delineamento' || !Router.importar) && (
                   <ComponentImport
                     title="Importar Delineamento"
                     table="DELIMITATION"
@@ -826,7 +826,7 @@ export default function Import({
                   />
                 )}
 
-                {(Router?.importar == "ambiente" || !Router.importar) && (
+                {(Router?.importar == 'ambiente' || !Router.importar) && (
                   <ComponentImport
                     title="Importar Ambiente"
                     table="NPE"
@@ -834,7 +834,7 @@ export default function Import({
                   />
                 )}
 
-                {(Router?.importar == "layout_quadra" || !Router.importar) && (
+                {(Router?.importar == 'layout_quadra' || !Router.importar) && (
                   <ComponentImport
                     title="Importar Layout de quadra"
                     table="BLOCK_LAYOUT"
@@ -842,7 +842,7 @@ export default function Import({
                   />
                 )}
 
-                {(Router?.importar == "quadra" || !Router.importar) && (
+                {(Router?.importar == 'quadra' || !Router.importar) && (
                   <ComponentImport
                     title="Importar Quadra"
                     table="BLOCK"
@@ -850,21 +850,21 @@ export default function Import({
                   />
                 )}
 
-                {(Router?.importar == "alocacao_quadra" ||
-                  !Router.importar) && (
+                {(Router?.importar == 'alocacao_quadra'
+                  || !Router.importar) && (
                   <ComponentImport
                     title="Importar Alocação de quadra"
                     table="ALLOCATION"
                     moduleId={31}
                   />
                 )}
-                {(Router?.importar == "etiquetas_impressas" ||
-                  !Router.importar) && (
+                {(Router?.importar == 'etiquetas_impressas'
+                  || !Router.importar) && (
                   <ComponentImport
                     disabled
                     title="Importar Etiquetas Impressas"
-                    table="TAG_PRINTED" //AINDA NÃO SEI NOME CORRETO
-                    moduleId={0} //AINDA NÃO SEI CODIGO CORRETO
+                    table="TAG_PRINTED" // AINDA NÃO SEI NOME CORRETO
+                    moduleId={0} // AINDA NÃO SEI CODIGO CORRETO
                   />
                 )}
               </TabPanel>
@@ -897,9 +897,9 @@ export default function Import({
                       pb-0
                     "
                   >
-                    {filterFieldFactory("filterUser", "Usuário")}
-                    {filterFieldFactory("filterTable", "Tabela")}
-                    {filterFieldFactory("filterState", "Status")}
+                    {filterFieldFactory('filterUser', 'Usuário')}
+                    {filterFieldFactory('filterTable', 'Tabela')}
+                    {filterFieldFactory('filterState', 'Status')}
 
                     <FieldItemsPerPage
                       label="Itens"
@@ -1080,7 +1080,7 @@ export default function Import({
                           </div>
                         </div>
 
-                        <div className="h-12 flex items-center justify-left">
+                        {/* <div className="h-12 flex items-center justify-left">
                           <Button
                             title="Cancelar importação de planilha"
                             icon={<AiOutlineStop size={20} />}
@@ -1093,7 +1093,7 @@ export default function Import({
                               cancelImport();
                             }}
                           />
-                        </div>
+                        </div> */}
 
                         <div className="h-12 flex items-center justify-center w-full">
                           <Button
