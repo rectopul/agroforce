@@ -412,6 +412,7 @@ export class ImportGenotypeController {
                 spreadSheet[row][column] = `${spreadSheet[row][column].split('.')[0]}Z`;
                 // eslint-disable-next-line no-param-reassign
                 spreadSheet[row][column] = new Date(spreadSheet[row][column]);
+                console.log('new date ', spreadSheet[row][column]);
                 const { status, response }: IReturnObject = await loteController.getAll({
                   id_dados: spreadSheet[row][21],
                   id_culture: idCulture,
@@ -435,6 +436,7 @@ export class ImportGenotypeController {
                   );
                 }
                 if (status === 200) {
+                  console.log('response', response);
                   const lastDtImport = response[0]?.dt_export?.getTime();
 
                   if (
