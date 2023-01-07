@@ -88,6 +88,8 @@ export default function Listagem({
 
   const router = useRouter();
   const inputRef = useRef();
+  const Iref = useRef();
+  const myRef = useRef(null);
 
   const tabsEtiquetagemMenu = tabsOperation.map((i: any) =>
     i.titleTab === "ETIQUETAGEM"
@@ -108,6 +110,9 @@ export default function Listagem({
   );
   const [parcelas, setParcelas] = useState<ITreatment[] | any>([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [isOpenModalPrint, setIsOpenModalPrint] = useState(false);
+  const [urlPrint, setUrlPrint] = useState("");
+  const [stateIframe, setStateIframe] = useState(0);
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -788,7 +793,9 @@ export default function Listagem({
     setValidateNcaTwo("bg-gray-300");
     setParcelasToPrint([]);
     // setIsOpenModal(!isOpenModal);
-    (document.getElementById("inputCode") as HTMLInputElement).value = "";
+    if(isOpenModal){
+      (document.getElementById("inputCode") as HTMLInputElement).value = "";
+    }
     (inputRef?.current as any)?.focus();
   }
 
@@ -866,8 +873,8 @@ export default function Listagem({
         status: "IMPRESSO",
         userId: userLogado.id,
       });
+      
       cleanState();
-      // setIsOpenModal(false);
 
       const parcelsByNCA = parcelas.filter((i: any) => i.nca == inputCode);
       const parcels = parcelsByNCA.map((i: any) => ({
@@ -878,7 +885,14 @@ export default function Listagem({
       }));
       if (parcels) {
         localStorage.setItem("parcelasToPrint", JSON.stringify(parcels));
-        window.open("imprimir", "_blank");
+
+        //setStateIframe(stateIframe + 1);
+
+        resetIframe();
+        
+        // -- AQUI
+        setIsOpenModalPrint(true);
+        setUrlPrint("imprimir");
         cleanState();
         (document.getElementById("inputCode") as HTMLInputElement).value = "";
         setTimeout(() => (inputRef?.current as any)?.focus(), 2000);
@@ -1032,6 +1046,10 @@ export default function Listagem({
     return true;
   }
 
+  function resetIframe() {
+    setStateIframe(stateIframe + 1);
+  }
+  
   return (
     <>
       <Head>
@@ -1043,7 +1061,55 @@ export default function Listagem({
       {isLoading && (
         <LoadingComponent text="Gerando etiquetas para impressão..." />
       )}
+      
+      <Modal
+        isOpen={isOpenModalPrint}
+        shouldCloseOnOverlayClick={false}
+        shouldCloseOnEsc={false}
+        onRequestClose={() => {
+          setIsOpenModalPrint(!isOpenModalPrint);
+        }}
+        overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
+        className="flex
+          flex-col
+          w-full
+          h-64
+          max-w-xl
+          bg-gray-50
+          rounded-tl-2xl
+          rounded-tr-2xl
+          rounded-br-2xl
+          rounded-bl-2xl
+          pt-2
+          pb-4
+          px-8
+          relative
+          shadow-lg
+          shadow-gray-900/50
+          modalEtiquetaAutomatizada"
+      >
+        
+        <h3>Impressão de etiquetas</h3>
+        <button
+          type="button"
+          className="flex absolute top-4 right-3 justify-end"
+          onClick={() => {
+            cleanState();
+            setIsOpenModalPrint(false);
+          }}
+        >
+          <RiCloseCircleFill
+            size={35}
+            className="fill-red-600 hover:fill-red-800"
+          />
+        </button>
 
+        
+        {/*<iframe key={this.state.random} src={this.props.myUrl}></iframe>*/}
+        
+        <iframe src={urlPrint} key={stateIframe} id="iframePrint" ref={myRef} width="100%" height="100%"></iframe>
+      </Modal>
+      
       <Modal
         isOpen={isOpenModal}
         shouldCloseOnOverlayClick={false}
@@ -1081,6 +1147,7 @@ export default function Listagem({
             onClick={() => {
               cleanState();
               setIsOpenModal(false);
+              setIsOpenModalPrint(false);
             }}
           >
             <RiCloseCircleFill
@@ -1088,7 +1155,9 @@ export default function Listagem({
               className="fill-red-600 hover:fill-red-800"
             />
           </button>
-
+          
+          
+          
           <div className="w-72 flex">
             <div className="w-44">
               <InputRef
