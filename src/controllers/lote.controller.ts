@@ -255,6 +255,10 @@ export class LoteController {
         orderBy,
       );
 
+      response.map((item: any) => {
+        item.dt_export = new Date(item.dt_export);
+      });
+
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }

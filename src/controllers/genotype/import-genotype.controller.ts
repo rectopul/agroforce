@@ -408,8 +408,15 @@ export class ImportGenotypeController {
                   row,
                   spreadSheet[0][column],
                 );
+              } else if (typeof spreadSheet[row][column] === 'number') {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  Number(column) + 1,
+                  row,
+                  spreadSheet[0][column],
+                  'o campo DT precisa ser no formato data',
+                );
               } else {
-                spreadSheet[row][column] = `${spreadSheet[row][column].split('.')[0]}Z`;
+                spreadSheet[row][column] = spreadSheet[row][column].replace(/\.\d+/, '');
                 // eslint-disable-next-line no-param-reassign
                 spreadSheet[row][column] = new Date(spreadSheet[row][column]);
                 const { status, response }: IReturnObject = await loteController.getAll({
@@ -439,7 +446,7 @@ export class ImportGenotypeController {
 
                   if (
                     lastDtImport
-                    > spreadSheet[row][column].getTime()
+                      > spreadSheet[row][column].getTime()
                   ) {
                     responseIfError[Number(column)] += responseGenericFactory(
                       Number(column) + 1,

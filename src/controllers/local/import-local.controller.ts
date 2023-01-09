@@ -251,7 +251,15 @@ export class ImportLocalController {
                 row,
                 spreadSheet[0][column],
               );
+            } else if (typeof spreadSheet[row][column] === 'number') {
+              responseIfError[Number(column)] += responseGenericFactory(
+                Number(column) + 1,
+                row,
+                spreadSheet[0][column],
+                'o campo DT precisa ser no formato data',
+              );
             } else {
+              // eslint-disable-next-line no-param-reassign
               spreadSheet[row][column] = spreadSheet[row][column].replace(/\.\d+/, '');
               // eslint-disable-next-line no-param-reassign
               spreadSheet[row][column] = new Date(spreadSheet[row][column]);
@@ -280,7 +288,7 @@ export class ImportLocalController {
                 const lastDtImport = response[0]?.dt_export?.getTime();
                 if (
                   lastDtImport
-                    > spreadSheet[row][column].getTime()
+                      > spreadSheet[row][column].getTime()
                 ) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,

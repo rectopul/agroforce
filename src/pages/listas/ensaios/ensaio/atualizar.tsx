@@ -750,7 +750,7 @@ export default function AtualizarTipoEnsaio({
             newRow.STATUS_EXPERIMENTO = newRow.status_experiment;
             newRow.NCA = newRow.lote?.ncc;
             newRow.COD_LOTE = newRow.lote?.cod_lote;
-            newRow.COMENTÁRIOS = newRow.comments;
+            newRow.OBS = newRow.comments;
 
             delete row.id_lote;
             delete row.id_genotipo;
