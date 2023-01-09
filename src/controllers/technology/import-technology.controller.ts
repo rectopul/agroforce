@@ -131,6 +131,13 @@ export class ImportTechnologyController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[column]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              } else if (typeof spreadSheet[row][column] === 'number') {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  Number(column) + 1,
+                  row,
+                  spreadSheet[0][column],
+                  'o campo DT precisa ser no formato data',
+                );
               } else {
                 // eslint-disable-next-line no-param-reassign
                 spreadSheet[row][column] = spreadSheet[row][column].replace(/\.\d+/, '');
