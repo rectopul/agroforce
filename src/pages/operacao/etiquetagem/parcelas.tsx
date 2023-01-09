@@ -89,6 +89,8 @@ export default function Listagem({
 
   const router = useRouter();
   const inputRef = useRef();
+  const Iref = useRef();
+  const myRef = useRef(null);
 
   const tabsEtiquetagemMenu = tabsOperation.map((i: any) =>
     i.titleTab === "ETIQUETAGEM"
@@ -100,7 +102,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.parcelas || {
     id: 0,
     table_preferences:
-      "id,foco,type_assay,tecnologia,gli,experiment,local,repetitionsNumber,status,NT,npe,name_genotipo,nca",
+      "id,foco,type_assay,tecnologia,gli,experiment,local,repetitionsNumber,status,NT,npe,name_genotipo,nca,action",
   };
 
   const tableRef = useRef<any>(null);
@@ -109,6 +111,9 @@ export default function Listagem({
   );
   const [parcelas, setParcelas] = useState<ITreatment[] | any>([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [isOpenModalPrint, setIsOpenModalPrint] = useState(false);
+  const [urlPrint, setUrlPrint] = useState("");
+  const [stateIframe, setStateIframe] = useState(0);
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -615,7 +620,7 @@ export default function Listagem({
   const columns = orderColumns(camposGerenciados);
 
   async function getValuesColumns(): Promise<void> {
-    const els: any = document.querySelectorAll("input[type='checkbox'");
+    const els: any = document.querySelectorAll("input[type='checkbox']");
     let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
@@ -1151,6 +1156,10 @@ export default function Listagem({
           />
         </button>
 
+        <iframe src={urlPrint} key={stateIframe} id="iframePrint" ref={myRef} width="100%" height="100%"></iframe>
+        
+      </Modal>
+      
       <Modal
         isOpen={isOpenModal}
         shouldCloseOnOverlayClick={false}
