@@ -767,8 +767,8 @@ export default function Listagem({
                             );
                           }}
                           bgColor="bg-blue-600"
-                          // bgColor={experimentGroup?.status === 'ETIQ. EM ANDAMENTO' ? 'bg-gray-400' : 'bg-blue-600'}
-                          // disabled={experimentGroup?.status === 'ETIQ. EM ANDAMENTO'}
+                          bgColor={experimentGroup?.status === 'ETIQ. EM ANDAMENTO' ? 'bg-gray-400' : 'bg-blue-600'}
+                          disabled={experimentGroup?.status === 'ETIQ. EM ANDAMENTO'}
                         />
                       </div>
                       <div className="h-12 w-12 ml-2">
