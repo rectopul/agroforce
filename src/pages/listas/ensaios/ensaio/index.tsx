@@ -54,17 +54,17 @@ import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactor
 import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 
 export default function TipoEnsaio({
-      allAssay,
-      itensPerPage,
-      filterApplication,
-      totalItems,
-      idSafra,
-      idCulture,
-      pageBeforeEdit,
-      filterBeforeEdit,
-      typeOrderServer,
-      orderByserver,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allAssay,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+  idSafra,
+  idCulture,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  typeOrderServer,
+  orderByserver,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -161,8 +161,9 @@ export default function TipoEnsaio({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy
-    }&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
+    orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy
+  }&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IAssayListFilter>({
     initialValues: {
@@ -207,6 +208,8 @@ export default function TipoEnsaio({
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
+    console.log('chamou');
+
     setFilter(parametersFilter);
     setCookies('filterBeforeEdit', parametersFilter);
     setCookies('filterBeforeEditTypeOrder', typeOrder);
@@ -320,7 +323,7 @@ export default function TipoEnsaio({
       userId: userLogado.id,
     });
     if (status === 200) {
-      handlePagination();
+      handlePagination(currentPage);
       setLoading(false);
     } else {
       Swal.fire({
@@ -398,7 +401,7 @@ export default function TipoEnsaio({
               icon={<BsTrashFill size={14} />}
               title="Ensaio já associado a um experimento"
               disabled
-              onClick={() => { }}
+              onClick={() => {}}
               bgColor="bg-gray-600"
               textColor="white"
             />
@@ -664,7 +667,7 @@ export default function TipoEnsaio({
     }
   }
 
-  async function handlePagination(): Promise<void> {
+  async function handlePagination(page: any): Promise<void> {
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
@@ -682,6 +685,7 @@ export default function TipoEnsaio({
     //   }
     // });
 
+    setCurrentPage(page);
     await callingApi(filter); // handle pagination globly
   }
 
@@ -712,10 +716,10 @@ export default function TipoEnsaio({
     );
   }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   return (
     <>
@@ -774,7 +778,7 @@ export default function TipoEnsaio({
                         id="filterTratFrom"
                         name="filterTratFrom"
                         onChange={formik.handleChange}
-                        defaultValue={checkValue("filterTratFrom")}
+                        defaultValue={checkValue('filterTratFrom')}
                       />
                       <Input
                         style={{ marginLeft: 8 }}
@@ -783,7 +787,7 @@ export default function TipoEnsaio({
                         id="filterTratTo"
                         name="filterTratTo"
                         onChange={formik.handleChange}
-                        defaultValue={checkValue("filterTratTo")}
+                        defaultValue={checkValue('filterTratTo')}
                       />
                     </div>
                   </div>
@@ -838,19 +842,19 @@ export default function TipoEnsaio({
                     border-gray-200
                   "
                   >
-                    {/* <div className="h-12">
+                    <div className="h-12">
                       <Button
-                        title="Importar Planilha"
-                        value="Importar Planilha"
+                        title="Importar"
+                        value="Importar"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => { }}
-                        href="ensaio/importar-planilha"
+                        onClick={() => {
+                          window.open('/listas/rd?importar=ensaio', '_blank');
+                        }}
                         icon={<RiFileExcel2Line size={20} />}
                       />
-                    </div> */}
+                    </div>
 
-                    <div />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}

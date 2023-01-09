@@ -440,6 +440,7 @@ export default function Listagem({
     await tecnologiaService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((row: any) => {
+          console.log('🚀 ~ file: index.tsx:443 ~ newData ~ row', row);
           const dataExp = new Date();
           let hours: string;
           let minutes: string;
@@ -670,17 +671,20 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    <div className="h-12" />
-                    {/* <div className="h-12">
+                    {/* <div className="h-12" /> */}
+                    <div className="h-12">
                       <Button
-                        title="Importar planilha"
-                        value="Importar planilha"
+                        title="Importar"
+                        value="Importar"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => { router.push('tecnologia/importar-planilha'); }}
+                        onClick={() => {
+                          window.open('/listas/rd?importar=rd', '_blank');
+                        }}
                         icon={<RiFileExcel2Line size={20} />}
                       />
-                    </div> */}
+                    </div>
+
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}

@@ -417,7 +417,7 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    await experimentService.getAll(filter).then(({ status, response }: any) => {
+    await experimentService.getAll(`${filter}&excel=${true}`).then(({ status, response }: any) => {
       if (status === 200) {
         response.map((item: any) => {
           const newItem = item;
@@ -468,7 +468,11 @@ export default function Listagem({
         });
         const workSheet = XLSX.utils.json_to_sheet(response);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'exp-para-etiquetagem');
+        XLSX.utils.book_append_sheet(
+          workBook,
+          workSheet,
+          'exp-para-etiquetagem',
+        );
 
         // Buffer
         XLSX.write(workBook, {
@@ -498,7 +502,11 @@ export default function Listagem({
     }
   }
 
-  async function handlePagination(): Promise<void> {
+  async function handlePagination(page: any): Promise<void> {
+    console.log('chamou');
+
+    setCurrentPage(page);
+
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
@@ -574,8 +582,8 @@ export default function Listagem({
       userId: userLogado.id,
     });
     if (status === 200) {
-      handlePagination();
-      handleTotalPages();
+      handlePagination(currentPage);
+      // handleTotalPages();
       setLoading(false);
     } else {
       Swal.fire({
@@ -615,12 +623,18 @@ export default function Listagem({
   }
 
   useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+    handlePagination(0);
+  }, []);
+
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   async function validateAddExperiment() {
-    const { response } = await experimentGroupService.getAll({ id: experimentGroupId });
+    const { response } = await experimentGroupService.getAll({
+      id: experimentGroupId,
+    });
     if (response[0].status === 'ETIQ. NÃO INICIADA') {
       setExperimentAdd(false);
     }
@@ -860,14 +874,14 @@ export default function Listagem({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(0)}
+                      onClick={() => handlePagination(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
                       disabled={currentPage < 1}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
+                      onClick={() => handlePagination(currentPage - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<BiLeftArrow size={15} />}
@@ -878,7 +892,7 @@ export default function Listagem({
                       .map((value, index) => (
                         <Button
                           key={index}
-                          onClick={() => setCurrentPage(index)}
+                          onClick={() => handlePagination(index)}
                           value={`${currentPage + 1}`}
                           bgColor="bg-blue-600"
                           textColor="white"
@@ -886,14 +900,14 @@ export default function Listagem({
                         />
                       ))}
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
+                      onClick={() => handlePagination(currentPage + 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<BiRightArrow size={15} />}
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages - 1)}
+                      onClick={() => handlePagination(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}

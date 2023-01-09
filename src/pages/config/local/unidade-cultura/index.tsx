@@ -614,6 +614,7 @@ export default function Listagem({
           let dtSeconds: string;
 
           newRow.dt_export = new Date(newRow.dt_export);
+          newRow.dt_export = new Date(newRow.dt_export.toISOString().slice(0, -1));
 
           if (String(newRow.dt_export.getHours()).length === 1) {
             dtHours = `0${String(newRow.dt_export.getHours())}`;
@@ -884,7 +885,20 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
-                    <div className="h-12" />
+                    {/* <div className="h-12" /> */}
+                    <div className="h-12">
+                      <Button
+                        title="Importar"
+                        value="Importar"
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        onClick={() => {
+                          window.open('/listas/rd?importar=rd', '_blank');
+                        }}
+                        icon={<RiFileExcel2Line size={20} />}
+                      />
+                    </div>
+
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}

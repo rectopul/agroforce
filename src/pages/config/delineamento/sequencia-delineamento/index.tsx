@@ -650,7 +650,7 @@ export default function Listagem({
     }
   }
 
-  async function handlePagination(): Promise<void> {
+  async function handlePagination(page: any): Promise<void> {
     // const skip = currentPage * Number(take);
     // let parametersFilter;
     // if (orderType) {
@@ -670,6 +670,8 @@ export default function Listagem({
     //       setTotalItems(allTotal);
     //     }
     //   });
+
+    setCurrentPage(page);
     await callingApi(filter); // handle pagination globly
   }
 
@@ -682,10 +684,10 @@ export default function Listagem({
     return parameter;
   }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   return (
     <>
@@ -984,14 +986,14 @@ export default function Listagem({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(0)}
+                      onClick={() => handlePagination(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
                       disabled={currentPage < 1}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
+                      onClick={() => handlePagination(currentPage - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<BiLeftArrow size={15} />}
@@ -1002,7 +1004,7 @@ export default function Listagem({
                       .map((value, index) => (
                         <Button
                           key={index}
-                          onClick={() => setCurrentPage(index)}
+                          onClick={() => handlePagination(index)}
                           value={`${currentPage + 1}`}
                           bgColor="bg-blue-600"
                           textColor="white"
@@ -1010,14 +1012,14 @@ export default function Listagem({
                         />
                       ))}
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
+                      onClick={() => handlePagination(currentPage + 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<BiRightArrow size={15} />}
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages - 1)}
+                      onClick={() => handlePagination(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -1042,7 +1044,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const PreferencesControllers = new UserPreferenceController();
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) ?? 15;
+  )?.response[0]?.itens_per_page) ?? 10;
 
   const { token } = req.cookies;
   const idDelineamento: number = Number(query.id_delineamento);
@@ -1100,7 +1102,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   } as RequestInit | undefined;
 
   const { response: allItems, total: totalItems }: IReturnObject = await fetch(
-    `${baseUrl}`,
+    urlParameters.toString(),
     requestOptions,
   ).then((response) => response.json());
 

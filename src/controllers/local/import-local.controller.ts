@@ -252,6 +252,7 @@ export class ImportLocalController {
                 spreadSheet[0][column],
               );
             } else {
+              // eslint-disable-next-line no-param-reassign
               spreadSheet[row][column] = spreadSheet[row][column].replace(/\.\d+/, '');
               // eslint-disable-next-line no-param-reassign
               spreadSheet[row][column] = new Date(spreadSheet[row][column]);

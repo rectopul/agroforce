@@ -8,14 +8,12 @@ import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import Swal from 'sweetalert2';
 import {
   experimentGenotipeService,
-  layoutQuadraService,
   npeService,
 } from 'src/services';
 import InputMask from 'react-input-mask';
 
 import { IoMdArrowBack } from 'react-icons/io';
 import { MdDateRange } from 'react-icons/md';
-import npe from 'src/pages/api/npe';
 import {
   Content, Input, Select, Button,
 } from '../../../components';
@@ -97,11 +95,6 @@ export default function NovoLocal({
     googleMapsApiKey: 'AIzaSyD2fT6h_lQHgdj4_TgbwV6uDfZ23Hj0vKg',
   });
 
-  const position = {
-    lat,
-    lng,
-  };
-
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const locais: object | any = [];
   const router = useRouter();
@@ -128,7 +121,7 @@ export default function NovoLocal({
 
       const parametersFilter = `filterStatus=1&npei=${values.prox_npe}`;
       await npeService.getAll(parametersFilter).then(async (response) => {
-        if (response.total <= 0) {
+        if (response.total <= 0 || npe[0]?.id === response[0]?.id) {
           const paramFilter = `id_culture=${idCulture}&id_safra=${idSafra}&npe=${values.prox_npe}`;
           await experimentGenotipeService
             .getAll(paramFilter)
@@ -442,6 +435,7 @@ export default function NovoLocal({
                 textColor="white"
                 icon={<IoMdArrowBack size={18} />}
                 onClick={() => {
+                  setLoading(true);
                   router.back();
                 }}
               />

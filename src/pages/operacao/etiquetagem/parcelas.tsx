@@ -51,6 +51,7 @@ import * as ITabs from "../../../shared/utils/dropdown";
 import { IReturnObject } from "../../../interfaces/shared/Import.interface";
 import { fetchWrapper, tableGlobalFunctions } from "../../../helpers";
 import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
+import { functionsUtils } from "src/shared/utils/functionsUtils";
 
 interface IFilter {
   filterFoco: string;
@@ -88,8 +89,6 @@ export default function Listagem({
 
   const router = useRouter();
   const inputRef = useRef();
-  const Iref = useRef();
-  const myRef = useRef(null);
 
   const tabsEtiquetagemMenu = tabsOperation.map((i: any) =>
     i.titleTab === "ETIQUETAGEM"
@@ -101,7 +100,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.parcelas || {
     id: 0,
     table_preferences:
-      "id,foco,type_assay,tecnologia,gli,experiment,local,repetitionsNumber,status,NT,npe,name_genotipo,nca,action",
+      "id,foco,type_assay,tecnologia,gli,experiment,local,repetitionsNumber,status,NT,npe,name_genotipo,nca",
   };
 
   const tableRef = useRef<any>(null);
@@ -110,9 +109,6 @@ export default function Listagem({
   );
   const [parcelas, setParcelas] = useState<ITreatment[] | any>([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [isOpenModalPrint, setIsOpenModalPrint] = useState(false);
-  const [urlPrint, setUrlPrint] = useState("");
-  const [stateIframe, setStateIframe] = useState(0);
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -194,12 +190,12 @@ export default function Listagem({
       value: "nca",
       defaultChecked: () => camposGerenciados.includes("nca"),
     },
-    {
-      name: "CamposGerenciados[]",
-      title: "Ação",
-      value: "action",
-      defaultChecked: () => camposGerenciados.includes("action"),
-    },
+    // {
+    //   name: "CamposGerenciados[]",
+    //   title: "Ação",
+    //   value: "action",
+    //   defaultChecked: () => camposGerenciados.includes("action"),
+    // },
   ]);
 
   const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
@@ -339,7 +335,7 @@ export default function Listagem({
           setTotalItems(response.total);
           setCurrentPage(0);
           tableRef.current.dataManager.changePageSize(
-            itemsTotal >= take ? take : itemsTotal
+            response.total >= take ? take : response.total
           );
           setLoading(false);
         })
@@ -609,9 +605,9 @@ export default function Listagem({
           })
         );
       }
-      if (columnOrder[index] === "action") {
-        tableFields.push(actionTableFactory());
-      }
+      // if (columnOrder[index] === "action") {
+      //   tableFields.push(actionTableFactory());
+      // }
     });
     return tableFields;
   }
@@ -704,7 +700,11 @@ export default function Listagem({
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Parcelas de expe. etiquetagem');
+          XLSX.utils.book_append_sheet(
+            workBook,
+            workSheet,
+            "Parcelas de expe. etiquetagem"
+          );
 
           // Buffer
           XLSX.write(workBook, {
@@ -717,8 +717,7 @@ export default function Listagem({
             type: "binary",
           });
           // Download
-          XLSX.writeFile(workBook, 'Parcelas de expe. etiquetagem.xlsx');
-
+          XLSX.writeFile(workBook, "Parcelas de expe. etiquetagem.xlsx");
         } else {
           setLoading(false);
           Swal.fire(
@@ -737,7 +736,11 @@ export default function Listagem({
     }
   }
 
-  async function handlePagination(): Promise<void> {
+  async function handlePagination(page: any): Promise<void> {
+    setCurrentPage(page);
+
+    console.log("chamou");
+
     const skip = currentPage * Number(take);
     let parametersFilter;
     if (orderType) {
@@ -793,9 +796,7 @@ export default function Listagem({
     setValidateNcaTwo("bg-gray-300");
     setParcelasToPrint([]);
     // setIsOpenModal(!isOpenModal);
-    if(isOpenModal){
-      (document.getElementById("inputCode") as HTMLInputElement).value = "";
-    }
+    (document.getElementById("inputCode") as HTMLInputElement).value = "";
     (inputRef?.current as any)?.focus();
   }
 
@@ -873,8 +874,8 @@ export default function Listagem({
         status: "IMPRESSO",
         userId: userLogado.id,
       });
-      
       cleanState();
+      // setIsOpenModal(false);
 
       const parcelsByNCA = parcelas.filter((i: any) => i.nca == inputCode);
       const parcels = parcelsByNCA.map((i: any) => ({
@@ -896,7 +897,7 @@ export default function Listagem({
         cleanState();
         (document.getElementById("inputCode") as HTMLInputElement).value = "";
         setTimeout(() => (inputRef?.current as any)?.focus(), 2000);
-        handlePagination();
+        handlePagination(currentPage);
         // router.push("imprimir");
       }
     }
@@ -909,39 +910,52 @@ export default function Listagem({
     //   document.getElementById("inputCode") as HTMLInputElement
     // )?.value;
     if (!doubleVerify) {
-      let colorVerify = "";
-      if (inputCode == writeOffNca) {
-        colorVerify = "bg-green-600";
-        setValidateNcaOne("bg-green-600");
-      } else {
-        colorVerify = "bg-red-600";
-        setValidateNcaOne("bg-red-600");
-      }
-      if (colorVerify === "bg-green-600") {
-        (document.getElementById("inputCode") as HTMLInputElement).value = "";
-        setDoubleVerify(true);
-      } else {
-        setDoubleVerify(false);
-      }
+      //let colorVerify = "";
+      // if (inputCode == writeOffNca) {
+      //   colorVerify = "bg-green-600";
+      //   setValidateNcaOne("bg-green-600");
+      // } else {
+      //   colorVerify = "bg-red-600";
+      //   setValidateNcaOne("bg-red-600");
+      // }
+      //if (colorVerify === "bg-green-600") {
+      (document.getElementById("inputCode") as HTMLInputElement).value = "";
+      setDoubleVerify(true);
+      //} else {
+      //setDoubleVerify(false);
+      //}
     } else {
-      let colorVerify = "";
-      if (inputCode == writeOffNca) {
-        colorVerify = "bg-green-600";
-        setValidateNcaTwo("bg-green-600");
-      } else {
-        colorVerify = "bg-red-600";
-        setValidateNcaTwo("bg-red-600");
-      }
-      if (colorVerify === "bg-green-600") {
-        await experimentGenotipeService.update({
-          idList: [writeOffId],
+      //let colorVerify = "";
+      // if (inputCode == writeOffNca) {
+      //   colorVerify = "bg-green-600";
+      //   setValidateNcaTwo("bg-green-600");
+      // } else {
+      //   colorVerify = "bg-red-600";
+      //   setValidateNcaTwo("bg-red-600");
+      // }
+      //if (colorVerify === "bg-green-600") {
+
+      //NA CHAMADA TEM QUE SER MANDANDO O NUMERO DO NPE PARA A API DAR BAIXA
+      try {
+        const response = await experimentGenotipeService.update({
+          //idList: [writeOffId],
+          npe: inputCode,
           status: "EM ETIQUETAGEM",
           userId: userLogado.id,
         });
+        console.log({ response });
+
         cleanState();
-        handlePagination();
+        handlePagination(currentPage);
         setIsOpenModal(false);
+      } catch (error) {
+        console.log({ error });
+
+        cleanState();
+        Swal.fire("Erro ao tentar dar baixa na parcela.");
       }
+
+      //}
     }
   }
 
@@ -961,13 +975,33 @@ export default function Listagem({
     if (e?.charCode === 13 || e?.charCode === 10) validateInput();
   }
 
-  function generateEAN13digit(code: any) {
-    let sum = 0;
-    for (let i = 11; i >= 0; i--) {
-      sum += parseInt(code[i]) * (i % 2 == 0 ? 1 : 3);
-    }
-    return (10 - (sum % 10)) % 10;
-  }
+  // function generateEAN13digit(code: any) {
+  //   let sum = 0;
+  //   for (let i = 11; i >= 0; i--) {
+  //     sum += parseInt(code[i]) * (i % 2 == 0 ? 1 : 3);
+  //   }
+  //   return (10 - (sum % 10)) % 10;
+  // }
+
+  // function generateEAN8Digit(code: any) {
+  //   let sum1 = 0;
+  //   let sum2 = 0;
+
+  //   for (let i = 6; i >= 0; i--) {
+  //     if (i % 2 != 0) {
+  //       sum1 += parseInt(code[i]);
+  //     } else {
+  //       sum2 += parseInt(code[i]);
+  //     }
+  //   }
+  //   sum2 = sum2 * 3;
+
+  //   let sum = sum1 + sum2;
+  //   let checkSum = 10 - (sum % 10);
+  //   if (checkSum == 10) checkSum = 0;
+
+  //   return checkSum;
+  // }
 
   async function validateInput() {
     const inputCode: any = (
@@ -977,28 +1011,37 @@ export default function Listagem({
       const lastNumber = parseInt(inputCode?.substring(12, 13));
       const withoutDigit = parseInt(inputCode?.substring(0, 12));
 
-      if (dismiss) {
-        if (generateEAN13digit(inputCode) !== lastNumber) {
-          setValidateNcaOne("bg-red-600");
-          return;
-        }
-
-        writeOff(withoutDigit);
-      } else if (doubleVerify) {
-        if (generateEAN13digit(inputCode) !== lastNumber) {
+      if (doubleVerify) {
+        if (functionsUtils?.generateDigitEAN13(inputCode) !== lastNumber) {
           setValidateNcaTwo("bg-red-600");
           return;
         }
 
         verifyAgain(withoutDigit);
       } else {
-        if (generateEAN13digit(inputCode) !== lastNumber) {
+        if (functionsUtils?.generateDigitEAN13(inputCode) !== lastNumber) {
           setValidateNcaOne("bg-red-600");
           return;
         }
 
         handleSubmit(withoutDigit);
       }
+    }
+    if (inputCode?.length === 8) {
+      const lastNumber = parseInt(inputCode?.substring(7, 8));
+      const withoutDigit = parseInt(inputCode?.substring(0, 7));
+
+      if (functionsUtils?.generateDigitEAN8(inputCode) !== lastNumber) {
+        doubleVerify
+          ? setValidateNcaTwo("bg-red-600")
+          : setValidateNcaOne("bg-red-600");
+        return;
+      }
+
+      doubleVerify
+        ? setValidateNcaTwo("bg-green-600")
+        : setValidateNcaOne("bg-green-600");
+      writeOff(withoutDigit);
     }
   }
 
@@ -1022,16 +1065,20 @@ export default function Listagem({
       localStorage.setItem("parcelasToPrint", JSON.stringify(parcels));
       // router.push("imprimir");
       window.open("imprimir", "_blank");
-      handlePagination();
+      handlePagination(currentPage);
     }
 
     setIsLoading(false);
   }
 
   useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+    handlePagination(0);
+  }, []);
+
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   function openModal() {
     setIsOpenModal(true);
@@ -1104,12 +1151,6 @@ export default function Listagem({
           />
         </button>
 
-        
-        {/*<iframe key={this.state.random} src={this.props.myUrl}></iframe>*/}
-        
-        <iframe src={urlPrint} key={stateIframe} id="iframePrint" ref={myRef} width="100%" height="100%"></iframe>
-      </Modal>
-      
       <Modal
         isOpen={isOpenModal}
         shouldCloseOnOverlayClick={false}
@@ -1147,7 +1188,6 @@ export default function Listagem({
             onClick={() => {
               cleanState();
               setIsOpenModal(false);
-              setIsOpenModalPrint(false);
             }}
           >
             <RiCloseCircleFill
@@ -1155,10 +1195,8 @@ export default function Listagem({
               className="fill-red-600 hover:fill-red-800"
             />
           </button>
-          
-          
-          
-          <div className="w-72 flex">
+
+          <div className="w-72 flex mt-1">
             <div className="w-44">
               <InputRef
                 type="text"
@@ -1190,7 +1228,7 @@ export default function Listagem({
             </div>
           </div>
 
-          <div className="flex flex-1 mt-5">
+          <div className="flex flex-1 mt-8">
             <div className="flex flex-1">
               <div className="bg-blue-600 w-1 h-34 mr-2" />
               <div>
@@ -1201,10 +1239,10 @@ export default function Listagem({
                 <p className="h-4 font-bold text-xs text-gray-300">
                   {genotypeNameOne}
                 </p>
-                <p className="font-bold text-xs mt-1">Nome do grupo de exp</p>
+                {/* <p className="font-bold text-xs mt-1">Nome do grupo de exp</p>
                 <p className="h-4 font-bold text-xs text-gray-300">
                   {groupNameOne}
-                </p>
+                </p> */}
               </div>
             </div>
             <div className="flex flex-1">
@@ -1217,10 +1255,10 @@ export default function Listagem({
                 <p className="h-4 font-bold text-xs text-gray-300">
                   {genotypeNameTwo}
                 </p>
-                <p className="font-bold text-xs mt-1">Nome do grupo de exp</p>
+                {/* <p className="font-bold text-xs mt-1">Nome do grupo de exp</p>
                 <p className="h-4 font-bold text-xs text-gray-300">
                   {groupNameTwo}
-                </p>
+                </p> */}
               </div>
             </div>
           </div>
@@ -1602,14 +1640,14 @@ export default function Listagem({
                       {...props}
                     >
                       <Button
-                        onClick={() => setCurrentPage(0)}
+                        onClick={() => handlePagination(0)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdFirstPage size={18} />}
                         disabled={currentPage < 1}
                       />
                       <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
+                        onClick={() => handlePagination(currentPage - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiLeftArrow size={15} />}
@@ -1620,7 +1658,7 @@ export default function Listagem({
                         .map((value, index) => (
                           <Button
                             key={index}
-                            onClick={() => setCurrentPage(index)}
+                            onClick={() => handlePagination(index)}
                             value={`${currentPage + 1}`}
                             bgColor="bg-blue-600"
                             textColor="white"
@@ -1628,14 +1666,14 @@ export default function Listagem({
                           />
                         ))}
                       <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
+                        onClick={() => handlePagination(currentPage + 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiRightArrow size={15} />}
                         disabled={currentPage + 1 >= pages}
                       />
                       <Button
-                        onClick={() => setCurrentPage(pages - 1)}
+                        onClick={() => handlePagination(pages - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdLastPage size={18} />}

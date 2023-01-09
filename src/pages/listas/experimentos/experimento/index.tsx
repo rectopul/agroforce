@@ -291,7 +291,7 @@ export default function Listagem({
       .then((response) => {
         if (
           response.status === 200
-          || (response.status === 400 && response.total === 0)
+          || (response.status === 400 && response.total == 0)
         ) {
           setExperimento(response.response);
           setTotalItems(response.total);
@@ -440,7 +440,7 @@ export default function Listagem({
       userId: userLogado.id,
     });
     if (status === 200) {
-      handlePagination();
+      handlePagination(currentPage);
       setLoading(false);
     } else {
       Swal.fire({
@@ -702,7 +702,7 @@ export default function Listagem({
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
     await experimentService
-      .getAll(filter)
+      .getAll(`${filter}&excel=${true}`)
       .then(({ status, response, message }: any) => {
         if (status === 200) {
           response.map((item: any) => {
@@ -786,7 +786,8 @@ export default function Listagem({
     }
   }
 
-  async function handlePagination(): Promise<void> {
+  async function handlePagination(page: any): Promise<void> {
+    setCurrentPage(page);
     await callingApi(filter); // handle pagination globly
   }
 
@@ -799,11 +800,11 @@ export default function Listagem({
     return parameter;
   }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-    // localStorage.removeItem('orderSorting');
-  }, [currentPage]);
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  //   // localStorage.removeItem('orderSorting');
+  // }, [currentPage]);
 
   function filterFieldFactory(title: any, name: any) {
     return (
@@ -997,19 +998,22 @@ export default function Listagem({
                                                 border-gray-200
                                             "
                   >
-                    {/* <div className="h-12">
+                    <div className="h-12">
                       <Button
-                        title="Importar Planilha"
-                        value="Importar Planilha"
+                        title="Importar"
+                        value="Importar"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        onClick={() => { }}
-                        href="experimento/importar-planilha"
+                        onClick={() => {
+                          window.open(
+                            '/listas/rd?importar=experimento',
+                            '_blank',
+                          );
+                        }}
                         icon={<RiFileExcel2Line size={20} />}
                       />
-                    </div> */}
+                    </div>
 
-                    <div />
                     <strong className="text-blue-600">
                       Total registrado:
                       {' '}
@@ -1099,7 +1103,7 @@ export default function Listagem({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(0)}
+                      onClick={() => handlePagination(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
@@ -1107,7 +1111,7 @@ export default function Listagem({
                     />
                     <Button
                       onClick={() => {
-                        setCurrentPage(currentPage - 1);
+                        handlePagination(currentPage - 1);
                       }}
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -1119,7 +1123,7 @@ export default function Listagem({
                       .map((value, index) => (
                         <Button
                           key={index}
-                          onClick={() => setCurrentPage(index)}
+                          onClick={() => handlePagination(index)}
                           value={`${currentPage + 1}`}
                           bgColor="bg-blue-600"
                           textColor="white"
@@ -1127,14 +1131,14 @@ export default function Listagem({
                         />
                       ))}
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
+                      onClick={() => handlePagination(currentPage + 1)}
                       bgColor="bg-blue-600 RR"
                       textColor="white"
                       icon={<BiRightArrow size={15} />}
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages - 1)}
+                      onClick={() => handlePagination(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
@@ -1181,11 +1185,11 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : `idSafra=${idSafra}&id_culture=${cultureId}`;
+    : `idSafra=${idSafra}&id_culture=${cultureId}&grid=${true}`;
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}`
-    : `idSafra=${idSafra}&id_culture=${cultureId}`;
+    : `idSafra=${idSafra}&id_culture=${cultureId}&grid=${true}`;
 
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
@@ -1205,7 +1209,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/experiment`;
 
-  const param = `skip=0&take=${itensPerPage}&idSafra=${idSafra}&id_culture=${cultureId}`;
+  const param = `skip=0&take=${itensPerPage}&idSafra=${idSafra}&id_culture=${cultureId}&grid=${true}`;
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
