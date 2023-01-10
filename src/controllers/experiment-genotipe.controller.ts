@@ -227,7 +227,6 @@ export class ExperimentGenotipeController {
                 gli: true,
                 bgm: true,
                 status: true,
-                genotype_treatment: { select: { status: true, genotipo: true } },
                 tecnologia: {
                   select: {
                     name: true,
@@ -579,7 +578,7 @@ export class ExperimentGenotipeController {
           // logic
           const newData = response.map((item: any) => {
             const newItem: any = {};
-            newItem.CULTURA = item.safra.culture.name;
+          newItem.CULTURA = item.safra.culture.name;
             newItem.SAFRA = item.safra.safraName;
             newItem.FOCO = item.foco.name;
             newItem.ENSAIO = item.type_assay.name;
