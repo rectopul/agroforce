@@ -111,12 +111,12 @@ interface IData {
 }
 
 export default function Listagem({
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs;
 
   const tableRef = useRef<any>(null);
@@ -197,6 +197,7 @@ export default function Listagem({
     JSON.parse(localStorage.getItem("selectedNPE") as string)
   );
   // let selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string);
+  const [allNPERecords, setAllNPERecords] = useState<object>();
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -696,44 +697,83 @@ export default function Listagem({
   };
 
   async function getExperiments(): Promise<void> {
-    if (NPESelectedRow) {
-      const skip = currentPage * Number(take);
-      let parametersFilter = `idSafra=${NPESelectedRow?.safraId}&idLocal=${NPESelectedRow?.localId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}&Status=IMPORTADO`;
+    // if (NPESelectedRow) {
+    //   const skip = currentPage * Number(take);
+    //   let parametersFilter = `idSafra=${NPESelectedRow?.safraId}&idLocal=${NPESelectedRow?.localId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}&Status=IMPORTADO&excel=true`;
 
+    //   if (filter) {
+    //     parametersFilter = `${parametersFilter}&${filter}`;
+    //   }
+
+    //   setLoading(true);
+
+    //   await experimentService
+    //     .getAll(parametersFilter)
+    //     .then(({ status, response, total }: any) => {
+    //       if (status === 200 || status === 400) {
+    //         let i = 0;
+    //         response.length > 0
+    //           ? (i = NPESelectedRow.prox_npe)
+    //           : (i = NPESelectedRow.npef);
+    //         let ntQT = 1;
+    //         response.map(async (item: any) => {
+    //           item.npei = i;
+    //           item.seq_delineamento.map((sd: any) => {
+    //             item.npef = i;
+    //             i = item.npef + 1;
+    //             i >= NPESelectedRow.nextNPE.npei_i && npeUsedFrom == 0
+    //               ? setNpeUsedFrom(NPESelectedRow.nextNPE.npei_i)
+    //               : "";
+    //           });
+    //           item.npeQT = item.npef - item.npei + 1;
+    //           ntQT++;
+    //         });
+    //         setExperimento(response);
+    //         setTotalItems(total);
+    //         tableRef.current.dataManager.changePageSize(total);
+    //       }
+    //     });
+    //   setLoading(false);
+    // }
+
+    // fetching all experiments of the selected environments.
+    const tempData: any[] = [];
+    await selectedNPE.map(async (env: any) => {
+      let tempFilter = `idSafra=${env?.safraId}&idLocal=${env?.localId}&Foco=${env?.foco.id}&Epoca=${env?.epoca}&Tecnologia=${env?.tecnologia.cod_tec}&TypeAssay=${env?.type_assay.id}&Status=IMPORTADO&excel=true`;
       if (filter) {
-        parametersFilter = `${parametersFilter}&${filter}`;
+        tempFilter = `${tempFilter}&${filter}`;
       }
 
-      setLoading(true);
+      await experimentService.getAll(tempFilter).then(({ status, response, total }) => {
+        console.log(response, 'responseeee');
+        let i = 0;
 
-      await experimentService
-        .getAll(parametersFilter)
-        .then(({ status, response, total }: any) => {
-          if (status === 200 || status === 400) {
-            let i = 0;
-            response.length > 0
-              ? (i = NPESelectedRow.prox_npe)
-              : (i = NPESelectedRow.npef);
-            let ntQT = 1;
-            response.map(async (item: any) => {
-              item.npei = i;
-              item.seq_delineamento.map((sd: any) => {
-                item.npef = i;
-                i = item.npef + 1;
-                i >= NPESelectedRow.nextNPE.npei_i && npeUsedFrom == 0
-                  ? setNpeUsedFrom(NPESelectedRow.nextNPE.npei_i)
-                  : "";
-              });
-              item.npeQT = item.npef - item.npei + 1;
-              ntQT++;
-            });
-            setExperimento(response);
-            setTotalItems(total);
-            tableRef.current.dataManager.changePageSize(total);
-          }
+        response.length > 0
+          ? (i = env.prox_npe)
+          : (i = env.npef);
+
+        response.map((exp: any) => {
+          exp.npei = i;
+
+          exp.seq_delineamento.map((sd: any) => {
+            exp.npef = i;
+            i = exp.npef + 1;
+            i >= env.nextNPE.npei_i && npeUsedFrom == 0
+              ? setNpeUsedFrom(env.nextNPE.npei_i)
+              : '';
+          });
+
+          exp.npeQT = exp.npef - exp.npei + 1;
         });
-      setLoading(false);
-    }
+        const temp = new Object();
+        temp.env = env;
+        temp.data = response;
+        tempData.push(temp);
+      });
+    });
+    setAllNPERecords(tempData);
+    console.log('All Experiments :', tempData);
+
   }
 
   async function createExperimentGenotipe({
@@ -741,64 +781,68 @@ export default function Listagem({
     total_consumed,
     genotipo_treatment,
   }: any) {
-    if (data.length > 0) {
-      const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
-      const experimentObj: any[] = [];
-      experimentos.map((item: any) => {
-        const data: any = {};
-        data.id = Number(item.id);
-        data.status = "SORTEADO";
-        experimentObj.push(data);
-      });
+    console.log('data : ', data);
+    console.log('genotipe Treatment : ', genotipo_treatment);
+    console.log('total consumed : ', total_consumed);
+    // if (data.length > 0) {
+    //   const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
+    //   const experimentObj: any[] = [];
+    //   experimentos.map((item: any) => {
+    //     const data: any = {};
+    //     data.id = Number(item.id);
+    //     data.status = "SORTEADO";
+    //     experimentObj.push(data);
+    //   });
 
-      if (
-        NPESelectedRow?.npeQT == "N/A"
-          ? true
-          : NPESelectedRow?.npeQT - total_consumed > 0 &&
-            lastNpe < NPESelectedRow?.nextNPE.npei_i
-      ) {
-        setLoading(true);
+    //   if (
+    //     NPESelectedRow?.npeQT == "N/A"
+    //       ? true
+    //       : NPESelectedRow?.npeQT - total_consumed > 0 &&
+    //       lastNpe < NPESelectedRow?.nextNPE.npei_i
+    //   ) {
+    //     setLoading(true);
 
-        await experimentGenotipeService
-          .create(data)
-          .then(async ({ status, response }: any) => {
-            if (status === 200) {
-              await genotypeTreatmentService.update(genotipo_treatment);
-              await experimentService.update(experimentObj);
-              await npeService
-                .update({
-                  id: NPESelectedRow?.id,
-                  npef: lastNpe,
-                  npeQT:
-                    NPESelectedRow?.npeQT == "N/A"
-                      ? null
-                      : NPESelectedRow?.npeQT - total_consumed,
-                  status: 3,
-                  prox_npe: lastNpe + 1,
-                })
-                .then(({ status }: any) => {
-                  if (status === 200) {
-                    Swal.fire({
-                      title: "Sorteio salvo com sucesso.",
-                      showDenyButton: false,
-                      showCancelButton: false,
-                      confirmButtonText: "Ok",
-                    }).then(() => {
-                      router.push("/operacao/ambiente");
-                    });
-                  }
-                });
-            }
-          });
+    //     await experimentGenotipeService
+    //       .create(data)
+    //       .then(async ({ status, response }: any) => {
+    //         if (status === 200) {
+    //           await genotypeTreatmentService.update(genotipo_treatment);
+    //           await experimentService.update(experimentObj);
+    //           await npeService
+    //             .update({
+    //               id: NPESelectedRow?.id,
+    //               npef: lastNpe,
+    //               npeQT:
+    //                 NPESelectedRow?.npeQT == "N/A"
+    //                   ? null
+    //                   : NPESelectedRow?.npeQT - total_consumed,
+    //               status: 3,
+    //               prox_npe: lastNpe + 1,
+    //             })
+    //             .then(({ status }: any) => {
+    //               if (status === 200) {
+    //                 Swal.fire({
+    //                   title: "Sorteio salvo com sucesso.",
+    //                   showDenyButton: false,
+    //                   showCancelButton: false,
+    //                   confirmButtonText: "Ok",
+    //                 }).then(() => {
+    //                   router.push("/operacao/ambiente");
+    //                 });
+    //               }
+    //             });
+    //         }
+    //       });
 
-        setLoading(false);
-      }
-    } else {
-      Swal.fire("Nenhum experimento para sortear.");
-    }
+    //     setLoading(false);
+    //   }
+    // } else {
+    //   Swal.fire("Nenhum experimento para sortear.");
+    // }
   }
 
   function validateConsumedData() {
+    console.log(experimentos);
     if (!SortearDisable) {
       const experiment_genotipo: any[] = [];
       const genotipo_treatment: any[] = [];
@@ -848,8 +892,7 @@ export default function Listagem({
         html:
           `Existem NPE usados ​​entre <b>${npeUsedFrom}</b> e <b>${temp.npef}</b><br><br>` +
           `Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : ${temp.nextNPE.foco.name}</b><br><b> Ensaio : ${temp.nextNPE.type_assay.name}</b><br><b> Local : ${temp.nextNPE.local.name_local_culture}</b><br><b>Epoca : ${temp.nextNPE.epoca}</b><br><b>Tecnologia : ${temp.nextNPE.tecnologia.name}</b></p><br>` +
-          `O próximo NPE disponível é <strong>${
-            Number(temp.nextAvailableNPE) + 1
+          `O próximo NPE disponível é <strong>${Number(temp.nextAvailableNPE) + 1
           }</strong></div>`,
         icon: "warning",
         showCloseButton: true,
@@ -880,8 +923,8 @@ export default function Listagem({
     let count = 0;
     experimentos.map((item: any) => {
       item.npei <= NPESelectedRow?.nextNPE.npei_i &&
-      item.npef >= NPESelectedRow?.nextNPE.npei_i &&
-      NPESelectedRow?.nextNPE != 0
+        item.npef >= NPESelectedRow?.nextNPE.npei_i &&
+        NPESelectedRow?.nextNPE != 0
         ? count++
         : "";
     });
@@ -912,9 +955,8 @@ export default function Listagem({
                         "
         >
           <div
-            className={`w-full ${
-              selectedNPE?.length > 3 && "max-h-40 overflow-y-scroll"
-            } mb-4`}
+            className={`w-full ${selectedNPE?.length > 3 && "max-h-40 overflow-y-scroll"
+              } mb-4`}
           >
             <MaterialTable
               style={{
@@ -940,8 +982,8 @@ export default function Listagem({
                         ? "#FF5349"
                         : "#d3d3d3"
                       : rowData.npef > rowData.nextNPE.npei_i
-                      ? "#FF5349"
-                      : "#f9fafb",
+                        ? "#FF5349"
+                        : "#f9fafb",
                   height: 40,
                 }),
                 search: false,
@@ -973,7 +1015,7 @@ export default function Listagem({
                   rowStyle: (rowData) => ({
                     backgroundColor:
                       rowData.npef >= NPESelectedRow?.nextNPE.npei_i &&
-                      SortearDisable
+                        SortearDisable
                         ? "#FF5349"
                         : "#f9fafb",
                     height: 40,
