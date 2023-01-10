@@ -646,17 +646,19 @@ export default function Listagem({
     }
   }
 
-  async function handlePagination(): Promise<void> {
+  async function handlePagination(page: any): Promise<void> {
+    setCurrentPage(page);
+
     if (NPESelectedRow) {
       const skip = currentPage * Number(take);
       setExperimentoNew(experimentos.slice(skip, skip + take));
     }
   }
 
-  useLayoutEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+  // useLayoutEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   function filterFieldFactory(title: any, name: any) {
     return (
@@ -696,6 +698,8 @@ export default function Listagem({
   };
 
   async function getExperiments(): Promise<void> {
+    console.log("chamou");
+
     if (NPESelectedRow) {
       const skip = currentPage * Number(take);
       let parametersFilter = `idSafra=${NPESelectedRow?.safraId}&idLocal=${NPESelectedRow?.localId}&Foco=${NPESelectedRow?.foco.id}&Epoca=${NPESelectedRow?.epoca}&Tecnologia=${NPESelectedRow?.tecnologia.cod_tec}&TypeAssay=${NPESelectedRow?.type_assay.id}&Status=IMPORTADO`;
@@ -1110,14 +1114,14 @@ export default function Listagem({
                         {...props}
                       >
                         <Button
-                          onClick={() => setCurrentPage(currentPage - 10)}
+                          onClick={() => handlePagination(currentPage - 10)}
                           bgColor="bg-blue-600"
                           textColor="white"
                           icon={<MdFirstPage size={18} />}
                           disabled={currentPage <= 1}
                         />
                         <Button
-                          onClick={() => setCurrentPage(currentPage - 1)}
+                          onClick={() => handlePagination(currentPage - 1)}
                           bgColor="bg-blue-600"
                           textColor="white"
                           icon={<BiLeftArrow size={15} />}
@@ -1128,21 +1132,21 @@ export default function Listagem({
                           .map((value, index) => (
                             <Button
                               key={index}
-                              onClick={() => setCurrentPage(index)}
+                              onClick={() => handlePagination(index)}
                               value={`${currentPage + 1}`}
                               bgColor="bg-blue-600"
                               textColor="white"
                             />
                           ))}
                         <Button
-                          onClick={() => setCurrentPage(currentPage + 1)}
+                          onClick={() => handlePagination(currentPage + 1)}
                           bgColor="bg-blue-600"
                           textColor="white"
                           icon={<BiRightArrow size={15} />}
                           disabled={currentPage + 1 >= pages}
                         />
                         <Button
-                          onClick={() => setCurrentPage(currentPage + 10)}
+                          onClick={() => handlePagination(currentPage + 10)}
                           bgColor="bg-blue-600"
                           textColor="white"
                           icon={<MdLastPage size={18} />}
@@ -1175,10 +1179,9 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const idSafra = Number(req.cookies.safraId);
 
-  const filterBeforeEdit = '';
-  const filterApplication = '';
+  const filterBeforeEdit = "";
+  const filterApplication = "";
   const pageBeforeEdit = 0;
-
 
   return {
     props: {

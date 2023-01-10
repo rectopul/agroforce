@@ -79,15 +79,15 @@ interface IData {
 }
 
 export default function Listagem({
-      allUsers,
-      itensPerPage,
-      filterApplication,
-      totalItems,
-      pageBeforeEdit,
-      filterBeforeEdit,
-      typeOrderServer, // RR
-      orderByserver, // RR
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allUsers,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  typeOrderServer, // RR
+  orderByserver, // RR
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tableRef = useRef<any>(null);
@@ -97,7 +97,7 @@ export default function Listagem({
 
   tabsDropDowns.map((tab) =>
     tab.titleTab === "TMG" &&
-      tab.data.map((i) => i.labelDropDown === "Usuários")
+    tab.data.map((i) => i.labelDropDown === "Usuários")
       ? (tab.statusTab = true)
       : (tab.statusTab = false)
   );
@@ -168,8 +168,9 @@ export default function Listagem({
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
   const [fieldOrder, setFieldOrder] = useState<any>(null);
-  const pathExtra = `skip=${currentPage * Number(take)
-    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const pathExtra = `skip=${
+    currentPage * Number(take)
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const filters = [
     { id: 2, name: "Todos" },
@@ -204,8 +205,9 @@ export default function Listagem({
       //     setCurrentPage(0);
       //   });
 
-      const parametersFilter = `filterStatus=${filterStatus || 1
-        }&filterName=${filterName}&filterLogin=${filterLogin}`;
+      const parametersFilter = `filterStatus=${
+        filterStatus || 1
+      }&filterName=${filterName}&filterLogin=${filterLogin}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -670,7 +672,8 @@ export default function Listagem({
     }
   }
 
-  async function handlePagination(): Promise<void> {
+  async function handlePagination(page: any): Promise<void> {
+    setCurrentPage(page);
     // // manage using comman function
     // const { parametersFilter, currentPages } = await tableGlobalFunctions.handlePaginationGlobal(currentPage, take, filtersParams);
 
@@ -712,10 +715,10 @@ export default function Listagem({
     );
   }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   return (
     <>
@@ -833,7 +836,7 @@ export default function Listagem({
                           setCookies("filterBeforeEditOrderBy", orderBy);
                           setCookies("filtersParams", filtersParams);
                           setCookies("takeBeforeEdit", take);
-                          setCookies('lastPage', 'cadastro');
+                          setCookies("lastPage", "cadastro");
                           router.push("usuarios/cadastro");
                         }}
                         icon={<FiUserPlus size={20} />}
@@ -930,14 +933,14 @@ export default function Listagem({
                       {...props}
                     >
                       <Button
-                        onClick={() => setCurrentPage(0)}
+                        onClick={() => handlePagination(0)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdFirstPage size={18} />}
                         disabled={currentPage < 1}
                       />
                       <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
+                        onClick={() => handlePagination(currentPage - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiLeftArrow size={15} />}
@@ -948,7 +951,7 @@ export default function Listagem({
                         .map((value, index) => (
                           <Button
                             key={index}
-                            onClick={() => setCurrentPage(index)}
+                            onClick={() => handlePagination(index)}
                             value={`${currentPage + 1}`}
                             bgColor="bg-blue-600"
                             textColor="white"
@@ -956,14 +959,14 @@ export default function Listagem({
                           />
                         ))}
                       <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
+                        onClick={() => handlePagination(currentPage + 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiRightArrow size={15} />}
                         disabled={currentPage + 1 >= pages}
                       />
                       <Button
-                        onClick={() => setCurrentPage(pages - 1)}
+                        onClick={() => handlePagination(pages - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdLastPage size={18} />}
