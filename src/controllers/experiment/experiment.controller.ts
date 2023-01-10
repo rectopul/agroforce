@@ -344,14 +344,14 @@ export class ExperimentController {
       const experimentGenotipeController = new ExperimentGenotipeController();
       if (data.idList) {
         await this.experimentRepository.relationGroup(data);
-        if (data.experimentGroupId) {
-          const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
-          await this.setParcelasStatus(idList);
-          return { status: 200, message: 'Experimento atualizado' };
-        }
-        const idList = await this.countExperimentGroupChildren(Number(data.newGroupId));
-        await this.setParcelasStatus(idList);
-        return { status: 200, message: 'Experimento atualizado' };
+        // if (data.experimentGroupId) {
+        //    const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
+        //    await this.setParcelasStatus(idList);
+        //   return { status: 200, message: 'Experimento atualizado' };
+        // }
+        //  const idList = await this.countExperimentGroupChildren(Number(data.newGroupId));
+        //  await this.setParcelasStatus(idList);
+        // return { status: 200, message: 'Experimento atualizado' };
       }
       if (data.id) {
         const experimento: any = await this.experimentRepository.findOne(data.id);
@@ -367,9 +367,9 @@ export class ExperimentController {
           }
         }
         const response = await this.experimentRepository.update(experimento.id, data);
-        if (experimento.experimentGroupId) {
-          await this.countExperimentGroupChildren(experimento.experimentGroupId);
-        }
+        // if (experimento.experimentGroupId) {
+        //   await this.countExperimentGroupChildren(experimento.experimentGroupId);
+        // }
         if (!response.experimentGroupId) {
           if (!(data.nlp || data.clp || data.comments)) {
             await this.experimentRepository.update(response.id, { status: 'SORTEADO' });
@@ -432,24 +432,24 @@ export class ExperimentController {
     }
   }
 
-  async countExperimentGroupChildren(id: number) {
-    const experimentGroupController = new ExperimentGroupController();
-    const { response }: IReturnObject = await experimentGroupController.getOne(id);
-    if (!response) throw new Error('GRUPO DE EXPERIMENTO NÃO ENCONTRADO');
-    const idList = response.experiment?.map((item: any) => item.id);
-    const experimentAmount = response.experiment?.length;
-    let { status } = response;
-    if (!response.status) {
-      status = experimentAmount === 0 ? null : 'ETIQ. NÃO INICIADA';
-    }
-    await experimentGroupController.update({ id: response.id, experimentAmount, status });
-    return idList;
-  }
+  // async countExperimentGroupChildren(id: number) {
+  //   const experimentGroupController = new ExperimentGroupController();
+  //   const { response }: IReturnObject = await experimentGroupController.getOne(id);
+  //   if (!response) throw new Error('GRUPO DE EXPERIMENTO NÃO ENCONTRADO');
+  //   const idList = response.experiment?.map((item: any) => item.id);
+  //   const experimentAmount = response.experiment?.length;
+  //   let { status } = response;
+  //   if (!response.status) {
+  //     status = experimentAmount === 0 ? null : 'ETIQ. NÃO INICIADA';
+  //   }
+  //   await experimentGroupController.update({ id: response.id, experimentAmount, status });
+  //   return idList;
+  // }
 
-  async setParcelasStatus(idList: Array<number>) {
-    const experimentGenotipeController = new ExperimentGenotipeController();
-    await experimentGenotipeController.setStatus({ idList, status: 'EM ETIQUETAGEM' });
-  }
+  // async setParcelasStatus(idList: Array<number>) {
+  //   const experimentGenotipeController = new ExperimentGenotipeController();
+  //   await experimentGenotipeController.setStatus({ idList, status: 'EM ETIQUETAGEM' });
+  // }
 
   async handleExperimentStatus(id: number) {
     const { response }: any = await this.getOne(id);

@@ -503,8 +503,6 @@ export default function Listagem({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    console.log('chamou');
-
     setCurrentPage(page);
 
     const skip = currentPage * Number(take);

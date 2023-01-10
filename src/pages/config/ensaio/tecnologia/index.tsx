@@ -440,7 +440,6 @@ export default function Listagem({
     await tecnologiaService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((row: any) => {
-          console.log('🚀 ~ file: index.tsx:443 ~ newData ~ row', row);
           const dataExp = new Date();
           let hours: string;
           let minutes: string;

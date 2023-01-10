@@ -13,7 +13,6 @@ export class UnidadeCulturaController {
   safraController = new SafraController();
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: unidade-cultura.controller.ts:16 ~ UnidadeCulturaController ~ getAll ~ options', options);
     const parameters: any = {};
     parameters.AND = [];
     let orderBy: object | any;
