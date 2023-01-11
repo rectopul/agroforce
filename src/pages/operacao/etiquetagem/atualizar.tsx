@@ -588,7 +588,6 @@ export default function Listagem({
   async function deleteItem() {
     setLoading(true);
     setIsOpenModalConfirm(false);
-    setLoading(true);
 
     const { status, message } = await experimentService.update({
       id: itemSelectedDelete?.id,
@@ -629,7 +628,7 @@ export default function Listagem({
     });
     if (status === 200) {
       setLoading(false);
-      handlePagination(0);
+      handlePagination(currentPage);
       //router.reload();
     } else {
       Swal.fire({
