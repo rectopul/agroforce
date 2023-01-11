@@ -36,6 +36,7 @@ const nextConfig = {
 
   // evitar o render duplo do useEffect no modo desenvolvimento
   reactStrictMode: false,
+
 };
 
 module.exports = nextConfig;
