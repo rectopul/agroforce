@@ -1018,7 +1018,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : 'desc';
+    : 'asc';
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy

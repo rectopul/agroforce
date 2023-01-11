@@ -883,6 +883,7 @@ export default function Listagem({
                         placeholder="Cod Tec"
                         id="filterCodTec"
                         name="filterCodTec"
+                        defaultValue={checkValue('filterCodTec')}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -908,6 +909,7 @@ export default function Listagem({
                         placeholder="Época"
                         id="filterPeriod"
                         name="filterPeriod"
+                        defaultValue={checkValue('filterPeriod')}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -924,6 +926,7 @@ export default function Listagem({
                         type="number"
                         placeholder="De"
                         id="filterRepetitionFrom"
+                        defaultValue={checkValue('filterRepetitionFrom')}
                         name="filterRepetitionFrom"
                         onChange={formik.handleChange}
                       />
@@ -933,6 +936,7 @@ export default function Listagem({
                         placeholder="Até"
                         id="filterRepetitionTo"
                         name="filterRepetitionTo"
+                        defaultValue={checkValue('filterRepetitionTo')}
                         onChange={formik.handleChange}
                       />
                     </div>

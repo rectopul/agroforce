@@ -787,6 +787,7 @@ export default function TipoEnsaio({
                           placeholder="De"
                           id="filterSeedsFrom"
                           name="filterSeedsFrom"
+                          defaultValue={checkValue('filterSeedsFrom')}
                           onChange={formik.handleChange}
                         />
                       </div>
@@ -797,6 +798,7 @@ export default function TipoEnsaio({
                           placeholder="Até"
                           id="filterSeedsTo"
                           name="filterSeedsTo"
+                          defaultValue={checkValue('filterSeedsTo')}
                           onChange={formik.handleChange}
                         />
                       </div>
