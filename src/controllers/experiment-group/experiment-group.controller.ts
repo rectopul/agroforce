@@ -12,6 +12,7 @@ export class ExperimentGroupController {
   experimentController = new ExperimentController();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: experiment-group.controller.ts:15 ~ ExperimentGroupController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     try {
@@ -222,8 +223,6 @@ export class ExperimentGroupController {
   }
 
   async countEtiqueta(id: number, idExperiment: any) {
-    console.log('🚀 ~ file: experiment-group.controller.ts:225 ~ ExperimentGroupController ~ countEtiqueta ~ idExperiment', idExperiment);
-    console.log('🚀 ~ file: experiment-group.controller.ts:225 ~ ExperimentGroupController ~ countEtiqueta ~ id', id);
     const { response }: any = await this.getOne(id);
     let totalTags = 0;
     let tagsToPrint = 0;

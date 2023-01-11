@@ -56,7 +56,6 @@ export default function Listagem({
   itensPerPage,
   filterApplication,
   safraId,
-  filterBeforeEdit,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
@@ -77,8 +76,6 @@ export default function Listagem({
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(0);
-  const [afterFilter, setAfterFilter] = useState<boolean>(false);
-  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [experimentAdd, setExperimentAdd] = useState<boolean>();
 
@@ -931,12 +928,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     await PreferencesControllers.getConfigGerais()
   )?.response[0]?.itens_per_page;
 
-  const pageBeforeEdit = req.cookies.pageBeforeEdit
-    ? req.cookies.pageBeforeEdit
-    : 0;
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : '';
   const { token } = req.cookies;
   const { safraId } = req.cookies;
   const experimentGroupId = query.id;
@@ -946,9 +937,6 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const filterApplication = `experimentGroupId=${experimentGroupId}&safraId=${safraId}`
     || `&experimentGroupId=${experimentGroupId}&safraId=${safraId}`;
-
-  // removeCookies("filterBeforeEdit", { req, res });
-  // removeCookies("pageBeforeEdit", { req, res });
 
   const param = `&experimentGroupId=${experimentGroupId}&safraId=${safraId}`;
 
@@ -979,8 +967,6 @@ export const getServerSideProps: GetServerSideProps = async ({
       itensPerPage,
       filterApplication,
       safraId,
-      pageBeforeEdit,
-      filterBeforeEdit,
     },
   };
 };

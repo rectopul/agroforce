@@ -1661,8 +1661,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   //   req.cookies.filterBeforeEdit ||
   //   `&id_culture=${idCulture}&id_safra=${idSafra}`;
   const filterApplication = `&id_culture=${idCulture}&id_safra=${idSafra}&experimentGroupId=${experimentGroupId}`;
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
 
   const param = `&id_culture=${idCulture}&id_safra=${idSafra}&experimentGroupId=${experimentGroupId}`;
 
