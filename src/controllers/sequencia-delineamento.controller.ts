@@ -66,7 +66,6 @@ export class SequenciaDelineamentoController {
   }
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: sequencia-delineamento.controller.ts:69 ~ SequenciaDelineamentoController ~ getAll ~ options', options);
     const parameters: object | any = {};
     parameters.AND = [];
     let orderBy: object | any;
@@ -175,7 +174,6 @@ export class SequenciaDelineamentoController {
         skip,
         orderBy,
       );
-      // console.log('🚀 ~ file: sequencia-delineamento.controller.ts:177 ~ SequenciaDelineamentoController ~ getAll ~ response', response);
 
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };

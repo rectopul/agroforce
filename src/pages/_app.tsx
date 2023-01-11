@@ -1,3 +1,4 @@
+import newrelic from "newrelic";
 import { useRouter } from 'next/router';
 import NProgress from 'nprogress';
 import { useEffect, useState } from 'react';

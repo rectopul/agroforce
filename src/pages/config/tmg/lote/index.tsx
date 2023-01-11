@@ -606,7 +606,7 @@ export default function Listagem({
           }
 
           newItem.EXPORT = `${newItem.dt_export.toLocaleDateString(
-            "pt-BR"
+            'en-US',
           )} ${dtHours}:${dtMinutes}:${dtSeconds}`;
 
           newItem.CULTURA = item?.genotipo.culture.name;
