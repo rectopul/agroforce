@@ -164,8 +164,8 @@ export default function Listagem({
       filterStatus: filterStatusBeforeEdit[13],
       filterSafra: checkValue('filterSafra'),
       filterYear: checkValue('filterYear'),
-      filterYearTo: '',
-      filterYearFrom: '',
+      filterYearTo: checkValue('filterYearTo'),
+      filterYearFrom: checkValue('filterYearFrom'),
       filterStartDate: '',
       filterEndDate: '',
       orderBy: '',
@@ -709,6 +709,7 @@ export default function Listagem({
                         placeholder="De"
                         id="filterYearFrom"
                         name="filterYearFrom"
+                        defaultValue={checkValue('filterYearFrom')}
                         onChange={formik.handleChange}
                       />
                       <Input
@@ -717,6 +718,7 @@ export default function Listagem({
                         placeholder="Até"
                         id="filterYearTo"
                         name="filterYearTo"
+                        defaultValue={checkValue('filterYearTo')}
                         onChange={formik.handleChange}
                       />
                     </div>

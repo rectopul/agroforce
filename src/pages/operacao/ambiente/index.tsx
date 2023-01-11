@@ -897,6 +897,7 @@ export default function Listagem({
                         placeholder="De"
                         id="filterNpeFrom"
                         name="filterNpeFrom"
+                        defaultValue={checkValue('filterNpeFrom')}
                         onChange={formik.handleChange}
                       />
                       <Input
@@ -905,6 +906,7 @@ export default function Listagem({
                         placeholder="Até"
                         id="filterNpeTo"
                         name="filterNpeTo"
+                        defaultValue={checkValue('filterNpeTo')}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -920,6 +922,7 @@ export default function Listagem({
                         placeholder="De"
                         id="filterNpeFinalFrom"
                         name="filterNpeFinalFrom"
+                        defaultValue={checkValue('filterNpeFinalFrom')}
                         onChange={formik.handleChange}
                       />
                       <Input
@@ -928,6 +931,7 @@ export default function Listagem({
                         placeholder="Até"
                         id="filterNpeFinalTo"
                         name="filterNpeFinalTo"
+                        defaultValue={checkValue('filterNpeFinalTo')}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -943,6 +947,7 @@ export default function Listagem({
                         type="number"
                         id="filterNpeFinalFrom"
                         name="filterNpeFinalFrom"
+                        defaultValue={checkValue('filterNpeFinalFrom')}
                         onChange={formik.handleChange}
                       />
                       <Input
@@ -951,6 +956,7 @@ export default function Listagem({
                         type="number"
                         id="filterNpeFinalTo"
                         name="filterNpeFinalTo"
+                        defaultValue={checkValue('filterNpeFinalTo')}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -966,6 +972,7 @@ export default function Listagem({
                         placeholder="De"
                         id="filterGrpFrom"
                         name="filterGrpFrom"
+                        defaultValue={checkValue('filterGrpFrom')}
                         onChange={formik.handleChange}
                       />
                       <Input
@@ -974,6 +981,7 @@ export default function Listagem({
                         placeholder="Até"
                         id="filterGrpTo"
                         name="filterGrpTo"
+                        defaultValue={checkValue('filterGrpTo')}
                         onChange={formik.handleChange}
                       />
                     </div>

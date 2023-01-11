@@ -942,6 +942,7 @@ export default function Listagem({
               placeholder="De"
               id="filterLotsFrom"
               name="filterLotsFrom"
+              defaultValue={checkValue("filterLotsFrom")}
               onChange={formik.handleChange}
             />
           </div>
@@ -951,6 +952,7 @@ export default function Listagem({
               placeholder="Até"
               id="filterLotsTo"
               name="filterLotsTo"
+              defaultValue={checkValue("filterLotsTo")}
               onChange={formik.handleChange}
             />
           </div>

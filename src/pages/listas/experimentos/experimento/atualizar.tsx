@@ -208,8 +208,9 @@ export default function AtualizarLocal({
   // Calling common API
   async function getTreatments(parametersFilter: any) {
     // setCookies('filterBeforeEdit', parametersFilter);
-    setCookies('filterBeforeEditTypeOrder', typeOrder);
-    setCookies('filterBeforeEditOrderBy', orderBy);
+    // setCookies('filterBeforeEditTypeOrder', typeOrder);
+    // setCookies('orderList', orderList);
+    // setCookies('fieldOrder', fieldOrder);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
@@ -1141,8 +1142,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   // removeCookies('pageBeforeEdit', { req, res });
 
   // RR
-  removeCookies('filterBeforeEditTypeOrder', { req, res });
-  removeCookies('filterBeforeEditOrderBy', { req, res });
+  // removeCookies('filterBeforeEditTypeOrder', { req, res });
+  // removeCookies('filterBeforeEditOrderBy', { req, res });
   // removeCookies('lastPage', { req, res });
 
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/experiment`;
