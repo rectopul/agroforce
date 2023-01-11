@@ -1,4 +1,5 @@
 import { ExperimentGenotipeRepository } from 'src/repository/experiment-genotipe.repository';
+import * as XLSX from 'xlsx';
 import { IReturnObject } from '../interfaces/shared/Import.interface';
 import handleError from '../shared/utils/handleError';
 import { ExperimentGroupController } from './experiment-group/experiment-group.controller';
@@ -6,10 +7,8 @@ import { ExperimentController } from './experiment/experiment.controller';
 import { PrintHistoryController } from './print-history/print-history.controller';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
-import * as XLSX from 'xlsx';
 
 export class ExperimentGenotipeController {
-
   private ExperimentGenotipeRepository = new ExperimentGenotipeRepository();
 
   private experimentController = new ExperimentController();
@@ -26,7 +25,7 @@ export class ExperimentGenotipeController {
       options = await removeEspecialAndSpace(options);
       if (options.createFile) {
         const sheet = await this.createXls(options);
-        return { status: 200, response: sheet };;
+        return { status: 200, response: sheet };
       }
       if (options.filterFoco) {
         parameters.foco = JSON.parse(
@@ -227,7 +226,6 @@ export class ExperimentGenotipeController {
                 gli: true,
                 bgm: true,
                 status: true,
-                genotype_treatment: { select: { status: true, genotipo: true } },
                 tecnologia: {
                   select: {
                     name: true,
@@ -451,7 +449,6 @@ export class ExperimentGenotipeController {
     }
   }
 
-
   async relateLayout({ id, blockLayoutId, status }: any) {
     try {
       const parcela: any = await this.getOne(Number(id));
@@ -575,12 +572,11 @@ export class ExperimentGenotipeController {
 
       options.skip = 1000;
       while (res.length > 0) {
-
         await this.getAll(options).then(({ status, response }) => {
           // logic
           const newData = response.map((item: any) => {
             const newItem: any = {};
-            newItem.CULTURA = item.safra.culture.name;
+          newItem.CULTURA = item.safra.culture.name;
             newItem.SAFRA = item.safra.safraName;
             newItem.FOCO = item.foco.name;
             newItem.ENSAIO = item.type_assay.name;
@@ -606,15 +602,12 @@ export class ExperimentGenotipeController {
           res = response;
 
           options.skip += 1000;
-        })
+        });
       }
-
-
 
       return workSheet;
     } catch (error) {
       console.log(error);
     }
-
   }
 }
