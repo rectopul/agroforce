@@ -2,42 +2,42 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import React, { useRef } from 'react';
-import { removeCookies, setCookies } from 'cookies-next';
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import getConfig from 'next/config';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import React, { useRef } from "react";
+import { removeCookies, setCookies } from "cookies-next";
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from 'react-beautiful-dnd';
-import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { BsDownload } from 'react-icons/bs';
+} from "react-beautiful-dnd";
+import { BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { BsDownload } from "react-icons/bs";
 import {
   RiArrowUpDownLine,
   RiCloseCircleFill,
   RiFileExcel2Line,
-} from 'react-icons/ri';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import Modal from 'react-modal';
-import * as XLSX from 'xlsx';
-import Swal from 'sweetalert2';
-import readXlsxFile from 'read-excel-file';
+} from "react-icons/ri";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import Modal from "react-modal";
+import * as XLSX from "xlsx";
+import Swal from "sweetalert2";
+import readXlsxFile from "read-excel-file";
 import {
   ITreatment,
   ITreatmentFilter,
   ITreatmentGrid,
-} from '../../interfaces/listas/ensaio/genotype-treatment.interface';
-import { IGenerateProps } from '../../interfaces/shared/generate-props.interface';
-import ComponentLoading from '../../components/Loading';
+} from "../../interfaces/listas/ensaio/genotype-treatment.interface";
+import { IGenerateProps } from "../../interfaces/shared/generate-props.interface";
+import ComponentLoading from "../../components/Loading";
 
 import {
   AccordionFilter,
@@ -47,13 +47,13 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
-} from '../../components';
-import { UserPreferenceController } from '../../controllers/user-preference.controller';
-import { reporteService, userPreferencesService } from '../../services';
-import * as ITabs from '../../shared/utils/dropdown';
-import { functionsUtils } from '../../shared/utils/functionsUtils';
-import { tableGlobalFunctions } from '../../helpers';
-import headerTableFactoryGlobal from '../../shared/utils/headerTableFactory';
+} from "../../components";
+import { UserPreferenceController } from "../../controllers/user-preference.controller";
+import { reporteService, userPreferencesService } from "../../services";
+import * as ITabs from "../../shared/utils/dropdown";
+import { functionsUtils } from "../../shared/utils/functionsUtils";
+import { tableGlobalFunctions } from "../../helpers";
+import headerTableFactoryGlobal from "../../shared/utils/headerTableFactory";
 
 export default function Listagem({
   totalItems,
@@ -67,20 +67,22 @@ export default function Listagem({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsReport } = ITabs.default;
 
-  const tabsDropDowns = tabsReport.map((i) => (i.titleTab === 'RELATORIOS' ? { ...i, statusTab: true } : i));
+  const tabsDropDowns = tabsReport.map((i) =>
+    i.titleTab === "RELATORIOS" ? { ...i, statusTab: true } : i
+  );
 
   const tableRef = useRef<any>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.reporte || {
     id: 0,
-    table_preferences: 'madeBy,madeIn,module,operation',
+    table_preferences: "madeBy,madeIn,module,operation",
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+    preferences.table_preferences
   );
   const [reportes, setReportes] = useState<ITreatment[] | any>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -90,28 +92,28 @@ export default function Listagem({
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
-      name: 'CamposGerenciados[]',
-      title: 'Feito Por',
-      value: 'madeBy',
-      defaultChecked: () => camposGerenciados.includes('madeBy'),
+      name: "CamposGerenciados[]",
+      title: "Feito Por",
+      value: "madeBy",
+      defaultChecked: () => camposGerenciados.includes("madeBy"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Feito Em',
-      value: 'madeIn',
-      defaultChecked: () => camposGerenciados.includes('madeIn'),
+      name: "CamposGerenciados[]",
+      title: "Feito Em",
+      value: "madeIn",
+      defaultChecked: () => camposGerenciados.includes("madeIn"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Módulo',
-      value: 'module',
-      defaultChecked: () => camposGerenciados.includes('module'),
+      name: "CamposGerenciados[]",
+      title: "Módulo",
+      value: "module",
+      defaultChecked: () => camposGerenciados.includes("module"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Operação',
-      value: 'operation',
-      defaultChecked: () => camposGerenciados.includes('operation'),
+      name: "CamposGerenciados[]",
+      title: "Operação",
+      value: "operation",
+      defaultChecked: () => camposGerenciados.includes("operation"),
     },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -129,24 +131,24 @@ export default function Listagem({
 
   const formik = useFormik<any>({
     initialValues: {
-      filterFoco: '',
-      filterTypeAssay: '',
-      filterTechnology: '',
-      filterGli: '',
-      filterBgm: '',
-      filterTreatmentsNumber: '',
-      filterStatus: '',
-      filterCodTec: '',
-      filterStatusAssay: '',
-      filterGenotypeName: '',
-      filterNca: '',
-      orderBy: '',
-      typeOrder: '',
-      filterBgmTo: '',
-      filterBgmFrom: '',
-      filterNtTo: '',
-      filterNtFrom: '',
-      filterStatusT: '',
+      filterFoco: "",
+      filterTypeAssay: "",
+      filterTechnology: "",
+      filterGli: "",
+      filterBgm: "",
+      filterTreatmentsNumber: "",
+      filterStatus: "",
+      filterCodTec: "",
+      filterStatusAssay: "",
+      filterGenotypeName: "",
+      filterNca: "",
+      orderBy: "",
+      typeOrder: "",
+      filterBgmTo: "",
+      filterBgmFrom: "",
+      filterNtTo: "",
+      filterNtFrom: "",
+      filterStatusT: "",
     },
     onSubmit: async ({
       filterFoco,
@@ -166,9 +168,9 @@ export default function Listagem({
       filterCodTec,
     }) => {
       const allCheckBox: any = document.querySelectorAll(
-        "input[name='StatusCheckbox']",
+        "input[name='StatusCheckbox']"
       );
-      let selecionados = '';
+      let selecionados = "";
       for (let i = 0; i < allCheckBox.length; i += 1) {
         if (allCheckBox[i].checked) {
           selecionados += `${allCheckBox[i].value},`;
@@ -187,12 +189,12 @@ export default function Listagem({
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
-    setCookies('filterBeforeEdit', parametersFilter);
-    setCookies('filterBeforeEditTypeOrder', typeOrder);
-    setCookies('filterBeforeEditOrderBy', orderBy);
+    setCookies("filterBeforeEdit", parametersFilter);
+    setCookies("filterBeforeEditTypeOrder", typeOrder);
+    setCookies("filterBeforeEditOrderBy", orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies('filtersParams', parametersFilter);
+    setCookies("filtersParams", parametersFilter);
 
     await reporteService
       .getAll(parametersFilter)
@@ -201,7 +203,7 @@ export default function Listagem({
           setReportes(response.response);
           setTotalItems(response.total);
           tableRef?.current?.dataManager?.changePageSize(
-            response.total >= take ? take : response.total,
+            response.total >= take ? take : response.total
           );
         }
       })
@@ -218,7 +220,7 @@ export default function Listagem({
   async function handleOrder(
     column: string,
     order: number,
-    name: any,
+    name: any
   ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
@@ -257,9 +259,8 @@ export default function Listagem({
     //   setOrder(orderList + 1);
     // }
     // Gobal manage orders
-    const {
-      typeOrderG, columnG, orderByG, arrowOrder,
-    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    const { typeOrderG, columnG, orderByG, arrowOrder } =
+      await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setFieldOrder(name);
     setTypeOrder(typeOrderG);
@@ -314,25 +315,25 @@ export default function Listagem({
   // }
 
   function orderColumns(columnsOrder: string): Array<object> {
-    const columnOrder: any = columnsOrder.split(',');
+    const columnOrder: any = columnsOrder.split(",");
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item: any) => {
-      if (columnOrder[item] === 'madeBy') {
+      if (columnOrder[item] === "madeBy") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Feito Por',
-            title: 'user.name',
+            name: "Feito Por",
+            title: "user.name",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnOrder[item] === 'madeIn') {
+      if (columnOrder[item] === "madeIn") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Feito Em',
-            title: 'madeIn',
+            name: "Feito Em",
+            title: "madeIn",
             orderList,
             fieldOrder,
             handleOrder,
@@ -345,29 +346,29 @@ export default function Listagem({
                 }`}
               </div>
             ),
-          }),
+          })
         );
       }
-      if (columnOrder[item] === 'module') {
+      if (columnOrder[item] === "module") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Módulo',
-            title: 'module',
+            name: "Módulo",
+            title: "module",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnOrder[item] === 'operation') {
+      if (columnOrder[item] === "operation") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Operação',
-            title: 'operation',
+            name: "Operação",
+            title: "operation",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
     });
@@ -378,7 +379,7 @@ export default function Listagem({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
+    let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -401,7 +402,7 @@ export default function Listagem({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
       userLogado.preferences.reporte = {
         id: preferences.id,
@@ -412,7 +413,7 @@ export default function Listagem({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -452,23 +453,23 @@ export default function Listagem({
         });
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
+        XLSX.utils.book_append_sheet(workBook, workSheet, "Tratamentos");
 
         // Buffer
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
+          bookType: "xlsx", // xlsx
+          type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
+          bookType: "xlsx", // xlsx
+          type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
+        XLSX.writeFile(workBook, "Tratamentos-genótipo.xlsx");
       } else {
         setLoading(false);
-        Swal.fire('Não existem registros para serem exportados, favor checar.');
+        Swal.fire("Não existem registros para serem exportados, favor checar.");
       }
     });
     setLoading(false);
@@ -481,7 +482,8 @@ export default function Listagem({
     }
   }
 
-  async function handlePagination(): Promise<void> {
+  async function handlePagination(page: any): Promise<void> {
+    setCurrentPage(page);
     // const skip = currentPage * Number(take);
     // let parametersFilter;
     // if (orderType) {
@@ -520,10 +522,10 @@ export default function Listagem({
     );
   }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   return (
     <>
@@ -558,9 +560,9 @@ export default function Listagem({
                   pb-0
                 "
                 >
-                  {filterFieldFactory('filterMadeBy', 'Feito Por')}
-                  {filterFieldFactory('filterMadeIn', 'Feito Em')}
-                  {filterFieldFactory('filterOperation', 'Operação')}
+                  {filterFieldFactory("filterMadeBy", "Feito Por")}
+                  {filterFieldFactory("filterMadeIn", "Feito Em")}
+                  {filterFieldFactory("filterOperation", "Operação")}
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
@@ -586,7 +588,7 @@ export default function Listagem({
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
               tableRef={tableRef}
-              style={{ background: '#f9fafb' }}
+              style={{ background: "#f9fafb" }}
               columns={columns}
               data={reportes}
               options={{
@@ -594,7 +596,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 0,
                 },
-                rowStyle: { background: '#f9fafb', height: 35 },
+                rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: Number(take),
@@ -615,9 +617,7 @@ export default function Listagem({
                   "
                   >
                     <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
+                      Total registrado: {itemsTotal}
                     </strong>
 
                     <div
@@ -664,7 +664,7 @@ export default function Listagem({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value,
+                                                generate.value
                                               )}
                                             />
                                           </li>
@@ -693,58 +693,59 @@ export default function Listagem({
                     </div>
                   </div>
                 ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => setCurrentPage(0)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {Array(1)
-                      .fill('')
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(pages - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => handlePagination(0)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage < 1}
+                      />
+                      <Button
+                        onClick={() => handlePagination(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => handlePagination(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => handlePagination(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => handlePagination(pages - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                   ) as any,
               }}
             />
@@ -769,7 +770,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : '';
+    : "";
   const { token } = req.cookies;
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
@@ -778,48 +779,49 @@ export const getServerSideProps: GetServerSideProps = async ({
   const baseUrl = `${publicRuntimeConfig.apiUrl}/reporte`;
 
   // Last page
-  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
 
-  if (lastPageServer == undefined || lastPageServer == 'No') {
-    removeCookies('filterBeforeEdit', { req, res });
-    removeCookies('pageBeforeEdit', { req, res });
-    removeCookies('filterBeforeEditTypeOrder', { req, res });
-    removeCookies('filterBeforeEditOrderBy', { req, res });
-    removeCookies('lastPage', { req, res });
+  if (lastPageServer == undefined || lastPageServer == "No") {
+    removeCookies("filterBeforeEdit", { req, res });
+    removeCookies("pageBeforeEdit", { req, res });
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("lastPage", { req, res });
   }
 
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : '';
+    : "";
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : '';
+    : "";
 
-  const filterApplication = req.cookies.filterBeforeEdit
-    || `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const filterApplication =
+    req.cookies.filterBeforeEdit ||
+    `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-  removeCookies('filterBeforeEditTypeOrder', { req, res });
-  removeCookies('filterBeforeEditOrderBy', { req, res });
-  removeCookies('lastPage', { req, res });
+  removeCookies("filterBeforeEdit", { req, res });
+  removeCookies("pageBeforeEdit", { req, res });
+  removeCookies("filterBeforeEditTypeOrder", { req, res });
+  removeCookies("filterBeforeEditOrderBy", { req, res });
+  removeCookies("lastPage", { req, res });
 
   const param = `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
   const { response: allReportes = [], total: totalItems = 0 } = await fetch(
     urlParameters.toString(),
-    requestOptions,
+    requestOptions
   ).then((response) => response.json());
   return {
     props: {

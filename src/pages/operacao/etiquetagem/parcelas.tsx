@@ -1079,7 +1079,7 @@ export default function Listagem({
   }
 
   function selectableFilter(rowData: any) {
-    if (isOpenModal || rowData?.status == "IMPRESSO") {
+    if (isOpenModal || rowData?.status != "IMPRESSO") {
       return false;
     }
 
