@@ -226,7 +226,7 @@ export default function AtualizarTipoEnsaio({
   async function callingApi(parametersFilter: any) {
     // setCookies('filterBeforeEdit', parametersFilter);
     setCookies('filterBeforeEditTypeOrder', typeOrder);
-    setCookies('filterBeforeEditOrderBy', orderBy);
+    // setCookies('filterBeforeEditOrderBy', orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
