@@ -18,7 +18,6 @@ export class ExperimentGenotipeController {
   private printedHistoryController = new PrintHistoryController();
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: experiment-genotipe.controller.ts:21 ~ ExperimentGenotipeController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
@@ -414,8 +413,6 @@ export class ExperimentGenotipeController {
   }
 
   async update({ idList, status, userId = 0 }: any) {
-    console.log('🚀 ~ file: experiment-genotipe.controller.ts:418 ~ ExperimentGenotipeController ~ update ~ status', status);
-    console.log('🚀 ~ file: experiment-genotipe.controller.ts:418 ~ ExperimentGenotipeController ~ update ~ idList', idList);
     try {
       await this.ExperimentGenotipeRepository.printed(idList, status);
       // const { response: parcelas } = await this.getOne(idList[0]);

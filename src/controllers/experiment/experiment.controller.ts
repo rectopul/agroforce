@@ -18,6 +18,7 @@ export class ExperimentController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: experiment.controller.ts:21 ~ ExperimentController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
@@ -273,7 +274,7 @@ export class ExperimentController {
         orderBy,
       );
 
-      /* 
+      /*
       TODO: Refatorar este código, pois esse if está inteferindo na tela de ambiente ao sortear os experimentos
        src/pages/operacao/ambiente/experimento/index.tsx
        src/pages/operacao/ambiente/experimento/index.tsx:711

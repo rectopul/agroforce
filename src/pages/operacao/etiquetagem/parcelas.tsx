@@ -100,7 +100,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.parcelas || {
     id: 0,
     table_preferences:
-      "id,foco,type_assay,tecnologia,gli,experiment,local,repetitionsNumber,status,NT,npe,name_genotipo,nca,action",
+      'id,foco,type_assay,tecnologia,gli,experiment,local,repetitionsNumber,status,NT,npe,name_genotipo,nca,action',
   };
 
   const tableRef = useRef<any>(null);
@@ -110,7 +110,7 @@ export default function Listagem({
   const [parcelas, setParcelas] = useState<ITreatment[] | any>([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isOpenModalPrint, setIsOpenModalPrint] = useState(false);
-  const [urlPrint, setUrlPrint] = useState("");
+  const [urlPrint, setUrlPrint] = useState('');
   const [stateIframe, setStateIframe] = useState(0);
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -795,8 +795,8 @@ export default function Listagem({
     setValidateNcaTwo('bg-gray-300');
     setParcelasToPrint([]);
     // setIsOpenModal(!isOpenModal);
-    if(isOpenModal) {
-      (document.getElementById("inputCode") as HTMLInputElement).value = "";
+    if (isOpenModal) {
+      (document.getElementById('inputCode') as HTMLInputElement).value = '';
     }
     (inputRef?.current as any)?.focus();
   }
@@ -886,15 +886,15 @@ export default function Listagem({
         )[0]?.seeds,
       }));
       if (parcels) {
-        localStorage.setItem("parcelasToPrint", JSON.stringify(parcels));
+        localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
 
-        //setStateIframe(stateIframe + 1);
+        // setStateIframe(stateIframe + 1);
 
         resetIframe();
-        
+
         // -- AQUI
         setIsOpenModalPrint(true);
-        setUrlPrint("imprimir");
+        setUrlPrint('imprimir');
         cleanState();
         (document.getElementById('inputCode') as HTMLInputElement).value = '';
         setTimeout(() => (inputRef?.current as any)?.focus(), 2000);
@@ -1084,7 +1084,7 @@ export default function Listagem({
   }
 
   function selectableFilter(rowData: any) {
-    if (isOpenModal || rowData?.status != "IMPRESSO") {
+    if (isOpenModal || rowData?.status != 'IMPRESSO') {
       return false;
     }
 
@@ -1094,7 +1094,7 @@ export default function Listagem({
   function resetIframe() {
     setStateIframe(stateIframe + 1);
   }
-  
+
   return (
     <>
       <Head>
@@ -1106,7 +1106,7 @@ export default function Listagem({
       {isLoading && (
         <LoadingComponent text="Gerando etiquetas para impressão..." />
       )}
-      
+
       <Modal
         isOpen={isOpenModalPrint}
         shouldCloseOnOverlayClick={false}
@@ -1133,7 +1133,7 @@ export default function Listagem({
           shadow-gray-900/50
           modalEtiquetaAutomatizada"
       >
-        
+
         <h3>Impressão de etiquetas</h3>
         <button
           type="button"
@@ -1149,10 +1149,10 @@ export default function Listagem({
           />
         </button>
 
-        <iframe src={urlPrint} key={stateIframe} id="iframePrint" ref={myRef} width="100%" height="100%"></iframe>
-        
+        <iframe src={urlPrint} key={stateIframe} id="iframePrint" ref={myRef} width="100%" height="100%" />
+
       </Modal>
-      
+
       <Modal
         isOpen={isOpenModal}
         shouldCloseOnOverlayClick={false}
