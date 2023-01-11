@@ -7,6 +7,7 @@
  */
 
 let appName = '';
+
 if (process.env.NODE_ENV === "development") {
   appName = 'development';
 } else if (process.env.COPYMOD == 'tmg') {
@@ -15,11 +16,14 @@ if (process.env.NODE_ENV === "development") {
   appName = 'tmgdns-qa';
 } else if (process.env.COPYMOD * 1 == 2) {
   appName = 'production2';
-} else if (typeof process.env.COPYMOD != 'undefined') {
+} else if (typeof process.env.COPYMOD === 'undefined') {
   appName = process.env.COPYMOD;
 } else {
   appName = 'production';
 }
+
+
+appName = 'development';
 
 exports.config = {
   /**

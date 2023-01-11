@@ -801,7 +801,9 @@ export default function Listagem({
     setValidateNcaTwo("bg-gray-300");
     setParcelasToPrint([]);
     // setIsOpenModal(!isOpenModal);
-    (document.getElementById("inputCode") as HTMLInputElement).value = "";
+    if(isOpenModal) {
+      (document.getElementById("inputCode") as HTMLInputElement).value = "";
+    }
     (inputRef?.current as any)?.focus();
   }
 

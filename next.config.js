@@ -36,9 +36,7 @@ const nextConfig = {
 
   //evitar o render duplo do useEffect no modo desenvolvimento
   reactStrictMode: false,
-};
 
-console.log("process.env",process.env);
-console.log("process.env.COPYMOD",process.env.COPYMOD);
+};
 
 module.exports = nextConfig;
