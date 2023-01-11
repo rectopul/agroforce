@@ -19,13 +19,15 @@
 
 # misc
 .DS_Store
+.idea/
 
 
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
+package-lock.old
+newrelic_agent.log
 
 # local env files
 .env.local
@@ -36,7 +38,6 @@ package-lock.json
 
 .vscode/settings.json
 src.zip
- .vscode/settings.json
 
 # vercel
 .vercel
@@ -45,3 +46,4 @@ src.zip
 *.tsbuildinfo
 
 k8s/secret.yaml
+/documentacao/
