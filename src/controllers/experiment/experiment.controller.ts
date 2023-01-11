@@ -273,6 +273,11 @@ export class ExperimentController {
         orderBy,
       );
 
+      /* 
+      TODO: Refatorar este código, pois esse if está inteferindo na tela de ambiente ao sortear os experimentos
+       src/pages/operacao/ambiente/experimento/index.tsx
+       src/pages/operacao/ambiente/experimento/index.tsx:711
+       */
       if (options.excel) {
         response.map(async (item: any) => {
           const newItem = item;

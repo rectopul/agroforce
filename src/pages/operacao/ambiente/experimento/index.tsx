@@ -703,6 +703,11 @@ export default function Listagem({
       if (filter) {
         parametersFilter = `${parametersFilter}&${filter}`;
       }
+      
+      // BUG: Não está retornando a seguencia de delineamento
+      // FIX: trazendo toda informação necessária para a execução deste código
+      // TODO: Remover esse parametro futuramente para não afetar em outros locais no sistema;
+      parametersFilter = `${parametersFilter}&excel=1`
 
       setLoading(true);
 
@@ -711,9 +716,14 @@ export default function Listagem({
         .then(({ status, response, total }: any) => {
           if (status === 200 || status === 400) {
             let i = 0;
+            console.log('response.length', response.length);
             response.length > 0
               ? (i = NPESelectedRow.prox_npe)
               : (i = NPESelectedRow.npef);
+            console.log('Local selecionado: ', NPESelectedRow.local.name_local_culture);
+            console.log('NPESelectedRow', NPESelectedRow);
+            console.log('i = npei que será armazenado no npei do experimento', i);
+            
             let ntQT = 1;
             response.map(async (item: any) => {
               item.npei = i;
