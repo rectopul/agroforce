@@ -617,6 +617,8 @@ export default function Listagem({
       return Swal.fire("Selecione os experimentos para excluir.");
     }
 
+    setLoading(true);
+
     // enviar para a api a lista de ids
     const { status, message } = await experimentService.update({
       idList: selectedCheckBoxIds,
@@ -626,7 +628,9 @@ export default function Listagem({
       userId: userLogado.id,
     });
     if (status === 200) {
-      router.reload();
+      setLoading(false);
+      handlePagination(0);
+      //router.reload();
     } else {
       Swal.fire({
         html: message,
