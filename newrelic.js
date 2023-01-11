@@ -22,9 +22,6 @@ if (process.env.NODE_ENV === "development") {
   appName = 'production';
 }
 
-
-appName = 'development';
-
 exports.config = {
   /**
    * Array of application names.
