@@ -49,6 +49,21 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
           <div className="flex1">
             {item?.npe && <BarCode valor={generateEAN8(item?.npe)} />}
           </div>
+          {/* INICIO CONTAGEM IMPRESSAO ETIQUETAS */}
+          <div>
+            <div
+              style={{
+                fontSize: 7,
+                borderWidth: 1,
+                borderRadius: 2,
+                padding: 1,
+                marginBottom: -2,
+              }}
+            >
+              1
+            </div>
+          </div>
+          {/* FIM CONTAGEM IMPRESSAO ETIQUETAS */}
         </div>
         <div className="flexRow" style={{ fontSize: 9 }}>
           <div className="flex1">{item?.genotipo?.name_genotipo}</div>
