@@ -683,7 +683,7 @@ export default function Listagem({
           ? (i = env.prox_npe)
           : (i = env.npef);
         let count = 0;
-        response.map((p) => {
+        response.map((p: any) => {
           p.npei = i;
 
           p.seq_delineamento?.map((sd: any) => {
