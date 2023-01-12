@@ -95,7 +95,7 @@ export class ExperimentGenotipeRepository extends BaseRepository {
     return result;
   }
 
-  async printed(idList: number, status: string): Promise<any> {
+  async printed(idList: number, status: string, counter: any): Promise<any> {
     const result = await prisma.experiment_genotipe.updateMany({
       where: {
         id: {
@@ -104,6 +104,7 @@ export class ExperimentGenotipeRepository extends BaseRepository {
       },
       data: {
         status,
+        counter,
       },
     });
     return result;

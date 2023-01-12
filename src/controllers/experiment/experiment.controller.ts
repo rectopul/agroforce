@@ -357,7 +357,7 @@ export class ExperimentController {
         // }
         //  const idList = await this.countExperimentGroupChildren(Number(data.newGroupId));
         //  await this.setParcelasStatus(idList);
-        // return { status: 200, message: 'Experimento atualizado' };
+        return { status: 200, message: 'Experimento atualizado' };
       }
       if (data.id) {
         const experimento: any = await this.experimentRepository.findOne(data.id);
