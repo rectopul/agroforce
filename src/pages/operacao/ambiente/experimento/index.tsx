@@ -767,29 +767,24 @@ export default function Listagem({
     if (data.length > 0) {
       const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
       const experimentObj: any[] = [];
-      experimentos.map((item: any) => {
+      data.map((item: any) => {
         const data: any = {};
-        data.id = Number(item.id);
+        data.id = Number(item.idExperiment);
         data.status = 'SORTEADO';
         experimentObj.push(data);
       });
 
-      if (
-        NPESelectedRow?.npeQT == 'N/A'
-          ? true
-          : NPESelectedRow?.npeQT - total_consumed > 0
-          && lastNpe < NPESelectedRow?.nextNPE.npei_i
-      ) {
-        setLoading(true);
+      let localStatus = 0;
+      setLoading(true);
 
-        await experimentGenotipeService
-          .create(data)
-          .then(async ({ status, response }: any) => {
-            if (status === 200) {
-              await genotypeTreatmentService.update(genotipo_treatment);
-              await experimentService.update(experimentObj);
-              let localStatus = 0;
-              allNPERecords && allNPERecords.length > 0 ? allNPERecords.map(async (item: any) => {
+      await experimentGenotipeService
+        .create(data)
+        .then(async ({ status, response }: any) => {
+          if (status === 200) {
+            await genotypeTreatmentService.update(genotipo_treatment);
+            await experimentService.update(experimentObj);
+            if (allNPERecords && allNPERecords.length > 0) {
+              allNPERecords.map(async (item: any) => {
                 await npeService
                   .update({
                     id: item.env?.id,
@@ -808,8 +803,7 @@ export default function Listagem({
                       localStatus = status;
                     }
                   });
-              }) : null;
-
+              })
               if (localStatus === 200) {
                 Swal.fire({
                   title: 'Sorteio salvo com sucesso.',
@@ -823,17 +817,16 @@ export default function Listagem({
                 console.log('staatus : ', localStatus);
               }
             }
-          });
+          }
+        });
+      setLoading(false);
 
-        setLoading(false);
-      }
     } else {
       Swal.fire('Nenhum experimento para sortear.');
     }
   }
 
   function validateConsumedData() {
-
     if (!SortearDisable) {
       const experiment_genotipo: any[] = [];
       const genotipo_treatment: any[] = [];
@@ -874,7 +867,6 @@ export default function Listagem({
         });
       });
 
-      setData(experiment_genotipo);
       createExperimentGenotipe({
         data: experiment_genotipo,
         total_consumed: experiment_genotipo.length,
