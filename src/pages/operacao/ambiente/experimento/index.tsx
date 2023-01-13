@@ -770,8 +770,6 @@ export default function Listagem({
         data.status = 'SORTEADO';
         experimentObj.push(data);
       });
-
-      let localStatus = 0;
       setLoading(true);
 
       await experimentGenotipeService
@@ -781,38 +779,34 @@ export default function Listagem({
             await genotypeTreatmentService.update(genotipo_treatment);
             await experimentService.update(experimentObj);
             if (allNPERecords && allNPERecords.length > 0) {
+              let npeToUpdate: any[] = [];
               allNPERecords.map(async (item: any) => {
-                await npeService
-                  .update({
-                    id: item.env?.id,
-                    npef: item.env?.npef,
-                    // npeQT:
-                    //   NPESelectedRow?.npeQT == 'N/A'
-                    //     ? null
-                    //     : NPESelectedRow?.npeQT - total_consumed,
-                    status: 3,
-                    prox_npe: item.env?.npef + 1,
-                  })
-                  .then(({ status }: any) => {
-                    if (status === 200 && (localStatus === 0 || localStatus === 200)) {
-                      localStatus = status;
-                    } else if (status != 200) {
-                      localStatus = status;
-                    }
-                  });
-              });
-              if (localStatus === 200) {
-                Swal.fire({
-                  title: 'Sorteio salvo com sucesso.',
-                  showDenyButton: false,
-                  showCancelButton: false,
-                  confirmButtonText: 'Ok',
-                }).then(() => {
-                  router.push('/operacao/ambiente');
+                const temp = {
+                  id: item.env?.id,
+                  npef: item.env?.npef,
+                  // npeQT:
+                  //   NPESelectedRow?.npeQT == 'N/A'
+                  //     ? null
+                  //     : NPESelectedRow?.npeQT - total_consumed,
+                  status: 3,
+                  prox_npe: item.env?.npef + 1,
+                }
+                npeToUpdate.push(temp);
+              })
+              await npeService
+                .update(npeToUpdate)
+                .then(({ status }: any) => {
+                  if (status === 200) {
+                    Swal.fire({
+                      title: 'Sorteio salvo com sucesso.',
+                      showDenyButton: false,
+                      showCancelButton: false,
+                      confirmButtonText: 'Ok',
+                    }).then(() => {
+                      router.push('/operacao/ambiente');
+                    });
+                  }
                 });
-              } else {
-                console.log('staatus : ', localStatus);
-              }
             }
           }
         });

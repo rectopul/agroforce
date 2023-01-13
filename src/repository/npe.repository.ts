@@ -1,6 +1,7 @@
 import { prisma } from '../pages/api/db/db';
+import { BaseRepository } from './base-repository';
 
-export class NpeRepository {
+export class NpeRepository extends BaseRepository {
   async findOne(id: number) {
     const result = await prisma.npe.findUnique({
       where: {
