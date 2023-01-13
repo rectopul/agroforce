@@ -81,15 +81,15 @@ interface IData {
 }
 
 export default function Listagem({
-  allUsers,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer, // RR
-  orderByserver, // RR
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allUsers,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      typeOrderServer, // RR
+      orderByserver, // RR
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tableRef = useRef<any>(null);
@@ -116,8 +116,7 @@ export default function Listagem({
     Number(pageBeforeEdit),
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [orderList, setOrder] = useState<number>(0);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -165,12 +164,12 @@ export default function Listagem({
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const filters = [
     { id: 2, name: 'Todos' },
@@ -205,9 +204,8 @@ export default function Listagem({
       //     setCurrentPage(0);
       //   });
 
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterName=${filterName}&filterLogin=${filterLogin}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterName=${filterName}&filterLogin=${filterLogin}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -434,14 +432,14 @@ export default function Listagem({
           width: 0,
           exports: false,
           render: (rowData: IUsers) => (!rowData.avatar || rowData.avatar === '' ? (
-          // eslint-disable-next-line @next/next/no-img-element
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src="https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag"
               alt={rowData.name}
               style={{ width: 30, height: 30, borderRadius: 99999 }}
             />
           ) : (
-          // eslint-disable-next-line @next/next/no-img-element
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={rowData.avatar}
               alt={rowData.name}
@@ -533,10 +531,10 @@ export default function Listagem({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setOrderBy(columnG);
-    setOrder(orderByG);
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -973,7 +971,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

@@ -102,16 +102,16 @@ interface IData {
 }
 
 export default function Listagem({
-  allNpe,
-  itensPerPage,
-  filterApplication,
-  filterBeforeEdit,
-  totalItems,
-  typeOrderServer,
-  orderByserver,
-  safraId,
-  idCulture,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allNpe,
+      itensPerPage,
+      filterApplication,
+      filterBeforeEdit,
+      totalItems,
+      typeOrderServer,
+      orderByserver,
+      safraId,
+      idCulture,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState<boolean>(false);
 
   const { TabsDropDowns } = ITabs.default;
@@ -137,7 +137,7 @@ export default function Listagem({
   );
   const [npe, setNPE] = useState(allNpe);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
@@ -214,11 +214,10 @@ export default function Listagem({
   const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == 'Tecnologia' ? 'tecnologia.cod_tec' : orderBy
-  }&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == 'Tecnologia' ? 'tecnologia.cod_tec' : orderBy
+    }&typeOrder=${typeOrder}`;
 
   const filters = [
     { id: 2, name: 'Todos' },
@@ -275,9 +274,8 @@ export default function Listagem({
       }
 
       // &filterSafra=${filterSafra}
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterSafra=${filterSafra}&filterNpeTo=${filterNpeTo}&filterCodTecnologia=${filterCodTecnologia}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_culture=${idCulture}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&id_safra=${safraId}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterSafra=${filterSafra}&filterNpeTo=${filterNpeTo}&filterCodTecnologia=${filterCodTecnologia}&filterNpeFrom=${filterNpeFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&id_culture=${idCulture}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&id_safra=${safraId}`;
       // &id_safra=${safraId}
       // await npeService
       //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
@@ -631,10 +629,10 @@ export default function Listagem({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -686,11 +684,9 @@ export default function Listagem({
   }
 
   async function handleStatus(idNPE: number, data: any): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&safraId=${
-      data.safraId
-    }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${
-      data.id_type_assay
-    }&epoca=${String(data.epoca)}`;
+    const parametersFilter = `filterStatus=${1}&safraId=${data.safraId
+      }&id_foco=${data.id_foco}&id_ogm=${data.id_ogm}&id_type_assay=${data.id_type_assay
+      }&epoca=${String(data.epoca)}`;
     if (data.status == 0) {
       await npeService.getAll(parametersFilter).then((response) => {
         if (response.total > 0) {
@@ -994,7 +990,7 @@ export default function Listagem({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -1192,7 +1188,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

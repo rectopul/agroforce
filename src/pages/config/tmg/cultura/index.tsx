@@ -79,16 +79,15 @@ interface IData {
 }
 
 export default function Listagem({
-  allCultures,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer, // RR
-  orderByserver, // RR
-}: // filterParams,
-InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allCultures,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      typeOrderServer, // RR
+      orderByserver, // RR
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tableRef = useRef<any>(null);
@@ -116,7 +115,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   );
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -162,10 +161,9 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -288,10 +286,10 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {

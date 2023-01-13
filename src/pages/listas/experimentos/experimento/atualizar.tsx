@@ -85,16 +85,16 @@ interface IUpdateExperimento {
 }
 
 export default function AtualizarLocal({
-  experimento,
-  allItens,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idExperiment,
-  pageBeforeEdit,
-  typeOrderServer, // RR
-  orderByserver, // RR
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      experimento,
+      allItens,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idExperiment,
+      pageBeforeEdit,
+      typeOrderServer, // RR
+      orderByserver, // RR
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -124,7 +124,7 @@ export default function AtualizarLocal({
     Number(pageBeforeEdit),
   );
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   // const [setArrowOrder] = useState<any>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -163,20 +163,18 @@ export default function AtualizarLocal({
   const [orderBy, setOrderBy] = useState<string>('');
   const [typeOrder, setTypeOrder] = useState<string>('');
 
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy
-  }&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy
+    }&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IUpdateExperimento>({
     initialValues: {
       id: experimento.id,
       foco: experimento.assay_list?.foco.name,
       ensaio: experimento.assay_list?.type_assay.name,
-      tecnologia: `${experimento?.assay_list?.tecnologia?.cod_tec || ''} ${
-        experimento?.assay_list?.tecnologia?.name || ''
-      }`,
+      tecnologia: `${experimento?.assay_list?.tecnologia?.cod_tec || ''} ${experimento?.assay_list?.tecnologia?.name || ''
+        }`,
       gli: experimento.assay_list?.gli,
       experimentName: experimento?.experimentName,
       bgm: experimento.assay_list?.bgm || '',
@@ -307,12 +305,12 @@ export default function AtualizarLocal({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     getTreatments(filter);
 
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -914,7 +912,7 @@ export default function AtualizarLocal({
                     bgColor="bg-blue-600"
                     textColor="white"
                     icon={<RiOrganizationChart size={18} />}
-                    onClick={() => {}}
+                    onClick={() => { }}
                   />
                 </div>
               </div>
@@ -1101,7 +1099,7 @@ export default function AtualizarLocal({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

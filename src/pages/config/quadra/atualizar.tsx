@@ -2,7 +2,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 import { useFormik } from 'formik';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -144,7 +144,7 @@ export default function AtualizarQuadra({
   filterApplication,
   idQuadra,
   quadra,
-}: IData) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -227,7 +227,7 @@ export default function AtualizarQuadra({
   const [colorStar, setColorStar] = useState<string>('');
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>('');
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -389,7 +389,7 @@ export default function AtualizarQuadra({
       }
     }
 
-    setFieldOrder(name);
+    // setFieldOrder(columnG);
   }
 
   function dividersColumnsOrder(columnsCampos: string) {

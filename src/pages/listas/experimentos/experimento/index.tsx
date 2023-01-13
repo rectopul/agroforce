@@ -93,17 +93,17 @@ interface IData {
 }
 
 export default function Listagem({
-  allExperiments,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer,
-  orderByserver,
-  cultureId,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+          allExperiments,
+          totalItems,
+          itensPerPage,
+          filterApplication,
+          idSafra,
+          pageBeforeEdit,
+          filterBeforeEdit,
+          typeOrderServer,
+          orderByserver,
+          cultureId,
+        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState<boolean>(false);
   const { TabsDropDowns } = ITabs;
 
@@ -133,7 +133,7 @@ export default function Listagem({
   );
   const [filter, setFilter] = useState<any>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -171,7 +171,7 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
     orderBy == 'tecnologia' ? 'assay_list.tecnologia.cod_tec' : orderBy
@@ -354,10 +354,10 @@ export default function Listagem({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -435,12 +435,12 @@ export default function Listagem({
     setLoading(true);
 
     // eslint-disable-next-line max-len
-    const { status, message } = await await experimentService.deleted({
+    const { status, message } = await experimentService.deleted({
       id: itemSelectedDelete?.id,
       userId: userLogado.id,
     });
     if (status === 200) {
-      handlePagination(currentPage);
+      await handlePagination(currentPage);
       setLoading(false);
     } else {
       Swal.fire({
