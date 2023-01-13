@@ -117,8 +117,6 @@ export default function Listagem({
     orderBy == 'tecnologia' ? 'assay_list.tecnologia.cod_tec' : orderBy
   }&typeOrder=${typeOrder}`;
 
-  const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit);
-
   const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   // const take: number = itensPerPage;
@@ -619,7 +617,7 @@ export default function Listagem({
     if (status === 200) {
       setLoading(false);
       handlePagination(currentPage);
-      //router.reload();
+      // router.reload();
     } else {
       Swal.fire({
         html: message,
@@ -678,7 +676,7 @@ export default function Listagem({
           isMultipleDelete
             ? 'os items selecionados?'
             : `o item ${itemSelectedDelete?.experimentName}?`
-          }`}
+        }`}
         onPress={isMultipleDelete ? deleteMultipleItems : deleteItem}
         onCancel={() => setIsOpenModalConfirm(false)}
       />
