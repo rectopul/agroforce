@@ -690,6 +690,7 @@ export default function Listagem({
           flex flex-col
           items-start
           gap-4
+          overflow-y-hidden
         "
         >
           <form
@@ -720,7 +721,7 @@ export default function Listagem({
           </form>
 
           {/* overflow-y-scroll */}
-          <div className="w-full h-full overflow-y-scroll">
+          <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
               style={{ background: "#f9fafb" }}
@@ -728,8 +729,11 @@ export default function Listagem({
               data={experiments}
               options={{
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - 355px)`,
                 headerStyle: {
-                  zIndex: 0,
+                  zIndex: 1,
+                  position: "sticky",
+                  top: 0,
                 },
                 showSelectAllCheckbox: true,
                 selection: true,
