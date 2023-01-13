@@ -41,7 +41,7 @@ import {
 import * as XLSX from 'xlsx';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
-import ComponentLoading from "../../../../components/Loading";
+import ComponentLoading from '../../../../components/Loading';
 
 interface IFilter {
   filterStatus: object | any;
@@ -65,13 +65,13 @@ interface IData {
 }
 
 export default function Atualizarquadra({
-          layoutChildren,
-          totalItems,
-          itensPerPage,
-          filterApplication,
-          id_layout,
-          layout,
-        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  layoutChildren,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  id_layout,
+  layout,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -133,7 +133,7 @@ export default function Atualizarquadra({
   const [disparos, setDisparos] = useState<any[]>(() => layoutChildren);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
+  const [orderList, setOrder] = useState<number>(1);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -158,7 +158,7 @@ export default function Atualizarquadra({
   const [colorStar, setColorStar] = useState<string>('');
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
-  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
+  const [fieldOrder, setFieldOrder] = useState<any>('');
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -393,7 +393,7 @@ export default function Atualizarquadra({
       }
     }
 
-    setFieldOrder(columnG);
+    // setFieldOrder(columnG);
   }
 
   async function getValuesColumns(): Promise<void> {

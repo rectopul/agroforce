@@ -72,16 +72,16 @@ interface IUpdateLocal {
 }
 
 export default function AtualizarLocal({
-      local,
-      allCultureUnity,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      id_local,
-      pageBeforeEdit,
-      typeOrderServer, // RR
-      orderByserver, // RR
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  local,
+  allCultureUnity,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  id_local,
+  pageBeforeEdit,
+  typeOrderServer, // RR
+  orderByserver, // RR
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('config');
@@ -297,7 +297,7 @@ export default function AtualizarLocal({
       setLoading(false);
     }, 100);
 
-    setFieldOrder(columnG);
+    // setFieldOrder(columnG);
   }
 
   async function getValuesColumns(): Promise<void> {

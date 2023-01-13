@@ -54,17 +54,17 @@ import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactor
 import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 
 export default function TipoEnsaio({
-      allAssay,
-      itensPerPage,
-      filterApplication,
-      totalItems,
-      idSafra,
-      idCulture,
-      pageBeforeEdit,
-      filterBeforeEdit,
-      typeOrderServer,
-      orderByserver,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allAssay,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+  idSafra,
+  idCulture,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  typeOrderServer,
+  orderByserver,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -158,8 +158,8 @@ export default function TipoEnsaio({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == "tecnologia" ? "tecnologia.cod_tec" : orderBy
-    }&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy
+  }&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IAssayListFilter>({
     initialValues: {
@@ -356,39 +356,39 @@ export default function TipoEnsaio({
               textColor="white"
             />
           </div>
-        ) : (
-          <div className="h-7 flex">
-            <div className="h-7">
-              <Button
-                icon={<BiEdit size={14} />}
-                title={`Atualizar ${rowData.gli}`}
-                onClick={() => {
-                  setCookies("pageBeforeEdit", currentPage?.toString());
-                  setCookies("filterBeforeEdit", filter);
-                  setCookies("filterBeforeEditTypeOrder", typeOrder);
-                  setCookies("filterBeforeEditOrderBy", orderBy);
-                  setCookies("filtersParams", filtersParams);
-                  setCookies("takeBeforeEdit", take);
-                  setCookies("lastPage", "atualizar");
-                  router.push(
-                    `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`
-                  );
-                }}
-                bgColor="bg-blue-600"
-                textColor="white"
-              />
-            </div>
-            <div style={{ width: 5 }} />
-            <div>
-              <Button
-                icon={<BsTrashFill size={14} />}
-                title="Ensaio já associado a um experimento"
-                disabled
-                onClick={() => { }}
-                bgColor="bg-gray-600"
-                textColor="white"
-              />
-            </div>
+        </div>
+      ) : (
+        <div className="h-7 flex">
+          <div className="h-7">
+            <Button
+              icon={<BiEdit size={14} />}
+              title={`Atualizar ${rowData.gli}`}
+              onClick={() => {
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('takeBeforeEdit', take);
+                setCookies('lastPage', 'atualizar');
+                router.push(
+                  `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`,
+                );
+              }}
+              bgColor="bg-blue-600"
+              textColor="white"
+            />
+          </div>
+          <div style={{ width: 5 }} />
+          <div>
+            <Button
+              icon={<BsTrashFill size={14} />}
+              title="Ensaio já associado a um experimento"
+              disabled
+              onClick={() => { }}
+              bgColor="bg-gray-600"
+              textColor="white"
+            />
           </div>
         </div>
       )),
