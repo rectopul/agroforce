@@ -1,33 +1,31 @@
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import getConfig from 'next/config';
-import Head from 'next/head';
-import { useEffect, useRef, useState } from 'react';
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
+import { useEffect, useRef, useState } from "react";
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from 'react-beautiful-dnd';
+} from "react-beautiful-dnd";
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiTwotoneStar,
-} from 'react-icons/ai';
-import {
-  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
-} from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
-import { Router, useRouter } from 'next/router';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
-import Swal from 'sweetalert2';
-import * as XLSX from 'xlsx';
-import { removeCookies, setCookies } from 'cookies-next';
-import { npeService, userPreferencesService } from '../../../services';
-import { UserPreferenceController } from '../../../controllers/user-preference.controller';
+} from "react-icons/ai";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { Router, useRouter } from "next/router";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line, RiSettingsFill } from "react-icons/ri";
+import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
+import { removeCookies, setCookies } from "cookies-next";
+import { npeService, userPreferencesService } from "../../../services";
+import { UserPreferenceController } from "../../../controllers/user-preference.controller";
 import {
   AccordionFilter,
   Button,
@@ -37,12 +35,12 @@ import {
   Select,
   FieldItemsPerPage,
   ButtonDeleteConfirmation,
-} from '../../../components';
-import * as ITabs from '../../../shared/utils/dropdown';
-import { functionsUtils } from '../../../shared/utils/functionsUtils';
-import { tableGlobalFunctions } from '../../../helpers';
-import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
-import ComponentLoading from '../../../components/Loading';
+} from "../../../components";
+import * as ITabs from "../../../shared/utils/dropdown";
+import { functionsUtils } from "../../../shared/utils/functionsUtils";
+import { tableGlobalFunctions } from "../../../helpers";
+import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
+import ComponentLoading from "../../../components/Loading";
 
 interface INpeProps {
   id: number | any;
@@ -100,112 +98,118 @@ interface IData {
 }
 
 export default function Listagem({
-      allNpe,
-      itensPerPage,
-      filterApplication,
-      totalItems,
-      filterBeforeEdit,
-      id_safra,
-      cultureId,
-      orderByserver,
-      typeOrderServer,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allNpe,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+  filterBeforeEdit,
+  id_safra,
+  cultureId,
+  orderByserver,
+  typeOrderServer,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
-  const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE'
-    ? { ...i, statusTab: true }
-    : { ...i, statubsTab: false }));
+  const tabsOperationMenu = tabsOperation.map((i) =>
+    i.titleTab === "AMBIENTE"
+      ? { ...i, statusTab: true }
+      : { ...i, statubsTab: false }
+  );
 
   const tableRef = useRef<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.npe || {
     id: 0,
     table_preferences:
-      'id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef,prox_npe,grp,status',
+      "id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef,prox_npe,grp,status",
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+    preferences.table_preferences
   );
   const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
   const [npe, setNPE] = useState(allNpe);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [statusAccordionFilter, setStatusAccordionFilter] =
+    useState<boolean>(false);
   const [selectedNPE, setSelectedNPE] = useState<INpeProps[]>([]);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
-      name: 'CamposGerenciados[]',
-      title: 'Lugar de cultura',
-      value: 'local',
-      defaultChecked: () => camposGerenciados.includes('local'),
+      name: "CamposGerenciados[]",
+      title: "Lugar de cultura",
+      value: "local",
+      defaultChecked: () => camposGerenciados.includes("local"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Safra ',
-      value: 'safra',
-      defaultChecked: () => camposGerenciados.includes('safra'),
+      name: "CamposGerenciados[]",
+      title: "Safra ",
+      value: "safra",
+      defaultChecked: () => camposGerenciados.includes("safra"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Foco ',
-      value: 'foco',
-      defaultChecked: () => camposGerenciados.includes('foco'),
+      name: "CamposGerenciados[]",
+      title: "Foco ",
+      value: "foco",
+      defaultChecked: () => camposGerenciados.includes("foco"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Ensaio ',
-      value: 'ensaio',
-      defaultChecked: () => camposGerenciados.includes('ensaio'),
+      name: "CamposGerenciados[]",
+      title: "Ensaio ",
+      value: "ensaio",
+      defaultChecked: () => camposGerenciados.includes("ensaio"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Tecnologia',
-      value: 'tecnologia',
-      defaultChecked: () => camposGerenciados.includes('tecnologia'),
+      name: "CamposGerenciados[]",
+      title: "Tecnologia",
+      value: "tecnologia",
+      defaultChecked: () => camposGerenciados.includes("tecnologia"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Época',
-      value: 'epoca',
-      defaultChecked: () => camposGerenciados.includes('epoca'),
+      name: "CamposGerenciados[]",
+      title: "Época",
+      value: "epoca",
+      defaultChecked: () => camposGerenciados.includes("epoca"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'NPE Inicial ',
-      value: 'npei_i',
-      defaultChecked: () => camposGerenciados.includes('npei_i'),
+      name: "CamposGerenciados[]",
+      title: "NPE Inicial ",
+      value: "npei_i",
+      defaultChecked: () => camposGerenciados.includes("npei_i"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'NPE Final',
-      value: 'npef',
-      defaultChecked: () => camposGerenciados.includes('npef'),
+      name: "CamposGerenciados[]",
+      title: "NPE Final",
+      value: "npef",
+      defaultChecked: () => camposGerenciados.includes("npef"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Prox NPE ',
-      value: 'prox_npe',
-      defaultChecked: () => camposGerenciados.includes('prox_npe'),
+      name: "CamposGerenciados[]",
+      title: "Prox NPE ",
+      value: "prox_npe",
+      defaultChecked: () => camposGerenciados.includes("prox_npe"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'GRP',
-      value: 'grp',
-      defaultChecked: () => camposGerenciados.includes('grp'),
+      name: "CamposGerenciados[]",
+      title: "GRP",
+      value: "grp",
+      defaultChecked: () => camposGerenciados.includes("grp"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Ação',
-      value: 'status',
-      defaultChecked: () => camposGerenciados.includes('status'),
+      name: "CamposGerenciados[]",
+      title: "Ação",
+      value: "status",
+      defaultChecked: () => camposGerenciados.includes("status"),
     },
   ]);
 
@@ -216,18 +220,19 @@ export default function Listagem({
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
-  const pathExtra = `skip=${currentPage * Number(take)
-    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${
+    currentPage * Number(take)
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
   // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}`;
 
   const filters = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
-    { id: 3, name: 'Sorteado' },
+    { id: 2, name: "Todos" },
+    { id: 1, name: "Ativos" },
+    { id: 0, name: "Inativos" },
+    { id: 3, name: "Sorteado" },
   ];
 
-  const filterStatus = filterApplication.split('');
+  const filterStatus = filterApplication.split("");
 
   const formik = useFormik<any>({
     initialValues: {
@@ -271,22 +276,22 @@ export default function Listagem({
       filterGrpFrom,
     }) => {
       if (!functionsUtils?.isNumeric(filterNpeFrom)) {
-        return Swal.fire('O campo NPE Inicial não pode ter ponto ou vírgula.');
+        return Swal.fire("O campo NPE Inicial não pode ter ponto ou vírgula.");
       }
       if (!functionsUtils?.isNumeric(filterNpeFrom)) {
-        return Swal.fire('O campo NPE Inicial não pode ter ponto ou vírgula.');
+        return Swal.fire("O campo NPE Inicial não pode ter ponto ou vírgula.");
       }
       if (!functionsUtils?.isNumeric(filterNpeFinalFrom)) {
-        return Swal.fire('O campo NPE Final não pode ter ponto ou vírgula.');
+        return Swal.fire("O campo NPE Final não pode ter ponto ou vírgula.");
       }
       if (!functionsUtils?.isNumeric(filterNpeFinalTo)) {
-        return Swal.fire('O campo NPE Final não pode ter ponto ou vírgula.');
+        return Swal.fire("O campo NPE Final não pode ter ponto ou vírgula.");
       }
       if (!functionsUtils?.isNumeric(filterGrpFrom)) {
-        return Swal.fire('O campo GRP não pode ter ponto ou vírgula.');
+        return Swal.fire("O campo GRP não pode ter ponto ou vírgula.");
       }
       if (!functionsUtils?.isNumeric(filterGrpTo)) {
-        return Swal.fire('O campo GRP não pode ter ponto ou vírgula.');
+        return Swal.fire("O campo GRP não pode ter ponto ou vírgula.");
       }
       if (!functionsUtils?.isNumeric(filterProxNpeFrom)) {
         return Swal.fire("O campo Prox Npe não pode ter ponto ou vírgula.");
@@ -316,12 +321,12 @@ export default function Listagem({
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
-    setCookies('filterBeforeEdit', parametersFilter);
-    setCookies('filterBeforeEditTypeOrder', typeOrder);
-    setCookies('filterBeforeEditOrderBy', orderBy);
+    setCookies("filterBeforeEdit", parametersFilter);
+    setCookies("filterBeforeEditTypeOrder", typeOrder);
+    setCookies("filterBeforeEditOrderBy", orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies('filtersParams', parametersFilter);
+    setCookies("filtersParams", parametersFilter);
 
     await npeService
       .getAll(parametersFilter)
@@ -330,7 +335,7 @@ export default function Listagem({
           setNPE(response.response);
           setTotalItems(response.total);
           tableRef?.current?.dataManager?.changePageSize(
-            response.total >= take ? take : response.total,
+            response.total >= take ? take : response.total
           );
         }
         setLoading(false);
@@ -359,35 +364,35 @@ export default function Listagem({
     } else {
       Swal.fire({
         html: message,
-        width: '800',
+        width: "800",
       });
     }
   }
 
   function statusHeaderFactory() {
     return {
-      title: 'Ação',
-      field: 'status',
+      title: "Ação",
+      field: "status",
       sorting: false,
       searchable: false,
-      filterPlaceholder: 'Filtrar por status',
+      filterPlaceholder: "Filtrar por status",
       render: (rowData: any) => (
         <div className="h-7 flex">
           <div className="h-7">
             <Button
               icon={<BiEdit size={14} />}
-              bgColor={rowData.edited === 1 ? 'bg-blue-900' : 'bg-blue-600'}
+              bgColor={rowData.edited === 1 ? "bg-blue-900" : "bg-blue-600"}
               textColor="white"
               title="Editar"
               onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filter);
-                setCookies('filterBeforeEditTypeOrder', typeOrder);
-                setCookies('filterBeforeEditOrderBy', orderBy);
-                setCookies('filtersParams', filtersParams);
-                setCookies('lastPage', 'atualizar');
-                setCookies('itensPage', itensPerPage);
-                setCookies('takeBeforeEdit', take);
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filter);
+                setCookies("filterBeforeEditTypeOrder", typeOrder);
+                setCookies("filterBeforeEditOrderBy", orderBy);
+                setCookies("filtersParams", filtersParams);
+                setCookies("lastPage", "atualizar");
+                setCookies("itensPage", itensPerPage);
+                setCookies("takeBeforeEdit", take);
                 router.push(`/operacao/ambiente/atualizar?id=${rowData.id}`);
               }}
             />
@@ -430,58 +435,58 @@ export default function Listagem({
   }
 
   function colums(camposGerenciados: any): any {
-    const columnCampos: any = camposGerenciados.split(',');
+    const columnCampos: any = camposGerenciados.split(",");
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item: any) => {
-      if (columnCampos[item] === 'local') {
+      if (columnCampos[item] === "local") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Lugar de cultura',
-            title: 'local.name_local_culture',
+            name: "Lugar de cultura",
+            title: "local.name_local_culture",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[item] === 'safra') {
+      if (columnCampos[item] === "safra") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Safra',
-            title: 'safra.safraName',
+            name: "Safra",
+            title: "safra.safraName",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[item] === 'foco') {
+      if (columnCampos[item] === "foco") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Foco',
-            title: 'foco.name',
+            name: "Foco",
+            title: "foco.name",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[item] === 'ensaio') {
+      if (columnCampos[item] === "ensaio") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Ensaio',
-            title: 'type_assay.name',
+            name: "Ensaio",
+            title: "type_assay.name",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[item] === 'tecnologia') {
+      if (columnCampos[item] === "tecnologia") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Tecnologia',
-            title: 'tecnologia.cod_tec',
+            name: "Tecnologia",
+            title: "tecnologia.cod_tec",
             orderList,
             fieldOrder,
             handleOrder,
@@ -490,68 +495,68 @@ export default function Listagem({
                 {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
               </div>
             ),
-          }),
+          })
         );
       }
-      if (columnCampos[item] === 'epoca') {
+      if (columnCampos[item] === "epoca") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Época',
-            title: 'epoca',
+            name: "Época",
+            title: "epoca",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[item] === 'npei_i') {
+      if (columnCampos[item] === "npei_i") {
         tableFields.push(
           headerTableFactoryGlobal({
-            type: 'int',
-            name: 'NPE Inicial',
-            title: 'npei',
+            type: "int",
+            name: "NPE Inicial",
+            title: "npei",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[item] === 'npef') {
-        tableFields.push(
-          headerTableFactoryGlobal({
-            type: 'int',
-            name: 'NPE Final',
-            title: 'npef',
-            orderList,
-            fieldOrder,
-            handleOrder,
-          }),
-        );
-      }
+      // if (columnCampos[item] === 'npef') {
+      //   tableFields.push(
+      //     headerTableFactoryGlobal({
+      //       type: 'int',
+      //       name: 'NPE Final',
+      //       title: 'npef',
+      //       orderList,
+      //       fieldOrder,
+      //       handleOrder,
+      //     }),
+      //   );
+      // }
       if (columnCampos[item] === 'prox_npe') {
         tableFields.push(
           headerTableFactoryGlobal({
-            type: 'int',
-            name: 'Prox NPE',
-            title: 'prox_npe',
+            type: "int",
+            name: "Prox NPE",
+            title: "prox_npe",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[item] === 'grp') {
+      if (columnCampos[item] === "grp") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'GRP',
-            title: 'group.group',
+            name: "GRP",
+            title: "group.group",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[item] === 'status') {
+      if (columnCampos[item] === "status") {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -563,17 +568,16 @@ export default function Listagem({
   async function handleOrder(
     column: string,
     order: string | any,
-    name: any,
+    name: any
   ): Promise<void> {
     // Gobal manage orders
-    const {
-      typeOrderG, columnG, orderByG, arrowOrder,
-    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    const { typeOrderG, columnG, orderByG, arrowOrder } =
+      await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
+    typeOrderG !== "" ? (typeOrderG == "desc" ? setOrder(1) : setOrder(2)) : "";
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -583,7 +587,7 @@ export default function Listagem({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
+    let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -606,7 +610,7 @@ export default function Listagem({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
       userLogado.preferences.npe = {
         id: preferences.id,
@@ -617,7 +621,7 @@ export default function Listagem({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -638,7 +642,7 @@ export default function Listagem({
 
   const downloadExcel_old = async (): Promise<void> => {
     setLoading(true);
-    if (!filterApplication.includes('paramSelect')) {
+    if (!filterApplication.includes("paramSelect")) {
       filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
@@ -646,9 +650,9 @@ export default function Listagem({
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           if (row.status === 0) {
-            row.status = 'Inativo';
+            row.status = "Inativo";
           } else {
-            row.status = 'Ativo';
+            row.status = "Ativo";
           }
           row.LOCAL = row.local.name_local_culture;
           row.SAFRA = row.safra.safraName;
@@ -681,23 +685,23 @@ export default function Listagem({
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'npe');
+        XLSX.utils.book_append_sheet(workBook, workSheet, "npe");
 
         // Buffer
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
+          bookType: "xlsx", // xlsx
+          type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
+          bookType: "xlsx", // xlsx
+          type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, 'NPE.xlsx');
+        XLSX.writeFile(workBook, "NPE.xlsx");
       } else {
         setLoading(false);
-        Swal.fire('Não existem registros para serem exportados, favor checar.');
+        Swal.fire("Não existem registros para serem exportados, favor checar.");
       }
     });
     setLoading(false);
@@ -710,9 +714,9 @@ export default function Listagem({
         const newData = response.map((row: any) => {
           delete row.avatar;
           if (row.status === 0) {
-            row.status = 'Inativo';
+            row.status = "Inativo";
           } else {
-            row.status = 'Ativo';
+            row.status = "Ativo";
           }
 
           row.CULTURA = row.safra?.culture?.name;
@@ -752,22 +756,22 @@ export default function Listagem({
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'npe');
+        XLSX.utils.book_append_sheet(workBook, workSheet, "npe");
 
         // Buffer
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
+          bookType: "xlsx", // xlsx
+          type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
+          bookType: "xlsx", // xlsx
+          type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, 'NPE.xlsx');
+        XLSX.writeFile(workBook, "NPE.xlsx");
       } else {
-        Swal.fire('Não existem registros para serem exportados, favor checar.');
+        Swal.fire("Não existem registros para serem exportados, favor checar.");
       }
     });
     setLoading(false);
@@ -789,7 +793,7 @@ export default function Listagem({
   function checkValue(value: any) {
     const parameter = tableGlobalFunctions.getValuesForFilter(
       value,
-      filtersParams,
+      filtersParams
     );
     return parameter;
   }
@@ -847,9 +851,13 @@ export default function Listagem({
           flex flex-col
           items-start
           gap-4
+          overflow-y-hidden
         "
         >
-          <AccordionFilter title="Filtrar ambientes">
+          <AccordionFilter
+            title="Filtrar ambientes"
+            onChange={(_, e) => setStatusAccordionFilter(e)}
+          >
             <div className="w-full flex gap-0">
               <form
                 className="flex flex-col
@@ -880,15 +888,15 @@ export default function Listagem({
                     />
                   </div> */}
 
-                  {filterFieldFactory('filterLocal', 'Lugar de cultura')}
+                  {filterFieldFactory("filterLocal", "Lugar de cultura")}
 
-                  {filterFieldFactory('filterFoco', 'Foco')}
+                  {filterFieldFactory("filterFoco", "Foco")}
 
-                  {filterFieldFactory('filterEnsaio', 'Ensaio')}
+                  {filterFieldFactory("filterEnsaio", "Ensaio")}
 
-                  {filterFieldFactory('filterCodTecnologia', 'Cod Tec')}
+                  {filterFieldFactory("filterCodTecnologia", "Cod Tec")}
 
-                  {filterFieldFactory('filterTecnologia', 'Nome Tec')}
+                  {filterFieldFactory("filterTecnologia", "Nome Tec")}
                 </div>
 
                 <div
@@ -898,7 +906,7 @@ export default function Listagem({
                   pt-4
                 "
                 >
-                  {filterFieldFactory('filterEpoca', 'Época')}
+                  {filterFieldFactory("filterEpoca", "Época")}
 
                   <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -910,7 +918,7 @@ export default function Listagem({
                         placeholder="De"
                         id="filterNpeFrom"
                         name="filterNpeFrom"
-                        defaultValue={checkValue('filterNpeFrom')}
+                        defaultValue={checkValue("filterNpeFrom")}
                         onChange={formik.handleChange}
                       />
                       <Input
@@ -919,7 +927,7 @@ export default function Listagem({
                         placeholder="Até"
                         id="filterNpeTo"
                         name="filterNpeTo"
-                        defaultValue={checkValue('filterNpeTo')}
+                        defaultValue={checkValue("filterNpeTo")}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -935,7 +943,7 @@ export default function Listagem({
                         placeholder="De"
                         id="filterNpeFinalFrom"
                         name="filterNpeFinalFrom"
-                        defaultValue={checkValue('filterNpeFinalFrom')}
+                        defaultValue={checkValue("filterNpeFinalFrom")}
                         onChange={formik.handleChange}
                       />
                       <Input
@@ -944,7 +952,7 @@ export default function Listagem({
                         placeholder="Até"
                         id="filterNpeFinalTo"
                         name="filterNpeFinalTo"
-                        defaultValue={checkValue('filterNpeFinalTo')}
+                        defaultValue={checkValue("filterNpeFinalTo")}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -960,7 +968,7 @@ export default function Listagem({
                         type="number"
                         id="filterProxNpeFrom"
                         name="filterProxNpeFrom"
-                        defaultValue={checkValue('filterProxNpeFrom')}
+                        defaultValue={checkValue("filterProxNpeFrom")}
                         onChange={formik.handleChange}
                       />
                       <Input
@@ -969,7 +977,7 @@ export default function Listagem({
                         type="number"
                         id="filterProxNpeTo"
                         name="filterProxNpeTo"
-                        defaultValue={checkValue('filterProxNpeTo')}
+                        defaultValue={checkValue("filterProxNpeTo")}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -985,7 +993,7 @@ export default function Listagem({
                         placeholder="De"
                         id="filterGrpFrom"
                         name="filterGrpFrom"
-                        defaultValue={checkValue('filterGrpFrom')}
+                        defaultValue={checkValue("filterGrpFrom")}
                         onChange={formik.handleChange}
                       />
                       <Input
@@ -994,7 +1002,7 @@ export default function Listagem({
                         placeholder="Até"
                         id="filterGrpTo"
                         name="filterGrpTo"
-                        defaultValue={checkValue('filterGrpTo')}
+                        defaultValue={checkValue("filterGrpTo")}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -1004,7 +1012,7 @@ export default function Listagem({
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 15 }}>
                     <Button
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -1017,10 +1025,10 @@ export default function Listagem({
           </AccordionFilter>
 
           {/* overflow-y-scroll */}
-          <div className="w-full h-full overflow-y-scroll">
+          <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
-              style={{ background: '#f9fafb' }}
+              style={{ background: "#f9fafb" }}
               columns={columns}
               data={npe}
               onRowClick={(evt, selectedRow: any) => {
@@ -1028,10 +1036,17 @@ export default function Listagem({
               }}
               options={{
                 showTitle: false,
+                //maxBodyHeight: window?.screen?.availHeight - 400,
+                //maxBodyHeight: window?.screen?.height - 400,
+                //maxBodyHeight: window?.innerHeight - 300,
+                // prettier-ignore
+                maxBodyHeight: `calc(100vh - ${statusAccordionFilter ? 460 : 310}px)`,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 1,
+                  position: "sticky",
+                  top: 0,
                 },
-                rowStyle: { background: '#f9fafb', height: 35 },
+                rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: Number(take),
@@ -1064,8 +1079,8 @@ export default function Listagem({
                           textColor="white"
                           onClick={() => {
                             window.open(
-                              '/listas/rd?importar=ambiente',
-                              '_blank',
+                              "/listas/rd?importar=ambiente",
+                              "_blank"
                             );
                           }}
                           icon={<RiFileExcel2Line size={20} />}
@@ -1077,30 +1092,30 @@ export default function Listagem({
                           value="Gerar sorteio"
                           bgColor={
                             selectedNPE?.length <= 0
-                              ? 'bg-gray-400'
-                              : 'bg-blue-600'
+                              ? "bg-gray-400"
+                              : "bg-blue-600"
                           }
                           textColor="white"
                           disabled={selectedNPE.length <= 0}
                           onClick={() => {
                             selectedNPE.sort((a, b) => a.prox_npe - b.prox_npe);
                             localStorage.setItem(
-                              'selectedNPE',
-                              JSON.stringify(selectedNPE),
+                              "selectedNPE",
+                              JSON.stringify(selectedNPE)
                             );
                             setCookies(
-                              'pageBeforeEdit',
-                              currentPage?.toString(),
+                              "pageBeforeEdit",
+                              currentPage?.toString()
                             );
-                            setCookies('filterBeforeEdit', filter);
-                            setCookies('filterBeforeEditTypeOrder', typeOrder);
-                            setCookies('filterBeforeEditOrderBy', orderBy);
-                            setCookies('filtersParams', filtersParams);
-                            setCookies('lastPage', 'atualizar');
-                            setCookies('takeBeforeEdit', take);
-                            setCookies('itensPage', itensPerPage);
+                            setCookies("filterBeforeEdit", filter);
+                            setCookies("filterBeforeEditTypeOrder", typeOrder);
+                            setCookies("filterBeforeEditOrderBy", orderBy);
+                            setCookies("filtersParams", filtersParams);
+                            setCookies("lastPage", "atualizar");
+                            setCookies("takeBeforeEdit", take);
+                            setCookies("itensPage", itensPerPage);
                             router.push({
-                              pathname: '/operacao/ambiente/experimento',
+                              pathname: "/operacao/ambiente/experimento",
                             });
                           }}
                         />
@@ -1108,9 +1123,7 @@ export default function Listagem({
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
+                      Total registrado: {itemsTotal}
                     </strong>
 
                     <div
@@ -1157,7 +1170,7 @@ export default function Listagem({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value,
+                                                generate.value
                                               )}
                                             />
                                           </li>
@@ -1194,59 +1207,60 @@ export default function Listagem({
                     </div>
                   </div>
                 ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => handlePagination(currentPage - 10)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage <= 1}
-                    />
-                    <Button
-                      onClick={() => handlePagination(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {Array(1)
-                      .fill('')
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => handlePagination(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
-                    <Button
-                      onClick={() => handlePagination(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => handlePagination(pages - 1)}
-                      bgColor="bg-blue-600 testing"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
-                ) as any,
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => handlePagination(currentPage - 10)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage <= 1}
+                      />
+                      <Button
+                        onClick={() => handlePagination(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => handlePagination(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => handlePagination(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => handlePagination(pages - 1)}
+                        bgColor="bg-blue-600 testing"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
+                  ) as any,
               }}
             />
           </div>
@@ -1265,14 +1279,14 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { cultureId } = req.cookies;
 
   // Last page
-  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
 
-  if (lastPageServer == undefined || lastPageServer == 'No') {
-    removeCookies('filterBeforeEdit', { req, res });
-    removeCookies('pageBeforeEdit', { req, res });
-    removeCookies('filterBeforeEditTypeOrder', { req, res });
-    removeCookies('filterBeforeEditOrderBy', { req, res });
-    removeCookies('lastPage', { req, res });
+  if (lastPageServer == undefined || lastPageServer == "No") {
+    removeCookies("filterBeforeEdit", { req, res });
+    removeCookies("pageBeforeEdit", { req, res });
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("lastPage", { req, res });
   }
 
   const itensPerPage = req.cookies.takeBeforeEdit
@@ -1289,18 +1303,18 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : 'asc';
+    : "asc";
 
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : '';
+    : "";
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-  removeCookies('filterBeforeEditTypeOrder', { req, res });
-  removeCookies('takeBeforeEdit', { req, res });
-  removeCookies('filterBeforeEditOrderBy', { req, res });
-  removeCookies('lastPage', { req, res });
+  removeCookies("filterBeforeEdit", { req, res });
+  removeCookies("pageBeforeEdit", { req, res });
+  removeCookies("filterBeforeEditTypeOrder", { req, res });
+  removeCookies("takeBeforeEdit", { req, res });
+  removeCookies("filterBeforeEditOrderBy", { req, res });
+  removeCookies("lastPage", { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;
@@ -1308,14 +1322,14 @@ export const getServerSideProps: GetServerSideProps = async ({
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
   const { response: allNpe = [], total: totalItems = 0 } = await fetch(
     urlParameters.toString(),
-    requestOptions,
+    requestOptions
   ).then((response) => response.json());
 
   return {
