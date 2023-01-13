@@ -435,12 +435,12 @@ export default function Listagem({
     setLoading(true);
 
     // eslint-disable-next-line max-len
-    const { status, message } = await await experimentService.deleted({
+    const { status, message } = await experimentService.deleted({
       id: itemSelectedDelete?.id,
       userId: userLogado.id,
     });
     if (status === 200) {
-      handlePagination(currentPage);
+      await handlePagination(currentPage);
       setLoading(false);
     } else {
       Swal.fire({

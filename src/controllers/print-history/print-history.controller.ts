@@ -3,12 +3,9 @@
 /* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable max-len */
-import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import handleError from '../../shared/utils/handleError';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { PrintHistoryRepository } from '../../repository/print-history.repository';
-import { IReturnObject } from '../../interfaces/shared/Import.interface';
-import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
 
 export class PrintHistoryController {
   printHistoryRepository = new PrintHistoryRepository();
@@ -29,30 +26,22 @@ export class PrintHistoryController {
 
   async create({ idList, userId, status }: any) {
     try {
-      const transactionConfig = new TransactionConfig();
-      const printHistoryRepositoryTransaction = new PrintHistoryRepository();
-      printHistoryRepositoryTransaction.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
-      try {
-        await transactionConfig.transactionScope.run(async () => {
-          for (const row in idList) {
-            const { response }: IReturnObject = await this.getAll({ experimentGenotypeId: idList[row] });
-            if (response.total > 0) {
-              status = 'REIMPRESSO';
-            } else if (response[0]?.status === 'REIMPRESSO'
-                    || response[0]?.status === 'IMPRESSO') {
-              status = 'BAIXA';
-            }
-            const data = {
-              experimentGenotypeId: idList[row],
-              status,
-              userId,
-            };
-            await printHistoryRepositoryTransaction.createTransaction(data);
-          }
+      if (Array.isArray(idList)) {
+        idList.forEach(async (_: any, index: any) => {
+          const data = {
+            experimentGenotypeId: idList[index],
+            status,
+            userId,
+          };
+          await this.printHistoryRepository.create(data);
         });
-      } catch (error: any) {
-        handleError('Controlador de histórico de impressão', 'Create', error.message);
-        throw new Error('[Controller] - Criar erro de histórico de impressão');
+      } else {
+        const data = {
+          experimentGenotypeId: idList,
+          status,
+          userId,
+        };
+        await this.printHistoryRepository.create(data);
       }
     } catch (error: any) {
       handleError('Histórico de impressão Controller', 'Create', error.message);

@@ -777,6 +777,24 @@ export default function Listagem({
     if (colorVerify === 'bg-green-600') {
       setIsLoading(true);
 
+      const validateSeeds: any = [];
+      const parcels = rowsSelected.map((item: any) => {
+        item.type_assay.envelope?.filter((seed: any) => seed.id_safra === idSafra);
+        if (item.type_assay.envelope?.length === 0) {
+          validateSeeds.push(true);
+        } else {
+          return item;
+        }
+      });
+      if (validateSeeds.includes(true)) {
+        Swal.fire(
+          'Sementes não cadastradas no tipo de ensaio',
+        );
+        setLoading(false);
+        setIsLoading(false);
+        return;
+      }
+
       await experimentGenotipeService.update({
         idList: parcelasToPrint,
         status: 'IMPRESSO',
@@ -786,13 +804,13 @@ export default function Listagem({
       cleanState();
       // setIsOpenModal(false);
 
-      const parcelsByNCA = parcelas.filter((i: any) => i.nca == inputCode);
-      const parcels = parcelsByNCA.map((i: any) => ({
-        ...i,
-        envelope: i?.type_assay?.envelope?.filter(
-          (x: any) => x.id_safra === idSafra,
-        )[0]?.seeds,
-      }));
+      // const parcelsByNCA = parcelas.filter((i: any) => i.nca == inputCode);
+      // const parcels = parcelsByNCA.map((i: any) => ({
+      //   ...i,
+      //   envelope: i?.type_assay?.envelope?.filter(
+      //     (x: any) => x.id_safra === idSafra,
+      //   )[0]?.seeds,
+      // }));
       if (parcels) {
         localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
 
@@ -845,10 +863,12 @@ export default function Listagem({
       // if (colorVerify === "bg-green-600") {
 
       // NA CHAMADA TEM QUE SER MANDANDO O NUMERO DO NPE PARA A API DAR BAIXA
+      let writeOffIdList = parcelas.filter((item: any) => item.npe === inputCode);
+      writeOffIdList = writeOffIdList.map((item:any) => item.id);
       try {
         const response = await experimentGenotipeService.update({
-          idList: [writeOffId],
-          // npe: inputCode,
+          idList: writeOffIdList,
+          npe: inputCode,
           status: 'EM ETIQUETAGEM',
           userId: userLogado.id,
           count: 'writeOff',
@@ -956,19 +976,35 @@ export default function Listagem({
     setIsLoading(true);
     const idList = rowsSelected.map((item: any) => item.id);
 
+    const validateSeeds: any = [];
+    const parcels = rowsSelected.map((item: any) => {
+      item.type_assay.envelope?.filter((seed: any) => seed.id_safra === idSafra);
+      if (item.type_assay.envelope?.length === 0) {
+        validateSeeds.push(true);
+      } else {
+        return item;
+      }
+    });
+    if (validateSeeds.includes(true)) {
+      Swal.fire(
+        'Sementes não cadastradas no tipo de ensaio',
+      );
+      setLoading(false);
+      setIsLoading(false);
+      return;
+    }
     await experimentGenotipeService.update({
       idList,
-      status: 'IMPRESSO',
+      status: 'REIMPRESSO',
       userId: userLogado.id,
       count: 'reprint',
     });
-
-    const parcels = rowsSelected.map((i: any) => ({
-      ...i,
-      envelope: i?.type_assay?.envelope?.filter(
-        (x: any) => x.id_safra == idSafra,
-      )[0]?.seeds,
-    }));
+    // const parcels = rowsSelected.map((i: any) => ({
+    //   ...i,
+    //   envelope: i?.type_assay?.envelope?.filter(
+    //     (x: any) => x.id_safra === idSafra,
+    //   )[0]?.seeds,
+    // }));
     if (parcels?.length > 0) {
       localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
       // router.push("imprimir");

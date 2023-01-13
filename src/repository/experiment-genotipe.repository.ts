@@ -109,4 +109,17 @@ export class ExperimentGenotipeRepository extends BaseRepository {
     });
     return result;
   }
+
+  async writeOff(npe: any, status: any, counter: number) {
+    const result = await prisma.experiment_genotipe.updateMany({
+      where: {
+        npe,
+      },
+      data: {
+        status,
+        counter,
+      },
+    });
+    return result;
+  }
 }
