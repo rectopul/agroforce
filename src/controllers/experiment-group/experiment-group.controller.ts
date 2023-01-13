@@ -12,6 +12,7 @@ export class ExperimentGroupController {
   experimentController = new ExperimentController();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: experiment-group.controller.ts:15 ~ ExperimentGroupController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     try {

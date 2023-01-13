@@ -85,16 +85,16 @@ interface IData {
 }
 
 export default function Listagem({
-      allSafras,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      cultureId,
-      pageBeforeEdit,
-      filterBeforeEdit,
-      typeOrderServer, // RR
-      orderByserver, // RR
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allSafras,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  cultureId,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  typeOrderServer, // RR
+  orderByserver, // RR
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -156,8 +156,9 @@ export default function Listagem({
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
   const [fieldOrder, setFieldOrder] = useState<any>(null);
-  const pathExtra = `skip=${currentPage * Number(take)
-    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${
+    currentPage * Number(take)
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -201,8 +202,9 @@ export default function Listagem({
         return;
       }
 
-      const parametersFilter = `filterStatus=${filterStatus || 2
-        }&filterSafra=${filterSafra}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
+      const parametersFilter = `filterStatus=${
+        filterStatus || 2
+      }&filterSafra=${filterSafra}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&id_culture=${cultureId}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -213,6 +215,7 @@ export default function Listagem({
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
+    console.log('chamou');
     setLoading(true);
 
     setCookies('filterBeforeEdit', parametersFilter);
@@ -280,7 +283,7 @@ export default function Listagem({
     //   status,
     // });
 
-    handlePagination();
+    handlePagination(currentPage);
   }
 
   // async function handleOrder(
@@ -622,7 +625,8 @@ export default function Listagem({
     }
   }
 
-  async function handlePagination(): Promise<void> {
+  async function handlePagination(page: any): Promise<void> {
+    setCurrentPage(page);
     await callingApi(filter); // handle pagination globly
   }
 
@@ -635,10 +639,10 @@ export default function Listagem({
     return parameter;
   }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   return (
     <>
@@ -830,14 +834,14 @@ export default function Listagem({
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {
-                          setCookies("pageBeforeEdit", currentPage?.toString());
-                          setCookies("filterBeforeEdit", filter);
-                          setCookies("filterBeforeEditTypeOrder", typeOrder);
-                          setCookies("filterBeforeEditOrderBy", orderBy);
-                          setCookies("filtersParams", filtersParams);
-                          setCookies("takeBeforeEdit", take);
+                          setCookies('pageBeforeEdit', currentPage?.toString());
+                          setCookies('filterBeforeEdit', filter);
+                          setCookies('filterBeforeEditTypeOrder', typeOrder);
+                          setCookies('filterBeforeEditOrderBy', orderBy);
+                          setCookies('filtersParams', filtersParams);
+                          setCookies('takeBeforeEdit', take);
                           setCookies('lastPage', 'cadastro');
-                          router.push("safra/cadastro");
+                          router.push('safra/cadastro');
                         }}
                         icon={<MdDateRange size={20} />}
                       />
@@ -931,14 +935,14 @@ export default function Listagem({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(0)}
+                      onClick={() => handlePagination(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
                       disabled={currentPage <= 1}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
+                      onClick={() => handlePagination(currentPage - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<BiLeftArrow size={15} />}
@@ -949,7 +953,7 @@ export default function Listagem({
                       .map((value, index) => (
                         <Button
                           key={index}
-                          onClick={() => setCurrentPage(index)}
+                          onClick={() => handlePagination(index)}
                           value={`${currentPage + 1}`}
                           bgColor="bg-blue-600"
                           textColor="white"
@@ -957,14 +961,14 @@ export default function Listagem({
                         />
                       ))}
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
+                      onClick={() => handlePagination(currentPage + 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<BiRightArrow size={15} />}
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages - 1)}
+                      onClick={() => handlePagination(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}
