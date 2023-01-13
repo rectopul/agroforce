@@ -1,39 +1,37 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { removeCookies, setCookies } from 'cookies-next';
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import getConfig from 'next/config';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useEffect, useState, useRef } from 'react';
-import Swal from 'sweetalert2';
+import { removeCookies, setCookies } from "cookies-next";
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useEffect, useState, useRef } from "react";
+import Swal from "sweetalert2";
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from 'react-beautiful-dnd';
+} from "react-beautiful-dnd";
 
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiTwotoneStar,
-} from 'react-icons/ai';
+} from "react-icons/ai";
 
-import {
-  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
-} from 'react-icons/bi';
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
 
-import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiOrganizationChart } from 'react-icons/ri';
-import * as XLSX from 'xlsx';
-import ComponentLoading from '../../../../components/Loading';
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line, RiOrganizationChart } from "react-icons/ri";
+import * as XLSX from "xlsx";
+import ComponentLoading from "../../../../components/Loading";
 import {
   AccordionFilter,
   Button,
@@ -43,14 +41,14 @@ import {
   Select,
   FieldItemsPerPage,
   ButtonToogleConfirmation,
-} from '../../../../components';
+} from "../../../../components";
 
-import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import { typeAssayService, userPreferencesService } from '../../../../services';
-import * as ITabs from '../../../../shared/utils/dropdown';
-import { tableGlobalFunctions } from '../../../../helpers';
-import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
-import { functionsUtils } from '../../../../shared/utils/functionsUtils';
+import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
+import { typeAssayService, userPreferencesService } from "../../../../services";
+import * as ITabs from "../../../../shared/utils/dropdown";
+import { tableGlobalFunctions } from "../../../../helpers";
+import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
+import { functionsUtils } from "../../../../shared/utils/functionsUtils";
 
 interface ITypeAssayProps {
   id: number;
@@ -109,61 +107,63 @@ export default function TipoEnsaio({
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === "ENSAIO" ? (tab.statusTab = true) : (tab.statusTab = false)
+  );
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.tipo_ensaio || {
     id: 0,
-    table_preferences: 'id,name,protocol_name,envelope,safra,status',
+    table_preferences: "id,name,protocol_name,envelope,safra,status",
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+    preferences.table_preferences
   );
   const [typeAssay, setTypeAssay] = useState<ITypeAssayProps[]>(
-    () => allTypeAssay,
+    () => allTypeAssay
   );
   const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit),
+    Number(pageBeforeEdit)
   );
 
   const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
-      name: 'CamposGerenciados[]',
-      title: 'Nome',
-      value: 'name',
-      defaultChecked: () => camposGerenciados.includes('name'),
+      name: "CamposGerenciados[]",
+      title: "Nome",
+      value: "name",
+      defaultChecked: () => camposGerenciados.includes("name"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Quant de sementes por envelope',
-      value: 'envelope',
-      defaultChecked: () => camposGerenciados.includes('envelope'),
+      name: "CamposGerenciados[]",
+      title: "Quant de sementes por envelope",
+      value: "envelope",
+      defaultChecked: () => camposGerenciados.includes("envelope"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Safra',
-      value: 'safra',
-      defaultChecked: () => camposGerenciados.includes('safra'),
+      name: "CamposGerenciados[]",
+      title: "Safra",
+      value: "safra",
+      defaultChecked: () => camposGerenciados.includes("safra"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Ação',
-      value: 'status',
-      defaultChecked: () => camposGerenciados.includes('status'),
+      name: "CamposGerenciados[]",
+      title: "Ação",
+      value: "status",
+      defaultChecked: () => camposGerenciados.includes("status"),
     },
   ]);
 
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [colorStar, setColorStar] = useState<string>('');
+  const [colorStar, setColorStar] = useState<string>("");
 
   // const [orderBy, setOrderBy] = useState<string>("");
 
-  const [orderType, setOrderType] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>("");
   const router = useRouter();
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -179,22 +179,22 @@ export default function TipoEnsaio({
     }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const filters = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
+    { id: 2, name: "Todos" },
+    { id: 1, name: "Ativos" },
+    { id: 0, name: "Inativos" },
   ];
 
-  const filterStatusBeforeEdit = filterBeforeEdit.split('');
+  const filterStatusBeforeEdit = filterBeforeEdit.split("");
 
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: filterStatusBeforeEdit[13],
-      filterName: checkValue('filterName'),
-      filterProtocolName: checkValue('filterProtocolName'),
-      filterSeedsTo: checkValue('filterSeedsTo'),
-      filterSeedsFrom: checkValue('filterSeedsFrom'),
-      orderBy: '',
-      typeOrder: '',
+      filterName: checkValue("filterName"),
+      filterProtocolName: checkValue("filterProtocolName"),
+      filterSeedsTo: checkValue("filterSeedsTo"),
+      filterSeedsFrom: checkValue("filterSeedsFrom"),
+      orderBy: "",
+      typeOrder: "",
     },
     onSubmit: async ({
       filterStatus,
@@ -205,19 +205,19 @@ export default function TipoEnsaio({
     }) => {
       if (!functionsUtils?.isNumeric(filterSeedsFrom)) {
         return Swal.fire(
-          'O campo Quantidade de Sementes não pode ter ponto ou vírgula.',
+          "O campo Quantidade de Sementes não pode ter ponto ou vírgula."
         );
       }
       if (!functionsUtils?.isNumeric(filterSeedsTo)) {
         return Swal.fire(
-          'O campo Quantidade de Sementes não pode ter ponto ou vírgula.',
+          "O campo Quantidade de Sementes não pode ter ponto ou vírgula."
         );
       }
 
       const parametersFilter = `filterStatus=${filterStatus || 1
         }&filterName=${filterName}&filterProtocolName=${filterProtocolName}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&id_culture=${idCulture}&id_safra=${safraId}`;
       setFiltersParams(parametersFilter);
-      setCookies('filterBeforeEdit', filtersParams);
+      setCookies("filterBeforeEdit", filtersParams);
       setFilter(parametersFilter);
       setCurrentPage(0);
       setLoading(true);
@@ -237,12 +237,14 @@ export default function TipoEnsaio({
   // Calling common API
 
   async function callingApi(parametersFilter: any) {
-    setCookies('filterBeforeEdit', parametersFilter);
-    setCookies('filterBeforeEditTypeOrder', typeOrder);
-    setCookies('filterBeforeEditOrderBy', orderBy);
+    console.log("chamou");
+
+    setCookies("filterBeforeEdit", parametersFilter);
+    setCookies("filterBeforeEditTypeOrder", typeOrder);
+    setCookies("filterBeforeEditOrderBy", orderBy);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
-    setCookies('filtersParams', parametersFilter);
+    setCookies("filtersParams", parametersFilter);
     await typeAssayService
       .getAll(parametersFilter)
       .then((response) => {
@@ -250,7 +252,7 @@ export default function TipoEnsaio({
           setTypeAssay(response.response);
           setTotalItems(response.total);
           tableRef.current.dataManager.changePageSize(
-            response.total >= take ? take : response.total,
+            response.total >= take ? take : response.total
           );
           setLoading(false);
         }
@@ -269,7 +271,7 @@ export default function TipoEnsaio({
   async function handleOrder(
     column: string,
     order: string | any,
-    name: string | any,
+    name: string | any
   ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
@@ -327,9 +329,8 @@ export default function TipoEnsaio({
 
     // Gobal manage orders
 
-    const {
-      typeOrderG, columnG, orderByG, arrowOrder,
-    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    const { typeOrderG, columnG, orderByG, arrowOrder } =
+      await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
@@ -368,7 +369,7 @@ export default function TipoEnsaio({
     //   return copy;
     // });
 
-    handlePagination();
+    handlePagination(currentPage);
   }
 
   // function headerTableFactory(name: any, title: string) {
@@ -395,47 +396,48 @@ export default function TipoEnsaio({
     return {
       title: <div className="flex items-center">{arrowOrder}</div>,
 
-      field: 'id',
+      field: "id",
 
       width: 0,
 
       sorting: false,
 
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-9 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
+      render: () =>
+        colorStar === "#eba417" ? (
+          <div className="h-9 flex">
+            <div>
+              <button
+                type="button"
+                className="w-full h-full flex items-center justify-center border-0"
+                onClick={() => setColorStar("")}
+              >
+                <AiTwotoneStar size={20} color="#eba417" />
+              </button>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="h-9 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
+        ) : (
+          <div className="h-9 flex">
+            <div>
+              <button
+                type="button"
+                className="w-full h-full flex items-center justify-center border-0"
+                onClick={() => setColorStar("#eba417")}
+              >
+                <AiTwotoneStar size={20} />
+              </button>
+            </div>
           </div>
-        </div>
-      )),
+        ),
     };
   }
 
   function statusHeaderFactory() {
     return {
-      title: 'Ação',
-      field: 'status',
+      title: "Ação",
+      field: "status",
       sorting: false,
       searchable: false,
-      filterPlaceholder: 'Filtrar por status',
+      filterPlaceholder: "Filtrar por status",
       render: (rowData: ITypeAssayProps) => (
         <div className="flex">
           {rowData.status ? (
@@ -445,15 +447,15 @@ export default function TipoEnsaio({
                   icon={<BiEdit size={14} />}
                   title={`Atualizar ${rowData.name}`}
                   onClick={() => {
-                    setCookies('pageBeforeEdit', currentPage?.toString());
-                    setCookies('filterBeforeEdit', filter);
-                    setCookies('filterBeforeEditTypeOrder', typeOrder);
-                    setCookies('filterBeforeEditOrderBy', orderBy);
-                    setCookies('filtersParams', filtersParams);
-                    setCookies('lastPage', 'atualizar');
-                    setCookies('takeBeforeEdit', take);
+                    setCookies("pageBeforeEdit", currentPage?.toString());
+                    setCookies("filterBeforeEdit", filter);
+                    setCookies("filterBeforeEditTypeOrder", typeOrder);
+                    setCookies("filterBeforeEditOrderBy", orderBy);
+                    setCookies("filtersParams", filtersParams);
+                    setCookies("lastPage", "atualizar");
+                    setCookies("takeBeforeEdit", take);
                     router.push(
-                      `/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`,
+                      `/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`
                     );
                   }}
                   bgColor="bg-blue-600"
@@ -492,7 +494,7 @@ export default function TipoEnsaio({
   }
 
   function colums(columnsOrder: any): any {
-    const columnOrder: any = columnsOrder.split(',');
+    const columnOrder: any = columnsOrder.split(",");
 
     const tableFields: any = [];
 
@@ -501,40 +503,40 @@ export default function TipoEnsaio({
       //   tableFields.push(idHeaderFactory());
       // }
 
-      if (columnOrder[item] === 'name') {
+      if (columnOrder[item] === "name") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Nome',
-            title: 'name',
+            name: "Nome",
+            title: "name",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnOrder[item] === 'envelope') {
+      if (columnOrder[item] === "envelope") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Quant de sementes por envelope',
-            title: 'envelope.seeds',
+            name: "Quant de sementes por envelope",
+            title: "envelope.seeds",
             orderList,
             fieldOrder,
             handleOrder: returnFalse,
-          }),
+          })
         );
       }
-      if (columnOrder[item] === 'safra') {
+      if (columnOrder[item] === "safra") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Safra',
-            title: 'envelope.safra.safraName',
+            name: "Safra",
+            title: "envelope.safra.safraName",
             orderList,
             fieldOrder,
             handleOrder: returnFalse,
-          }),
+          })
         );
       }
-      if (columnOrder[item] === 'status') {
+      if (columnOrder[item] === "status") {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -547,7 +549,7 @@ export default function TipoEnsaio({
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
 
-    let selecionados = '';
+    let selecionados = "";
 
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
@@ -582,7 +584,7 @@ export default function TipoEnsaio({
           preferences.id = response.response.id;
         });
 
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
       userLogado.preferences.tipo_ensaio = {
         id: preferences.id,
@@ -598,7 +600,7 @@ export default function TipoEnsaio({
         id: preferences.id,
       });
 
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -624,61 +626,59 @@ export default function TipoEnsaio({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    await typeAssayService
-      .getAll(filter)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          const newData = response.map((row: any) => {
-            const newRow = row;
+    await typeAssayService.getAll(filter).then(({ status, response }) => {
+      if (status === 200) {
+        const newData = response.map((row: any) => {
+          const newRow = row;
 
-            newRow.envelope = row.envelope.seeds;
-            newRow.status = row.status === 0 ? 'Inativo' : 'Ativo';
-            newRow.CULTURA = newRow.culture.name;
-            newRow.NOME = newRow.name;
-            newRow.NOME_PROTOCOLO = newRow.protocol_name;
-            newRow.QUANT_SEMENTES = newRow.envelope;
-            newRow.SAFRA = newRow.envelope ? newRow.envelope[0]?.safra.safraName : '';
-            newRow.STATUS = newRow.status;
+          newRow.envelope = row.envelope.seeds;
+          newRow.status = row.status === 0 ? "Inativo" : "Ativo";
+          newRow.CULTURA = newRow.culture.name;
+          newRow.NOME = newRow.name;
+          newRow.NOME_PROTOCOLO = newRow.protocol_name;
+          newRow.QUANT_SEMENTES = newRow.envelope;
+          newRow.SAFRA = newRow.envelope
+            ? newRow.envelope[0]?.safra.safraName
+            : "";
+          newRow.STATUS = newRow.status;
 
-            delete newRow.name;
-            delete newRow.culture;
-            delete newRow.protocol_name;
-            delete newRow.envelope;
-            delete newRow.status;
-            delete newRow.id;
-            return newRow;
-          });
+          delete newRow.name;
+          delete newRow.culture;
+          delete newRow.protocol_name;
+          delete newRow.envelope;
+          delete newRow.status;
+          delete newRow.id;
+          return newRow;
+        });
 
-          const workSheet = XLSX.utils.json_to_sheet(newData);
-          const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Tipo_Ensaio');
+        const workSheet = XLSX.utils.json_to_sheet(newData);
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, "Tipo_Ensaio");
 
-          // Buffer
-          XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
+        // Buffer
+        XLSX.write(workBook, {
+          bookType: "xlsx", // xlsx
 
-            type: 'buffer',
-          });
+          type: "buffer",
+        });
 
-          // Binary
-          XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
+        // Binary
+        XLSX.write(workBook, {
+          bookType: "xlsx", // xlsx
 
-            type: 'binary',
-          });
+          type: "binary",
+        });
 
-          // Download
+        // Download
 
-          XLSX.writeFile(workBook, 'Tipo_Ensaio.xlsx');
+        XLSX.writeFile(workBook, "Tipo_Ensaio.xlsx");
 
-          setLoading(false);
-        } else {
-          setLoading(false);
-          Swal.fire(
-            'Não existem registros para serem exportados, favor checar.',
-          );
-        }
-      });
+        setLoading(false);
+      } else {
+        setLoading(false);
+        Swal.fire("Não existem registros para serem exportados, favor checar.");
+      }
+    });
   };
 
   // manage total pages
@@ -689,41 +689,25 @@ export default function TipoEnsaio({
     }
   }
 
-  async function handlePagination(): Promise<void> {
+  async function handlePagination(page: any): Promise<void> {
+    setCurrentPage(page);
     // const skip = currentPage * Number(take);
-
     // let parametersFilter;
-
     // if (orderType) {
-
     //   parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-
     // } else {
-
     //   parametersFilter = `skip=${skip}&take=${take}`;
-
     // }
-
     // if (filter) {
-
     //   parametersFilter = `${parametersFilter}&${filter}`;
-
     // }
-
     // await typeAssayService
-
     //   .getAll(parametersFilter)
-
     //   .then(({ status, response }) => {
-
     //     if (status === 200) {
-
     //       setTypeAssay(response);
-
     //     }
-
     //   });
-
     await callingApi(filter); // handle pagination globly
   }
 
@@ -732,16 +716,16 @@ export default function TipoEnsaio({
   function checkValue(value: any) {
     const parameter = tableGlobalFunctions.getValuesForFilter(
       value,
-      filtersParams,
+      filtersParams
     );
 
     return parameter;
   }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   return (
     <>
@@ -784,7 +768,7 @@ export default function TipoEnsaio({
                       placeholder="Nome"
                       id="filterName"
                       name="filterName"
-                      defaultValue={checkValue('filterName')}
+                      defaultValue={checkValue("filterName")}
                       onChange={formik.handleChange}
                     />
                   </div>
@@ -841,7 +825,7 @@ export default function TipoEnsaio({
           <div className="w-full h-full overflow-y-scroll">
             <MaterialTable
               tableRef={tableRef}
-              style={{ background: '#f9fafb' }}
+              style={{ background: "#f9fafb" }}
               columns={columns}
               data={typeAssay}
               options={{
@@ -849,7 +833,7 @@ export default function TipoEnsaio({
                 headerStyle: {
                   zIndex: 0,
                 },
-                rowStyle: { background: '#f9fafb', height: 35 },
+                rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: Number(take),
@@ -870,7 +854,7 @@ export default function TipoEnsaio({
                           setCookies("filterBeforeEditOrderBy", orderBy);
                           setCookies("filtersParams", filtersParams);
                           setCookies("takeBeforeEdit", take);
-                          setCookies('lastPage', 'cadastro');
+                          setCookies("lastPage", "cadastro");
                           router.push("tipo-ensaio/cadastro ");
                         }}
                         // href="/config/ensaio/tipo-ensaio/cadastro"
@@ -879,9 +863,7 @@ export default function TipoEnsaio({
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
+                      Total registrado: {itemsTotal}
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
@@ -926,7 +908,7 @@ export default function TipoEnsaio({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value,
+                                                generate.value
                                               )}
                                             />
                                           </li>
@@ -958,9 +940,10 @@ export default function TipoEnsaio({
                   </div>
                 ),
 
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
 
                       h-20
 
@@ -973,55 +956,55 @@ export default function TipoEnsaio({
                       bg-gray-50
 
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => setCurrentPage(0)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
-                    />
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => handlePagination(0)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage < 1}
+                      />
 
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
+                      <Button
+                        onClick={() => handlePagination(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
 
-                    {Array(1)
-                      .fill('')
+                      {Array(1)
+                        .fill("")
 
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => handlePagination(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
 
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
+                      <Button
+                        onClick={() => handlePagination(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
 
-                    <Button
-                      onClick={() => setCurrentPage(pages - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
-                ) as any,
+                      <Button
+                        onClick={() => handlePagination(pages - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
+                  ) as any,
               }}
             />
           </div>
@@ -1044,15 +1027,15 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   // Last page
 
-  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
 
-  if (lastPageServer == undefined || lastPageServer == 'No') {
-    removeCookies('filterBeforeEdit', { req, res });
-    removeCookies('pageBeforeEdit', { req, res });
-    removeCookies('filterBeforeEditTypeOrder', { req, res });
-    removeCookies('filterBeforeEditOrderBy', { req, res });
-    removeCookies('lastPage', { req, res });
-    removeCookies('itensPage', { req, res });
+  if (lastPageServer == undefined || lastPageServer == "No") {
+    removeCookies("filterBeforeEdit", { req, res });
+    removeCookies("pageBeforeEdit", { req, res });
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("lastPage", { req, res });
+    removeCookies("itensPage", { req, res });
   }
 
   const itensPerPage = req.cookies.takeBeforeEdit
@@ -1066,36 +1049,36 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : 'desc';
+    : "desc";
   // RR
 
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : 'name';
+    : "name";
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/type-assay`;
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}`
     : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-  removeCookies('takeBeforeEdit', { req, res });
-  removeCookies('filterBeforeEditTypeOrder', { req, res });
-  removeCookies('filterBeforeEditOrderBy', { req, res });
-  removeCookies('lastPage', { req, res });
+  removeCookies("filterBeforeEdit", { req, res });
+  removeCookies("pageBeforeEdit", { req, res });
+  removeCookies("takeBeforeEdit", { req, res });
+  removeCookies("filterBeforeEditTypeOrder", { req, res });
+  removeCookies("filterBeforeEditOrderBy", { req, res });
+  removeCookies("lastPage", { req, res });
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
   const { response: allTypeAssay = [], total: totalItems = 0 } = await fetch(
     urlParameters.toString(),
-    requestOptions,
+    requestOptions
   ).then((response) => response.json());
 
   return {

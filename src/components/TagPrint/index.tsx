@@ -26,7 +26,18 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
   const random = (max = 30, min = 10) => Math.floor(Math.random() * max) + min;
 
   function generateEAN8(npe: any) {
-    let ean8 = `${npe}${functionsUtils?.generateDigitEAN8(npe)}`;
+    let ean8 = "";
+    let npe7Digits = String(npe);
+    let countNPE = String(npe)?.length;
+
+    if (countNPE < 7) {
+      while (countNPE < 7) {
+        npe7Digits = "0" + npe7Digits;
+        countNPE++;
+      }
+    }
+
+    ean8 = `${npe7Digits}${functionsUtils?.generateDigitEAN8(npe7Digits)}`;
     return ean8;
   }
 
@@ -36,9 +47,23 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
         <div className="flexRow" style={{ fontSize: 16 }}>
           <div className="flex1">{item?.npe}</div>
           <div className="flex1">
-            {/* {item?.nca && <BarCode valor={generateEAN8(item?.npe)} />} */}
-            {item?.nca && <BarCode valor={item?.npe} />}
+            {item?.npe && <BarCode valor={generateEAN8(item?.npe)} />}
           </div>
+          {/* INICIO CONTAGEM IMPRESSAO ETIQUETAS */}
+          <div>
+            <div
+              style={{
+                fontSize: 7,
+                borderWidth: 1,
+                borderRadius: 2,
+                padding: 1,
+                marginBottom: -2,
+              }}
+            >
+              1
+            </div>
+          </div>
+          {/* FIM CONTAGEM IMPRESSAO ETIQUETAS */}
         </div>
         <div className="flexRow" style={{ fontSize: 9 }}>
           <div className="flex1">{item?.genotipo?.name_genotipo}</div>

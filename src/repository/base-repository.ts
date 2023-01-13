@@ -25,7 +25,6 @@ export class BaseRepository {
   }
 
   async createTransaction(data: object | any) {
-    console.log('🚀 ~ file: base-repository.ts:28 ~ BaseRepository ~ createTransaction ~ data', data);
     if (this.clientManager && this.transactionScope) {
       return await this.transactionScope.run(async () => this.create(data));
     }

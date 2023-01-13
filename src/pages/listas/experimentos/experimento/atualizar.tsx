@@ -7,7 +7,9 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect, useState, useRef } from 'react';
+import {
+  useEffect, useState, useRef, useMemo,
+} from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -83,16 +85,16 @@ interface IUpdateExperimento {
 }
 
 export default function AtualizarLocal({
-              experimento,
-              allItens,
-              totalItems,
-              itensPerPage,
-              filterApplication,
-              idExperiment,
-              pageBeforeEdit,
-              typeOrderServer, // RR
-              orderByserver, // RR
-            }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      experimento,
+      allItens,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idExperiment,
+      pageBeforeEdit,
+      typeOrderServer, // RR
+      orderByserver, // RR
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -207,6 +209,8 @@ export default function AtualizarLocal({
 
   // Calling common API
   async function getTreatments(parametersFilter: any) {
+    console.log('chamou');
+
     // setCookies('filterBeforeEdit', parametersFilter);
     // setCookies('filterBeforeEditTypeOrder', typeOrder);
     // setCookies('orderList', orderList);
@@ -234,9 +238,13 @@ export default function AtualizarLocal({
   }, [idExperiment]);
 
   // Call that function when change type order value.
-  useEffect(() => {
-    getTreatments(filter);
-  }, [typeOrder]);
+  // useEffect(() => {
+  //   getTreatments(filter);
+  // }, [typeOrder]);
+
+  useMemo(() => {
+    handlePagination(currentPage);
+  }, [take]);
 
   // async function getTreatments() {
   //   await experimentGenotipeService
@@ -299,6 +307,8 @@ export default function AtualizarLocal({
 
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
+    getTreatments(filter);
+
     setOrderBy(columnG);
     typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setArrowOrder(arrowOrder);
@@ -641,14 +651,15 @@ export default function AtualizarLocal({
     }
   }
 
-  async function handlePagination(): Promise<void> {
+  async function handlePagination(page: any): Promise<void> {
+    setCurrentPage(page);
     await getTreatments(filter); // handle pagination globly
   }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage, take]);
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage, take]);
 
   function fieldsFactory(name: string, title: string, values: any) {
     return (
@@ -1048,14 +1059,14 @@ export default function AtualizarLocal({
                     {...props}
                   >
                     <Button
-                      onClick={() => setCurrentPage(0)}
+                      onClick={() => handlePagination(0)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdFirstPage size={18} />}
                       disabled={currentPage < 1}
                     />
                     <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
+                      onClick={() => handlePagination(currentPage - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<BiLeftArrow size={15} />}
@@ -1066,7 +1077,7 @@ export default function AtualizarLocal({
                       .map((value, index) => (
                         <Button
                           key={index}
-                          onClick={() => setCurrentPage(index)}
+                          onClick={() => handlePagination(index)}
                           value={`${currentPage + 1}`}
                           bgColor="bg-blue-600"
                           textColor="white"
@@ -1074,14 +1085,14 @@ export default function AtualizarLocal({
                         />
                       ))}
                     <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
+                      onClick={() => handlePagination(currentPage + 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<BiRightArrow size={15} />}
                       disabled={currentPage + 1 >= pages}
                     />
                     <Button
-                      onClick={() => setCurrentPage(pages - 1)}
+                      onClick={() => handlePagination(pages - 1)}
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<MdLastPage size={18} />}

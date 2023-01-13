@@ -145,7 +145,7 @@ export default function Import({
               disabledButton,
             });
             setImportLoading(false);
-            handlePagination();
+            handlePagination(currentPage);
             Swal.fire({
               html: message,
               width: '800',
@@ -162,7 +162,7 @@ export default function Import({
               disabledButton,
             });
             setImportLoading(false);
-            handlePagination();
+            handlePagination(currentPage);
             Swal.fire({
               html: message,
               width: '800',
@@ -261,6 +261,8 @@ export default function Import({
   });
 
   async function getAllLogs(parametersFilter: any) {
+    console.log('chamou');
+
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     await logImportService
       .getAll(parametersFilter)
@@ -615,7 +617,8 @@ export default function Import({
     }
   }
 
-  async function handlePagination(): Promise<void> {
+  async function handlePagination(page: any): Promise<void> {
+    setCurrentPage(page);
     await getAllLogs(filter);
   }
 
@@ -702,10 +705,7 @@ export default function Import({
   }
 
   function ComponentImport({
-    title,
-    table,
-    moduleId,
-    disabled = false,
+    title, table, moduleId, disabled = false,
   }: any) {
     return (
       <div className="m-4 grid grid-cols-3 gap-4 h-20 items-center">
@@ -739,10 +739,10 @@ export default function Import({
     );
   }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   return (
     <>
@@ -1116,14 +1116,14 @@ export default function Import({
                       {...props}
                     >
                       <Button
-                        onClick={() => setCurrentPage(0)}
+                        onClick={() => handlePagination(0)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdFirstPage size={18} />}
                         disabled={currentPage < 1}
                       />
                       <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
+                        onClick={() => handlePagination(currentPage - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiLeftArrow size={15} />}
@@ -1134,7 +1134,7 @@ export default function Import({
                         .map((value, index) => (
                           <Button
                             key={index}
-                            onClick={() => setCurrentPage(index)}
+                            onClick={() => handlePagination(index)}
                             value={`${currentPage + 1}`}
                             bgColor="bg-blue-600"
                             textColor="white"
@@ -1142,14 +1142,14 @@ export default function Import({
                           />
                         ))}
                       <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
+                        onClick={() => handlePagination(currentPage + 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiRightArrow size={15} />}
                         disabled={currentPage + 1 >= pages}
                       />
                       <Button
-                        onClick={() => setCurrentPage(pages)}
+                        onClick={() => handlePagination(pages)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdLastPage size={18} />}

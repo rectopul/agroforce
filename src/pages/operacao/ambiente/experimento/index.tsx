@@ -117,12 +117,12 @@ interface IData {
 }
 
 export default function Listagem({
-      itensPerPage,
-      filterApplication,
-      idSafra,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  itensPerPage,
+  filterApplication,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs;
 
   const tableRef = useRef<any>(null);
@@ -380,7 +380,6 @@ export default function Listagem({
     };
   }
 
-
   function columnsOrder(columnsCampos: any): any {
     const columnCampos: any = columnsCampos.split(',');
     const tableFields: any = [];
@@ -617,17 +616,19 @@ export default function Listagem({
     }
   }
 
-  async function handlePagination(): Promise<void> {
+  async function handlePagination(page: any): Promise<void> {
+    setCurrentPage(page);
+
     if (NPESelectedRow) {
       const skip = currentPage * Number(take);
       setExperimentoNew(experimentos.slice(skip, skip + take));
     }
   }
 
-  useLayoutEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+  // useLayoutEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   function filterFieldFactory(title: any, name: any) {
     return (
@@ -667,7 +668,6 @@ export default function Listagem({
   };
 
   async function getExperiments(): Promise<void> {
-
     selectedNPE.map(async (env: any) => {
       let tempFilter = `idSafra=${env?.safraId}&idLocal=${env?.localId}&Foco=${env?.foco.id}&Epoca=${env?.epoca}&Tecnologia=${env?.tecnologia.cod_tec}&TypeAssay=${env?.type_assay.id}&Status=IMPORTADO&excel=true`;
       if (filter) {
@@ -676,7 +676,6 @@ export default function Listagem({
       let count1 = 0;
 
       await experimentService.getAll(tempFilter).then(({ status, response, total }) => {
-
         let i = 0;
 
         response.length > 0
@@ -757,13 +756,11 @@ export default function Listagem({
     }
   }, [allNPERecords, NPESelectedRow]);
 
-
   async function createExperimentGenotipe({
     data,
     total_consumed,
     genotipo_treatment,
   }: any) {
-
     if (data.length > 0) {
       const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
       const experimentObj: any[] = [];
@@ -814,7 +811,6 @@ export default function Listagem({
           }
         });
       setLoading(false);
-
     } else {
       Swal.fire('Nenhum experimento para sortear.');
     }
@@ -917,7 +913,6 @@ export default function Listagem({
       }).then((result) => {
         if (result.isConfirmed) {
           window.open('/config/ambiente', '_ blank');
-
         }
       });
     }
@@ -973,7 +968,7 @@ export default function Listagem({
         >
           <div
             className={`w-full ${selectedNPE?.length > 3 && 'max-h-40 overflow-y-scroll'
-              } mb-4`}
+            } mb-4`}
           >
             <MaterialTable
               style={{
@@ -1171,14 +1166,14 @@ export default function Listagem({
                       {...props}
                     >
                       <Button
-                        onClick={() => setCurrentPage(currentPage - 10)}
+                        onClick={() => handlePagination(currentPage - 10)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdFirstPage size={18} />}
                         disabled={currentPage <= 1}
                       />
                       <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
+                        onClick={() => handlePagination(currentPage - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiLeftArrow size={15} />}
@@ -1189,28 +1184,28 @@ export default function Listagem({
                         .map((value, index) => (
                           <Button
                             key={index}
-                            onClick={() => setCurrentPage(index)}
+                            onClick={() => handlePagination(index)}
                             value={`${currentPage + 1}`}
                             bgColor="bg-blue-600"
                             textColor="white"
                           />
                         ))}
                       <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
+                        onClick={() => handlePagination(currentPage + 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiRightArrow size={15} />}
                         disabled={currentPage + 1 >= pages}
                       />
                       <Button
-                        onClick={() => setCurrentPage(currentPage + 10)}
+                        onClick={() => handlePagination(currentPage + 10)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdLastPage size={18} />}
                         disabled={currentPage + 1 >= pages}
                       />
                     </div>
-                  ) as any,
+                    ) as any,
                 }}
               />
             </div>

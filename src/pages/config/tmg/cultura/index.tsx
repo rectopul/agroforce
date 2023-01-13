@@ -87,7 +87,6 @@ export default function Listagem({
       filterBeforeEdit,
       typeOrderServer, // RR
       orderByserver, // RR
-      // filterParams,
     }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
@@ -162,6 +161,9 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
   const pathExtra = `skip=${currentPage * Number(take)
     }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
@@ -186,6 +188,8 @@ export default function Listagem({
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
+    console.log("chamou");
+
     setCookies("filterBeforeEdit", parametersFilter);
     setCookies("filterBeforeEditTypeOrder", typeOrder);
     setCookies("filterBeforeEditOrderBy", orderBy);
@@ -218,7 +222,7 @@ export default function Listagem({
   // Call that function when change type order value.
   useEffect(() => {
     callingApi(filter);
-  }, [typeOrder]);
+  }, [typeOrder, filter]);
 
   async function handleStatusCulture(data: any): Promise<void> {
     // if (data.status === 0) {
@@ -247,7 +251,7 @@ export default function Listagem({
       created_by: Number(userLogado.id),
     });
 
-    handlePagination();
+    handlePagination(currentPage);
   }
 
   async function handleOrder(
@@ -302,10 +306,6 @@ export default function Listagem({
   //   setFilter('filterStatus=1')
   //   // removeCookies("filterBeforeEdit");
   // });
-
-  useEffect(() => {
-    callingApi(filter);
-  }, [filter]);
 
   // function headerTableFactory(name: any, title: string) {
   //   return {
@@ -563,7 +563,8 @@ export default function Listagem({
     // }
   }
 
-  async function handlePagination(): Promise<void> {
+  async function handlePagination(page: any): Promise<void> {
+    setCurrentPage(page);
     // // manage using comman function
     // const { parametersFilter, currentPages } = await tableGlobalFunctions.handlePaginationGlobal(currentPage, take, filtersParams);
 
@@ -588,10 +589,10 @@ export default function Listagem({
     return parameter;
   }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   return (
     <>
@@ -717,7 +718,7 @@ export default function Listagem({
                           setCookies("filterBeforeEditOrderBy", orderBy);
                           setCookies("filtersParams", filtersParams);
                           setCookies("takeBeforeEdit", take);
-                          setCookies('lastPage', 'cadastro');
+                          setCookies("lastPage", "cadastro");
                           router.push("cultura/cadastro");
                         }}
                         // href="cultura/cadastro"
@@ -812,14 +813,14 @@ export default function Listagem({
                       {...props}
                     >
                       <Button
-                        onClick={() => setCurrentPage(0)}
+                        onClick={() => handlePagination(0)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdFirstPage size={18} />}
                         disabled={currentPage <= 1}
                       />
                       <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
+                        onClick={() => handlePagination(currentPage - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiLeftArrow size={15} />}
@@ -830,7 +831,7 @@ export default function Listagem({
                         .map((value, index) => (
                           <Button
                             key={index}
-                            onClick={() => setCurrentPage(index)}
+                            onClick={() => handlePagination(index)}
                             value={`${currentPage + 1}`}
                             bgColor="bg-blue-600"
                             textColor="white"
@@ -838,14 +839,14 @@ export default function Listagem({
                           />
                         ))}
                       <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
+                        onClick={() => handlePagination(currentPage + 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiRightArrow size={15} />}
                         disabled={currentPage + 1 >= pages}
                       />
                       <Button
-                        onClick={() => setCurrentPage(pages - 1)}
+                        onClick={() => handlePagination(pages - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdLastPage size={18} />}
