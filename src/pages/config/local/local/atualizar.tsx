@@ -1,6 +1,6 @@
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -49,6 +49,8 @@ export interface IData {
   id_safra: number;
   local: object | any;
   pageBeforeEdit: string | any;
+  typeOrderServer: any | string; // RR
+  orderByserver: any | string; // RR
 }
 
 interface IGenerateProps {
@@ -70,14 +72,16 @@ interface IUpdateLocal {
 }
 
 export default function AtualizarLocal({
-  local,
-  allCultureUnity,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  id_local,
-  pageBeforeEdit,
-}: IData) {
+      local,
+      allCultureUnity,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      id_local,
+      pageBeforeEdit,
+      typeOrderServer, // RR
+      orderByserver, // RR
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('config');
@@ -102,7 +106,7 @@ export default function AtualizarLocal({
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -116,9 +120,9 @@ export default function AtualizarLocal({
     },
     { name: 'CamposGerenciados[]', title: 'Ano', value: 'year' },
   ]);
-  const [orderBy, setOrderBy] = useState<string>('');
+  const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [orderType, setOrderType] = useState<string>('');
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -293,7 +297,7 @@ export default function AtualizarLocal({
       setLoading(false);
     }, 100);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
   }
 
   async function getValuesColumns(): Promise<void> {
@@ -761,7 +765,7 @@ export default function AtualizarLocal({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

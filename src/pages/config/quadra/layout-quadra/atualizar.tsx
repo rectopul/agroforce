@@ -1,5 +1,5 @@
 import { useFormik } from 'formik';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -65,13 +65,13 @@ interface IData {
 }
 
 export default function Atualizarquadra({
-  layoutChildren,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  id_layout,
-  layout,
-}: IData) {
+          layoutChildren,
+          totalItems,
+          itensPerPage,
+          filterApplication,
+          id_layout,
+          layout,
+        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -133,7 +133,7 @@ export default function Atualizarquadra({
   const [disparos, setDisparos] = useState<any[]>(() => layoutChildren);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -158,7 +158,7 @@ export default function Atualizarquadra({
   const [colorStar, setColorStar] = useState<string>('');
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -393,7 +393,7 @@ export default function Atualizarquadra({
       }
     }
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
   }
 
   async function getValuesColumns(): Promise<void> {
@@ -569,7 +569,7 @@ export default function Atualizarquadra({
 
   return (
     <>
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Atualizar layout quadra</title>
       </Head>
@@ -771,7 +771,7 @@ export default function Atualizarquadra({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

@@ -85,16 +85,16 @@ interface Idata {
 }
 
 export default function Listagem({
-  delineamentos,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  cultureId,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer, // RR
-  orderByserver, // RR
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+              delineamentos,
+              itensPerPage,
+              filterApplication,
+              totalItems,
+              cultureId,
+              pageBeforeEdit,
+              filterBeforeEdit,
+              typeOrderServer, // RR
+              orderByserver, // RR
+            }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState<boolean>(false);
   const { TabsDropDowns } = ITabs.default;
 
@@ -125,7 +125,7 @@ export default function Listagem({
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
 
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
@@ -177,11 +177,10 @@ export default function Listagem({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const columns = colums(camposGerenciados);
   const filters = [
@@ -232,9 +231,8 @@ export default function Listagem({
         );
       }
 
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}&filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterTratRepetitionTo=${filterTratRepetitionTo}&filterTratRepetitionFrom=${filterTratRepetitionFrom}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterName=${filterName}&filterRepeat=${filterRepeat}&filterTreatment=${filterTreatment}&id_culture=${cultureId}&filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterTratRepetitionTo=${filterTratRepetitionTo}&filterTratRepetitionFrom=${filterTratRepetitionFrom}`;
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEdit', filtersParams);
       // await delineamentoService
@@ -465,10 +463,10 @@ export default function Listagem({
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -520,9 +518,8 @@ export default function Listagem({
   }
 
   async function handleStatus(data: IDelineamentoProps): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&id_culture=${cultureId}&name=${
-      data?.name
-    }`;
+    const parametersFilter = `filterStatus=${1}&id_culture=${cultureId}&name=${data?.name
+      }`;
 
     await delineamentoService.getAll(parametersFilter).then((response) => {
       // if (response.total > 0) {
@@ -801,7 +798,7 @@ export default function Listagem({
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

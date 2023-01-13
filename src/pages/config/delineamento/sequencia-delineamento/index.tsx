@@ -6,7 +6,7 @@ import {
 } from 'react';
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
@@ -96,15 +96,15 @@ interface IData {
 }
 
 export default function Listagem({
-  allItems,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idDelineamento,
-  typeOrderServer,
-  orderByserver,
-  filterBeforeEdit,
-}: IData) {
+      allItems,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idDelineamento,
+      typeOrderServer,
+      orderByserver,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tableRef = useRef<any>(null);
@@ -132,7 +132,7 @@ export default function Listagem({
   >(() => allItems);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
@@ -164,11 +164,10 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
   const filterStatusBeforeEdit = filterBeforeEdit.split('');
 
@@ -349,10 +348,10 @@ export default function Listagem({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -841,7 +840,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -1026,7 +1025,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

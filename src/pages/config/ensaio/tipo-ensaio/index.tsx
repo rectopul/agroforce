@@ -89,17 +89,17 @@ interface IData {
 }
 
 export default function TipoEnsaio({
-  allTypeAssay,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  idCulture,
-  safraId,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer, // RR
-  orderByserver, // RR
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allTypeAssay,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      idCulture,
+      safraId,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      typeOrderServer, // RR
+      orderByserver, // RR
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState<boolean>(false);
   const { TabsDropDowns } = ITabs.default;
 
@@ -126,7 +126,7 @@ export default function TipoEnsaio({
     Number(pageBeforeEdit)
   );
 
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -170,14 +170,13 @@ export default function TipoEnsaio({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [selectedModal, setSelectedModal] = useState<any>(null);
 
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const filters = [
     { id: 2, name: "Todos" },
@@ -215,9 +214,8 @@ export default function TipoEnsaio({
         );
       }
 
-      const parametersFilter = `filterStatus=${
-        filterStatus || 1
-      }&filterName=${filterName}&filterProtocolName=${filterProtocolName}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&id_culture=${idCulture}&id_safra=${safraId}`;
+      const parametersFilter = `filterStatus=${filterStatus || 1
+        }&filterName=${filterName}&filterProtocolName=${filterProtocolName}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&id_culture=${idCulture}&id_safra=${safraId}`;
       setFiltersParams(parametersFilter);
       setCookies("filterBeforeEdit", filtersParams);
       setFilter(parametersFilter);
@@ -334,10 +332,10 @@ export default function TipoEnsaio({
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -471,7 +469,7 @@ export default function TipoEnsaio({
                 <Button
                   title={`Atualizar ${rowData.name}`}
                   icon={<BiEdit size={14} />}
-                  onClick={() => {}}
+                  onClick={() => { }}
                   bgColor="bg-blue-600"
                   textColor="white"
                   href={`/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`}
@@ -787,6 +785,7 @@ export default function TipoEnsaio({
                           placeholder="De"
                           id="filterSeedsFrom"
                           name="filterSeedsFrom"
+                          defaultValue={checkValue('filterSeedsFrom')}
                           onChange={formik.handleChange}
                         />
                       </div>
@@ -797,6 +796,7 @@ export default function TipoEnsaio({
                           placeholder="Até"
                           id="filterSeedsTo"
                           name="filterSeedsTo"
+                          defaultValue={checkValue('filterSeedsTo')}
                           onChange={formik.handleChange}
                         />
                       </div>
@@ -808,7 +808,7 @@ export default function TipoEnsaio({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

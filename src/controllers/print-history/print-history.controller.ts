@@ -3,12 +3,9 @@
 /* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable max-len */
-import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import handleError from '../../shared/utils/handleError';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { PrintHistoryRepository } from '../../repository/print-history.repository';
-import { IReturnObject } from '../../interfaces/shared/Import.interface';
-import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
 
 export class PrintHistoryController {
   printHistoryRepository = new PrintHistoryRepository();
@@ -29,30 +26,22 @@ export class PrintHistoryController {
 
   async create({ idList, userId, status }: any) {
     try {
-      const transactionConfig = new TransactionConfig();
-      const printHistoryRepositoryTransaction = new PrintHistoryRepository();
-      printHistoryRepositoryTransaction.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
-      try {
-        await transactionConfig.transactionScope.run(async () => {
-          for (const row in idList) {
-            const { response }: IReturnObject = await this.getAll({ experimentGenotypeId: idList[row] });
-            if (response.total > 0) {
-              status = 'REIMPRESSO';
-            } else if (response[0]?.status === 'REIMPRESSO'
-                    || response[0]?.status === 'IMPRESSO') {
-              status = 'BAIXA';
-            }
-            const data = {
-              experimentGenotypeId: idList[row],
-              status,
-              userId,
-            };
-            await printHistoryRepositoryTransaction.createTransaction(data);
-          }
+      if (Array.isArray(idList)) {
+        idList.forEach(async (_: any, index: any) => {
+          const data = {
+            experimentGenotypeId: idList[index],
+            status,
+            userId,
+          };
+          await this.printHistoryRepository.create(data);
         });
-      } catch (error: any) {
-        handleError('Controlador de histórico de impressão', 'Create', error.message);
-        throw new Error('[Controller] - Criar erro de histórico de impressão');
+      } else {
+        const data = {
+          experimentGenotypeId: idList,
+          status,
+          userId,
+        };
+        await this.printHistoryRepository.create(data);
       }
     } catch (error: any) {
       handleError('Histórico de impressão Controller', 'Create', error.message);
@@ -80,6 +69,7 @@ export class PrintHistoryController {
   async getAll(options: any) {
     const parameters: object | any = {};
     parameters.AND = [];
+    parameters.OR = [];
     let orderBy: object | any = '';
     try {
       const select = {
@@ -93,22 +83,25 @@ export class PrintHistoryController {
         experiment_genotipe: true,
       };
 
+      if (options.filterOperation) {
+        const statusParams = options.filterOperation?.split(',');
+        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
+        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
+        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[2]}" } }`));
+      }
+
       if (options.filterMadeBy) {
         parameters.user = JSON.parse(`{ "name": { "contains":"${options.filterMadeBy}" } }`);
       }
 
-      if (options.filterOperation) {
-        parameters.status = JSON.parse(`{ "contains":"${options.filterOperation}" }`);
-      }
-
-      if (options.filterStartDate) {
-        const newStartDate = new Date(options.filterStartDate);
-        parameters.AND.push({ createdAt: { gte: newStartDate } });
-      }
-
-      if (options.filterEndDate) {
-        const newEndDate = new Date(options.filterEndDate);
-        parameters.AND.push({ createdAt: { lte: newEndDate } });
+      if (options.filterStartDate || options.filterEndDate) {
+        if (options.filterStartDate && options.filterEndDate) {
+          parameters.AND.push({ createdAt: { gte: new Date(`${options.filterStartDate}T00:00:00.000z`), lte: new Date(`${options.filterEndDate}T23:59:59.999z`) } });
+        } else if (options.filterStartDate) {
+          parameters.AND.push({ createdAt: { gte: new Date(`${options.filterStartDate}T00:00:00.000z`) } });
+        } else if (options.filterEndDate) {
+          parameters.AND.push({ createdAt: { lte: new Date(`${options.filterEndDate}T23:59:59.999z`) } });
+        }
       }
 
       if (options.id) {
@@ -134,6 +127,14 @@ export class PrintHistoryController {
       if (options.orderBy) {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+      }
+
+      if (parameters.OR.length === 0) {
+        delete parameters.OR;
+      }
+
+      if (parameters.AND.length === 0) {
+        delete parameters.AND;
       }
 
       const response: object | any = await this.printHistoryRepository.findAll(

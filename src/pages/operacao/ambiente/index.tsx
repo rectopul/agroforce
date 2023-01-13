@@ -72,6 +72,8 @@ interface IFilter {
   filterNpeFrom: string | any;
   filterNpeFinalTo: string | any;
   filterNpeFinalFrom: string | any;
+  filterProxNpeTo: string | any;
+  filterProxNpeFrom: string | any;
   filterGrpTo: string | any;
   filterGrpFrom: string | any;
   orderBy: object | any;
@@ -132,7 +134,9 @@ export default function Listagem({
   const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
   const [npe, setNPE] = useState(allNpe);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
@@ -214,7 +218,7 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const pathExtra = `skip=${
     currentPage * Number(take)
@@ -247,6 +251,8 @@ export default function Listagem({
       filterNpeFrom: checkValue("filterNpeFrom"),
       filterNpeFinalTo: checkValue("filterNpeFinalTo"),
       filterNpeFinalFrom: checkValue("filterNpeFinalFrom"),
+      filterProxNpeFrom: checkValue("filterProxNpeFrom"),
+      filterProxNpeTo: checkValue("filterProxNpeTo"),
       filterGrpTo: checkValue("filterGrpTo"),
       filterGrpFrom: checkValue("filterGrpFrom"),
     },
@@ -264,6 +270,8 @@ export default function Listagem({
       filterNpeFrom,
       filterNpeFinalTo,
       filterNpeFinalFrom,
+      filterProxNpeFrom,
+      filterProxNpeTo,
       filterGrpTo,
       filterGrpFrom,
     }) => {
@@ -285,9 +293,15 @@ export default function Listagem({
       if (!functionsUtils?.isNumeric(filterGrpTo)) {
         return Swal.fire("O campo GRP não pode ter ponto ou vírgula.");
       }
+      if (!functionsUtils?.isNumeric(filterProxNpeFrom)) {
+        return Swal.fire("O campo Prox Npe não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterProxNpeTo)) {
+        return Swal.fire("O campo Prox Npe não pode ter ponto ou vírgula.");
+      }
 
       // &filterSafra=${filterSafra}
-      const parametersFilter = `filterStatus=${filterStatus}&filterCodTecnologia=${filterCodTecnologia}&filterGrpTo=${filterGrpTo}&filterGrpFrom=${filterGrpFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&safraId=${id_safra}`;
+      const parametersFilter = `filterStatus=${filterStatus}&filterCodTecnologia=${filterCodTecnologia}&filterGrpTo=${filterGrpTo}&filterGrpFrom=${filterGrpFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&filterProxNpeTo=${filterProxNpeTo}&filterProxNpeFrom=${filterProxNpeFrom}&safraId=${id_safra}`;
       // await npeService
       //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
       //   .then((response) => {
@@ -560,10 +574,10 @@ export default function Listagem({
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== "" ? (typeOrderG == "desc" ? setOrder(1) : setOrder(2)) : "";
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -904,6 +918,7 @@ export default function Listagem({
                         placeholder="De"
                         id="filterNpeFrom"
                         name="filterNpeFrom"
+                        defaultValue={checkValue("filterNpeFrom")}
                         onChange={formik.handleChange}
                       />
                       <Input
@@ -912,6 +927,7 @@ export default function Listagem({
                         placeholder="Até"
                         id="filterNpeTo"
                         name="filterNpeTo"
+                        defaultValue={checkValue("filterNpeTo")}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -927,6 +943,7 @@ export default function Listagem({
                         placeholder="De"
                         id="filterNpeFinalFrom"
                         name="filterNpeFinalFrom"
+                        defaultValue={checkValue("filterNpeFinalFrom")}
                         onChange={formik.handleChange}
                       />
                       <Input
@@ -935,6 +952,7 @@ export default function Listagem({
                         placeholder="Até"
                         id="filterNpeFinalTo"
                         name="filterNpeFinalTo"
+                        defaultValue={checkValue("filterNpeFinalTo")}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -948,16 +966,18 @@ export default function Listagem({
                       <Input
                         placeholder="De"
                         type="number"
-                        id="filterNpeFinalFrom"
-                        name="filterNpeFinalFrom"
+                        id="filterProxNpeFrom"
+                        name="filterProxNpeFrom"
+                        defaultValue={checkValue("filterProxNpeFrom")}
                         onChange={formik.handleChange}
                       />
                       <Input
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         type="number"
-                        id="filterNpeFinalTo"
-                        name="filterNpeFinalTo"
+                        id="filterProxNpeTo"
+                        name="filterProxNpeTo"
+                        defaultValue={checkValue("filterProxNpeTo")}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -973,6 +993,7 @@ export default function Listagem({
                         placeholder="De"
                         id="filterGrpFrom"
                         name="filterGrpFrom"
+                        defaultValue={checkValue("filterGrpFrom")}
                         onChange={formik.handleChange}
                       />
                       <Input
@@ -981,6 +1002,7 @@ export default function Listagem({
                         placeholder="Até"
                         id="filterGrpTo"
                         name="filterGrpTo"
+                        defaultValue={checkValue("filterGrpTo")}
                         onChange={formik.handleChange}
                       />
                     </div>
