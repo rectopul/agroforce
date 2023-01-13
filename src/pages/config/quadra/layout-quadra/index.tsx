@@ -101,17 +101,17 @@ interface Idata {
 }
 
 export default function Listagem({
-  layouts,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  local,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  cultureId,
-  orderByserver,
-  typeOrderServer,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      layouts,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      local,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      cultureId,
+      orderByserver,
+      typeOrderServer,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tableRef = useRef<any>(null);
@@ -139,7 +139,7 @@ export default function Listagem({
     Number(pageBeforeEdit)
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
@@ -198,11 +198,10 @@ export default function Listagem({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
   const columns = colums(camposGerenciados);
 
@@ -567,10 +566,10 @@ export default function Listagem({
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -622,9 +621,8 @@ export default function Listagem({
   }
 
   async function handleStatus(data: any): Promise<void> {
-    const parametersFilter = `filterStatus=${1}&id_culture=${
-      userLogado.userCulture.cultura_selecionada
-    }&esquema=${data.esquema}&status=${1}`;
+    const parametersFilter = `filterStatus=${1}&id_culture=${userLogado.userCulture.cultura_selecionada
+      }&esquema=${data.esquema}&status=${1}`;
     // if (data.status == 0) {
 
     await layoutQuadraService.getAll(parametersFilter).then((response) => {
@@ -936,7 +934,7 @@ export default function Listagem({
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

@@ -83,16 +83,16 @@ interface IUpdateExperimento {
 }
 
 export default function AtualizarLocal({
-      experimento,
-      allItens,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      idExperiment,
-      pageBeforeEdit,
-      typeOrderServer, // RR
-      orderByserver, // RR
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+              experimento,
+              allItens,
+              totalItems,
+              itensPerPage,
+              filterApplication,
+              idExperiment,
+              pageBeforeEdit,
+              typeOrderServer, // RR
+              orderByserver, // RR
+            }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -122,7 +122,7 @@ export default function AtualizarLocal({
     Number(pageBeforeEdit),
   );
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   // const [setArrowOrder] = useState<any>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -161,7 +161,7 @@ export default function AtualizarLocal({
   const [orderBy, setOrderBy] = useState<string>('');
   const [typeOrder, setTypeOrder] = useState<string>('');
 
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy
     }&typeOrder=${typeOrder}`;
@@ -297,10 +297,10 @@ export default function AtualizarLocal({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {

@@ -68,7 +68,7 @@ export default function Listagem({
   typeOrderServer,
   orderByserver,
 }: // eslint-disable-next-line no-use-before-define
-InferGetServerSidePropsType<typeof getServerSideProps>) {
+  InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
   const tabsEtiquetagemMenu = tabsOperation.map((i) =>
@@ -97,7 +97,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     () => allExperimentGroup
   );
   const [currentPage, setCurrentPage] = useState<number>(pageBeforeEdit);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
@@ -180,11 +180,10 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -323,10 +322,10 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -438,7 +437,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
               rounder="rounded-full"
               bgColor={
                 rowData.status === "ETIQ. EM ANDAMENTO" ||
-                rowData.status === "ETIQ. FINALIZADA"
+                  rowData.status === "ETIQ. FINALIZADA"
                   ? "bg-gray-600"
                   : "bg-red-600"
               }
@@ -1084,7 +1083,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) {
                 filtering: false,
                 pageSize: Number(take),
               }}
-              onChangeRowsPerPage={() => {}}
+              onChangeRowsPerPage={() => { }}
               components={{
                 Toolbar: () => (
                   <div

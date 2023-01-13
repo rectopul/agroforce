@@ -56,15 +56,15 @@ import { tableGlobalFunctions } from '../../helpers';
 import headerTableFactoryGlobal from '../../shared/utils/headerTableFactory';
 
 export default function Listagem({
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idCulture,
-  idSafra,
-  filterBeforeEdit,
-  orderByserver,
-  typeOrderServer,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+          totalItems,
+          itensPerPage,
+          filterApplication,
+          idCulture,
+          idSafra,
+          filterBeforeEdit,
+          orderByserver,
+          typeOrderServer,
+        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsReport } = ITabs.default;
 
   const tabsDropDowns = tabsReport.map((i) => (i.titleTab === 'RELATORIOS' ? { ...i, statusTab: true } : i));
@@ -84,7 +84,7 @@ export default function Listagem({
   );
   const [reportes, setReportes] = useState<ITreatment[] | any>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
@@ -121,7 +121,7 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const pathExtra = `skip=${
     currentPage * Number(take)
@@ -261,10 +261,10 @@ export default function Listagem({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
   }
 
   // function headerTableFactory(name: string, title: string) {

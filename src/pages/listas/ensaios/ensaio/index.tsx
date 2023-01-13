@@ -54,17 +54,17 @@ import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactor
 import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 
 export default function TipoEnsaio({
-  allAssay,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  idSafra,
-  idCulture,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer,
-  orderByserver,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+          allAssay,
+          itensPerPage,
+          filterApplication,
+          totalItems,
+          idSafra,
+          idCulture,
+          pageBeforeEdit,
+          filterBeforeEdit,
+          typeOrderServer,
+          orderByserver,
+        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -87,7 +87,7 @@ export default function TipoEnsaio({
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit),
   );
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -152,7 +152,7 @@ export default function TipoEnsaio({
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const router = useRouter();
   const [take, setTake] = useState<number>(itensPerPage);
@@ -280,10 +280,10 @@ export default function TipoEnsaio({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {

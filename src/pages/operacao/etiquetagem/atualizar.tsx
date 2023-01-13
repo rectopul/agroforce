@@ -51,13 +51,13 @@ import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../components/Loading';
 
 export default function Listagem({
-  experimentGroup,
-  experimentGroupId,
-  itensPerPage,
-  filterApplication,
-  safraId,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      experimentGroup,
+      experimentGroupId,
+      itensPerPage,
+      filterApplication,
+      safraId,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
   const tabsEtiquetagemMenu = tabsOperation.map((i: any) => (i.titleTab === 'ETIQUETAGEM' ? { ...i, statusTab: true } : i));
@@ -76,7 +76,7 @@ export default function Listagem({
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -105,7 +105,7 @@ export default function Listagem({
   ]);
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -161,7 +161,7 @@ export default function Listagem({
       setOrder(orderList + 1);
     }
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
   }
 
   // function headerTableFactory(name: string, title: string) {
@@ -230,7 +230,7 @@ export default function Listagem({
               rounder="rounded-full"
               bgColor={
                 rowData.status === 'ETIQ. EM ANDAMENTO'
-                || rowData.status === 'ETIQ. FINALIZADA'
+                  || rowData.status === 'ETIQ. FINALIZADA'
                   ? 'bg-gray-600'
                   : 'bg-red-600'
               }
@@ -678,7 +678,7 @@ export default function Listagem({
         >
           <form
             className="w-full bg-white shadow-md rounded p-4"
-            onSubmit={() => {}}
+            onSubmit={() => { }}
           >
             <div className="w-full flex justify-between items-start gap-5 mt-1">
               {nameGroupFieldFactory('name', 'Grupo de etiquetagem')}
@@ -738,7 +738,7 @@ export default function Listagem({
               //     emptyDataSourceMessage: tableMessage ? 'Nenhum experimento encontrado!' : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
               //   },
               // }}
-              onChangeRowsPerPage={() => {}}
+              onChangeRowsPerPage={() => { }}
               onSelectionChange={setSelectedCheckBox}
               components={{
                 Toolbar: () => (
@@ -913,7 +913,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

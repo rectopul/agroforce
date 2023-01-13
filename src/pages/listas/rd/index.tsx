@@ -79,14 +79,16 @@ interface TabPanelProps {
 }
 
 export default function Import({
-  allLogs,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  uploadInProcess,
-  idSafra,
-  idCulture,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allLogs,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      uploadInProcess,
+      idSafra,
+      idCulture,
+      typeOrderServer, // RR
+      orderByserver, // RR
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const router = useRouter();
@@ -203,7 +205,7 @@ export default function Import({
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -218,13 +220,12 @@ export default function Import({
   const [colorStar, setColorStar] = useState<string>('');
   const [orderBy, setOrderBy] = useState<string>('');
   const [typeOrder, setTypeOrder] = useState<string>('');
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
   const pages = Math.ceil(total / take);
   const formik = useFormik<any>({
     initialValues: {
@@ -461,10 +462,10 @@ export default function Import({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -807,12 +808,12 @@ export default function Import({
 
                 {(Router?.importar == 'subs_experimento'
                   || !Router.importar) && (
-                  <ComponentImport
-                    title="Importar Subs. de genótipo/nca Experimento"
-                    table="PARCELS"
-                    moduleId={30}
-                  />
-                )}
+                    <ComponentImport
+                      title="Importar Subs. de genótipo/nca Experimento"
+                      table="PARCELS"
+                      moduleId={30}
+                    />
+                  )}
 
                 <div className="h-10" />
               </TabPanel>
@@ -852,21 +853,21 @@ export default function Import({
 
                 {(Router?.importar == 'alocacao_quadra'
                   || !Router.importar) && (
-                  <ComponentImport
-                    title="Importar Alocação de quadra"
-                    table="ALLOCATION"
-                    moduleId={31}
-                  />
-                )}
+                    <ComponentImport
+                      title="Importar Alocação de quadra"
+                      table="ALLOCATION"
+                      moduleId={31}
+                    />
+                  )}
                 {(Router?.importar == 'etiquetas_impressas'
                   || !Router.importar) && (
-                  <ComponentImport
-                    disabled
-                    title="Importar Etiquetas Impressas"
-                    table="TAG_PRINTED" // AINDA NÃO SEI NOME CORRETO
-                    moduleId={0} // AINDA NÃO SEI CODIGO CORRETO
-                  />
-                )}
+                    <ComponentImport
+                      disabled
+                      title="Importar Etiquetas Impressas"
+                      table="TAG_PRINTED" // AINDA NÃO SEI NOME CORRETO
+                      moduleId={0} // AINDA NÃO SEI CODIGO CORRETO
+                    />
+                  )}
               </TabPanel>
             </Box>
           </div>
@@ -1155,7 +1156,7 @@ export default function Import({
                         disabled={currentPage + 1 >= pages}
                       />
                     </div>
-                    ) as any,
+                  ) as any,
                 }}
               />
             </div>

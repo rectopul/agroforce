@@ -5,7 +5,7 @@ import { capitalize } from "@mui/material";
 import { setCookies } from "cookies-next";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import getConfig from "next/config";
 import { RequestInit } from "next/dist/server/web/spec-extension/request";
 import Head from "next/head";
@@ -60,6 +60,8 @@ interface IData {
   idSafra: number;
   foco: IUpdateFoco;
   pageBeforeEdit: string | any;
+  typeOrderServer: any | string; // RR
+  orderByserver: any | string; // RR
 }
 
 interface IGenerateProps {
@@ -69,15 +71,17 @@ interface IGenerateProps {
 }
 
 export default function Atualizar({
-  foco,
-  allItens,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idFoco,
-  idSafra,
-  pageBeforeEdit,
-}: IData) {
+      foco,
+      allItens,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idFoco,
+      idSafra,
+      pageBeforeEdit,
+      typeOrderServer, // RR
+      orderByserver, // RR
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -150,7 +154,7 @@ export default function Atualizar({
     Number(pageBeforeEdit)
   );
   const itemsTotal = totalItems;
-  const [orderList, setOrder] = useState<number>(1);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -161,9 +165,10 @@ export default function Atualizar({
   ]);
   const filter = filterApplication;
   const [colorStar, setColorStar] = useState<string>("");
-  const [orderBy, setOrderBy] = useState<string>("");
+  const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [orderType, setOrderType] = useState<string>("");
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -217,7 +222,7 @@ export default function Atualizar({
       }
     }
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
   }
 
   // function headerTableFactory(name: any, title: string) {
@@ -302,7 +307,7 @@ export default function Atualizar({
                 disabled
                 bgColor="bg-gray-600"
                 textColor="white"
-                onClick={() => {}}
+                onClick={() => { }}
               />
             </div>
           </div>
@@ -450,7 +455,7 @@ export default function Atualizar({
           XLSX.writeFile(workBook, "grupos.xlsx");
         }
       });
-      setLoading(false);
+    setLoading(false);
   };
 
   function handleTotalPages(): void {
@@ -487,7 +492,7 @@ export default function Atualizar({
 
   return (
     <>
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Atualizar foco</title>
       </Head>
@@ -550,7 +555,7 @@ export default function Atualizar({
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<AiOutlineFileSearch size={20} />}
-                onClick={() => {setLoading(true);}}
+                onClick={() => { setLoading(true); }}
               />
             </div>
           </div>
@@ -601,11 +606,10 @@ export default function Atualizar({
                             : "Cadastrar grupo"
                         }
                         // title="Cadastrar grupo"
-                        value={`${
-                          grupos.length
-                            ? "Grupo ja cadastrado na safra"
-                            : "Cadastrar grupo"
-                        }`}
+                        value={`${grupos.length
+                          ? "Grupo ja cadastrado na safra"
+                          : "Cadastrar grupo"
+                          }`}
                         // value="Cadastrar grupo"
                         bgColor={grupos.length ? "bg-gray-400" : "bg-blue-600"}
                         // bgColor="bg-blue-600"

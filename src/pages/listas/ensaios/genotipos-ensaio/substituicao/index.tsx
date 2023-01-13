@@ -97,13 +97,13 @@ interface IData {
 }
 
 export default function Listagem({
-  allLote,
-  totalItems,
-  idSafra,
-  idCulture,
-  itensPerPage,
-  filterApplication,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allLote,
+      totalItems,
+      idSafra,
+      idCulture,
+      itensPerPage,
+      filterApplication,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const router = useRouter();
@@ -140,7 +140,7 @@ export default function Listagem({
   const [nameReplace, setNameReplace] = useState<any>('');
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>('');
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -178,7 +178,7 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isReplaceGenotypeId, setIsReplaceGenotypeId] = useState<any>(null);
@@ -329,7 +329,7 @@ export default function Listagem({
     setTimeout(() => {
       setLoading(false);
     }, 100);
-    setFieldOrder(name);
+    setFieldOrder(columnG);
   }
 
   // function headerTableFactory(name: string, title: string) {
@@ -921,7 +921,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6 ml-2">
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -1097,7 +1097,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

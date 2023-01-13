@@ -79,16 +79,16 @@ interface IGenerateProps {
 }
 
 export default function Listagem({
-  allPrintHistory,
-  itensPerPage,
-  filterApplication,
-  filterBeforeEdit,
-  totalItems,
-  typeOrderServer,
-  orderByserver,
-  safraId,
-  idCulture,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+          allPrintHistory,
+          itensPerPage,
+          filterApplication,
+          filterBeforeEdit,
+          totalItems,
+          typeOrderServer,
+          orderByserver,
+          safraId,
+          idCulture,
+        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState<boolean>(false);
 
   const { tabsReport } = ITabs.default;
@@ -108,7 +108,7 @@ export default function Listagem({
   );
   const [npe, setNPE] = useState(allPrintHistory);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
@@ -153,7 +153,7 @@ export default function Listagem({
   const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
@@ -308,10 +308,10 @@ export default function Listagem({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {

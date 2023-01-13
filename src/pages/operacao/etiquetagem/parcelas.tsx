@@ -75,16 +75,16 @@ interface IFilter {
 }
 
 export default function Listagem({
-  allExperiments,
-  totalItems,
-  experimentGroup,
-  itensPerPage,
-  experimentGroupId,
-  filterApplication,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allExperiments,
+      totalItems,
+      experimentGroup,
+      itensPerPage,
+      experimentGroupId,
+      filterApplication,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
   const router = useRouter();
@@ -112,7 +112,7 @@ export default function Listagem({
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -230,7 +230,7 @@ export default function Listagem({
   ]);
   const [orderBy, setOrderBy] = useState<string>("");
   const [orderType, setOrderType] = useState<string>("");
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [take, setTake] = useState<number>(itensPerPage);
@@ -385,7 +385,7 @@ export default function Listagem({
       setOrder(orderList + 1);
     }
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
   }
 
   // function headerTableFactory(name: string, title: string) {
@@ -1163,15 +1163,15 @@ export default function Listagem({
             <div className="w-20 h-7 ml-2">
               {(validateNcaOne === "bg-red-600" ||
                 validateNcaTwo === "bg-red-600") && (
-                <Button
-                  type="button"
-                  title="Limpar"
-                  value="Limpar"
-                  textColor="white"
-                  onClick={() => cleanState()}
-                  bgColor="bg-blue-600"
-                />
-              )}
+                  <Button
+                    type="button"
+                    title="Limpar"
+                    value="Limpar"
+                    textColor="white"
+                    onClick={() => cleanState()}
+                    bgColor="bg-blue-600"
+                  />
+                )}
             </div>
           </div>
 
@@ -1400,7 +1400,7 @@ export default function Listagem({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       type="submit"
                       bgColor="bg-blue-600"
@@ -1442,7 +1442,7 @@ export default function Listagem({
                 filtering: false,
                 pageSize: Number(take),
               }}
-              onChangeRowsPerPage={() => {}}
+              onChangeRowsPerPage={() => { }}
               onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (
