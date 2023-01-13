@@ -6,6 +6,7 @@ import { GroupController } from '../group.controller';
 import { prisma } from '../../pages/api/db/db';
 import { ExperimentController } from '../experiment/experiment.controller';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 // import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class NpeController {
@@ -276,16 +277,33 @@ export class NpeController {
   async update(data: any) {
     try {
       if (data) {
-        const operation = data.status === 1 ? 'Ativação' : 'Inativação';
-        const npe = await this.npeRepository.update(data.id, data);
-        if (!npe) return { status: 400, message: 'Npe não encontrado' };
-        if (data.status === 0 || data.status === 1) {
-          const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-          await this.reporteRepository.create({
-            madeBy: npe.created_by, module: 'Npe', operation, name: JSON.stringify(npe.safraId), ip: JSON.stringify(ip), idOperation: npe.id,
-          });
+        if (data.length === undefined) {
+          const operation = data.status === 1 ? 'Ativação' : 'Inativação';
+          const npe = await this.npeRepository.update(data.id, data);
+          if (!npe) return { status: 400, message: 'Npe não encontrado' };
+          if (data.status === 0 || data.status === 1) {
+            const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+            await this.reporteRepository.create({
+              madeBy: npe.created_by, module: 'Npe', operation, name: JSON.stringify(npe.safraId), ip: JSON.stringify(ip), idOperation: npe.id,
+            });
+          }
+          return { status: 200, message: 'Npe atualizada' };
+        } else {
+          const transactionConfig = new TransactionConfig();
+          const npeRepositoryTransaction = new NpeRepository();
+          npeRepositoryTransaction.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+          try {
+            await transactionConfig.transactionScope.run(async () => {
+              for (const row in data) {
+                await npeRepositoryTransaction.updateTransaction(data[row].id, data[row]);
+              }
+            })
+            return { status: 200, message: 'Npe atualizada' };
+          } catch (error: any) {
+            handleError('NPE Controller', 'Update', error.message);
+            throw new Error('[Controller] - Update NPE erro');
+          }
         }
-        return { status: 200, message: 'Npe atualizada' };
       }
       const npeExist = await this.getOne(data.id);
       if (!npeExist) return npeExist;
