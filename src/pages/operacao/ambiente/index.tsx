@@ -74,6 +74,8 @@ interface IFilter {
   filterNpeFrom: string | any;
   filterNpeFinalTo: string | any;
   filterNpeFinalFrom: string | any;
+  filterProxNpeTo: string | any;
+  filterProxNpeFrom: string | any;
   filterGrpTo: string | any;
   filterGrpFrom: string | any;
   orderBy: object | any;
@@ -98,16 +100,16 @@ interface IData {
 }
 
 export default function Listagem({
-  allNpe,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  filterBeforeEdit,
-  id_safra,
-  cultureId,
-  orderByserver,
-  typeOrderServer,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allNpe,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      filterBeforeEdit,
+      id_safra,
+      cultureId,
+      orderByserver,
+      typeOrderServer,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
   const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE'
@@ -132,8 +134,8 @@ export default function Listagem({
   const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
   const [npe, setNPE] = useState(allNpe);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(0);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -212,11 +214,10 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
   // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}`;
 
   const filters = [
@@ -231,22 +232,24 @@ export default function Listagem({
   const formik = useFormik<any>({
     initialValues: {
       filterStatus: filterStatus[13],
-      filterLocal: checkValue('filterLocal'),
-      filterSafra: checkValue('filterSafra'),
-      filterFoco: checkValue('filterFoco'),
-      filterEnsaio: checkValue('filterEnsaio'),
-      filterTecnologia: checkValue('filterTecnologia'),
-      filterEpoca: checkValue('filterEpoca'),
-      filterNPE: checkValue('filterNPE'),
-      filterCodTecnologia: checkValue('filterCodTecnologia'),
-      orderBy: '',
-      typeOrder: '',
-      filterNpeTo: checkValue('filterNpeTo'),
-      filterNpeFrom: checkValue('filterNpeFrom'),
-      filterNpeFinalTo: checkValue('filterNpeFinalTo'),
-      filterNpeFinalFrom: checkValue('filterNpeFinalFrom'),
-      filterGrpTo: checkValue('filterGrpTo'),
-      filterGrpFrom: checkValue('filterGrpFrom'),
+      filterLocal: checkValue("filterLocal"),
+      filterSafra: checkValue("filterSafra"),
+      filterFoco: checkValue("filterFoco"),
+      filterEnsaio: checkValue("filterEnsaio"),
+      filterTecnologia: checkValue("filterTecnologia"),
+      filterEpoca: checkValue("filterEpoca"),
+      filterNPE: checkValue("filterNPE"),
+      filterCodTecnologia: checkValue("filterCodTecnologia"),
+      orderBy: "",
+      typeOrder: "",
+      filterNpeTo: checkValue("filterNpeTo"),
+      filterNpeFrom: checkValue("filterNpeFrom"),
+      filterNpeFinalTo: checkValue("filterNpeFinalTo"),
+      filterNpeFinalFrom: checkValue("filterNpeFinalFrom"),
+      filterProxNpeFrom: checkValue("filterProxNpeFrom"),
+      filterProxNpeTo: checkValue("filterProxNpeTo"),
+      filterGrpTo: checkValue("filterGrpTo"),
+      filterGrpFrom: checkValue("filterGrpFrom"),
     },
     onSubmit: async ({
       filterStatus,
@@ -262,6 +265,8 @@ export default function Listagem({
       filterNpeFrom,
       filterNpeFinalTo,
       filterNpeFinalFrom,
+      filterProxNpeFrom,
+      filterProxNpeTo,
       filterGrpTo,
       filterGrpFrom,
     }) => {
@@ -283,9 +288,15 @@ export default function Listagem({
       if (!functionsUtils?.isNumeric(filterGrpTo)) {
         return Swal.fire('O campo GRP não pode ter ponto ou vírgula.');
       }
+      if (!functionsUtils?.isNumeric(filterProxNpeFrom)) {
+        return Swal.fire("O campo Prox Npe não pode ter ponto ou vírgula.");
+      }
+      if (!functionsUtils?.isNumeric(filterProxNpeTo)) {
+        return Swal.fire("O campo Prox Npe não pode ter ponto ou vírgula.");
+      }
 
       // &filterSafra=${filterSafra}
-      const parametersFilter = `filterStatus=${filterStatus}&filterCodTecnologia=${filterCodTecnologia}&filterGrpTo=${filterGrpTo}&filterGrpFrom=${filterGrpFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&safraId=${id_safra}`;
+      const parametersFilter = `filterStatus=${filterStatus}&filterCodTecnologia=${filterCodTecnologia}&filterGrpTo=${filterGrpTo}&filterGrpFrom=${filterGrpFrom}&filterLocal=${filterLocal}&filterFoco=${filterFoco}&filterEnsaio=${filterEnsaio}&filterTecnologia=${filterTecnologia}&filterEpoca=${filterEpoca}&filterNPE=${filterNPE}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterNpeFinalTo=${filterNpeFinalTo}&filterNpeFinalFrom=${filterNpeFinalFrom}&filterProxNpeTo=${filterProxNpeTo}&filterProxNpeFrom=${filterProxNpeFrom}&safraId=${id_safra}`;
       // await npeService
       //   .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}`)
       //   .then((response) => {
@@ -559,10 +570,10 @@ export default function Listagem({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -947,18 +958,18 @@ export default function Listagem({
                       <Input
                         placeholder="De"
                         type="number"
-                        id="filterNpeFinalFrom"
-                        name="filterNpeFinalFrom"
-                        defaultValue={checkValue('filterNpeFinalFrom')}
+                        id="filterProxNpeFrom"
+                        name="filterProxNpeFrom"
+                        defaultValue={checkValue('filterProxNpeFrom')}
                         onChange={formik.handleChange}
                       />
                       <Input
                         style={{ marginLeft: 8 }}
                         placeholder="Até"
                         type="number"
-                        id="filterNpeFinalTo"
-                        name="filterNpeFinalTo"
-                        defaultValue={checkValue('filterNpeFinalTo')}
+                        id="filterProxNpeTo"
+                        name="filterProxNpeTo"
+                        defaultValue={checkValue('filterProxNpeTo')}
                         onChange={formik.handleChange}
                       />
                     </div>
@@ -993,7 +1004,7 @@ export default function Listagem({
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 15 }}>
                     <Button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -1235,7 +1246,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

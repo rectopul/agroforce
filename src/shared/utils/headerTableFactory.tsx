@@ -18,6 +18,7 @@ export default function headerTableFactoryGlobal({
   handleOrder,
   ...rest
 }: IHeaderTableFactory) {
+  console.log('fieldOrder :', fieldOrder, 'orderList :', orderList);
   return {
     title: (
       <div className="flex items-center">
@@ -30,7 +31,7 @@ export default function headerTableFactoryGlobal({
         >
           {name}
         </button>
-        {fieldOrder === name && (
+        {fieldOrder === title && (
           <div className="pl-2">
             {orderList !== 0 ? (
               orderList === 1 ? (

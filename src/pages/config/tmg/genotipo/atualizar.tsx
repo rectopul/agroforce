@@ -98,16 +98,20 @@ interface IData {
   filterApplication: object | any;
   idGenotipo: number;
   genotipo: IUpdateGenotipo;
+  typeOrderServer: any | string; // RR
+  orderByserver: any | string; // RR
 }
 
 export default function Atualizargenotipo({
-  allLote,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  idGenotipo,
-  genotipo,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allLote,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      idGenotipo,
+      genotipo,
+      typeOrderServer, // RR
+      orderByserver,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -171,7 +175,7 @@ export default function Atualizargenotipo({
   const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -191,7 +195,7 @@ export default function Atualizargenotipo({
   const [colorStar, setColorStar] = useState<string>('');
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -268,7 +272,7 @@ export default function Atualizargenotipo({
     setTimeout(() => {
       setLoading(false);
     }, 100);
-    setFieldOrder(name);
+    setFieldOrder(columnG);
   }
 
   // function headerTableFactory(name: any, title: string) {
@@ -1009,7 +1013,7 @@ export default function Atualizargenotipo({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

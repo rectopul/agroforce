@@ -1169,15 +1169,15 @@ export default function Listagem({
             <div className="w-20 h-7 ml-2">
               {(validateNcaOne === 'bg-red-600'
                 || validateNcaTwo === 'bg-red-600') && (
-                <Button
-                  type="button"
-                  title="Limpar"
-                  value="Limpar"
-                  textColor="white"
-                  onClick={() => cleanState()}
-                  bgColor="bg-blue-600"
-                />
-              )}
+                  <Button
+                    type="button"
+                    title="Limpar"
+                    value="Limpar"
+                    textColor="white"
+                    onClick={() => cleanState()}
+                    bgColor="bg-blue-600"
+                  />
+                )}
             </div>
           </div>
 
@@ -1406,7 +1406,7 @@ export default function Listagem({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       type="submit"
                       bgColor="bg-blue-600"
@@ -1448,7 +1448,7 @@ export default function Listagem({
                 filtering: false,
                 pageSize: Number(take),
               }}
-              onChangeRowsPerPage={() => {}}
+              onChangeRowsPerPage={() => { }}
               onSelectionChange={setRowsSelected}
               components={{
                 Toolbar: () => (
@@ -1638,7 +1638,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

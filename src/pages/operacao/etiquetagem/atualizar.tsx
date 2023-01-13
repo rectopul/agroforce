@@ -80,7 +80,9 @@ export default function Listagem({
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
+  const [afterFilter, setAfterFilter] = useState<boolean>(false);
+  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [experimentAdd, setExperimentAdd] = useState<boolean>();
 
@@ -676,7 +678,7 @@ export default function Listagem({
           isMultipleDelete
             ? 'os items selecionados?'
             : `o item ${itemSelectedDelete?.experimentName}?`
-        }`}
+          }`}
         onPress={isMultipleDelete ? deleteMultipleItems : deleteItem}
         onCancel={() => setIsOpenModalConfirm(false)}
       />
@@ -691,7 +693,7 @@ export default function Listagem({
         >
           <form
             className="w-full bg-white shadow-md rounded p-4"
-            onSubmit={() => {}}
+            onSubmit={() => { }}
           >
             <div className="w-full flex justify-between items-start gap-5 mt-1">
               {nameGroupFieldFactory('name', 'Grupo de etiquetagem')}
@@ -752,7 +754,7 @@ export default function Listagem({
               //     emptyDataSourceMessage: tableMessage ? 'Nenhum experimento encontrado!' : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
               //   },
               // }}
-              onChangeRowsPerPage={() => {}}
+              onChangeRowsPerPage={() => { }}
               onSelectionChange={setSelectedCheckBox}
               components={{
                 Toolbar: () => (

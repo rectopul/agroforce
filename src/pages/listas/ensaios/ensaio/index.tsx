@@ -54,17 +54,17 @@ import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactor
 import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 
 export default function TipoEnsaio({
-  allAssay,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  idSafra,
-  idCulture,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer,
-  orderByserver,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allAssay,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      idSafra,
+      idCulture,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      typeOrderServer,
+      orderByserver,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -87,7 +87,7 @@ export default function TipoEnsaio({
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit),
   );
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -149,7 +149,7 @@ export default function TipoEnsaio({
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const router = useRouter();
   const [take, setTake] = useState<number>(itensPerPage);
@@ -158,9 +158,8 @@ export default function TipoEnsaio({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy
-  }&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == "tecnologia" ? "tecnologia.cod_tec" : orderBy
+    }&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IAssayListFilter>({
     initialValues: {
@@ -275,10 +274,10 @@ export default function TipoEnsaio({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -357,49 +356,39 @@ export default function TipoEnsaio({
               textColor="white"
             />
           </div>
-          <div style={{ width: 5 }} />
-          <div>
-            <Button
-              title={`Deletar ${rowData.gli}`}
-              icon={<BsTrashFill size={14} />}
-              onClick={() => deleteConfirmItem(rowData)}
-              bgColor="bg-red-600"
-              textColor="white"
-            />
-          </div>
-        </div>
-      ) : (
-        <div className="h-7 flex">
-          <div className="h-7">
-            <Button
-              icon={<BiEdit size={14} />}
-              title={`Atualizar ${rowData.gli}`}
-              onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filter);
-                setCookies('filterBeforeEditTypeOrder', typeOrder);
-                setCookies('filterBeforeEditOrderBy', orderBy);
-                setCookies('filtersParams', filtersParams);
-                setCookies('takeBeforeEdit', take);
-                setCookies('lastPage', 'atualizar');
-                router.push(
-                  `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`,
-                );
-              }}
-              bgColor="bg-blue-600"
-              textColor="white"
-            />
-          </div>
-          <div style={{ width: 5 }} />
-          <div>
-            <Button
-              icon={<BsTrashFill size={14} />}
-              title="Ensaio já associado a um experimento"
-              disabled
-              onClick={() => {}}
-              bgColor="bg-gray-600"
-              textColor="white"
-            />
+        ) : (
+          <div className="h-7 flex">
+            <div className="h-7">
+              <Button
+                icon={<BiEdit size={14} />}
+                title={`Atualizar ${rowData.gli}`}
+                onClick={() => {
+                  setCookies("pageBeforeEdit", currentPage?.toString());
+                  setCookies("filterBeforeEdit", filter);
+                  setCookies("filterBeforeEditTypeOrder", typeOrder);
+                  setCookies("filterBeforeEditOrderBy", orderBy);
+                  setCookies("filtersParams", filtersParams);
+                  setCookies("takeBeforeEdit", take);
+                  setCookies("lastPage", "atualizar");
+                  router.push(
+                    `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`
+                  );
+                }}
+                bgColor="bg-blue-600"
+                textColor="white"
+              />
+            </div>
+            <div style={{ width: 5 }} />
+            <div>
+              <Button
+                icon={<BsTrashFill size={14} />}
+                title="Ensaio já associado a um experimento"
+                disabled
+                onClick={() => { }}
+                bgColor="bg-gray-600"
+                textColor="white"
+              />
+            </div>
           </div>
         </div>
       )),
@@ -793,7 +782,7 @@ export default function TipoEnsaio({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"

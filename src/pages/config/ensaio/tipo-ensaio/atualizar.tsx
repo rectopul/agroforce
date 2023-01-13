@@ -5,7 +5,7 @@
 import { setCookies } from "cookies-next";
 import { useFormik } from "formik";
 import MaterialTable from "material-table";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import getConfig from "next/config";
 import { RequestInit } from "next/dist/server/web/spec-extension/request";
 import Head from "next/head";
@@ -63,6 +63,8 @@ interface IData {
   idSafra: number | any;
   idTypeAssay: number;
   pageBeforeEdit: string | any;
+  typeOrderServer: any | string; // RR
+  orderByserver: any | string; // RR
 }
 
 interface IGenerateProps {
@@ -72,15 +74,17 @@ interface IGenerateProps {
 }
 
 export default function AtualizarTipoEnsaio({
-  typeAssay,
-  idTypeAssay,
-  idSafra,
-  allEnvelopes,
-  totalItens,
-  itensPerPage,
-  filterApplication,
-  pageBeforeEdit,
-}: IData) {
+      typeAssay,
+      idTypeAssay,
+      idSafra,
+      allEnvelopes,
+      totalItens,
+      itensPerPage,
+      filterApplication,
+      pageBeforeEdit,
+      typeOrderServer, // RR
+      orderByserver, // RR
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -106,7 +110,7 @@ export default function AtualizarTipoEnsaio({
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit)
   );
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -227,7 +231,7 @@ export default function AtualizarTipoEnsaio({
       }
     }
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
   }
 
   // function headerTableFactory(name: any, title: string) {
@@ -540,7 +544,7 @@ export default function AtualizarTipoEnsaio({
                   bgColor="bg-blue-600"
                   textColor="white"
                   icon={<RiOrganizationChart size={18} />}
-                  onClick={() => {}}
+                  onClick={() => { }}
                 />
               </div>
             </div>

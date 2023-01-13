@@ -62,21 +62,21 @@ import ComponentLoading from '../../../../components/Loading';
 type IAssayListUpdate = Omit<IAssayList, 'id_safra' | 'period'>;
 
 export default function AtualizarTipoEnsaio({
-  allGenotypeTreatment,
-  totalItens,
-  itensPerPage,
-  treatmentsFilterApplication,
-  experimentFilterApplication,
-  idAssayList,
-  idSafra,
-  assayList,
-  allExperiments,
-  totalExperiments,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  orderByserver,
-  typeOrderServer,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+          allGenotypeTreatment,
+          totalItens,
+          itensPerPage,
+          treatmentsFilterApplication,
+          experimentFilterApplication,
+          idAssayList,
+          idSafra,
+          assayList,
+          allExperiments,
+          totalExperiments,
+          pageBeforeEdit,
+          filterBeforeEdit,
+          orderByserver,
+          typeOrderServer,
+        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -118,10 +118,10 @@ export default function AtualizarTipoEnsaio({
   );
   const [experiments, setExperiments] = useState<any>(() => allExperiments);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
   const [take, setTake] = useState<number>(itensPerPage);
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
@@ -290,10 +290,10 @@ export default function AtualizarTipoEnsaio({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -348,7 +348,7 @@ export default function AtualizarTipoEnsaio({
       }
     }
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
   }
 
   function formatDecimal(num: number) {
