@@ -1303,12 +1303,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   const filterApplication = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : `&id_culture=${idCulture}&id_safra=${idSafra}`;
-
-  console.log('🚀 ~ file: index.tsx:1280 ~ req.cookies.pageBeforeEdit', req.cookies.pageBeforeEdit);
-  console.log('🚀 ~ file: index.tsx:1284 ~ req.cookies.filterBeforeEdit', req.cookies.filterBeforeEdit);
-  console.log('🚀 ~ file: index.tsx:1293 ~ req.cookies.filterBeforeEditTypeOrder', req.cookies.filterBeforeEditTypeOrder);
-  console.log('🚀 ~ file: index.tsx:1298 ~ req.cookies.filterBeforeEditOrderBy', req.cookies.filterBeforeEditOrderBy);
-  console.log('🚀 ~ file: index.tsx:1302 ~ req.cookies.filterBeforeEdit', req.cookies.filterBeforeEdit);
   // //RR
   removeCookies('filterBeforeEditTypeOrder', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });

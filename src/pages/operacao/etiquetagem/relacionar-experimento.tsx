@@ -246,7 +246,7 @@ export default function Listagem({
           setExperiments(response.response);
           setTotalItems(response.total);
           tableRef.current.dataManager.changePageSize(
-            response.total >= take ? take : response.total
+            response.total >= take ? take : response.total,
           );
         }
         setLoading(false);
@@ -266,6 +266,7 @@ export default function Listagem({
     order: number,
     name: any,
   ): Promise<void> {
+    setLoading(true);
     // let typeOrder: any;
     // let parametersFilter: any;
     // if (order === 1) {
@@ -313,6 +314,10 @@ export default function Listagem({
     setOrderBy(columnG);
     setOrder(orderByG);
     setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 100);
   }
 
   // function headerTableFactory(name: string, title: string) {
@@ -400,7 +405,7 @@ export default function Listagem({
         tableFields.push(
           headerTableFactoryGlobal({
             name: 'Tecnologia',
-            title: 'assay_list.tecnologia.name',
+            title: 'assay_list.tecnologia.cod_tec',
             orderList,
             fieldOrder,
             handleOrder,
@@ -640,6 +645,7 @@ export default function Listagem({
   }
 
   async function handleSubmit() {
+    setLoading(true);
     const experimentsSelected = rowsSelected.map(
       (item: IExperiments) => item.id,
     );
@@ -649,6 +655,7 @@ export default function Listagem({
     });
     if (status !== 200) {
       Swal.fire('Erro ao associar experimentos');
+      setLoading(false);
     } else {
       router.back();
     }

@@ -273,7 +273,7 @@ export class ExperimentController {
         orderBy,
       );
 
-      /* 
+      /*
       TODO: Refatorar este código, pois esse if está inteferindo na tela de ambiente ao sortear os experimentos
        src/pages/operacao/ambiente/experimento/index.tsx
        src/pages/operacao/ambiente/experimento/index.tsx:711
@@ -356,7 +356,7 @@ export class ExperimentController {
         // }
         //  const idList = await this.countExperimentGroupChildren(Number(data.newGroupId));
         //  await this.setParcelasStatus(idList);
-        // return { status: 200, message: 'Experimento atualizado' };
+        return { status: 200, message: 'Experimento atualizado' };
       }
       if (data.id) {
         const experimento: any = await this.experimentRepository.findOne(data.id);

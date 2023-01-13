@@ -779,7 +779,7 @@ export default function Listagem({
             await genotypeTreatmentService.update(genotipo_treatment);
             await experimentService.update(experimentObj);
             if (allNPERecords && allNPERecords.length > 0) {
-              let npeToUpdate: any[] = [];
+              const npeToUpdate: any[] = [];
               allNPERecords.map(async (item: any) => {
                 const temp = {
                   id: item.env?.id,
@@ -790,9 +790,9 @@ export default function Listagem({
                   //     : NPESelectedRow?.npeQT - total_consumed,
                   status: 3,
                   prox_npe: item.env?.npef + 1,
-                }
+                };
                 npeToUpdate.push(temp);
-              })
+              });
               await npeService
                 .update(npeToUpdate)
                 .then(({ status }: any) => {
@@ -1223,7 +1223,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   res,
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-
   const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()
   )?.response[0]?.itens_per_page) ?? 10;

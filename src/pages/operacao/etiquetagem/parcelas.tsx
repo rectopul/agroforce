@@ -75,15 +75,18 @@ interface IFilter {
 }
 
 export default function Listagem({
-  allExperiments,
+  allParcelas,
   totalItems,
-  experimentGroup,
   itensPerPage,
   experimentGroupId,
   filterApplication,
   idSafra,
+  experimentGroup,
   pageBeforeEdit,
   filterBeforeEdit,
+  idCulture,
+  typeOrderServer, // RR
+  orderByserver, // RR
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
@@ -100,7 +103,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.parcelas || {
     id: 0,
     table_preferences:
-      "id,foco,type_assay,tecnologia,gli,experiment,local,repetitionsNumber,status,NT,npe,name_genotipo,nca,action",
+      'id,foco,type_assay,tecnologia,gli,experiment,local,repetitionsNumber,status,NT,npe,name_genotipo,nca,action',
   };
 
   const tableRef = useRef<any>(null);
@@ -110,12 +113,13 @@ export default function Listagem({
   const [parcelas, setParcelas] = useState<ITreatment[] | any>([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isOpenModalPrint, setIsOpenModalPrint] = useState(false);
-  const [urlPrint, setUrlPrint] = useState("");
+  const [urlPrint, setUrlPrint] = useState('');
   const [stateIframe, setStateIframe] = useState(0);
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [orderList, setOrder] = useState<number>(0);
+  const [arrowOrder, setArrowOrder] = useState<any>('');
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -231,8 +235,8 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes('finalizada'),
     },
   ]);
-  const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>('');
+  const [orderBy, setOrderBy] = useState<string>(orderByserver);
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
   const [fieldOrder, setFieldOrder] = useState<any>(null);
 
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
@@ -254,6 +258,10 @@ export default function Listagem({
   const [writeOffId, setWriteOffId] = useState<number>();
   const [writeOffNca, setWriteOffNca] = useState<number>();
   const [rowsSelected, setRowsSelected] = useState([]);
+
+  const pathExtra = `skip=${
+    currentPage * Number(take)
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -326,144 +334,60 @@ export default function Listagem({
       // Call filter with there parameter
       const parametersFilter = `&filterStatusT=${filterStatusT}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterNameTec=${filterNameTec}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNcaTo=${filterNcaTo}&filterNcaFrom=${filterNcaFrom}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterCodTec=${filterCodTec}&filterExperimentName=${filterExperimentName}&filterRepTo=${filterRepTo}&filterRepFrom=${filterRepFrom}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterPlacingPlace=${filterPlacingPlace}`;
 
-      setFiltersParams(parametersFilter);
+      setLoading(true);
       setFilter(parametersFilter);
-      setCookies('filterBeforeEdit', filter);
-
-      await experimentGenotipeService
-        .getAll(`${parametersFilter}&skip=0&take=${take}`)
-        .then((response) => {
-          setFilter(parametersFilter);
-          setParcelas(response.response);
-          setTotalItems(response.total);
-          setCurrentPage(0);
-          tableRef.current.dataManager.changePageSize(
-            response.total >= take ? take : response.total,
-          );
-          setLoading(false);
-        })
-        .catch((e) => setLoading(false));
+      setCurrentPage(0);
+      await callingApi(parametersFilter);
+      setLoading(false);
     },
   });
 
-  async function handleOrder(
-    column: string,
-    order: number,
-    name: any,
-  ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+  async function callingApi(parametersFilter: any) {
+    setFilter(parametersFilter);
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
+    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    setFiltersParams(parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
     await experimentGenotipeService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then(({ status, response }: IReturnObject) => {
-        if (status === 200 || status === 400) {
-          setParcelas(response);
+      .getAll(parametersFilter)
+      .then((response: any) => {
+        if (response.status === 200 || response.status === 400) {
+          setParcelas(response.response);
+          setTotalItems(response.total);
+          tableRef.current.dataManager.changePageSize(
+            response.total >= take ? take : response.total,
+          );
         }
+        setLoading(false);
+      })
+      .catch((_) => {
+        setLoading(false);
       });
-
-    if (orderList === 2) {
-      setOrder(0);
-    } else {
-      setOrder(orderList + 1);
-    }
-
-    setFieldOrder(name);
   }
 
-  // function headerTableFactory(name: string, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: true,
-  //   };
-  // }
+  async function handleOrder(
+    column: string,
+    order: string | any,
+    name: any,
+  ): Promise<void> {
+    setLoading(true);
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-  // function tecnologiaHeaderFactory(name: string, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: "tecnologia",
-  //     width: 0,
-  //     sorting: true,
-  //     render: (rowData: any) => (
-  //       <div className="h-10 flex">
-  //         <div>
-  //           {`${rowData.tecnologia.cod_tec} ${rowData.tecnologia.name}`}
-  //         </div>
-  //       </div>
-  //     ),
-  //   };
-  // }
-
-  function actionTableFactory() {
-    return {
-      title: <div className="flex items-center">Ação</div>,
-      field: 'action',
-      sorting: false,
-      width: 0,
-      render: (rowData: any) => (rowData.status === 'IMPRESSO' ? (
-        <div className="h-7 flex">
-          <div className="h-7" />
-          <div style={{ width: 5 }} />
-          <div>
-            <Button
-              icon={<HiArrowNarrowRight size={14} />}
-              title={`Dar baixa na parcela ${rowData.id}`}
-              onClick={() => {
-                setDismiss(true);
-                setIsOpenModal(true);
-                setWriteOffNca(rowData.nca);
-                setWriteOffId(rowData.id);
-              }}
-              bgColor="bg-red-600"
-              textColor="white"
-            />
-          </div>
-        </div>
-      ) : (
-        <div />
-      )),
-    };
+    setFieldOrder(name);
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 100);
   }
 
   function orderColumns(columnsOrder: string): Array<object> {
@@ -496,7 +420,7 @@ export default function Listagem({
         tableFields.push(
           headerTableFactoryGlobal({
             name: 'Tecnologia',
-            title: 'tecnologia',
+            title: 'tecnologia.cod_tec',
             orderList,
             fieldOrder,
             handleOrder,
@@ -740,26 +664,7 @@ export default function Listagem({
 
   async function handlePagination(page: any): Promise<void> {
     setCurrentPage(page);
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
-
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
-
-    await experimentGenotipeService
-      .getAll(parametersFilter)
-      .then(({ status, response, total }: IReturnObject) => {
-        if (status === 200 || status === 400) {
-          setTotalItems(total);
-          setParcelas(response);
-        }
-      });
+    await callingApi(filter); // handle pagination globly
   }
 
   function filterFieldFactory(title: string, name: string) {
@@ -795,8 +700,8 @@ export default function Listagem({
     setValidateNcaTwo('bg-gray-300');
     setParcelasToPrint([]);
     // setIsOpenModal(!isOpenModal);
-    if(isOpenModal) {
-      (document.getElementById("inputCode") as HTMLInputElement).value = "";
+    if (isOpenModal) {
+      (document.getElementById('inputCode') as HTMLInputElement).value = '';
     }
     (inputRef?.current as any)?.focus();
   }
@@ -808,10 +713,12 @@ export default function Listagem({
     let countNca = 0;
     parcelas.map((item: any) => {
       if (item.nca == inputCode) {
-        setParcelasToPrint((current: any) => [...current, item.id]);
-        countNca += 1;
-        setGenotypeNameOne(item?.genotipo?.name_genotipo);
-        setNcaOne(item.nca);
+        if (item.status !== 'IMPRESSO') {
+          setParcelasToPrint((current: any) => [...current, item.id]);
+          countNca += 1;
+          setGenotypeNameOne(item?.genotipo?.name_genotipo);
+          setNcaOne(item.nca);
+        }
       }
     });
     const { response } = await experimentGroupService.getAll({
@@ -870,31 +777,50 @@ export default function Listagem({
     if (colorVerify === 'bg-green-600') {
       setIsLoading(true);
 
+      const validateSeeds: any = [];
+      const parcels = rowsSelected.map((item: any) => {
+        item.type_assay.envelope?.filter((seed: any) => seed.id_safra === idSafra);
+        if (item.type_assay.envelope?.length === 0) {
+          validateSeeds.push(true);
+        } else {
+          return item;
+        }
+      });
+      if (validateSeeds.includes(true)) {
+        Swal.fire(
+          'Sementes não cadastradas no tipo de ensaio',
+        );
+        setLoading(false);
+        setIsLoading(false);
+        return;
+      }
+
       await experimentGenotipeService.update({
         idList: parcelasToPrint,
         status: 'IMPRESSO',
         userId: userLogado.id,
+        count: 'print',
       });
       cleanState();
       // setIsOpenModal(false);
 
-      const parcelsByNCA = parcelas.filter((i: any) => i.nca == inputCode);
-      const parcels = parcelsByNCA.map((i: any) => ({
-        ...i,
-        envelope: i?.type_assay?.envelope?.filter(
-          (x: any) => x.id_safra === idSafra,
-        )[0]?.seeds,
-      }));
+      // const parcelsByNCA = parcelas.filter((i: any) => i.nca == inputCode);
+      // const parcels = parcelsByNCA.map((i: any) => ({
+      //   ...i,
+      //   envelope: i?.type_assay?.envelope?.filter(
+      //     (x: any) => x.id_safra === idSafra,
+      //   )[0]?.seeds,
+      // }));
       if (parcels) {
-        localStorage.setItem("parcelasToPrint", JSON.stringify(parcels));
+        localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
 
-        //setStateIframe(stateIframe + 1);
+        // setStateIframe(stateIframe + 1);
 
         resetIframe();
-        
+
         // -- AQUI
         setIsOpenModalPrint(true);
-        setUrlPrint("imprimir");
+        setUrlPrint('imprimir');
         cleanState();
         (document.getElementById('inputCode') as HTMLInputElement).value = '';
         setTimeout(() => (inputRef?.current as any)?.focus(), 2000);
@@ -937,12 +863,15 @@ export default function Listagem({
       // if (colorVerify === "bg-green-600") {
 
       // NA CHAMADA TEM QUE SER MANDANDO O NUMERO DO NPE PARA A API DAR BAIXA
+      let writeOffIdList = parcelas.filter((item: any) => item.npe === inputCode);
+      writeOffIdList = writeOffIdList.map((item:any) => item.id);
       try {
         const response = await experimentGenotipeService.update({
-          // idList: [writeOffId],
+          idList: writeOffIdList,
           npe: inputCode,
           status: 'EM ETIQUETAGEM',
           userId: userLogado.id,
+          count: 'writeOff',
         });
 
         cleanState();
@@ -1047,18 +976,35 @@ export default function Listagem({
     setIsLoading(true);
     const idList = rowsSelected.map((item: any) => item.id);
 
+    const validateSeeds: any = [];
+    const parcels = rowsSelected.map((item: any) => {
+      item.type_assay.envelope?.filter((seed: any) => seed.id_safra === idSafra);
+      if (item.type_assay.envelope?.length === 0) {
+        validateSeeds.push(true);
+      } else {
+        return item;
+      }
+    });
+    if (validateSeeds.includes(true)) {
+      Swal.fire(
+        'Sementes não cadastradas no tipo de ensaio',
+      );
+      setLoading(false);
+      setIsLoading(false);
+      return;
+    }
     await experimentGenotipeService.update({
       idList,
-      status: 'IMPRESSO',
+      status: 'REIMPRESSO',
       userId: userLogado.id,
+      count: 'reprint',
     });
-
-    const parcels = rowsSelected.map((i: any) => ({
-      ...i,
-      envelope: i?.type_assay?.envelope?.filter(
-        (x: any) => x.id_safra == idSafra,
-      )[0]?.seeds,
-    }));
+    // const parcels = rowsSelected.map((i: any) => ({
+    //   ...i,
+    //   envelope: i?.type_assay?.envelope?.filter(
+    //     (x: any) => x.id_safra === idSafra,
+    //   )[0]?.seeds,
+    // }));
     if (parcels?.length > 0) {
       localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
       // router.push("imprimir");
@@ -1073,6 +1019,11 @@ export default function Listagem({
     handlePagination(0);
   }, []);
 
+  // Call that function when change type order value.
+  useEffect(() => {
+    callingApi(filter);
+  }, [typeOrder]);
+
   // useEffect(() => {
   //   handlePagination();
   //   handleTotalPages();
@@ -1084,7 +1035,7 @@ export default function Listagem({
   }
 
   function selectableFilter(rowData: any) {
-    if (isOpenModal || rowData?.status != "IMPRESSO") {
+    if (isOpenModal || rowData?.status != 'IMPRESSO') {
       return false;
     }
 
@@ -1094,7 +1045,7 @@ export default function Listagem({
   function resetIframe() {
     setStateIframe(stateIframe + 1);
   }
-  
+
   return (
     <>
       <Head>
@@ -1106,7 +1057,7 @@ export default function Listagem({
       {isLoading && (
         <LoadingComponent text="Gerando etiquetas para impressão..." />
       )}
-      
+
       <Modal
         isOpen={isOpenModalPrint}
         shouldCloseOnOverlayClick={false}
@@ -1133,7 +1084,7 @@ export default function Listagem({
           shadow-gray-900/50
           modalEtiquetaAutomatizada"
       >
-        
+
         <h3>Impressão de etiquetas</h3>
         <button
           type="button"
@@ -1149,10 +1100,10 @@ export default function Listagem({
           />
         </button>
 
-        <iframe src={urlPrint} key={stateIframe} id="iframePrint" ref={myRef} width="100%" height="100%"></iframe>
-        
+        <iframe src={urlPrint} key={stateIframe} id="iframePrint" ref={myRef} width="100%" height="100%" />
+
       </Modal>
-      
+
       <Modal
         isOpen={isOpenModal}
         shouldCloseOnOverlayClick={false}
@@ -1707,27 +1658,48 @@ export const getServerSideProps: GetServerSideProps = async ({
     await PreferencesControllers.getConfigGerais()
   )?.response[0]?.itens_per_page;
 
+  // Last page
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
+
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
+  }
+
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : '';
+
+  // RR
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'desc';
+
+  // RR
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : '';
+
   const { token } = req.cookies;
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
-  const { id: experimentGroupId } = query;
+  const experimentGroupId = query.id;
 
-  const { publicRuntimeConfig } = getConfig();
-  const baseUrlParcelas = `${publicRuntimeConfig.apiUrl}/experiment-genotipe`;
-
-  // const filterApplication =
-  //   req.cookies.filterBeforeEdit ||
-  //   `&id_culture=${idCulture}&id_safra=${idSafra}`;
   const filterApplication = `&id_culture=${idCulture}&id_safra=${idSafra}&experimentGroupId=${experimentGroupId}`;
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
 
   const param = `&id_culture=${idCulture}&id_safra=${idSafra}&experimentGroupId=${experimentGroupId}`;
 
+  const { publicRuntimeConfig } = getConfig();
+  const baseUrlParcelas = `${publicRuntimeConfig.apiUrl}/experiment-genotipe`;
   const urlParametersParcelas: any = new URL(baseUrlParcelas);
   urlParametersParcelas.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -1752,12 +1724,15 @@ export const getServerSideProps: GetServerSideProps = async ({
       allParcelas,
       totalItems,
       experimentGroupId,
-      experimentGroup,
       itensPerPage,
       filterApplication,
       idSafra,
+      experimentGroup,
       pageBeforeEdit,
       filterBeforeEdit,
+      idCulture,
+      orderByserver, // RR
+      typeOrderServer, // RR
     },
   };
 };
