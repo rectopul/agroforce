@@ -386,7 +386,7 @@ export default function NovoLocal({
                 style={{ background: '#e5e7eb' }}
               />
             </div>
-            <div className="w-full">
+            {/* <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-2">
                 NPE Final
               </label>
@@ -400,7 +400,7 @@ export default function NovoLocal({
                 disabled
                 style={{ background: '#e5e7eb' }}
               />
-            </div>
+            </div> */}
             <div className="w-full">
               <label className="block text-gray-900 text-sm font-bold mb-1">
                 Prox NPE

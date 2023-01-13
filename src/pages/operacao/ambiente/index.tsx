@@ -516,18 +516,18 @@ export default function Listagem({
           }),
         );
       }
-      if (columnCampos[item] === 'npef') {
-        tableFields.push(
-          headerTableFactoryGlobal({
-            type: 'int',
-            name: 'NPE Final',
-            title: 'npef',
-            orderList,
-            fieldOrder,
-            handleOrder,
-          }),
-        );
-      }
+      // if (columnCampos[item] === 'npef') {
+      //   tableFields.push(
+      //     headerTableFactoryGlobal({
+      //       type: 'int',
+      //       name: 'NPE Final',
+      //       title: 'npef',
+      //       orderList,
+      //       fieldOrder,
+      //       handleOrder,
+      //     }),
+      //   );
+      // }
       if (columnCampos[item] === 'prox_npe') {
         tableFields.push(
           headerTableFactoryGlobal({
