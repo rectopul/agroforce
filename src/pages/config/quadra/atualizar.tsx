@@ -138,13 +138,13 @@ const parcelsCampos = 'experimentName,genotipo,status_t,fase,tecnologia,sc,npe,n
 const plantingCampos = 't4,tratorista,disp_a,disp_b,olheiro,responsible';
 
 export default function AtualizarQuadra({
-      allDividers,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      idQuadra,
-      quadra,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allDividers,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idQuadra,
+  quadra,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -227,7 +227,7 @@ export default function AtualizarQuadra({
   const [colorStar, setColorStar] = useState<string>('');
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
-  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
+  const [fieldOrder, setFieldOrder] = useState<any>('');
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -389,7 +389,7 @@ export default function AtualizarQuadra({
       }
     }
 
-    setFieldOrder(columnG);
+    // setFieldOrder(columnG);
   }
 
   function dividersColumnsOrder(columnsCampos: string) {

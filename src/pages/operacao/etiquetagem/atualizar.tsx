@@ -620,7 +620,7 @@ export default function Listagem({
     if (status === 200) {
       setLoading(false);
       handlePagination(currentPage);
-      //router.reload();
+      // router.reload();
     } else {
       Swal.fire({
         html: message,

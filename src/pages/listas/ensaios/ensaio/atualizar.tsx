@@ -62,21 +62,21 @@ import ComponentLoading from '../../../../components/Loading';
 type IAssayListUpdate = Omit<IAssayList, 'id_safra' | 'period'>;
 
 export default function AtualizarTipoEnsaio({
-          allGenotypeTreatment,
-          totalItens,
-          itensPerPage,
-          treatmentsFilterApplication,
-          experimentFilterApplication,
-          idAssayList,
-          idSafra,
-          assayList,
-          allExperiments,
-          totalExperiments,
-          pageBeforeEdit,
-          filterBeforeEdit,
-          orderByserver,
-          typeOrderServer,
-        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allGenotypeTreatment,
+  totalItens,
+  itensPerPage,
+  treatmentsFilterApplication,
+  experimentFilterApplication,
+  idAssayList,
+  idSafra,
+  assayList,
+  allExperiments,
+  totalExperiments,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  orderByserver,
+  typeOrderServer,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -348,7 +348,7 @@ export default function AtualizarTipoEnsaio({
       }
     }
 
-    setFieldOrder(columnG);
+    // setFieldOrder(columnG);
   }
 
   function formatDecimal(num: number) {

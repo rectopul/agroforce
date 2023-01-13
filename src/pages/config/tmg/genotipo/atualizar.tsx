@@ -103,15 +103,15 @@ interface IData {
 }
 
 export default function Atualizargenotipo({
-      allLote,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      idGenotipo,
-      genotipo,
-      typeOrderServer, // RR
-      orderByserver,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allLote,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idGenotipo,
+  genotipo,
+  typeOrderServer, // RR
+  orderByserver,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -272,7 +272,7 @@ export default function Atualizargenotipo({
     setTimeout(() => {
       setLoading(false);
     }, 100);
-    setFieldOrder(columnG);
+    // setFieldOrder(columnG);
   }
 
   // function headerTableFactory(name: any, title: string) {

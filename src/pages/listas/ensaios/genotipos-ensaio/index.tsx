@@ -6,7 +6,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { removeCookies, setCookies } from 'cookies-next';
 import { replace, useFormik } from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
@@ -64,16 +64,16 @@ import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactor
 import ComponentLoading from '../../../../components/Loading';
 
 export default function Listagem({
-          allTreatments,
-          assaySelect,
-          genotypeSelect,
-          itensPerPage,
-          filterApplication,
-          idSafra,
-          filterBeforeEdit,
-          typeOrderServer,
-          orderByserver,
-        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allTreatments,
+  assaySelect,
+  genotypeSelect,
+  itensPerPage,
+  filterApplication,
+  idSafra,
+  filterBeforeEdit,
+  typeOrderServer,
+  orderByserver,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const [loading, setLoading] = useState<boolean>(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
