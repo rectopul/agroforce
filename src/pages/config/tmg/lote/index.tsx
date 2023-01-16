@@ -27,6 +27,7 @@ import { RiFileExcel2Line } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { tableGlobalFunctions } from 'src/helpers';
+import moment from 'moment';
 import {
   AccordionFilter,
   Button,
@@ -605,6 +606,8 @@ export default function Listagem({
             newItem.dt_export.toISOString().slice(0, -1),
           );
 
+          newItem.dt_export = moment(newItem.dt_export).format('DD-MM-YYYY hh:mm:ss');
+
           newItem.CULTURA = item?.genotipo.culture.name;
           newItem.ANO = item?.year;
           newItem.SAFRA = item?.safra.safraName;
@@ -619,7 +622,8 @@ export default function Listagem({
           newItem.GMR = item?.genotipo.gmr;
           newItem.BGM = item?.genotipo.bgm;
           newItem.TECNOLOGIA = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
-          newItem.DT_EXPORT = new Date(newItem.dt_export);
+          newItem.DT_EXPORT = newItem.dt_export;
+          console.log('🚀 ~ file: index.tsx:623 ~ newData ~ newItem.dt_export', newItem.dt_export);
 
           delete newItem.quant_sementes;
           delete newItem.peso;
