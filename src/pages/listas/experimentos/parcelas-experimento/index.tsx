@@ -744,7 +744,6 @@ export default function Listagem({
     //       })
     //     }
     //   })
-    console.log(filterParam);
     await experimentGenotipeService
       .getAll(filterParam)
       .then(({ status, response }) => {

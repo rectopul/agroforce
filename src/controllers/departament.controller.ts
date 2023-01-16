@@ -100,9 +100,9 @@ export class DepartamentController {
         return { status: 400, response: [], total: 0 };
       }
       return { status: 200, response, total: response.total };
-    } catch (err) {
-      handleError('Department Controller', 'GetAll', err);
-      throw new Error('[Controller] - GetAll Department erro');
+    } catch (error: any) {
+      handleError('Setor Controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll Setor erro');
     }
   }
 
@@ -113,8 +113,9 @@ export class DepartamentController {
       if (!response) throw new Error('Setor não encontrado');
 
       return { status: 200, response };
-    } catch (e) {
-      return { status: 400, message: 'Setor não encontrado' };
+    } catch (error: any) {
+      handleError('Setor Controller', 'GetOne', error.message);
+      throw new Error('[Controller] - GetOne Setor erro');
     }
   }
 
@@ -134,15 +135,14 @@ export class DepartamentController {
         madeBy: data.created_by, module: 'Setor', operation: 'Cadastro', name: data.name, ip: JSON.stringify(ip), idOperation: setor.id,
       });
       return { status: 200, message: 'Setor cadastrado' };
-    } catch (err) {
-      return { status: 404, message: 'Setor não cadastrado' };
+    } catch (error: any) {
+      handleError('Setor Controller', 'Create', error.message);
+      throw new Error('[Controller] - Create Setor erro');
     }
   }
 
   async updateDepartament(data: UpdateDepartmentDTO) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-
       const departament = await this.departamentRepository.findOne(data.id);
 
       if (!departament) return { status: 400, message: 'Setor não existente' };
@@ -153,23 +153,21 @@ export class DepartamentController {
         return { status: 400, message: 'Esse item já está cadastro. favor consultar os inativos' };
       }
 
-      departament.name = data.name;
-      departament.status = data.status;
-
-      await this.departamentRepository.update(data.id, departament);
-      if (departament.status === 1) {
-        await this.reporteRepository.create({
-          madeBy: departament.created_by, module: 'Setor', operation: 'Edição', name: data.name, ip: JSON.stringify(ip), idOperation: departament.id,
-        });
-      }
-      if (departament.status === 0) {
-        await this.reporteRepository.create({
-          madeBy: departament.created_by, module: 'Setor', operation: 'Inativação', name: data.name, ip: JSON.stringify(ip), idOperation: departament.id,
-        });
-      }
+      await this.departamentRepository.update(data.id, data);
+      // if (departament.status === 1) {
+      //   await this.reporteRepository.create({
+      //     madeBy: departament.created_by, module: 'Setor', operation: 'Edição', name: data.name, ip: JSON.stringify(ip), idOperation: departament.id,
+      //   });
+      // }
+      // if (departament.status === 0) {
+      //   await this.reporteRepository.create({
+      //     madeBy: departament.created_by, module: 'Setor', operation: 'Inativação', name: data.name, ip: JSON.stringify(ip), idOperation: departament.id,
+      //   });
+      // }
       return { status: 200, message: 'Setor atualizado' };
-    } catch (err) {
-      return { status: 404, message: 'Erro ao atualizar' };
+    } catch (error: any) {
+      handleError('Setor Controller', 'Update', error.message);
+      throw new Error('[Controller] - Update Setor erro');
     }
   }
 }

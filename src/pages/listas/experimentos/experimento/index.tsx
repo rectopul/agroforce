@@ -93,17 +93,17 @@ interface IData {
 }
 
 export default function Listagem({
-          allExperiments,
-          totalItems,
-          itensPerPage,
-          filterApplication,
-          idSafra,
-          pageBeforeEdit,
-          filterBeforeEdit,
-          typeOrderServer,
-          orderByserver,
-          cultureId,
-        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allExperiments,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  typeOrderServer,
+  orderByserver,
+  cultureId,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState<boolean>(false);
   const { TabsDropDowns } = ITabs;
 
@@ -173,9 +173,9 @@ export default function Listagem({
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == 'tecnologia' ? 'assay_list.tecnologia.cod_tec' : orderBy
-  }&typeOrder=${typeOrder}`;
+  // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
+  //   orderBy == 'tecnologia' ? 'assay_list.tecnologia.cod_tec' : orderBy
+  // }&typeOrder=${typeOrder}`;
 
   const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
 
@@ -270,17 +270,19 @@ export default function Listagem({
       setLoading(true);
       setFilter(parametersFilter);
       setCurrentPage(0);
-      await callingApi(parametersFilter);
+      await callingApi(parametersFilter, currentPage);
       setLoading(false);
     },
   });
 
   // Calling common API
-  async function callingApi(parametersFilter: any) {
+  async function callingApi(parametersFilter: any, newPage: any) {
     setCookies('filterBeforeEdit', parametersFilter);
     setCookies('filterBeforeEditTypeOrder', typeOrder);
     setCookies('filterBeforeEditOrderBy', orderBy);
-    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    parametersFilter = `${parametersFilter}&skip=${(newPage ?? currentPage) * Number(take)}&take=${take}&orderBy=${
+      orderBy === 'tecnologia' ? 'assay_list.tecnologia.cod_tec' : orderBy
+    }&typeOrder=${typeOrder}`;
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
@@ -310,7 +312,7 @@ export default function Listagem({
 
   // Call that function when change type order value.
   useEffect(() => {
-    callingApi(filter);
+    callingApi(filter, currentPage);
   }, [typeOrder]);
 
   async function handleOrder(
@@ -500,33 +502,6 @@ export default function Listagem({
       ),
     };
   }
-
-  // function tecnologiaHeaderFactory(name: string, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: 'tecnologia',
-  //     width: 0,
-  //     sorting: true,
-  //     render: (rowData: any) => (
-  //       <div className="h-10 flex">
-  //         <div>
-  //           {`${rowData?.assay_list?.tecnologia?.cod_tec} ${rowData?.assay_list?.tecnologia?.name}`}
-  //         </div>
-  //       </div>
-  //     ),
-  //   };
-  // }
-
   function columnsOrder(columnsCampos: any): any {
     const columnCampos: any = columnsCampos.split(',');
     const tableFields: any = [];
@@ -786,9 +761,13 @@ export default function Listagem({
     }
   }
 
-  async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
-    await callingApi(filter); // handle pagination globly
+  async function setState(state: any, setStates: any) {
+    return setStates(state);
+  }
+
+  async function handlePagination(newPage: any): Promise<void> {
+    setCurrentPage(newPage);
+    await callingApi(filter, newPage); // handle pagination globly
   }
 
   // Checking defualt values

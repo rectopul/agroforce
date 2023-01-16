@@ -14,6 +14,7 @@ import {
   Content, Input,
 } from '../../../../../components';
 import * as ITabs from '../../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../../components/Loading';
 
 interface ICreateFoco {
   safra: string;
@@ -34,6 +35,7 @@ export default function Cadastro({ safra, id_foco }: any) {
   ));
 
   const router = useRouter();
+  const [loading, setLoading] = useState<boolean>(false);
   const [checkInput, setCheckInput] = useState('text-black');
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
@@ -46,6 +48,7 @@ export default function Cadastro({ safra, id_foco }: any) {
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
+      setLoading(true);
       validateInputs(values);
       if (!values.group) {
         Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
@@ -70,6 +73,7 @@ export default function Cadastro({ safra, id_foco }: any) {
           router.back();
         } else {
           setCheckInput('text-red-600');
+          setLoading(false);
           Swal.fire(response.message);
         }
       }).finally(() => {
@@ -90,6 +94,9 @@ export default function Cadastro({ safra, id_foco }: any) {
 
   return (
     <>
+
+      {loading && <ComponentLoading text="" />}
+
       <Head>
         <title>Novo</title>
       </Head>

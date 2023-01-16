@@ -279,8 +279,6 @@ export default function Listagem({
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
-    console.log('chamou');
-
     setCookies('filterBeforeEdit', parametersFilter);
     setCookies('filterBeforeEditTypeOrder', typeOrder);
     setCookies('filterBeforeEditOrderBy', orderBy);
@@ -555,57 +553,57 @@ export default function Listagem({
       if (status === 200) {
         const newData = response.map((item: any) => {
           const newItem = item;
-          const dataExp = new Date();
-          let hours: string;
-          let minutes: string;
-          let seconds: string;
-          if (String(dataExp.getHours()).length === 1) {
-            hours = `0${String(dataExp.getHours())}`;
-          } else {
-            hours = String(dataExp.getHours());
-          }
-          if (String(dataExp.getMinutes()).length === 1) {
-            minutes = `0${String(dataExp.getMinutes())}`;
-          } else {
-            minutes = String(dataExp.getMinutes());
-          }
-          if (String(dataExp.getSeconds()).length === 1) {
-            seconds = `0${String(dataExp.getSeconds())}`;
-          } else {
-            seconds = String(dataExp.getSeconds());
-          }
-          newItem.DT = `${dataExp.toLocaleDateString(
-            'pt-BR',
-          )} ${hours}:${minutes}:${seconds}`;
+          // const dataExp = new Date();
+          // let hours: string;
+          // let minutes: string;
+          // let seconds: string;
+          // if (String(dataExp.getHours()).length === 1) {
+          //   hours = `0${String(dataExp.getHours())}`;
+          // } else {
+          //   hours = String(dataExp.getHours());
+          // }
+          // if (String(dataExp.getMinutes()).length === 1) {
+          //   minutes = `0${String(dataExp.getMinutes())}`;
+          // } else {
+          //   minutes = String(dataExp.getMinutes());
+          // }
+          // if (String(dataExp.getSeconds()).length === 1) {
+          //   seconds = `0${String(dataExp.getSeconds())}`;
+          // } else {
+          //   seconds = String(dataExp.getSeconds());
+          // }
+          // newItem.DT = `${dataExp.toLocaleDateString(
+          //   'pt-BR',
+          // )} ${hours}:${minutes}:${seconds}`;
 
-          let dtHours: string;
-          let dtMinutes: string;
-          let dtSeconds: string;
+          // let dtHours: string;
+          // let dtMinutes: string;
+          // let dtSeconds: string;
+
+          // if (String(newItem.dt_export.getHours()).length === 1) {
+          //   dtHours = `0${String(newItem.dt_export.getHours())}`;
+          // } else {
+          //   dtHours = String(newItem.dt_export.getHours());
+          // }
+          // if (String(newItem.dt_export.getMinutes()).length === 1) {
+          //   dtMinutes = `0${String(newItem.dt_export.getMinutes())}`;
+          // } else {
+          //   dtMinutes = String(newItem.dt_export.getMinutes());
+          // }
+          // if (String(newItem.dt_export.getSeconds()).length === 1) {
+          //   dtSeconds = `0${String(newItem.dt_export.getSeconds())}`;
+          // } else {
+          //   dtSeconds = String(newItem.dt_export.getSeconds());
+          // }
+
+          // newItem.EXPORT = `${newItem.dt_export.toLocaleDateString(
+          //   'en-US',
+          // )} ${dtHours}:${dtMinutes}:${dtSeconds}`;
 
           newItem.dt_export = new Date(newItem.dt_export);
           newItem.dt_export = new Date(
             newItem.dt_export.toISOString().slice(0, -1),
           );
-
-          if (String(newItem.dt_export.getHours()).length === 1) {
-            dtHours = `0${String(newItem.dt_export.getHours())}`;
-          } else {
-            dtHours = String(newItem.dt_export.getHours());
-          }
-          if (String(newItem.dt_export.getMinutes()).length === 1) {
-            dtMinutes = `0${String(newItem.dt_export.getMinutes())}`;
-          } else {
-            dtMinutes = String(newItem.dt_export.getMinutes());
-          }
-          if (String(newItem.dt_export.getSeconds()).length === 1) {
-            dtSeconds = `0${String(newItem.dt_export.getSeconds())}`;
-          } else {
-            dtSeconds = String(newItem.dt_export.getSeconds());
-          }
-
-          newItem.EXPORT = `${newItem.dt_export.toLocaleDateString(
-            'en-US',
-          )} ${dtHours}:${dtMinutes}:${dtSeconds}`;
 
           newItem.CULTURA = item?.genotipo.culture.name;
           newItem.ANO = item?.year;
@@ -615,13 +613,13 @@ export default function Listagem({
           newItem.FASE = item?.fase;
           newItem.PESO = item?.peso;
           newItem.QUANT_SEMENTES = item?.quant_sementes;
-          newItem.DT_GOM = newItem.DT;
+          newItem.DT_GOM = new Date();
           newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
           newItem.NOME_PRINCIPAL = item?.genotipo.name_main;
           newItem.GMR = item?.genotipo.gmr;
           newItem.BGM = item?.genotipo.bgm;
           newItem.TECNOLOGIA = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
-          newItem.DT_EXPORT = newItem.EXPORT;
+          newItem.DT_EXPORT = new Date(newItem.dt_export);
 
           delete newItem.quant_sementes;
           delete newItem.peso;
@@ -632,7 +630,7 @@ export default function Listagem({
           delete newItem.id_s2;
           delete newItem.id_dados;
           delete newItem.DT;
-          delete newItem.EXPORT;
+          // delete newItem.EXPORT;
           delete newItem.dt_export;
           delete newItem.id;
           delete newItem.id_genotipo;
@@ -642,7 +640,7 @@ export default function Listagem({
           return newItem;
         });
 
-        const workSheet = XLSX.utils.json_to_sheet(newData);
+        const workSheet = XLSX.utils.json_to_sheet(newData, { cellDates: true, dateNF: 'YYYY-MM-DD HH:mm:ss' });
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, 'lotes');
 
