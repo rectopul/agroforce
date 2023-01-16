@@ -171,7 +171,7 @@ export class LoteController {
         parameters.AND.push(JSON.parse(`{ "genotipo": { "tecnologia": { "cod_tec": {"contains": "${options.filterTecnologiaCod}" } } } }`));
       }
       if (options.filterTecnologiaDesc) {
-        parameters.AND.push(JSON.parse(`{ "genotipo": { "tecnologia": { "desc": {"contains": "${options.filterTecnologiaDesc}" } } } }`));
+        parameters.AND.push(JSON.parse(`{ "genotipo": { "tecnologia": { "name": {"contains": "${options.filterTecnologiaDesc}" } } } }`));
       }
 
       const select = {
@@ -245,6 +245,10 @@ export class LoteController {
       if (options.orderBy) {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+      }
+
+      if (parameters.AND.length === 0) {
+        delete parameters.AND;
       }
 
       const response: object | any = await this.loteRepository.findAll(

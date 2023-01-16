@@ -261,8 +261,6 @@ export default function Import({
   });
 
   async function getAllLogs(parametersFilter: any) {
-    console.log('chamou');
-
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     await logImportService
       .getAll(parametersFilter)

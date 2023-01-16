@@ -416,9 +416,11 @@ export class ImportGenotypeController {
                   'o campo DT precisa ser no formato data',
                 );
               } else {
+                console.log('🚀 ~ file: import-genotype.controller.ts:420 ~ ImportGenotypeController ~ spreadSheet[row][column]', spreadSheet[row][column]);
                 spreadSheet[row][column] = spreadSheet[row][column].replace(/\.\d+/, '');
                 // eslint-disable-next-line no-param-reassign
                 spreadSheet[row][column] = new Date(spreadSheet[row][column]);
+                console.log('🚀 ~ file: import-genotype.controller.ts:423 ~ ImportGenotypeController ~ spreadSheet[row][column]', spreadSheet[row][column]);
                 const { status, response }: IReturnObject = await loteController.getAll({
                   id_dados: spreadSheet[row][21],
                   id_culture: idCulture,
@@ -443,6 +445,7 @@ export class ImportGenotypeController {
                 }
                 if (status === 200) {
                   const lastDtImport = response[0]?.dt_export?.getTime();
+                  console.log('🚀 ~ file: import-genotype.controller.ts:448 ~ ImportGenotypeController ~ response[0]?.dt_export', response[0]?.dt_export);
 
                   if (
                     lastDtImport

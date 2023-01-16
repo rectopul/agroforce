@@ -655,8 +655,6 @@ export default function Listagem({
   }
 
   async function seperate(parametersFilter: any) {
-    console.log('chamou');
-
     const skip = currentPage * Number(take);
 
     const tempParams: any = [];

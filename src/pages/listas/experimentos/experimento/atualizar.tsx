@@ -209,8 +209,6 @@ export default function AtualizarLocal({
 
   // Calling common API
   async function getTreatments(parametersFilter: any) {
-    console.log('chamou');
-
     // setCookies('filterBeforeEdit', parametersFilter);
     // setCookies('filterBeforeEditTypeOrder', typeOrder);
     // setCookies('orderList', orderList);

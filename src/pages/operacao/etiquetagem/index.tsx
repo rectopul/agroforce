@@ -239,8 +239,6 @@ export default function Listagem({
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
-    console.log('chamou');
-
     setCookies('filterBeforeEditOperation', parametersFilter);
     setCookies('filterBeforeEditTypeOrderOperation', typeOrder);
     setCookies('filterBeforeEditOrderByOperation', orderBy);

@@ -17,6 +17,7 @@ import {
   Content, Input,
 } from '../../../../../components';
 import * as ITabs from '../../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../../components/Loading';
 
 export default function Cadastro({ grupo, safra }: any) {
   const { TabsDropDowns } = ITabs.default;
@@ -30,6 +31,7 @@ export default function Cadastro({ grupo, safra }: any) {
   ));
 
   const router = useRouter();
+  const [loading, setLoading] = useState<boolean>(false);
   const [checkInput, setCheckInput] = useState('text-black');
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
@@ -54,6 +56,7 @@ export default function Cadastro({ grupo, safra }: any) {
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
+      setLoading(true);
       validateInputs(values);
       if (!values.group) {
         Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
@@ -77,6 +80,7 @@ export default function Cadastro({ grupo, safra }: any) {
           router.back();
         } else {
           setCheckInput('text-red-600');
+          setLoading(false);
           Swal.fire(response.message);
         }
       }).finally(() => {
@@ -87,6 +91,9 @@ export default function Cadastro({ grupo, safra }: any) {
 
   return (
     <>
+
+      {loading && <ComponentLoading text="" />}
+
       <Head>
         <title>Novo</title>
       </Head>
