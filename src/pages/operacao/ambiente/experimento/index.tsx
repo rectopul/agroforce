@@ -117,12 +117,12 @@ interface IData {
 }
 
 export default function Listagem({
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      pageBeforeEdit,
+      filterBeforeEdit,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs;
 
   const tableRef = useRef<any>(null);
@@ -694,7 +694,7 @@ export default function Listagem({
           });
 
           p.npeQT = p.npef - p.npei + 1;
-          env.npef = i;
+          env.npef = i - 1;
 
           // enable disable button && isNCCAvailable
           p.assay_list?.genotype_treatment?.map((exp: any) => {
@@ -704,7 +704,7 @@ export default function Listagem({
             }
           });
         });
-        if (env.npef > env.nextNPE.prox_npe) {
+        if (env.npef > env.nextNPE.npei_i) {
           ++count1;
         }
         const temp = {
@@ -761,6 +761,44 @@ export default function Listagem({
     total_consumed,
     genotipo_treatment,
   }: any) {
+
+    var gt = genotipo_treatment.reduce((unique: any, o: any) => {
+      if (!unique.some((obj: any) => obj.id === o.id && obj.status_experiment === o.status_experiment)) {
+        unique.push(o);
+      }
+      return unique;
+    }, []);
+
+    const tempExperimentObj: any[] = [];
+    data.map((item: any) => {
+      const data: any = {};
+      data.id = Number(item.idExperiment);
+      data.status = 'SORTEADO';
+      tempExperimentObj.push(data);
+    });
+
+    var experimentObj = tempExperimentObj.reduce((unique, o) => {
+      if (!unique.some((obj: any) => obj.id === o.id && obj.status === o.status)) {
+        unique.push(o);
+      }
+      return unique;
+    }, []);
+
+    let npeToUpdate: any[] = [];
+    allNPERecords.map(async (item: any) => {
+      const temp = {
+        id: item.env?.id,
+        npef: item.env?.npef,
+        // npeQT:
+        //   NPESelectedRow?.npeQT == 'N/A'
+        //     ? null
+        //     : NPESelectedRow?.npeQT - total_consumed,
+        status: 3,
+        prox_npe: item.env?.npef + 1,
+      }
+      npeToUpdate.push(temp);
+    })
+
     if (data.length > 0) {
       const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
       const experimentObj: any[] = [];
@@ -776,7 +814,7 @@ export default function Listagem({
         .create(data)
         .then(async ({ status, response }: any) => {
           if (status === 200) {
-            await genotypeTreatmentService.update(genotipo_treatment);
+            await genotypeTreatmentService.update(gt);
             await experimentService.update(experimentObj);
             if (allNPERecords && allNPERecords.length > 0) {
               let npeToUpdate: any[] = [];
@@ -817,6 +855,10 @@ export default function Listagem({
   }
 
   function validateConsumedData() {
+    console.log('SortearDisable : ', SortearDisable);
+    console.log('isNccAvailable : ', isNccAvailable);
+    console.log('isOverLap : ', isOverLap);
+
     if (!SortearDisable) {
       const experiment_genotipo: any[] = [];
       const genotipo_treatment: any[] = [];
@@ -968,7 +1010,7 @@ export default function Listagem({
         >
           <div
             className={`w-full ${selectedNPE?.length > 3 && 'max-h-40 overflow-y-scroll'
-            } mb-4`}
+              } mb-4`}
           >
             <MaterialTable
               style={{
@@ -1027,7 +1069,7 @@ export default function Listagem({
                   },
                   rowStyle: (rowData) => ({
                     backgroundColor:
-                      rowData.npef >= npeData?.env.nextNPE.prox_npe
+                      rowData.npef >= npeData?.env.nextNPE.npei_i
                         ? '#FF5349'
                         : checkValidLote(rowData) ? '#f9fafb'
                           : '#ff8449',
@@ -1205,7 +1247,7 @@ export default function Listagem({
                         disabled={currentPage + 1 >= pages}
                       />
                     </div>
-                    ) as any,
+                  ) as any,
                 }}
               />
             </div>
