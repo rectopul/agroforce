@@ -270,7 +270,7 @@ export default function Listagem({
       setLoading(true);
       setFilter(parametersFilter);
       setCurrentPage(0);
-      await callingApi(parametersFilter);
+      await callingApi(parametersFilter, currentPage);
       setLoading(false);
     },
   });
@@ -312,7 +312,7 @@ export default function Listagem({
 
   // Call that function when change type order value.
   useEffect(() => {
-    callingApi(filter);
+    callingApi(filter, currentPage);
   }, [typeOrder]);
 
   async function handleOrder(
