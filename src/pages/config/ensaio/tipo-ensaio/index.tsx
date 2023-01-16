@@ -237,8 +237,6 @@ export default function TipoEnsaio({
   // Calling common API
 
   async function callingApi(parametersFilter: any) {
-    console.log('chamou');
-
     setCookies('filterBeforeEdit', parametersFilter);
     setCookies('filterBeforeEditTypeOrder', typeOrder);
     setCookies('filterBeforeEditOrderBy', orderBy);

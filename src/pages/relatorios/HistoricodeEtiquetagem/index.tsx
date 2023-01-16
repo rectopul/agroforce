@@ -79,16 +79,16 @@ interface IGenerateProps {
 }
 
 export default function Listagem({
-      allPrintHistory,
-      itensPerPage,
-      filterApplication,
-      filterBeforeEdit,
-      totalItems,
-      typeOrderServer,
-      orderByserver,
-      safraId,
-      idCulture,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allPrintHistory,
+  itensPerPage,
+  filterApplication,
+  filterBeforeEdit,
+  totalItems,
+  typeOrderServer,
+  orderByserver,
+  safraId,
+  idCulture,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState<boolean>(false);
 
   const { tabsReport } = ITabs.default;
@@ -176,7 +176,7 @@ export default function Listagem({
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const pathExtra = `skip=${currentPage * Number(take)
-    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
   const filterStatusBeforeEdit = filterApplication.split('');
 
@@ -216,8 +216,6 @@ export default function Listagem({
 
   // Calling common API
   async function callingApi(parametersFilter: any) {
-    console.log('chamou');
-
     setCookies('filterBeforeEdit', parametersFilter);
     setCookies('filterBeforeEditTypeOrder', typeOrder);
     setCookies('filterBeforeEditOrderBy', orderBy);
@@ -272,9 +270,9 @@ export default function Listagem({
             render: (rowData: any) => (
               <div>
                 {`${rowData.createdAt
-                    ? functionsUtils?.formatDate(new Date(rowData.createdAt))
-                    : null
-                  }`}
+                  ? functionsUtils?.formatDate(new Date(rowData.createdAt))
+                  : null
+                }`}
               </div>
             ),
           }),

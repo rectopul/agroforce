@@ -52,7 +52,7 @@ export class GenotipoController {
       }
 
       if (options.filterTecnologiaDesc) {
-        parameters.AND.push(JSON.parse(`{ "tecnologia": { "desc": {"contains": "${options.filterTecnologiaDesc}" } } }`));
+        parameters.AND.push(JSON.parse(`{ "tecnologia": { "name": {"contains": "${options.filterTecnologiaDesc}" } } }`));
       }
 
       if (options.filterCruza) {
@@ -83,7 +83,6 @@ export class GenotipoController {
           name_experiment: true,
           name_alter: true,
           elit_name: true,
-          // tecnologia: true,
           tecnologia: {
             select: {
               name: true,
@@ -140,6 +139,7 @@ export class GenotipoController {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       }
+
       const response: object | any = await this.genotipoRepository.findAll(
         parameters,
         select,
