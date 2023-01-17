@@ -226,9 +226,11 @@ export default function Import({
 
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
+  // const pathExtra = `skip=${
+  //   currentPage * Number(take)
+  // }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
   const pages = Math.ceil(total / take);
   const formik = useFormik<any>({
     initialValues: {
@@ -263,8 +265,14 @@ export default function Import({
     },
   });
 
-  async function getAllLogs(parametersFilter: any) {
-    parametersFilter = `${parametersFilter}&${pathExtra}`;
+  async function getAllLogs(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
+
+    //parametersFilter = `${parametersFilter}&${pathExtra}`;
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
     await logImportService
       .getAll(parametersFilter)
       .then(({ response, total: allTotal }) => {
@@ -618,8 +626,7 @@ export default function Import({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
-    await getAllLogs(filter);
+    await getAllLogs(filter, page);
   }
 
   function filterFieldFactory(title: string, name: string) {

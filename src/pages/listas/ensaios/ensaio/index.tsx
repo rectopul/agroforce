@@ -162,9 +162,10 @@ export default function TipoEnsaio({
 
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == "tecnologia" ? "tecnologia.cod_tec" : orderBy
-  }&typeOrder=${typeOrder}`;
+
+  // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
+  //   orderBy == "tecnologia" ? "tecnologia.cod_tec" : orderBy
+  // }&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IAssayListFilter>({
     initialValues: {
@@ -208,12 +209,21 @@ export default function TipoEnsaio({
   });
 
   // Calling common API
-  async function callingApi(parametersFilter: any) {
+  async function callingApi(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
+
     setFilter(parametersFilter);
     setCookies("filterBeforeEdit", parametersFilter);
     setCookies("filterBeforeEditTypeOrder", typeOrder);
     setCookies("filterBeforeEditOrderBy", orderBy);
-    parametersFilter = `${parametersFilter}&${pathExtra}`;
+
+    //parametersFilter = `${parametersFilter}&${pathExtra}`;
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${
+      orderBy == "tecnologia" ? "tecnologia.cod_tec" : orderBy
+    }&typeOrder=${typeOrder}`;
+
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
@@ -674,8 +684,7 @@ export default function TipoEnsaio({
     //   }
     // });
 
-    setCurrentPage(page);
-    await callingApi(filter); // handle pagination globly
+    await callingApi(filter, page); // handle pagination globly
   }
 
   // Checking defualt values

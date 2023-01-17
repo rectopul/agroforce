@@ -652,14 +652,15 @@ export default function Listagem({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
-
     let parametersFilter;
-    await seperate(parametersFilter);
+    await seperate(parametersFilter, page);
   }
 
-  async function seperate(parametersFilter: any) {
-    const skip = currentPage * Number(take);
+  async function seperate(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
+
+    //const skip = currentPage * Number(take);
+    const skip = page * Number(take);
 
     const tempParams: any = [];
 

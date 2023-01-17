@@ -120,9 +120,7 @@ export default function AtualizarLocal({
 
   const [materiais, setMateriais] = useState<any>(() => allItens);
   const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
-  const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit)
-  );
+  const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [orderList, setOrder] = useState<number>(
     typeOrderServer == "desc" ? 1 : 2
@@ -167,9 +165,9 @@ export default function AtualizarLocal({
 
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-    orderBy == "tecnologia" ? "tecnologia.cod_tec" : orderBy
-  }&typeOrder=${typeOrder}`;
+  // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
+  //   orderBy == "tecnologia" ? "tecnologia.cod_tec" : orderBy
+  // }&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IUpdateExperimento>({
     initialValues: {
@@ -212,12 +210,21 @@ export default function AtualizarLocal({
   });
 
   // Calling common API
-  async function getTreatments(parametersFilter: any) {
+  async function getTreatments(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
+
     // setCookies('filterBeforeEdit', parametersFilter);
     // setCookies('filterBeforeEditTypeOrder', typeOrder);
     // setCookies('orderList', orderList);
     // setCookies('fieldOrder', fieldOrder);
-    parametersFilter = `${parametersFilter}&${pathExtra}`;
+
+    //parametersFilter = `${parametersFilter}&${pathExtra}`;
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${
+      orderBy == "tecnologia" ? "tecnologia.cod_tec" : orderBy
+    }&typeOrder=${typeOrder}`;
+
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
@@ -228,8 +235,7 @@ export default function AtualizarLocal({
           setTreatments(response.response);
           setTotaItems(response.total);
           tableRef?.current?.dataManager?.changePageSize(
-            //response.total >= take ? take : response.total
-            20
+            response.total >= take ? take : response.total
           );
         }
       });
@@ -654,8 +660,7 @@ export default function AtualizarLocal({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
-    await getTreatments(filter); // handle pagination globly
+    await getTreatments(filter, page); // handle pagination globly
   }
 
   // useEffect(() => {

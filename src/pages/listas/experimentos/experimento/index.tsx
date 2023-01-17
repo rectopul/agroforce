@@ -274,21 +274,25 @@ export default function Listagem({
       setLoading(true);
       setFilter(parametersFilter);
       setCurrentPage(0);
-      await callingApi(parametersFilter, currentPage);
+      await callingApi(parametersFilter);
       setLoading(false);
     },
   });
 
   // Calling common API
-  async function callingApi(parametersFilter: any, newPage: any) {
+  async function callingApi(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
+
     setCookies("filterBeforeEdit", parametersFilter);
     setCookies("filterBeforeEditTypeOrder", typeOrder);
     setCookies("filterBeforeEditOrderBy", orderBy);
+
     parametersFilter = `${parametersFilter}&skip=${
-      (newPage ?? currentPage) * Number(take)
+      page * Number(take)
     }&take=${take}&orderBy=${
       orderBy === "tecnologia" ? "assay_list.tecnologia.cod_tec" : orderBy
     }&typeOrder=${typeOrder}`;
+
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
@@ -318,7 +322,7 @@ export default function Listagem({
 
   // Call that function when change type order value.
   useEffect(() => {
-    callingApi(filter, currentPage);
+    callingApi(filter);
   }, [typeOrder]);
 
   async function handleOrder(
@@ -770,9 +774,8 @@ export default function Listagem({
     return setStates(state);
   }
 
-  async function handlePagination(newPage: any): Promise<void> {
-    setCurrentPage(newPage);
-    await callingApi(filter, newPage); // handle pagination globly
+  async function handlePagination(page: any): Promise<void> {
+    await callingApi(filter, page); // handle pagination globly
   }
 
   // Checking defualt values

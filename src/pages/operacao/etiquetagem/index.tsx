@@ -243,11 +243,18 @@ export default function Listagem({
   });
 
   // Calling common API
-  async function callingApi(parametersFilter: any) {
+  async function callingApi(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
+
     setCookies("filterBeforeEditOperation", parametersFilter);
     setCookies("filterBeforeEditTypeOrderOperation", typeOrder);
     setCookies("filterBeforeEditOrderByOperation", orderBy);
-    parametersFilter = `${parametersFilter}&${pathExtra}`;
+
+    //parametersFilter = `${parametersFilter}&${pathExtra}`;
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
     setFiltersParams(parametersFilter);
     // setCookies("filtersParams", parametersFilter);
 
@@ -673,9 +680,7 @@ export default function Listagem({
     //       setExperimentGroup(response);
     //     }
     //   });
-
-    setCurrentPage(page);
-    await callingApi(filter); // handle pagination globly
+    await callingApi(filter, page); // handle pagination globly
   }
 
   // Checking defualt values
