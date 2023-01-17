@@ -639,6 +639,7 @@ export default function Listagem({
           );
 
           newRow.dt_export = moment(newRow.dt_export).format('DD-MM-YYYY HH:mm:ss');
+          const timeExport = moment().format('DD-MM-YYYY HH:mm:ss');
 
           newRow.NOME_UNIDADE_CULTURA = newRow?.name_unity_culture;
           newRow.ANO = newRow?.year;
@@ -649,7 +650,7 @@ export default function Listagem({
           newRow.PAÍS = newRow.local?.label_country;
           newRow.REGIÃO = newRow.local?.label_region;
           newRow.LOCALIDADE = newRow.local?.name_locality;
-          newRow.DT_GOM = new Date();
+          newRow.DT_GOM = timeExport;
           newRow.DT_EXPORT = newRow.dt_export;
 
           delete newRow.year;

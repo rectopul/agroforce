@@ -356,6 +356,15 @@ export default function TipoEnsaio({
               textColor="white"
             />
           </div>
+          <div>
+            <Button
+              icon={<BsTrashFill size={14} />}
+              title="Excluir um experimento"
+              onClick={() => { }}
+              bgColor="bg-red-600"
+              textColor="white"
+            />
+          </div>
         </div>
       ) : (
         <div className="h-7 flex">
