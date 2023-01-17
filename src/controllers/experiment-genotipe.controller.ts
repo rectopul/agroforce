@@ -58,11 +58,11 @@ export class ExperimentGenotipeController {
       }
 
       if (options.filterCodTec) {
-        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterCodTec}" } }`);
+        parameters.AND.push(JSON.parse(`{ "tecnologia": { "cod_tec": { "contains": "${options.filterCodTec}" } } }`));
       }
 
       if (options.filterTechnology) {
-        parameters.AND.push(JSON.parse(`{ "tecnologia": {"name": "${options.filterTechnology}" } }`));
+        parameters.AND.push(JSON.parse(`{ "tecnologia": {"name": { "contains": "${options.filterTechnology}" } } }`));
       }
 
       if (options.filterExperimentName) {
@@ -499,24 +499,24 @@ export class ExperimentGenotipeController {
     }
   }
 
-  // async setStatus({ idList: idExperiment, status }: any) {
-  //   try {
-  //     await this.ExperimentGenotipeRepository.updateStatus(
-  //       idExperiment,
-  //       status,
-  //     );
-  //     idExperiment.map(async (id: number) => {
-  //       const { response }: any = await this.experimentController.getOne(id);
-  //       await this.experimentGroupController.countEtiqueta(
-  //         response.experimentGroupId,
-  //         idExperiment,
-  //       );
-  //     });
-  //   } catch (error: any) {
-  //     handleError('Parcelas controller', 'setStatus', error.message);
-  //     throw new Error('[Controller] - setStatus Parcelas erro');
-  //   }
-  // }
+  async setStatus({ idList: idExperiment, status }: any) {
+    try {
+      await this.ExperimentGenotipeRepository.updateStatus(
+        idExperiment,
+        status,
+      );
+      idExperiment.map(async (id: number) => {
+        const { response }: any = await this.experimentController.getOne(id);
+        await this.experimentGroupController.countEtiqueta(
+          response.experimentGroupId,
+          idExperiment,
+        );
+      });
+    } catch (error: any) {
+      handleError('Parcelas controller', 'setStatus', error.message);
+      throw new Error('[Controller] - setStatus Parcelas erro');
+    }
+  }
 
   async updateData(data: any) {
     try {
