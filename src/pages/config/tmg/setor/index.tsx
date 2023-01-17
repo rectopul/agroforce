@@ -108,9 +108,13 @@ export default function Listagem({
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [statusAccordionFilter, setStatusAccordionFilter] =
+    useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: "CamposGerenciados[]", title: "Nome", value: "name" },
@@ -392,7 +396,7 @@ export default function Listagem({
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
+    typeOrderG !== "" ? (typeOrderG == "desc" ? setOrder(1) : setOrder(2)) : "";
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -554,9 +558,13 @@ export default function Listagem({
           flex flex-col
           items-start
           gap-4
+          overflow-y-hidden
         "
         >
-          <AccordionFilter title="Filtrar setores">
+          <AccordionFilter
+            title="Filtrar setores"
+            onChange={(_, e) => setStatusAccordionFilter(e)}
+          >
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -619,7 +627,7 @@ export default function Listagem({
             </div>
           </AccordionFilter>
 
-          <div className="w-full h-full overflow-y-scroll">
+          <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
               style={{ background: "#f9fafb" }}
@@ -628,8 +636,11 @@ export default function Listagem({
               options={{
                 sorting: true,
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - ${
+                  statusAccordionFilter ? 400 : 320
+                }px)`,
                 headerStyle: {
-                  zIndex: 0,
+                  zIndex: 1,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
