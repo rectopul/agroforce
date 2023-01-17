@@ -606,7 +606,7 @@ export default function Listagem({
             newItem.dt_export.toISOString().slice(0, -1),
           );
 
-          newItem.dt_export = moment(newItem.dt_export).format('DD-MM-YYYY hh:mm:ss');
+          newItem.dt_export = moment(newItem.dt_export).format('DD-MM-YYYY HH:mm:ss');
 
           newItem.CULTURA = item?.genotipo.culture.name;
           newItem.ANO = item?.year;
