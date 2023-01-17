@@ -638,7 +638,7 @@ export default function Listagem({
             newRow.dt_export.toISOString().slice(0, -1),
           );
 
-          newRow.dt_export = moment(newRow.dt_export).format('DD-MM-YYYY hh:mm:ss');
+          newRow.dt_export = moment(newRow.dt_export).format('DD-MM-YYYY HH:mm:ss');
 
           newRow.NOME_UNIDADE_CULTURA = newRow?.name_unity_culture;
           newRow.ANO = newRow?.year;
