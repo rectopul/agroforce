@@ -1,11 +1,11 @@
-import { useFormik } from 'formik';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import getConfig from 'next/config';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useState, ReactNode, useEffect } from 'react';
-import { IoMdArrowBack } from 'react-icons/io';
-import MaterialTable from 'material-table';
+import { useFormik } from "formik";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useState, ReactNode, useEffect } from "react";
+import { IoMdArrowBack } from "react-icons/io";
+import MaterialTable from "material-table";
 import {
   Button,
   Content,
@@ -13,35 +13,35 @@ import {
   AccordionFilter,
   CheckBox,
   Select,
-} from 'src/components';
-import Swal from 'sweetalert2';
+} from "src/components";
+import Swal from "sweetalert2";
 
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from 'react-beautiful-dnd';
+} from "react-beautiful-dnd";
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiTwotoneStar,
-} from 'react-icons/ai';
-import { BiEdit, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from 'react-icons/ri';
-import { UserPreferenceController } from 'src/controllers/user-preference.controller';
+} from "react-icons/ai";
+import { BiEdit, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line, RiPlantLine, RiSettingsFill } from "react-icons/ri";
+import { UserPreferenceController } from "src/controllers/user-preference.controller";
 import {
   userPreferencesService,
   layoutChildrenService,
   quadraService,
-} from 'src/services';
-import * as XLSX from 'xlsx';
-import * as ITabs from '../../../../shared/utils/dropdown';
-import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
-import ComponentLoading from '../../../../components/Loading';
+} from "src/services";
+import * as XLSX from "xlsx";
+import * as ITabs from "../../../../shared/utils/dropdown";
+import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
+import ComponentLoading from "../../../../components/Loading";
 
 interface IFilter {
   filterStatus: object | any;
@@ -77,9 +77,11 @@ export default function Atualizarquadra({
   const tabsDropDowns = TabsDropDowns();
   const [loading, setLoading] = useState<boolean>(false);
 
-  tabsDropDowns.map((tab) => (tab.titleTab === 'QUADRAS'
-    ? (tab.statusTab = true)
-    : (tab.statusTab = false)));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === "QUADRAS"
+      ? (tab.statusTab = true)
+      : (tab.statusTab = false)
+  );
 
   const router = useRouter();
 
@@ -111,7 +113,7 @@ export default function Atualizarquadra({
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire('Genótipo atualizado com sucesso!');
+            Swal.fire("Genótipo atualizado com sucesso!");
             router.back();
           } else {
             Swal.fire(response.message);
@@ -120,45 +122,45 @@ export default function Atualizarquadra({
     },
   });
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.layout_children || {
     id: 0,
     table_preferences:
-      'id,sl,sc,s_aloc,tiro,cj,disparo,dist,st,spc,scolheita,tipo_parcela',
+      "id,sl,sc,s_aloc,tiro,cj,disparo,dist,st,spc,scolheita,tipo_parcela",
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+    preferences.table_preferences
   );
 
   const [disparos, setDisparos] = useState<any[]>(() => layoutChildren);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [orderList, setOrder] = useState<number>(1);
-  const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
+  const [arrowOrder, setArrowOrder] = useState<ReactNode>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'SL', value: 'sl' },
-    { name: 'CamposGerenciados[]', title: 'sSCc', value: 'sc' },
-    { name: 'CamposGerenciados[]', title: 'S Aloc', value: 's_aloc' },
-    { name: 'CamposGerenciados[]', title: 'Tiro', value: 'tiro' },
-    { name: 'CamposGerenciados[]', title: 'CJ', value: 'cj' },
-    { name: 'CamposGerenciados[]', title: 'Disparo', value: 'disparo' },
-    { name: 'CamposGerenciados[]', title: 'Dist', value: 'dist' },
-    { name: 'CamposGerenciados[]', title: 'ST', value: 'st' },
-    { name: 'CamposGerenciados[]', title: 'SPC', value: 'spc' },
-    { name: 'CamposGerenciados[]', title: 'SColheita', value: 'scolheita' },
+    { name: "CamposGerenciados[]", title: "SL", value: "sl" },
+    { name: "CamposGerenciados[]", title: "sSCc", value: "sc" },
+    { name: "CamposGerenciados[]", title: "S Aloc", value: "s_aloc" },
+    { name: "CamposGerenciados[]", title: "Tiro", value: "tiro" },
+    { name: "CamposGerenciados[]", title: "CJ", value: "cj" },
+    { name: "CamposGerenciados[]", title: "Disparo", value: "disparo" },
+    { name: "CamposGerenciados[]", title: "Dist", value: "dist" },
+    { name: "CamposGerenciados[]", title: "ST", value: "st" },
+    { name: "CamposGerenciados[]", title: "SPC", value: "spc" },
+    { name: "CamposGerenciados[]", title: "SColheita", value: "scolheita" },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Tipo Parcela',
-      value: 'tipo_parcela',
+      name: "CamposGerenciados[]",
+      title: "Tipo Parcela",
+      value: "tipo_parcela",
     },
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [colorStar, setColorStar] = useState<string>('');
-  const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>('');
-  const [fieldOrder, setFieldOrder] = useState<any>('');
+  const [colorStar, setColorStar] = useState<string>("");
+  const [orderBy, setOrderBy] = useState<string>("");
+  const [orderType, setOrderType] = useState<string>("");
+  const [fieldOrder, setFieldOrder] = useState<any>("");
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -183,162 +185,163 @@ export default function Atualizarquadra({
   function idHeaderFactory() {
     return {
       title: <div className="flex items-center">{arrowOrder}</div>,
-      field: 'id',
+      field: "id",
       width: 0,
       sorting: false,
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-7 flex">
-          <div>
-            <button
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
+      render: () =>
+        colorStar === "#eba417" ? (
+          <div className="h-7 flex">
+            <div>
+              <button
+                className="w-full h-full flex items-center justify-center border-0"
+                onClick={() => setColorStar("")}
+              >
+                <AiTwotoneStar size={20} color="#eba417" />
+              </button>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="h-7 flex">
-          <div>
-            <button
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
+        ) : (
+          <div className="h-7 flex">
+            <div>
+              <button
+                className="w-full h-full flex items-center justify-center border-0"
+                onClick={() => setColorStar("#eba417")}
+              >
+                <AiTwotoneStar size={20} />
+              </button>
+            </div>
           </div>
-        </div>
-      )),
+        ),
     };
   }
 
   function columnsOrder(camposGerenciados: string) {
-    const columnCampos: string[] = camposGerenciados.split(',');
+    const columnCampos: string[] = camposGerenciados.split(",");
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
       // if (columnCampos[index] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
-      if (columnCampos[index] === 'sl') {
+      if (columnCampos[index] === "sl") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'SL',
-            title: 'sl',
+            name: "SL",
+            title: "sl",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'sc') {
+      if (columnCampos[index] === "sc") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'SC',
-            title: 'sc',
+            name: "SC",
+            title: "sc",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 's_aloc') {
+      if (columnCampos[index] === "s_aloc") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'S Aloc',
-            title: 's_aloc',
+            name: "S Aloc",
+            title: "s_aloc",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'tiro') {
+      if (columnCampos[index] === "tiro") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Tiro',
-            title: 'tiro',
+            name: "Tiro",
+            title: "tiro",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'cj') {
+      if (columnCampos[index] === "cj") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'CJ',
-            title: 'cj',
+            name: "CJ",
+            title: "cj",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'disparo') {
+      if (columnCampos[index] === "disparo") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Disparos',
-            title: 'disparo',
+            name: "Disparos",
+            title: "disparo",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'dist') {
+      if (columnCampos[index] === "dist") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Dist',
-            title: 'dist',
+            name: "Dist",
+            title: "dist",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'st') {
+      if (columnCampos[index] === "st") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'ST',
-            title: 'st',
+            name: "ST",
+            title: "st",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'spc') {
+      if (columnCampos[index] === "spc") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'SPC',
-            title: 'spc',
+            name: "SPC",
+            title: "spc",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'scolheita') {
+      if (columnCampos[index] === "scolheita") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'SColheira',
-            title: 'scolheita',
+            name: "SColheira",
+            title: "scolheita",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'tipo_parcela') {
+      if (columnCampos[index] === "tipo_parcela") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Tipo Parcela',
-            title: 'tipo_parcela',
+            name: "Tipo Parcela",
+            title: "tipo_parcela",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
     });
@@ -348,26 +351,26 @@ export default function Atualizarquadra({
   async function handleOrder(
     column: string,
     order: string | any,
-    name: any,
+    name: any
   ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = 'asc';
+      typeOrder = "asc";
     } else if (order === 2) {
-      typeOrder = 'desc';
+      typeOrder = "desc";
     } else {
-      typeOrder = '';
+      typeOrder = "";
     }
     setOrderBy(column);
     setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
+    if (filter && typeof filter !== "undefined") {
+      if (typeOrder !== "") {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== '') {
+    } else if (typeOrder !== "") {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_layout=${id_layout}`;
     } else {
       parametersFilter = filter;
@@ -389,7 +392,7 @@ export default function Atualizarquadra({
       if (orderList === 1) {
         setArrowOrder(<AiOutlineArrowUp />);
       } else {
-        setArrowOrder('');
+        setArrowOrder("");
       }
     }
 
@@ -398,7 +401,7 @@ export default function Atualizarquadra({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
+    let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -421,7 +424,7 @@ export default function Atualizarquadra({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
       userLogado.preferences.layout_children = {
         id: preferences.id,
@@ -432,7 +435,7 @@ export default function Atualizarquadra({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -457,9 +460,9 @@ export default function Atualizarquadra({
       if (response.status === 200) {
         const newData = response.response.map((row: any) => {
           if (row.status === 0) {
-            row.status = 'Inativo';
+            row.status = "Inativo";
           } else {
-            row.status = 'Ativo';
+            row.status = "Ativo";
           }
 
           row.ESQUEMA = row.Layout.esquema;
@@ -497,20 +500,20 @@ export default function Atualizarquadra({
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'Esquema');
+        XLSX.utils.book_append_sheet(workBook, workSheet, "Esquema");
 
         // Buffer
         const buf = XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
+          bookType: "xlsx", // xlsx
+          type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
+          bookType: "xlsx", // xlsx
+          type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, 'Esquema.xlsx');
+        XLSX.writeFile(workBook, "Esquema.xlsx");
       }
     });
     setLoading(false);
@@ -552,11 +555,10 @@ export default function Atualizarquadra({
     return (
       <div className="w-full h-6">
         <label className="block text-gray-900 text-sm font-bold mb-1">
-          *
-          {name}
+          *{name}
         </label>
         <Input
-          style={{ background: '#e5e7eb' }}
+          style={{ background: "#e5e7eb" }}
           disabled
           required
           id={title}
@@ -574,55 +576,53 @@ export default function Atualizarquadra({
         <title>Atualizar layout quadra</title>
       </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
-        <form
-          className="w-full bg-white shadow-md rounded px-4 pt-3 pb-3 mt-2"
-          onSubmit={formik.handleSubmit}
-        >
-          <h1 className="text-xl">Atualizar layout quadra</h1>
-
-          <div className="w-full flex justify-between items-start gap-5 mt-2">
-            {updateFieldFactory('esquema', 'Código esquema')}
-
-            {updateFieldFactory('plantadeira', 'Plantadeiras')}
-          </div>
-          <div className="w-full flex justify-between items-start gap-5 mt-10">
-            {updateFieldFactory('tiros', 'Tiros')}
-
-            {updateFieldFactory('disparos', 'Disparos')}
-
-            {updateFieldFactory('parcelas', 'Parcelas')}
-
-            <div
-              style={{ minWidth: 150, maxWidth: 150 }}
-              className="h-7 flex gap-3 justify-center mt-6"
-            >
-              <div className="w-30" />
-              <Button
-                type="button"
-                value="Voltar"
-                bgColor="bg-red-600"
-                textColor="white"
-                icon={<IoMdArrowBack size={18} />}
-                onClick={() => router.back()}
-              />
-            </div>
-          </div>
-        </form>
-        <main className="w-full flex flex-col items-start gap-8">
-          <div
-            style={{ marginTop: '1%' }}
-            className="w-full h-full overflow-y-scroll"
+        <main className="w-full flex flex-col items-start shadow-md gap-0 overflow-y-hidden">
+          <form
+            className="w-full bg-white shadow-md rounded px-4 pt-3 pb-3 mt-2"
+            onSubmit={formik.handleSubmit}
           >
+            <h1 className="text-xl">Atualizar layout quadra</h1>
+
+            <div className="w-full flex justify-between items-start gap-5 mt-2">
+              {updateFieldFactory("esquema", "Código esquema")}
+
+              {updateFieldFactory("plantadeira", "Plantadeiras")}
+            </div>
+            <div className="w-full flex justify-between items-start gap-5 mt-10">
+              {updateFieldFactory("tiros", "Tiros")}
+
+              {updateFieldFactory("disparos", "Disparos")}
+
+              {updateFieldFactory("parcelas", "Parcelas")}
+
+              <div
+                style={{ minWidth: 150, maxWidth: 150 }}
+                className="h-7 flex gap-3 justify-center mt-6"
+              >
+                <div className="w-30" />
+                <Button
+                  type="button"
+                  value="Voltar"
+                  bgColor="bg-red-600"
+                  textColor="white"
+                  icon={<IoMdArrowBack size={18} />}
+                  onClick={() => router.back()}
+                />
+              </div>
+            </div>
+          </form>
+          <div style={{ marginTop: "1%" }} className="w-full h-full">
             <MaterialTable
-              style={{ background: '#f9fafb' }}
+              style={{ background: "#f9fafb" }}
               columns={columns}
               data={disparos}
               options={{
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - 460px)`,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 1,
                 },
-                rowStyle: { background: '#f9fafb', height: 35 },
+                rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -689,7 +689,7 @@ export default function Atualizarquadra({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value as string,
+                                                generate.value as string
                                               )}
                                             />
                                           </li>
@@ -719,59 +719,60 @@ export default function Atualizarquadra({
                     </div>
                   </div>
                 ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => setCurrentPage(0)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {Array(1)
-                      .fill('')
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(pages)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
-                ) as any,
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(0)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage < 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(pages)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
+                  ) as any,
               }}
             />
           </div>
@@ -783,23 +784,24 @@ export default function Atualizarquadra({
 
 export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) ?? 10;
+  const itensPerPage =
+    (await (
+      await PreferencesControllers.getConfigGerais()
+    )?.response[0]?.itens_per_page) ?? 10;
 
   const { token } = context.req.cookies;
 
   const { publicRuntimeConfig } = getConfig();
   const requestOptions: RequestInit | undefined = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   };
 
   const baseUrl = `${publicRuntimeConfig.apiUrl}/layout-quadra`;
   const apiQuadra = await fetch(
     `${baseUrl}/${context.query.id}`,
-    requestOptions,
+    requestOptions
   );
   const layout = await apiQuadra.json();
 
@@ -814,7 +816,7 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
 
   const api = await fetch(
     `${baseUrlDisparos}?id_layout=${id_layout}`,
-    requestOptions,
+    requestOptions
   );
 
   const { response: layoutChildren, total: totalItems } = await api.json();
