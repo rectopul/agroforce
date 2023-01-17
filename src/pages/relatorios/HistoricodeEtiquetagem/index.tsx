@@ -220,11 +220,17 @@ export default function Listagem({
   });
 
   // Calling common API
-  async function callingApi(parametersFilter: any) {
+  async function callingApi(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
+
     setCookies("filterBeforeEdit", parametersFilter);
     setCookies("filterBeforeEditTypeOrder", typeOrder);
     setCookies("filterBeforeEditOrderBy", orderBy);
-    parametersFilter = `${parametersFilter}&${pathExtra}`;
+
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
@@ -235,8 +241,7 @@ export default function Listagem({
           setNPE(response.response);
           setTotalItems(response.total);
           tableRef.current.dataManager.changePageSize(
-            //response.total >= take ? take : response.total,
-            20
+            response.total >= take ? take : response.total
           );
         }
       })
@@ -487,8 +492,7 @@ export default function Listagem({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
-    await callingApi(filter); // handle pagination globly
+    await callingApi(filter, page); // handle pagination globly
   }
 
   function filterFieldFactory(title: any, name: any) {
