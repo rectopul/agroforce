@@ -52,6 +52,7 @@
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.5.23",
     "material-table": "^1.63.0",
+    "moment": "^2.29.4",
     "newrelic": "^9.7.5",
     "next": "^12.1.0",
     "next-barcode": "1.4.0",

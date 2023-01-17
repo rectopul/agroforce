@@ -25,6 +25,7 @@ import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
+import moment from 'moment';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   tecnologiaService,
@@ -467,12 +468,14 @@ export default function Listagem({
             row.dt_export.toISOString().slice(0, -1),
           );
 
+          row.dt_export = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
+
           row.CULTURA = row.culture.desc;
           row.NOME = row.name;
           row.DESC = row.desc;
           row.COD_TEC = row.cod_tec;
           row.DT_GOM = new Date();
-          row.DT_EXPORT = new Date(row.dt_export);
+          row.DT_EXPORT = row.dt_export;
 
           delete row.culture;
           delete row.id;

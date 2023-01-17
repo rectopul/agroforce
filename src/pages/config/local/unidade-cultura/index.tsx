@@ -33,6 +33,7 @@ import { unidadeCulturaService, userPreferencesService } from 'src/services';
 import * as XLSX from 'xlsx';
 import { BsTrashFill } from 'react-icons/bs';
 import Swal from 'sweetalert2';
+import moment from 'moment';
 import {
   AccordionFilter,
   Button,
@@ -637,6 +638,8 @@ export default function Listagem({
             newRow.dt_export.toISOString().slice(0, -1),
           );
 
+          newRow.dt_export = moment(newRow.dt_export).format('DD-MM-YYYY hh:mm:ss');
+
           newRow.NOME_UNIDADE_CULTURA = newRow?.name_unity_culture;
           newRow.ANO = newRow?.year;
           newRow.NOME_LUGAR_CULTURA = newRow.local?.name_local_culture;
@@ -647,7 +650,7 @@ export default function Listagem({
           newRow.REGIÃO = newRow.local?.label_region;
           newRow.LOCALIDADE = newRow.local?.name_locality;
           newRow.DT_GOM = new Date();
-          newRow.DT_EXPORT = new Date(newRow.dt_export);
+          newRow.DT_EXPORT = newRow.dt_export;
 
           delete newRow.year;
           delete newRow.name_unity_culture;
