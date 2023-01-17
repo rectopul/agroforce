@@ -140,7 +140,7 @@ export class UserController {
 
   async create(data: object | any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+    //  const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const parameters: any = {};
       if (data !== null && data !== undefined) {
@@ -208,9 +208,9 @@ export class UserController {
               { cultureId: data.cultureId, userId: response.id, created_by: data.created_by },
             );
           }
-          await this.reporteRepository.create({
-            madeBy: data.created_by, module: 'Usuários', operation: 'Cadastro', name: data.name, idOperation: response.id, ip: JSON.stringify(ip),
-          });
+          // await this.reporteRepository.create({
+          //   madeBy: data.created_by, module: 'Usuários', operation: 'Cadastro', name: data.name, idOperation: response.id, ip: JSON.stringify(ip),
+          // });
           return { status: 200, message: 'users inseridos' };
         }
         return { status: 400, message: 'houve um erro, tente novamente' };

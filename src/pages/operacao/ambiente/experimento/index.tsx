@@ -117,12 +117,12 @@ interface IData {
 }
 
 export default function Listagem({
-      itensPerPage,
-      filterApplication,
-      idSafra,
-      pageBeforeEdit,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  itensPerPage,
+  filterApplication,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs;
 
   const tableRef = useRef<any>(null);
@@ -761,8 +761,7 @@ export default function Listagem({
     total_consumed,
     genotipo_treatment,
   }: any) {
-
-    var gt = genotipo_treatment.reduce((unique: any, o: any) => {
+    const gt = genotipo_treatment.reduce((unique: any, o: any) => {
       if (!unique.some((obj: any) => obj.id === o.id && obj.status_experiment === o.status_experiment)) {
         unique.push(o);
       }
@@ -784,7 +783,7 @@ export default function Listagem({
       return unique;
     }, []);
 
-    let npeToUpdate: any[] = [];
+    const npeToUpdate: any[] = [];
     allNPERecords.map(async (item: any) => {
       const temp = {
         id: item.env?.id,
@@ -795,9 +794,10 @@ export default function Listagem({
         //     : NPESelectedRow?.npeQT - total_consumed,
         status: 3,
         prox_npe: item.env?.npef + 1,
-      }
+      };
       npeToUpdate.push(temp);
-    })
+    });
+
     if (data.length > 0) {
       const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
       // const experimentObj: any[] = [];
@@ -1009,7 +1009,7 @@ export default function Listagem({
         >
           <div
             className={`w-full ${selectedNPE?.length > 3 && 'max-h-40 overflow-y-scroll'
-              } mb-4`}
+            } mb-4`}
           >
             <MaterialTable
               style={{

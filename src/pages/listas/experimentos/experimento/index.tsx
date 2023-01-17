@@ -761,10 +761,6 @@ export default function Listagem({
     }
   }
 
-  async function setState(state: any, setStates: any) {
-    return setStates(state);
-  }
-
   async function handlePagination(newPage: any): Promise<void> {
     setCurrentPage(newPage);
     await callingApi(filter, newPage); // handle pagination globly

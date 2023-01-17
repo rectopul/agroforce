@@ -15,6 +15,7 @@ import { LogImportController } from '../log-import.controller';
 import { ImportController } from '../import.controller';
 import { NpeController } from './npe.controller';
 import { TecnologiaController } from '../technology/tecnologia.controller';
+import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
 import { GroupController } from '../group.controller';
 import { FocoController } from '../foco.controller';
 import { TypeAssayController } from '../tipo-ensaio.controller';
@@ -41,6 +42,7 @@ export class ImportNpeController {
     const logImportController = new LogImportController();
     const typeAssayController = new TypeAssayController();
     const tecnologiaController = new TecnologiaController();
+    const experimentGenotipeController = new ExperimentGenotipeController();
 
     const npeTemp: Array<string> = [];
     const npeiTemp: Array<number> = [];
@@ -386,24 +388,24 @@ export class ImportNpeController {
                         spreadSheet[0][column],
                         `ja cadastrado dentro do grupo ${groupNumber[0]?.group}`,
                       );
+                    } else {
+                      const {
+                        response: parcelas,
+                      }: IReturnObject = await experimentGenotipeController.getAll({
+                        id_safra: idSafra,
+                        filterNpeFrom: Number(spreadSheet[row][column]),
+                        filterNpeTo: Number(spreadSheet[row][column]),
+                      });
+                      if (parcelas.length > 0) {
+                        responseIfError[Number(column)] += responseGenericFactory(
+                          Number(column) + 1,
+                          row,
+                          spreadSheet[0][column],
+                          `o NPE ${spreadSheet[row][column]} já esta sendo usado por uma parcela`,
+                        );
+                      }
                     }
                   }
-                  // const resp: any = await npeController.validateNpeiDBA({
-                  //   Column: Number(column) + 1,
-                  //   Line: Number(row) + 1,
-                  //   safra: idSafra,
-                  //   foco: this.aux.focoId,
-                  //   npei: spreadSheet[row][column],
-                  // });
-                  // if (resp.erro === 1) {
-                  //   responseIfError[Number(column)] += resp.message;
-                  // }
-                  // if (responseIfError.length === 0) {
-                  //   this.aux.npei = spreadSheet[row][column];
-                  //   this.aux.npef = spreadSheet[row][column];
-                  //   this.aux.prox_npe = spreadSheet[row][column];
-                  //   this.aux.npei_i = spreadSheet[row][column];
-                  // }
                 } else {
                   responseIfError[Number(column)]
                     += responsePositiveNumericFactory(

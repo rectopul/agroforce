@@ -416,11 +416,9 @@ export class ImportGenotypeController {
                   'o campo DT precisa ser no formato data',
                 );
               } else {
-                console.log('🚀 PLANILHA', spreadSheet[row][column]);
                 spreadSheet[row][column] = spreadSheet[row][column].replace(/\.\d+/, '');
                 // eslint-disable-next-line no-param-reassign
                 spreadSheet[row][column] = new Date(spreadSheet[row][column]);
-                console.log('🚀 POS NEW DATE  ', spreadSheet[row][column]);
                 const { status, response }: IReturnObject = await loteController.getAll({
                   id_dados: spreadSheet[row][21],
                   id_culture: idCulture,
@@ -445,7 +443,6 @@ export class ImportGenotypeController {
                 }
                 if (status === 200) {
                   const lastDtImport = response[0]?.dt_export?.getTime();
-                  console.log('🚀 BANCO', response[0]?.dt_export);
 
                   if (
                     lastDtImport
