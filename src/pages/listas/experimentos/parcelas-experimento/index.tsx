@@ -63,15 +63,15 @@ import ComponentLoading from "../../../../components/Loading";
 import { functionsUtils } from "../../../../shared/utils/functionsUtils";
 
 export default function Listagem({
-          // assaySelect,
-          genotypeSelect,
-          itensPerPage,
-          filterApplication,
-          idSafra,
-          filterBeforeEdit,
-          typeOrderServer,
-          orderByserver,
-        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  // assaySelect,
+  genotypeSelect,
+  itensPerPage,
+  filterApplication,
+  idSafra,
+  filterBeforeEdit,
+  typeOrderServer,
+  orderByserver,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState<boolean>(false);
   const { TabsDropDowns } = ITabs.default;
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -98,7 +98,9 @@ export default function Listagem({
   const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -229,6 +231,8 @@ export default function Listagem({
   const [orderType, setOrderType] = useState<string>("");
   const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [statusAccordionFilter, setStatusAccordionFilter] =
+    useState<boolean>(false);
   // const take: number = itensPerPage;
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -440,7 +444,7 @@ export default function Listagem({
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
+    typeOrderG !== "" ? (typeOrderG == "desc" ? setOrder(1) : setOrder(2)) : "";
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -1172,9 +1176,13 @@ export default function Listagem({
           flex flex-col
           items-start
           gap-4
+          overflow-y-hidden
         "
         >
-          <AccordionFilter title="Filtrar parcelas dos experimentos">
+          <AccordionFilter
+            title="Filtrar parcelas dos experimentos"
+            onChange={(_, e) => setStatusAccordionFilter(e)}
+          >
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -1450,7 +1458,7 @@ export default function Listagem({
           </AccordionFilter>
 
           {/* overflow-y-scroll */}
-          <div className="w-full h-full overflow-y-scroll">
+          <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
               style={{ background: "#f9fafb" }}
@@ -1467,8 +1475,11 @@ export default function Listagem({
                 },
                 // selectionProps: (rowData: any) => isOpenModal && { disabled: rowData },
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - ${
+                  statusAccordionFilter ? 460 : 320
+                }px)`,
                 headerStyle: {
-                  zIndex: 0,
+                  zIndex: 1,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
