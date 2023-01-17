@@ -468,7 +468,7 @@ export default function Listagem({
             row.dt_export.toISOString().slice(0, -1),
           );
 
-          row.dt_export = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
+          row.dt_export = moment(row.dt_export).format('DD-MM-YYYY HH:mm:ss');
 
           row.CULTURA = row.culture.desc;
           row.NOME = row.name;
