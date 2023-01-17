@@ -13,6 +13,8 @@ export class ExperimentRepository extends BaseRepository {
       select: {
         id: true,
         idAssayList: true,
+        idSafra: true,
+        idLocal: true,
         density: true,
         period: true,
         repetitionsNumber: true,
@@ -31,17 +33,20 @@ export class ExperimentRepository extends BaseRepository {
             bgm: true,
             tecnologia: {
               select: {
+                id: true,
                 name: true,
                 cod_tec: true,
               },
             },
             foco: {
               select: {
+                id: true,
                 name: true,
               },
             },
             type_assay: {
               select: {
+                id: true,
                 name: true,
               },
             },

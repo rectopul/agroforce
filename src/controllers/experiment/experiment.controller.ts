@@ -9,6 +9,8 @@ import { IReturnObject } from '../../interfaces/shared/Import.interface';
 import { ExperimentGroupController } from '../experiment-group/experiment-group.controller';
 import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
+import { NpeController } from '../npe/npe.controller';
+import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -18,7 +20,6 @@ export class ExperimentController {
   reporteRepository = new ReporteRepository();
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: experiment.controller.ts:21 ~ ExperimentController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
@@ -350,13 +351,13 @@ export class ExperimentController {
       const experimentGenotipeController = new ExperimentGenotipeController();
       if (data.idList) {
         await this.experimentRepository.relationGroup(data);
-        // if (data.experimentGroupId) {
-        //    const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
-        //    await this.setParcelasStatus(idList);
-        //   return { status: 200, message: 'Experimento atualizado' };
-        // }
-        //  const idList = await this.countExperimentGroupChildren(Number(data.newGroupId));
-        //  await this.setParcelasStatus(idList);
+        if (data.experimentGroupId) {
+          const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
+          await this.setParcelasStatus(idList);
+          return { status: 200, message: 'Experimento atualizado' };
+        }
+        const idList = await this.countExperimentGroupChildren(Number(data.newGroupId));
+        await this.setParcelasStatus(idList);
         return { status: 200, message: 'Experimento atualizado' };
       }
       if (data.id) {
@@ -373,9 +374,9 @@ export class ExperimentController {
           }
         }
         const response = await this.experimentRepository.update(experimento.id, data);
-        // if (experimento.experimentGroupId) {
-        //   await this.countExperimentGroupChildren(experimento.experimentGroupId);
-        // }
+        if (experimento.experimentGroupId) {
+          await this.countExperimentGroupChildren(experimento.experimentGroupId);
+        }
         if (!response.experimentGroupId) {
           if (!(data.nlp || data.clp || data.comments)) {
             await this.experimentRepository.update(response.id, { status: 'SORTEADO' });
@@ -408,6 +409,8 @@ export class ExperimentController {
   }
 
   async delete(data: any) {
+    const npeController = new NpeController();
+    const genotypeTreatment = new GenotypeTreatmentController();
     try {
       const experimentGenotipeController = new ExperimentGenotipeController();
       const { response: experimentExist }: any = await this.getOne(Number(data.id));
@@ -425,6 +428,36 @@ export class ExperimentController {
             id: experimentExist?.idAssayList,
             status: 'IMPORTADO',
           });
+          assayList?.genotype_treatment.map(async (treatment: any) => {
+            await genotypeTreatment.update({
+              id: treatment.id,
+              status: 'IMPORTADO',
+            });
+          });
+        }
+        const { response: ambiente } = await npeController.getAll({
+          safraId: experimentExist?.idSafra,
+          localId: experimentExist?.idLocal,
+          focoId: experimentExist?.assay_list?.foco?.id,
+          epoca: experimentExist?.period,
+          filterCodTecnologia: experimentExist?.assay_list?.tecnologia?.cod_tec,
+          typeAssayId: experimentExist?.assay_list?.type_assay?.id,
+        });
+        const { response: experiment } = await this.getAll({
+          idSafra: experimentExist?.idSafra,
+          idLocal: experimentExist?.idLocal,
+          Foco: experimentExist?.assay_list?.foco?.id,
+          Epoca: experimentExist?.period,
+          Tecnologia: experimentExist?.assay_list?.tecnologia?.cod_tec,
+          TypeAssay: experimentExist?.assay_list?.type_assay?.id,
+          Status: 'IMPORTADO',
+        });
+        if (ambiente.length > 0 && experiment.length === 0) {
+          await npeController.update({
+            id: ambiente[0]?.id,
+            status: 1,
+            edited: 0,
+          });
         }
 
         if (response) {
@@ -438,24 +471,24 @@ export class ExperimentController {
     }
   }
 
-  // async countExperimentGroupChildren(id: number) {
-  //   const experimentGroupController = new ExperimentGroupController();
-  //   const { response }: IReturnObject = await experimentGroupController.getOne(id);
-  //   if (!response) throw new Error('GRUPO DE EXPERIMENTO NÃO ENCONTRADO');
-  //   const idList = response.experiment?.map((item: any) => item.id);
-  //   const experimentAmount = response.experiment?.length;
-  //   let { status } = response;
-  //   if (!response.status) {
-  //     status = experimentAmount === 0 ? null : 'ETIQ. NÃO INICIADA';
-  //   }
-  //   await experimentGroupController.update({ id: response.id, experimentAmount, status });
-  //   return idList;
-  // }
+  async countExperimentGroupChildren(id: number) {
+    const experimentGroupController = new ExperimentGroupController();
+    const { response }: IReturnObject = await experimentGroupController.getOne(id);
+    if (!response) throw new Error('GRUPO DE EXPERIMENTO NÃO ENCONTRADO');
+    const idList = response.experiment?.map((item: any) => item.id);
+    const experimentAmount = response.experiment?.length;
+    let { status } = response;
+    if (!response.status) {
+      status = experimentAmount === 0 ? null : 'ETIQ. NÃO INICIADA';
+    }
+    await experimentGroupController.update({ id: response.id, experimentAmount, status });
+    return idList;
+  }
 
-  // async setParcelasStatus(idList: Array<number>) {
-  //   const experimentGenotipeController = new ExperimentGenotipeController();
-  //   await experimentGenotipeController.setStatus({ idList, status: 'EM ETIQUETAGEM' });
-  // }
+  async setParcelasStatus(idList: Array<number>) {
+    const experimentGenotipeController = new ExperimentGenotipeController();
+    await experimentGenotipeController.setStatus({ idList, status: 'EM ETIQUETAGEM' });
+  }
 
   async handleExperimentStatus(id: number) {
     const { response }: any = await this.getOne(id);

@@ -353,52 +353,8 @@ export default function Listagem({
     }, 100);
   }
 
-  // function headerTableFactory(name: any, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: true,
-  //   };
-  // }
-
-  function tecnologiaHeaderFactory(name: string, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList, 'tecnologia')}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: 'tecnologia',
-      width: 0,
-      sorting: true,
-      render: (rowData: any) => (
-        <div className="h-10 flex">
-          <div>
-            {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.name}`}
-          </div>
-        </div>
-      ),
-    };
-  }
-
   function formatDecimal(num: number) {
-    return Number(num).toFixed(1);
+    return num ? Number(num).toFixed(1) : '';
   }
 
   function columnsOrder(columnsCampos: string) {
@@ -406,9 +362,6 @@ export default function Listagem({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      // if (columnCampos[index] === 'id') {
-      //   tableFields.push(idHeaderFactory());
-      // }
       if (columnCampos[index] === 'year') {
         tableFields.push(
           headerTableFactoryGlobal({
@@ -505,8 +458,8 @@ export default function Listagem({
       if (columnCampos[index] === 'gmr') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'GMR',
             type: 'int',
+            name: 'GMR',
             title: 'genotipo.gmr',
             orderList,
             fieldOrder,
@@ -607,8 +560,14 @@ export default function Listagem({
           );
 
           newItem.dt_export = moment(newItem.dt_export).format('DD-MM-YYYY HH:mm:ss');
+          const timeExport = moment().format('DD-MM-YYYY HH:mm:ss');
 
           newItem.CULTURA = item?.genotipo.culture.name;
+          newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
+          newItem.NOME_PRINCIPAL = item?.genotipo.name_main;
+          newItem.GMR = item?.genotipo.gmr;
+          newItem.BGM = item?.genotipo.bgm;
+          newItem.TECNOLOGIA = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
           newItem.ANO = item?.year;
           newItem.SAFRA = item?.safra.safraName;
           newItem.COD_LOTE = item?.cod_lote;
@@ -616,14 +575,8 @@ export default function Listagem({
           newItem.FASE = item?.fase;
           newItem.PESO = item?.peso;
           newItem.QUANT_SEMENTES = item?.quant_sementes;
-          newItem.DT_GOM = new Date();
-          newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
-          newItem.NOME_PRINCIPAL = item?.genotipo.name_main;
-          newItem.GMR = item?.genotipo.gmr;
-          newItem.BGM = item?.genotipo.bgm;
-          newItem.TECNOLOGIA = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
           newItem.DT_EXPORT = newItem.dt_export;
-          console.log('🚀 ~ file: index.tsx:623 ~ newData ~ newItem.dt_export', newItem.dt_export);
+          newItem.DT_GOM = timeExport;
 
           delete newItem.quant_sementes;
           delete newItem.peso;
@@ -735,17 +688,6 @@ export default function Listagem({
 
   async function handlePagination(page: any): Promise<void> {
     setCurrentPage(page);
-    // // manage using comman function
-    // const { parametersFilter, currentPages } = await tableGlobalFunctions.handlePaginationGlobal(currentPage, take, filter);
-
-    // await loteService.getAll(parametersFilter).then((response) => {
-    //   if (response.status === 200) {
-    //     setLotes(response.response);
-    //     setTotalItems(response.total); // Set new total records
-    //     setCurrentPage(currentPages); // Set new current page
-    //   }
-    // });
-
     await callingApi(filter); // handle pagination globly
   }
 
