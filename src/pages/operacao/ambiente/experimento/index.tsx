@@ -777,7 +777,7 @@ export default function Listagem({
       tempExperimentObj.push(data);
     });
 
-    var experimentObj = tempExperimentObj.reduce((unique, o) => {
+    const experimentObj = tempExperimentObj.reduce((unique, o) => {
       if (!unique.some((obj: any) => obj.id === o.id && obj.status === o.status)) {
         unique.push(o);
       }
@@ -798,16 +798,15 @@ export default function Listagem({
       }
       npeToUpdate.push(temp);
     })
-
     if (data.length > 0) {
       const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
-      const experimentObj: any[] = [];
-      data.map((item: any) => {
-        const data: any = {};
-        data.id = Number(item.idExperiment);
-        data.status = 'SORTEADO';
-        experimentObj.push(data);
-      });
+      // const experimentObj: any[] = [];
+      // data.map((item: any) => {
+      //   const data: any = {};
+      //   data.id = Number(item.idExperiment);
+      //   data.status = 'SORTEADO';
+      //   experimentObj.push(data);
+      // });
       setLoading(true);
 
       await experimentGenotipeService
