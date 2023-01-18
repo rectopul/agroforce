@@ -116,6 +116,7 @@ export class LogImportController {
         invalid_data: true,
         created_at: true,
         updated_at: true,
+        filePath: true,
       };
 
       if (options.idSafra) {

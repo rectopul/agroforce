@@ -533,6 +533,7 @@ model log_import {
   invalid_data String?   @db.LongText
   executeTime  String?
   totalRecords Int?
+  filePath    String?  
 
   safra safra @relation(fields: [idSafra], references: [id])
   user  user  @relation(fields: [user_id], references: [id])

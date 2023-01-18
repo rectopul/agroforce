@@ -80,9 +80,21 @@ async function deleted(url: any, body: any) {
   return handleResponse(response);
 }
 
+async function postFile(url: any, body: any) {
+  
+  const requestOptions: object | any = {
+    method: 'POST',
+    headers: { ...authHeader(url) },
+    body: body
+  };
+  const response = await fetch(url, requestOptions);
+  return handleResponse(response);
+}
+
 export const fetchWrapper = {
   get,
   post,
   put,
   deleted,
+  postFile,
 };

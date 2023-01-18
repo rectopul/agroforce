@@ -10,6 +10,7 @@ import React, {
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { IoIosCloudUpload } from 'react-icons/io';
+import { BsDownload } from "react-icons/bs";
 import {
   AiFillInfoCircle,
   AiOutlineArrowDown,
@@ -31,7 +32,7 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { useFormik } from 'formik';
+import { Form, useFormik } from 'formik';
 import {
   Box, Tab, Tabs, Typography,
 } from '@mui/material';
@@ -55,6 +56,9 @@ import * as ITabs from '../../../shared/utils/dropdown';
 import ComponentLoading from '../../../components/Loading';
 import { functionsUtils } from '../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
+import { resolve } from 'node:path/win32';
+import { rejects } from 'node:assert';
+import * as fs from 'fs';
 // import { importblob } from '../../../services/azure_services/import_blob_azure';
 // import { ImputtoBase64 } from '../../../components/helpers/funções_helpers';
 
@@ -79,16 +83,14 @@ interface TabPanelProps {
 }
 
 export default function Import({
-      allLogs,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      uploadInProcess,
-      idSafra,
-      idCulture,
-      typeOrderServer, // RR
-      orderByserver, // RR
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allLogs,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  uploadInProcess,
+  idSafra,
+  idCulture,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const router = useRouter();
@@ -108,6 +110,68 @@ export default function Import({
   const bgColor = executeUpload === 1 ? 'bg-red-600' : 'bg-blue-600';
   const [loading, setLoading] = useState<boolean>(false);
   const [importLoading, setImportLoading] = useState<boolean>(false);
+  const [filePath, setFilePath] = useState<any>('');
+  const [file, setFile] = useState<any>();
+  const [moduleId, setModuleId] = useState<any>();
+  const [table, setTable] = useState<any>();  
+
+  useEffect(() => {
+    console.log("coming2", filePath, file);
+
+    if(filePath!==''){
+      readXlsxFile(file)
+        .then(async (rows) => {
+          setImportLoading(true);
+  
+            if (moduleId) {
+              const { message } = await importService.validate({
+                spreadSheet: rows,
+                moduleId,
+                created_by: userLogado.id,
+                idSafra,
+                idCulture,
+                table,
+                disabledButton,
+                filePath: filePath
+              });
+              setImportLoading(false);
+              handlePagination();
+              Swal.fire({
+                html: message,
+                width: '800',
+              });
+              setExecuteUpload(0);
+            } else {
+              const { message } = await importService.validateProtocol({
+                spreadSheet: rows,
+                moduleId,
+                created_by: userLogado.id,
+                idSafra,
+                idCulture,
+                table,
+                disabledButton,
+                filePath: filePath
+              });
+              setImportLoading(false);
+              handlePagination();
+              Swal.fire({
+                html: message,
+                width: '800',
+              });
+              setExecuteUpload(0);
+            }
+          })
+          .catch((e: any) => {
+            Swal.fire({
+              html: 'Erro ao ler planilha',
+              width: '800',
+              didClose: () => {
+                router.reload();
+              },
+            });
+          });
+    }
+  }, [filePath]);
 
   async function readExcel(moduleId: number, table: string) {
     try {
@@ -129,56 +193,26 @@ export default function Import({
 
       const userLogado = JSON.parse(localStorage.getItem('user') as string);
       setExecuteUpload(1);
-
-      readXlsxFile(value.files[0])
-        .then(async (rows) => {
-          setImportLoading(true);
-
-          if (moduleId) {
-            const { message } = await importService.validate({
-              spreadSheet: rows,
-              moduleId,
-              created_by: userLogado.id,
-              idSafra,
-              idCulture,
-              table,
-              disabledButton,
-            });
-            setImportLoading(false);
-            handlePagination(currentPage);
-            Swal.fire({
-              html: message,
-              width: '800',
-            });
-            setExecuteUpload(0);
-          } else {
-            const { message } = await importService.validateProtocol({
-              spreadSheet: rows,
-              moduleId,
-              created_by: userLogado.id,
-              idSafra,
-              idCulture,
-              table,
-              disabledButton,
-            });
-            setImportLoading(false);
-            handlePagination(currentPage);
-            Swal.fire({
-              html: message,
-              width: '800',
-            });
-            setExecuteUpload(0);
+      let file = value.files[0];
+      setModuleId(moduleId);
+      setTable(table);
+      setFile(value.files[0]);
+      
+      if(file){
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("fileName", file.name);
+        new Promise(async (resolve, reject) => {
+          const response = await importService.uploadFile(formData);
+          if(response.status == 201){
+            resolve(response);
+          }else{
+            reject(response);
           }
+        }).then( (res: any)=> {
+          setFilePath(res.filename);
         })
-        .catch((e: any) => {
-          Swal.fire({
-            html: 'Erro ao ler planilha',
-            width: '800',
-            didClose: () => {
-              router.reload();
-            },
-          });
-        });
+      }
 
       (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
     } catch (e: any) {
@@ -205,7 +239,7 @@ export default function Import({
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
+  const [orderList, setOrder] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -220,7 +254,7 @@ export default function Import({
   const [colorStar, setColorStar] = useState<string>('');
   const [orderBy, setOrderBy] = useState<string>('');
   const [typeOrder, setTypeOrder] = useState<string>('');
-  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
 
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -261,8 +295,6 @@ export default function Import({
   });
 
   async function getAllLogs(parametersFilter: any) {
-    console.log('chamou');
-
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     await logImportService
       .getAll(parametersFilter)
@@ -348,35 +380,94 @@ export default function Import({
   //   };
   // }
 
+  async function downloadFile(rowData: any){
+    const filename = `/log_import/${rowData.filePath}`;
+
+    await importService.checkFile().then((res) => {
+      console.log('res:', res.files);
+      let validFileName = res.files;
+      let valid = false;
+
+      if(validFileName.length>0){
+        validFileName.map((e: any) => {
+          if(e == rowData.filePath){
+            valid = true;
+          }
+        });
+
+        if(valid){
+          //creating an invisible element
+          var element = document.createElement('a');
+         //  console.log("process.env.PUBLIC_URL :", process.env.PUBLIC_URL);
+          element.setAttribute('href', filename);
+          element.setAttribute('download', rowData.filePath);
+       
+          // Above code is equivalent to
+          // <a href="path of file" download="file name">
+           
+          document.body.appendChild(element);
+       
+          //onClick property
+          element.click();
+       
+          document.body.removeChild(element);
+        }else{
+          Swal.fire('No File Available To Download');
+        }
+      }
+    });
+  }
+
   function headerTableActionFactory() {
     return {
       title: 'Ação',
       field: 'action',
       sorting: false,
       render: (rowData: any) => (
-        <div className="h-7 flex">
-          {rowData.invalid_data ? (
-            <div className="h-7">
-              <Button
-                title={rowData.state}
-                onClick={async () => {
-                  setLoading(true);
-                  Swal.fire({
-                    html: `<div style="max-height: 350px; overflow-y: auto">${rowData.invalid_data}</di>`,
-                    width: '800',
-                    didClose: () => {
-                      setLoading(false);
-                    },
-                  });
-                }}
-                icon={<AiFillInfoCircle size={20} />}
-                bgColor="bg-blue-600"
-                textColor="white"
-              />
-            </div>
-          ) : (
-            ''
-          )}
+        <div className="flex justify-between">
+          <div className="h-7 flex">
+            {rowData.invalid_data ? (
+              <div className="h-7">
+                <Button
+                  title={rowData.state}
+                  onClick={async () => {
+                    setLoading(true);
+                    Swal.fire({
+                      html: `<div style="max-height: 350px; overflow-y: auto">${rowData.invalid_data}</di>`,
+                      width: '800',
+                      didClose: () => {
+                        setLoading(false);
+                      },
+                    });
+                  }}
+                  icon={<AiFillInfoCircle size={20} />}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                />
+              </div>
+            ) : (
+              ''
+            )}
+          </div>
+          <div className="h-7 flex">
+            {rowData.filePath ? (
+              <div className="h-7">
+                <Button
+                  title="Exportar planilha para substituição"
+                  icon={<BsDownload size={20} />}
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  onClick={() => {
+                    downloadFile(rowData);
+                    // replacementExcel();
+                  }}
+                >
+                </Button>
+              </div>
+            ) : (
+              ''
+            )}
+          </div>
         </div>
       ),
     };
@@ -464,10 +555,10 @@ export default function Import({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(columnG);
+    setFieldOrder(name);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
+    setOrder(orderByG);
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -560,6 +651,7 @@ export default function Import({
   //   }
   // }
 
+
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
     await logImportService.getAll(filter).then(({ status, response }) => {
@@ -617,8 +709,7 @@ export default function Import({
     }
   }
 
-  async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
+  async function handlePagination(): Promise<void> {
     await getAllLogs(filter);
   }
 
@@ -705,7 +796,10 @@ export default function Import({
   }
 
   function ComponentImport({
-    title, table, moduleId, disabled = false,
+    title,
+    table,
+    moduleId,
+    disabled = false,
   }: any) {
     return (
       <div className="m-4 grid grid-cols-3 gap-4 h-20 items-center">
@@ -739,10 +833,10 @@ export default function Import({
     );
   }
 
-  // useEffect(() => {
-  //   handlePagination();
-  //   handleTotalPages();
-  // }, [currentPage]);
+  useEffect(() => {
+    handlePagination();
+    handleTotalPages();
+  }, [currentPage]);
 
   return (
     <>
@@ -1116,14 +1210,14 @@ export default function Import({
                       {...props}
                     >
                       <Button
-                        onClick={() => handlePagination(0)}
+                        onClick={() => setCurrentPage(0)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdFirstPage size={18} />}
                         disabled={currentPage < 1}
                       />
                       <Button
-                        onClick={() => handlePagination(currentPage - 1)}
+                        onClick={() => setCurrentPage(currentPage - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiLeftArrow size={15} />}
@@ -1134,7 +1228,7 @@ export default function Import({
                         .map((value, index) => (
                           <Button
                             key={index}
-                            onClick={() => handlePagination(index)}
+                            onClick={() => setCurrentPage(index)}
                             value={`${currentPage + 1}`}
                             bgColor="bg-blue-600"
                             textColor="white"
@@ -1142,14 +1236,14 @@ export default function Import({
                           />
                         ))}
                       <Button
-                        onClick={() => handlePagination(currentPage + 1)}
+                        onClick={() => setCurrentPage(currentPage + 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiRightArrow size={15} />}
                         disabled={currentPage + 1 >= pages}
                       />
                       <Button
-                        onClick={() => handlePagination(pages)}
+                        onClick={() => setCurrentPage(pages)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdLastPage size={18} />}
