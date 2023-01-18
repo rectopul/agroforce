@@ -86,17 +86,17 @@ interface Idata {
 }
 
 export default function Listagem({
-      locais,
-      itensPerPage,
-      filterApplication,
-      totalItems,
-      pageBeforeEdit,
-      filterBeforeEdit,
-      typeOrderServer,
-      orderByserver,
-      cultureId,
-      safraId,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  locais,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  typeOrderServer,
+  orderByserver,
+  cultureId,
+  safraId,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tableRef = useRef<any>(null);
@@ -122,7 +122,9 @@ export default function Listagem({
     Number(pageBeforeEdit)
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
@@ -183,6 +185,8 @@ export default function Listagem({
     },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [statusAccordionFilter, setStatusAccordionFilter] =
+    useState<boolean>(false);
   const [selectedRowById, setSelectedRowById] = useState<number>();
   const [colorStar, setColorStar] = useState<string>("");
   // const [orderBy, setOrderBy] = useState<string>('');
@@ -195,8 +199,9 @@ export default function Listagem({
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
-  const pathExtra = `skip=${currentPage * Number(take)
-    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const pathExtra = `skip=${
+    currentPage * Number(take)
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const columns = columnsOrder(camposGerenciados);
   const filters = [
@@ -250,11 +255,17 @@ export default function Listagem({
   });
 
   // Calling common API
-  async function callingApi(parametersFilter: any) {
+  async function callingApi(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
+
     setCookies("filterBeforeEdit", parametersFilter);
     setCookies("filterBeforeEditTypeOrder", typeOrder);
     setCookies("filterBeforeEditOrderBy", orderBy);
-    parametersFilter = `${parametersFilter}&${pathExtra}`;
+
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
@@ -512,7 +523,7 @@ export default function Listagem({
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
+    typeOrderG !== "" ? (typeOrderG == "desc" ? setOrder(1) : setOrder(2)) : "";
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -662,7 +673,6 @@ export default function Listagem({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
     // const skip = currentPage * Number(take);
     // let parametersFilter;
     // if (orderType) {
@@ -679,7 +689,7 @@ export default function Listagem({
     //     setLocal(response.response);
     //   }
     // });
-    await callingApi(filter); // handle pagination globly
+    await callingApi(filter, page); // handle pagination globly
   }
 
   // Checking defualt values
@@ -721,8 +731,11 @@ export default function Listagem({
         <title>Listagem de Lugares de Culturas</title>
       </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="config">
-        <main className="h-full w-full flex flex-col items-start gap-4">
-          <AccordionFilter title="Filtrar lugares de culturas">
+        <main className="h-full w-full flex flex-col items-start gap-4 overflow-y-hidden">
+          <AccordionFilter
+            title="Filtrar lugares de culturas"
+            onChange={(_, e) => setStatusAccordionFilter(e)}
+          >
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -776,7 +789,7 @@ export default function Listagem({
           </AccordionFilter>
 
           {/* overflow-y-scroll */}
-          <div className="w-full h-full overflow-y-scroll">
+          <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
               columns={columns}
@@ -786,6 +799,12 @@ export default function Listagem({
               }}
               options={{
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - ${
+                  statusAccordionFilter ? 400 : 320
+                }px)`,
+                headerStyle: {
+                  zIndex: 1,
+                },
                 search: false,
                 filtering: false,
                 pageSize: Number(take),

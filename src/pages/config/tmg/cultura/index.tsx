@@ -79,15 +79,15 @@ interface IData {
 }
 
 export default function Listagem({
-      allCultures,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      pageBeforeEdit,
-      filterBeforeEdit,
-      typeOrderServer, // RR
-      orderByserver, // RR
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allCultures,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  typeOrderServer, // RR
+  orderByserver, // RR
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tableRef = useRef<any>(null);
@@ -115,9 +115,13 @@ export default function Listagem({
   );
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [statusAccordionFilter, setStatusAccordionFilter] =
+    useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // {
     //   name: 'CamposGerenciados[]',
@@ -162,8 +166,10 @@ export default function Listagem({
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
-  const pathExtra = `skip=${currentPage * Number(take)
-    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+
+  // const pathExtra = `skip=${
+  //   currentPage * Number(take)
+  // }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -184,12 +190,18 @@ export default function Listagem({
   });
 
   // Calling common API
-  async function callingApi(parametersFilter: any) {
+  async function callingApi(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
+
     setCookies("filterBeforeEdit", parametersFilter);
     setCookies("filterBeforeEditTypeOrder", typeOrder);
     setCookies("filterBeforeEditOrderBy", orderBy);
 
-    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    //parametersFilter = `${parametersFilter}&${pathExtra}`;
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
     // parametersFilter = filterParams
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
@@ -287,7 +299,7 @@ export default function Listagem({
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
+    typeOrderG !== "" ? (typeOrderG == "desc" ? setOrder(1) : setOrder(2)) : "";
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -559,7 +571,6 @@ export default function Listagem({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
     // // manage using comman function
     // const { parametersFilter, currentPages } = await tableGlobalFunctions.handlePaginationGlobal(currentPage, take, filtersParams);
 
@@ -572,7 +583,7 @@ export default function Listagem({
     //   }
     // });
 
-    await callingApi(filter); // handle pagination globly
+    await callingApi(filter, page); // handle pagination globly
   }
 
   // Checking defualt values
@@ -602,9 +613,13 @@ export default function Listagem({
           flex flex-col
           items-start
           gap-4
+          overflow-y-hidden
         "
         >
-          <AccordionFilter title="Filtrar culturas">
+          <AccordionFilter
+            title="Filtrar culturas"
+            onChange={(_, e) => setStatusAccordionFilter(e)}
+          >
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -668,7 +683,7 @@ export default function Listagem({
             </div>
           </AccordionFilter>
 
-          <div className="w-full h-full overflow-y-scroll">
+          <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
               style={{ background: "#f9fafb" }}
@@ -677,8 +692,11 @@ export default function Listagem({
               options={{
                 sorting: false,
                 showTitle: true,
+                maxBodyHeight: `calc(100vh - ${
+                  statusAccordionFilter ? 400 : 320
+                }px)`,
                 headerStyle: {
-                  zIndex: 0,
+                  zIndex: 1,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
