@@ -881,7 +881,7 @@ export default function Listagem({
           placeholder={name}
           id={title}
           name={title}
-          // defaultValue={title}
+          defaultValue={checkValue("filterCodTec")}
           onChange={formik.handleChange}
         />
       </div>
@@ -933,7 +933,9 @@ export default function Listagem({
       setCookies("filterBeforeEditTypeOrder", typeOrder);
       setCookies("filterBeforeEditOrderBy", orderBy);
       setCookies("filtersParams", filtersParams);
-      setCookies("lastPage", "substituicao");
+      setCookies("lastPage", "atualizar");
+      setCookies("takeBeforeEdit", take);
+      setCookies("itensPage", itensPerPage);
 
       router.push(
         "/listas/ensaios/genotipos-ensaio/substituicao?value=ensaios"
@@ -1005,7 +1007,7 @@ export default function Listagem({
 
   function selectableFilter(rowData: any) {
     if (isOpenModal || rowData?.status_experiment == "EXP. SORTEADO") {
-      return false;
+      return true;
     }
 
     return true;
@@ -1191,6 +1193,7 @@ export default function Listagem({
                         id="filterCodTec"
                         name="filterCodTec"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterCodTec")}
                       />
                     </div>
                   </div>
@@ -1207,6 +1210,7 @@ export default function Listagem({
                         id="filterGgenCod"
                         name="filterGgenCod"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterGgenCod")}
                       />
                     </div>
                   </div>
@@ -1221,38 +1225,13 @@ export default function Listagem({
                         id="filterGgenName"
                         name="filterGgenName"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterGgenName")}
                       />
                     </div>
                   </div>
 
                   {filterFieldFactory("filterGli", "GLI")}
 
-                  {/* <div className="h-10 w-1/2 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      GLI
-                    </label>
-                    <SelectAutoComplete
-                      data={assaySelect.map((i: any) => i.name)}
-                      // value={checkValue("filterGli")}
-                      onChange={(e: any) => formik.setFieldValue('filterGli', e)}
-                      value={checkValue('filterGli')}
-                    />
-                  </div> */}
-
-                  {/* <div className="h-7 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      GLI
-                    </label>
-                    <Select
-                      values={assaySelect}
-                      id="filterGli"
-                      name="filterGli"
-                      onChange={formik.handleChange}
-                      selected={false}
-                    />
-                  </div> */}
-
-                  {/* {filterFieldFactory('filterGli', 'GLI')} */}
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       BGM_Ens
@@ -1264,6 +1243,7 @@ export default function Listagem({
                         id="filterBgmFrom"
                         name="filterBgmFrom"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterBgmFrom")}
                       />
                       <Input
                         type="number"
@@ -1272,6 +1252,7 @@ export default function Listagem({
                         id="filterBgmTo"
                         name="filterBgmTo"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterBgmTo")}
                       />
                     </div>
                   </div>
@@ -1287,6 +1268,7 @@ export default function Listagem({
                         id="filterBgmGenotypeFrom"
                         name="filterBgmGenotypeFrom"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterBgmGenotypeFrom")}
                       />
                       <Input
                         type="number"
@@ -1295,6 +1277,7 @@ export default function Listagem({
                         id="filterBgmGenotypeTo"
                         name="filterBgmGenotypeTo"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterBgmGenotypeTo")}
                       />
                     </div>
                   </div>
@@ -1310,6 +1293,7 @@ export default function Listagem({
                         id="filterGmrFrom"
                         name="filterGmrFrom"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterGmrFrom")}
                       />
                       <Input
                         type="number"
@@ -1318,6 +1302,7 @@ export default function Listagem({
                         id="filterGmrTo"
                         name="filterGmrTo"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterGmrTo")}
                       />
                     </div>
                   </div>
@@ -1342,6 +1327,7 @@ export default function Listagem({
                         id="filterNtFrom"
                         name="filterNtFrom"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterNtFrom")}
                       />
                       <Input
                         type="number"
@@ -1350,6 +1336,7 @@ export default function Listagem({
                         id="filterNtTo"
                         name="filterNtTo"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterNtTo")}
                       />
                     </div>
                   </div>
@@ -1363,6 +1350,7 @@ export default function Listagem({
                         id="filterStatusT"
                         name="filterStatusT"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterStatusT")}
                       />
                     </div>
                   </div>
@@ -1378,76 +1366,6 @@ export default function Listagem({
                     />
                   </div>
 
-                  {/* <div className="h-10 w-1/2 ml-4">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status do Ensaio
-                    </label>
-
-                    <AccordionFilter>
-                      <DragDropContext onDragEnd={handleOnDragEnd}>
-                        <Droppable droppableId="characters">
-                          {(provided) => (
-                            <ul
-                              className="w-full h-full characters"
-                              {...provided.droppableProps}
-                              ref={provided.innerRef}
-                            >
-                              {statusFilter.map((generate, index) => (
-                                <Draggable
-                                  key={index}
-                                  draggableId={String(generate.title)}
-                                  index={index}
-                                >
-                                  {(providers) => (
-                                    <li
-                                      ref={providers.innerRef}
-                                      {...providers.draggableProps}
-                                      {...providers.dragHandleProps}
-                                    >
-                                      <CheckBox
-                                        name={generate.name}
-                                        title={generate.title?.toString()}
-                                        value={generate.value}
-                                        defaultChecked={false}
-                                      />
-                                    </li>
-                                  )}
-                                </Draggable>
-                              ))}
-                              {provided.placeholder}
-                            </ul>
-                          )}
-                        </Droppable>
-                      </DragDropContext>
-                    </AccordionFilter>
-                  </div> */}
-                  {/* {filterFieldFactory('filterStatusAssay', 'Status do ensaio')} */}
-
-                  {/* <div className="h-7 w-1/2 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Nome do genótipo
-                    </label> */}
-                  {/* <Select
-                      values={[
-                        { id: "", name: "Selecione" },
-                        ...genotypeSelect,
-                      ]}
-                      id="filterGenotypeName"
-                      name="filterGenotypeName"
-                      onChange={formik.handleChange}
-                      selected={false}
-                    /> */}
-                  {/* <SelectAutoComplete
-                      data={removeSameItems(genotypeSelect)?.map(
-                        (i: any) => i.name
-                      )}
-                      value={checkValue("filterGenotypeName")}
-                      onChange={(e: any) =>
-                        formik.setFieldValue("filterGenotypeName", e)
-                      }
-                    /> */}
-                  {/* </div> */}
-
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Nome do genótipo
@@ -1458,6 +1376,7 @@ export default function Listagem({
                         id="filterGenotypeName"
                         name="filterGenotypeName"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterGenotypeName")}
                       />
                     </div>
                   </div>
@@ -1472,6 +1391,7 @@ export default function Listagem({
                         id="filterNcaFrom"
                         name="filterNcaFrom"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterNcaFrom")}
                       />
                       <Input
                         style={{ marginLeft: 8 }}
@@ -1479,6 +1399,7 @@ export default function Listagem({
                         id="filterNcaTo"
                         name="filterNcaTo"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterNcaTo")}
                       />
                     </div>
                   </div>

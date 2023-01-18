@@ -973,6 +973,15 @@ export default function Listagem({
         JSON.stringify("genotipo")
       );
 
+      setCookies("pageBeforeEdit", currentPage?.toString());
+      setCookies("filterBeforeEdit", filter);
+      setCookies("filterBeforeEditTypeOrder", typeOrder);
+      setCookies("filterBeforeEditOrderBy", orderBy);
+      setCookies("filtersParams", filtersParams);
+      setCookies("lastPage", "atualizar");
+      setCookies("takeBeforeEdit", take);
+      setCookies("itensPage", itensPerPage);
+
       router.push(
         "/listas/ensaios/genotipos-ensaio/substituicao?value=experiment"
         // "/listas/ensaios/tratamento-genotipo/substituicao?value=experiment"
@@ -1221,6 +1230,7 @@ export default function Listagem({
                         id="filterCodTec"
                         name="filterCodTec"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterCodTec")}
                       />
                     </div>
                   </div>
@@ -1250,6 +1260,7 @@ export default function Listagem({
                         id="filterRepFrom"
                         name="filterRepFrom"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterRepFrom")}
                       />
                       <Input
                         type="number"
@@ -1258,6 +1269,7 @@ export default function Listagem({
                         id="filterRepTo"
                         name="filterRepTo"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterRepTo")}
                       />
                     </div>
                   </div>
@@ -1273,60 +1285,6 @@ export default function Listagem({
                     />
                   </div>
 
-                  {/* <div className="h-10 w-full ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status EXP.
-                    </label> */}
-                  {/* <div style={{ display: 'flex', flexDirection: 'row' }}>
-                      {statusFilter.map((generate, index) => (
-                        <CheckBox
-                          key={index}
-                          name={generate.name}
-                          title={generate.title?.toString()}
-                          value={generate.value}
-                          defaultChecked={false}
-                        />
-                      ))}
-                    </div> */}
-                  {/* <AccordionFilter>
-                      <DragDropContext onDragEnd={handleOnDragEnd}>
-                        <Droppable droppableId="characters">
-                          {(provided) => (
-                            <ul
-                              className="w-full h-full characters"
-                              {...provided.droppableProps}
-                              ref={provided.innerRef}
-                            >
-                              {statusFilter.map((generate, index) => (
-                                <Draggable
-                                  key={index}
-                                  draggableId={String(generate.title)}
-                                  index={index}
-                                >
-                                  {(providers) => (
-                                    <li
-                                      ref={providers.innerRef}
-                                      {...providers.draggableProps}
-                                      {...providers.dragHandleProps}
-                                    >
-                                      <CheckBox
-                                        name={generate.name}
-                                        title={generate.title?.toString()}
-                                        value={generate.value}
-                                        defaultChecked={false}
-                                      />
-                                    </li>
-                                  )}
-                                </Draggable>
-                              ))}
-                              {provided.placeholder}
-                            </ul>
-                          )}
-                        </Droppable>
-                      </DragDropContext>
-                    </AccordionFilter> */}
-                  {/* </div> */}
-
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       NT
@@ -1338,6 +1296,7 @@ export default function Listagem({
                         id="filterNtFrom"
                         name="filterNtFrom"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterNtFrom")}
                       />
                       <Input
                         type="number"
@@ -1346,6 +1305,7 @@ export default function Listagem({
                         id="filterNtTo"
                         name="filterNtTo"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterNtTo")}
                       />
                     </div>
                   </div>
@@ -1360,6 +1320,7 @@ export default function Listagem({
                         id="filterNpeFrom"
                         name="filterNpeFrom"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterNpeFrom")}
                       />
                       <Input
                         type="number"
@@ -1368,41 +1329,10 @@ export default function Listagem({
                         id="filterNpeTo"
                         name="filterNpeTo"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterNpeTo")}
                       />
                     </div>
                   </div>
-                  {/* {filterFieldFactory('filterStatusAssay', 'Status do ensaio')} */}
-
-                  {/* <div className="h-7 w-1/2 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Nome genótipo
-                    </label>
-                    <Select
-                      values={[
-                        { id: '', name: 'Selecione' },
-                        ...genotypeSelect,
-                      ]}
-                      id="filterGenotypeName"
-                      name="filterGenotypeName"
-                      onChange={formik.handleChange}
-                      selected={false}
-                    />
-                  </div> */}
-
-                  {/* <div className="h-7 w-1/2 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Nome do genótipo
-                    </label>
-                    <SelectAutoComplete
-                      data={removeSameItems(genotypeSelect)?.map(
-                        (i: any) => i.name
-                      )}
-                      value={checkValue("filterGenotypeName")}
-                      onChange={(e: any) =>
-                        formik.setFieldValue("filterGenotypeName", e)
-                      }
-                    />
-                  </div> */}
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -1414,6 +1344,7 @@ export default function Listagem({
                         id="filterGenotypeName"
                         name="filterGenotypeName"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterGenotypeName")}
                       />
                     </div>
                   </div>
@@ -1429,6 +1360,7 @@ export default function Listagem({
                         id="filterNcaFrom"
                         name="filterNcaFrom"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterNcaFrom")}
                       />
                       <Input
                         type="text"
@@ -1437,6 +1369,7 @@ export default function Listagem({
                         id="filterNcaTo"
                         name="filterNcaTo"
                         onChange={formik.handleChange}
+                        defaultValue={checkValue("filterNcaTo")}
                       />
                     </div>
                   </div>

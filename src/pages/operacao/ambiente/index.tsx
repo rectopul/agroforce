@@ -1042,9 +1042,9 @@ export default function Listagem({
               }}
               options={{
                 showTitle: false,
-                //maxBodyHeight: window?.screen?.availHeight - 400,
-                //maxBodyHeight: window?.screen?.height - 400,
-                //maxBodyHeight: window?.innerHeight - 300,
+                // maxBodyHeight: window?.screen?.availHeight - 400,
+                // maxBodyHeight: window?.screen?.height - 400,
+                // maxBodyHeight: window?.innerHeight - 300,
                 // prettier-ignore
                 maxBodyHeight: `calc(100vh - ${statusAccordionFilter ? 460 : 310}px)`,
                 headerStyle: {

@@ -137,7 +137,7 @@ export default function Atualizargenotipo({
       name_alter: genotipo.name_alter,
       elit_name: genotipo.elit_name,
       type: genotipo.type,
-      gmr: Number(genotipo.gmr).toFixed(1),
+      gmr: genotipo.gmr ? Number(genotipo.gmr).toFixed(1) : '',
       bgm: genotipo.bgm,
       progenitor_f_direto: genotipo.progenitor_f_direto,
       progenitor_m_direto: genotipo.progenitor_m_direto,

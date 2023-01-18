@@ -1048,9 +1048,6 @@ export default function Listagem({
                           </AccordionFilter>
                         </div>
                       </div>
-                      {/* <div className="h-12 flex items-center justify-center w-full">
-                        <Button icon={<RiSettingsFill size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { }} href="lote/importar-planilha/config-planilha" />
-                      </div> */}
                     </div>
                   </div>
                 ),
@@ -1132,9 +1129,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { checked }: any = query;
   const idSafra = req.cookies.safraId;
   const idCulture = req.cookies.cultureId;
-
-  removeCookies("filterBeforeEdit", { req, res });
-  removeCookies("pageBeforeEdit", { req, res });
 
   const param = `skip=0&take=${itensPerPage}&treatmentChecked=${checked}`;
   const { publicRuntimeConfig } = getConfig();

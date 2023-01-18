@@ -480,13 +480,14 @@ export default function Listagem({
           row.dt_export = new Date(row.dt_export);
           row.dt_export = new Date(row.dt_export.toISOString().slice(0, -1));
 
-          row.dt_export = moment(row.dt_export).format("DD-MM-YYYY hh:mm:ss");
+          row.dt_export = moment(row.dt_export).format("DD-MM-YYYY HH:mm:ss");
+          const timeExport = moment().format("DD-MM-YYYY HH:mm:ss");
 
           row.CULTURA = row.culture.desc;
           row.NOME = row.name;
           row.DESC = row.desc;
           row.COD_TEC = row.cod_tec;
-          row.DT_GOM = new Date();
+          row.DT_GOM = timeExport;
           row.DT_EXPORT = row.dt_export;
 
           delete row.culture;

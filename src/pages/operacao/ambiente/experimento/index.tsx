@@ -770,7 +770,7 @@ export default function Listagem({
     total_consumed,
     genotipo_treatment,
   }: any) {
-    var gt = genotipo_treatment.reduce((unique: any, o: any) => {
+    const gt = genotipo_treatment.reduce((unique: any, o: any) => {
       if (
         !unique.some(
           (obj: any) =>
@@ -790,7 +790,7 @@ export default function Listagem({
       tempExperimentObj.push(data);
     });
 
-    var experimentObj = tempExperimentObj.reduce((unique, o) => {
+    const experimentObj = tempExperimentObj.reduce((unique, o) => {
       if (
         !unique.some((obj: any) => obj.id === o.id && obj.status === o.status)
       ) {
@@ -799,7 +799,7 @@ export default function Listagem({
       return unique;
     }, []);
 
-    let npeToUpdate: any[] = [];
+    const npeToUpdate: any[] = [];
     allNPERecords.map(async (item: any) => {
       const temp = {
         id: item.env?.id,
@@ -816,13 +816,13 @@ export default function Listagem({
 
     if (data.length > 0) {
       const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
-      const experimentObj: any[] = [];
-      data.map((item: any) => {
-        const data: any = {};
-        data.id = Number(item.idExperiment);
-        data.status = "SORTEADO";
-        experimentObj.push(data);
-      });
+      // const experimentObj: any[] = [];
+      // data.map((item: any) => {
+      //   const data: any = {};
+      //   data.id = Number(item.idExperiment);
+      //   data.status = 'SORTEADO';
+      //   experimentObj.push(data);
+      // });
       setLoading(true);
 
       await experimentGenotipeService

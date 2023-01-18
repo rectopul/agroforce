@@ -44,6 +44,7 @@ async function get(url: any, params: any) {
     credentials: 'include',
     headers: authHeader(url),
   };
+
   const response = await fetch(urlParameters, requestOptions);
   return handleResponse(response);
 }
