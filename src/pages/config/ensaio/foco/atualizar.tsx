@@ -1,49 +1,49 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
-import { capitalize } from '@mui/material';
-import { setCookies } from 'cookies-next';
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import getConfig from 'next/config';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { ReactNode, useEffect, useState } from 'react';
+import { capitalize } from "@mui/material";
+import { setCookies } from "cookies-next";
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import getConfig from "next/config";
+import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { ReactNode, useEffect, useState } from "react";
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from 'react-beautiful-dnd';
-import { BiEdit, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { FaSortAmountUpAlt } from 'react-icons/fa';
+} from "react-beautiful-dnd";
+import { BiEdit, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { FaSortAmountUpAlt } from "react-icons/fa";
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiOutlineFileSearch,
   AiTwotoneStar,
-} from 'react-icons/ai';
-import { IoMdArrowBack } from 'react-icons/io';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line } from 'react-icons/ri';
-import Swal from 'sweetalert2';
-import * as XLSX from 'xlsx';
+} from "react-icons/ai";
+import { IoMdArrowBack } from "react-icons/io";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line } from "react-icons/ri";
+import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
 import {
   AccordionFilter,
   CheckBox,
   Button,
   Content,
   Input,
-} from '../../../../components';
-import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import { groupService, userPreferencesService } from '../../../../services';
-import { focoService } from '../../../../services/foco.service';
-import * as ITabs from '../../../../shared/utils/dropdown';
-import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
-import ComponentLoading from '../../../../components/Loading';
+} from "../../../../components";
+import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
+import { groupService, userPreferencesService } from "../../../../services";
+import { focoService } from "../../../../services/foco.service";
+import * as ITabs from "../../../../shared/utils/dropdown";
+import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
+import ComponentLoading from "../../../../components/Loading";
 
 export interface IUpdateFoco {
   id: number;
@@ -86,21 +86,23 @@ export default function Atualizar({
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === "ENSAIO" ? (tab.statusTab = true) : (tab.statusTab = false)
+  );
 
   const router = useRouter();
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const [loading, setLoading] = useState<boolean>(false);
   const culture = userLogado.userCulture.cultura_selecionada as string;
 
   function validateInputs(values: any) {
     if (!values.name) {
-      const inputName: any = document.getElementById('name');
-      inputName.style.borderColor = 'red';
+      const inputName: any = document.getElementById("name");
+      inputName.style.borderColor = "red";
     } else {
-      const inputName: any = document.getElementById('name');
-      inputName.style.borderColor = '';
+      const inputName: any = document.getElementById("name");
+      inputName.style.borderColor = "";
     }
   }
 
@@ -114,7 +116,7 @@ export default function Atualizar({
       validateInputs(values);
       if (!values.name) {
         Swal.fire(
-          'Preencha todos os campos obrigatórios destacados em vermelho.',
+          "Preencha todos os campos obrigatórios destacados em vermelho."
         );
         setLoading(false);
         return;
@@ -128,7 +130,7 @@ export default function Atualizar({
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire('Foco atualizado com sucesso!');
+            Swal.fire("Foco atualizado com sucesso!");
             setLoading(false);
             router.back();
           } else {
@@ -141,30 +143,32 @@ export default function Atualizar({
 
   const preferences = userLogado.preferences.group || {
     id: 0,
-    table_preferences: 'id,safra,name,group,action',
+    table_preferences: "id,safra,name,group,action",
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+    preferences.table_preferences
   );
 
   const [grupos, setGrupos] = useState<any>(() => allItens);
   const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit),
+    Number(pageBeforeEdit)
   );
   const itemsTotal = totalItems;
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
-  const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
+  const [arrowOrder, setArrowOrder] = useState<ReactNode>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Safra', value: 'safra' },
-    { name: 'CamposGerenciados[]', title: 'Grupo', value: 'group' },
-    { name: 'CamposGerenciados[]', title: 'Ação', value: 'action' },
+    { name: "CamposGerenciados[]", title: "Safra", value: "safra" },
+    { name: "CamposGerenciados[]", title: "Grupo", value: "group" },
+    { name: "CamposGerenciados[]", title: "Ação", value: "action" },
   ]);
   const filter = filterApplication;
-  const [colorStar, setColorStar] = useState<string>('');
+  const [colorStar, setColorStar] = useState<string>("");
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
-  const [orderType, setOrderType] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>("");
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
 
@@ -175,26 +179,26 @@ export default function Atualizar({
   async function handleOrder(
     column: string,
     order: string | any,
-    name: any,
+    name: any
   ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {
-      typeOrder = 'asc';
+      typeOrder = "asc";
     } else if (order === 2) {
-      typeOrder = 'desc';
+      typeOrder = "desc";
     } else {
-      typeOrder = '';
+      typeOrder = "";
     }
     setOrderBy(column);
     setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
+    if (filter && typeof filter !== "undefined") {
+      if (typeOrder !== "") {
         parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
       } else {
         parametersFilter = filter;
       }
-    } else if (typeOrder !== '') {
+    } else if (typeOrder !== "") {
       parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_foco${idFoco}`;
     } else {
       parametersFilter = filter;
@@ -216,7 +220,7 @@ export default function Atualizar({
       if (orderList === 1) {
         setArrowOrder(<AiOutlineArrowUp />);
       } else {
-        setArrowOrder('');
+        setArrowOrder("");
       }
     }
 
@@ -244,104 +248,106 @@ export default function Atualizar({
   function idHeaderFactory() {
     return {
       title: <div className="flex items-center">{arrowOrder}</div>,
-      field: 'id',
+      field: "id",
       width: 0,
       sorting: false,
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-7 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
+      render: () =>
+        colorStar === "#eba417" ? (
+          <div className="h-7 flex">
+            <div>
+              <button
+                type="button"
+                className="w-full h-full flex items-center justify-center border-0"
+                onClick={() => setColorStar("")}
+              >
+                <AiTwotoneStar size={20} color="#eba417" />
+              </button>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="h-7 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
+        ) : (
+          <div className="h-7 flex">
+            <div>
+              <button
+                type="button"
+                className="w-full h-full flex items-center justify-center border-0"
+                onClick={() => setColorStar("#eba417")}
+              >
+                <AiTwotoneStar size={20} />
+              </button>
+            </div>
           </div>
-        </div>
-      )),
+        ),
     };
   }
 
   function statusHeaderFactory() {
     return {
-      title: 'Ação',
-      field: 'action',
+      title: "Ação",
+      field: "action",
       sorting: false,
-      render: (rowData: any) => (!rowData.npe.length ? (
-        <div className="h-7 flex">
-          <div className="h-7">
-            <Button
-              icon={<BiEdit size={16} />}
-              onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                router.push(`grupo/atualizar?id=${rowData.id}`);
-              }}
-              bgColor="bg-blue-600"
-              textColor="white"
-            />
+      render: (rowData: any) =>
+        !rowData.npe.length ? (
+          <div className="h-7 flex">
+            <div className="h-7">
+              <Button
+                icon={<BiEdit size={16} />}
+                onClick={() => {
+                  setCookies("pageBeforeEdit", currentPage?.toString());
+                  router.push(`grupo/atualizar?id=${rowData.id}`);
+                }}
+                bgColor="bg-blue-600"
+                textColor="white"
+              />
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="h-7 flex">
-          <div className="h-7">
-            <Button
-              icon={<BiEdit size={16} />}
-              title="Grupo já associado a uma NPE"
-              disabled
-              bgColor="bg-gray-600"
-              textColor="white"
-              onClick={() => { }}
-            />
+        ) : (
+          <div className="h-7 flex">
+            <div className="h-7">
+              <Button
+                icon={<BiEdit size={16} />}
+                title="Grupo já associado a uma NPE"
+                disabled
+                bgColor="bg-gray-600"
+                textColor="white"
+                onClick={() => {}}
+              />
+            </div>
           </div>
-        </div>
-      )),
+        ),
     };
   }
 
   function columnsOrder(columnOrder: string) {
-    const columnCampos: string[] = columnOrder.split(',');
+    const columnCampos: string[] = columnOrder.split(",");
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
       // if (columnCampos[index] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
-      if (columnCampos[index] === 'safra') {
+      if (columnCampos[index] === "safra") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Safra',
-            title: 'safra.safraName',
+            name: "Safra",
+            title: "safra.safraName",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'group') {
+      if (columnCampos[index] === "group") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Grupo',
-            title: 'group',
+            name: "Grupo",
+            title: "group",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[index] === 'action') {
+      if (columnCampos[index] === "action") {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -352,7 +358,7 @@ export default function Atualizar({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
+    let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -375,7 +381,7 @@ export default function Atualizar({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
       userLogado.preferences.group = {
         id: preferences.id,
@@ -386,7 +392,7 @@ export default function Atualizar({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -435,20 +441,20 @@ export default function Atualizar({
 
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'group');
+          XLSX.utils.book_append_sheet(workBook, workSheet, "group");
 
           // Buffer
           XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
-            type: 'buffer',
+            bookType: "xlsx", // xlsx
+            type: "buffer",
           });
           // Binary
           XLSX.write(workBook, {
-            bookType: 'xlsx', // xlsx
-            type: 'binary',
+            bookType: "xlsx", // xlsx
+            type: "binary",
           });
           // Download
-          XLSX.writeFile(workBook, 'grupos.xlsx');
+          XLSX.writeFile(workBook, "grupos.xlsx");
         }
       });
     setLoading(false);
@@ -494,87 +500,92 @@ export default function Atualizar({
       </Head>
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
-        <form
-          className="w-full bg-white shadow-md rounded p-4"
-          onSubmit={formik.handleSubmit}
+        <main
+          className="w-full
+          shadow-md
+          flex flex-col
+          items-start
+          gap-0
+          overflow-y-hidden
+        "
         >
-          <h1 className="text-xl">Atualizar foco</h1>
+          <form
+            className="w-full bg-white shadow-md rounded p-4"
+            onSubmit={formik.handleSubmit}
+          >
+            <h1 className="text-xl">Atualizar foco</h1>
 
-          <div
-            className="w-1/2
+            <div
+              className="w-1/2
               flex
               justify-around
               gap-6
               mt-2
               mb-4
           "
-          >
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-1">
-                Nome
-              </label>
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                max="50"
-                placeholder="Foco"
-                onChange={formik.handleChange}
-                value={formik.values.name}
-              />
+            >
+              <div className="w-full">
+                <label className="block text-gray-900 text-sm font-bold mb-1">
+                  Nome
+                </label>
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  max="50"
+                  placeholder="Foco"
+                  onChange={formik.handleChange}
+                  value={formik.values.name}
+                />
+              </div>
             </div>
-          </div>
 
-          <div
-            className="
+            <div
+              className="
               h-7 w-full
               flex
               gap-3
               justify-center
               mt-4
             "
-          >
-            <div className="w-40">
-              <Button
-                type="button"
-                value="Voltar"
-                bgColor="bg-red-600"
-                textColor="white"
-                icon={<IoMdArrowBack size={18} />}
-                onClick={() => router.back()}
-              />
+            >
+              <div className="w-40">
+                <Button
+                  type="button"
+                  value="Voltar"
+                  bgColor="bg-red-600"
+                  textColor="white"
+                  icon={<IoMdArrowBack size={18} />}
+                  onClick={() => router.back()}
+                />
+              </div>
+              <div className="w-40">
+                <Button
+                  type="submit"
+                  value="Atualizar"
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  icon={<AiOutlineFileSearch size={20} />}
+                  onClick={() => {
+                    setLoading(true);
+                  }}
+                />
+              </div>
             </div>
-            <div className="w-40">
-              <Button
-                type="submit"
-                value="Atualizar"
-                bgColor="bg-blue-600"
-                textColor="white"
-                icon={<AiOutlineFileSearch size={20} />}
-                onClick={() => { setLoading(true); }}
-              />
-            </div>
-          </div>
-        </form>
-        <main
-          className="w-full
+          </form>
 
-          flex flex-col
-          items-start
-          gap-8
-        "
-        >
-          <div style={{ marginTop: '1%' }} className="w-full h-auto">
+          <div style={{ marginTop: "1%" }} className="w-full h-auto">
             <MaterialTable
-              style={{ background: '#f9fafb' }}
+              style={{ background: "#f9fafb" }}
               columns={columns}
               data={grupos}
               options={{
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - 435px)`,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 1,
                 },
-                rowStyle: { background: '#f9fafb', height: 35 },
+                rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -598,16 +609,17 @@ export default function Atualizar({
                       <Button
                         title={
                           grupos.length
-                            ? 'Grupo ja cadastrado na safra'
-                            : 'Cadastrar grupo'
+                            ? "Grupo ja cadastrado na safra"
+                            : "Cadastrar grupo"
                         }
                         // title="Cadastrar grupo"
-                        value={`${grupos.length
-                          ? 'Grupo ja cadastrado na safra'
-                          : 'Cadastrar grupo'
+                        value={`${
+                          grupos.length
+                            ? "Grupo ja cadastrado na safra"
+                            : "Cadastrar grupo"
                         }`}
                         // value="Cadastrar grupo"
-                        bgColor={grupos.length ? 'bg-gray-400' : 'bg-blue-600'}
+                        bgColor={grupos.length ? "bg-gray-400" : "bg-blue-600"}
                         // bgColor="bg-blue-600"
                         textColor="white"
                         disabled={grupos.length}
@@ -619,9 +631,7 @@ export default function Atualizar({
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
+                      Total registrado: {itemsTotal}
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
@@ -665,7 +675,7 @@ export default function Atualizar({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value as string,
+                                                generate.value as string
                                               )}
                                             />
                                           </li>
@@ -695,58 +705,59 @@ export default function Atualizar({
                     </div>
                   </div>
                 ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => setCurrentPage(0)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {Array(1)
-                      .fill('')
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setCurrentPage(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
-                    <Button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => setCurrentPage(pages)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => setCurrentPage(0)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage < 1}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => setCurrentPage(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => setCurrentPage(pages)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                   ) as any,
               }}
             />
@@ -763,9 +774,10 @@ export const getServerSideProps: GetServerSideProps = async ({
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) ?? 5;
+  const itensPerPage =
+    (await (
+      await PreferencesControllers.getConfigGerais()
+    )?.response[0]?.itens_per_page) ?? 5;
 
   const { token } = req.cookies;
   const idSafra = req.cookies.safraId;
@@ -774,8 +786,8 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 0;
 
   const requestOptions: RequestInit | undefined = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   };
 
@@ -788,12 +800,12 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const { response: allItens, total: totalItems } = await fetch(
     `${baseUrlGrupo}?id_foco=${idFoco}&id_safra=${idSafra}`,
-    requestOptions,
+    requestOptions
   ).then((response) => response.json());
 
   const { response: foco } = await fetch(
     `${baseUrlShow}/${idFoco}`,
-    requestOptions,
+    requestOptions
   ).then((response) => response.json());
 
   return {
