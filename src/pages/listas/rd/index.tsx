@@ -56,9 +56,6 @@ import * as ITabs from '../../../shared/utils/dropdown';
 import ComponentLoading from '../../../components/Loading';
 import { functionsUtils } from '../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
-import { resolve } from 'node:path/win32';
-import { rejects } from 'node:assert';
-import * as fs from 'fs';
 // import { importblob } from '../../../services/azure_services/import_blob_azure';
 // import { ImputtoBase64 } from '../../../components/helpers/funções_helpers';
 
@@ -116,8 +113,6 @@ export default function Import({
   const [table, setTable] = useState<any>();  
 
   useEffect(() => {
-    console.log("coming2", filePath, file);
-
     if(filePath!==''){
       readXlsxFile(file)
         .then(async (rows) => {
@@ -384,7 +379,6 @@ export default function Import({
     const filename = `/log_import/${rowData.filePath}`;
 
     await importService.checkFile().then((res) => {
-      console.log('res:', res.files);
       let validFileName = res.files;
       let valid = false;
 
@@ -396,20 +390,11 @@ export default function Import({
         });
 
         if(valid){
-          //creating an invisible element
           var element = document.createElement('a');
-         //  console.log("process.env.PUBLIC_URL :", process.env.PUBLIC_URL);
           element.setAttribute('href', filename);
           element.setAttribute('download', rowData.filePath);
-       
-          // Above code is equivalent to
-          // <a href="path of file" download="file name">
-           
           document.body.appendChild(element);
-       
-          //onClick property
           element.click();
-       
           document.body.removeChild(element);
         }else{
           Swal.fire('No File Available To Download');

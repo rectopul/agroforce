@@ -321,7 +321,6 @@ export class ImportController {
     const res = new Promise(async (resolve, reject) => {
       await fs.readdir('./public/log_import', (err, files) => {
         files.forEach(file => {
-          console.log(file);
           filePath.push(file);
         });
         if(filePath.length > 0){
@@ -354,11 +353,8 @@ export class ImportController {
       if (!fs.existsSync(dir)){
           fs.mkdirSync(dir);
           await form.parse(req,async (err : any, fields: any, files: any) => {
-            console.log("files :", files);
             var oldpath = files.file.path;
             name = files.file.name;
-            // files.file.originalFilename = timestamp + files.file.originalFilename
-            // console.log("loclStorage :", localStorage.getItem('user'));
             var newpath = `./public/log_import/${timestamp}${files.file.name}`;
             await fs.rename(oldpath, newpath, function (err) {
               if (err){
@@ -373,11 +369,8 @@ export class ImportController {
           });
       }else{
         await form.parse(req,async (err : any, fields: any, files: any) => {
-          console.log("files :", files);
           var oldpath = files.file.path;
           name = files.file.name;
-          // files.file.originalFilename = timestamp + files.file.originalFilename
-          // console.log("loclStorage :", localStorage.getItem('user'));
           var newpath = `./public/log_import/${timestamp}${files.file.name}`;
           await fs.rename(oldpath, newpath, function (err) {
             if (err){

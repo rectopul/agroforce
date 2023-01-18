@@ -3,7 +3,6 @@ import { ImportController } from '../../../controllers/import.controller';
 import { apiHandler } from '../../../helpers/api';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // console.log('api', req);
   const Controller = new ImportController();
   switch (req.method) {
     case 'POST': {
