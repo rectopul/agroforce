@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   MdOutlineKeyboardArrowDown,
   MdCheckBoxOutlineBlank,
@@ -8,6 +8,12 @@ import {
 export function SelectMultiple({ data = [], values = [], onChange }) {
   const [open, setOpen] = useState(false);
   const [checkAll, setCheckAll] = useState(false);
+
+  const wrapperRef = useRef(null);
+
+  useOutsideAlerter(wrapperRef, function () {
+    setOpen(false);
+  });
 
   function handleSelect(item) {
     let newValues = values;
@@ -39,6 +45,29 @@ export function SelectMultiple({ data = [], values = [], onChange }) {
     onChange(newValues);
   }
 
+  /**
+   * Hook that alerts clicks outside of the passed ref
+   */
+  function useOutsideAlerter(ref, callback) {
+    useEffect(() => {
+      /**
+       * Alert if clicked on outside of element
+       */
+      function handleClickOutside(event) {
+        if (ref.current && !ref.current.contains(event.target)) {
+          // use callback
+          callback();
+        }
+      }
+      // Bind the event listener
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        // Unbind the event listener on clean up
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, [ref]);
+  }
+
   const classContainer =
     "flex shadow appearance-none bg-white bg-no-repeat border border-solid border-gray-300 rounded w-full py-1 px-2 text-gray-900 text-sm leading-tight focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none";
   const classInput = "flex flex-1 focus:shadow-0 focus:outline-0";
@@ -50,13 +79,15 @@ export function SelectMultiple({ data = [], values = [], onChange }) {
   const classItemText = "ml-1 text-sm";
 
   return (
-    <div>
+    <div
+      ref={wrapperRef}
+      //onBlur={() => setOpen(false)}
+    >
       <button
         type="button"
         className={classContainer}
         id="classContainer"
         onClick={() => setOpen(!open)}
-        onfocusOut={() => setOpen(false)}
       >
         <div className={classInput}>
           {values?.length > 0 ? `${values?.length} item(s)` : "Selecione"}
@@ -92,6 +123,7 @@ export function SelectMultiple({ data = [], values = [], onChange }) {
               //type="button"
               className={classButtonItem}
               onClick={() => handleSelect(i)}
+              onBlur={() => setOpen(false)}
             >
               <div>
                 {values?.some((x) => x === i) ? (

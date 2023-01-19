@@ -1076,6 +1076,7 @@ export default function Listagem({
         onRequestClose={() => {
           setIsOpenModalPrint(!isOpenModalPrint);
         }}
+        style={{ overlay: { zIndex: 1000 } }}
         overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
         className="flex
           flex-col
@@ -1127,6 +1128,7 @@ export default function Listagem({
         onRequestClose={() => {
           setIsOpenModal(!isOpenModal);
         }}
+        style={{ overlay: { zIndex: 1000 } }}
         overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
         className="flex
           flex-col

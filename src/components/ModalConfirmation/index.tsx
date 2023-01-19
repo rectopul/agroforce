@@ -21,6 +21,7 @@ export function ModalConfirmation({
       onRequestClose={() => {
         onCancel();
       }}
+      style={{ overlay: { zIndex: 1000 } }}
       overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
       className="flex flex-col w-full h-44 max-w-xl bg-white rounded-3xl pt-2 pb-4 px-8 relative shadow-lg shadow-gray-900/50"
     >
