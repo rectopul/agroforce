@@ -1108,6 +1108,7 @@ export default function Listagem({
                   search: false,
                   filtering: false,
                   pageSize: itensPerPage,
+                  paging: false, //PAGINACAO DESATIVADA TEMPORARIAMENTE
                 }}
                 components={{
                   Toolbar: () => (
