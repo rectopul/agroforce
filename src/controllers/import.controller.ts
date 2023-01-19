@@ -46,6 +46,8 @@ import { ImportNpeController } from './npe/import-npe.controller';
 import { ImportAllocationController } from './allocation/import-allocation.controller';
 import { ImportExperimentGenotypeController } from './experiment-genotype/import-experiment-genotype.controller';
 // import { importblob } from '../services/azure_services/import_blob_azure';
+import formidable from 'formidable';
+import * as fs from 'fs';
 
 export class ImportController {
   importRepository = new ImportRepository();
@@ -153,6 +155,7 @@ export class ImportController {
       totalRecords: (data.spreadSheet.length - 1),
       state: 'EM ANDAMENTO',
       idSafra: data.idSafra,
+      filePath: data.filePath,
     });
     try {
       if (status === 400) {
@@ -220,6 +223,7 @@ export class ImportController {
       totalRecords: (data.spreadSheet.length - 1),
       state: 'EM ANDAMENTO',
       idSafra: data.idSafra,
+      filePath: data.filePath,
     });
     try {
       // await importblob(data.files[0]);
@@ -309,5 +313,80 @@ export class ImportController {
       const executeTime = await calculatingExecutionTime(responseLog?.id);
       await this.logImportController.update({ id: responseLog?.id, status: 1, executeTime });
     }
+  }
+
+  async checkFile(req: any){
+
+    let filePath: any = [];
+    const res = new Promise(async (resolve, reject) => {
+      await fs.readdir('./public/log_import', (err, files) => {
+        files.forEach(file => {
+          filePath.push(file);
+        });
+        if(filePath.length > 0){
+          resolve({
+            message: 'files fetched success',
+            files: filePath
+          });
+        }else{
+          reject({
+            message: 'no files',
+            files: []
+          })
+        }
+      });
+    })
+
+    return res;
+  }
+
+  async uploadFile(req :any){
+    const timestamp = Date.now();
+    let name = '';
+
+    const form = new formidable.IncomingForm();
+
+    const s = new Promise(async (resolve, reject) => {
+
+      var dir = './public/log_import';
+
+      if (!fs.existsSync(dir)){
+          fs.mkdirSync(dir);
+          await form.parse(req,async (err : any, fields: any, files: any) => {
+            var oldpath = files.file.path;
+            name = files.file.name;
+            var newpath = `./public/log_import/${timestamp}${files.file.name}`;
+            await fs.rename(oldpath, newpath, function (err) {
+              if (err){
+                reject(err);
+              }
+              resolve({
+                message: 'File uploaded and moved!',
+                filename: `${timestamp}${files.file.name}`,
+                status: 201
+              }) 
+            });
+          });
+      }else{
+        await form.parse(req,async (err : any, fields: any, files: any) => {
+          var oldpath = files.file.path;
+          name = files.file.name;
+          var newpath = `./public/log_import/${timestamp}${files.file.name}`;
+          await fs.rename(oldpath, newpath, function (err) {
+            if (err){
+              reject(err);
+            }
+            resolve({
+              message: 'File uploaded and moved!',
+              filename: `${timestamp}${files.file.name}`,
+              status: 201
+            }) 
+          });
+        });
+      }
+
+      
+    })
+    return s;
   }
 }

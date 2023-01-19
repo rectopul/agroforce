@@ -25,10 +25,21 @@ function validateProtocol(data: any) {
   return fetchWrapper.post(`${baseUrl}/validateProtocol`, data);
 }
 
+function uploadFile(data: any) {
+  return fetchWrapper.postFile(`${baseUrl}/uploadFile`, data);
+}
+
+function checkFile() {
+  const data = {};
+  return fetchWrapper.post(`${baseUrl}/checkFile`, data);
+}
+
 export const importService = {
   getAll,
   create,
   update,
   validate,
   validateProtocol,
+  uploadFile,
+  checkFile
 };

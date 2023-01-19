@@ -387,9 +387,53 @@ export class ExperimentGenotipeController {
     }
   }
 
-  async create(data: object | any) {
+  async create({ experiment_genotipo, gt, experimentObj, npeToUpdate }: object | any) {
     try {
-      const response = await this.ExperimentGenotipeRepository.createMany(data);
+      const response = await prisma?.$transaction(async (tx) => {
+
+        await gt.map(async (gen_treatment: any) => {
+          await tx.genotype_treatment.update({
+            where: {
+              id: gen_treatment.id,
+            },
+            data: {
+              status_experiment: gen_treatment.status_experiment,
+            }
+          })
+        })
+
+        await experimentObj.map(async (exp: any) => {
+          await tx.experiment.update({
+            where: {
+              id: exp.id,
+            },
+            data: {
+              status: exp.status,
+            }
+          })
+        })
+
+        await npeToUpdate.map(async (npe: any) => {
+          await tx.npe.update({
+            where: {
+              id: npe.id,
+            },
+            data: {
+              npef: npe.npef,
+              prox_npe: npe.prox_npe,
+              status: npe.status,
+            }
+          })
+        })
+
+        const exp_gen = await tx.experiment_genotipe.createMany({ data: experiment_genotipo })
+
+        return exp_gen
+      }, {
+        maxWait: 5000,
+        timeout: 10000,
+      })
+
       if (response) {
         return { status: 200, message: 'Tratamento experimental registrado' };
       }

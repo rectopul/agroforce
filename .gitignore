@@ -5,6 +5,7 @@
 /.pnp
 .pnp.js
 /dev
+/public/log_import
 
 # testing
 /coverage
