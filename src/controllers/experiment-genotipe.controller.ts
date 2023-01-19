@@ -461,15 +461,15 @@ export class ExperimentGenotipeController {
     idList, npe, status, userId = 0, count,
   }: any) {
     try {
-      let counter = 0;
+      let counter = 1;
       if (count === 'print') {
         status = 'IMPRESSO';
-        counter = 1;
+        counter = 2;
       } else if (count === 'reprint') {
         await idList.map(async (id: any) => {
           const { response }: any = await this.getOne(id);
           const newCount = response.counter + 1;
-          const status = 'REIMPRESSO';
+          status = 'IMPRESSO';
           await this.ExperimentGenotipeRepository.printed(id, status, newCount);
         });
       } else if (count === 'writeOff') {
