@@ -982,7 +982,6 @@ export default function Listagem({
 
       router.push(
         '/listas/ensaios/genotipos-ensaio/substituicao?value=experiment',
-        // "/listas/ensaios/tratamento-genotipo/substituicao?value=experiment"
       );
     } else if (ncaButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => ({
@@ -991,6 +990,16 @@ export default function Listagem({
         idGenotipo: item.idGenotipo,
         idLote: item.idLote,
       }));
+
+      setCookies('pageBeforeEdit', currentPage?.toString());
+      setCookies('filterBeforeEdit', filter);
+      setCookies('filterBeforeEditTypeOrder', typeOrder);
+      setCookies('filterBeforeEditOrderBy', orderBy);
+      setCookies('filtersParams', filtersParams);
+      setCookies('lastPage', 'atualizar');
+      setCookies('takeBeforeEdit', take);
+      setCookies('itensPage', itensPerPage);
+
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
       localStorage.setItem('treatmentsOptionSelected', JSON.stringify('nca'));

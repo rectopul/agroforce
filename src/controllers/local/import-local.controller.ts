@@ -76,7 +76,7 @@ export class ImportLocalController {
       const configModule: object | any = await importController.getAll(4);
       configModule.response[0]?.fields.push('DT');
       for (const row in spreadSheet) {
-        if (localTemp.includes(spreadSheet[row][2])) {
+        if (localTemp?.includes(spreadSheet[row][2])) {
           await logImportController.update({
             id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela`,
           });
@@ -86,8 +86,8 @@ export class ImportLocalController {
         localTemp[row] = spreadSheet[row][2];
         for (const column in spreadSheet[row]) {
           if (row === '0') {
-            if (!(spreadSheet[row][column].toUpperCase())
-              .includes(configModule.response[0]?.fields[column].toUpperCase())) {
+            if (!(spreadSheet[row][column]?.toUpperCase())
+              ?.includes(configModule.response[0]?.fields[column]?.toUpperCase())) {
               responseIfError[Number(column)]
                 += responseGenericFactory(
                   (Number(column) + 1),
@@ -96,7 +96,7 @@ export class ImportLocalController {
                   'a sequencia de colunas da planilha esta incorreta',
                 );
             }
-          } else if (spreadSheet[0][column].includes('ID da unidade de cultura')) {
+          } else if (spreadSheet[0][column]?.includes('ID da unidade de cultura')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -108,7 +108,7 @@ export class ImportLocalController {
                   spreadSheet[row][column],
                 );
             }
-          } else if (spreadSheet[0][column].includes('Ano')) {
+          } else if (spreadSheet[0][column]?.includes('Ano')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -133,7 +133,7 @@ export class ImportLocalController {
                 }
               }
             }
-          } else if (spreadSheet[0][column].includes('Nome da unidade de cultura')) {
+          } else if (spreadSheet[0][column]?.includes('Nome da unidade de cultura')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -157,7 +157,7 @@ export class ImportLocalController {
                 }
               }
             }
-          } else if (spreadSheet[0][column].includes('ID do lugar de cultura')) {
+          } else if (spreadSheet[0][column]?.includes('ID do lugar de cultura')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -169,21 +169,21 @@ export class ImportLocalController {
                   spreadSheet[row][column],
                 );
             }
-          } else if (spreadSheet[0][column].includes('Nome do lugar de cultura')) {
+          } else if (spreadSheet[0][column]?.includes('Nome do lugar de cultura')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
             }
-          } else if (spreadSheet[0][column].includes('Rótulo')) {
+          } else if (spreadSheet[0][column]?.includes('Rótulo')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
             }
-          } else if (spreadSheet[0][column].includes('MLOC')) {
+          } else if (spreadSheet[0][column]?.includes('MLOC')) {
             // vazio
-          } else if (spreadSheet[0][column].includes('Endereço')) {
+          } else if (spreadSheet[0][column]?.includes('Endereço')) {
             // vazio
-          } else if (spreadSheet[0][column].includes('Identificador de localidade')) {
+          } else if (spreadSheet[0][column]?.includes('Identificador de localidade')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -195,34 +195,12 @@ export class ImportLocalController {
                   spreadSheet[row][column],
                 );
             }
-          } else if (spreadSheet[0][column].includes('Nome da localidade')) {
+          } else if (spreadSheet[0][column]?.includes('Nome da localidade')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
             }
-          } else if (spreadSheet[0][column].includes('Identificador de região')) {
-            if (spreadSheet[row][column] === null) {
-              responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-            } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
-              responseIfError[Number(column)]
-                += responsePositiveNumericFactory(
-                  (Number(column) + 1),
-                  row,
-                  spreadSheet[row][column],
-                );
-            }
-          } else if (spreadSheet[0][column].includes('Nome da região')) {
-            if (spreadSheet[row][column] === null) {
-              responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-            }
-          } else if (spreadSheet[0][column].includes('REG_LIBELLE')) {
-            if (spreadSheet[row][column] === null) {
-              responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-            }
-          } else if (spreadSheet[0][column].includes('ID do País')) {
+          } else if (spreadSheet[0][column]?.includes('Identificador de região')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
@@ -234,17 +212,39 @@ export class ImportLocalController {
                   spreadSheet[row][column],
                 );
             }
-          } else if (spreadSheet[0][column].includes('Nome do país')) {
+          } else if (spreadSheet[0][column]?.includes('Nome da região')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
             }
-          } else if (spreadSheet[0][column].includes('CNTR_LIBELLE')) {
+          } else if (spreadSheet[0][column]?.includes('REG_LIBELLE')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
             }
-          } else if (spreadSheet[0][column].includes('DT')) {
+          } else if (spreadSheet[0][column]?.includes('ID do País')) {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)]
+                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+            } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
+              responseIfError[Number(column)]
+                += responsePositiveNumericFactory(
+                  (Number(column) + 1),
+                  row,
+                  spreadSheet[row][column],
+                );
+            }
+          } else if (spreadSheet[0][column]?.includes('Nome do país')) {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)]
+                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+            }
+          } else if (spreadSheet[0][column]?.includes('CNTR_LIBELLE')) {
+            if (spreadSheet[row][column] === null) {
+              responseIfError[Number(column)]
+                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+            }
+          } else if (spreadSheet[0][column]?.includes('DT')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += responseNullFactory(
                 Number(column) + 1,
@@ -311,39 +311,39 @@ export class ImportLocalController {
             for (const row in spreadSheet) {
               if (row !== '0') {
                 for (const column in spreadSheet[row]) {
-                  if (spreadSheet[0][column].includes('ID da unidade de cultura')) {
+                  if (spreadSheet[0][column]?.includes('ID da unidade de cultura')) {
                     unityCultureDTO.id_unity_culture = Number(spreadSheet[row][column]);
-                  } else if (spreadSheet[0][column].includes('Ano')) {
+                  } else if (spreadSheet[0][column]?.includes('Ano')) {
                     unityCultureDTO.year = Number(spreadSheet[row][column]);
-                  } else if (spreadSheet[0][column].includes('Nome da unidade de cultura')) {
+                  } else if (spreadSheet[0][column]?.includes('Nome da unidade de cultura')) {
                     unityCultureDTO.name_unity_culture = (spreadSheet[row][column]?.toString());
-                  } else if (spreadSheet[0][column].includes('ID do lugar de cultura')) {
+                  } else if (spreadSheet[0][column]?.includes('ID do lugar de cultura')) {
                     localCultureDTO.id_local_culture = Number(spreadSheet[row][column]);
-                  } else if (spreadSheet[0][column].includes('Nome do lugar de cultura')) {
+                  } else if (spreadSheet[0][column]?.includes('Nome do lugar de cultura')) {
                     localCultureDTO.name_local_culture = (spreadSheet[row][column]?.toString());
-                  } else if (spreadSheet[0][column].includes('CP_LIBELLE')) {
+                  } else if (spreadSheet[0][column]?.includes('CP_LIBELLE')) {
                     localCultureDTO.label = (spreadSheet[row][column]?.toString());
-                  } else if (spreadSheet[0][column].includes('MLOC')) {
+                  } else if (spreadSheet[0][column]?.includes('MLOC')) {
                     localCultureDTO.mloc = (spreadSheet[row][column]?.toString());
-                  } else if (spreadSheet[0][column].includes('Endereço')) {
+                  } else if (spreadSheet[0][column]?.includes('Endereço')) {
                     localCultureDTO.adress = (spreadSheet[row][column]?.toString());
-                  } else if (spreadSheet[0][column].includes('Identificador de localidade')) {
+                  } else if (spreadSheet[0][column]?.includes('Identificador de localidade')) {
                     localCultureDTO.id_locality = Number(spreadSheet[row][column]);
-                  } else if (spreadSheet[0][column].includes('Nome da localidade')) {
+                  } else if (spreadSheet[0][column]?.includes('Nome da localidade')) {
                     localCultureDTO.name_locality = (spreadSheet[row][column]?.toString());
-                  } else if (spreadSheet[0][column].includes('Identificador de região')) {
+                  } else if (spreadSheet[0][column]?.includes('Identificador de região')) {
                     localCultureDTO.id_region = Number(spreadSheet[row][column]);
-                  } else if (spreadSheet[0][column].includes('Nome da região')) {
+                  } else if (spreadSheet[0][column]?.includes('Nome da região')) {
                     localCultureDTO.name_region = (spreadSheet[row][column]?.toString());
-                  } else if (spreadSheet[0][column].includes('REG_LIBELLE')) {
+                  } else if (spreadSheet[0][column]?.includes('REG_LIBELLE')) {
                     localCultureDTO.label_region = (spreadSheet[row][column]?.toString());
-                  } else if (spreadSheet[0][column].includes('ID do País')) {
+                  } else if (spreadSheet[0][column]?.includes('ID do País')) {
                     localCultureDTO.id_country = Number(spreadSheet[row][column]);
-                  } else if (spreadSheet[0][column].includes('Nome do país')) {
+                  } else if (spreadSheet[0][column]?.includes('Nome do país')) {
                     localCultureDTO.name_country = (spreadSheet[row][column]?.toString());
-                  } else if (spreadSheet[0][column].includes('CNTR_LIBELLE')) {
+                  } else if (spreadSheet[0][column]?.includes('CNTR_LIBELLE')) {
                     localCultureDTO.label_country = (spreadSheet[row][column]?.toString());
-                  } else if (spreadSheet[0][column].includes('DT')) {
+                  } else if (spreadSheet[0][column]?.includes('DT')) {
                     unityCultureDTO.dt_export = spreadSheet[row][column];
                   }
                 }

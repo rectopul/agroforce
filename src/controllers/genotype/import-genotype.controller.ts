@@ -409,6 +409,7 @@ export class ImportGenotypeController {
                   spreadSheet[0][column],
                 );
               } else if (typeof spreadSheet[row][column] === 'number') {
+                console.log('🚀 ~ file: import-genotype.controller.ts:420 ~ ImportGenotypeController ~ spreadSheet[row][column]', spreadSheet[row][column]);
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
                   row,
@@ -416,6 +417,8 @@ export class ImportGenotypeController {
                   'o campo DT precisa ser no formato data',
                 );
               } else {
+                console.log('🚀 ~ file: import-genotype.controller.ts:420 ~ ImportGenotypeController ~ spreadSheet[row][column]', spreadSheet[row][column]);
+
                 spreadSheet[row][column] = spreadSheet[row][column].replace(/\.\d+/, '');
                 // eslint-disable-next-line no-param-reassign
                 spreadSheet[row][column] = new Date(spreadSheet[row][column]);
