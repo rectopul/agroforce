@@ -772,7 +772,7 @@ export default function Listagem({
   }, [allNPERecords, NPESelectedRow]);
 
   async function createExperimentGenotipe({
-    data,
+    experiment_genotipo,
     total_consumed,
     genotipo_treatment,
   }: any) {
@@ -789,7 +789,7 @@ export default function Listagem({
     }, []);
 
     const tempExperimentObj: any[] = [];
-    data.map((item: any) => {
+    experiment_genotipo.map((item: any) => {
       const data: any = {};
       data.id = Number(item.idExperiment);
       data.status = "SORTEADO";
@@ -818,53 +818,28 @@ export default function Listagem({
         prox_npe: item.env?.npef + 1,
       };
       npeToUpdate.push(temp);
-    });
-
-    if (data.length > 0) {
-      const lastNpe = data[Object.keys(data)[Object.keys(data).length - 1]].npe;
-      // const experimentObj: any[] = [];
-      // data.map((item: any) => {
-      //   const data: any = {};
-      //   data.id = Number(item.idExperiment);
-      //   data.status = 'SORTEADO';
-      //   experimentObj.push(data);
-      // });
+    })
+    if (experiment_genotipo.length > 0) {
       setLoading(true);
 
       await experimentGenotipeService
-        .create(data)
-        .then(async ({ status, response }: any) => {
-          if (status === 200) {
-            await genotypeTreatmentService.update(gt);
-            await experimentService.update(experimentObj);
-            if (allNPERecords && allNPERecords.length > 0) {
-              const npeToUpdate: any[] = [];
-              allNPERecords.map(async (item: any) => {
-                const temp = {
-                  id: item.env?.id,
-                  npef: item.env?.npef,
-                  // npeQT:
-                  //   NPESelectedRow?.npeQT == 'N/A'
-                  //     ? null
-                  //     : NPESelectedRow?.npeQT - total_consumed,
-                  status: 3,
-                  prox_npe: item.env?.npef + 1,
-                };
-                npeToUpdate.push(temp);
-              });
-              await npeService.update(npeToUpdate).then(({ status }: any) => {
-                if (status === 200) {
-                  Swal.fire({
-                    title: "Sorteio salvo com sucesso.",
-                    showDenyButton: false,
-                    showCancelButton: false,
-                    confirmButtonText: "Ok",
-                  }).then(() => {
-                    router.push("/operacao/ambiente");
-                  });
-                }
-              });
-            }
+        .create({ experiment_genotipo, gt, experimentObj, npeToUpdate })
+        .then(response => {
+          console.log(response);
+          if (response.status === 200) {
+            Swal.fire({
+              title: 'Sorteio salvo com sucesso.',
+              showDenyButton: false,
+              showCancelButton: false,
+              confirmButtonText: 'Ok',
+            }).then(() => {
+              router.push('/operacao/ambiente');
+            });
+          } else {
+            Swal.fire({
+              title: 'algo deu errado',
+              showCancelButton: true,
+            })
           }
         });
       setLoading(false);
@@ -919,7 +894,7 @@ export default function Listagem({
       });
 
       createExperimentGenotipe({
-        data: experiment_genotipo,
+        experiment_genotipo,
         total_consumed: experiment_genotipo.length,
         genotipo_treatment,
       });
