@@ -236,7 +236,7 @@ export class ReplaceTreatmentController {
       }
 
       if (options.filterNameTec) {
-        parameters.AND.push(JSON.parse(`{ "genotipo": { "tecnologia": { "desc": {"contains": "${options.filterNameTec}" } } } }`));
+        parameters.AND.push(JSON.parse(`{ "genotipo": { "tecnologia": { "name": {"contains": "${options.filterNameTec}" } } } }`));
       }
 
       if (options.idCulture) {

@@ -97,13 +97,13 @@ interface IData {
 }
 
 export default function Listagem({
-      allLote,
-      totalItems,
-      idSafra,
-      idCulture,
-      itensPerPage,
-      filterApplication,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allLote,
+  totalItems,
+  idSafra,
+  idCulture,
+  itensPerPage,
+  filterApplication,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const router = useRouter();
@@ -114,7 +114,7 @@ export default function Listagem({
 
   tabsDropDowns.map((tab) =>
     tab.titleTab ===
-      (Router?.value === "experiment" ? "EXPERIMENTOS" : "ENSAIO")
+    (Router?.value === "experiment" ? "EXPERIMENTOS" : "ENSAIO")
       ? (tab.statusTab = true)
       : (tab.statusTab = false)
   );
@@ -141,10 +141,12 @@ export default function Listagem({
   const [loading, setLoading] = useState<boolean>(false);
   const [nameReplace, setNameReplace] = useState<any>("");
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
+  const [arrowOrder, setArrowOrder] = useState<any>("");
+  const [orderList, setOrder] = useState<number>(1);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [statusAccordionFilter, setStatusAccordionFilter] =
+    useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: "CamposGerenciados[]", title: "Safra", value: "safra" },
@@ -178,9 +180,9 @@ export default function Listagem({
     { name: "CamposGerenciados[]", title: "Substituir", value: "action" },
   ]);
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>('');
-  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
+  const [orderBy, setOrderBy] = useState<string>("");
+  const [orderType, setOrderType] = useState<string>("");
+  const [fieldOrder, setFieldOrder] = useState<any>("");
 
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isReplaceGenotypeId, setIsReplaceGenotypeId] = useState<any>(null);
@@ -331,7 +333,7 @@ export default function Listagem({
     setTimeout(() => {
       setLoading(false);
     }, 100);
-    setFieldOrder(columnG);
+    // setFieldOrder(columnG);
   }
 
   // function headerTableFactory(name: string, title: string) {
@@ -650,16 +652,15 @@ export default function Listagem({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
-
     let parametersFilter;
-    await seperate(parametersFilter);
+    await seperate(parametersFilter, page);
   }
 
-  async function seperate(parametersFilter: any) {
-    console.log("chamou");
+  async function seperate(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
 
-    const skip = currentPage * Number(take);
+    //const skip = currentPage * Number(take);
+    const skip = page * Number(take);
 
     const tempParams: any = [];
 
@@ -732,13 +733,14 @@ export default function Listagem({
       />
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
-        <main className="h-full w-full flex flex-col items-start gap-4">
+        <main className="h-full w-full flex flex-col items-start gap-4 overflow-y-hidden">
           <AccordionFilter
             title={
               treatmentsOptionSelected === "genotipo"
                 ? "Filtrar Genótipo/NCA"
                 : "Filtrar lotes"
             }
+            onChange={(_, e) => setStatusAccordionFilter(e)}
           >
             <div className="w-full flex gap-2">
               <form
@@ -927,7 +929,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6 ml-2">
                     <Button
                       type="submit"
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -939,7 +941,7 @@ export default function Listagem({
             </div>
           </AccordionFilter>
 
-          <div className="w-full h-full overflow-y-scroll">
+          <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
               style={{ background: "#f9fafb" }}
@@ -947,8 +949,11 @@ export default function Listagem({
               data={lotes}
               options={{
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - ${
+                  statusAccordionFilter ? 460 : 320
+                }px)`,
                 headerStyle: {
-                  zIndex: 0,
+                  zIndex: 1,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
@@ -1043,9 +1048,6 @@ export default function Listagem({
                           </AccordionFilter>
                         </div>
                       </div>
-                      {/* <div className="h-12 flex items-center justify-center w-full">
-                        <Button icon={<RiSettingsFill size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { }} href="lote/importar-planilha/config-planilha" />
-                      </div> */}
                     </div>
                   </div>
                 ),
@@ -1127,9 +1129,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { checked }: any = query;
   const idSafra = req.cookies.safraId;
   const idCulture = req.cookies.cultureId;
-
-  removeCookies("filterBeforeEdit", { req, res });
-  removeCookies("pageBeforeEdit", { req, res });
 
   const param = `skip=0&take=${itensPerPage}&treatmentChecked=${checked}`;
   const { publicRuntimeConfig } = getConfig();

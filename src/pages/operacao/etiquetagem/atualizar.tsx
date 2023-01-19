@@ -49,21 +49,25 @@ import * as ITabs from "../../../shared/utils/dropdown";
 import { IExperiments } from "../../../interfaces/listas/experimento/experimento.interface";
 import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
 import ComponentLoading from "../../../components/Loading";
+import { tableGlobalFunctions } from "../../../helpers";
 
 export default function Listagem({
-      experimentGroup,
-      experimentGroupId,
-      itensPerPage,
-      filterApplication,
-      safraId,
-      filterBeforeEdit,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  experimentGroup,
+  experimentGroupId,
+  itensPerPage,
+  filterApplication,
+  filterBeforeEdit,
+  orderByserver,
+  typeOrderServer,
+  safraId,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
   const tabsEtiquetagemMenu = tabsOperation.map((i: any) =>
     i.titleTab === "ETIQUETAGEM" ? { ...i, statusTab: true } : i
   );
 
+  const tableRef = useRef<any>(null);
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.experimento || {
     id: 0,
@@ -78,12 +82,16 @@ export default function Listagem({
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [experimentAdd, setExperimentAdd] = useState<boolean>();
 
+  const [take, setTake] = useState<number>(itensPerPage);
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [itemsTotal, setTotalItems] = useState<number>(0);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     { name: "CamposGerenciados[]", title: "Foco", value: "foco" },
@@ -105,14 +113,17 @@ export default function Listagem({
     { name: "CamposGerenciados[]", title: "Status EXP", value: "status" },
     { name: "CamposGerenciados[]", title: "Ação", value: "action" },
   ]);
-  const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>('');
-  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
+  const [orderBy, setOrderBy] = useState<string>(orderByserver);
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const [fieldOrder, setFieldOrder] = useState<any>(null);
+
+  // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
+  //   orderBy == "tecnologia" ? "assay_list.tecnologia.cod_tec" : orderBy
+  // }&typeOrder=${typeOrder}`;
 
   const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   // const take: number = itensPerPage;
-  const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
@@ -122,49 +133,59 @@ export default function Listagem({
   const [isMultipleDelete, setIsMultipleDelete] = useState<boolean>(false);
   const [itemSelectedDelete, setItemSelectedDelete] = useState<any>(null);
 
-  async function handleOrder(
-    column: string,
-    order: number,
-    name: any
-  ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = "asc";
-    } else if (order === 2) {
-      typeOrder = "desc";
-    } else {
-      typeOrder = "";
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== "undefined") {
-      if (typeOrder !== "") {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== "") {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
+  async function callingApi(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
+
+    setFilter(parametersFilter);
+    setCookies("filterBeforeEdit", parametersFilter);
+    setCookies("filterBeforeEditTypeOrder", typeOrder);
+    setCookies("filterBeforeEditOrderBy", orderBy);
+
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${
+      orderBy == "tecnologia" ? "assay_list.tecnologia.cod_tec" : orderBy
+    }&typeOrder=${typeOrder}`;
+
+    setFiltersParams(parametersFilter);
+    setCookies("filtersParams", parametersFilter);
 
     await experimentService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then(({ status, response }: any) => {
-        if (status === 200) {
-          setExperiments(response);
+      .getAll(parametersFilter)
+      .then((response: any) => {
+        if (response.status === 200 || response.status === 400) {
+          setExperiments(response.response);
+          setTotalItems(response.total);
+          tableRef.current.dataManager.changePageSize(
+            response.total >= take ? take : response.total
+          );
         }
+        setLoading(false);
+      })
+      .catch((_) => {
+        setLoading(false);
       });
+  }
 
-    if (orderList === 2) {
-      setOrder(0);
-    } else {
-      setOrder(orderList + 1);
-    }
+  async function handleOrder(
+    column: string,
+    order: string | any,
+    name: any
+  ): Promise<void> {
+    setLoading(true);
+    // Gobal manage orders
+    const { typeOrderG, columnG, orderByG, arrowOrder } =
+      await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(columnG);
+    setFieldOrder(name);
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    setOrder(orderByG);
+    setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 100);
   }
 
   // function headerTableFactory(name: string, title: string) {
@@ -232,10 +253,10 @@ export default function Listagem({
               }}
               rounder="rounded-full"
               bgColor={
-                rowData.status === 'ETIQ. EM ANDAMENTO'
-                  || rowData.status === 'ETIQ. FINALIZADA'
-                  ? 'bg-gray-600'
-                  : 'bg-red-600'
+                rowData.status === "ETIQ. EM ANDAMENTO" ||
+                rowData.status === "ETIQ. FINALIZADA"
+                  ? "bg-gray-600"
+                  : "bg-red-600"
               }
               textColor="white"
               icon={<BsTrashFill size={20} />}
@@ -510,28 +531,7 @@ export default function Listagem({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
-
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
-
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
-
-    await experimentService
-      .getAll(parametersFilter)
-      .then(({ status, response, total: newTotal }: any) => {
-        if (status === 200) {
-          setExperiments(response);
-          setTotalItems(newTotal);
-        }
-      });
+    await callingApi(filter, page); // handle pagination globly
   }
 
   function updateFieldFactory(title: string, name: string) {
@@ -627,7 +627,7 @@ export default function Listagem({
     if (status === 200) {
       setLoading(false);
       handlePagination(currentPage);
-      //router.reload();
+      // router.reload();
     } else {
       Swal.fire({
         html: message,
@@ -638,8 +638,14 @@ export default function Listagem({
   }
 
   useEffect(() => {
+    validateAddExperiment();
     handlePagination(0);
   }, []);
+
+  // Call that function when change type order value.
+  useEffect(() => {
+    callingApi(filter);
+  }, [typeOrder]);
 
   // useEffect(() => {
   //   handlePagination();
@@ -655,8 +661,6 @@ export default function Listagem({
     }
     setExperimentAdd(true);
   }
-
-  validateAddExperiment();
 
   function selectableFilter(rowData: any) {
     if (
@@ -678,10 +682,11 @@ export default function Listagem({
 
       <ModalConfirmation
         isOpen={isOpenModalConfirm}
-        text={`Tem certeza que deseja deletar ${isMultipleDelete
-            ? `os items selecionados?`
+        text={`Tem certeza que deseja deletar ${
+          isMultipleDelete
+            ? "os items selecionados?"
             : `o item ${itemSelectedDelete?.experimentName}?`
-          }`}
+        }`}
         onPress={isMultipleDelete ? deleteMultipleItems : deleteItem}
         onCancel={() => setIsOpenModalConfirm(false)}
       />
@@ -692,11 +697,12 @@ export default function Listagem({
           flex flex-col
           items-start
           gap-4
+          overflow-y-hidden
         "
         >
           <form
             className="w-full bg-white shadow-md rounded p-4"
-            onSubmit={() => { }}
+            onSubmit={() => {}}
           >
             <div className="w-full flex justify-between items-start gap-5 mt-1">
               {nameGroupFieldFactory("name", "Grupo de etiquetagem")}
@@ -722,15 +728,19 @@ export default function Listagem({
           </form>
 
           {/* overflow-y-scroll */}
-          <div className="w-full h-full overflow-y-scroll">
+          <div className="w-full h-full">
             <MaterialTable
+              tableRef={tableRef}
               style={{ background: "#f9fafb" }}
               columns={columns}
               data={experiments}
               options={{
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - 355px)`,
                 headerStyle: {
-                  zIndex: 0,
+                  zIndex: 1,
+                  position: "sticky",
+                  top: 0,
                 },
                 showSelectAllCheckbox: true,
                 selection: true,
@@ -756,7 +766,7 @@ export default function Listagem({
               //     emptyDataSourceMessage: tableMessage ? 'Nenhum experimento encontrado!' : 'ATENÇÃO, VOCÊ PRECISA APLICAR O FILTRO PARA VER OS REGISTROS.',
               //   },
               // }}
-              onChangeRowsPerPage={() => { }}
+              onChangeRowsPerPage={() => {}}
               onSelectionChange={setSelectedCheckBox}
               components={{
                 Toolbar: () => (
@@ -798,7 +808,7 @@ export default function Listagem({
                         <Button
                           title="Excluir grupo"
                           type="button"
-                          //onClick={deleteMultipleItems}
+                          // onClick={deleteMultipleItems}
                           onClick={() => deleteConfirmItem(null, true)}
                           bgColor="bg-red-600"
                           textColor="white"
@@ -952,21 +962,52 @@ export const getServerSideProps: GetServerSideProps = async ({
   res,
   query,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page;
-
   const { token } = req.cookies;
   const { safraId } = req.cookies;
   const experimentGroupId = query.id;
+  const pageBeforeEdit = req.cookies.pageBeforeEdit
+    ? req.cookies.pageBeforeEdit
+    : 0;
+
+  // Last page
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
+
+  if (lastPageServer == undefined || lastPageServer == "No") {
+    removeCookies("filterBeforeEdit", { req, res });
+    removeCookies("pageBeforeEdit", { req, res });
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("lastPage", { req, res });
+    removeCookies("itensPage", { req, res });
+  }
+
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
+    : 10;
+
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : `experimentGroupId=${experimentGroupId}&safraId=${safraId}&grid=${true}`;
+
+  const filterApplication = `experimentGroupId=${experimentGroupId}&safraId=${safraId}&grid=${true}`;
+
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+    ? req.cookies.filterBeforeEditTypeOrder
+    : "asc";
+
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : "";
+
+  removeCookies("filterBeforeEdit", { req, res });
+  removeCookies("pageBeforeEdit", { req, res });
+  removeCookies("filterBeforeEditTypeOrder", { req, res });
+  removeCookies("takeBeforeEdit", { req, res });
+  removeCookies("filterBeforeEditOrderBy", { req, res });
+  removeCookies("lastPage", { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrlExperiments = `${publicRuntimeConfig.apiUrl}/experiment`;
-
-  const filterApplication =
-    `experimentGroupId=${experimentGroupId}&safraId=${safraId}` ||
-    `&experimentGroupId=${experimentGroupId}&safraId=${safraId}`;
 
   const param = `&experimentGroupId=${experimentGroupId}&safraId=${safraId}`;
 
@@ -988,15 +1029,20 @@ export const getServerSideProps: GetServerSideProps = async ({
     `${baseUrlShow}/${experimentGroupId}`,
     requestOptions
   ).then((response) => response.json());
+
   return {
     props: {
       allExperiments,
-      experimentGroupId,
       experimentGroup,
       totalItems,
       itensPerPage,
+      experimentGroupId,
       filterApplication,
       safraId,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      orderByserver,
+      typeOrderServer,
     },
   };
 };

@@ -25,6 +25,7 @@ import { IoReloadSharp } from "react-icons/io5";
 import { MdFirstPage, MdLastPage } from "react-icons/md";
 import { RiFileExcel2Line } from "react-icons/ri";
 import * as XLSX from "xlsx";
+import moment from "moment";
 import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
 import {
   tecnologiaService,
@@ -76,17 +77,17 @@ interface Idata {
 }
 
 export default function Listagem({
-      allItems,
-      itensPerPage,
-      filterApplication,
-      totalItems,
-      idCulture,
-      pageBeforeEdit,
-      filterBeforeEdit,
-      typeOrderServer,
-      orderByserver,
-      safraId,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allItems,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+  idCulture,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  typeOrderServer,
+  orderByserver,
+  safraId,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState<boolean>(false);
   const { TabsDropDowns } = ITabs.default;
 
@@ -114,8 +115,10 @@ export default function Listagem({
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit)
   );
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
@@ -146,6 +149,8 @@ export default function Listagem({
     },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [statusAccordionFilter, setStatusAccordionFilter] =
+    useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>("");
   // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>("");
@@ -157,8 +162,9 @@ export default function Listagem({
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
   const [fieldOrder, setFieldOrder] = useState<any>(null);
 
-  const pathExtra = `skip=${currentPage * Number(take)
-    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const pathExtra = `skip=${
+    currentPage * Number(take)
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -190,13 +196,18 @@ export default function Listagem({
   });
 
   // Calling common API
-  async function callingApi(parametersFilter: any) {
-    console.log("chamou");
+  async function callingApi(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
 
     setCookies("filterBeforeEdit", parametersFilter);
     setCookies("filterBeforeEditTypeOrder", typeOrder);
     setCookies("filterBeforeEditOrderBy", orderBy);
-    parametersFilter = `${parametersFilter}&${pathExtra}`;
+
+    //parametersFilter = `${parametersFilter}&${pathExtra}`;
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
@@ -276,7 +287,7 @@ export default function Listagem({
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
+    typeOrderG !== "" ? (typeOrderG == "desc" ? setOrder(1) : setOrder(2)) : "";
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -443,34 +454,41 @@ export default function Listagem({
     await tecnologiaService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((row: any) => {
-          const dataExp = new Date();
-          let hours: string;
-          let minutes: string;
-          let seconds: string;
-          if (String(dataExp.getHours()).length === 1) {
-            hours = `0${String(dataExp.getHours())}`;
-          } else {
-            hours = String(dataExp.getHours());
-          }
-          if (String(dataExp.getMinutes()).length === 1) {
-            minutes = `0${String(dataExp.getMinutes())}`;
-          } else {
-            minutes = String(dataExp.getMinutes());
-          }
-          if (String(dataExp.getSeconds()).length === 1) {
-            seconds = `0${String(dataExp.getSeconds())}`;
-          } else {
-            seconds = String(dataExp.getSeconds());
-          }
-          row.DT = `${dataExp.toLocaleDateString(
-            "pt-BR"
-          )} ${hours}:${minutes}:${seconds}`;
+          // const dataExp = new Date();
+          // let hours: string;
+          // let minutes: string;
+          // let seconds: string;
+          // if (String(dataExp.getHours()).length === 1) {
+          //   hours = `0${String(dataExp.getHours())}`;
+          // } else {
+          //   hours = String(dataExp.getHours());
+          // }
+          // if (String(dataExp.getMinutes()).length === 1) {
+          //   minutes = `0${String(dataExp.getMinutes())}`;
+          // } else {
+          //   minutes = String(dataExp.getMinutes());
+          // }
+          // if (String(dataExp.getSeconds()).length === 1) {
+          //   seconds = `0${String(dataExp.getSeconds())}`;
+          // } else {
+          //   seconds = String(dataExp.getSeconds());
+          // }
+          // row.DT = `${dataExp.toLocaleDateString(
+          //   'pt-BR',
+          // )} ${hours}:${minutes}:${seconds}`;
+
+          row.dt_export = new Date(row.dt_export);
+          row.dt_export = new Date(row.dt_export.toISOString().slice(0, -1));
+
+          row.dt_export = moment(row.dt_export).format("DD-MM-YYYY HH:mm:ss");
+          const timeExport = moment().format("DD-MM-YYYY HH:mm:ss");
 
           row.CULTURA = row.culture.desc;
           row.NOME = row.name;
           row.DESC = row.desc;
           row.COD_TEC = row.cod_tec;
-          row.DT_GOM = row.DT;
+          row.DT_GOM = timeExport;
+          row.DT_EXPORT = row.dt_export;
 
           delete row.culture;
           delete row.id;
@@ -513,7 +531,6 @@ export default function Listagem({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
     // const skip = currentPage * Number(take);
     // let parametersFilter;
     // if (orderType) {
@@ -531,7 +548,7 @@ export default function Listagem({
     //   }
     // });
 
-    await callingApi(filter); // handle pagination globly
+    await callingApi(filter, page); // handle pagination globly
   }
 
   // Checking defualt values
@@ -560,9 +577,13 @@ export default function Listagem({
           flex flex-col
           items-start
           gap-4
+          overflow-y-hidden
         "
         >
-          <AccordionFilter title="Filtrar tecnologias">
+          <AccordionFilter
+            title="Filtrar tecnologias"
+            onChange={(_, e) => setStatusAccordionFilter(e)}
+          >
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -643,7 +664,7 @@ export default function Listagem({
           </AccordionFilter>
 
           {/* overflow-y-scroll */}
-          <div className="w-full h-full overflow-y-scroll">
+          <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
               style={{ background: "#f9fafb" }}
@@ -651,8 +672,11 @@ export default function Listagem({
               data={tecnologias}
               options={{
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - ${
+                  statusAccordionFilter ? 400 : 320
+                }px)`,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 1,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,

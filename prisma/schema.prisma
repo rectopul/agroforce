@@ -618,6 +618,7 @@ model experiment_genotipe {
   nca                 String?
   status              String    @default("SORTEADO")
   status_t            String    @default("L")
+  counter             Int       @default(0)
 
   safra                  safra                  @relation(fields: [idSafra], references: [id])
   type_assay             type_assay             @relation(fields: [idTypeAssay], references: [id])
@@ -690,11 +691,3 @@ model AllocatedExperiment {
 
   quadra quadra @relation(fields: [blockId], references: [id])
 }
-
-// model Item {
-//   id        Int       @id @default(autoincrement())
-//   name      String
-//   createdAt DateTime  @default(now())
-
-//   @@map(name: "items")
-// }

@@ -85,16 +85,16 @@ interface IData {
 }
 
 export default function Listagem({
-      totalItems,
-      itensPerPage,
-      cultureId,
-      safraId,
-      filterApplication,
-      pageBeforeEdit,
-      filterBeforeEdit,
-      typeOrderServer,
-      orderByserver,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  totalItems,
+  itensPerPage,
+  cultureId,
+  safraId,
+  filterApplication,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  typeOrderServer,
+  orderByserver,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tableRef = useRef<any>(null);
@@ -121,9 +121,13 @@ export default function Listagem({
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
-  const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
+  const [arrowOrder, setArrowOrder] = useState<ReactNode>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [statusAccordionFilter, setStatusAccordionFilter] =
+    useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: "CamposGerenciados[]", title: "Nome", value: "name" },
@@ -147,8 +151,9 @@ export default function Listagem({
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
   const [fieldOrder, setFieldOrder] = useState<any>(null);
 
-  const pathExtra = `skip=${currentPage * Number(take)
-    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const pathExtra = `skip=${
+    currentPage * Number(take)
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const filterStatusBeforeEdit = filterBeforeEdit.split("");
 
@@ -191,8 +196,9 @@ export default function Listagem({
         );
       }
 
-      const parametersFilter = `filterStatus=${filterStatus || 1
-        }&filterSearch=${filterSearch}&filterGroupTo=${filterGroupTo}&filterGroupFrom=${filterGroupFrom}&id_culture=${cultureId}&id_safra=${safraId}`;
+      const parametersFilter = `filterStatus=${
+        filterStatus || 1
+      }&filterSearch=${filterSearch}&filterGroupTo=${filterGroupTo}&filterGroupFrom=${filterGroupFrom}&id_culture=${cultureId}&id_safra=${safraId}`;
       setFilter(parametersFilter);
       setCurrentPage(0);
       setLoading(true);
@@ -202,13 +208,18 @@ export default function Listagem({
   });
 
   // Calling common API
-  async function callingApi(parametersFilter: any) {
-    console.log("chamou");
+  async function callingApi(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
 
     setCookies("filterBeforeEdit", parametersFilter);
     setCookies("filterBeforeEditTypeOrder", typeOrder);
     setCookies("filterBeforeEditOrderBy", orderBy);
-    parametersFilter = `${parametersFilter}&${pathExtra}`;
+
+    //parametersFilter = `${parametersFilter}&${pathExtra}`;
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
@@ -236,8 +247,9 @@ export default function Listagem({
   }, [typeOrder]);
 
   async function handleStatus(data: any) {
-    const params = `filterStatus=${1}&id_culture=${cultureId}&id_safra=${safraId}&filterSearch=${data.name
-      }`;
+    const params = `filterStatus=${1}&id_culture=${cultureId}&id_safra=${safraId}&filterSearch=${
+      data.name
+    }`;
 
     await handleStatusGlobal({
       id: data?.id,
@@ -313,7 +325,7 @@ export default function Listagem({
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
+    typeOrderG !== "" ? (typeOrderG == "desc" ? setOrder(1) : setOrder(2)) : "";
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -585,7 +597,6 @@ export default function Listagem({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
     // const skip = currentPage * Number(take);
     // let parametersFilter;
     // if (orderType) {
@@ -604,7 +615,7 @@ export default function Listagem({
     //   }
     // });
 
-    await callingApi(filter); // handle pagination globly
+    await callingApi(filter, page); // handle pagination globly
   }
 
   // Checking defualt values
@@ -666,9 +677,13 @@ export default function Listagem({
           flex flex-col
           items-start
           gap-4
+          overflow-hidden
         "
         >
-          <AccordionFilter title="Filtrar focos">
+          <AccordionFilter
+            title="Filtrar focos"
+            onChange={(_, e) => setStatusAccordionFilter(e)}
+          >
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -719,7 +734,7 @@ export default function Listagem({
 
                   <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
                     <Button
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -731,7 +746,7 @@ export default function Listagem({
             </div>
           </AccordionFilter>
 
-          <div className="w-full h-full overflow-y-scroll">
+          <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
               style={{ background: "#f9fafb" }}
@@ -739,8 +754,11 @@ export default function Listagem({
               data={focos}
               options={{
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - ${
+                  statusAccordionFilter ? 400 : 320
+                }px)`,
                 headerStyle: {
-                  zIndex: 0,
+                  zIndex: 1,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,

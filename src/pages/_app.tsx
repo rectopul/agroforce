@@ -1,4 +1,4 @@
-import newrelic from "newrelic";
+import newrelic from 'newrelic';
 import { useRouter } from 'next/router';
 import NProgress from 'nprogress';
 import { useEffect, useState } from 'react';
@@ -31,7 +31,7 @@ function App({
       setAuthorized(true);
     }
   }
-
+  // teste
   useEffect(() => {
     // run auth check on initial load
     authCheck(router.asPath);

@@ -18,7 +18,6 @@ export class ExperimentGenotipeController {
   private printedHistoryController = new PrintHistoryController();
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: experiment-genotipe.controller.ts:21 ~ ExperimentGenotipeController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
@@ -59,11 +58,11 @@ export class ExperimentGenotipeController {
       }
 
       if (options.filterCodTec) {
-        parameters.tecnologia = JSON.parse(`{ "cod_tec": {"contains": "${options.filterCodTec}" } }`);
+        parameters.AND.push(JSON.parse(`{ "tecnologia": { "cod_tec": { "contains": "${options.filterCodTec}" } } }`));
       }
 
       if (options.filterTechnology) {
-        parameters.AND.push(JSON.parse(`{ "tecnologia": {"name": "${options.filterTechnology}" } }`));
+        parameters.AND.push(JSON.parse(`{ "tecnologia": {"name": { "contains": "${options.filterTechnology}" } } }`));
       }
 
       if (options.filterExperimentName) {
@@ -214,6 +213,7 @@ export class ExperimentGenotipeController {
         tecnologia: { select: { name: true, cod_tec: true } },
         gli: true,
         status: true,
+        counter: true,
         experiment: {
           select: {
             experimentName: true,
@@ -457,20 +457,32 @@ export class ExperimentGenotipeController {
     }
   }
 
-  async update({ idList, status, userId = 0 }: any) {
-    console.log('🚀 ~ file: experiment-genotipe.controller.ts:418 ~ ExperimentGenotipeController ~ update ~ status', status);
-    console.log('🚀 ~ file: experiment-genotipe.controller.ts:418 ~ ExperimentGenotipeController ~ update ~ idList', idList);
+  async update({
+    idList, npe, status, userId = 0, count,
+  }: any) {
     try {
-      await this.ExperimentGenotipeRepository.printed(idList, status);
-      // const { response: parcelas } = await this.getOne(idList[0]);
-      // const { response }: any = await this.experimentController.getOne(
-      //   parcelas?.idExperiment,
-      // );
-      // await this.experimentGroupController.countEtiqueta(
-      //   response.experimentGroupId,
-      //   parcelas?.idExperiment,
-      // );
+      let counter = 0;
+      if (count === 'print') {
+        status = 'IMPRESSO';
+        counter = 1;
+      } else if (count === 'reprint') {
+        await idList.map(async (id: any) => {
+          const { response }: any = await this.getOne(id);
+          const newCount = response.counter + 1;
+          const status = 'REIMPRESSO';
+          await this.ExperimentGenotipeRepository.printed(id, status, newCount);
+        });
+      } else if (count === 'writeOff') {
+        counter = 0;
+        status = 'EM ETIQUETAGEM';
+        await this.ExperimentGenotipeRepository.writeOff(npe, status, counter);
+        status = 'BAIXA';
+        await this.printedHistoryController.create({ idList, userId, status });
+        return { status: 200 };
+      }
+      await this.ExperimentGenotipeRepository.printed(idList, status, counter);
       await this.printedHistoryController.create({ idList, userId, status });
+      return { status: 200 };
     } catch (error: any) {
       handleError('Parcelas controller', 'Update', error.message);
       throw new Error('[Controller] - Update Parcelas erro');
@@ -531,24 +543,24 @@ export class ExperimentGenotipeController {
     }
   }
 
-  // async setStatus({ idList: idExperiment, status }: any) {
-  //   try {
-  //     await this.ExperimentGenotipeRepository.updateStatus(
-  //       idExperiment,
-  //       status,
-  //     );
-  //     idExperiment.map(async (id: number) => {
-  //       const { response }: any = await this.experimentController.getOne(id);
-  //       await this.experimentGroupController.countEtiqueta(
-  //         response.experimentGroupId,
-  //         idExperiment,
-  //       );
-  //     });
-  //   } catch (error: any) {
-  //     handleError('Parcelas controller', 'setStatus', error.message);
-  //     throw new Error('[Controller] - setStatus Parcelas erro');
-  //   }
-  // }
+  async setStatus({ idList: idExperiment, status }: any) {
+    try {
+      await this.ExperimentGenotipeRepository.updateStatus(
+        idExperiment,
+        status,
+      );
+      idExperiment.map(async (id: number) => {
+        const { response }: any = await this.experimentController.getOne(id);
+        await this.experimentGroupController.countEtiqueta(
+          response.experimentGroupId,
+          idExperiment,
+        );
+      });
+    } catch (error: any) {
+      handleError('Parcelas controller', 'setStatus', error.message);
+      throw new Error('[Controller] - setStatus Parcelas erro');
+    }
+  }
 
   async updateData(data: any) {
     try {

@@ -74,17 +74,17 @@ interface IGenerateProps {
 }
 
 export default function AtualizarTipoEnsaio({
-      typeAssay,
-      idTypeAssay,
-      idSafra,
-      allEnvelopes,
-      totalItens,
-      itensPerPage,
-      filterApplication,
-      pageBeforeEdit,
-      typeOrderServer, // RR
-      orderByserver, // RR
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  typeAssay,
+  idTypeAssay,
+  idSafra,
+  allEnvelopes,
+  totalItens,
+  itensPerPage,
+  filterApplication,
+  pageBeforeEdit,
+  typeOrderServer, // RR
+  orderByserver, // RR
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -110,7 +110,9 @@ export default function AtualizarTipoEnsaio({
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit)
   );
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
   const [arrowOrder, setArrowOrder] = useState<ReactNode>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -231,7 +233,7 @@ export default function AtualizarTipoEnsaio({
       }
     }
 
-    setFieldOrder(columnG);
+    // setFieldOrder(columnG);
   }
 
   // function headerTableFactory(name: any, title: string) {
@@ -486,89 +488,89 @@ export default function AtualizarTipoEnsaio({
       {loading && <ComponentLoading text="" />}
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
-        <form
-          className="w-full bg-white shadow-md rounded p-4"
-          onSubmit={formik.handleSubmit}
+        <main
+          className="w-full
+      flex flex-col
+      items-start
+      gap-0
+      shadow-md
+      overflow-y-hidden
+    "
         >
-          <div className="w-full flex justify-between items-start">
-            <h1 className="text-xl">Atualizar Tipo Ensaio</h1>
-          </div>
+          <form
+            className="w-full bg-white shadow-md rounded p-4"
+            onSubmit={formik.handleSubmit}
+          >
+            <div className="w-full flex justify-between items-start">
+              <h1 className="text-xl">Atualizar Tipo Ensaio</h1>
+            </div>
 
-          <div
-            className="w-full
+            <div
+              className="w-full
             flex
             justify-around
             gap-6
             mt-2
             mb-4
           "
-          >
-            <div className="w-full h-7">
-              <label className="block text-gray-900 text-sm font-bold mb-1">
-                *Nome
-              </label>
-              <Input
-                type="text"
-                placeholder="Nome"
-                id="name"
-                name="name"
-                onChange={formik.handleChange}
-                value={formik.values.name}
-              />
-            </div>
-            <div
-              className="
+            >
+              <div className="w-full h-7">
+                <label className="block text-gray-900 text-sm font-bold mb-1">
+                  *Nome
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Nome"
+                  id="name"
+                  name="name"
+                  onChange={formik.handleChange}
+                  value={formik.values.name}
+                />
+              </div>
+              <div
+                className="
             h-7 w-full
             flex
             gap-3
             justify-end
             mt-6
           "
-            >
-              <div className="w-40">
-                <Button
-                  type="button"
-                  value="Voltar"
-                  bgColor="bg-red-600"
-                  textColor="white"
-                  icon={<IoMdArrowBack size={18} />}
-                  onClick={() => {
-                    router.back();
-                  }}
-                />
-              </div>
-              <div className="w-40">
-                <Button
-                  type="submit"
-                  value="Atualizar"
-                  bgColor="bg-blue-600"
-                  textColor="white"
-                  icon={<RiOrganizationChart size={18} />}
-                  onClick={() => { }}
-                />
+              >
+                <div className="w-40">
+                  <Button
+                    type="button"
+                    value="Voltar"
+                    bgColor="bg-red-600"
+                    textColor="white"
+                    icon={<IoMdArrowBack size={18} />}
+                    onClick={() => {
+                      router.back();
+                    }}
+                  />
+                </div>
+                <div className="w-40">
+                  <Button
+                    type="submit"
+                    value="Atualizar"
+                    bgColor="bg-blue-600"
+                    textColor="white"
+                    icon={<RiOrganizationChart size={18} />}
+                    onClick={() => {}}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        </form>
-        <main
-          className="w-full
-          flex flex-col
-          items-start
-          gap-8
-        "
-        >
-          <div
-            style={{ marginTop: "1%" }}
-            className="w-full h-auto overflow-y-scroll"
-          >
+          </form>
+          <div style={{ marginTop: "1%" }} className="w-full h-auto">
             <MaterialTable
               style={{ background: "#f9fafb" }}
               columns={columns}
               data={seeds}
               options={{
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - 410px)`,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 1,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,

@@ -27,6 +27,7 @@ import { RiFileExcel2Line } from "react-icons/ri";
 import Swal from "sweetalert2";
 import * as XLSX from "xlsx";
 import { tableGlobalFunctions } from "src/helpers";
+import moment from "moment";
 import {
   AccordionFilter,
   Button,
@@ -97,15 +98,15 @@ interface IData {
 }
 
 export default function Listagem({
-      allLote,
-      totalItems,
-      idSafra,
-      idCulture,
-      itensPerPage,
-      typeOrderServer,
-      orderByserver,
-      filterApplication,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allLote,
+  totalItems,
+  idSafra,
+  idCulture,
+  itensPerPage,
+  typeOrderServer,
+  orderByserver,
+  filterApplication,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tableRef = useRef<any>(null);
@@ -129,10 +130,14 @@ export default function Listagem({
 
   const [lotes, setLotes] = useState<LoteGenotipo[]>(() => allLote);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
+  const [arrowOrder, setArrowOrder] = useState<any>("");
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [statusAccordionFilter, setStatusAccordionFilter] =
+    useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<any>(""); // Set filter Parameter
 
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -173,8 +178,9 @@ export default function Listagem({
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
-  const pathExtra = `skip=${currentPage * Number(take)
-    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const pathExtra = `skip=${
+    currentPage * Number(take)
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -280,13 +286,17 @@ export default function Listagem({
   });
 
   // Calling common API
-  async function callingApi(parametersFilter: any) {
-    console.log("chamou");
+  async function callingApi(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
 
     setCookies("filterBeforeEdit", parametersFilter);
     setCookies("filterBeforeEditTypeOrder", typeOrder);
     setCookies("filterBeforeEditOrderBy", orderBy);
-    parametersFilter = `${parametersFilter}&${pathExtra}`;
+
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
@@ -348,59 +358,15 @@ export default function Listagem({
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
+    typeOrderG !== "" ? (typeOrderG == "desc" ? setOrder(1) : setOrder(2)) : "";
     setArrowOrder(arrowOrder);
     setTimeout(() => {
       setLoading(false);
     }, 100);
   }
 
-  // function headerTableFactory(name: any, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: true,
-  //   };
-  // }
-
-  function tecnologiaHeaderFactory(name: string, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            type="button"
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList, "tecnologia")}
-          >
-            {name}
-          </button>
-        </div>
-      ),
-      field: "tecnologia",
-      width: 0,
-      sorting: true,
-      render: (rowData: any) => (
-        <div className="h-10 flex">
-          <div>
-            {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.name}`}
-          </div>
-        </div>
-      ),
-    };
-  }
-
   function formatDecimal(num: number) {
-    return Number(num).toFixed(1);
+    return num ? Number(num).toFixed(1) : "";
   }
 
   function columnsOrder(columnsCampos: string) {
@@ -556,59 +522,69 @@ export default function Listagem({
       if (status === 200) {
         const newData = response.map((item: any) => {
           const newItem = item;
-          const dataExp = new Date();
-          let hours: string;
-          let minutes: string;
-          let seconds: string;
-          if (String(dataExp.getHours()).length === 1) {
-            hours = `0${String(dataExp.getHours())}`;
-          } else {
-            hours = String(dataExp.getHours());
-          }
-          if (String(dataExp.getMinutes()).length === 1) {
-            minutes = `0${String(dataExp.getMinutes())}`;
-          } else {
-            minutes = String(dataExp.getMinutes());
-          }
-          if (String(dataExp.getSeconds()).length === 1) {
-            seconds = `0${String(dataExp.getSeconds())}`;
-          } else {
-            seconds = String(dataExp.getSeconds());
-          }
-          newItem.DT = `${dataExp.toLocaleDateString(
-            "pt-BR"
-          )} ${hours}:${minutes}:${seconds}`;
+          // const dataExp = new Date();
+          // let hours: string;
+          // let minutes: string;
+          // let seconds: string;
+          // if (String(dataExp.getHours()).length === 1) {
+          //   hours = `0${String(dataExp.getHours())}`;
+          // } else {
+          //   hours = String(dataExp.getHours());
+          // }
+          // if (String(dataExp.getMinutes()).length === 1) {
+          //   minutes = `0${String(dataExp.getMinutes())}`;
+          // } else {
+          //   minutes = String(dataExp.getMinutes());
+          // }
+          // if (String(dataExp.getSeconds()).length === 1) {
+          //   seconds = `0${String(dataExp.getSeconds())}`;
+          // } else {
+          //   seconds = String(dataExp.getSeconds());
+          // }
+          // newItem.DT = `${dataExp.toLocaleDateString(
+          //   'pt-BR',
+          // )} ${hours}:${minutes}:${seconds}`;
 
-          let dtHours: string;
-          let dtMinutes: string;
-          let dtSeconds: string;
+          // let dtHours: string;
+          // let dtMinutes: string;
+          // let dtSeconds: string;
+
+          // if (String(newItem.dt_export.getHours()).length === 1) {
+          //   dtHours = `0${String(newItem.dt_export.getHours())}`;
+          // } else {
+          //   dtHours = String(newItem.dt_export.getHours());
+          // }
+          // if (String(newItem.dt_export.getMinutes()).length === 1) {
+          //   dtMinutes = `0${String(newItem.dt_export.getMinutes())}`;
+          // } else {
+          //   dtMinutes = String(newItem.dt_export.getMinutes());
+          // }
+          // if (String(newItem.dt_export.getSeconds()).length === 1) {
+          //   dtSeconds = `0${String(newItem.dt_export.getSeconds())}`;
+          // } else {
+          //   dtSeconds = String(newItem.dt_export.getSeconds());
+          // }
+
+          // newItem.EXPORT = `${newItem.dt_export.toLocaleDateString(
+          //   'en-US',
+          // )} ${dtHours}:${dtMinutes}:${dtSeconds}`;
 
           newItem.dt_export = new Date(newItem.dt_export);
           newItem.dt_export = new Date(
             newItem.dt_export.toISOString().slice(0, -1)
           );
 
-          if (String(newItem.dt_export.getHours()).length === 1) {
-            dtHours = `0${String(newItem.dt_export.getHours())}`;
-          } else {
-            dtHours = String(newItem.dt_export.getHours());
-          }
-          if (String(newItem.dt_export.getMinutes()).length === 1) {
-            dtMinutes = `0${String(newItem.dt_export.getMinutes())}`;
-          } else {
-            dtMinutes = String(newItem.dt_export.getMinutes());
-          }
-          if (String(newItem.dt_export.getSeconds()).length === 1) {
-            dtSeconds = `0${String(newItem.dt_export.getSeconds())}`;
-          } else {
-            dtSeconds = String(newItem.dt_export.getSeconds());
-          }
-
-          newItem.EXPORT = `${newItem.dt_export.toLocaleDateString(
-            'en-US',
-          )} ${dtHours}:${dtMinutes}:${dtSeconds}`;
+          newItem.dt_export = moment(newItem.dt_export).format(
+            "DD-MM-YYYY HH:mm:ss"
+          );
+          const timeExport = moment().format("DD-MM-YYYY HH:mm:ss");
 
           newItem.CULTURA = item?.genotipo.culture.name;
+          newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
+          newItem.NOME_PRINCIPAL = item?.genotipo.name_main;
+          newItem.GMR = item?.genotipo.gmr;
+          newItem.BGM = item?.genotipo.bgm;
+          newItem.TECNOLOGIA = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
           newItem.ANO = item?.year;
           newItem.SAFRA = item?.safra.safraName;
           newItem.COD_LOTE = item?.cod_lote;
@@ -616,13 +592,8 @@ export default function Listagem({
           newItem.FASE = item?.fase;
           newItem.PESO = item?.peso;
           newItem.QUANT_SEMENTES = item?.quant_sementes;
-          newItem.DT_GOM = newItem.DT;
-          newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
-          newItem.NOME_PRINCIPAL = item?.genotipo.name_main;
-          newItem.GMR = item?.genotipo.gmr;
-          newItem.BGM = item?.genotipo.bgm;
-          newItem.TECNOLOGIA = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
-          newItem.DT_EXPORT = newItem.EXPORT;
+          newItem.DT_EXPORT = newItem.dt_export;
+          newItem.DT_GOM = timeExport;
 
           delete newItem.quant_sementes;
           delete newItem.peso;
@@ -633,7 +604,7 @@ export default function Listagem({
           delete newItem.id_s2;
           delete newItem.id_dados;
           delete newItem.DT;
-          delete newItem.EXPORT;
+          // delete newItem.EXPORT;
           delete newItem.dt_export;
           delete newItem.id;
           delete newItem.id_genotipo;
@@ -643,7 +614,10 @@ export default function Listagem({
           return newItem;
         });
 
-        const workSheet = XLSX.utils.json_to_sheet(newData);
+        const workSheet = XLSX.utils.json_to_sheet(newData, {
+          cellDates: true,
+          dateNF: "YYYY-MM-DD HH:mm:ss",
+        });
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, workSheet, "lotes");
 
@@ -733,7 +707,6 @@ export default function Listagem({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
     // // manage using comman function
     // const { parametersFilter, currentPages } = await tableGlobalFunctions.handlePaginationGlobal(currentPage, take, filter);
 
@@ -745,7 +718,7 @@ export default function Listagem({
     //   }
     // });
 
-    await callingApi(filter); // handle pagination globly
+    await callingApi(filter, page); // handle pagination globly
   }
 
   // Checking defualt values
@@ -792,9 +765,13 @@ export default function Listagem({
           flex flex-col
           items-start
           gap-4
+          overflow-y-hidden
         "
         >
-          <AccordionFilter title="Filtrar lotes">
+          <AccordionFilter
+            title="Filtrar lotes"
+            onChange={(_, e) => setStatusAccordionFilter(e)}
+          >
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -994,7 +971,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -1006,7 +983,7 @@ export default function Listagem({
             </div>
           </AccordionFilter>
 
-          <div className="w-full h-full overflow-y-scroll">
+          <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
               style={{ background: "#f9fafb" }}
@@ -1014,8 +991,11 @@ export default function Listagem({
               data={lotes}
               options={{
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - ${
+                  statusAccordionFilter ? 460 : 320
+                }px)`,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 1,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,

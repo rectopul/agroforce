@@ -56,15 +56,15 @@ import { tableGlobalFunctions } from "../../helpers";
 import headerTableFactoryGlobal from "../../shared/utils/headerTableFactory";
 
 export default function Listagem({
-          totalItems,
-          itensPerPage,
-          filterApplication,
-          idCulture,
-          idSafra,
-          filterBeforeEdit,
-          orderByserver,
-          typeOrderServer,
-        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idCulture,
+  idSafra,
+  filterBeforeEdit,
+  orderByserver,
+  typeOrderServer,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsReport } = ITabs.default;
 
   const tabsDropDowns = tabsReport.map((i) =>
@@ -86,7 +86,9 @@ export default function Listagem({
   );
   const [reportes, setReportes] = useState<ITreatment[] | any>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
@@ -117,6 +119,8 @@ export default function Listagem({
     },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [statusAccordionFilter, setStatusAccordionFilter] =
+    useState<boolean>(false);
   // const take: number = itensPerPage;
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -188,11 +192,18 @@ export default function Listagem({
   });
 
   // Calling common API
-  async function callingApi(parametersFilter: any) {
+  async function callingApi(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
+
     setCookies("filterBeforeEdit", parametersFilter);
     setCookies("filterBeforeEditTypeOrder", typeOrder);
     setCookies("filterBeforeEditOrderBy", orderBy);
-    parametersFilter = `${parametersFilter}&${pathExtra}`;
+
+    //parametersFilter = `${parametersFilter}&${pathExtra}`;
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
@@ -265,7 +276,7 @@ export default function Listagem({
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
+    typeOrderG !== "" ? (typeOrderG == "desc" ? setOrder(1) : setOrder(2)) : "";
   }
 
   // function headerTableFactory(name: string, title: string) {
@@ -483,7 +494,6 @@ export default function Listagem({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
     // const skip = currentPage * Number(take);
     // let parametersFilter;
     // if (orderType) {
@@ -502,7 +512,7 @@ export default function Listagem({
     //       setReportes(response);
     //     }
     //   });
-    await callingApi(filter); // handle pagination globly
+    await callingApi(filter, page); // handle pagination globly
   }
 
   function filterFieldFactory(title: string, name: string) {
@@ -540,9 +550,13 @@ export default function Listagem({
           flex flex-col
           items-start
           gap-4
+          overflow-y-hidden
         "
         >
-          <AccordionFilter title="Filtrar relatórios">
+          <AccordionFilter
+            title="Filtrar relatórios"
+            onChange={(_, e) => setStatusAccordionFilter(e)}
+          >
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -585,7 +599,7 @@ export default function Listagem({
           </AccordionFilter>
 
           {/* overflow-y-scroll */}
-          <div className="w-full h-full overflow-y-scroll">
+          <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
               style={{ background: "#f9fafb" }}
@@ -593,8 +607,11 @@ export default function Listagem({
               data={reportes}
               options={{
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - ${
+                  statusAccordionFilter ? 400 : 320
+                }px)`,
                 headerStyle: {
-                  zIndex: 0,
+                  zIndex: 1,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,

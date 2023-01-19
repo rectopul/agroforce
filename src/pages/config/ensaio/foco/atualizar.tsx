@@ -43,7 +43,7 @@ import { groupService, userPreferencesService } from "../../../../services";
 import { focoService } from "../../../../services/foco.service";
 import * as ITabs from "../../../../shared/utils/dropdown";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
-import ComponentLoading from '../../../../components/Loading';
+import ComponentLoading from "../../../../components/Loading";
 
 export interface IUpdateFoco {
   id: number;
@@ -71,17 +71,17 @@ interface IGenerateProps {
 }
 
 export default function Atualizar({
-      foco,
-      allItens,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      idFoco,
-      idSafra,
-      pageBeforeEdit,
-      typeOrderServer, // RR
-      orderByserver, // RR
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  foco,
+  allItens,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idFoco,
+  idSafra,
+  pageBeforeEdit,
+  typeOrderServer, // RR
+  orderByserver, // RR
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -154,7 +154,9 @@ export default function Atualizar({
     Number(pageBeforeEdit)
   );
   const itemsTotal = totalItems;
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
   const [arrowOrder, setArrowOrder] = useState<ReactNode>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -222,7 +224,7 @@ export default function Atualizar({
       }
     }
 
-    setFieldOrder(columnG);
+    // setFieldOrder(columnG);
   }
 
   // function headerTableFactory(name: any, title: string) {
@@ -307,7 +309,7 @@ export default function Atualizar({
                 disabled
                 bgColor="bg-gray-600"
                 textColor="white"
-                onClick={() => { }}
+                onClick={() => {}}
               />
             </div>
           </div>
@@ -498,76 +500,80 @@ export default function Atualizar({
       </Head>
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
-        <form
-          className="w-full bg-white shadow-md rounded p-4"
-          onSubmit={formik.handleSubmit}
+        <main
+          className="w-full
+          shadow-md
+          flex flex-col
+          items-start
+          gap-0
+          overflow-y-hidden
+        "
         >
-          <h1 className="text-xl">Atualizar foco</h1>
+          <form
+            className="w-full bg-white shadow-md rounded p-4"
+            onSubmit={formik.handleSubmit}
+          >
+            <h1 className="text-xl">Atualizar foco</h1>
 
-          <div
-            className="w-1/2
+            <div
+              className="w-1/2
               flex
               justify-around
               gap-6
               mt-2
               mb-4
           "
-          >
-            <div className="w-full">
-              <label className="block text-gray-900 text-sm font-bold mb-1">
-                Nome
-              </label>
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                max="50"
-                placeholder="Foco"
-                onChange={formik.handleChange}
-                value={formik.values.name}
-              />
+            >
+              <div className="w-full">
+                <label className="block text-gray-900 text-sm font-bold mb-1">
+                  Nome
+                </label>
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  max="50"
+                  placeholder="Foco"
+                  onChange={formik.handleChange}
+                  value={formik.values.name}
+                />
+              </div>
             </div>
-          </div>
 
-          <div
-            className="
+            <div
+              className="
               h-7 w-full
               flex
               gap-3
               justify-center
               mt-4
             "
-          >
-            <div className="w-40">
-              <Button
-                type="button"
-                value="Voltar"
-                bgColor="bg-red-600"
-                textColor="white"
-                icon={<IoMdArrowBack size={18} />}
-                onClick={() => router.back()}
-              />
+            >
+              <div className="w-40">
+                <Button
+                  type="button"
+                  value="Voltar"
+                  bgColor="bg-red-600"
+                  textColor="white"
+                  icon={<IoMdArrowBack size={18} />}
+                  onClick={() => router.back()}
+                />
+              </div>
+              <div className="w-40">
+                <Button
+                  type="submit"
+                  value="Atualizar"
+                  bgColor="bg-blue-600"
+                  textColor="white"
+                  icon={<AiOutlineFileSearch size={20} />}
+                  onClick={() => {
+                    setLoading(true);
+                  }}
+                />
+              </div>
             </div>
-            <div className="w-40">
-              <Button
-                type="submit"
-                value="Atualizar"
-                bgColor="bg-blue-600"
-                textColor="white"
-                icon={<AiOutlineFileSearch size={20} />}
-                onClick={() => { setLoading(true); }}
-              />
-            </div>
-          </div>
-        </form>
-        <main
-          className="w-full
+          </form>
 
-          flex flex-col
-          items-start
-          gap-8
-        "
-        >
           <div style={{ marginTop: "1%" }} className="w-full h-auto">
             <MaterialTable
               style={{ background: "#f9fafb" }}
@@ -575,8 +581,9 @@ export default function Atualizar({
               data={grupos}
               options={{
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - 435px)`,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 1,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
@@ -606,10 +613,11 @@ export default function Atualizar({
                             : "Cadastrar grupo"
                         }
                         // title="Cadastrar grupo"
-                        value={`${grupos.length
-                          ? "Grupo ja cadastrado na safra"
-                          : "Cadastrar grupo"
-                          }`}
+                        value={`${
+                          grupos.length
+                            ? "Grupo ja cadastrado na safra"
+                            : "Cadastrar grupo"
+                        }`}
                         // value="Cadastrar grupo"
                         bgColor={grupos.length ? "bg-gray-400" : "bg-blue-600"}
                         // bgColor="bg-blue-600"

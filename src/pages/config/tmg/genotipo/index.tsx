@@ -91,17 +91,17 @@ interface IData {
 }
 
 export default function Listagem({
-      allGenotipos,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      idCulture,
-      idSafra,
-      pageBeforeEdit,
-      filterBeforeEdit,
-      typeOrderServer,
-      orderByserver,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allGenotipos,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  idCulture,
+  idSafra,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  typeOrderServer,
+  orderByserver,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
   const tabsDropDowns = TabsDropDowns();
 
@@ -128,9 +128,13 @@ export default function Listagem({
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [statusAccordionFilter, setStatusAccordionFilter] =
+    useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     {
@@ -212,8 +216,10 @@ export default function Listagem({
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
-  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${orderBy == "Tecnologia" ? "tecnologia.cod_tec" : orderBy
-    }&typeOrder=${typeOrder}`;
+
+  const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
+    orderBy == "Tecnologia" ? "tecnologia.cod_tec" : orderBy
+  }&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -262,11 +268,20 @@ export default function Listagem({
   });
 
   // Calling common API
-  async function callingApi(parametersFilter: any) {
+  async function callingApi(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
+
     setCookies("filterBeforeEdit", parametersFilter);
     setCookies("filterBeforeEditTypeOrder", typeOrder);
     setCookies("filterBeforeEditOrderBy", orderBy);
-    parametersFilter = `${parametersFilter}&${pathExtra}`;
+
+    //parametersFilter = `${parametersFilter}&${pathExtra}`;
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${
+      orderBy == "Tecnologia" ? "tecnologia.cod_tec" : orderBy
+    }&typeOrder=${typeOrder}`;
+
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
@@ -336,7 +351,7 @@ export default function Listagem({
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
+    typeOrderG !== "" ? (typeOrderG == "desc" ? setOrder(1) : setOrder(2)) : "";
     setArrowOrder(arrowOrder);
     setTimeout(() => {
       setLoading(false);
@@ -851,7 +866,6 @@ export default function Listagem({
   }
   // paginação certa
   async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
     // manage using comman function
     // const { parametersFilter, currentPages } = await tableGlobalFunctions.handlePaginationGlobal(
     //   currentPage,
@@ -867,7 +881,7 @@ export default function Listagem({
     //     setTimeout(removestate, 5000); // Remove State
     //   }
     // });
-    await callingApi(filter); // handle pagination globly
+    await callingApi(filter, page); // handle pagination globly
   }
 
   // Checking defualt values
@@ -979,9 +993,13 @@ export default function Listagem({
           flex flex-col
           items-start
           gap-4
+          overflow-y-hidden
         "
         >
-          <AccordionFilter title="Filtrar genótipos">
+          <AccordionFilter
+            title="Filtrar genótipos"
+            onChange={(_, e) => setStatusAccordionFilter(e)}
+          >
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -1026,7 +1044,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -1038,7 +1056,7 @@ export default function Listagem({
             </div>
           </AccordionFilter>
 
-          <div className="w-full h-full overflow-y-scroll">
+          <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
               style={{ background: "#f9fafb", width: "100%" }}
@@ -1047,8 +1065,11 @@ export default function Listagem({
               options={{
                 sorting: true,
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - ${
+                  statusAccordionFilter ? 460 : 320
+                }px)`,
                 headerStyle: {
-                  zIndex: 20,
+                  zIndex: 1,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,

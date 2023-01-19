@@ -89,17 +89,17 @@ interface IData {
 }
 
 export default function TipoEnsaio({
-      allTypeAssay,
-      itensPerPage,
-      filterApplication,
-      totalItems,
-      idCulture,
-      safraId,
-      pageBeforeEdit,
-      filterBeforeEdit,
-      typeOrderServer, // RR
-      orderByserver, // RR
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allTypeAssay,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+  idCulture,
+  safraId,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  typeOrderServer, // RR
+  orderByserver, // RR
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState<boolean>(false);
   const { TabsDropDowns } = ITabs.default;
 
@@ -126,7 +126,9 @@ export default function TipoEnsaio({
     Number(pageBeforeEdit)
   );
 
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -159,6 +161,8 @@ export default function TipoEnsaio({
   ]);
 
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [statusAccordionFilter, setStatusAccordionFilter] =
+    useState<boolean>(false);
   const [colorStar, setColorStar] = useState<string>("");
 
   // const [orderBy, setOrderBy] = useState<string>("");
@@ -175,8 +179,9 @@ export default function TipoEnsaio({
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [selectedModal, setSelectedModal] = useState<any>(null);
 
-  const pathExtra = `skip=${currentPage * Number(take)
-    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
+  const pathExtra = `skip=${
+    currentPage * Number(take)
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const filters = [
     { id: 2, name: "Todos" },
@@ -214,8 +219,9 @@ export default function TipoEnsaio({
         );
       }
 
-      const parametersFilter = `filterStatus=${filterStatus || 1
-        }&filterName=${filterName}&filterProtocolName=${filterProtocolName}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&id_culture=${idCulture}&id_safra=${safraId}`;
+      const parametersFilter = `filterStatus=${
+        filterStatus || 1
+      }&filterName=${filterName}&filterProtocolName=${filterProtocolName}&filterSeedsTo=${filterSeedsTo}&filterSeedsFrom=${filterSeedsFrom}&id_culture=${idCulture}&id_safra=${safraId}`;
       setFiltersParams(parametersFilter);
       setCookies("filterBeforeEdit", filtersParams);
       setFilter(parametersFilter);
@@ -236,13 +242,18 @@ export default function TipoEnsaio({
 
   // Calling common API
 
-  async function callingApi(parametersFilter: any) {
-    console.log("chamou");
+  async function callingApi(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
 
     setCookies("filterBeforeEdit", parametersFilter);
     setCookies("filterBeforeEditTypeOrder", typeOrder);
     setCookies("filterBeforeEditOrderBy", orderBy);
-    parametersFilter = `${parametersFilter}&${pathExtra}`;
+
+    //parametersFilter = `${parametersFilter}&${pathExtra}`;
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
     await typeAssayService
@@ -335,7 +346,7 @@ export default function TipoEnsaio({
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
+    typeOrderG !== "" ? (typeOrderG == "desc" ? setOrder(1) : setOrder(2)) : "";
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -469,7 +480,7 @@ export default function TipoEnsaio({
                 <Button
                   title={`Atualizar ${rowData.name}`}
                   icon={<BiEdit size={14} />}
-                  onClick={() => { }}
+                  onClick={() => {}}
                   bgColor="bg-blue-600"
                   textColor="white"
                   href={`/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`}
@@ -690,7 +701,6 @@ export default function TipoEnsaio({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
     // const skip = currentPage * Number(take);
     // let parametersFilter;
     // if (orderType) {
@@ -708,7 +718,7 @@ export default function TipoEnsaio({
     //       setTypeAssay(response);
     //     }
     //   });
-    await callingApi(filter); // handle pagination globly
+    await callingApi(filter, page); // handle pagination globly
   }
 
   // Checking defualt values
@@ -736,8 +746,11 @@ export default function TipoEnsaio({
       </Head>
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
-        <main className="h-full w-full flex flex-col items-start gap-4">
-          <AccordionFilter title="Filtrar tipos de ensaios">
+        <main className="h-full w-full flex flex-col items-start gap-4 overflow-y-hidden">
+          <AccordionFilter
+            title="Filtrar tipos de ensaios"
+            onChange={(_, e) => setStatusAccordionFilter(e)}
+          >
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col w-full items-center px-4 bg-white"
@@ -785,7 +798,7 @@ export default function TipoEnsaio({
                           placeholder="De"
                           id="filterSeedsFrom"
                           name="filterSeedsFrom"
-                          defaultValue={checkValue('filterSeedsFrom')}
+                          defaultValue={checkValue("filterSeedsFrom")}
                           onChange={formik.handleChange}
                         />
                       </div>
@@ -796,7 +809,7 @@ export default function TipoEnsaio({
                           placeholder="Até"
                           id="filterSeedsTo"
                           name="filterSeedsTo"
-                          defaultValue={checkValue('filterSeedsTo')}
+                          defaultValue={checkValue("filterSeedsTo")}
                           onChange={formik.handleChange}
                         />
                       </div>
@@ -808,7 +821,7 @@ export default function TipoEnsaio({
                   <div style={{ width: 40 }} />
                   <div className="h-7 w-32 mt-6">
                     <Button
-                      onClick={() => { }}
+                      onClick={() => {}}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -821,8 +834,7 @@ export default function TipoEnsaio({
           </AccordionFilter>
 
           {/* overflow-y-scroll */}
-
-          <div className="w-full h-full overflow-y-scroll">
+          <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
               style={{ background: "#f9fafb" }}
@@ -830,8 +842,11 @@ export default function TipoEnsaio({
               data={typeAssay}
               options={{
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - ${
+                  statusAccordionFilter ? 410 : 320
+                }px)`,
                 headerStyle: {
-                  zIndex: 0,
+                  zIndex: 1,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,

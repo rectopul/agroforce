@@ -32,7 +32,7 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
 
     if (countNPE < 7) {
       while (countNPE < 7) {
-        npe7Digits = "0" + npe7Digits;
+        npe7Digits = `0${npe7Digits}`;
         countNPE++;
       }
     }
@@ -60,7 +60,7 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
                 marginBottom: -2,
               }}
             >
-              1
+              {item?.counter}
             </div>
           </div>
           {/* FIM CONTAGEM IMPRESSAO ETIQUETAS */}
@@ -71,8 +71,8 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
         </div>
         <div style={{ fontSize: 7.5 }}>
           {item?.experiment?.local?.name_local_culture}-{item?.gli}-
-          {item?.envelope}
-          MTS
+          {item?.type_assay?.envelope[0]?.seeds}
+          SMT
         </div>
       </div>
     ));

@@ -31,6 +31,7 @@ import { unidadeCulturaService, userPreferencesService } from "src/services";
 import * as XLSX from "xlsx";
 import { BsTrashFill } from "react-icons/bs";
 import Swal from "sweetalert2";
+import moment from "moment";
 import {
   AccordionFilter,
   Button,
@@ -92,17 +93,17 @@ interface IData {
 }
 
 export default function Listagem({
-      allCultureUnity,
-      totalItems,
-      idSafra,
-      itensPerPage,
-      filterApplication,
-      pageBeforeEdit,
-      filterBeforeEdit,
-      typeOrderServer,
-      orderByserver,
-      cultureId,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allCultureUnity,
+  totalItems,
+  idSafra,
+  itensPerPage,
+  filterApplication,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  typeOrderServer,
+  orderByserver,
+  cultureId,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tableRef = useRef<any>(null);
@@ -129,8 +130,10 @@ export default function Listagem({
     Number(pageBeforeEdit)
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -202,6 +205,8 @@ export default function Listagem({
     // },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [statusAccordionFilter, setStatusAccordionFilter] =
+    useState<boolean>(false);
   const [selectedRowById, setSelectedRowById] = useState<number>();
   const [colorStar, setColorStar] = useState<string>("");
   // const [orderBy, setOrderBy] = useState<string>('');
@@ -214,8 +219,9 @@ export default function Listagem({
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
-  const pathExtra = `skip=${currentPage * Number(take)
-    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${
+    currentPage * Number(take)
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IFilter>({
     initialValues: {
@@ -263,13 +269,17 @@ export default function Listagem({
   });
 
   // Calling common API
-  async function callingApi(parametersFilter: any) {
-    console.log("chamou");
+  async function callingApi(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
 
     setCookies("filterBeforeEdit", parametersFilter);
     setCookies("filterBeforeEditTypeOrder", typeOrder);
     setCookies("filterBeforeEditOrderBy", orderBy);
-    parametersFilter = `${parametersFilter}&${pathExtra}`;
+
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
@@ -349,7 +359,7 @@ export default function Listagem({
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
+    typeOrderG !== "" ? (typeOrderG == "desc" ? setOrder(1) : setOrder(2)) : "";
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -586,57 +596,62 @@ export default function Listagem({
       if (status === 200) {
         const newData = response.map((row: any) => {
           const newRow = row;
-          const dataExp = new Date();
-          let hours: string;
-          let minutes: string;
-          let seconds: string;
-          if (String(dataExp.getHours()).length === 1) {
-            hours = `0${String(dataExp.getHours())}`;
-          } else {
-            hours = String(dataExp.getHours());
-          }
-          if (String(dataExp.getMinutes()).length === 1) {
-            minutes = `0${String(dataExp.getMinutes())}`;
-          } else {
-            minutes = String(dataExp.getMinutes());
-          }
-          if (String(dataExp.getSeconds()).length === 1) {
-            seconds = `0${String(dataExp.getSeconds())}`;
-          } else {
-            seconds = String(dataExp.getSeconds());
-          }
-          newRow.DT = `${dataExp.toLocaleDateString(
-            "pt-BR"
-          )} ${hours}:${minutes}:${seconds}`;
+          // const dataExp = new Date();
+          // let hours: string;
+          // let minutes: string;
+          // let seconds: string;
+          // if (String(dataExp.getHours()).length === 1) {
+          //   hours = `0${String(dataExp.getHours())}`;
+          // } else {
+          //   hours = String(dataExp.getHours());
+          // }
+          // if (String(dataExp.getMinutes()).length === 1) {
+          //   minutes = `0${String(dataExp.getMinutes())}`;
+          // } else {
+          //   minutes = String(dataExp.getMinutes());
+          // }
+          // if (String(dataExp.getSeconds()).length === 1) {
+          //   seconds = `0${String(dataExp.getSeconds())}`;
+          // } else {
+          //   seconds = String(dataExp.getSeconds());
+          // }
+          // newRow.DT = `${dataExp.toLocaleDateString(
+          //   'pt-BR',
+          // )} ${hours}:${minutes}:${seconds}`;
 
-          let dtHours: string;
-          let dtMinutes: string;
-          let dtSeconds: string;
+          // let dtHours: string;
+          // let dtMinutes: string;
+          // let dtSeconds: string;
+
+          // if (String(newRow.dt_export.getHours()).length === 1) {
+          //   dtHours = `0${String(newRow.dt_export.getHours())}`;
+          // } else {
+          //   dtHours = String(newRow.dt_export.getHours());
+          // }
+          // if (String(newRow.dt_export.getMinutes()).length === 1) {
+          //   dtMinutes = `0${String(newRow.dt_export.getMinutes())}`;
+          // } else {
+          //   dtMinutes = String(newRow.dt_export.getMinutes());
+          // }
+          // if (String(newRow.dt_export.getSeconds()).length === 1) {
+          //   dtSeconds = `0${String(newRow.dt_export.getSeconds())}`;
+          // } else {
+          //   dtSeconds = String(newRow.dt_export.getSeconds());
+          // }
+
+          // newRow.EXPORT = `${newRow.dt_export.toLocaleDateString(
+          //   'pt-BR',
+          // )} ${dtHours}:${dtMinutes}:${dtSeconds}`;
 
           newRow.dt_export = new Date(newRow.dt_export);
           newRow.dt_export = new Date(
             newRow.dt_export.toISOString().slice(0, -1)
           );
 
-          if (String(newRow.dt_export.getHours()).length === 1) {
-            dtHours = `0${String(newRow.dt_export.getHours())}`;
-          } else {
-            dtHours = String(newRow.dt_export.getHours());
-          }
-          if (String(newRow.dt_export.getMinutes()).length === 1) {
-            dtMinutes = `0${String(newRow.dt_export.getMinutes())}`;
-          } else {
-            dtMinutes = String(newRow.dt_export.getMinutes());
-          }
-          if (String(newRow.dt_export.getSeconds()).length === 1) {
-            dtSeconds = `0${String(newRow.dt_export.getSeconds())}`;
-          } else {
-            dtSeconds = String(newRow.dt_export.getSeconds());
-          }
-
-          newRow.EXPORT = `${newRow.dt_export.toLocaleDateString(
-            "pt-BR"
-          )} ${dtHours}:${dtMinutes}:${dtSeconds}`;
+          newRow.dt_export = moment(newRow.dt_export).format(
+            "DD-MM-YYYY HH:mm:ss"
+          );
+          const timeExport = moment().format("DD-MM-YYYY HH:mm:ss");
 
           newRow.NOME_UNIDADE_CULTURA = newRow?.name_unity_culture;
           newRow.ANO = newRow?.year;
@@ -647,15 +662,15 @@ export default function Listagem({
           newRow.PAÍS = newRow.local?.label_country;
           newRow.REGIÃO = newRow.local?.label_region;
           newRow.LOCALIDADE = newRow.local?.name_locality;
-          newRow.DT_GOM = newRow.DT;
-          newRow.DT_EXPORT = row.EXPORT;
+          newRow.DT_GOM = timeExport;
+          newRow.DT_EXPORT = newRow.dt_export;
 
           delete newRow.year;
           delete newRow.name_unity_culture;
           delete newRow.DT;
           delete newRow.id_safra;
           delete newRow.id;
-          delete newRow.EXPORT;
+          // delete newRow.EXPORT;
           delete newRow.dt_export;
           delete newRow.id_unity_culture;
           delete newRow.id_local;
@@ -694,7 +709,6 @@ export default function Listagem({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
     // const skip = currentPage * Number(take);
     // let parametersFilter;
     // if (orderType) {
@@ -714,7 +728,7 @@ export default function Listagem({
     //     }
     //   });
 
-    await callingApi(filter); // handle pagination globly
+    await callingApi(filter, page); // handle pagination globly
   }
 
   function filterFieldFactory(title: any, name: any) {
@@ -761,9 +775,13 @@ export default function Listagem({
           flex flex-col
           items-start
           gap-4
+          overflow-y-hidden
         "
         >
-          <AccordionFilter title="Filtrar unidades de culturas">
+          <AccordionFilter
+            title="Filtrar unidades de culturas"
+            onChange={(_, e) => setStatusAccordionFilter(e)}
+          >
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -854,7 +872,7 @@ export default function Listagem({
           </AccordionFilter>
 
           {/* overflow-y-scroll */}
-          <div className="w-full h-full overflow-y-scroll">
+          <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
               columns={columns}
@@ -864,6 +882,9 @@ export default function Listagem({
               }}
               options={{
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - ${
+                  statusAccordionFilter ? 460 : 320
+                }px)`,
                 search: false,
                 filtering: false,
                 pageSize: Number(take),

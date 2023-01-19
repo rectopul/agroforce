@@ -38,6 +38,7 @@ import {
   Select,
   FieldItemsPerPage,
   ButtonDeleteConfirmation,
+  SelectMultiple,
 } from "../../../components";
 import * as ITabs from "../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../helpers";
@@ -66,7 +67,6 @@ interface IFilter {
   filterStartDate: string | any;
   filterEndDate: string | any;
   filterModule: string | any;
-  filterOperation: string | any;
   orderBy: object | any;
   typeOrder: object | any;
 }
@@ -77,16 +77,16 @@ interface IGenerateProps {
 }
 
 export default function Listagem({
-      allPrintHistory,
-      itensPerPage,
-      filterApplication,
-      filterBeforeEdit,
-      totalItems,
-      typeOrderServer,
-      orderByserver,
-      safraId,
-      idCulture,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allPrintHistory,
+  itensPerPage,
+  filterApplication,
+  filterBeforeEdit,
+  totalItems,
+  typeOrderServer,
+  orderByserver,
+  safraId,
+  idCulture,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState<boolean>(false);
 
   const { tabsReport } = ITabs.default;
@@ -107,11 +107,16 @@ export default function Listagem({
   );
   const [npe, setNPE] = useState(allPrintHistory);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == "desc" ? 1 : 2
+  );
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [statusAccordionFilter, setStatusAccordionFilter] =
+    useState<boolean>(false);
+  const [statusFilterSelected, setStatusFilterSelected] = useState<any>([]);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
       name: "CamposGerenciados[]",
@@ -144,6 +149,26 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("parcela"),
     },
   ]);
+  const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
+    {
+      name: "StatusCheckbox",
+      title: "IMPRESSO",
+      value: "IMPRESSO",
+      defaultChecked: () => camposGerenciados.includes("IMPRESSO"),
+    },
+    {
+      name: "StatusCheckbox",
+      title: "REIMPRESSO",
+      value: "REIMPRESSO",
+      defaultChecked: () => camposGerenciados.includes("REIMPRESSO"),
+    },
+    {
+      name: "StatusCheckbox",
+      title: "BAIXA",
+      value: "BAIXA",
+      defaultChecked: () => camposGerenciados.includes("BAIXA"),
+    },
+  ]);
   // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>("");
   const [take, setTake] = useState<number>(itensPerPage);
@@ -154,8 +179,9 @@ export default function Listagem({
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
-  const pathExtra = `skip=${currentPage * Number(take)
-    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${
+    currentPage * Number(take)
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
   const filterStatusBeforeEdit = filterApplication.split("");
 
@@ -165,7 +191,6 @@ export default function Listagem({
       filterStartDate: "",
       filterEndDate: "",
       filterModule: "",
-      filterOperation: "",
       orderBy: "",
       typeOrder: "",
     },
@@ -174,9 +199,9 @@ export default function Listagem({
       filterStartDate,
       filterEndDate,
       filterModule,
-      filterOperation,
     }) => {
       // &filterSafra=${filterSafra}
+      const filterOperation = statusFilterSelected?.join(",")?.toUpperCase();
       const parametersFilter = `filterMadeBy=${filterMadeBy}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&filterModule=${filterModule}&filterOperation=${filterOperation}&`;
       // &id_safra=${safraId}
       // await npeService
@@ -195,13 +220,17 @@ export default function Listagem({
   });
 
   // Calling common API
-  async function callingApi(parametersFilter: any) {
-    console.log("chamou");
+  async function callingApi(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
 
     setCookies("filterBeforeEdit", parametersFilter);
     setCookies("filterBeforeEditTypeOrder", typeOrder);
     setCookies("filterBeforeEditOrderBy", orderBy);
-    parametersFilter = `${parametersFilter}&${pathExtra}`;
+
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
@@ -251,10 +280,11 @@ export default function Listagem({
             handleOrder,
             render: (rowData: any) => (
               <div>
-                {`${rowData.createdAt
+                {`${
+                  rowData.createdAt
                     ? functionsUtils?.formatDate(new Date(rowData.createdAt))
                     : null
-                  }`}
+                }`}
               </div>
             ),
           })
@@ -311,7 +341,7 @@ export default function Listagem({
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    typeOrderG !== '' ? typeOrderG == 'desc' ? setOrder(1) : setOrder(2) : '';
+    typeOrderG !== "" ? (typeOrderG == "desc" ? setOrder(1) : setOrder(2)) : "";
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -379,50 +409,60 @@ export default function Listagem({
     await printHistoryService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
         const newData = response.map((row: any) => {
-          delete row.avatar;
-          if (row.status === 0) {
-            row.status = "Inativo";
+          const newRow = row;
+
+          let dtHours: string;
+          let dtMinutes: string;
+          let dtSeconds: string;
+
+          newRow.createdAt = new Date(newRow.createdAt);
+          newRow.createdAt = new Date(
+            newRow.createdAt.toISOString().slice(0, -1)
+          );
+
+          if (String(newRow.createdAt.getHours()).length === 1) {
+            dtHours = `0${String(newRow.createdAt.getHours())}`;
           } else {
-            row.status = "Ativo";
+            dtHours = String(newRow.createdAt.getHours());
+          }
+          if (String(newRow.createdAt.getMinutes()).length === 1) {
+            dtMinutes = `0${String(newRow.createdAt.getMinutes())}`;
+          } else {
+            dtMinutes = String(newRow.createdAt.getMinutes());
+          }
+          if (String(newRow.createdAt.getSeconds()).length === 1) {
+            dtSeconds = `0${String(newRow.createdAt.getSeconds())}`;
+          } else {
+            dtSeconds = String(newRow.createdAt.getSeconds());
           }
 
-          row.SAFRA = row.safra?.safraName;
-          row.FOCO = row.foco?.name;
-          row.TIPO_ENSAIO = row.type_assay?.name;
-          row.TECNOLOGIA = row.tecnologia?.name;
-          row.LOCAL = row.local?.name_local_culture;
-          row.NPEI = row.npei;
-          row.ÉPOCA = row?.epoca;
-          row.GRUPO = row.group.group;
-          row.NEXT_AVAILABLE_NPE = row?.nextAvailableNPE;
-          row.PROX_NPE = row.prox_npe;
-          row.STATUS = row.status;
+          newRow.FEITO_POR = row.user.name;
+          newRow.FEITO_EM = `${newRow.createdAt.toLocaleDateString(
+            "en-US"
+          )} ${dtHours}:${dtMinutes}:${dtSeconds}`;
 
-          delete row.nextAvailableNPE;
-          delete row.prox_npe;
+          newRow.MODULO = row.modulo;
+          newRow.OPERACAO = row.status;
+          newRow.PARCELA = row.experiment_genotipe.nca;
 
-          delete row.edited;
-          delete row.local;
-          delete row.safra;
-          delete row.foco;
-          delete row.epoca;
-          delete row.tecnologia;
-          delete row.type_assay;
-          delete row.group;
-          delete row.npei;
-          delete row.status;
-          delete row.nextNPE;
-          delete row.npeQT;
-          delete row.localId;
-          delete row.safraId;
-          delete row.npef;
-          delete row.id;
-          return row;
+          delete newRow.id;
+          delete newRow.experiment_genotipe;
+          delete newRow.experimentGenotypeId;
+          delete newRow.status;
+          delete newRow.userId;
+          delete newRow.user;
+          delete newRow.createdAt;
+          delete newRow.modulo;
+          return newRow;
         });
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "npe");
+        XLSX.utils.book_append_sheet(
+          workBook,
+          workSheet,
+          "Histórico-Etiquetagem"
+        );
 
         // Buffer
         XLSX.write(workBook, {
@@ -435,7 +475,7 @@ export default function Listagem({
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "NPE.xlsx");
+        XLSX.writeFile(workBook, "Histórico-Etiquetagem.xlsx");
       } else {
         setLoading(false);
         Swal.fire("Não existem registros para serem exportados, favor checar.");
@@ -452,8 +492,7 @@ export default function Listagem({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    setCurrentPage(page);
-    await callingApi(filter); // handle pagination globly
+    await callingApi(filter, page); // handle pagination globly
   }
 
   function filterFieldFactory(title: any, name: any) {
@@ -501,9 +540,13 @@ export default function Listagem({
           flex flex-col
           items-start
           gap-4
+          overflow-y-hidden
         "
         >
-          <AccordionFilter title="Filtrar Histórico de Etiquetagem">
+          <AccordionFilter
+            title="Filtrar Histórico de Etiquetagem"
+            onChange={(_, e) => setStatusAccordionFilter(e)}
+          >
             <div className="w-full flex gap-2">
               <form
                 className="flex flex-col
@@ -540,8 +583,16 @@ export default function Listagem({
                     />
                   </div>
 
-                  {filterFieldFactory("filterModule", "Módulo")}
-                  {filterFieldFactory("filterOperation", "Operação")}
+                  <div className="h-10 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Operação
+                    </label>
+                    <SelectMultiple
+                      data={statusFilter.map((i: any) => i.title)}
+                      values={statusFilterSelected}
+                      onChange={(e: any) => setStatusFilterSelected(e)}
+                    />
+                  </div>
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
@@ -563,7 +614,7 @@ export default function Listagem({
           </AccordionFilter>
 
           {/* overflow-y-scroll */}
-          <div className="w-full h-full overflow-y-scroll">
+          <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
               style={{ background: "#f9fafb" }}
@@ -571,8 +622,11 @@ export default function Listagem({
               data={npe}
               options={{
                 showTitle: false,
+                maxBodyHeight: `calc(100vh - ${
+                  statusAccordionFilter ? 400 : 320
+                }px)`,
                 headerStyle: {
-                  zIndex: 0,
+                  zIndex: 1,
                 },
                 rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
@@ -777,40 +831,40 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies("itensPage", { req, res });
   }
 
-  // RR
+  const pageBeforeEdit = req.cookies.pageBeforeEdit
+    ? req.cookies.pageBeforeEdit
+    : 0;
+
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : "";
 
   const itensPerPage = req.cookies.takeBeforeEdit
     ? req.cookies.takeBeforeEdit
     : 10;
 
+  // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : "";
+    : "desc";
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
+    : "createdAt";
+
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
     : "";
 
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
+  // //RR
+  removeCookies("filterBeforeEditTypeOrder", { req, res });
+  removeCookies("filterBeforeEditOrderBy", { req, res });
+  removeCookies("takeBeforeEdit", { req, res });
+  removeCookies("lastPage", { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/print-history`;
-
-  const filterApplication = req.cookies.filterBeforeEdit
-    ? `${req.cookies.filterBeforeEdit}`
-    : `filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
-  // id_culture=${idCulture}&id_safra=${safraId}
-
-  removeCookies("filterBeforeEdit", { req, res });
-  removeCookies("pageBeforeEdit", { req, res });
-  removeCookies("filterBeforeEditTypeOrder", { req, res });
-  removeCookies("takeBeforeEdit", { req, res });
-  removeCookies("filterBeforeEditOrderBy", { req, res });
-  removeCookies("lastPage", { req, res });
-
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();

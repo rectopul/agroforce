@@ -1,3 +1,4 @@
+import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import handleError from '../../shared/utils/handleError';
 import { NpeRepository } from '../../repository/npe.repository';
@@ -6,7 +7,6 @@ import { GroupController } from '../group.controller';
 import { prisma } from '../../pages/api/db/db';
 import { ExperimentController } from '../experiment/experiment.controller';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
-import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 // import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class NpeController {
@@ -201,7 +201,6 @@ export class NpeController {
         });
       }
 
-
       if (!response || response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhuma NPE cadastrada',
@@ -288,21 +287,20 @@ export class NpeController {
             });
           }
           return { status: 200, message: 'Npe atualizada' };
-        } else {
-          const transactionConfig = new TransactionConfig();
-          const npeRepositoryTransaction = new NpeRepository();
-          npeRepositoryTransaction.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
-          try {
-            await transactionConfig.transactionScope.run(async () => {
-              for (const row in data) {
-                await npeRepositoryTransaction.updateTransaction(data[row].id, data[row]);
-              }
-            })
-            return { status: 200, message: 'Npe atualizada' };
-          } catch (error: any) {
-            handleError('NPE Controller', 'Update', error.message);
-            throw new Error('[Controller] - Update NPE erro');
-          }
+        }
+        const transactionConfig = new TransactionConfig();
+        const npeRepositoryTransaction = new NpeRepository();
+        npeRepositoryTransaction.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+        try {
+          await transactionConfig.transactionScope.run(async () => {
+            for (const row in data) {
+              await npeRepositoryTransaction.updateTransaction(data[row].id, data[row]);
+            }
+          });
+          return { status: 200, message: 'Npe atualizada' };
+        } catch (error: any) {
+          handleError('NPE Controller', 'Update', error.message);
+          throw new Error('[Controller] - Update NPE erro');
         }
       }
       const npeExist = await this.getOne(data.id);
