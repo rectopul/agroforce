@@ -138,9 +138,10 @@ export default function Listagem({
   const router = useRouter();
   const [experimentos, setExperimento] = useState<IExperimento[]>([]);
   const [experimentosNew, setExperimentoNew] = useState<IExperimento[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit)
-  );
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  // const [currentPage, setCurrentPage] = useState<number>(
+  //   Number(pageBeforeEdit)
+  // );
   const [filter, setFilter] = useState<any>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(0);
 
@@ -745,6 +746,11 @@ export default function Listagem({
     );
     setNpeData(env ? env[0] : "");
 
+    //STEWART
+    if (env) {
+      tableRef?.current?.dataManager?.changePageSize(env[0]?.data?.length);
+    }
+
     let isNccAvailable = true;
     let isOverLap = false;
 
@@ -1001,6 +1007,7 @@ export default function Listagem({
                         flex flex-col
                         items-start
                         gap-0
+                        overflow-y-hidden
                         "
         >
           <div
@@ -1076,6 +1083,7 @@ export default function Listagem({
                   search: false,
                   filtering: false,
                   pageSize: itensPerPage,
+                  paging: false, //PAGINACAO DESATIVADA TEMPORARIAMENTE
                 }}
                 components={{
                   Toolbar: () => (
@@ -1118,7 +1126,8 @@ export default function Listagem({
 
                       <strong className="text-600">Experimentos</strong>
                       <strong className="text-blue-600">
-                        Total registrado: {experimentos?.length}
+                        {/* Total registrado: {experimentos?.length} */}
+                        Total registrado: {npeData?.data?.length}
                       </strong>
 
                       <div className="h-full flex items-center gap-2">
