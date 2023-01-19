@@ -259,9 +259,9 @@ export default function Import({
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
 
-  // const pathExtra = `skip=${
-  //   currentPage * Number(take)
-  // }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${
+    currentPage * Number(take)
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
   const pages = Math.ceil(total / take);
   const formik = useFormik<any>({
