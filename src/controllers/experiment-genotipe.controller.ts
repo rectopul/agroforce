@@ -7,6 +7,7 @@ import { ExperimentController } from './experiment/experiment.controller';
 import { PrintHistoryController } from './print-history/print-history.controller';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
+import { prisma } from '../pages/api/db/db';
 
 export class ExperimentGenotipeController {
   private ExperimentGenotipeRepository = new ExperimentGenotipeRepository();
@@ -440,7 +441,7 @@ export class ExperimentGenotipeController {
       return { status: 400, message: 'Parcelas não registrado' };
     } catch (error: any) {
       handleError('Parcelas do controlador', 'Create', error.message);
-      throw new Error('[Controller] - Erro ao criar esboço de Parcelas');
+      throw new Error('[Controller] - Erro ao criar esboço de Parcelas: '+ JSON.stringify(error));
     }
   }
 

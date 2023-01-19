@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import { ButtonAside } from './ButtonAside';
 
 
-const versionApp = '0.0.19';
+const versionApp = '0.0.20';
 
 export function Aside({ moduloActive }: any) {
   return (
