@@ -253,12 +253,17 @@ export class ExperimentController {
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
       console.log('🚀 ~ file: experiment.controller.ts:256 ~ ExperimentController ~ getAll ~ options', options);
+      
+      console.log('options.orderBy', typeof options.orderBy);
+      
       if (options.orderBy) {
-        if (!options.excel || 1 === 1) {
-          console.log('1');
+        // verifica se options.orderBy é objeto entra também
+        if (!options.excel || (typeof options.orderBy === 'object')) {
           if (typeof options.orderBy !== 'string' || typeof options.typeOrder !== 'string') {
             if (options.orderBy[2] == '' || !options.orderBy[2]) {
-              console.log('3');
+              /** 
+               * @todo: Refatorar esse código para verificar se cada orderBy tem ponto se tiver é uma relação
+               */
               const tempOrder = handleOrderForeign(options.orderBy[1], options.typeOrder[1]);
               console.log('🚀 ~ file: experiment.controller.ts:275 ~ ExperimentController ~ getAll ~ tempOrder', tempOrder);
 
@@ -271,7 +276,6 @@ export class ExperimentController {
             orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
             orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
           }
-        } else {
         }
       }
 
