@@ -252,21 +252,45 @@ export class ExperimentController {
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
+      console.log('options.orderBy', options.orderBy, typeof options.orderBy);
+      console.log('options.excel', options.excel);
+      console.log('typeof orderBy', typeof orderBy);
       if (options.orderBy) {
-        if (!options.excel) {
+        console.log('0');
+        if (!options.excel || 1==1) {
+          console.log('1');
           if (typeof options.orderBy !== 'string' || typeof options.typeOrder !== 'string') {
+            console.log('2'); 
+            
+            Object.values(options.orderBy).forEach((nameColumn, index) => {
+              let orderByStr = handleOrderForeign(nameColumn, options.typeOrder[index]);
+              orderByStr = orderByStr || `{"${options.orderBy[2]}":"${options.typeOrder[2]}"}`;
+              orderBy[index] = orderByStr;
+            });
+            
+            console.log('orderByNEw', orderBy);
+            
+            
             if (options.orderBy[2] == '' || !options.orderBy[2]) {
+              console.log('3');
               orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `{"${options.orderBy[1]}":"${options.typeOrder[1]}"}`];
             } else {
+              console.log('4');
               orderBy = handleOrderForeign(options.orderBy[2], options.typeOrder[2]);
               orderBy = orderBy || `{"${options.orderBy[2]}":"${options.typeOrder[2]}"}`;
             }
           } else {
+            console.log('5');
             orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
             orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
           }
+        } else {
+          console.log('6');
         }
       }
+      
+      console.log('orderBy', orderBy);
+      
       const response: object | any = await this.experimentRepository.findAll(
         parameters,
         select,
