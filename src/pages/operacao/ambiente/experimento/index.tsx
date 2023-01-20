@@ -818,28 +818,28 @@ export default function Listagem({
         prox_npe: item.env?.npef + 1,
       };
       npeToUpdate.push(temp);
-    })
+    });
     if (experiment_genotipo.length > 0) {
       setLoading(true);
 
       await experimentGenotipeService
         .create({ experiment_genotipo, gt, experimentObj, npeToUpdate })
-        .then(response => {
+        .then((response) => {
           console.log(response);
           if (response.status === 200) {
             Swal.fire({
-              title: 'Sorteio salvo com sucesso.',
+              title: "Sorteio salvo com sucesso.",
               showDenyButton: false,
               showCancelButton: false,
-              confirmButtonText: 'Ok',
+              confirmButtonText: "Ok",
             }).then(() => {
-              router.push('/operacao/ambiente');
+              router.push("/operacao/ambiente");
             });
           } else {
             Swal.fire({
-              title: 'algo deu errado',
+              title: "algo deu errado",
               showCancelButton: true,
-            })
+            });
           }
         });
       setLoading(false);
@@ -1081,7 +1081,8 @@ export default function Listagem({
                 data={npeData?.data}
                 options={{
                   showTitle: false,
-                  maxBodyHeight: `calc(100vh - 400px)`,
+                  //maxBodyHeight: `calc(100vh - 400px)`,
+                  maxBodyHeight: `calc(100vh - 320px)`,
                   headerStyle: {
                     zIndex: 1,
                   },
