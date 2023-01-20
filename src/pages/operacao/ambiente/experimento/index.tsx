@@ -892,12 +892,26 @@ export default function Listagem({
           });
         });
       });
-
-      createExperimentGenotipe({
-        experiment_genotipo,
-        total_consumed: experiment_genotipo.length,
-        genotipo_treatment,
-      });
+      
+      try {
+      
+        createExperimentGenotipe({
+          experiment_genotipo,
+          total_consumed: experiment_genotipo.length,
+          genotipo_treatment,
+        });
+        
+      } catch (e: any) {
+        console.log('validateConsumedData -> e', e);
+        Swal.fire({
+          html: 'Erro ao sortear experimentos: ' + e,
+          width: '800',
+          didClose: () => {
+            router.reload();
+          },
+        });
+      }
+      
     } else if (isNccAvailable == false && isOverLap == true) {
       const temp = NPESelectedRow;
       Swal.fire({

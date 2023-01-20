@@ -450,7 +450,6 @@ export class ExperimentController {
           Epoca: experimentExist?.period,
           Tecnologia: experimentExist?.assay_list?.tecnologia?.cod_tec,
           TypeAssay: experimentExist?.assay_list?.type_assay?.id,
-          Status: 'IMPORTADO',
         });
         if (ambiente.length > 0 && experiment.length === 0) {
           await npeController.update({
