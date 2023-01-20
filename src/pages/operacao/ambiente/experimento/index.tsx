@@ -673,6 +673,20 @@ export default function Listagem({
       if (filter) {
         tempFilter = `${tempFilter}&${filter}`;
       }
+
+      let orderBy1 = "orderDraw";
+      let typeOrder1 = "asc";
+      
+      let orderBy2 = "assay_list.gli";
+      let typeOrder2 = "asc";
+      
+      const orderBy = [orderBy1, orderBy2];
+      const typeOrder = [typeOrder1, typeOrder2];
+      
+      tempFilter = `${tempFilter}&orderBy=${orderBy1}&typeOrder=${typeOrder1}&orderBy=${orderBy2}&typeOrder=${typeOrder2}`;
+      tempFilter = `${tempFilter}&orderBy=&typeOrder=`;
+      console.log('tempFilter', tempFilter);
+      
       let count1 = 0;
 
       await experimentService
@@ -807,6 +821,11 @@ export default function Listagem({
 
     const npeToUpdate: any[] = [];
     allNPERecords.map(async (item: any) => {
+      
+      // console.log('item.env?.npef', item.env?.npef, item.env?.npei);
+      // console.log('compara: ', (item.env?.npef == item.env?.npei));
+      // console.log(item);
+      
       const temp = {
         id: item.env?.id,
         npef: item.env?.npef,
@@ -814,32 +833,33 @@ export default function Listagem({
         //   NPESelectedRow?.npeQT == 'N/A'
         //     ? null
         //     : NPESelectedRow?.npeQT - total_consumed,
-        status: 3,
-        prox_npe: item.env?.npef + 1,
+        status: (item.env?.npef == item.env?.npei) ? item.env?.status : 3, // quando não houver experimentos não atualiza o status
+        prox_npe: (item.env?.npef == item.env?.npei) ? item.env?.npef : item.env?.npef + 1,
       };
       npeToUpdate.push(temp);
-    })
+    });
+
     if (experiment_genotipo.length > 0) {
       setLoading(true);
 
       await experimentGenotipeService
         .create({ experiment_genotipo, gt, experimentObj, npeToUpdate })
-        .then(response => {
+        .then((response) => {
           console.log(response);
           if (response.status === 200) {
             Swal.fire({
-              title: 'Sorteio salvo com sucesso.',
+              title: "Sorteio salvo com sucesso.",
               showDenyButton: false,
               showCancelButton: false,
-              confirmButtonText: 'Ok',
+              confirmButtonText: "Ok",
             }).then(() => {
-              router.push('/operacao/ambiente');
+              router.push("/operacao/ambiente");
             });
           } else {
             Swal.fire({
-              title: 'algo deu errado',
+              title: "algo deu errado",
               showCancelButton: true,
-            })
+            });
           }
         });
       setLoading(false);
@@ -1081,7 +1101,8 @@ export default function Listagem({
                 data={npeData?.data}
                 options={{
                   showTitle: false,
-                  maxBodyHeight: `calc(100vh - 400px)`,
+                  //maxBodyHeight: `calc(100vh - 400px)`,
+                  maxBodyHeight: `calc(100vh - 320px)`,
                   headerStyle: {
                     zIndex: 1,
                   },

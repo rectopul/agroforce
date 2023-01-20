@@ -171,9 +171,13 @@ export class ExperimentRepository extends BaseRepository {
   async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
     let order: object | any;
 
-    if (orderBy) {
+    if (typeof orderBy === 'object') {
+      order = orderBy.map((item: any) => JSON.parse(item));
+    } else if (orderBy) {
       order = JSON.parse(orderBy);
     }
+
+    console.log('prisma.order', order);
 
     const count = await prisma.experiment.count({ where });
 
