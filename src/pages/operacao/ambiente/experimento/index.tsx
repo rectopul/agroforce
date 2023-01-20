@@ -656,7 +656,8 @@ export default function Listagem({
     { title: "Época", field: "epoca" },
     { title: "NPE Inicial", field: "prox_npe" },
     { title: "NPE Final", field: "npef" },
-    { title: "NPE Quantity", field: "npeQT" },
+    { title: "NPE Requisitada", field: "npeRequisitada" },
+    { title: "NPE Disponível", field: "npeQT" },
   ];
 
   const handleNPERowSelection = (rowData: any) => {
@@ -685,7 +686,7 @@ export default function Listagem({
       
       tempFilter = `${tempFilter}&orderBy=${orderBy1}&typeOrder=${typeOrder1}&orderBy=${orderBy2}&typeOrder=${typeOrder2}`;
       tempFilter = `${tempFilter}&orderBy=&typeOrder=`;
-      console.log('tempFilter', tempFilter);
+      // console.log('tempFilter', tempFilter);
       
       let count1 = 0;
 
@@ -702,6 +703,9 @@ export default function Listagem({
             p.seq_delineamento?.map((sd: any) => {
               p.npef = i;
               i = p.npef + 1;
+              // npeRequisitada
+              env.npeRequisitada++;
+              
               i >= env.nextNPE.npei_i && npeUsedFrom == 0
                 ? setNpeUsedFrom(env.nextNPE.npei_i)
                 : "";
@@ -709,6 +713,8 @@ export default function Listagem({
 
             p.npeQT = p.npef - p.npei + 1;
             env.npef = i - 1;
+            
+            console.log('p.npeQT', p.npeQT);
 
             // enable disable button && isNCCAvailable
             p.assay_list?.genotype_treatment?.map((exp: any) => {
@@ -723,9 +729,21 @@ export default function Listagem({
               }
             });
           });
-          if (env.npef > env.nextNPE.npei_i) {
-            ++count1;
+          
+          console.log('env.npef', env.npef, 'env.nextNPE.npei_i', env.nextNPE.npei_i);
+
+          /**
+           * No caso temos o ENV1 com NPEI = 101 e NPEF = 101 e NPEI_I = 101 e PROX_NPE = 101
+           * Quando calculamos os experimentos + seq_delineamento
+           * No caso temos o ENV2 com NPEI = 151 e NPEF = 151 e NPEI_I = 151 e PROX_NPE = 151
+           * EDITA o ENV2 para PROX_NPE: 190
+           * No caso temos o ENV2 com NPEI = 151 e NPEF = 190 e NPEI_I = 190 e PROX_NPE = 190
+           * 
+           **/
+          if (env.npef >= env.nextNPE.npei_i) {
+            ++count1; // conta o número de sobreposições
           }
+          
           const temp = {
             env,
             data: response,
@@ -737,7 +755,7 @@ export default function Listagem({
           temp.isOverLap = false;
 
           if (count1 > 0) {
-            temp.isOverLap = true;
+            temp.isOverLap = true; // indica se houve sobreposição no env atual com o proximo env
           } else {
             temp.isOverLap = false;
           }
@@ -748,6 +766,10 @@ export default function Listagem({
             temp.isNccAvailable = true;
           }
 
+          console.log('contagem de lotes sem NCC dos tratamentos de genótipos (count)', count, '<<genotype_treatment>>');
+          console.log('contagem de sobreposições (count1): ', count1);
+          console.log('temp.isOverLap: ', temp.isOverLap);
+          
           setAllNPERecords((prev) => [...prev, temp]);
           count = 0;
         });
@@ -780,6 +802,10 @@ export default function Listagem({
     }
     setIsNccAvailable(isNccAvailable);
     setIsOverLap(isOverLap);
+    
+    console.log('isNccAvailable', isNccAvailable);
+    console.log('isOverLap', isOverLap);
+    
     if (!isNccAvailable || isOverLap) {
       setSortearDisable(true);
     }
