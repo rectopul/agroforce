@@ -848,22 +848,28 @@ export default function Listagem({
     const npeToUpdate: any[] = [];
     allNPERecords.map(async (item: any) => {
       
-      // console.log('item.env?.npef', item.env?.npef, item.env?.npei);
-      // console.log('compara: ', (item.env?.npef == item.env?.npei));
-      // console.log(item);
+      console.log('item.env?.npef', item.env?.npef, item.env?.npei);
+      console.log('compara: ', (item.env?.npef == item.env?.npei));
+      console.log(item);
       
-      const temp = {
-        id: item.env?.id,
-        npef: item.env?.npef,
-        // npeQT:
-        //   NPESelectedRow?.npeQT == 'N/A'
-        //     ? null
-        //     : NPESelectedRow?.npeQT - total_consumed,
-        status: (item.env?.npef == item.env?.npei) ? item.env?.status : 3, // quando não houver experimentos não atualiza o status
-        prox_npe: (item.env?.npef == item.env?.npei) ? item.env?.npef : item.env?.npef + 1,
-      };
-      npeToUpdate.push(temp);
+      // se tiver experimentos no env atual
+      if(item.data.length > 0) {
+        const temp = {
+          id: item.env?.id,
+          npef: item.env?.npef,
+          // npeQT:
+          //   NPESelectedRow?.npeQT == 'N/A'
+          //     ? null
+          //     : NPESelectedRow?.npeQT - total_consumed,
+          status: 3, // quando não houver experimentos não atualiza o status
+          prox_npe: item.env?.npef + 1,
+        };
+        npeToUpdate.push(temp);
+      }
+      
     });
+    
+    console.log('npeToUpdate: ', npeToUpdate); // atenção se não houver experimentos não atualiza o status do env
 
     if (experiment_genotipo.length > 0) {
       setLoading(true);
@@ -1095,7 +1101,7 @@ export default function Listagem({
                 rowStyle: (rowData) => ({
                   backgroundColor:
                     NPESelectedRow?.tableData?.id === rowData.tableData.id
-                      ? NPESelectedRow.npef > NPESelectedRow.nextNPE.npei_i
+                      ? NPESelectedRow.npef >= NPESelectedRow.nextNPE.npei_i
                         ? "#FF5349"
                         : "#d3d3d3"
                       : rowData.npef > rowData.nextNPE.npei_i
