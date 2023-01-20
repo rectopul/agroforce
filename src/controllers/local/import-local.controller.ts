@@ -45,6 +45,8 @@ export class ImportLocalController {
 
     const localTemp: Array<string> = [];
     const responseIfError: Array<string> = [];
+    let validateAll: any = {};
+    const allEqual = (arr: any) => arr.every((val: any) => val === arr[0]);
 
     const headers = [
       'ID da unidade de cultura (CULTURE_UNIT_ID)',
@@ -76,26 +78,62 @@ export class ImportLocalController {
       const configModule: object | any = await importController.getAll(4);
       configModule.response[0]?.fields.push('DT');
       for (const row in spreadSheet) {
+        if (row !== '0') {
+          if (spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]
+          || (spreadSheet.length - 1) === Number(row)) {
+            if ((spreadSheet.length - 1) === Number(row)) {
+              validateAll.ROTULO.push(spreadSheet[row][5]);
+              validateAll.MLOC.push(spreadSheet[row][6]);
+              validateAll.ENDERECO.push(spreadSheet[row][7]);
+              validateAll.LOCALIDADE.push(spreadSheet[row][9]);
+              validateAll.REGIAO.push(spreadSheet[row][11]);
+              validateAll.PAIS.push(spreadSheet[row][14]);
+            }
+            for (const property in validateAll) {
+              const result = allEqual(validateAll[property]);
+              if (!result) {
+                responseIfError[Number(0)]
+                += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo Nome do Lugar de Cultura(${spreadSheet[row][4]}) devem ser iguais. </li> <br>`;
+              }
+            }
+            validateAll = {
+              ROTULO: [],
+              MLOC: [],
+              ENDERECO: [],
+              LOCALIDADE: [],
+              REGIAO: [],
+              PAIS: [],
+            };
+          } else {
+            validateAll.ROTULO.push(spreadSheet[row][5]);
+            validateAll.MLOC.push(spreadSheet[row][6]);
+            validateAll.ENDERECO.push(spreadSheet[row][7]);
+            validateAll.LOCALIDADE.push(spreadSheet[row][9]);
+            validateAll.REGIAO.push(spreadSheet[row][11]);
+            validateAll.PAIS.push(spreadSheet[row][14]);
+          }
+        }
         if (localTemp?.includes(spreadSheet[row][2])) {
           await logImportController.update({
             id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela`,
           });
           localTemp[row] = spreadSheet[row][2];
-          return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela` };
+          return { status: 200, message: `Erro na linha ${Number(row) + 1}. Unidades de cultura duplicados na tabela` };
         }
         localTemp[row] = spreadSheet[row][2];
         for (const column in spreadSheet[row]) {
           if (row === '0') {
-            if (!(spreadSheet[row][column]?.toUpperCase())
-              ?.includes(configModule.response[0]?.fields[column]?.toUpperCase())) {
-              responseIfError[Number(column)]
-                += responseGenericFactory(
-                  (Number(column) + 1),
-                  row,
-                  spreadSheet[0][column],
-                  'a sequencia de colunas da planilha esta incorreta',
-                );
-            }
+            // if (!(spreadSheet[row][column]?.toUpperCase())
+            //   ?.includes(configModule.response[0]?.fields[column]?.toUpperCase())) {
+            //   responseIfError[Number(column)]
+            //     += responseGenericFactory(
+            //       (Number(column) + 1),
+            //       row,
+            //       spreadSheet[0][column],
+            //       'a sequencia de colunas da planilha esta incorreta',
+            //     );
+            // }
+
           } else if (spreadSheet[0][column]?.includes('ID da unidade de cultura')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
