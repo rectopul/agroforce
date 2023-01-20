@@ -3,6 +3,7 @@ import { ReporteRepository } from '../../repository/reporte.repository';
 import handleError from '../../shared/utils/handleError';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 import { LayoutChildrenController } from '../layout-children.controller';
+import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class LayoutQuadraController {
   layoutQuadraRepository = new LayoutQuadraRepository();
@@ -15,6 +16,10 @@ export class LayoutQuadraController {
     const parameters: object | any = {};
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const sheet = await createXls(options, 'QUADRAS-LAYOUT');
+        return { status: 200, response: sheet };
+      }
       if (options.filterShotsFrom || options.filterShotsTo) {
         if (options.filterShotsFrom && options.filterShotsTo) {
           parameters.disparos = JSON.parse(`{"gte": ${Number(options.filterShotsFrom)}, "lte": ${Number(options.filterShotsTo)} }`);

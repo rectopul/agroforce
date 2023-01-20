@@ -54,17 +54,17 @@ import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactor
 import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 
 export default function TipoEnsaio({
-  allAssay,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  idSafra,
-  idCulture,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer,
-  orderByserver,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allAssay,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      idSafra,
+      idCulture,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      typeOrderServer,
+      orderByserver,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -600,49 +600,19 @@ export default function TipoEnsaio({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
+
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filterApplication}&skip=${skip}&take=${take}&createFile=true`;
+
     await assayListService
-      .getAll(filterApplication)
+      .getAll(filterParam)
       .then(({ status, response }) => {
         if (status === 200) {
-          response.map((item: any) => {
-            const newItem = item;
-
-            newItem.CULTURA = newItem.safra?.culture?.name;
-            newItem.SAFRA = newItem.safra?.safraName;
-            newItem.PROTOCOLO = newItem?.protocol_name;
-            newItem.FOCO = newItem.foco?.name;
-            newItem.TIPO_DE_ENSAIO = newItem.type_assay?.name;
-            newItem.TECNOLOGIA = `${newItem.tecnologia.cod_tec} ${newItem.tecnologia.name}`;
-            newItem.GLI = newItem?.gli;
-            newItem.BGM = newItem?.bgm;
-            newItem.STATUS = newItem?.status;
-            newItem.PROJETO = newItem?.project;
-            newItem.OBSERVAÇÕES = newItem?.comments;
-            newItem.NÚMERO_DE_TRATAMENTOS = newItem?.countNT;
-
-            delete newItem.safra;
-            delete newItem.treatmentsNumber;
-            delete newItem.project;
-            delete newItem.status;
-            delete newItem.bgm;
-            delete newItem.gli;
-            delete newItem.tecnologia;
-            delete newItem.foco;
-            delete newItem.protocol_name;
-            delete newItem.countNT;
-            delete newItem.period;
-            delete newItem.comments;
-            delete newItem.type_assay;
-            delete newItem.id;
-            delete newItem.id_safra;
-            delete newItem.experiment;
-            delete newItem.genotype_treatment;
-
-            return newItem;
-          });
-          const workSheet = XLSX.utils.json_to_sheet(response);
+          
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Tipo_Ensaio');
+          XLSX.utils.book_append_sheet(workBook, response, "Tipo_Ensaio");
 
           // Buffer
           XLSX.write(workBook, {

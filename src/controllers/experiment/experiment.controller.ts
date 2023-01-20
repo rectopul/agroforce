@@ -11,6 +11,7 @@ import { ExperimentGenotipeController } from '../experiment-genotipe.controller'
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 import { NpeController } from '../npe/npe.controller';
 import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';
+import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -25,6 +26,11 @@ export class ExperimentController {
     parameters.AND = [];
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const sheet = await createXls(options, 'EXPERIMENTOS-EXPERIMENTO');
+        return { status: 200, response: sheet };
+      }
+
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
         if (options.filterRepetitionFrom && options.filterRepetitionTo) {
           parameters.repetitionsNumber = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);

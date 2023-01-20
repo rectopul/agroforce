@@ -3,6 +3,7 @@ import { GenotipoRepository } from '../../repository/genotipo.repository';
 import { functionsUtils } from '../../shared/utils/functionsUtils';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
+import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class GenotipoController {
   genotipoRepository = new GenotipoRepository();
@@ -14,6 +15,11 @@ export class GenotipoController {
     let select: any = [];
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const sheet = await createXls(options, 'TMG-GENOTIPE');
+        return { status: 200, response: sheet };
+      }
+
       if (options.filterGenotipo) {
         parameters.name_genotipo = JSON.parse(`{"contains":"${options.filterGenotipo}"}`);
       }

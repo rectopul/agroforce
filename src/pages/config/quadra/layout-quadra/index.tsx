@@ -709,38 +709,17 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    await layoutQuadraService.getAll(filter).then((response) => {
+
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+
+    await layoutQuadraService.getAll(filterParam).then(({ status, response }) => {
       if (response.status === 200) {
-        const newData = response.response.map((row: any) => {
-          if (row.status === 0) {
-            row.status = "Inativo" as any;
-          } else {
-            row.status = "Ativo" as any;
-          }
 
-          row.ESQUEMA = row.esquema;
-          row.PLANTADEIRAS = row.plantadeira;
-          row.TIROS = row.tiros;
-          row.DISPAROS = row.disparos;
-          row.PARCELAS = row.parcelas;
-          row.STATUS = row.status;
-
-          delete row.esquema;
-          delete row.plantadeira;
-          delete row.tiros;
-          delete row.disparos;
-          delete row.parcelas;
-          delete row.status;
-          delete row.id;
-          delete row.id_culture;
-          delete row.tableData;
-
-          return row;
-        });
-
-        const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "quadras");
+        XLSX.utils.book_append_sheet(workBook, response, "quadras");
 
         // Buffer
         const buf = XLSX.write(workBook, {

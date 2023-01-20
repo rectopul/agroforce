@@ -608,35 +608,16 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    await delineamentoService.getAll(filter).then((response) => {
-      if (response.status === 200) {
-        const newData = response.response.map((row: any) => {
-          if (row.status === 0) {
-            row.status = "Inativo" as any;
-          } else {
-            row.status = "Ativo" as any;
-          }
+    const skip = 0;
+    const take = 10;
 
-          row.CULTURA = row?.culture?.name;
-          row.NOME = row?.name;
-          row.REPETIÇÃO = row?.repeticao;
-          row.TRAT_REPETIÇÃO = row?.trat_repeticao;
-          row.STATUS = row?.status;
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
 
-          delete row.name;
-          delete row.repeticao;
-          delete row.trat_repeticao;
-          delete row.status;
-          delete row.culture;
-          delete row.id;
-          delete row.tableData;
+    await delineamentoService.getAll(filterParam).then(({ status, response }) => {
+      if (status === 200) {
 
-          return row;
-        });
-
-        const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "delineamento");
+        XLSX.utils.book_append_sheet(workBook, response, "delineamento");
 
         // Buffer
         const buf = XLSX.write(workBook, {

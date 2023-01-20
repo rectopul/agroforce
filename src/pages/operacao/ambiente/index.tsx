@@ -98,16 +98,16 @@ interface IData {
 }
 
 export default function Listagem({
-  allNpe,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  filterBeforeEdit,
-  id_safra,
-  cultureId,
-  orderByserver,
-  typeOrderServer,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allNpe,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      filterBeforeEdit,
+      id_safra,
+      cultureId,
+      orderByserver,
+      typeOrderServer,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
   const tabsOperationMenu = tabsOperation.map((i) =>
@@ -716,54 +716,16 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    await npeService.getAll(filter).then(({ status, response }) => {
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+
+    await npeService.getAll(filterParam).then(({ status, response }) => {
       if (status === 200) {
-        const newData = response.map((row: any) => {
-          delete row.avatar;
-          if (row.status === 0) {
-            row.status = "Inativo";
-          } else {
-            row.status = "Ativo";
-          }
 
-          row.CULTURA = row.safra?.culture?.name;
-          row.SAFRA = row.safra?.safraName;
-          row.LOCAL = row.local?.name_local_culture;
-          row.FOCO = row.foco?.name;
-          row.TIPO_ENSAIO = row.type_assay?.name;
-          row.TECNOLOGIA = `${row.tecnologia?.cod_tec} ${row.tecnologia?.name}`;
-          row.ÉPOCA = row?.epoca;
-          row.NPEI = row.npei;
-          row.NPE_FINAL = row.npef;
-          row.PROX_NPE = row.prox_npe;
-          row.GRUPO = row.group.group;
-
-          delete row.nextAvailableNPE;
-          delete row.prox_npe;
-
-          delete row.edited;
-          delete row.local;
-          delete row.safra;
-          delete row.foco;
-          delete row.epoca;
-          delete row.tecnologia;
-          delete row.type_assay;
-          delete row.group;
-          delete row.npei;
-          delete row.npei_i;
-          delete row.status;
-          delete row.nextNPE;
-          delete row.npeQT;
-          delete row.localId;
-          delete row.safraId;
-          delete row.npef;
-          delete row.id;
-          return row;
-        });
-
-        const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "npe");
+        XLSX.utils.book_append_sheet(workBook, response, 'npe');
 
         // Buffer
         XLSX.write(workBook, {

@@ -8,6 +8,7 @@ import { prisma } from '../../pages/api/db/db';
 import { ExperimentController } from '../experiment/experiment.controller';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 // import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
+import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class NpeController {
   npeRepository = new NpeRepository();
@@ -25,6 +26,11 @@ export class NpeController {
     let select: any = [];
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const sheet = await createXls(options, 'AMBIENTE-AMBIENTE');
+        return { status: 200, response: sheet };
+      }
+
       if (options.filterStatus) {
         if (options.filterStatus !== '2') {
           if (options.filterStatus == '1') {
