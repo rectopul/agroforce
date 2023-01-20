@@ -431,7 +431,7 @@ export class ExperimentController {
           assayList?.genotype_treatment.map(async (treatment: any) => {
             await genotypeTreatment.update({
               id: treatment.id,
-              status: 'IMPORTADO',
+              status_experiment: 'IMPORTADO',
             });
           });
         }
