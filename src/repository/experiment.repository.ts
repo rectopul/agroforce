@@ -172,16 +172,13 @@ export class ExperimentRepository extends BaseRepository {
     let order: object | any;
 
     if (typeof orderBy === 'object') {
-      order = orderBy.map((item: any) => {
-        console.log('JSON.parse(item)', JSON.parse(item), item, typeof item);
-        return JSON.parse(item);
-      });
+      order = orderBy.map((item: any) => JSON.parse(item));
     } else if (orderBy) {
       order = JSON.parse(orderBy);
     }
-    
+
     console.log('prisma.order', order);
-    
+
     const count = await prisma.experiment.count({ where });
 
     const result: object | any = await prisma.experiment.findMany({
