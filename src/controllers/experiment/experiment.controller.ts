@@ -252,9 +252,9 @@ export class ExperimentController {
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
-      console.log('🚀 ~ file: experiment.controller.ts:256 ~ ExperimentController ~ getAll ~ options', options);
+      // console.log('🚀 ~ file: experiment.controller.ts:256 ~ ExperimentController ~ getAll ~ options', options);
       
-      console.log('options.orderBy', typeof options.orderBy);
+      // console.log('options.orderBy', typeof options.orderBy);
       
       if (options.orderBy) {
         // verifica se options.orderBy é objeto entra também
@@ -265,7 +265,7 @@ export class ExperimentController {
                * @todo: Refatorar esse código para verificar se cada orderBy tem ponto se tiver é uma relação
                */
               const tempOrder = handleOrderForeign(options.orderBy[1], options.typeOrder[1]);
-              console.log('🚀 ~ file: experiment.controller.ts:275 ~ ExperimentController ~ getAll ~ tempOrder', tempOrder);
+              // console.log('🚀 ~ file: experiment.controller.ts:275 ~ ExperimentController ~ getAll ~ tempOrder', tempOrder);
 
               orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `${tempOrder}`];
             } else {
@@ -279,7 +279,7 @@ export class ExperimentController {
         }
       }
 
-      console.log('orderBy', orderBy);
+      // console.log('orderBy', orderBy);
 
       const response: object | any = await this.experimentRepository.findAll(
         parameters,

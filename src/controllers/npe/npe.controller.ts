@@ -182,25 +182,29 @@ export class NpeController {
       );
 
       if (response.length > 0) {
-        const next_available_npe = response[response.length - 1].prox_npe;
+        const next_available_npe = response[response.length - 1].prox_npe;// proximo npe disponivel
         response.map(async (value: any, index: any, elements: any) => {
           const newItem = value;
           const next = elements[index + 1];
 
           if (next) {
             if (!newItem.npeQT) {
-              newItem.npeQT = next.npei_i - newItem.npef;
+              newItem.npeQT = next.npei_i - newItem.npef; // quantidade disponivel
             }
+            newItem.npeRequisitada = 0; // quantidade a ser consumida (contagem de experimentos)
             newItem.nextNPE = next;
           } else {
             newItem.npeQT = 'N/A';
             newItem.nextNPE = 0;
+            newItem.npeRequisitada = 0;
           }
           newItem.nextAvailableNPE = next_available_npe;
           return newItem;
         });
       }
-
+      
+      console.log('npe:', response);
+      
       if (!response || response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhuma NPE cadastrada',

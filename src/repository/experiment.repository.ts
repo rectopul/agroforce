@@ -177,7 +177,7 @@ export class ExperimentRepository extends BaseRepository {
       order = JSON.parse(orderBy);
     }
 
-    console.log('prisma.order', order);
+    // console.log('prisma.order', order);
 
     const count = await prisma.experiment.count({ where });
 
