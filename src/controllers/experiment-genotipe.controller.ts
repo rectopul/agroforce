@@ -18,6 +18,39 @@ export class ExperimentGenotipeController {
 
   private printedHistoryController = new PrintHistoryController();
 
+  async getLastNpeDisponible(options: {
+    safraId: number;
+    groupId: number;
+    npefSearch: number;
+  }) {
+    
+    console.log('options', options);
+    
+    let safraId = options.safraId;
+    let groupId = options.groupId;
+    let npefSearch = options.npefSearch;
+    
+    try {
+      const response: { 
+        count_npe_exists: number|null,
+        max_NPE_1: number|null,
+        maxnpe: number|null,
+      } = await prisma.$queryRaw`SELECT 
+        (EXISTS (SELECT npe FROM experiment_genotipe WHERE npe = ${npefSearch})) as count_npe_exists, 
+        (MAX(gn.npe) + 1) as max_NPE_1, 
+        IF( (EXISTS (SELECT npe FROM experiment_genotipe WHERE npe = ${npefSearch})) > 0, (MAX(gn.npe) + 1), ${npefSearch}) as maxnpe
+        FROM experiment_genotipe gn
+        WHERE 1 = 1
+        AND gn.groupId = ${groupId}
+        ORDER BY npe DESC`;
+      // const response = await this.ExperimentGenotipeRepository.getLastNpeDisponible(groupId);
+      return response;
+    } catch (error: any) {
+      handleError('Parcelas controller', 'getLastNpeDisponible', error.message);
+      throw new Error('[Controller] - getLastNpeDisponible Parcelas erro');
+    }
+  }
+  
   async getAll(options: any) {
     const parameters: object | any = {};
     let orderBy: object | any;

@@ -16,8 +16,17 @@ function update(data: any) {
   return fetchWrapper.put(baseUrl, data);
 }
 
+// function validateProtocol(data: any) {
+//   return fetchWrapper.post(`${baseUrl}/validateProtocol`, data);
+// }
+
+function getLastNpeDisponible(data: any) {
+  return fetchWrapper.post(`${baseUrl}/getLastNpeDisponible`, data);
+}
+
 export const experimentGenotipeService = {
   create,
   update,
   getAll,
+  getLastNpeDisponible,
 };
