@@ -52,6 +52,8 @@ import {
 import LoadingComponent from "../../../../components/Loading";
 import ITabs from "../../../../shared/utils/dropdown";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
+import handleError from "../../../../shared/utils/handleError";
+import { prisma } from '../../../api/db/db';
 
 interface IFilter {
   filterFoco: string;
@@ -811,6 +813,17 @@ export default function Listagem({
     }
   }, [allNPERecords, NPESelectedRow]);
 
+  async function getLastNpeDisponible({safraId, groupId, npefSearch}: any) {
+    let body = {
+      safraId: safraId,
+      groupId: groupId,
+      npefSearch: npefSearch,
+    };
+    const result = await experimentGenotipeService.getLastNpeDisponible(body);
+    
+    return { maxNPE: result[0]?.maxnpe, count_npe_exists: result[0].count_npe_exists };
+  }
+  
   async function createExperimentGenotipe({
     experiment_genotipo,
     total_consumed,
@@ -844,14 +857,32 @@ export default function Listagem({
       }
       return unique;
     }, []);
-
+    
+    console.log('experimentObj', experimentObj);
+    
     const npeToUpdate: any[] = [];
     allNPERecords.map(async (item: any) => {
       
-      console.log('item.env?.npef', item.env?.npef, item.env?.npei);
-      console.log('compara: ', (item.env?.npef == item.env?.npei));
-      console.log(item);
+      // console.log('item.env?.npef', item.env?.npef, item.env?.npei);
+      // console.log('compara: ', (item.env?.npef == item.env?.npei));
+      console.log('item', item);
       
+      let nextNPE = item.env?.npef + 1;
+
+      let body = {
+        safraId: item.env?.safraId,
+        groupId: item.env?.group?.id,
+        npefSearch: nextNPE,
+      };
+      //
+      // const result = async() => {
+      //   const data = await getLastNpeDisponible(body);
+      //   console.log('data', data);
+      //   return data;
+      // }
+      //
+      // console.log('getLastNpeDisponible', result);
+      //
       // se tiver experimentos no env atual
       if(item.data.length > 0) {
         const temp = {
@@ -862,22 +893,24 @@ export default function Listagem({
           //     ? null
           //     : NPESelectedRow?.npeQT - total_consumed,
           status: 3, // quando não houver experimentos não atualiza o status
-          prox_npe: item.env?.npef + 1,
+          prox_npe: nextNPE,
         };
+        
         npeToUpdate.push(temp);
       }
       
     });
     
     console.log('npeToUpdate: ', npeToUpdate); // atenção se não houver experimentos não atualiza o status do env
-
+    console.log('experiment_genotipo.length', experiment_genotipo.length);
+    
     if (experiment_genotipo.length > 0) {
       setLoading(true);
 
       await experimentGenotipeService
         .create({ experiment_genotipo, gt, experimentObj, npeToUpdate })
         .then((response) => {
-          console.log(response);
+          console.log('response',response);
           if (response.status === 200) {
             Swal.fire({
               title: "Sorteio salvo com sucesso.",

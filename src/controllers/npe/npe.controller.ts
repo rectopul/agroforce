@@ -7,6 +7,7 @@ import { GroupController } from '../group.controller';
 import { prisma } from '../../pages/api/db/db';
 import { ExperimentController } from '../experiment/experiment.controller';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
+import {ExperimentGenotipeController} from "../experiment-genotipe.controller";
 // import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class NpeController {
@@ -15,6 +16,8 @@ export class NpeController {
   groupController = new GroupController();
 
   experimentController = new ExperimentController();
+  
+  experimentGenotipe = new ExperimentGenotipeController();
 
   reporteRepository = new ReporteRepository();
 
@@ -232,7 +235,9 @@ export class NpeController {
       throw new Error('[Controller] - GetOne NPE erro');
     }
   }
-
+  
+  
+  
   async validateNpeiDBA(data: any) {
     try {
       if (data.safra) {
