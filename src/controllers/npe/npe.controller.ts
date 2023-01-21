@@ -194,9 +194,6 @@ export class NpeController {
           // find groupId next element in elements with same group.id
           const next = elements.find((item: any, idx:any) => item.group?.id === groupId && idx > index);
           
-          console.log('newItem', newItem, 'group:', newItem.group?.id);
-          console.log('nextGroup', next, 'group:', next?.group?.id);
-          
           if (next) {
             if (!newItem.npeQT) {
               newItem.npeQT = next.npei_i - newItem.npef; // quantidade disponivel
