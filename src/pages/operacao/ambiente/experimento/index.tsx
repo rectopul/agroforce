@@ -52,6 +52,8 @@ import {
 import LoadingComponent from "../../../../components/Loading";
 import ITabs from "../../../../shared/utils/dropdown";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
+import handleError from "../../../../shared/utils/handleError";
+import { prisma } from '../../../api/db/db';
 
 interface IFilter {
   filterFoco: string;
@@ -686,7 +688,6 @@ export default function Listagem({
       
       tempFilter = `${tempFilter}&orderBy=${orderBy1}&typeOrder=${typeOrder1}&orderBy=${orderBy2}&typeOrder=${typeOrder2}`;
       tempFilter = `${tempFilter}&orderBy=&typeOrder=`;
-      // console.log('tempFilter', tempFilter);
       
       let count1 = 0;
 
@@ -811,6 +812,17 @@ export default function Listagem({
     }
   }, [allNPERecords, NPESelectedRow]);
 
+  async function getLastNpeDisponible({safraId, groupId, npefSearch}: any) {
+    let body = {
+      safraId: safraId,
+      groupId: groupId,
+      npefSearch: npefSearch,
+    };
+    const {status, response } = await experimentGenotipeService.getLastNpeDisponible(body);
+    console.log('getLastNpeDisponible.response', response);
+    return { maxNPE: response[0]?.maxnpe, count_npe_exists: response[0].count_npe_exists };
+  }
+  
   async function createExperimentGenotipe({
     experiment_genotipo,
     total_consumed,
@@ -829,6 +841,7 @@ export default function Listagem({
     }, []);
 
     const tempExperimentObj: any[] = [];
+    
     experiment_genotipo.map((item: any) => {
       const data: any = {};
       data.id = Number(item.idExperiment);
@@ -844,40 +857,57 @@ export default function Listagem({
       }
       return unique;
     }, []);
-
+    
     const npeToUpdate: any[] = [];
+    
     allNPERecords.map(async (item: any) => {
-      
-      console.log('item.env?.npef', item.env?.npef, item.env?.npei);
-      console.log('compara: ', (item.env?.npef == item.env?.npei));
-      console.log(item);
+    
+      let nextNPE = item.env?.npef + 1;
       
       // se tiver experimentos no env atual
       if(item.data.length > 0) {
         const temp = {
           id: item.env?.id,
           npef: item.env?.npef,
+          groupId: item.env?.group?.id,
+          safraId: item.env?.safraId,
           // npeQT:
           //   NPESelectedRow?.npeQT == 'N/A'
           //     ? null
           //     : NPESelectedRow?.npeQT - total_consumed,
           status: 3, // quando não houver experimentos não atualiza o status
-          prox_npe: item.env?.npef + 1,
+          prox_npe: nextNPE,
         };
+        
         npeToUpdate.push(temp);
       }
-      
     });
-    
-    console.log('npeToUpdate: ', npeToUpdate); // atenção se não houver experimentos não atualiza o status do env
 
+    console.log('npeToUpdate: ', npeToUpdate); // atenção se não houver experimentos não atualiza o status do env
+    console.log('experiment_genotipo.length', experiment_genotipo.length);
+    
+    // SEMPRE QUE FOR USAR FUNÇÃO ASSINCRONA USAR FOR PARA OBTER O RESULTADO ANTES DE EXECUTAR O RESTANTE DO CÓDIGO;
+    for (const item of Object.values(npeToUpdate)) {
+      const result = await getLastNpeDisponible({
+        safraId: item.safraId, 
+        groupId: item.groupId, 
+        npefSearch: item.prox_npe
+      });
+      console.log('result', result, 'item:', item);
+
+      item.prox_npe = result.maxNPE;
+      
+    }
+    
+    console.log('npeToUpdate -- ATUALIZADO: ', npeToUpdate);
+    
     if (experiment_genotipo.length > 0) {
       setLoading(true);
 
       await experimentGenotipeService
-        .create({ experiment_genotipo, gt, experimentObj, npeToUpdate })
+        .create({experiment_genotipo, gt, experimentObj, npeToUpdate})
         .then((response) => {
-          console.log(response);
+          console.log('response', response);
           if (response.status === 200) {
             Swal.fire({
               title: "Sorteio salvo com sucesso.",
