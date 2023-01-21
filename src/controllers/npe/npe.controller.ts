@@ -188,8 +188,15 @@ export class NpeController {
         const next_available_npe = response[response.length - 1].prox_npe;// proximo npe disponivel
         response.map(async (value: any, index: any, elements: any) => {
           const newItem = value;
-          const next = elements[index + 1];
-
+          const id = newItem.id;
+          const groupId = newItem.group?.id;
+          //const next = elements[index + 1]; // FIXED: desta forma você não consegue pegar o proximo elemento verificando se está no mesmo grupo;
+          // find groupId next element in elements with same group.id
+          const next = elements.find((item: any, idx:any) => item.group?.id === groupId && idx > index);
+          
+          console.log('newItem', newItem, 'group:', newItem.group?.id);
+          console.log('nextGroup', next, 'group:', next?.group?.id);
+          
           if (next) {
             if (!newItem.npeQT) {
               newItem.npeQT = next.npei_i - newItem.npef; // quantidade disponivel
@@ -206,7 +213,7 @@ export class NpeController {
         });
       }
       
-      console.log('npe:', response);
+      // console.log('npe:', response);
       
       if (!response || response.total <= 0) {
         return {
