@@ -80,14 +80,14 @@ interface TabPanelProps {
 }
 
 export default function Import({
-              allLogs,
-              totalItems,
-              itensPerPage,
-              filterApplication,
-              uploadInProcess,
-              idSafra,
-              idCulture,
-            }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allLogs,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      uploadInProcess,
+      idSafra,
+      idCulture,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const router = useRouter();
@@ -112,61 +112,61 @@ export default function Import({
   const [filePath, setFilePath] = useState<any>('');
   const [file, setFile] = useState<any>();
   const [moduleId, setModuleId] = useState<any>();
-  const [table, setTable] = useState<any>();  
+  const [table, setTable] = useState<any>();
 
   useEffect(() => {
-    if(filePath!==''){
+    if (filePath !== '') {
       readXlsxFile(file)
         .then(async (rows) => {
           setImportLoading(true);
-  
-            if (moduleId) {
-              const { message } = await importService.validate({
-                spreadSheet: rows,
-                moduleId,
-                created_by: userLogado.id,
-                idSafra,
-                idCulture,
-                table,
-                disabledButton,
-                filePath: filePath
-              });
-              setImportLoading(false);
-              handlePagination();
-              Swal.fire({
-                html: message,
-                width: '800',
-              });
-              setExecuteUpload(0);
-            } else {
-              const { message } = await importService.validateProtocol({
-                spreadSheet: rows,
-                moduleId,
-                created_by: userLogado.id,
-                idSafra,
-                idCulture,
-                table,
-                disabledButton,
-                filePath: filePath
-              });
-              setImportLoading(false);
-              handlePagination();
-              Swal.fire({
-                html: message,
-                width: '800',
-              });
-              setExecuteUpload(0);
-            }
-          })
-          .catch((e: any) => {
-            Swal.fire({
-              html: 'Erro ao ler planilha',
-              width: '800',
-              didClose: () => {
-                router.reload();
-              },
+
+          if (moduleId) {
+            const { message } = await importService.validate({
+              spreadSheet: rows,
+              moduleId,
+              created_by: userLogado.id,
+              idSafra,
+              idCulture,
+              table,
+              disabledButton,
+              filePath: filePath
             });
+            setImportLoading(false);
+            handlePagination();
+            Swal.fire({
+              html: message,
+              width: '800',
+            });
+            setExecuteUpload(0);
+          } else {
+            const { message } = await importService.validateProtocol({
+              spreadSheet: rows,
+              moduleId,
+              created_by: userLogado.id,
+              idSafra,
+              idCulture,
+              table,
+              disabledButton,
+              filePath: filePath
+            });
+            setImportLoading(false);
+            handlePagination();
+            Swal.fire({
+              html: message,
+              width: '800',
+            });
+            setExecuteUpload(0);
+          }
+        })
+        .catch((e: any) => {
+          Swal.fire({
+            html: 'Erro ao ler planilha',
+            width: '800',
+            didClose: () => {
+              router.reload();
+            },
           });
+        });
     }
   }, [filePath]);
 
@@ -194,20 +194,20 @@ export default function Import({
       setModuleId(moduleId);
       setTable(table);
       setFile(value.files[0]);
-      
-      if(file){
+
+      if (file) {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("fileName", file.name);
         new Promise(async (resolve, reject) => {
           const response = await importService.uploadFile(formData);
-          if(response.status == 201){
+          if (response.status == 201) {
             resolve(response);
-          }else{
+          } else {
             reject(response);
 
           }
-        }).then( (res: any)=> {
+        }).then((res: any) => {
           setFilePath(res.filename);
         })
       }
@@ -259,9 +259,8 @@ export default function Import({
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
 
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  const pathExtra = `skip=${currentPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
   const pages = Math.ceil(total / take);
   const formik = useFormik<any>({
@@ -384,28 +383,28 @@ export default function Import({
   //   };
   // }
 
-  async function downloadFile(rowData: any){
+  async function downloadFile(rowData: any) {
     const filename = `/log_import/${rowData.filePath}`;
 
     await importService.checkFile().then((res) => {
       let validFileName = res.files;
       let valid = false;
 
-      if(validFileName.length>0){
+      if (validFileName.length > 0) {
         validFileName.map((e: any) => {
-          if(e == rowData.filePath){
+          if (e == rowData.filePath) {
             valid = true;
           }
         });
 
-        if(valid){
+        if (valid) {
           var element = document.createElement('a');
           element.setAttribute('href', filename);
           element.setAttribute('download', rowData.filePath);
           document.body.appendChild(element);
           element.click();
           document.body.removeChild(element);
-        }else{
+        } else {
           Swal.fire('No File Available To Download');
         }
       }
@@ -655,7 +654,7 @@ export default function Import({
 
     await logImportService.getAll(filterParam).then(({ status, response }) => {
       if (status === 200) {
-        
+
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, response, 'logs');
 
@@ -872,12 +871,12 @@ export default function Import({
 
                 {(Router?.importar == "subs_experimento" ||
                   !Router.importar) && (
-                  <ComponentImport
-                    title="Importar Subs. de genótipo/nca Experimento"
-                    table="PARCELS"
-                    moduleId={30}
-                  />
-                )}
+                    <ComponentImport
+                      title="Importar Subs. de genótipo/nca Experimento"
+                      table="PARCELS"
+                      moduleId={30}
+                    />
+                  )}
 
                 <div className="h-10" />
               </TabPanel>
@@ -917,21 +916,21 @@ export default function Import({
 
                 {(Router?.importar == "alocacao_quadra" ||
                   !Router.importar) && (
-                  <ComponentImport
-                    title="Importar Alocação de quadra"
-                    table="ALLOCATION"
-                    moduleId={31}
-                  />
-                )}
+                    <ComponentImport
+                      title="Importar Alocação de quadra"
+                      table="ALLOCATION"
+                      moduleId={31}
+                    />
+                  )}
                 {(Router?.importar == "etiquetas_impressas" ||
                   !Router.importar) && (
-                  <ComponentImport
-                    disabled
-                    title="Importar Etiquetas Impressas"
-                    table="TAG_PRINTED" // AINDA NÃO SEI NOME CORRETO
-                    moduleId={0} // AINDA NÃO SEI CODIGO CORRETO
-                  />
-                )}
+                    <ComponentImport
+                      disabled
+                      title="Importar Etiquetas Impressas"
+                      table="TAG_PRINTED" // AINDA NÃO SEI NOME CORRETO
+                      moduleId={0} // AINDA NÃO SEI CODIGO CORRETO
+                    />
+                  )}
               </TabPanel>
             </Box>
           </div>
@@ -1055,9 +1054,8 @@ export default function Import({
                 data={logs}
                 options={{
                   showTitle: false,
-                  maxBodyHeight: `calc(100vh - ${
-                    statusAccordionFilter ? 488 : 346
-                  }px)`,
+                  maxBodyHeight: `calc(100vh - ${statusAccordionFilter ? 488 : 346
+                    }px)`,
                   headerStyle: {
                     zIndex: 1,
                   },
