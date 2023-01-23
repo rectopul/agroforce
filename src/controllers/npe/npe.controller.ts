@@ -7,6 +7,7 @@ import { GroupController } from '../group.controller';
 import { prisma } from '../../pages/api/db/db';
 import { ExperimentController } from '../experiment/experiment.controller';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
+import {ExperimentGenotipeController} from "../experiment-genotipe.controller";
 // import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 import createXls from 'src/helpers/api/xlsx-global-download';
 
@@ -16,6 +17,8 @@ export class NpeController {
   groupController = new GroupController();
 
   experimentController = new ExperimentController();
+  
+  experimentGenotipe = new ExperimentGenotipeController();
 
   reporteRepository = new ReporteRepository();
 
@@ -188,25 +191,33 @@ export class NpeController {
       );
 
       if (response.length > 0) {
-        const next_available_npe = response[response.length - 1].prox_npe;
+        const next_available_npe = response[response.length - 1].prox_npe;// proximo npe disponivel
         response.map(async (value: any, index: any, elements: any) => {
           const newItem = value;
-          const next = elements[index + 1];
-
+          const id = newItem.id;
+          const groupId = newItem.group?.id;
+          //const next = elements[index + 1]; // FIXED: desta forma você não consegue pegar o proximo elemento verificando se está no mesmo grupo;
+          // find groupId next element in elements with same group.id
+          const next = elements.find((item: any, idx:any) => item.group?.id === groupId && idx > index);
+          
           if (next) {
             if (!newItem.npeQT) {
-              newItem.npeQT = next.npei_i - newItem.npef;
+              newItem.npeQT = next.npei_i - newItem.npef; // quantidade disponivel
             }
+            newItem.npeRequisitada = 0; // quantidade a ser consumida (contagem de experimentos)
             newItem.nextNPE = next;
           } else {
             newItem.npeQT = 'N/A';
             newItem.nextNPE = 0;
+            newItem.npeRequisitada = 0;
           }
           newItem.nextAvailableNPE = next_available_npe;
           return newItem;
         });
       }
-
+      
+      // console.log('npe:', response);
+      
       if (!response || response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhuma NPE cadastrada',
@@ -234,7 +245,9 @@ export class NpeController {
       throw new Error('[Controller] - GetOne NPE erro');
     }
   }
-
+  
+  
+  
   async validateNpeiDBA(data: any) {
     try {
       if (data.safra) {

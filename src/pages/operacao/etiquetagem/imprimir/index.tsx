@@ -16,6 +16,7 @@ function PrintToTag() {
   );
 
   useEffect(() => {
+    console.log('🚀 ~ file: index.tsx:20 ~ useEffect ~ parcelsToPrint', parcelsToPrint);
     if (parcelsToPrint?.length > 0) {
       setData(parcelsToPrint);
     } else {

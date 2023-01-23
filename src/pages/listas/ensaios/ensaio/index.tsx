@@ -299,24 +299,6 @@ export default function TipoEnsaio({
     }, 100);
   }
 
-  // function headerTableFactory(name: string, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: true,
-  //   };
-  // }
-
   async function deleteConfirmItem(item: any) {
     setItemSelectedDelete(item);
     setIsOpenModalConfirm(true);
@@ -375,7 +357,7 @@ export default function TipoEnsaio({
             <Button
               icon={<BsTrashFill size={14} />}
               title="Excluir ensaio"
-              onClick={() => {}}
+              onClick={() => { deleteConfirmItem(rowData); }}
               bgColor="bg-red-600"
               textColor="white"
             />

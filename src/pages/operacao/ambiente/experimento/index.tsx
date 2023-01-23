@@ -52,6 +52,8 @@ import {
 import LoadingComponent from "../../../../components/Loading";
 import ITabs from "../../../../shared/utils/dropdown";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
+import handleError from "../../../../shared/utils/handleError";
+import { prisma } from '../../../api/db/db';
 
 interface IFilter {
   filterFoco: string;
@@ -138,9 +140,10 @@ export default function Listagem({
   const router = useRouter();
   const [experimentos, setExperimento] = useState<IExperimento[]>([]);
   const [experimentosNew, setExperimentoNew] = useState<IExperimento[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit)
-  );
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  // const [currentPage, setCurrentPage] = useState<number>(
+  //   Number(pageBeforeEdit)
+  // );
   const [filter, setFilter] = useState<any>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(0);
 
@@ -655,7 +658,8 @@ export default function Listagem({
     { title: "Época", field: "epoca" },
     { title: "NPE Inicial", field: "prox_npe" },
     { title: "NPE Final", field: "npef" },
-    { title: "NPE Quantity", field: "npeQT" },
+    { title: "NPE Requisitada", field: "npeRequisitada" },
+    { title: "NPE Disponível", field: "npeQT" },
   ];
 
   const handleNPERowSelection = (rowData: any) => {
@@ -672,6 +676,19 @@ export default function Listagem({
       if (filter) {
         tempFilter = `${tempFilter}&${filter}`;
       }
+
+      let orderBy1 = "orderDraw";
+      let typeOrder1 = "asc";
+      
+      let orderBy2 = "assay_list.gli";
+      let typeOrder2 = "asc";
+      
+      const orderBy = [orderBy1, orderBy2];
+      const typeOrder = [typeOrder1, typeOrder2];
+      
+      tempFilter = `${tempFilter}&orderBy=${orderBy1}&typeOrder=${typeOrder1}&orderBy=${orderBy2}&typeOrder=${typeOrder2}`;
+      tempFilter = `${tempFilter}&orderBy=&typeOrder=`;
+      
       let count1 = 0;
 
       await experimentService
@@ -687,6 +704,9 @@ export default function Listagem({
             p.seq_delineamento?.map((sd: any) => {
               p.npef = i;
               i = p.npef + 1;
+              // npeRequisitada
+              env.npeRequisitada++;
+              
               i >= env.nextNPE.npei_i && npeUsedFrom == 0
                 ? setNpeUsedFrom(env.nextNPE.npei_i)
                 : "";
@@ -694,6 +714,8 @@ export default function Listagem({
 
             p.npeQT = p.npef - p.npei + 1;
             env.npef = i - 1;
+            
+            console.log('p.npeQT', p.npeQT);
 
             // enable disable button && isNCCAvailable
             p.assay_list?.genotype_treatment?.map((exp: any) => {
@@ -708,9 +730,21 @@ export default function Listagem({
               }
             });
           });
-          if (env.npef > env.nextNPE.npei_i) {
-            ++count1;
+          
+          console.log('env.npef', env.npef, 'env.nextNPE.npei_i', env.nextNPE.npei_i);
+
+          /**
+           * No caso temos o ENV1 com NPEI = 101 e NPEF = 101 e NPEI_I = 101 e PROX_NPE = 101
+           * Quando calculamos os experimentos + seq_delineamento
+           * No caso temos o ENV2 com NPEI = 151 e NPEF = 151 e NPEI_I = 151 e PROX_NPE = 151
+           * EDITA o ENV2 para PROX_NPE: 190
+           * No caso temos o ENV2 com NPEI = 151 e NPEF = 190 e NPEI_I = 190 e PROX_NPE = 190
+           * 
+           **/
+          if (env.npef >= env.nextNPE.npei_i) {
+            ++count1; // conta o número de sobreposições
           }
+          
           const temp = {
             env,
             data: response,
@@ -722,7 +756,7 @@ export default function Listagem({
           temp.isOverLap = false;
 
           if (count1 > 0) {
-            temp.isOverLap = true;
+            temp.isOverLap = true; // indica se houve sobreposição no env atual com o proximo env
           } else {
             temp.isOverLap = false;
           }
@@ -733,6 +767,10 @@ export default function Listagem({
             temp.isNccAvailable = true;
           }
 
+          console.log('contagem de lotes sem NCC dos tratamentos de genótipos (count)', count, '<<genotype_treatment>>');
+          console.log('contagem de sobreposições (count1): ', count1);
+          console.log('temp.isOverLap: ', temp.isOverLap);
+          
           setAllNPERecords((prev) => [...prev, temp]);
           count = 0;
         });
@@ -744,6 +782,11 @@ export default function Listagem({
       ele?.env.id == NPESelectedRow?.id ? ele : ""
     );
     setNpeData(env ? env[0] : "");
+
+    //STEWART
+    if (env) {
+      tableRef?.current?.dataManager?.changePageSize(env[0]?.data?.length);
+    }
 
     let isNccAvailable = true;
     let isOverLap = false;
@@ -760,11 +803,26 @@ export default function Listagem({
     }
     setIsNccAvailable(isNccAvailable);
     setIsOverLap(isOverLap);
+    
+    console.log('isNccAvailable', isNccAvailable);
+    console.log('isOverLap', isOverLap);
+    
     if (!isNccAvailable || isOverLap) {
       setSortearDisable(true);
     }
   }, [allNPERecords, NPESelectedRow]);
 
+  async function getLastNpeDisponible({safraId, groupId, npefSearch}: any) {
+    let body = {
+      safraId: safraId,
+      groupId: groupId,
+      npefSearch: npefSearch,
+    };
+    const {status, response } = await experimentGenotipeService.getLastNpeDisponible(body);
+    console.log('getLastNpeDisponible.response', response);
+    return { maxNPE: response[0]?.maxnpe, count_npe_exists: response[0].count_npe_exists };
+  }
+  
   async function createExperimentGenotipe({
     experiment_genotipo,
     total_consumed,
@@ -783,6 +841,7 @@ export default function Listagem({
     }, []);
 
     const tempExperimentObj: any[] = [];
+    
     experiment_genotipo.map((item: any) => {
       const data: any = {};
       data.id = Number(item.idExperiment);
@@ -798,42 +857,71 @@ export default function Listagem({
       }
       return unique;
     }, []);
-
+    
     const npeToUpdate: any[] = [];
+    
     allNPERecords.map(async (item: any) => {
-      const temp = {
-        id: item.env?.id,
-        npef: item.env?.npef,
-        // npeQT:
-        //   NPESelectedRow?.npeQT == 'N/A'
-        //     ? null
-        //     : NPESelectedRow?.npeQT - total_consumed,
-        status: 3,
-        prox_npe: item.env?.npef + 1,
-      };
-      npeToUpdate.push(temp);
-    })
+    
+      let nextNPE = item.env?.npef + 1;
+      
+      // se tiver experimentos no env atual
+      if(item.data.length > 0) {
+        const temp = {
+          id: item.env?.id,
+          npef: item.env?.npef,
+          groupId: item.env?.group?.id,
+          safraId: item.env?.safraId,
+          // npeQT:
+          //   NPESelectedRow?.npeQT == 'N/A'
+          //     ? null
+          //     : NPESelectedRow?.npeQT - total_consumed,
+          status: 3, // quando não houver experimentos não atualiza o status
+          prox_npe: nextNPE,
+        };
+        
+        npeToUpdate.push(temp);
+      }
+    });
+
+    console.log('npeToUpdate: ', npeToUpdate); // atenção se não houver experimentos não atualiza o status do env
+    console.log('experiment_genotipo.length', experiment_genotipo.length);
+    
+    // SEMPRE QUE FOR USAR FUNÇÃO ASSINCRONA USAR FOR PARA OBTER O RESULTADO ANTES DE EXECUTAR O RESTANTE DO CÓDIGO;
+    for (const item of Object.values(npeToUpdate)) {
+      const result = await getLastNpeDisponible({
+        safraId: item.safraId, 
+        groupId: item.groupId, 
+        npefSearch: item.prox_npe
+      });
+      console.log('result', result, 'item:', item);
+
+      item.prox_npe = result.maxNPE;
+      
+    }
+    
+    console.log('npeToUpdate -- ATUALIZADO: ', npeToUpdate);
+    
     if (experiment_genotipo.length > 0) {
       setLoading(true);
 
       await experimentGenotipeService
-        .create({ experiment_genotipo, gt, experimentObj, npeToUpdate })
-        .then(response => {
-          console.log(response);
+        .create({experiment_genotipo, gt, experimentObj, npeToUpdate})
+        .then((response) => {
+          console.log('response', response);
           if (response.status === 200) {
             Swal.fire({
-              title: 'Sorteio salvo com sucesso.',
+              title: "Sorteio salvo com sucesso.",
               showDenyButton: false,
               showCancelButton: false,
-              confirmButtonText: 'Ok',
+              confirmButtonText: "Ok",
             }).then(() => {
-              router.push('/operacao/ambiente');
+              router.push("/operacao/ambiente");
             });
           } else {
             Swal.fire({
-              title: 'algo deu errado',
+              title: "algo deu errado",
               showCancelButton: true,
-            })
+            });
           }
         });
       setLoading(false);
@@ -886,12 +974,26 @@ export default function Listagem({
           });
         });
       });
-
-      createExperimentGenotipe({
-        experiment_genotipo,
-        total_consumed: experiment_genotipo.length,
-        genotipo_treatment,
-      });
+      
+      try {
+      
+        createExperimentGenotipe({
+          experiment_genotipo,
+          total_consumed: experiment_genotipo.length,
+          genotipo_treatment,
+        });
+        
+      } catch (e: any) {
+        console.log('validateConsumedData -> e', e);
+        Swal.fire({
+          html: 'Erro ao sortear experimentos: ' + e,
+          width: '800',
+          didClose: () => {
+            router.reload();
+          },
+        });
+      }
+      
     } else if (isNccAvailable == false && isOverLap == true) {
       const temp = NPESelectedRow;
       Swal.fire({
@@ -1001,6 +1103,7 @@ export default function Listagem({
                         flex flex-col
                         items-start
                         gap-0
+                        overflow-y-hidden
                         "
         >
           <div
@@ -1028,7 +1131,7 @@ export default function Listagem({
                 rowStyle: (rowData) => ({
                   backgroundColor:
                     NPESelectedRow?.tableData?.id === rowData.tableData.id
-                      ? NPESelectedRow.npef > NPESelectedRow.nextNPE.npei_i
+                      ? NPESelectedRow.npef >= NPESelectedRow.nextNPE.npei_i
                         ? "#FF5349"
                         : "#d3d3d3"
                       : rowData.npef > rowData.nextNPE.npei_i
@@ -1060,7 +1163,8 @@ export default function Listagem({
                 data={npeData?.data}
                 options={{
                   showTitle: false,
-                  maxBodyHeight: `calc(100vh - 400px)`,
+                  //maxBodyHeight: `calc(100vh - 400px)`,
+                  maxBodyHeight: `calc(100vh - 320px)`,
                   headerStyle: {
                     zIndex: 1,
                   },
@@ -1076,6 +1180,7 @@ export default function Listagem({
                   search: false,
                   filtering: false,
                   pageSize: itensPerPage,
+                  paging: false, //PAGINACAO DESATIVADA TEMPORARIAMENTE
                 }}
                 components={{
                   Toolbar: () => (
@@ -1118,7 +1223,8 @@ export default function Listagem({
 
                       <strong className="text-600">Experimentos</strong>
                       <strong className="text-blue-600">
-                        Total registrado: {experimentos?.length}
+                        {/* Total registrado: {experimentos?.length} */}
+                        Total registrado: {npeData?.data?.length}
                       </strong>
 
                       <div className="h-full flex items-center gap-2">

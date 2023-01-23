@@ -625,7 +625,7 @@ export default function AtualizarTipoEnsaio({
   );
 
   async function getValuesColumns() {
-    const els: any = document.querySelectorAll("input[type='checkbox'");
+    const els: any = document.querySelectorAll("input[type='checkbox']");
     let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
@@ -955,9 +955,10 @@ export default function AtualizarTipoEnsaio({
   }
 
   useEffect(() => {
+    // console.log('table', table);
     table === "genotipo" ? handlePagination() : handlePaginationExperiments();
     table === "genotipo" ? handleTotalPages() : handleTotalPagesExperiments();
-  }, [currentPage, take]);
+  }, [currentPage, take, table]);
 
   return (
     <>

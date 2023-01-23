@@ -1,6 +1,6 @@
-import { ReactNode } from 'react';
-import Modal from 'react-modal';
-import { RiCloseCircleFill } from 'react-icons/ri';
+import { ReactNode } from "react";
+import Modal from "react-modal";
+import { RiCloseCircleFill } from "react-icons/ri";
 
 interface ModalComponentProps {
   isOpen: boolean;
@@ -20,16 +20,24 @@ export function ModalComponent({
       isOpen={isOpen}
       shouldCloseOnOverlayClick={false}
       shouldCloseOnEsc={false}
-      onRequestClose={() => { onCancel(); }}
+      onRequestClose={() => {
+        onCancel();
+      }}
       overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
+      style={{ overlay: { zIndex: 1000 } }}
       className="flex flex-col w-full h-64 max-w-xl bg-gray-50 rounded-tl-2xl rounded-tr-2xl rounded-br-2xl rounded-bl-2xl pt-2 pb-4 px-8 relative shadow-lg shadow-gray-900/50"
     >
       <button
         type="button"
         className="flex absolute top-4 right-3 justify-end"
-        onClick={() => { onCancel(); }}
+        onClick={() => {
+          onCancel();
+        }}
       >
-        <RiCloseCircleFill size={35} className="fill-red-600 hover:fill-red-800" />
+        <RiCloseCircleFill
+          size={35}
+          className="fill-red-600 hover:fill-red-800"
+        />
       </button>
       {children}
 

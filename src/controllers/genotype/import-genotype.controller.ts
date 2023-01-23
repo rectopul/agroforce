@@ -101,8 +101,9 @@ export class ImportGenotypeController {
     const tecnologiaController = new TecnologiaController();
 
     const responseIfError: any = [];
-
     const nccValidate: any = [];
+    const allEqual = (arr: any) => arr.every((val: any) => val === arr[0]);
+    let validateAll: any = {};
     try {
       const configModule: object | any = await importController.getAll(10);
 
@@ -115,6 +116,72 @@ export class ImportGenotypeController {
               spreadSheet[0][25],
               'esta repetindo não planilha',
             );
+          }
+          if (spreadSheet[row][1] !== spreadSheet[Number(row) - 1][1]
+          || (spreadSheet.length - 1) === Number(row)) {
+            if ((spreadSheet.length - 1) === Number(row)) {
+              validateAll.NOME_GENOTIPO.push(spreadSheet[row][3]);
+              validateAll.NOME_PUBLICO.push(spreadSheet[row][4]);
+              validateAll.NOME_PRINCIPAL.push(spreadSheet[row][5]);
+              validateAll.NOME_EXPERIMENTAL.push(spreadSheet[row][6]);
+              validateAll.NOME_ALTERNATIVO.push(spreadSheet[row][7]);
+              validateAll.ELITE_NOME.push(spreadSheet[row][8]);
+              validateAll.TECNOLOGIA.push(spreadSheet[row][9]);
+              validateAll.TIPO.push(spreadSheet[row][10]);
+              validateAll.GMR.push(spreadSheet[row][11]);
+              validateAll.BGM.push(spreadSheet[row][12]);
+              validateAll.CRUZAMENTO_ORIGEM.push(spreadSheet[row][13]);
+              validateAll.PROGENITOR_F_DIREITO.push(spreadSheet[row][14]);
+              validateAll.PROGENITOR_M_DIREITO.push(spreadSheet[row][15]);
+              validateAll.PROGENITOR_F_ORIGEM.push(spreadSheet[row][16]);
+              validateAll.PROGENITOR_M_ORIGEM.push(spreadSheet[row][17]);
+              validateAll.PROGENITORES_ORIGEM.push(spreadSheet[row][18]);
+              validateAll.PARENTESCO_COMPLETO.push(spreadSheet[row][19]);
+            }
+            for (const property in validateAll) {
+              const result = allEqual(validateAll[property]);
+              if (!result) {
+                responseIfError[Number(0)]
+                += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo ID_DADOS(${spreadSheet[row][1]}) devem ser iguais. </li> <br>`;
+              }
+            }
+            validateAll = {
+              NOME_GENOTIPO: [],
+              NOME_PUBLICO: [],
+              NOME_PRINCIPAL: [],
+              NOME_EXPERIMENTAL: [],
+              NOME_ALTERNATIVO: [],
+              ELITE_NOME: [],
+              TECNOLOGIA: [],
+              TIPO: [],
+              GMR: [],
+              BGM: [],
+              CRUZAMENTO_ORIGEM: [],
+              PROGENITOR_F_DIREITO: [],
+              PROGENITOR_M_DIREITO: [],
+              PROGENITOR_F_ORIGEM: [],
+              PROGENITOR_M_ORIGEM: [],
+              PROGENITORES_ORIGEM: [],
+              PARENTESCO_COMPLETO: [],
+            };
+          } else {
+            validateAll.NOME_GENOTIPO.push(spreadSheet[row][3]);
+            validateAll.NOME_PUBLICO.push(spreadSheet[row][4]);
+            validateAll.NOME_PRINCIPAL.push(spreadSheet[row][5]);
+            validateAll.NOME_EXPERIMENTAL.push(spreadSheet[row][6]);
+            validateAll.NOME_ALTERNATIVO.push(spreadSheet[row][7]);
+            validateAll.ELITE_NOME.push(spreadSheet[row][8]);
+            validateAll.TECNOLOGIA.push(spreadSheet[row][9]);
+            validateAll.TIPO.push(spreadSheet[row][10]);
+            validateAll.GMR.push(spreadSheet[row][11]);
+            validateAll.BGM.push(spreadSheet[row][12]);
+            validateAll.CRUZAMENTO_ORIGEM.push(spreadSheet[row][13]);
+            validateAll.PROGENITOR_F_DIREITO.push(spreadSheet[row][14]);
+            validateAll.PROGENITOR_M_DIREITO.push(spreadSheet[row][15]);
+            validateAll.PROGENITOR_F_ORIGEM.push(spreadSheet[row][16]);
+            validateAll.PROGENITOR_M_ORIGEM.push(spreadSheet[row][17]);
+            validateAll.PROGENITORES_ORIGEM.push(spreadSheet[row][18]);
+            validateAll.PARENTESCO_COMPLETO.push(spreadSheet[row][19]);
           }
           nccValidate.push(spreadSheet[row][25]);
           for (const column in spreadSheet[row]) {

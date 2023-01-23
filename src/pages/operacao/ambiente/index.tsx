@@ -1019,7 +1019,7 @@ export default function Listagem({
                 filtering: false,
                 pageSize: Number(take),
                 selection: true,
-                showSelectAllCheckbox: false,
+                showSelectAllCheckbox: true,
                 showTextRowsSelected: false,
               }}
               onSelectionChange={handleSelectionRow}

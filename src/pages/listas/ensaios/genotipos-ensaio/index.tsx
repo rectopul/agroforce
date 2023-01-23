@@ -1008,6 +1008,7 @@ export default function Listagem({
         shouldCloseOnOverlayClick={false}
         shouldCloseOnEsc={false}
         onRequestClose={() => setIsOpenModal(!isOpenModal)}
+        style={{ overlay: { zIndex: 1000 } }}
         overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
         className="flex
           flex-col

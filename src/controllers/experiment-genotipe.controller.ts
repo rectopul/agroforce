@@ -7,6 +7,7 @@ import { ExperimentController } from './experiment/experiment.controller';
 import { PrintHistoryController } from './print-history/print-history.controller';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
+import { prisma } from '../pages/api/db/db';
 
 export class ExperimentGenotipeController {
   private ExperimentGenotipeRepository = new ExperimentGenotipeRepository();
@@ -16,7 +17,7 @@ export class ExperimentGenotipeController {
   private experimentGroupController = new ExperimentGroupController();
 
   private printedHistoryController = new PrintHistoryController();
-
+  
   async getAll(options: any) {
     const parameters: object | any = {};
     let orderBy: object | any;
@@ -387,7 +388,41 @@ export class ExperimentGenotipeController {
     }
   }
 
+  async getLastNpeDisponible(options: {
+    safraId: number;
+    groupId: number;
+    npefSearch: number;
+  }) {
+    let safraId = options.safraId;
+    let groupId = options.groupId;
+    let npefSearch = options.npefSearch;
+
+    try {
+      const response: {
+        count_npe_exists: number | null,
+        max_NPE_1: number | null,
+        maxnpe: number | null,
+      } = await prisma.$queryRaw`SELECT 
+        (EXISTS (SELECT npe FROM experiment_genotipe WHERE npe = ${npefSearch})) as count_npe_exists, 
+        (MAX(gn.npe) + 1) as max_NPE_1, 
+        IF( (EXISTS (SELECT npe FROM experiment_genotipe WHERE npe = ${npefSearch})) > 0, (MAX(gn.npe) + 1), ${npefSearch}) as maxnpe
+        FROM experiment_genotipe gn
+        WHERE 1 = 1
+        AND gn.groupId = ${groupId}
+        ORDER BY npe DESC`;
+
+      if (!response) throw new Error('Grupo não encontrado');
+
+      return {status: 200, response: response};
+
+    } catch (error: any) {
+      handleError('Parcelas controller', 'getLastNpeDisponible', error.message);
+      throw new Error('[Controller] - getLastNpeDisponible Parcelas erro');
+    }
+  }
+
   async create({ experiment_genotipo, gt, experimentObj, npeToUpdate }: object | any) {
+    
     try {
       const response = await prisma?.$transaction(async (tx) => {
 
@@ -440,7 +475,7 @@ export class ExperimentGenotipeController {
       return { status: 400, message: 'Parcelas não registrado' };
     } catch (error: any) {
       handleError('Parcelas do controlador', 'Create', error.message);
-      throw new Error('[Controller] - Erro ao criar esboço de Parcelas');
+      throw new Error('[Controller] - Erro ao criar esboço de Parcelas: '+ JSON.stringify(error));
     }
   }
 
@@ -461,15 +496,15 @@ export class ExperimentGenotipeController {
     idList, npe, status, userId = 0, count,
   }: any) {
     try {
-      let counter = 0;
+      let counter = 1;
       if (count === 'print') {
         status = 'IMPRESSO';
-        counter = 1;
+        counter = 2;
       } else if (count === 'reprint') {
         await idList.map(async (id: any) => {
           const { response }: any = await this.getOne(id);
           const newCount = response.counter + 1;
-          const status = 'REIMPRESSO';
+          status = 'IMPRESSO';
           await this.ExperimentGenotipeRepository.printed(id, status, newCount);
         });
       } else if (count === 'writeOff') {

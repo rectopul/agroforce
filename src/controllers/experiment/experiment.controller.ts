@@ -258,11 +258,22 @@ export class ExperimentController {
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
+      // console.log('🚀 ~ file: experiment.controller.ts:256 ~ ExperimentController ~ getAll ~ options', options);
+      
+      // console.log('options.orderBy', typeof options.orderBy);
+      
       if (options.orderBy) {
-        if (!options.excel) {
+        // verifica se options.orderBy é objeto entra também
+        if (!options.excel || (typeof options.orderBy === 'object')) {
           if (typeof options.orderBy !== 'string' || typeof options.typeOrder !== 'string') {
             if (options.orderBy[2] == '' || !options.orderBy[2]) {
-              orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `{"${options.orderBy[1]}":"${options.typeOrder[1]}"}`];
+              /** 
+               * @todo: Refatorar esse código para verificar se cada orderBy tem ponto se tiver é uma relação
+               */
+              const tempOrder = handleOrderForeign(options.orderBy[1], options.typeOrder[1]);
+              // console.log('🚀 ~ file: experiment.controller.ts:275 ~ ExperimentController ~ getAll ~ tempOrder', tempOrder);
+
+              orderBy = [`{"${options.orderBy[0]}":"${options.typeOrder[0]}"}`, `${tempOrder}`];
             } else {
               orderBy = handleOrderForeign(options.orderBy[2], options.typeOrder[2]);
               orderBy = orderBy || `{"${options.orderBy[2]}":"${options.typeOrder[2]}"}`;
@@ -273,6 +284,9 @@ export class ExperimentController {
           }
         }
       }
+
+      // console.log('orderBy', orderBy);
+
       const response: object | any = await this.experimentRepository.findAll(
         parameters,
         select,
@@ -437,7 +451,7 @@ export class ExperimentController {
           assayList?.genotype_treatment.map(async (treatment: any) => {
             await genotypeTreatment.update({
               id: treatment.id,
-              status: 'IMPORTADO',
+              status_experiment: 'IMPORTADO',
             });
           });
         }
@@ -456,7 +470,6 @@ export class ExperimentController {
           Epoca: experimentExist?.period,
           Tecnologia: experimentExist?.assay_list?.tecnologia?.cod_tec,
           TypeAssay: experimentExist?.assay_list?.type_assay?.id,
-          Status: 'IMPORTADO',
         });
         if (ambiente.length > 0 && experiment.length === 0) {
           await npeController.update({
