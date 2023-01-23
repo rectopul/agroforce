@@ -17,7 +17,7 @@ export class ExperimentGenotipeController {
   private experimentGroupController = new ExperimentGroupController();
 
   private printedHistoryController = new PrintHistoryController();
-  
+
   async getAll(options: any) {
     const parameters: object | any = {};
     let orderBy: object | any;
@@ -393,9 +393,9 @@ export class ExperimentGenotipeController {
     groupId: number;
     npefSearch: number;
   }) {
-    let safraId = options.safraId;
-    let groupId = options.groupId;
-    let npefSearch = options.npefSearch;
+    const { safraId } = options;
+    const { groupId } = options;
+    const { npefSearch } = options;
 
     try {
       const response: {
@@ -413,19 +413,18 @@ export class ExperimentGenotipeController {
 
       if (!response) throw new Error('Grupo não encontrado');
 
-      return {status: 200, response: response};
-
+      return { status: 200, response };
     } catch (error: any) {
       handleError('Parcelas controller', 'getLastNpeDisponible', error.message);
       throw new Error('[Controller] - getLastNpeDisponible Parcelas erro');
     }
   }
 
-  async create({ experiment_genotipo, gt, experimentObj, npeToUpdate }: object | any) {
-    
+  async create({
+    experiment_genotipo, gt, experimentObj, npeToUpdate,
+  }: object | any) {
     try {
       const response = await prisma?.$transaction(async (tx) => {
-
         await gt.map(async (gen_treatment: any) => {
           await tx.genotype_treatment.update({
             where: {
@@ -433,9 +432,9 @@ export class ExperimentGenotipeController {
             },
             data: {
               status_experiment: gen_treatment.status_experiment,
-            }
-          })
-        })
+            },
+          });
+        });
 
         await experimentObj.map(async (exp: any) => {
           await tx.experiment.update({
@@ -444,9 +443,9 @@ export class ExperimentGenotipeController {
             },
             data: {
               status: exp.status,
-            }
-          })
-        })
+            },
+          });
+        });
 
         await npeToUpdate.map(async (npe: any) => {
           await tx.npe.update({
@@ -457,17 +456,17 @@ export class ExperimentGenotipeController {
               npef: npe.npef,
               prox_npe: npe.prox_npe,
               status: npe.status,
-            }
-          })
-        })
+            },
+          });
+        });
 
-        const exp_gen = await tx.experiment_genotipe.createMany({ data: experiment_genotipo })
+        const exp_gen = await tx.experiment_genotipe.createMany({ data: experiment_genotipo });
 
-        return exp_gen
+        return exp_gen;
       }, {
         maxWait: 5000,
         timeout: 10000,
-      })
+      });
 
       if (response) {
         return { status: 200, message: 'Tratamento experimental registrado' };
@@ -475,7 +474,7 @@ export class ExperimentGenotipeController {
       return { status: 400, message: 'Parcelas não registrado' };
     } catch (error: any) {
       handleError('Parcelas do controlador', 'Create', error.message);
-      throw new Error('[Controller] - Erro ao criar esboço de Parcelas: '+ JSON.stringify(error));
+      throw new Error(`[Controller] - Erro ao criar esboço de Parcelas: ${JSON.stringify(error)}`);
     }
   }
 

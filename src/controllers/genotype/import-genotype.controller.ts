@@ -117,12 +117,73 @@ export class ImportGenotypeController {
               'esta repetindo não planilha',
             );
           }
-          if (spreadSheet[row][1] !== spreadSheet[Number(row) - 1][1]
-          || (spreadSheet.length - 1) === Number(row)) {
-            if ((spreadSheet.length - 1) === Number(row)) {
-              validateAll.NOME_GENOTIPO.push(spreadSheet[row][3]);
-              validateAll.NOME_PUBLICO.push(spreadSheet[row][4]);
-              validateAll.NOME_PRINCIPAL.push(spreadSheet[row][5]);
+          if (spreadSheet.length > 2) {
+            if (spreadSheet[row][1] !== spreadSheet[Number(row) - 1][1]
+            || (spreadSheet.length - 1) === Number(row)) {
+              if ((spreadSheet.length - 1) === Number(row)) {
+                validateAll.NOME_PRINCIPAL.push(spreadSheet[row][4]);
+                validateAll.NOME_PUBLICO.push(spreadSheet[row][5]);
+                validateAll.NOME_EXPERIMENTAL.push(spreadSheet[row][6]);
+                validateAll.NOME_ALTERNATIVO.push(spreadSheet[row][7]);
+                validateAll.ELITE_NOME.push(spreadSheet[row][8]);
+                validateAll.TECNOLOGIA.push(spreadSheet[row][9]);
+                validateAll.TIPO.push(spreadSheet[row][10]);
+                validateAll.GMR.push(spreadSheet[row][11]);
+                validateAll.BGM.push(spreadSheet[row][12]);
+                validateAll.CRUZAMENTO_ORIGEM.push(spreadSheet[row][13]);
+                validateAll.PROGENITOR_F_DIREITO.push(spreadSheet[row][14]);
+                validateAll.PROGENITOR_M_DIREITO.push(spreadSheet[row][15]);
+                validateAll.PROGENITOR_F_ORIGEM.push(spreadSheet[row][16]);
+                validateAll.PROGENITOR_M_ORIGEM.push(spreadSheet[row][17]);
+                validateAll.PROGENITORES_ORIGEM.push(spreadSheet[row][18]);
+                validateAll.PARENTESCO_COMPLETO.push(spreadSheet[row][19]);
+              }
+              console.log('🚀 ~ file: import-genotype.controller.ts:150 ~ ImportGenotypeController ~ || ~ validateAll', validateAll);
+
+              for (const property in validateAll) {
+                const result = allEqual(validateAll[property]);
+                if (!result) {
+                  responseIfError[Number(0)]
+                  += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo ID_DADOS(${spreadSheet[row][1]}) devem ser iguais. </li> <br>`;
+                }
+              }
+              validateAll = {
+                NOME_PUBLICO: [],
+                NOME_PRINCIPAL: [],
+                NOME_EXPERIMENTAL: [],
+                NOME_ALTERNATIVO: [],
+                ELITE_NOME: [],
+                TECNOLOGIA: [],
+                TIPO: [],
+                GMR: [],
+                BGM: [],
+                CRUZAMENTO_ORIGEM: [],
+                PROGENITOR_F_DIREITO: [],
+                PROGENITOR_M_DIREITO: [],
+                PROGENITOR_F_ORIGEM: [],
+                PROGENITOR_M_ORIGEM: [],
+                PROGENITORES_ORIGEM: [],
+                PARENTESCO_COMPLETO: [],
+              };
+              validateAll.NOME_PRINCIPAL.push(spreadSheet[row][4]);
+              validateAll.NOME_PUBLICO.push(spreadSheet[row][5]);
+              validateAll.NOME_EXPERIMENTAL.push(spreadSheet[row][6]);
+              validateAll.NOME_ALTERNATIVO.push(spreadSheet[row][7]);
+              validateAll.ELITE_NOME.push(spreadSheet[row][8]);
+              validateAll.TECNOLOGIA.push(spreadSheet[row][9]);
+              validateAll.TIPO.push(spreadSheet[row][10]);
+              validateAll.GMR.push(spreadSheet[row][11]);
+              validateAll.BGM.push(spreadSheet[row][12]);
+              validateAll.CRUZAMENTO_ORIGEM.push(spreadSheet[row][13]);
+              validateAll.PROGENITOR_F_DIREITO.push(spreadSheet[row][14]);
+              validateAll.PROGENITOR_M_DIREITO.push(spreadSheet[row][15]);
+              validateAll.PROGENITOR_F_ORIGEM.push(spreadSheet[row][16]);
+              validateAll.PROGENITOR_M_ORIGEM.push(spreadSheet[row][17]);
+              validateAll.PROGENITORES_ORIGEM.push(spreadSheet[row][18]);
+              validateAll.PARENTESCO_COMPLETO.push(spreadSheet[row][19]);
+            } else {
+              validateAll.NOME_PRINCIPAL.push(spreadSheet[row][4]);
+              validateAll.NOME_PUBLICO.push(spreadSheet[row][5]);
               validateAll.NOME_EXPERIMENTAL.push(spreadSheet[row][6]);
               validateAll.NOME_ALTERNATIVO.push(spreadSheet[row][7]);
               validateAll.ELITE_NOME.push(spreadSheet[row][8]);
@@ -138,50 +199,6 @@ export class ImportGenotypeController {
               validateAll.PROGENITORES_ORIGEM.push(spreadSheet[row][18]);
               validateAll.PARENTESCO_COMPLETO.push(spreadSheet[row][19]);
             }
-            for (const property in validateAll) {
-              const result = allEqual(validateAll[property]);
-              if (!result) {
-                responseIfError[Number(0)]
-                += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo ID_DADOS(${spreadSheet[row][1]}) devem ser iguais. </li> <br>`;
-              }
-            }
-            validateAll = {
-              NOME_GENOTIPO: [],
-              NOME_PUBLICO: [],
-              NOME_PRINCIPAL: [],
-              NOME_EXPERIMENTAL: [],
-              NOME_ALTERNATIVO: [],
-              ELITE_NOME: [],
-              TECNOLOGIA: [],
-              TIPO: [],
-              GMR: [],
-              BGM: [],
-              CRUZAMENTO_ORIGEM: [],
-              PROGENITOR_F_DIREITO: [],
-              PROGENITOR_M_DIREITO: [],
-              PROGENITOR_F_ORIGEM: [],
-              PROGENITOR_M_ORIGEM: [],
-              PROGENITORES_ORIGEM: [],
-              PARENTESCO_COMPLETO: [],
-            };
-          } else {
-            validateAll.NOME_GENOTIPO.push(spreadSheet[row][3]);
-            validateAll.NOME_PUBLICO.push(spreadSheet[row][4]);
-            validateAll.NOME_PRINCIPAL.push(spreadSheet[row][5]);
-            validateAll.NOME_EXPERIMENTAL.push(spreadSheet[row][6]);
-            validateAll.NOME_ALTERNATIVO.push(spreadSheet[row][7]);
-            validateAll.ELITE_NOME.push(spreadSheet[row][8]);
-            validateAll.TECNOLOGIA.push(spreadSheet[row][9]);
-            validateAll.TIPO.push(spreadSheet[row][10]);
-            validateAll.GMR.push(spreadSheet[row][11]);
-            validateAll.BGM.push(spreadSheet[row][12]);
-            validateAll.CRUZAMENTO_ORIGEM.push(spreadSheet[row][13]);
-            validateAll.PROGENITOR_F_DIREITO.push(spreadSheet[row][14]);
-            validateAll.PROGENITOR_M_DIREITO.push(spreadSheet[row][15]);
-            validateAll.PROGENITOR_F_ORIGEM.push(spreadSheet[row][16]);
-            validateAll.PROGENITOR_M_ORIGEM.push(spreadSheet[row][17]);
-            validateAll.PROGENITORES_ORIGEM.push(spreadSheet[row][18]);
-            validateAll.PARENTESCO_COMPLETO.push(spreadSheet[row][19]);
           }
           nccValidate.push(spreadSheet[row][25]);
           for (const column in spreadSheet[row]) {
@@ -847,21 +864,21 @@ export class ImportGenotypeController {
                     id_s1: this.aux.id_s1,
                     id_dados: String(this.aux.id_dados_geno),
                     name_genotipo: this.aux.name_genotipo,
-                    name_main: this.aux.name_main,
-                    name_public: this.aux.name_public,
-                    name_experiment: this.aux.name_experiment,
-                    name_alter: this.aux.name_alter,
-                    elit_name: this.aux.elit_name,
-                    type: this.aux.type,
-                    gmr: this.aux.gmr,
-                    bgm: this.aux.bgm,
-                    cruza: this.aux.cruza,
-                    progenitor_f_direto: this.aux.progenitor_f_direto ? String(this.aux.progenitor_f_direto) : undefined,
-                    progenitor_m_direto: this.aux.progenitor_m_direto ? String(this.aux.progenitor_m_direto) : undefined,
-                    progenitor_f_origem: this.aux.progenitor_f_origem ? String(this.aux.progenitor_f_origem) : undefined,
-                    progenitor_m_origem: this.aux.progenitor_m_origem ? String(this.aux.progenitor_m_origem) : undefined,
-                    progenitores_origem: this.aux.progenitores_origem ? String(this.aux.progenitores_origem) : undefined,
-                    parentesco_completo: this.aux.parentesco_completo ? String(this.aux.parentesco_completo) : undefined,
+                    name_main: this.aux.name_main ? String(this.aux.name_main) : null,
+                    name_public: this.aux.name_public ? String(this.aux.name_public) : null,
+                    name_experiment: this.aux.name_experiment ? String(this.aux.name_experiment) : null,
+                    name_alter: this.aux.name_alter ? String(this.aux.name_alter) : null,
+                    elit_name: this.aux.elit_name ? String(this.aux.elit_name) : null,
+                    type: this.aux.type ? String(this.aux.type) : null,
+                    gmr: this.aux.gmr ? this.aux.gmr : null,
+                    bgm: this.aux.bgm ? this.aux.bgm : null,
+                    cruza: this.aux.cruza ? String(this.aux.cruza) : null,
+                    progenitor_f_direto: this.aux.progenitor_f_direto ? String(this.aux.progenitor_f_direto) : null,
+                    progenitor_m_direto: this.aux.progenitor_m_direto ? String(this.aux.progenitor_m_direto) : null,
+                    progenitor_f_origem: this.aux.progenitor_f_origem ? String(this.aux.progenitor_f_origem) : null,
+                    progenitor_m_origem: this.aux.progenitor_m_origem ? String(this.aux.progenitor_m_origem) : null,
+                    progenitores_origem: this.aux.progenitores_origem ? String(this.aux.progenitores_origem) : null,
+                    parentesco_completo: this.aux.parentesco_completo ? String(this.aux.parentesco_completo) : null,
                     created_by: createdBy,
                   });
                 } else {
@@ -871,21 +888,21 @@ export class ImportGenotypeController {
                     id_s1: this.aux.id_s1,
                     id_dados: String(this.aux.id_dados_geno),
                     name_genotipo: this.aux.name_genotipo,
-                    name_main: this.aux.name_main,
-                    name_public: this.aux.name_public,
-                    name_experiment: this.aux.name_experiment,
-                    name_alter: this.aux.name_alter,
-                    elit_name: this.aux.elit_name,
-                    type: this.aux.type,
+                    name_main: this.aux.name_main ? String(this.aux.name_main) : null,
+                    name_public: this.aux.name_public ? String(this.aux.name_public) : null,
+                    name_experiment: this.aux.name_experiment ? String(this.aux.name_experiment) : null,
+                    name_alter: this.aux.name_alter ? String(this.aux.name_alter) : null,
+                    elit_name: this.aux.elit_name ? String(this.aux.elit_name) : null,
+                    type: this.aux.type ? String(this.aux.type) : null,
                     gmr: this.aux.gmr,
                     bgm: this.aux.bgm,
-                    cruza: this.aux.cruza,
-                    progenitor_f_direto: this.aux.progenitor_f_direto ? String(this.aux.progenitor_f_direto) : undefined,
-                    progenitor_m_direto: this.aux.progenitor_m_direto ? String(this.aux.progenitor_m_direto) : undefined,
-                    progenitor_f_origem: this.aux.progenitor_f_origem ? String(this.aux.progenitor_f_origem) : undefined,
-                    progenitor_m_origem: this.aux.progenitor_m_origem ? String(this.aux.progenitor_m_origem) : undefined,
-                    progenitores_origem: this.aux.progenitores_origem ? String(this.aux.progenitores_origem) : undefined,
-                    parentesco_completo: this.aux.parentesco_completo ? String(this.aux.parentesco_completo) : undefined,
+                    cruza: this.aux.cruza ? String(this.aux.cruza) : null,
+                    progenitor_f_direto: this.aux.progenitor_f_direto ? String(this.aux.progenitor_f_direto) : null,
+                    progenitor_m_direto: this.aux.progenitor_m_direto ? String(this.aux.progenitor_m_direto) : null,
+                    progenitor_f_origem: this.aux.progenitor_f_origem ? String(this.aux.progenitor_f_origem) : null,
+                    progenitor_m_origem: this.aux.progenitor_m_origem ? String(this.aux.progenitor_m_origem) : null,
+                    progenitores_origem: this.aux.progenitores_origem ? String(this.aux.progenitores_origem) : null,
+                    parentesco_completo: this.aux.parentesco_completo ? String(this.aux.parentesco_completo) : null,
                     created_by: createdBy,
                   });
 

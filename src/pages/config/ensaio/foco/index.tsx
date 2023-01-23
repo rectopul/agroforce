@@ -541,34 +541,16 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    await focoService.getAll(filter).then(({ status, response }) => {
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+
+    await focoService.getAll(filterParam).then(({ status, response }) => {
       if (status === 200) {
-        const newData = response.map((row: any) => {
-          if (row.status === 0) {
-            row.status = "Inativo" as any;
-          } else {
-            row.status = "Ativo" as any;
-          }
 
-          row.CULTURA = row?.culture?.name;
-          row.NOME = row?.name;
-          row.GRUPO = row?.group.group;
-          row.STATUS = row?.status;
-
-          delete row.name;
-          delete row.group;
-          delete row.status;
-          delete row.id_culture;
-          delete row.tableData;
-          delete row.culture;
-          delete row.id;
-
-          return row;
-        });
-
-        const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "focos");
+        XLSX.utils.book_append_sheet(workBook, response, "focos");
 
         // Buffer
         XLSX.write(workBook, {

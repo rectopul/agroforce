@@ -724,18 +724,10 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    // const newResponse: any = [];
-    // let newTake = 500;
-    // while (newTake < total) {
-    //   experimentGenotipeService.getAll(`${filter}&take=${newTake}&skip=${Number(newTake - 500)}`).then(({ response }: any) => {
-    //     newResponse.push(response);
-    //   });
-    //   newTake += 500;
-    // }
 
     const skip = 0;
     const take = 10;
-    // &createFile=true
+
     const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
     // await experimentGenotipeService
     //   .getAll(filterParam)

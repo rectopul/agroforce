@@ -64,16 +64,16 @@ import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactor
 import ComponentLoading from '../../../../components/Loading';
 
 export default function Listagem({
-  allTreatments,
-  assaySelect,
-  genotypeSelect,
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  filterBeforeEdit,
-  typeOrderServer,
-  orderByserver,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allTreatments,
+      assaySelect,
+      genotypeSelect,
+      itensPerPage,
+      filterApplication,
+      idSafra,
+      filterBeforeEdit,
+      typeOrderServer,
+      orderByserver,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const [loading, setLoading] = useState<boolean>(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -505,7 +505,7 @@ export default function Listagem({
   // }
 
   function formatDecimal(num: number) {
-    return Number(num).toFixed(1);
+    return num ? Number(num).toFixed(1) : '';
   }
 
   function orderColumns(columnsOrder: string): Array<object> {
@@ -732,32 +732,19 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
+
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+
     await genotypeTreatmentService
-      .getAll(`${filter}&excel=true`)
+      .getAll(`${filterParam}&excel=true`)
       .then(({ status, response }) => {
         if (status === 200) {
-          const newData = response.map((item: any) => {
-            const newItem: any = {};
-            newItem.CULTURA = item.safra.culture.name;
-            newItem.SAFRA = item.safra.safraName;
-            newItem.FOCO = item.assay_list.foco.name;
-            newItem.ENSAIO = item.assay_list.type_assay.name;
-            newItem.TECNOLOGIA = `${item.assay_list.tecnologia.cod_tec} ${item.assay_list.tecnologia.name}`;
-            newItem.GGEN = `${item.genotipo.tecnologia.cod_tec} ${item.genotipo.tecnologia.name}`;
-            newItem.GLI = item.assay_list.gli;
-            newItem.BGM = item.assay_list.bgm;
-            newItem.BGM_Genótipo = item.genotipo.bgm;
-            newItem.GMR_GEN = item.genotipo.gmr;
-            newItem.NT = item.treatments_number;
-            newItem.STATUS_T = item.status;
-            newItem.STATUS_ENSAIO = item.assay_list.status;
-            newItem.GENOTIPO = item.genotipo.name_genotipo;
-            newItem.NCA = item?.lote?.ncc;
-            return newItem;
-          });
-          const workSheet = XLSX.utils.json_to_sheet(newData);
+          
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Tratamentos');
+          XLSX.utils.book_append_sheet(workBook, response, "Tratamentos");
 
           // Buffer
           XLSX.write(workBook, {

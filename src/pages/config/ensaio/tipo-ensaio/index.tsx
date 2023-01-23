@@ -637,34 +637,16 @@ export default function TipoEnsaio({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    await typeAssayService.getAll(filter).then(({ status, response }) => {
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+    
+    await typeAssayService.getAll(filterParam).then(({ status, response }) => {
       if (status === 200) {
-        const newData = response.map((row: any) => {
-          const newRow = row;
 
-          newRow.envelope = row.envelope.seeds;
-          newRow.status = row.status === 0 ? "Inativo" : "Ativo";
-          newRow.CULTURA = newRow.culture.name;
-          newRow.NOME = newRow.name;
-          newRow.NOME_PROTOCOLO = newRow.protocol_name;
-          newRow.QUANT_SEMENTES = newRow.envelope;
-          newRow.SAFRA = newRow.envelope
-            ? newRow.envelope[0]?.safra.safraName
-            : "";
-          newRow.STATUS = newRow.status;
-
-          delete newRow.name;
-          delete newRow.culture;
-          delete newRow.protocol_name;
-          delete newRow.envelope;
-          delete newRow.status;
-          delete newRow.id;
-          return newRow;
-        });
-
-        const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "Tipo_Ensaio");
+        XLSX.utils.book_append_sheet(workBook, response, "Tipo_Ensaio");
 
         // Buffer
         XLSX.write(workBook, {

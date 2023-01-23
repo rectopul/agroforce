@@ -9,6 +9,7 @@ import { ExperimentController } from '../experiment/experiment.controller';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 import {ExperimentGenotipeController} from "../experiment-genotipe.controller";
 // import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
+import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class NpeController {
   npeRepository = new NpeRepository();
@@ -28,6 +29,11 @@ export class NpeController {
     let select: any = [];
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const sheet = await createXls(options, 'AMBIENTE-AMBIENTE');
+        return { status: 200, response: sheet };
+      }
+
       if (options.filterStatus) {
         if (options.filterStatus !== '2') {
           if (options.filterStatus == '1') {
@@ -194,19 +200,18 @@ export class NpeController {
           // find groupId next element in elements with same group.id
           const next = elements.find((item: any, idx:any) => item.group?.id === groupId && idx > index);
           
-          console.log('newItem', newItem, 'group:', newItem.group?.id);
-          console.log('nextGroup', next, 'group:', next?.group?.id);
-          
           if (next) {
             if (!newItem.npeQT) {
               newItem.npeQT = next.npei_i - newItem.npef; // quantidade disponivel
             }
             newItem.npeRequisitada = 0; // quantidade a ser consumida (contagem de experimentos)
             newItem.nextNPE = next;
+            //newItem.npefView = newItem.npef;
           } else {
             newItem.npeQT = 'N/A';
             newItem.nextNPE = 0;
             newItem.npeRequisitada = 0;
+            //newItem.npefView = newItem.npef;
           }
           newItem.nextAvailableNPE = next_available_npe;
           return newItem;

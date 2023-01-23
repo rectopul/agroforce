@@ -130,7 +130,7 @@ export default function Import({
               filePath,
             });
             setImportLoading(false);
-            handlePagination();
+            handlePagination(currentPage);
             Swal.fire({
               html: message,
               width: '800',
@@ -148,7 +148,7 @@ export default function Import({
               filePath,
             });
             setImportLoading(false);
-            handlePagination();
+            handlePagination(currentPage);
             Swal.fire({
               html: message,
               width: '800',
@@ -255,8 +255,7 @@ export default function Import({
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
 
-  const pathExtra = `skip=${
-    currentPage * Number(take)
+  const pathExtra = `skip=${currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
   const pages = Math.ceil(total / take);
@@ -285,7 +284,7 @@ export default function Import({
       setFilter(parametersFilter);
 
       setLoading(true);
-      await getAllLogs(`${parametersFilter}`);
+      await getAllLogs(`${parametersFilter}`, currentPage);
       setTimeout(() => {
         setLoading(false);
       }, 1000);
@@ -293,8 +292,12 @@ export default function Import({
     },
   });
 
-  async function getAllLogs(parametersFilter: any) {
-    parametersFilter = `${parametersFilter}`;
+  async function getAllLogs(parametersFilter: any, newPage: any) {
+    setCurrentPage(newPage);
+
+    parametersFilter = `${parametersFilter}&skip=${
+      newPage * Number(take)
+    }&take=${take}`;
 
     await logImportService
       .getAll(parametersFilter)
@@ -309,7 +312,7 @@ export default function Import({
 
   // Call that function when change type order value.
   useEffect(() => {
-    getAllLogs(filter);
+    getAllLogs(filter, currentPage);
   }, [typeOrder]);
 
   // async function handleOrder(
@@ -642,33 +645,16 @@ export default function Import({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    await logImportService.getAll(filter).then(({ status, response }) => {
+
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+
+    await logImportService.getAll(filterParam).then(({ status, response }) => {
       if (status === 200) {
-        response.map((item: any) => {
-          const newItem = item;
-
-          newItem.CULTURA = item.safra.culture.name;
-          newItem.SAFRA = item.safra.safraName;
-          newItem.USUÁRIO = item.user.name;
-          newItem.TABELA = item.table;
-          newItem.STATUS = item.state;
-          newItem.INICIO_EM = item.created_at;
-          newItem.FIM_EM = item.updated_at;
-
-          delete newItem.safra;
-          delete newItem.user;
-          delete newItem.table;
-          delete newItem.state;
-          delete newItem.created_at;
-          delete newItem.updated_at;
-          delete newItem.id;
-          delete newItem.status;
-          delete newItem.invalid_data;
-          return newItem;
-        });
-        const workSheet = XLSX.utils.json_to_sheet(response);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'logs');
+        XLSX.utils.book_append_sheet(workBook, response, 'logs');
 
         // Buffer
         XLSX.write(workBook, {
@@ -697,8 +683,8 @@ export default function Import({
     }
   }
 
-  async function handlePagination(): Promise<void> {
-    await getAllLogs(filter);
+  async function handlePagination(page: any): Promise<void> {
+    await getAllLogs(filter, page); // handle pagination globly
   }
 
   function filterFieldFactory(title: string, name: string) {
@@ -818,10 +804,10 @@ export default function Import({
     );
   }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   return (
     <>
@@ -887,11 +873,11 @@ export default function Import({
 
                 {(Router?.importar == 'subs_experimento'
                   || !Router.importar) && (
-                  <ComponentImport
-                    title="Importar Subs. de genótipo/nca Experimento"
-                    table="PARCELS"
-                    moduleId={30}
-                  />
+                    <ComponentImport
+                      title="Importar Subs. de genótipo/nca Experimento"
+                      table="PARCELS"
+                      moduleId={30}
+                    />
                 )}
 
                 <div className="h-10" />
@@ -932,20 +918,20 @@ export default function Import({
 
                 {(Router?.importar == 'alocacao_quadra'
                   || !Router.importar) && (
-                  <ComponentImport
-                    title="Importar Alocação de quadra"
-                    table="ALLOCATION"
-                    moduleId={31}
-                  />
+                    <ComponentImport
+                      title="Importar Alocação de quadra"
+                      table="ALLOCATION"
+                      moduleId={31}
+                    />
                 )}
                 {(Router?.importar == 'etiquetas_impressas'
                   || !Router.importar) && (
-                  <ComponentImport
-                    disabled
-                    title="Importar Etiquetas Impressas"
-                    table="TAG_PRINTED" // AINDA NÃO SEI NOME CORRETO
-                    moduleId={0} // AINDA NÃO SEI CODIGO CORRETO
-                  />
+                    <ComponentImport
+                      disabled
+                      title="Importar Etiquetas Impressas"
+                      table="TAG_PRINTED" // AINDA NÃO SEI NOME CORRETO
+                      moduleId={0} // AINDA NÃO SEI CODIGO CORRETO
+                    />
                 )}
               </TabPanel>
             </Box>
@@ -1070,8 +1056,7 @@ export default function Import({
                 data={logs}
                 options={{
                   showTitle: false,
-                  maxBodyHeight: `calc(100vh - ${
-                    statusAccordionFilter ? 488 : 346
+                  maxBodyHeight: `calc(100vh - ${statusAccordionFilter ? 488 : 346
                   }px)`,
                   headerStyle: {
                     zIndex: 1,
@@ -1194,18 +1179,26 @@ export default function Import({
                   ),
                   Pagination: (props) => (
                     <div
-                      className="flex h-20 gap-2 pr-2 py-5 bg-gray-50"
+                      className="flex
+                      h-20
+                      gap-2
+                      pr-2
+                      py-5
+                      bg-gray-50
+                    "
                       {...props}
                     >
                       <Button
-                        onClick={() => setCurrentPage(0)}
+                        onClick={() => handlePagination(0)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdFirstPage size={18} />}
                         disabled={currentPage < 1}
                       />
                       <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
+                        onClick={() => {
+                          handlePagination(currentPage - 1);
+                        }}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiLeftArrow size={15} />}
@@ -1216,7 +1209,7 @@ export default function Import({
                         .map((value, index) => (
                           <Button
                             key={index}
-                            onClick={() => setCurrentPage(index)}
+                            onClick={() => handlePagination(index)}
                             value={`${currentPage + 1}`}
                             bgColor="bg-blue-600"
                             textColor="white"
@@ -1224,14 +1217,14 @@ export default function Import({
                           />
                         ))}
                       <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
+                        onClick={() => handlePagination(currentPage + 1)}
+                        bgColor="bg-blue-600 RR"
                         textColor="white"
                         icon={<BiRightArrow size={15} />}
                         disabled={currentPage + 1 >= pages}
                       />
                       <Button
-                        onClick={() => setCurrentPage(pages)}
+                        onClick={() => handlePagination(pages - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdLastPage size={18} />}

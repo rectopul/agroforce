@@ -4,6 +4,7 @@ import { LoteRepository } from '../repository/lote.repository';
 import { GenotipoController } from './genotype/genotipo.controller';
 import { countLotesNumber } from '../shared/utils/counts';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
+import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class LoteController {
   loteRepository = new LoteRepository();
@@ -60,11 +61,16 @@ export class LoteController {
   }
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: lote.controller.ts:63 ~ LoteController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any = '';
     parameters.AND = [];
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const sheet = await createXls(options, 'TMG-LOTE');
+        return { status: 200, response: sheet };
+      }
       if (options.filterYearFrom || options.filterYearTo) {
         if (options.filterYearFrom && options.filterYearTo) {
           parameters.year = JSON.parse(`{"gte": ${Number(options.filterYearFrom)}, "lte": ${Number(options.filterYearTo)} }`);

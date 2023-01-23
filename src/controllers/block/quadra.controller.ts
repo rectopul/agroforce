@@ -3,6 +3,7 @@ import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { QuadraRepository } from '../../repository/quadra.repository';
 import { ReporteRepository } from '../../repository/reporte.repository';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
+import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class QuadraController {
   quadraRepository = new QuadraRepository();
@@ -15,6 +16,10 @@ export class QuadraController {
     let select: any = [];
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const {status, sheet} = await createXls(options, options.fileNumber == 1 ? 'QUADRAS-EXCEL' : options.fileNumber == 2 ? 'QUADRAS-EXCEL_SINTETICO' : 'QUADRAS-EXCEL_ANALYTICS');
+        return { status: status, response: sheet };
+      }
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }

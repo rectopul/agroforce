@@ -4,6 +4,7 @@ import handleError from '../../shared/utils/handleError';
 import { GenotypeTreatmentRepository } from '../../repository/genotype-treatment/genotype-treatment.repository';
 import { countTreatmentsNumber } from '../../shared/utils/counts';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
+import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class GenotypeTreatmentController {
   genotypeTreatmentRepository = new GenotypeTreatmentRepository();
@@ -15,6 +16,10 @@ export class GenotypeTreatmentController {
     parameters.OR = [];
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const sheet = await createXls(options, 'ENSAIO-GENOTIPE');
+        return { status: 200, response: sheet };
+      }
       if (options.filterStatus) {
         const statusParams = options.filterStatus?.split(',');
         parameters.OR.push(JSON.parse(`{ "assay_list": {"status": {"equals": "${statusParams[0]}" } } }`));

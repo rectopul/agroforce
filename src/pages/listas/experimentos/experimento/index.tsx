@@ -286,10 +286,8 @@ export default function Listagem({
     setCookies('filterBeforeEditTypeOrder', typeOrder);
     setCookies('filterBeforeEditOrderBy', orderBy);
 
-    parametersFilter = `${parametersFilter}&skip=${
-      page * Number(take)
-    }&take=${take}&orderBy=${
-      orderBy === 'tecnologia' ? 'assay_list.tecnologia.cod_tec' : orderBy
+    parametersFilter = `${parametersFilter}&skip=${page * Number(take)
+    }&take=${take}&orderBy=${orderBy === 'tecnologia' ? 'assay_list.tecnologia.cod_tec' : orderBy
     }&typeOrder=${typeOrder}`;
 
     setFiltersParams(parametersFilter);
@@ -329,37 +327,6 @@ export default function Listagem({
     order: string | any,
     name: any,
   ): Promise<void> {
-    // // Manage orders of colunms
-    // const parametersFilter = await fetchWrapper.handleOrderGlobal(
-    //   column,
-    //   order,
-    //   filter,
-    //   'experimento',
-    // );
-
-    // setOrderParams(parametersFilter);
-
-    // const value = await fetchWrapper.skip(currentPage, parametersFilter);
-
-    // await experimentService.getAll(value).then(({ status, response }: any) => {
-    //   if (status === 200) {
-    //     setExperimento(response);
-    //     setFiltersParams(parametersFilter);
-    //   }
-    // });
-
-    // if (orderList === 2) {
-    //   setOrder(0);
-    //   setArrowOrder(<AiOutlineArrowDown />);
-    // } else {
-    //   setOrder(orderList + 1);
-    //   if (orderList === 1) {
-    //     setArrowOrder(<AiOutlineArrowUp />);
-    //   } else {
-    //     setArrowOrder('');
-    //   }
-    // }
-
     // Gobal manage orders
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
@@ -368,6 +335,7 @@ export default function Listagem({
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
+    // eslint-disable-next-line no-unused-expressions, no-nested-ternary
     typeOrderG !== '' ? (typeOrderG == 'desc' ? setOrder(1) : setOrder(2)) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
@@ -375,66 +343,6 @@ export default function Listagem({
       setLoading(false);
     }, 100);
   }
-
-  // function headerTableFactory(name: any, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: true,
-  //   };
-  // }
-
-  // function idHeaderFactory() {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         {arrowOrder}
-  //       </div>
-  //     ),
-  //     field: 'id',
-  //     width: 0,
-  //     sorting: false,
-  //     render: () => (
-  //       colorStar === '#eba417'
-  //         ? (
-  //           <div className="h-7 flex">
-  //             <div>
-  //               <button
-  //                 type="button"
-  //                 className="w-full h-full flex items-center justify-center border-0"
-  //                 onClick={() => setColorStar('')}
-  //               >
-  //                 <AiTwotoneStar size={20} color="#eba417" />
-  //               </button>
-  //             </div>
-  //           </div>
-  //         )
-  //         : (
-  //           <div className="h-7 flex">
-  //             <div>
-  //               <button
-  //                 type="button"
-  //                 className="w-full h-full flex items-center justify-center border-0"
-  //                 onClick={() => setColorStar('#eba417')}
-  //               >
-  //                 <AiTwotoneStar size={20} />
-  //               </button>
-  //             </div>
-  //           </div>
-  //         )
-  //     ),
-  //   };
-  // }
 
   async function deleteConfirmItem(item: any) {
     setItemSelectedDelete(item);
@@ -685,61 +593,17 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+
     await experimentService
-      .getAll(`${filter}&excel=${true}`)
+      .getAll(`${filterParam}&excel=${true}`)
       .then(({ status, response, message }: any) => {
         if (status === 200) {
-          response.map((item: any) => {
-            const newItem = item;
-            newItem.CULTURA = item.assay_list?.safra?.culture?.name;
-            newItem.SAFRA = item.assay_list?.safra?.safraName;
-            newItem.FOCO = item.assay_list?.foco.name;
-            newItem.TIPO_DE_ENSAIO = item.assay_list?.type_assay.name;
-            newItem.TECNOLOGIA = `${item.assay_list?.tecnologia.cod_tec} ${item.assay_list?.tecnologia.name}`;
-            newItem.GLI = item.assay_list?.gli;
-            newItem.NOME_DO_EXPERIMENTO = item?.experimentName;
-            newItem.BGM = item.assay_list?.bgm;
-            newItem.STATUS_ENSAIO = item.assay_list?.status;
-            newItem.PLANTIO = newItem.local?.name_local_culture;
-            newItem.DELINEAMENTO = item.delineamento?.name;
-            newItem.DENSIDADE = item?.density;
-            newItem.REP = item.repetitionsNumber;
-            newItem.ÉPOCA = item?.period;
-            newItem.ORDEM_SORTEIO = item?.orderDraw;
-            newItem.NLP = item?.nlp;
-            newItem.CLP = item?.clp;
-            newItem.OBSERVAÇÕES = item?.comments;
-            newItem.COUNT_NT = newItem.countNT;
-            newItem.NPE_QT = newItem.npeQT;
-
-            delete newItem.id;
-            delete newItem.safra;
-            delete newItem.experiment_genotipe;
-            delete newItem.seq_delineamento;
-            delete newItem.experimentGroupId;
-            delete newItem.countNT;
-            delete newItem.npeQT;
-            delete newItem.local;
-            delete newItem.delineamento;
-            delete newItem.eel;
-            delete newItem.clp;
-            delete newItem.nlp;
-            delete newItem.orderDraw;
-            delete newItem.comments;
-            delete newItem.period;
-            delete newItem.repetitionsNumber;
-            delete newItem.density;
-            delete newItem.status;
-            delete newItem.experimentName;
-            delete newItem.type_assay;
-            delete newItem.idSafra;
-            delete newItem.assay_list;
-            return newItem;
-          });
-
-          const workSheet = XLSX.utils.json_to_sheet(response);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'experimentos');
+          XLSX.utils.book_append_sheet(workBook, response, 'experimentos');
 
           // Buffer
           XLSX.write(workBook, {
@@ -950,7 +814,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -970,8 +834,7 @@ export default function Listagem({
               data={experimentos}
               options={{
                 showTitle: false,
-                maxBodyHeight: `calc(100vh - ${
-                  statusAccordionFilter ? 460 : 320
+                maxBodyHeight: `calc(100vh - ${statusAccordionFilter ? 460 : 320
                 }px)`,
                 headerStyle: {
                   zIndex: 1,
@@ -1143,7 +1006,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

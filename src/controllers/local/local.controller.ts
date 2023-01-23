@@ -1,6 +1,7 @@
 import handleError from '../../shared/utils/handleError';
 import { LocalRepository } from '../../repository/local.repository';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
+import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class LocalController {
   localRepository = new LocalRepository();
@@ -10,6 +11,11 @@ export class LocalController {
     let select: any = [];
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const sheet = await createXls(options, 'LOCAL-LUGAR_CULTURA');
+        return { status: 200, response: sheet };
+      }
+
       if (options.filterNameLocalCulture) {
         parameters.name_local_culture = JSON.parse(`{ "contains":"${options.filterNameLocalCulture}" }`);
       }

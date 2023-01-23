@@ -467,32 +467,21 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
+
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+
     if (!filterApplication.includes("paramSelect")) {
       filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
-    await departmentService.getAll(filter).then((response) => {
-      if (response.status === 200) {
-        const newData = response.response.map((row: any) => {
-          if (row.status === 0) {
-            row.status = "Inativo" as any;
-          } else {
-            row.status = "Ativo" as any;
-          }
-          row.NOME = row.name;
-          row.STATUS = row.status;
+    await departmentService.getAll(filterParam).then(({ status, response }) => {
+      if (status === 200) {
 
-          delete row.name;
-          delete row.status;
-          delete row.id;
-          delete row.tableData;
-
-          return row;
-        });
-
-        const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "setores");
+        XLSX.utils.book_append_sheet(workBook, response, "setores");
 
         // Buffer
         const buf = XLSX.write(workBook, {
