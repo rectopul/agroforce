@@ -4,6 +4,7 @@ import { TypeAssayRepository } from '../repository/tipo-ensaio.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
+import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class TypeAssayController {
   typeAssayRepository = new TypeAssayRepository();
@@ -16,6 +17,11 @@ export class TypeAssayController {
     parameters.AND = [];
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const sheet = await createXls(options, 'ENSAIO-TIPO_DE_ENSAIO');
+        return { status: 200, response: sheet };
+      }
+
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
       }

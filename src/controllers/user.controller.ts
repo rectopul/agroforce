@@ -6,6 +6,7 @@ import { UserCultureController } from './user-culture.controller';
 import { UserPermissionController } from './user-permission.controller';
 import { ReporteRepository } from '../repository/reporte.repository';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
+import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class UserController {
   userRepository = new UserRepository();
@@ -26,6 +27,11 @@ export class UserController {
     let select: any = [];
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const sheet = await createXls(options, 'TMG-USUARIO');
+        return { status: 200, response: sheet };
+      }
+
       if (options.filterStatus) {
         if (options.filterStatus != 2) parameters.status = Number(options.filterStatus);
       }

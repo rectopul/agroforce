@@ -4,6 +4,7 @@ import { UnidadeCulturaRepository } from '../../repository/unidade-cultura.repos
 import { IReturnObject } from '../../interfaces/shared/Import.interface';
 import { SafraController } from '../safra.controller';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
+import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class UnidadeCulturaController {
   public readonly required = 'Campo obrigatório';
@@ -18,6 +19,11 @@ export class UnidadeCulturaController {
     let orderBy: object | any;
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const sheet = await createXls(options, 'LOCAL-UNIDADE-CULTURA');
+        return { status: 200, response: sheet };
+      }
+
       if (options.filterNameUnityCulture) {
         parameters.name_unity_culture = JSON.parse(`{ "contains": "${options.filterNameUnityCulture}" }`);
       }

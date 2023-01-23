@@ -5,6 +5,7 @@ import { CulturaRepository } from '../repository/culture.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
 import handleError from '../shared/utils/handleError';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
+import createXls from '../helpers/api/xlsx-global-download';
 
 interface CultureDTO {
   id: number;
@@ -34,6 +35,11 @@ export class CulturaController {
     let select: any = [];
 
     try {
+      if(options.createFile) {
+        const sheet = await createXls(options, 'TMG-CULTURA');
+        return { status: 200, response: sheet };
+      }
+
       if (options.filterStatus) {
         if (options.filterStatus !== '2') { parameters.status = Number(options.filterStatus); }
       }

@@ -2,6 +2,7 @@ import { SafraRepository } from '../repository/safra.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
 import handleError from '../shared/utils/handleError';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
+import createXls from 'src/helpers/api/xlsx-global-download';
 
 interface Safra {
   id: number;
@@ -28,6 +29,11 @@ export class SafraController {
     const parameters: object | any = {};
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const sheet = await createXls(options, 'TMG-SAFRA');
+        return { status: 200, response: sheet };
+      }
+
       if (options.filterStatus) {
         if (options.filterStatus != '2') {
           parameters.status = Number(options.filterStatus);

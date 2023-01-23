@@ -517,29 +517,34 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    
     setLoading(true);
-    await cultureService.getAll(filter).then(({ status, response }) => {
+
+    const skip = 0;
+    const take = 10;
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+    
+    await cultureService.getAll(filterParam).then(({ status, response }) => {
       if (status === 200) {
-        const newData = response.map((row: any) => {
-          if (row.status === 0) {
-            row.status = "Inativo" as any;
-          } else {
-            row.status = "Ativo" as any;
-          }
-          row.COD_REDUZIDO = row.name;
-          row.NOME = row.desc;
-          row.STATUS = row.status;
+        // const newData = response.map((row: any) => {
+        //   if (row.status === 0) {
+        //     row.status = "Inativo" as any;
+        //   } else {
+        //     row.status = "Ativo" as any;
+        //   }
+        //   row.COD_REDUZIDO = row.name;
+        //   row.NOME = row.desc;
+        //   row.STATUS = row.status;
 
-          delete row.desc;
-          delete row.status;
-          delete row.name;
-          delete row.id;
-          return row;
-        });
+        //   delete row.desc;
+        //   delete row.status;
+        //   delete row.name;
+        //   delete row.id;
+        //   return row;
+        // });
 
-        const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "cultures");
+        XLSX.utils.book_append_sheet(workBook, response, "cultures");
 
         // Buffer
         XLSX.write(workBook, {

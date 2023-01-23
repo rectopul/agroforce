@@ -2,6 +2,7 @@ import { DelineamentoRepository } from '../../repository/delineamento.repository
 import { ReporteRepository } from '../../repository/reporte.repository';
 import handleError from '../../shared/utils/handleError';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
+import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class DelineamentoController {
   Repository = new DelineamentoRepository();
@@ -13,6 +14,10 @@ export class DelineamentoController {
 
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const sheet = await createXls(options, 'DELINEAMENTO');
+        return { status: 200, response: sheet };
+      }
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
         if (options.filterRepetitionFrom && options.filterRepetitionTo) {
           parameters.repeticao = JSON.parse(`{"gte": ${Number(options.filterRepetitionFrom)}, "lte": ${Number(options.filterRepetitionTo)} }`);

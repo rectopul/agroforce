@@ -93,17 +93,17 @@ interface IData {
 }
 
 export default function Listagem({
-  allCultureUnity,
-  totalItems,
-  idSafra,
-  itensPerPage,
-  filterApplication,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer,
-  orderByserver,
-  cultureId,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allCultureUnity,
+      totalItems,
+      idSafra,
+      itensPerPage,
+      filterApplication,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      typeOrderServer,
+      orderByserver,
+      cultureId,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tableRef = useRef<any>(null);
@@ -580,6 +580,7 @@ export default function Listagem({
 
   function handleOnDragEnd(result: DropResult) {
     setStatusAccordion(true);
+
     if (!result) return;
 
     const items = Array.from(generatesProps);
@@ -592,95 +593,16 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    await unidadeCulturaService.getAll(filter).then(({ status, response }) => {
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+
+    await unidadeCulturaService.getAll(filterParam).then(({ status, response }) => {
       if (status === 200) {
-        const newData = response.map((row: any) => {
-          const newRow = row;
-          // const dataExp = new Date();
-          // let hours: string;
-          // let minutes: string;
-          // let seconds: string;
-          // if (String(dataExp.getHours()).length === 1) {
-          //   hours = `0${String(dataExp.getHours())}`;
-          // } else {
-          //   hours = String(dataExp.getHours());
-          // }
-          // if (String(dataExp.getMinutes()).length === 1) {
-          //   minutes = `0${String(dataExp.getMinutes())}`;
-          // } else {
-          //   minutes = String(dataExp.getMinutes());
-          // }
-          // if (String(dataExp.getSeconds()).length === 1) {
-          //   seconds = `0${String(dataExp.getSeconds())}`;
-          // } else {
-          //   seconds = String(dataExp.getSeconds());
-          // }
-          // newRow.DT = `${dataExp.toLocaleDateString(
-          //   'pt-BR',
-          // )} ${hours}:${minutes}:${seconds}`;
-
-          // let dtHours: string;
-          // let dtMinutes: string;
-          // let dtSeconds: string;
-
-          // if (String(newRow.dt_export.getHours()).length === 1) {
-          //   dtHours = `0${String(newRow.dt_export.getHours())}`;
-          // } else {
-          //   dtHours = String(newRow.dt_export.getHours());
-          // }
-          // if (String(newRow.dt_export.getMinutes()).length === 1) {
-          //   dtMinutes = `0${String(newRow.dt_export.getMinutes())}`;
-          // } else {
-          //   dtMinutes = String(newRow.dt_export.getMinutes());
-          // }
-          // if (String(newRow.dt_export.getSeconds()).length === 1) {
-          //   dtSeconds = `0${String(newRow.dt_export.getSeconds())}`;
-          // } else {
-          //   dtSeconds = String(newRow.dt_export.getSeconds());
-          // }
-
-          // newRow.EXPORT = `${newRow.dt_export.toLocaleDateString(
-          //   'pt-BR',
-          // )} ${dtHours}:${dtMinutes}:${dtSeconds}`;
-
-          newRow.dt_export = new Date(newRow.dt_export);
-          newRow.dt_export = new Date(
-            newRow.dt_export.toISOString().slice(0, -1)
-          );
-
-          newRow.dt_export = moment(newRow.dt_export).format(
-            "DD-MM-YYYY HH:mm:ss"
-          );
-          const timeExport = moment().format("DD-MM-YYYY HH:mm:ss");
-
-          newRow.NOME_UNIDADE_CULTURA = newRow?.name_unity_culture;
-          newRow.ANO = newRow?.year;
-          newRow.NOME_LUGAR_CULTURA = newRow.local?.name_local_culture;
-          newRow.RÓTULO = newRow.local?.label;
-          newRow.MLOC = newRow.local?.mloc;
-          newRow.FAZENDA = newRow.local?.adress;
-          newRow.PAÍS = newRow.local?.label_country;
-          newRow.REGIÃO = newRow.local?.label_region;
-          newRow.LOCALIDADE = newRow.local?.name_locality;
-          newRow.DT_GOM = timeExport;
-          newRow.DT_EXPORT = newRow.dt_export;
-
-          delete newRow.year;
-          delete newRow.name_unity_culture;
-          delete newRow.DT;
-          delete newRow.id_safra;
-          delete newRow.id;
-          // delete newRow.EXPORT;
-          delete newRow.dt_export;
-          delete newRow.id_unity_culture;
-          delete newRow.id_local;
-          delete newRow.local;
-          return newRow;
-        });
-
-        const workSheet = XLSX.utils.json_to_sheet(newData);
+        
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "unidade-cultura");
+        XLSX.utils.book_append_sheet(workBook, response, "unidade-cultura");
 
         // buffer
         XLSX.write(workBook, {

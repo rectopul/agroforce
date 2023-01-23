@@ -77,17 +77,17 @@ interface Idata {
 }
 
 export default function Listagem({
-  allItems,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  idCulture,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer,
-  orderByserver,
-  safraId,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allItems,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      idCulture,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      typeOrderServer,
+      orderByserver,
+      safraId,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState<boolean>(false);
   const { TabsDropDowns } = ITabs.default;
 
@@ -451,58 +451,16 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    await tecnologiaService.getAll(filter).then(({ status, response }) => {
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+
+    await tecnologiaService.getAll(filterParam).then(({ status, response }) => {
       if (status === 200) {
-        const newData = response.map((row: any) => {
-          // const dataExp = new Date();
-          // let hours: string;
-          // let minutes: string;
-          // let seconds: string;
-          // if (String(dataExp.getHours()).length === 1) {
-          //   hours = `0${String(dataExp.getHours())}`;
-          // } else {
-          //   hours = String(dataExp.getHours());
-          // }
-          // if (String(dataExp.getMinutes()).length === 1) {
-          //   minutes = `0${String(dataExp.getMinutes())}`;
-          // } else {
-          //   minutes = String(dataExp.getMinutes());
-          // }
-          // if (String(dataExp.getSeconds()).length === 1) {
-          //   seconds = `0${String(dataExp.getSeconds())}`;
-          // } else {
-          //   seconds = String(dataExp.getSeconds());
-          // }
-          // row.DT = `${dataExp.toLocaleDateString(
-          //   'pt-BR',
-          // )} ${hours}:${minutes}:${seconds}`;
-
-          row.dt_export = new Date(row.dt_export);
-          row.dt_export = new Date(row.dt_export.toISOString().slice(0, -1));
-
-          row.dt_export = moment(row.dt_export).format("DD-MM-YYYY HH:mm:ss");
-          const timeExport = moment().format("DD-MM-YYYY HH:mm:ss");
-
-          row.CULTURA = row.culture.desc;
-          row.NOME = row.name;
-          row.DESC = row.desc;
-          row.COD_TEC = row.cod_tec;
-          row.DT_GOM = timeExport;
-          row.DT_EXPORT = row.dt_export;
-
-          delete row.culture;
-          delete row.id;
-          delete row.dt_export;
-          delete row.name;
-          delete row.desc;
-          delete row.cod_tec;
-          delete row.DT;
-
-          return row;
-        });
-        const workSheet = XLSX.utils.json_to_sheet(newData);
+        
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "Tecnologias");
+        XLSX.utils.book_append_sheet(workBook, response, "Tecnologias");
 
         // Buffer
         XLSX.write(workBook, {

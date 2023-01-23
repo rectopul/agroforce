@@ -79,15 +79,15 @@ interface IData {
 }
 
 export default function Listagem({
-  allUsers,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer, // RR
-  orderByserver, // RR
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allUsers,
+      itensPerPage,
+      filterApplication,
+      totalItems,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      typeOrderServer, // RR
+      orderByserver, // RR
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tableRef = useRef<any>(null);
@@ -614,12 +614,17 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    if (!filterApplication.includes("paramSelect")) {
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+
+    if (!filterApplication.includes('paramSelect')) {
       // filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
-    await userService.getAll(filter).then((response) => {
-      if (response.status === 200) {
+    await userService.getAll(filterParam).then(({ status, response }) => {
+      if (status === 200) {
         /* const newData = users.map((row: { avatar: any; status: any }) => {
           delete row.avatar;
           if (row.status === 0) {
@@ -629,37 +634,13 @@ export default function Listagem({
           }
           return row;
         }); */
+        
 
-        const dataExcel: any = response.response;
-        dataExcel.forEach((line: any) => {
-          if (line.status === 0) {
-            line.status = "Inativo";
-          } else {
-            line.status = "Ativo";
-          }
-
-          line.LOGIN = line.login;
-          line.NOME = line.name;
-          line.TEL = line.tel;
-          line.STATUS = line.status;
-          line.CPF = line.cpf;
-
-          delete line.avatar;
-          delete line.id;
-          delete line.email;
-          delete line.name;
-          delete line.tel;
-          delete line.login;
-          delete line.cpf;
-          delete line.status;
-        });
-
-        const workSheet = XLSX.utils.json_to_sheet(dataExcel);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "usuarios");
+        XLSX.utils.book_append_sheet(workBook, response, 'usuarios');
 
         // Buffer
-        const buf = XLSX.write(workBook, {
+        XLSX.write(workBook, {
           bookType: "xlsx", // xlsx || csv
           type: "buffer",
         });

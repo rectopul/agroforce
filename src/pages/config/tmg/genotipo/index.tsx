@@ -752,92 +752,17 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    await genotipoService.getAll(filter).then(({ response, status }) => {
+
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+
+    await genotipoService.getAll(filterParam).then(({ response, status }) => {
       if (status === 200) {
-        const newData = response.map((row: any) => {
-          const dataExp = new Date();
-          let hours: string;
-          let minutes: string;
-          let seconds: string;
-          if (String(dataExp.getHours()).length === 1) {
-            hours = `0${String(dataExp.getHours())}`;
-          } else {
-            hours = String(dataExp.getHours());
-          }
-          if (String(dataExp.getMinutes()).length === 1) {
-            minutes = `0${String(dataExp.getMinutes())}`;
-          } else {
-            minutes = String(dataExp.getMinutes());
-          }
-          if (String(dataExp.getSeconds()).length === 1) {
-            seconds = `0${String(dataExp.getSeconds())}`;
-          } else {
-            seconds = String(dataExp.getSeconds());
-          }
-          row.DT = `${dataExp.toLocaleDateString(
-            "pt-BR"
-          )} ${hours}:${minutes}:${seconds}`;
-
-          row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.name}`;
-
-          row.CULTURA = row.culture.desc;
-          row.NOME_GENÓTIPO = row.name_genotipo;
-          row.NOME_PRINCIPAL = row.name_main;
-          row.NOME_PÚBLICO = row.name_public;
-          row.NOME_EXPERIMENTAL = row.name_experiment;
-          row.NOME_ALTERNATIVO = row.name_alter;
-          row.ELITE_NOME = row.elit_name;
-          row.TECNOLOGIA = row.tecnologia;
-          row.N_DE_LOTES = row.numberLotes;
-          row.TIPO = row.type;
-          row.GMR = row.gmr;
-          row.BGM = row.bgm;
-          row.CRUZA = row.cruza;
-          row.PROGENITOR_F_DIRETO = row.progenitor_f_direto;
-          row.PROGENITOR_M_DIRETO = row.progenitor_m_direto;
-          row.PROGENITOR_F_ORIGEM = row.progenitor_f_origem;
-          row.PROGENITOR_M_ORIGEM = row.progenitor_m_origem;
-          row.PROGENITORES_ORIGEM = row.progenitores_origem;
-          row.PARENTESCO_COMPLETO = row.parentesco_completo;
-          row.DATA = row.DT;
-
-          delete row.culture;
-          delete row.id_s1;
-          delete row.name_main;
-          delete row.id_dados;
-          delete row.name_genotipo;
-          delete row.name_public;
-          delete row.name_experiment;
-          delete row.name_alter;
-          delete row.elit_name;
-          delete row.tecnologia;
-          delete row.numberLotes;
-          delete row.type;
-          delete row.gmr;
-          delete row.bgm;
-          delete row.cruza;
-          delete row.progenitor_f_direto;
-          delete row.progenitor_m_direto;
-          delete row.progenitor_f_origem;
-          delete row.progenitor_m_origem;
-          delete row.progenitores_origem;
-          delete row.parentesco_completo;
-          delete row.DT;
-          delete row.id;
-          delete row.id_tecnologia;
-          delete row.tableData;
-          delete row.lote;
-          delete row.dt_export;
-
-          // row.DT = new Date();
-
-          return row;
-        });
-
-        const workSheet = XLSX.utils.json_to_sheet(newData);
 
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "Genótipos");
+        XLSX.utils.book_append_sheet(workBook, response, "Genótipos");
 
         // Buffer
         XLSX.write(workBook, {
