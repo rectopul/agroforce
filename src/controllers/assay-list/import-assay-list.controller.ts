@@ -96,34 +96,41 @@ export class ImportAssayListController {
       spreadSheet.unshift(header);
       for (const row in spreadSheet) {
         if (row !== '0') {
-          if (spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]
-          || (spreadSheet.length - 1) === Number(row)) {
-            if ((spreadSheet.length - 1) === Number(row)) {
+          if (spreadSheet.length > 2) {
+            if (spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]
+            || (spreadSheet.length - 1) === Number(row)) {
+              if ((spreadSheet.length - 1) === Number(row)) {
+                validateAll.FOCO.push(spreadSheet[row][2]);
+                validateAll.ENSAIO.push(spreadSheet[row][3]);
+                validateAll.TECNOLOGIA.push(spreadSheet[row][5]);
+                validateAll.BGM.push(spreadSheet[row][6]);
+              }
+              for (const property in validateAll) {
+                const result = allEqual(validateAll[property]);
+                if (!result) {
+                  responseIfError[Number(0)]
+                  += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo GLI(${spreadSheet[row][4]}) devem ser iguais. </li> <br>`;
+                }
+              }
+              validateAll = {
+                FOCO: [],
+                ENSAIO: [],
+                TECNOLOGIA: [],
+                BGM: [],
+                PROJETO: [],
+              };
               validateAll.FOCO.push(spreadSheet[row][2]);
               validateAll.ENSAIO.push(spreadSheet[row][3]);
               validateAll.TECNOLOGIA.push(spreadSheet[row][5]);
               validateAll.BGM.push(spreadSheet[row][6]);
+              validateAll.PROJETO.push(spreadSheet[row][7]);
+            } else {
+              validateAll.FOCO.push(spreadSheet[row][2]);
+              validateAll.ENSAIO.push(spreadSheet[row][3]);
+              validateAll.TECNOLOGIA.push(spreadSheet[row][5]);
+              validateAll.BGM.push(spreadSheet[row][6]);
+              validateAll.PROJETO.push(spreadSheet[row][7]);
             }
-            for (const property in validateAll) {
-              const result = allEqual(validateAll[property]);
-              if (!result) {
-                responseIfError[Number(0)]
-                += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo GLI(${spreadSheet[row][4]}) devem ser iguais. </li> <br>`;
-              }
-            }
-            validateAll = {
-              FOCO: [],
-              ENSAIO: [],
-              TECNOLOGIA: [],
-              BGM: [],
-              PROJETO: [],
-            };
-          } else {
-            validateAll.FOCO.push(spreadSheet[row][2]);
-            validateAll.ENSAIO.push(spreadSheet[row][3]);
-            validateAll.TECNOLOGIA.push(spreadSheet[row][5]);
-            validateAll.BGM.push(spreadSheet[row][6]);
-            validateAll.PROJETO.push(spreadSheet[row][7]);
           }
           for (const column in spreadSheet[row]) {
             // Validação do campo Cultura

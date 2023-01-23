@@ -79,9 +79,39 @@ export class ImportLocalController {
       configModule.response[0]?.fields.push('DT');
       for (const row in spreadSheet) {
         if (row !== '0') {
-          if (spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]
-          || (spreadSheet.length - 1) === Number(row)) {
-            if ((spreadSheet.length - 1) === Number(row)) {
+          if (spreadSheet.length > 2) {
+            if (spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]
+            || (spreadSheet.length - 1) === Number(row)) {
+              if ((spreadSheet.length - 1) === Number(row)) {
+                validateAll.ROTULO.push(spreadSheet[row][5]);
+                validateAll.MLOC.push(spreadSheet[row][6]);
+                validateAll.ENDERECO.push(spreadSheet[row][7]);
+                validateAll.LOCALIDADE.push(spreadSheet[row][9]);
+                validateAll.REGIAO.push(spreadSheet[row][11]);
+                validateAll.PAIS.push(spreadSheet[row][14]);
+              }
+              for (const property in validateAll) {
+                const result = allEqual(validateAll[property]);
+                if (!result) {
+                  responseIfError[Number(0)]
+                  += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo Nome do Lugar de Cultura(${spreadSheet[row][4]}) devem ser iguais. </li> <br>`;
+                }
+              }
+              validateAll = {
+                ROTULO: [],
+                MLOC: [],
+                ENDERECO: [],
+                LOCALIDADE: [],
+                REGIAO: [],
+                PAIS: [],
+              };
+              validateAll.ROTULO.push(spreadSheet[row][5]);
+              validateAll.MLOC.push(spreadSheet[row][6]);
+              validateAll.ENDERECO.push(spreadSheet[row][7]);
+              validateAll.LOCALIDADE.push(spreadSheet[row][9]);
+              validateAll.REGIAO.push(spreadSheet[row][11]);
+              validateAll.PAIS.push(spreadSheet[row][14]);
+            } else {
               validateAll.ROTULO.push(spreadSheet[row][5]);
               validateAll.MLOC.push(spreadSheet[row][6]);
               validateAll.ENDERECO.push(spreadSheet[row][7]);
@@ -89,28 +119,6 @@ export class ImportLocalController {
               validateAll.REGIAO.push(spreadSheet[row][11]);
               validateAll.PAIS.push(spreadSheet[row][14]);
             }
-            for (const property in validateAll) {
-              const result = allEqual(validateAll[property]);
-              if (!result) {
-                responseIfError[Number(0)]
-                += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo Nome do Lugar de Cultura(${spreadSheet[row][4]}) devem ser iguais. </li> <br>`;
-              }
-            }
-            validateAll = {
-              ROTULO: [],
-              MLOC: [],
-              ENDERECO: [],
-              LOCALIDADE: [],
-              REGIAO: [],
-              PAIS: [],
-            };
-          } else {
-            validateAll.ROTULO.push(spreadSheet[row][5]);
-            validateAll.MLOC.push(spreadSheet[row][6]);
-            validateAll.ENDERECO.push(spreadSheet[row][7]);
-            validateAll.LOCALIDADE.push(spreadSheet[row][9]);
-            validateAll.REGIAO.push(spreadSheet[row][11]);
-            validateAll.PAIS.push(spreadSheet[row][14]);
           }
         }
         if (localTemp?.includes(spreadSheet[row][2])) {

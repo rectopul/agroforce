@@ -505,7 +505,7 @@ export default function Listagem({
   // }
 
   function formatDecimal(num: number) {
-    return Number(num).toFixed(1);
+    return num ? Number(num).toFixed(1) : '';
   }
 
   function orderColumns(columnsOrder: string): Array<object> {

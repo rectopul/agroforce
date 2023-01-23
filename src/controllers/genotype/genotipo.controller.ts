@@ -1,9 +1,9 @@
+import createXls from 'src/helpers/api/xlsx-global-download';
 import handleError from '../../shared/utils/handleError';
 import { GenotipoRepository } from '../../repository/genotipo.repository';
 import { functionsUtils } from '../../shared/utils/functionsUtils';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
-import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class GenotipoController {
   genotipoRepository = new GenotipoRepository();
@@ -153,6 +153,13 @@ export class GenotipoController {
         skip,
         orderBy,
       );
+
+      response.map((genotipo: any) => {
+        const dts = genotipo.lote.map((lote: any) => lote.dt_export);
+        const maxDt = Math.max(...dts);
+        genotipo.dt_export = new Date(maxDt);
+      });
+      console.log('🚀 ~ file: genotipo.controller.ts:160 ~ GenotipoController ~ response.map ~ response', response);
 
       if (!response || response.total <= 0) {
         return {

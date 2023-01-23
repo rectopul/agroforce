@@ -2,8 +2,15 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { DepartamentController } from '../../../controllers/departament.controller';
 import { apiHandler } from '../../../helpers/api';
 
-export default apiHandler(handler);
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '8mb',
+    },
+  },
+};
 
+export default apiHandler(handler);
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const departamentController = new DepartamentController();
   const { id } = req.query;

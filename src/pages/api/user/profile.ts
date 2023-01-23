@@ -2,8 +2,15 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { ProfileController } from 'src/controllers/profile.controller';
 import { apiHandler } from '../../../helpers/api';
 
-export default apiHandler(handler);
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '8mb',
+    },
+  },
+};
 
+export default apiHandler(handler);
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const Controller = new ProfileController();
   switch (req.method) {

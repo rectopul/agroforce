@@ -80,14 +80,14 @@ interface TabPanelProps {
 }
 
 export default function Import({
-      allLogs,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      uploadInProcess,
-      idSafra,
-      idCulture,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allLogs,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  uploadInProcess,
+  idSafra,
+  idCulture,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const router = useRouter();
@@ -130,7 +130,7 @@ export default function Import({
               filePath,
             });
             setImportLoading(false);
-            handlePagination();
+            handlePagination(currentPage);
             Swal.fire({
               html: message,
               width: '800',
@@ -148,7 +148,7 @@ export default function Import({
               filePath,
             });
             setImportLoading(false);
-            handlePagination();
+            handlePagination(currentPage);
             Swal.fire({
               html: message,
               width: '800',
@@ -256,7 +256,7 @@ export default function Import({
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
 
   const pathExtra = `skip=${currentPage * Number(take)
-    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
   const pages = Math.ceil(total / take);
   const formik = useFormik<any>({
@@ -284,7 +284,7 @@ export default function Import({
       setFilter(parametersFilter);
 
       setLoading(true);
-      await getAllLogs(`${parametersFilter}`);
+      await getAllLogs(`${parametersFilter}`, currentPage);
       setTimeout(() => {
         setLoading(false);
       }, 1000);
@@ -292,8 +292,12 @@ export default function Import({
     },
   });
 
-  async function getAllLogs(parametersFilter: any) {
-    parametersFilter = `${parametersFilter}`;
+  async function getAllLogs(parametersFilter: any, newPage: any) {
+    setCurrentPage(newPage);
+
+    parametersFilter = `${parametersFilter}&skip=${
+      newPage * Number(take)
+    }&take=${take}`;
 
     await logImportService
       .getAll(parametersFilter)
@@ -308,7 +312,7 @@ export default function Import({
 
   // Call that function when change type order value.
   useEffect(() => {
-    getAllLogs(filter);
+    getAllLogs(filter, currentPage);
   }, [typeOrder]);
 
   // async function handleOrder(
@@ -649,7 +653,6 @@ export default function Import({
 
     await logImportService.getAll(filterParam).then(({ status, response }) => {
       if (status === 200) {
-
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, response, 'logs');
 
@@ -680,8 +683,8 @@ export default function Import({
     }
   }
 
-  async function handlePagination(): Promise<void> {
-    await getAllLogs(filter);
+  async function handlePagination(page: any): Promise<void> {
+    await getAllLogs(filter, page); // handle pagination globly
   }
 
   function filterFieldFactory(title: string, name: string) {
@@ -801,10 +804,10 @@ export default function Import({
     );
   }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   return (
     <>
@@ -875,7 +878,7 @@ export default function Import({
                       table="PARCELS"
                       moduleId={30}
                     />
-                  )}
+                )}
 
                 <div className="h-10" />
               </TabPanel>
@@ -920,7 +923,7 @@ export default function Import({
                       table="ALLOCATION"
                       moduleId={31}
                     />
-                  )}
+                )}
                 {(Router?.importar == 'etiquetas_impressas'
                   || !Router.importar) && (
                     <ComponentImport
@@ -929,7 +932,7 @@ export default function Import({
                       table="TAG_PRINTED" // AINDA NÃO SEI NOME CORRETO
                       moduleId={0} // AINDA NÃO SEI CODIGO CORRETO
                     />
-                  )}
+                )}
               </TabPanel>
             </Box>
           </div>
@@ -1054,7 +1057,7 @@ export default function Import({
                 options={{
                   showTitle: false,
                   maxBodyHeight: `calc(100vh - ${statusAccordionFilter ? 488 : 346
-                    }px)`,
+                  }px)`,
                   headerStyle: {
                     zIndex: 1,
                   },
@@ -1176,18 +1179,26 @@ export default function Import({
                   ),
                   Pagination: (props) => (
                     <div
-                      className="flex h-20 gap-2 pr-2 py-5 bg-gray-50"
+                      className="flex
+                      h-20
+                      gap-2
+                      pr-2
+                      py-5
+                      bg-gray-50
+                    "
                       {...props}
                     >
                       <Button
-                        onClick={() => setCurrentPage(0)}
+                        onClick={() => handlePagination(0)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdFirstPage size={18} />}
                         disabled={currentPage < 1}
                       />
                       <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
+                        onClick={() => {
+                          handlePagination(currentPage - 1);
+                        }}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiLeftArrow size={15} />}
@@ -1198,7 +1209,7 @@ export default function Import({
                         .map((value, index) => (
                           <Button
                             key={index}
-                            onClick={() => setCurrentPage(index)}
+                            onClick={() => handlePagination(index)}
                             value={`${currentPage + 1}`}
                             bgColor="bg-blue-600"
                             textColor="white"
@@ -1206,14 +1217,14 @@ export default function Import({
                           />
                         ))}
                       <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
+                        onClick={() => handlePagination(currentPage + 1)}
+                        bgColor="bg-blue-600 RR"
                         textColor="white"
                         icon={<BiRightArrow size={15} />}
                         disabled={currentPage + 1 >= pages}
                       />
                       <Button
-                        onClick={() => setCurrentPage(pages)}
+                        onClick={() => handlePagination(pages - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdLastPage size={18} />}

@@ -2,8 +2,15 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { LogImportController } from '../../../controllers/log-import.controller';
 import { apiHandler } from '../../../helpers/api';
 
-export default apiHandler(handler);
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '8mb',
+    },
+  },
+};
 
+export default apiHandler(handler);
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const logImportController = new LogImportController();
 

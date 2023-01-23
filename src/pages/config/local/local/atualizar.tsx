@@ -1,44 +1,48 @@
-import { useFormik } from "formik";
-import MaterialTable from "material-table";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import getConfig from "next/config";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { ReactNode, useEffect, useState } from "react";
+/* eslint-disable no-param-reassign */
+import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import getConfig from 'next/config';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import {
+  ReactNode, useEffect, useRef, useState,
+} from 'react';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from "react-beautiful-dnd";
+} from 'react-beautiful-dnd';
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiTwotoneStar,
-} from "react-icons/ai";
-import { BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { IoMdArrowBack } from "react-icons/io";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line } from "react-icons/ri";
-import * as XLSX from "xlsx";
-import Swal from "sweetalert2";
-import ComponentLoading from "../../../../components/Loading";
-import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
+} from 'react-icons/ai';
+import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import { IoMdArrowBack } from 'react-icons/io';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RiFileExcel2Line } from 'react-icons/ri';
+import * as XLSX from 'xlsx';
+import Swal from 'sweetalert2';
+import ComponentLoading from '../../../../components/Loading';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   localService,
   unidadeCulturaService,
   userPreferencesService,
-} from "../../../../services";
+} from '../../../../services';
 import {
   AccordionFilter,
   Button,
   CheckBox,
   Content,
   Input,
-} from "../../../../components";
-import * as ITabs from "../../../../shared/utils/dropdown";
-import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
+} from '../../../../components';
+import * as ITabs from '../../../../shared/utils/dropdown';
+import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+import { tableGlobalFunctions } from '../../../../helpers';
 
 export interface IData {
   allCultureUnity: any;
@@ -84,49 +88,49 @@ export default function AtualizarLocal({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
-  const tabsDropDowns = TabsDropDowns("config");
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "LOCAL" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  const tabsDropDowns = TabsDropDowns('config');
+  tabsDropDowns.map((tab) => (tab.titleTab === 'LOCAL' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
+  const tableRef = useRef<any>(null);
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.unidadeCultura || {
     id: 0,
-    table_preferences: "id,name_unity_culture,year",
+    table_preferences: 'id,name_unity_culture,year',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences
+    preferences.table_preferences,
   );
 
   const [unidadeCultura, setUnidadeCultura] = useState<any>(
-    () => allCultureUnity
+    () => allCultureUnity,
   );
   const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit)
+    Number(pageBeforeEdit),
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [orderList, setOrder] = useState<number>(
-    typeOrderServer == "desc" ? 1 : 2
+    typeOrderServer == 'desc' ? 1 : 2,
   );
-  const [arrowOrder, setArrowOrder] = useState<ReactNode>("");
+  const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [colorStar, setColorStar] = useState<string>("");
+  const [colorStar, setColorStar] = useState<string>('');
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     {
-      name: "CamposGerenciados[]",
-      title: "Nome de Unidade de Cultura",
-      value: "name_unity_culture",
+      name: 'CamposGerenciados[]',
+      title: 'Nome de Unidade de Cultura',
+      value: 'name_unity_culture',
     },
-    { name: "CamposGerenciados[]", title: "Ano", value: "year" },
+    { name: 'CamposGerenciados[]', title: 'Ano', value: 'year' },
   ]);
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
-  const [orderType, setOrderType] = useState<string>("");
+  const [orderType, setOrderType] = useState<string>('');
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
+  const [typeOrder, setTypeOrder] = useState<string>('');
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -159,7 +163,7 @@ export default function AtualizarLocal({
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire("atualizado com sucesso!");
+            Swal.fire('atualizado com sucesso!');
             router.back();
           } else {
             Swal.fire(response.message);
@@ -168,146 +172,100 @@ export default function AtualizarLocal({
     },
   });
 
-  // function headerTableFactory(name: any, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button className="font-medium text-gray-900" onClick={() => handleOrder(title, orderList)}>
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: false,
-  //   };
-  // }
+  async function callingApi(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
 
-  function idHeaderFactory() {
-    return {
-      title: <div className="flex items-center">{arrowOrder}</div>,
-      field: "id",
-      width: 0,
-      sorting: false,
-      render: () =>
-        colorStar === "#eba417" ? (
-          <div className="h-7 flex">
-            <div>
-              <button
-                className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar("")}
-              >
-                <AiTwotoneStar size={20} color="#eba417" />
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="h-7 flex">
-            <div>
-              <button
-                className="w-full h-full flex items-center justify-center border-0"
-                onClick={() => setColorStar("#eba417")}
-              >
-                <AiTwotoneStar size={20} />
-              </button>
-            </div>
-          </div>
-        ),
-    };
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
+    setLoading(true);
+
+    await unidadeCulturaService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (
+          response.status === 200
+          || (response.status === 400 && response.total == 0)
+        ) {
+          setUnidadeCultura(response.response);
+          setTotaItems(response.total);
+          tableRef.current?.dataManager.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+        }
+        setLoading(false);
+      })
+      .catch((_) => {
+        setLoading(false);
+      });
+
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    callingApi(filter);
+  }, [typeOrder]);
+
+  async function handleOrder(
+    column: string,
+    order: string | any,
+    name: any,
+  ): Promise<void> {
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+
+    setFieldOrder(columnG);
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    // eslint-disable-next-line no-unused-expressions, no-nested-ternary
+    typeOrderG !== '' ? (typeOrderG == 'desc' ? setOrder(1) : setOrder(2)) : '';
+    setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 100);
   }
 
   function columnsOrder(camposGerenciados: string) {
-    const columnCampos: string[] = camposGerenciados.split(",");
+    const columnCampos: string[] = camposGerenciados.split(',');
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
       // if (columnCampos[index] === 'id') {
       //   tableFields.push(idHeaderFactory());
       // }
-      if (columnCampos[index] === "name_unity_culture") {
+      if (columnCampos[index] === 'name_unity_culture') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Nome da Unidade de Cultura",
-            title: "name_unity_culture",
+            name: 'Nome da Unidade de Cultura',
+            title: 'name_unity_culture',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "year") {
+      if (columnCampos[index] === 'year') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Ano",
-            title: "year",
+            name: 'Ano',
+            title: 'year',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
     });
     return tableFields;
   }
 
-  async function handleOrder(
-    column: string,
-    order: string | any,
-    name: any
-  ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = "asc";
-    } else if (order === 2) {
-      typeOrder = "desc";
-    } else {
-      typeOrder = "";
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== "undefined") {
-      if (typeOrder !== "") {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== "") {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_local=${id_local}`;
-    } else {
-      parametersFilter = filter;
-    }
-
-    await unidadeCulturaService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then((response) => {
-        if (response.status === 200) {
-          setUnidadeCultura(response.response);
-        }
-      });
-
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder("");
-      }
-    }
-
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 100);
-
-    // setFieldOrder(columnG);
-  }
-
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = "";
+    let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -330,7 +288,7 @@ export default function AtualizarLocal({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
       userLogado.preferences.unidadeCultura = {
         id: preferences.id,
@@ -341,7 +299,7 @@ export default function AtualizarLocal({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -387,7 +345,7 @@ export default function AtualizarLocal({
           }
 
           row.EXPORT = `${row.dt_export.toLocaleDateString(
-            "pt-BR"
+            'pt-BR',
           )} ${dtHours}:${dtMinutes}:${dtSeconds}`;
 
           row.NOME_LOCAL_CULTURA = row.local.name_local_culture;
@@ -410,20 +368,20 @@ export default function AtualizarLocal({
 
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "unidade-cultura");
+        XLSX.utils.book_append_sheet(workBook, workSheet, 'unidade-cultura');
 
         // Buffer
         const buf = XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "buffer",
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "binary",
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, "Unidade-Cultura.xlsx");
+        XLSX.writeFile(workBook, 'Unidade-Cultura.xlsx');
       }
     });
     setLoading(false);
@@ -437,29 +395,14 @@ export default function AtualizarLocal({
     }
   }
 
-  async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
-
-    if (filter) {
-      parametersFilter = `${parametersFilter}&${filter}`;
-    }
-    await unidadeCulturaService.getAll(parametersFilter).then((response) => {
-      if (response.status === 200) {
-        setUnidadeCultura(response.response);
-      }
-    });
+  async function handlePagination(page: any): Promise<void> {
+    await callingApi(filter, page); // handle pagination globly
   }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   return (
     <>
@@ -493,7 +436,7 @@ export default function AtualizarLocal({
                   *Nome do lugar de cultura
                 </label>
                 <Input
-                  style={{ background: "#e5e7eb" }}
+                  style={{ background: '#e5e7eb' }}
                   id="name_local_culture"
                   name="name_local_culture"
                   disabled
@@ -507,7 +450,7 @@ export default function AtualizarLocal({
                   *Rótulo
                 </label>
                 <Input
-                  style={{ background: "#e5e7eb" }}
+                  style={{ background: '#e5e7eb' }}
                   id="label"
                   name="label"
                   disabled
@@ -521,7 +464,7 @@ export default function AtualizarLocal({
                   *MLOC
                 </label>
                 <Input
-                  style={{ background: "#e5e7eb" }}
+                  style={{ background: '#e5e7eb' }}
                   id="mloc"
                   name="mloc"
                   disabled
@@ -544,7 +487,7 @@ export default function AtualizarLocal({
                   *Nome da Fazenda
                 </label>
                 <Input
-                  style={{ background: "#e5e7eb" }}
+                  style={{ background: '#e5e7eb' }}
                   id="adress"
                   name="adress"
                   disabled
@@ -557,7 +500,7 @@ export default function AtualizarLocal({
                   *País
                 </label>
                 <Input
-                  style={{ background: "#e5e7eb" }}
+                  style={{ background: '#e5e7eb' }}
                   id="label_country"
                   name="label_country"
                   disabled
@@ -570,7 +513,7 @@ export default function AtualizarLocal({
                   *Região
                 </label>
                 <Input
-                  style={{ background: "#e5e7eb" }}
+                  style={{ background: '#e5e7eb' }}
                   id="label_region"
                   name="label_region"
                   disabled
@@ -583,7 +526,7 @@ export default function AtualizarLocal({
                   *Localidade
                 </label>
                 <Input
-                  style={{ background: "#e5e7eb" }}
+                  style={{ background: '#e5e7eb' }}
                   id="name_locality"
                   name="name_locality"
                   disabled
@@ -609,18 +552,19 @@ export default function AtualizarLocal({
               </div>
             </div>
           </form>
-          <div style={{ marginTop: "1%" }} className="w-full h-auto">
+          <div style={{ marginTop: '1%' }} className="w-full h-auto">
             <MaterialTable
-              style={{ background: "#f9fafb" }}
+              tableRef={tableRef}
+              style={{ background: '#f9fafb' }}
               columns={columns}
               data={unidadeCultura}
               options={{
                 showTitle: false,
-                maxBodyHeight: `calc(100vh - 470px)`,
+                maxBodyHeight: 'calc(100vh - 470px)',
                 headerStyle: {
                   zIndex: 1,
                 },
-                rowStyle: { background: "#f9fafb", height: 35 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: itensPerPage,
@@ -642,7 +586,9 @@ export default function AtualizarLocal({
                   >
                     <div className="h-12" />
                     <strong className="text-blue-600">
-                      Total registrado: {itemsTotal}
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
@@ -686,7 +632,7 @@ export default function AtualizarLocal({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value as string
+                                                generate.value as string,
                                               )}
                                             />
                                           </li>
@@ -716,59 +662,60 @@ export default function AtualizarLocal({
                     </div>
                   </div>
                 ),
-                Pagination: (props) =>
-                  (
-                    <div
-                      className="flex
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => setCurrentPage(0)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage < 1}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill("")
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setCurrentPage(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => setCurrentPage(pages)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => handlePagination(0)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage < 1}
+                    />
+                    <Button
+                      onClick={() => {
+                        handlePagination(currentPage - 1);
+                      }}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => handlePagination(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => handlePagination(currentPage + 1)}
+                      bgColor="bg-blue-600 RR"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => handlePagination(pages - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
                   ) as any,
               }}
             />
@@ -786,10 +733,9 @@ export const getServerSideProps: GetServerSideProps = async ({
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
-  const itensPerPage =
-    (await (
-      await PreferencesControllers.getConfigGerais()
-    )?.response[0]?.itens_per_page) ?? 5;
+  const itensPerPage = (await (
+    await PreferencesControllers.getConfigGerais()
+  )?.response[0]?.itens_per_page) ?? 5;
 
   const { token } = req.cookies;
   const id_local = query.id;
@@ -800,27 +746,26 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { publicRuntimeConfig } = getConfig();
 
   const requestOptions: RequestInit | undefined = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   };
 
   const baseUrlUnidadeCultura = `${publicRuntimeConfig.apiUrl}/unidade-cultura`;
   const responseUnidadeCultura = await fetch(
     `${baseUrlUnidadeCultura}?id_local=${id_local}`,
-    requestOptions
+    requestOptions,
   );
 
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/local`;
   const responseLocal = await fetch(
     `${baseUrlShow}/${query.id}`,
-    requestOptions
+    requestOptions,
   );
 
   const filterApplication = `filterStatus=1&&id_local=${id_local}&orderBy=year&typeOrder=desc`;
 
-  const { response: allCultureUnity, total: totalItems }: any =
-    await responseUnidadeCultura.json();
+  const { response: allCultureUnity, total: totalItems }: any = await responseUnidadeCultura.json();
 
   const { response: local } = await responseLocal.json();
 
