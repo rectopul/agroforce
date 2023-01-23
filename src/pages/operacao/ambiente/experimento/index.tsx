@@ -739,10 +739,15 @@ export default function Listagem({
            * No caso temos o ENV2 com NPEI = 151 e NPEF = 151 e NPEI_I = 151 e PROX_NPE = 151
            * EDITA o ENV2 para PROX_NPE: 190
            * No caso temos o ENV2 com NPEI = 151 e NPEF = 190 e NPEI_I = 190 e PROX_NPE = 190
-           * 
            **/
           if (env.npef >= env.nextNPE.npei_i) {
             ++count1; // conta o número de sobreposições
+          }
+
+          // se tiver zero experimentos o npef é igual ao npei
+          // IMPORTANTE: essa mudança no npef só é feita após a verificação de sobreposição;
+          if(response.length === 0) {
+            env.npef = env.prox_npe;
           }
           
           const temp = {
