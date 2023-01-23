@@ -206,10 +206,12 @@ export class NpeController {
             }
             newItem.npeRequisitada = 0; // quantidade a ser consumida (contagem de experimentos)
             newItem.nextNPE = next;
+            //newItem.npefView = newItem.npef;
           } else {
             newItem.npeQT = 'N/A';
             newItem.nextNPE = 0;
             newItem.npeRequisitada = 0;
+            //newItem.npefView = newItem.npef;
           }
           newItem.nextAvailableNPE = next_available_npe;
           return newItem;

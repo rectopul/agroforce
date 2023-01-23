@@ -484,7 +484,7 @@ export default function Listagem({
     tableFields.push(
       headerTableFactoryGlobal({
         name: "NPE Final",
-        title: "npef",
+        title: "npefView",
         orderList,
         fieldOrder,
         handleOrder,
@@ -657,7 +657,7 @@ export default function Listagem({
     { title: "Tecnologia", field: "tecnologia.name" },
     { title: "Época", field: "epoca" },
     { title: "NPE Inicial", field: "prox_npe" },
-    { title: "NPE Final", field: "npef" },
+    { title: "NPE Final", field: "npefView" },
     { title: "NPE Requisitada", field: "npeRequisitada" },
     { title: "NPE Disponível", field: "npeQT" },
   ];
@@ -714,6 +714,7 @@ export default function Listagem({
 
             p.npeQT = p.npef - p.npei + 1;
             env.npef = i - 1;
+            env.npefView = i - 1;
             
             console.log('p.npeQT', p.npeQT);
 
@@ -747,7 +748,8 @@ export default function Listagem({
           // se tiver zero experimentos o npef é igual ao npei
           // IMPORTANTE: essa mudança no npef só é feita após a verificação de sobreposição;
           if(response.length === 0) {
-            env.npef = env.prox_npe;
+            //env.npef = env.prox_npe;
+            env.npefView = env.prox_npe;
           }
           
           const temp = {
@@ -867,7 +869,7 @@ export default function Listagem({
     
     allNPERecords.map(async (item: any) => {
     
-      let nextNPE = item.env?.npef + 1;
+      let nextNPE = item.env?.npef + 1; // 117 == 118
       
       // se tiver experimentos no env atual
       if(item.data.length > 0) {
