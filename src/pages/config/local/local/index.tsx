@@ -587,63 +587,16 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    await localService.getAll(filter).then((response) => {
-      if (response.status === 200) {
-        const newData = response.response.map((row: any) => {
-          row.status = row.status === 0 ? 'Inativo' : 'Ativo';
 
-          const dataExp = new Date();
-          let hours: string;
-          let minutes: string;
-          let seconds: string;
-          if (String(dataExp.getHours()).length == 1) {
-            hours = `0${String(dataExp.getHours())}`;
-          } else {
-            hours = String(dataExp.getHours());
-          }
-          if (String(dataExp.getMinutes()).length == 1) {
-            minutes = `0${String(dataExp.getMinutes())}`;
-          } else {
-            minutes = String(dataExp.getMinutes());
-          }
-          if (String(dataExp.getSeconds()).length == 1) {
-            seconds = `0${String(dataExp.getSeconds())}`;
-          } else {
-            seconds = String(dataExp.getSeconds());
-          }
-          row.DT = `${dataExp.toLocaleDateString(
-            'pt-BR',
-          )} ${hours}:${minutes}:${seconds}`;
+    const skip = 0;
+    const take = 10;
 
-          row.NOME_LUGAR_CULTURA = row.name_local_culture;
-          row.RÓTULO = row.label;
-          row.MLOC = row.mloc;
-          row.ENDEREÇO = row.adress;
-          row.PAÍS = row.label_country;
-          row.REGIÃO = row.label_region;
-          row.LOCALIDADE = row.name_locality;
-          row.STATUS = row.status;
-          row.DT_GOM = row.DT;
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
 
-          delete row.name_local_culture;
-          delete row.label;
-          delete row.mloc;
-          delete row.adress;
-          delete row.label_country;
-          delete row.label_region;
-          delete row.name_locality;
-          delete row.status;
-          delete row.dt_export;
-          delete row.DT;
-          delete row.id;
-          delete row.cultureUnity;
-
-          return row;
-        });
-
-        const workSheet = XLSX.utils.json_to_sheet(newData);
+    await localService.getAll(filterParam).then(({ status, response }) => {
+      if (status === 200) {
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'locais');
+        XLSX.utils.book_append_sheet(workBook, response, 'locais');
 
         // buffer
         const blabel_region = XLSX.write(workBook, {

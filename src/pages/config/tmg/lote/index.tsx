@@ -516,108 +516,15 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    await loteService.getAll(filter).then(({ status, response }) => {
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+
+    await loteService.getAll(filterParam).then(({ status, response }) => {
       if (status === 200) {
-        const newData = response.map((item: any) => {
-          const newItem = item;
-          // const dataExp = new Date();
-          // let hours: string;
-          // let minutes: string;
-          // let seconds: string;
-          // if (String(dataExp.getHours()).length === 1) {
-          //   hours = `0${String(dataExp.getHours())}`;
-          // } else {
-          //   hours = String(dataExp.getHours());
-          // }
-          // if (String(dataExp.getMinutes()).length === 1) {
-          //   minutes = `0${String(dataExp.getMinutes())}`;
-          // } else {
-          //   minutes = String(dataExp.getMinutes());
-          // }
-          // if (String(dataExp.getSeconds()).length === 1) {
-          //   seconds = `0${String(dataExp.getSeconds())}`;
-          // } else {
-          //   seconds = String(dataExp.getSeconds());
-          // }
-          // newItem.DT = `${dataExp.toLocaleDateString(
-          //   'pt-BR',
-          // )} ${hours}:${minutes}:${seconds}`;
-
-          // let dtHours: string;
-          // let dtMinutes: string;
-          // let dtSeconds: string;
-
-          // if (String(newItem.dt_export.getHours()).length === 1) {
-          //   dtHours = `0${String(newItem.dt_export.getHours())}`;
-          // } else {
-          //   dtHours = String(newItem.dt_export.getHours());
-          // }
-          // if (String(newItem.dt_export.getMinutes()).length === 1) {
-          //   dtMinutes = `0${String(newItem.dt_export.getMinutes())}`;
-          // } else {
-          //   dtMinutes = String(newItem.dt_export.getMinutes());
-          // }
-          // if (String(newItem.dt_export.getSeconds()).length === 1) {
-          //   dtSeconds = `0${String(newItem.dt_export.getSeconds())}`;
-          // } else {
-          //   dtSeconds = String(newItem.dt_export.getSeconds());
-          // }
-
-          // newItem.EXPORT = `${newItem.dt_export.toLocaleDateString(
-          //   'en-US',
-          // )} ${dtHours}:${dtMinutes}:${dtSeconds}`;
-
-          newItem.dt_export = new Date(newItem.dt_export);
-          newItem.dt_export = new Date(
-            newItem.dt_export.toISOString().slice(0, -1),
-          );
-
-          newItem.dt_export = moment(newItem.dt_export).format(
-            'DD-MM-YYYY HH:mm:ss',
-          );
-          const timeExport = moment().format('DD-MM-YYYY HH:mm:ss');
-
-          newItem.CULTURA = item?.genotipo.culture.name;
-          newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
-          newItem.NOME_PRINCIPAL = item?.genotipo.name_main;
-          newItem.GMR = item?.genotipo.gmr;
-          newItem.BGM = item?.genotipo.bgm;
-          newItem.TECNOLOGIA = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
-          newItem.ANO = item?.year;
-          newItem.SAFRA = item?.safra.safraName;
-          newItem.COD_LOTE = item?.cod_lote;
-          newItem.NCC = item?.ncc;
-          newItem.FASE = item?.fase;
-          newItem.PESO = item?.peso;
-          newItem.QUANT_SEMENTES = item?.quant_sementes;
-          newItem.DT_EXPORT = newItem.dt_export;
-          newItem.DT_GOM = timeExport;
-
-          delete newItem.quant_sementes;
-          delete newItem.peso;
-          delete newItem.fase;
-          delete newItem.ncc;
-          delete newItem.cod_lote;
-          delete newItem.year;
-          delete newItem.id_s2;
-          delete newItem.id_dados;
-          delete newItem.DT;
-          // delete newItem.EXPORT;
-          delete newItem.dt_export;
-          delete newItem.id;
-          delete newItem.id_genotipo;
-          delete newItem.genotipo;
-          delete newItem.safra;
-
-          return newItem;
-        });
-
-        const workSheet = XLSX.utils.json_to_sheet(newData, {
-          cellDates: true,
-          dateNF: 'YYYY-MM-DD HH:mm:ss',
-        });
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'lotes');
+        XLSX.utils.book_append_sheet(workBook, response, 'lotes');
 
         // Buffer
         XLSX.write(workBook, {
@@ -705,17 +612,6 @@ export default function Listagem({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    // // manage using comman function
-    // const { parametersFilter, currentPages } = await tableGlobalFunctions.handlePaginationGlobal(currentPage, take, filter);
-
-    // await loteService.getAll(parametersFilter).then((response) => {
-    //   if (response.status === 200) {
-    //     setLotes(response.response);
-    //     setTotalItems(response.total); // Set new total records
-    //     setCurrentPage(currentPages); // Set new current page
-    //   }
-    // });
-
     await callingApi(filter, page); // handle pagination globly
   }
 

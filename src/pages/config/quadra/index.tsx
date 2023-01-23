@@ -97,16 +97,16 @@ interface IData {
 }
 
 export default function Listagem({
-  quadras,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  cultureId,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer,
-  orderByserver,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+              quadras,
+              totalItems,
+              itensPerPage,
+              filterApplication,
+              cultureId,
+              pageBeforeEdit,
+              filterBeforeEdit,
+              typeOrderServer,
+              orderByserver,
+            }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tabsDropDowns = TabsDropDowns();
@@ -616,64 +616,31 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    await quadraService.getAll(filter).then(({ status, response }) => {
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true&fileNumber=${1}`;
+
+    await quadraService.getAll(filterParam).then(({ status, response }) => {
       if (status === 200) {
-        const newData = response.map((row: any) => {
-          if (row.status === 0) {
-            row.status = "Inativo" as any;
-          } else {
-            row.status = "Ativo" as any;
-          }
 
-          row.COD_QUADRA = row.cod_quadra;
-          row.LOCAL = row.local?.name_local_culture;
-          row.ESQUEMA = row.esquema;
-          row.LARG_Q = row.larg_q;
-          row.COMP_P = row.comp_p;
-          row.LINHA_P = row.linha_p;
-          row.COMP_C = row.comp_c;
-          row.TIRO_FIXO = row.tiro_fixo;
-          row.DISPARO_FIXO = row.disparo_fixo;
-          row.STATUS_ALOCADO = row.allocation;
-          row.STATUS = row.status;
-
-          delete row.cod_quadra;
-          delete row.local;
-          delete row.esquema;
-          delete row.larg_q;
-          delete row.comp_p;
-          delete row.linha_p;
-          delete row.q;
-          delete row.comp_c;
-          delete row.tiro_fixo;
-          delete row.disparo_fixo;
-          delete row.status;
-          delete row.id;
-          delete row.safra;
-          delete row.tableData;
-          delete row.local_plantio;
-          delete row.allocation;
-          return row;
-        });
-
-        const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "quadra");
+        XLSX.utils.book_append_sheet(workBook, response, 'quadra');
 
         // Buffer
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "buffer",
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "binary",
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, "Quadras.xlsx");
+        XLSX.writeFile(workBook, 'Quadras.xlsx');
       } else {
-        Swal.fire("Não existem registros para serem exportados, favor checar.");
+        Swal.fire('Não existem registros para serem exportados, favor checar.');
       }
     });
     setLoading(false);
@@ -682,129 +649,68 @@ export default function Listagem({
   const [idArray, setIdArray] = useState([]);
 
   const downloadExcelSintetico = async (): Promise<void> => {
-    await quadraService.getAll(filter).then(({ status, response }) => {
+    setLoading(true);
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true&fileNumber=${2}`;
+
+    await quadraService.getAll(filterParam).then(({ status, response, message }) => {
       if (status === 200) {
-        const experimentArray: any = [];
-        const object: any = {};
-        const experimentObject: any = {
-          id: "",
-          safra: "",
-          experimentName: "",
-          npei: "",
-          npef: "",
-          ntparcelas: "",
-          locpreparo: "",
-          qm: "",
-        };
-
-        const data = response.map((tow: any) => {
-          tow.cod = tow.cod_quadra;
-          // tow.local = tow.name_local;
-          experimentObject.locpreparo = tow.local.name_local_culture;
-          object.qm = tow.cod;
-          // const localMap = tow.local;
-
-          const allocatedMap = tow.AllocatedExperiment.map((a: any) => {
-            experimentObject.npei = a.npei;
-            experimentObject.npef = a.npef;
-            experimentObject.ntparcelas = a.parcelas;
-            experimentArray.push(experimentObject);
-            return a;
-          });
-          const experimentMap = tow.experiment.map((e: any) => {
-            object.id = e.id;
-            experimentObject.safra = e.safra.safraName;
-            experimentObject.experimentName = e.experimentName;
-            return e;
-          });
-          experimentArray.push(object);
-          experimentArray.push(experimentObject);
-          return tow;
-        });
-        const newData = experimentArray.map((row: any) => {
-          row.ID_EXPERIMENTO = row.id;
-          return row;
-        });
-
-        const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "quadra");
+        XLSX.utils.book_append_sheet(workBook, response, 'quadra');
 
         // Buffer
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "buffer",
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "binary",
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, "Sintética.xlsx");
+        XLSX.writeFile(workBook, 'Sintética.xlsx');
       } else {
-        Swal.fire(response);
+        Swal.fire(`nenhum resultado encontrado`);
       }
     });
+    setLoading(false);
   };
 
   const dowloadExcelAnalytics = async () => {
+    setLoading(true);
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true&fileNumber=${3}`;
+
     await quadraService
-      .getAll(`${filter}&allocation=${"IMPORTADO"}`)
+      .getAll(`${filterParam}&allocation=${'IMPORTADO'}`)
       .then(({ status, response }) => {
         if (status === 200) {
-          const lines: any = [];
-          response.forEach(async (block: any) => {
-            await block.experiment?.forEach(async (experiment: any) => {
-              await experiment.experiment_genotipe?.forEach(
-                (parcela: any, index: number) => {
-                  lines.push({
-                    ID_EXPERIMENTO: experiment?.id,
-                    SAFRA: experiment?.safra?.safraName,
-                    EXPE: experiment?.experimentName,
-                    NPEI: parcela?.npe,
-                    NPEF: parcela?.npe,
-                    NTPARC: 1,
-                    LOCALPREP: block.local?.name_local_culture,
-                    QM: block.cod_quadra,
-                    SEQ: block.AllocatedExperiment[index]?.seq,
-                    FOCO: experiment?.assay_list?.foco?.name,
-                    ENSAIO: experiment?.assay_list?.type_assay?.name,
-                    GLI: experiment?.assay_list?.gli,
-                    CODLOCAL_EXP: experiment?.local?.name_local_culture,
-                    EPOCA: experiment?.period,
-                    TECNOLOGIA: experiment?.assay_list?.tecnologia?.name,
-                    BGM: experiment?.bgm,
-                    REP: experiment?.repetitionsNumber,
-                    STATUS_EXP: experiment?.status,
-                    CÓDIGO_GENOTIPO: parcela?.genotipo?.name_genotipo,
-                    STATUS_PARCELA: parcela?.status,
-                  });
-                }
-              );
-            });
-          });
 
-          const workSheet = XLSX.utils.json_to_sheet(lines);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, "quadra");
+          XLSX.utils.book_append_sheet(workBook, response, 'quadra');
 
           // Buffer
           XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "buffer",
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
           });
           // Binary
           XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "binary",
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, "Analítico.xlsx");
+          XLSX.writeFile(workBook, 'Analítico.xlsx');
         } else {
-          Swal.fire("Nenhuma quadra alocada");
+          Swal.fire('Nenhuma quadra alocada');
         }
       });
+    setLoading(false);
   };
 
   // manage total pages
@@ -838,7 +744,7 @@ export default function Listagem({
   function checkValue(value: any) {
     const parameter = tableGlobalFunctions.getValuesForFilter(
       value,
-      filtersParams
+      filtersParams,
     );
     return parameter;
   }
@@ -904,7 +810,7 @@ export default function Listagem({
                   type="button"
                   className="w-full h-8 ml-auto mt-0 bg-green-600 text-white px-8 rounded-lg text-sm hover:bg-green-800"
                   onClick={() => {
-                    window.open("/listas/rd?importar=quadra", "_blank");
+                    window.open('/listas/rd?importar=quadra', '_blank');
                     setModalImport(false);
                   }}
                 >
@@ -920,8 +826,8 @@ export default function Listagem({
                   className="w-full h-8 ml-auto mt-0 bg-green-600 text-white px-8 rounded-lg text-sm hover:bg-green-800"
                   onClick={() => {
                     window.open(
-                      "/listas/rd?importar=alocacao_quadra",
-                      "_blank"
+                      '/listas/rd?importar=alocacao_quadra',
+                      '_blank',
                     );
                     setModalImport(false);
                   }}

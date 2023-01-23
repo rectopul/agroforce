@@ -85,16 +85,16 @@ interface IData {
 }
 
 export default function Listagem({
-  allSafras,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  cultureId,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer, // RR
-  orderByserver, // RR
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      allSafras,
+      totalItems,
+      itensPerPage,
+      filterApplication,
+      cultureId,
+      pageBeforeEdit,
+      filterBeforeEdit,
+      typeOrderServer, // RR
+      orderByserver, // RR
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -580,34 +580,17 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    await safraService.getAll(filter).then((response) => {
-      if (response.status === 200) {
-        const newData = response.response.map((row: any) => {
-          if (row.status === 0) {
-            row.status = 'Inativos' as any;
-          } else {
-            row.status = 'Ativos' as any;
-          }
-          row.Nome = row.safraName;
-          row.Ano = row.year;
-          row.Início_Plantio = row.plantingStartTime;
-          row.Fim_Plantio = row.plantingEndTime;
-          row.Status = row.status;
 
-          delete row.safraName;
-          delete row.year;
-          delete row.plantingStartTime;
-          delete row.plantingEndTime;
-          delete row.status;
-          delete row.id;
-          delete row.tableData;
+    const skip = 0;
+    const take = 10;
 
-          return row;
-        });
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
 
-        const workSheet = XLSX.utils.json_to_sheet(newData);
+    await safraService.getAll(filterParam).then(({ status, response }) => {
+      if (status === 200) {
+          
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, 'safras');
+        XLSX.utils.book_append_sheet(workBook, response, 'safras');
 
         // Buffer
 

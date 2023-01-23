@@ -250,8 +250,32 @@ export default function AtualizarTipoEnsaio({
       });
   }
 
+  async function callingApiExperiment(parametersFilter: any) {
+    // setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    // setCookies('filterBeforeEditOrderBy', orderBy);
+    parametersFilter = `${parametersFilter}&${pathExtra}`;
+    setFiltersParams(parametersFilter);
+    setCookies('filtersParams', parametersFilter);
+
+    await experimentService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          setExperiments(response.response);
+          setItemsTotal(response.total);
+          tableRef.current.dataManager.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+        }
+      })
+      .catch((_) => {
+        setLoading(false);
+      });
+  }
+
   useEffect(() => {
-    callingApi(treatmentsFilter);
+    table === 'genotipo' ? callingApi(treatmentsFilter) : callingApiExperiment(experimentFilter);
   }, [typeOrder]);
 
   async function handleOrder(
@@ -259,36 +283,6 @@ export default function AtualizarTipoEnsaio({
     order: number,
     name: any,
   ): Promise<void> {
-    // let typeOrder: any;
-    // let parametersFilter: any;
-    // if (order === 1) {
-    //   typeOrder = 'asc';
-    // } else if (order === 2) {
-    //   typeOrder = 'desc';
-    // } else {
-    //   typeOrder = '';
-    // }
-    // setOrderBy(column);
-    // setOrderType(typeOrder);
-    // if (treatmentsFilter && typeof treatmentsFilter !== 'undefined') {
-    //   if (typeOrder !== '') {
-    //     parametersFilter = `${treatmentsFilter}&orderBy=${column}&typeOrder=${typeOrder}`;
-    //   } else {
-    //     parametersFilter = treatmentsFilter;
-    //   }
-    // } else if (typeOrder !== '') {
-    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    // } else {
-    //   parametersFilter = treatmentsFilter;
-    // }
-    // await genotypeTreatmentService
-    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
-    //   .then(({ status, response }) => {
-    //     if (status === 200) {
-    //       setGenotypeTreatments(response);
-    //     }
-    //   });
-
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
@@ -309,49 +303,19 @@ export default function AtualizarTipoEnsaio({
     order: string | any,
     name: any,
   ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    if (experimentFilter && typeof experimentFilter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${experimentFilter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = experimentFilter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}&id_safra=${idSafra}`;
-    } else {
-      parametersFilter = experimentFilter;
-    }
-
-    await experimentService
-      .getAll(`${parametersFilter}&skip=0&take=${take}`)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          setExperiments(response);
-        }
-      });
-
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
-
-    // setFieldOrder(columnG);
+    setFieldOrder(columnG);
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    typeOrderG !== '' ? (typeOrderG == 'desc' ? setOrder(1) : setOrder(2)) : '';
+    setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 100);
   }
 
   function formatDecimal(num: number) {
@@ -886,53 +850,11 @@ export default function AtualizarTipoEnsaio({
   }
 
   async function handlePagination(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
-
-    if (treatmentsFilter) {
-      parametersFilter = `${parametersFilter}&${treatmentsFilter}`;
-    }
-    await genotypeTreatmentService
-      .getAll(parametersFilter)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          setGenotypeTreatments(response);
-          setLoading(false);
-          tableRef?.current?.dataManager?.changePageSize(
-            response?.length >= take ? take : response?.length,
-          );
-        }
-      });
+    await callingApi(treatmentsFilter); // handle pagination globly
   }
 
   async function handlePaginationExperiments(): Promise<void> {
-    const skip = currentPage * Number(take);
-    let parametersFilter;
-    if (orderType) {
-      parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    } else {
-      parametersFilter = `skip=${skip}&take=${take}`;
-    }
-
-    if (experimentFilter) {
-      parametersFilter = `${parametersFilter}&${experimentFilter}`;
-    }
-    await experimentService
-      .getAll(parametersFilter)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          setExperiments(response);
-          setLoading(false);
-          tableRef?.current?.dataManager?.changePageSize(
-            response?.length >= take ? take : response?.length,
-          );
-        }
-      });
+    await callingApiExperiment(experimentFilter); // handle pagination globly
   }
 
   function updateFieldFactory(name: string, title: any = null) {

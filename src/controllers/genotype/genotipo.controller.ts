@@ -1,3 +1,4 @@
+import createXls from 'src/helpers/api/xlsx-global-download';
 import handleError from '../../shared/utils/handleError';
 import { GenotipoRepository } from '../../repository/genotipo.repository';
 import { functionsUtils } from '../../shared/utils/functionsUtils';
@@ -14,6 +15,11 @@ export class GenotipoController {
     let select: any = [];
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const sheet = await createXls(options, 'TMG-GENOTIPE');
+        return { status: 200, response: sheet };
+      }
+
       if (options.filterGenotipo) {
         parameters.name_genotipo = JSON.parse(`{"contains":"${options.filterGenotipo}"}`);
       }
@@ -147,6 +153,13 @@ export class GenotipoController {
         skip,
         orderBy,
       );
+
+      response.map((genotipo: any) => {
+        const dts = genotipo.lote.map((lote: any) => lote.dt_export);
+        const maxDt = Math.max(...dts);
+        genotipo.dt_export = new Date(maxDt);
+      });
+      console.log('🚀 ~ file: genotipo.controller.ts:160 ~ GenotipoController ~ response.map ~ response', response);
 
       if (!response || response.total <= 0) {
         return {

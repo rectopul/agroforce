@@ -9,6 +9,7 @@ import { ExperimentController } from '../experiment/experiment.controller';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 import {ExperimentGenotipeController} from "../experiment-genotipe.controller";
 // import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
+import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class NpeController {
   npeRepository = new NpeRepository();
@@ -28,6 +29,11 @@ export class NpeController {
     let select: any = [];
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const sheet = await createXls(options, 'AMBIENTE-AMBIENTE');
+        return { status: 200, response: sheet };
+      }
+
       if (options.filterStatus) {
         if (options.filterStatus !== '2') {
           if (options.filterStatus == '1') {
@@ -193,9 +199,6 @@ export class NpeController {
           //const next = elements[index + 1]; // FIXED: desta forma você não consegue pegar o proximo elemento verificando se está no mesmo grupo;
           // find groupId next element in elements with same group.id
           const next = elements.find((item: any, idx:any) => item.group?.id === groupId && idx > index);
-          
-          console.log('newItem', newItem, 'group:', newItem.group?.id);
-          console.log('nextGroup', next, 'group:', next?.group?.id);
           
           if (next) {
             if (!newItem.npeQT) {

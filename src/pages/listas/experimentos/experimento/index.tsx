@@ -286,10 +286,8 @@ export default function Listagem({
     setCookies('filterBeforeEditTypeOrder', typeOrder);
     setCookies('filterBeforeEditOrderBy', orderBy);
 
-    parametersFilter = `${parametersFilter}&skip=${
-      page * Number(take)
-    }&take=${take}&orderBy=${
-      orderBy === 'tecnologia' ? 'assay_list.tecnologia.cod_tec' : orderBy
+    parametersFilter = `${parametersFilter}&skip=${page * Number(take)
+    }&take=${take}&orderBy=${orderBy === 'tecnologia' ? 'assay_list.tecnologia.cod_tec' : orderBy
     }&typeOrder=${typeOrder}`;
 
     setFiltersParams(parametersFilter);
@@ -595,61 +593,17 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+
     await experimentService
-      .getAll(`${filter}&excel=${true}`)
+      .getAll(`${filterParam}&excel=${true}`)
       .then(({ status, response, message }: any) => {
         if (status === 200) {
-          response.map((item: any) => {
-            const newItem = item;
-            newItem.CULTURA = item.assay_list?.safra?.culture?.name;
-            newItem.SAFRA = item.assay_list?.safra?.safraName;
-            newItem.FOCO = item.assay_list?.foco.name;
-            newItem.TIPO_DE_ENSAIO = item.assay_list?.type_assay.name;
-            newItem.TECNOLOGIA = `${item.assay_list?.tecnologia.cod_tec} ${item.assay_list?.tecnologia.name}`;
-            newItem.GLI = item.assay_list?.gli;
-            newItem.NOME_DO_EXPERIMENTO = item?.experimentName;
-            newItem.BGM = item.assay_list?.bgm;
-            newItem.STATUS_ENSAIO = item.assay_list?.status;
-            newItem.PLANTIO = newItem.local?.name_local_culture;
-            newItem.DELINEAMENTO = item.delineamento?.name;
-            newItem.DENSIDADE = item?.density;
-            newItem.REP = item.repetitionsNumber;
-            newItem.ÉPOCA = item?.period;
-            newItem.ORDEM_SORTEIO = item?.orderDraw;
-            newItem.NLP = item?.nlp;
-            newItem.CLP = item?.clp;
-            newItem.OBSERVAÇÕES = item?.comments;
-            newItem.COUNT_NT = newItem.countNT;
-            newItem.NPE_QT = newItem.npeQT;
-
-            delete newItem.id;
-            delete newItem.safra;
-            delete newItem.experiment_genotipe;
-            delete newItem.seq_delineamento;
-            delete newItem.experimentGroupId;
-            delete newItem.countNT;
-            delete newItem.npeQT;
-            delete newItem.local;
-            delete newItem.delineamento;
-            delete newItem.eel;
-            delete newItem.clp;
-            delete newItem.nlp;
-            delete newItem.orderDraw;
-            delete newItem.comments;
-            delete newItem.period;
-            delete newItem.repetitionsNumber;
-            delete newItem.density;
-            delete newItem.status;
-            delete newItem.experimentName;
-            delete newItem.type_assay;
-            delete newItem.idSafra;
-            delete newItem.assay_list;
-            return newItem;
-          });
-
-          const workSheet = XLSX.utils.json_to_sheet(response);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'experimentos');
+          XLSX.utils.book_append_sheet(workBook, response, 'experimentos');
 
           // Buffer
           XLSX.write(workBook, {
@@ -860,7 +814,7 @@ export default function Listagem({
                   <div className="h-7 w-32 mt-6">
                     <Button
                       type="submit"
-                      onClick={() => {}}
+                      onClick={() => { }}
                       value="Filtrar"
                       bgColor="bg-blue-600"
                       textColor="white"
@@ -880,8 +834,7 @@ export default function Listagem({
               data={experimentos}
               options={{
                 showTitle: false,
-                maxBodyHeight: `calc(100vh - ${
-                  statusAccordionFilter ? 460 : 320
+                maxBodyHeight: `calc(100vh - ${statusAccordionFilter ? 460 : 320
                 }px)`,
                 headerStyle: {
                   zIndex: 1,
@@ -1053,7 +1006,7 @@ export default function Listagem({
                       disabled={currentPage + 1 >= pages}
                     />
                   </div>
-                  ) as any,
+                ) as any,
               }}
             />
           </div>

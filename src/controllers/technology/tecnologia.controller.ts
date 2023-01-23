@@ -1,6 +1,7 @@
 import { TecnologiaRepository } from '../../repository/tecnologia.repository';
 import handleError from '../../shared/utils/handleError';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
+import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class TecnologiaController {
   tecnologiaRepository = new TecnologiaRepository();
@@ -9,6 +10,10 @@ export class TecnologiaController {
     const parameters: object | any = {};
     try {
       options = await removeEspecialAndSpace(options);
+      if (options.createFile) {
+        const sheet = await createXls(options, 'ENSAIO-TECHNOLOGIA');
+        return { status: 200, response: sheet };
+      }
       if (options.filterName) {
         parameters.name = JSON.parse(`{ "contains":"${options.filterName}" }`);
       }
