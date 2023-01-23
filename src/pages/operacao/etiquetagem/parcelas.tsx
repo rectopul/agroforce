@@ -820,7 +820,6 @@ export default function Listagem({
       //   )[0]?.seeds,
       // }));
       if (parcels) {
-        console.log('🚀 ~ file: parcelas.tsx:823 ~ verifyAgain ~ parcels', parcels);
         localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
 
         // setStateIframe(stateIframe + 1);

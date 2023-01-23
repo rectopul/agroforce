@@ -329,37 +329,6 @@ export default function Listagem({
     order: string | any,
     name: any,
   ): Promise<void> {
-    // // Manage orders of colunms
-    // const parametersFilter = await fetchWrapper.handleOrderGlobal(
-    //   column,
-    //   order,
-    //   filter,
-    //   'experimento',
-    // );
-
-    // setOrderParams(parametersFilter);
-
-    // const value = await fetchWrapper.skip(currentPage, parametersFilter);
-
-    // await experimentService.getAll(value).then(({ status, response }: any) => {
-    //   if (status === 200) {
-    //     setExperimento(response);
-    //     setFiltersParams(parametersFilter);
-    //   }
-    // });
-
-    // if (orderList === 2) {
-    //   setOrder(0);
-    //   setArrowOrder(<AiOutlineArrowDown />);
-    // } else {
-    //   setOrder(orderList + 1);
-    //   if (orderList === 1) {
-    //     setArrowOrder(<AiOutlineArrowUp />);
-    //   } else {
-    //     setArrowOrder('');
-    //   }
-    // }
-
     // Gobal manage orders
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
@@ -368,6 +337,7 @@ export default function Listagem({
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
+    // eslint-disable-next-line no-unused-expressions, no-nested-ternary
     typeOrderG !== '' ? (typeOrderG == 'desc' ? setOrder(1) : setOrder(2)) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
@@ -375,66 +345,6 @@ export default function Listagem({
       setLoading(false);
     }, 100);
   }
-
-  // function headerTableFactory(name: any, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: true,
-  //   };
-  // }
-
-  // function idHeaderFactory() {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         {arrowOrder}
-  //       </div>
-  //     ),
-  //     field: 'id',
-  //     width: 0,
-  //     sorting: false,
-  //     render: () => (
-  //       colorStar === '#eba417'
-  //         ? (
-  //           <div className="h-7 flex">
-  //             <div>
-  //               <button
-  //                 type="button"
-  //                 className="w-full h-full flex items-center justify-center border-0"
-  //                 onClick={() => setColorStar('')}
-  //               >
-  //                 <AiTwotoneStar size={20} color="#eba417" />
-  //               </button>
-  //             </div>
-  //           </div>
-  //         )
-  //         : (
-  //           <div className="h-7 flex">
-  //             <div>
-  //               <button
-  //                 type="button"
-  //                 className="w-full h-full flex items-center justify-center border-0"
-  //                 onClick={() => setColorStar('#eba417')}
-  //               >
-  //                 <AiTwotoneStar size={20} />
-  //               </button>
-  //             </div>
-  //           </div>
-  //         )
-  //     ),
-  //   };
-  // }
 
   async function deleteConfirmItem(item: any) {
     setItemSelectedDelete(item);
