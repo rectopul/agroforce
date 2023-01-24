@@ -270,8 +270,9 @@ export class GenotypeTreatmentController {
     }
   }
 
-  async getOne({ id }: any) {
+  async getOne(id: number) {
     try {
+      console.log('getOne', id);
       const response = await this.genotypeTreatmentRepository.findById(id);
 
       if (!response) throw new Error('Tratamentos do genótipo não encontrada');
