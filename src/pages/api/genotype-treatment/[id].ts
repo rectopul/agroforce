@@ -17,7 +17,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (req.method) {
     case 'GET':
-      const result = await genotypeTreatmentController.getOne({id: Number(id)});
+      const result = await genotypeTreatmentController.getOne(Number(id));
       res.status(200).json(result.response);
       break;
     case 'PUT':
