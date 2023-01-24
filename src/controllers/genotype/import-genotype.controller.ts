@@ -120,7 +120,7 @@ export class ImportGenotypeController {
           if (spreadSheet.length > 2) {
             if (spreadSheet[row][1] !== spreadSheet[Number(row) - 1][1]
             || (spreadSheet.length - 1) === Number(row)) {
-              if ((spreadSheet.length - 1) === Number(row)) {
+              if ((spreadSheet.length - 1) === Number(row) && spreadSheet[row][1] === spreadSheet[Number(row) - 1][1]) {
                 validateAll.NOME_PRINCIPAL.push(spreadSheet[row][4]);
                 validateAll.NOME_PUBLICO.push(spreadSheet[row][5]);
                 validateAll.NOME_EXPERIMENTAL.push(spreadSheet[row][6]);
@@ -138,7 +138,6 @@ export class ImportGenotypeController {
                 validateAll.PROGENITORES_ORIGEM.push(spreadSheet[row][18]);
                 validateAll.PARENTESCO_COMPLETO.push(spreadSheet[row][19]);
               }
-              console.log('🚀 ~ file: import-genotype.controller.ts:150 ~ ImportGenotypeController ~ || ~ validateAll', validateAll);
 
               for (const property in validateAll) {
                 const result = allEqual(validateAll[property]);
@@ -147,6 +146,8 @@ export class ImportGenotypeController {
                   += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo ID_DADOS(${spreadSheet[row][1]}) devem ser iguais. </li> <br>`;
                 }
               }
+              console.log('🚀 ~ file: import-genotype.controller.ts:150 ~ ImportGenotypeController ~ || ~ validateAll', validateAll);
+
               validateAll = {
                 NOME_PUBLICO: [],
                 NOME_PRINCIPAL: [],
@@ -164,6 +165,7 @@ export class ImportGenotypeController {
                 PROGENITOR_M_ORIGEM: [],
                 PROGENITORES_ORIGEM: [],
                 PARENTESCO_COMPLETO: [],
+
               };
               validateAll.NOME_PRINCIPAL.push(spreadSheet[row][4]);
               validateAll.NOME_PUBLICO.push(spreadSheet[row][5]);

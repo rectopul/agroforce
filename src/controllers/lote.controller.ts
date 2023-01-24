@@ -61,7 +61,6 @@ export class LoteController {
   }
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: lote.controller.ts:63 ~ LoteController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any = '';
     parameters.AND = [];

@@ -306,7 +306,6 @@ export class GenotypeTreatmentController {
   }
 
   async update(data: any) {
-    console.log('🚀 ~ file: genotype-treatment.controller.ts:304 ~ GenotypeTreatmentController ~ update ~ data', data);
     try {
       if (data.id) {
         const response: any = await this.genotypeTreatmentRepository.findById(data.id);
