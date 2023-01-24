@@ -206,17 +206,28 @@ export class ExperimentGenotipeController {
         }
       }
 
+      // if (options.filterGrpFrom || options.filterGrpTo) {
+      //   if (options.filterGrpFrom && options.filterGrpTo) {
+      //     parameters.groupId = JSON.parse(`{"gte": ${Number(options.filterGrpFrom)}, "lte": ${Number(options.filterGrpTo)} }`);
+      //   } else if (options.filterGrpFrom) {
+      //     parameters.groupId = JSON.parse(`{"gte": ${Number(options.filterGrpFrom)} }`);
+      //   } else if (options.filterGrpTo) {
+      //     parameters.groupId = JSON.parse(`{"lte": ${Number(options.filterGrpTo)} }`);
+      //   }
+      // }
+
       if (options.filterGrpFrom || options.filterGrpTo) {
         if (options.filterGrpFrom && options.filterGrpTo) {
-          parameters.group = JSON.parse(`{"gte": ${Number(options.filterGrpFrom)}, "lte": ${Number(options.filterGrpTo)} }`);
+          parameters.group = JSON.parse(` {"group": {"gte": ${Number(options.filterGrpFrom)}, "lte": ${Number(options.filterGrpTo)} } }`);
         } else if (options.filterGrpFrom) {
-          parameters.group = JSON.parse(`{"gte": ${Number(options.filterGrpFrom)} }`);
+          parameters.group = JSON.parse(`{"group": {"gte": ${Number(options.filterGrpFrom)} } }`);
         } else if (options.filterGrpTo) {
-          parameters.group = JSON.parse(`{"lte": ${Number(options.filterGrpTo)} }`);
+          parameters.group = JSON.parse(` {"group": {"lte": ${Number(options.filterGrpTo)} } }`);
         }
       }
+      
 
-      console.log(parameters);
+      console.log('parameters',parameters);
       
       const select = {
         id: true,
@@ -330,6 +341,10 @@ export class ExperimentGenotipeController {
 
       if (options.idTecnologia) {
         parameters.idTecnologia = Number(options.idTecnologia);
+      }
+      
+      if(options.groupId){
+        parameters.groupId = Number(options.groupId);
       }
 
       if (options.nt) {
