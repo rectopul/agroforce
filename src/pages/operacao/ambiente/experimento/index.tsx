@@ -948,6 +948,9 @@ export default function Listagem({
 
       allNPERecords?.map((npe: any) => {
         let npei = Number(npe.data[0]?.npei);
+        
+        let groupId: number = npe.env?.group?.id;
+        
         npe.data.map((item: any) => {
           item.seq_delineamento?.map((sd: any) => {
             const gt = item.assay_list.genotype_treatment.filter(
@@ -965,7 +968,7 @@ export default function Listagem({
             data.nt = sd.nt;
             data.npe = npei;
             data.idLote = gt?.id_lote;
-            data.groupId = NPESelectedRow.group.id;
+            data.groupId = groupId; // NPESelectedRow.group.id
             data.idGenotipo = gt.genotipo?.id; // Added new field
             data.gli = item.assay_list?.gli;
             data.id_seq_delineamento = sd.id;
@@ -981,6 +984,8 @@ export default function Listagem({
           });
         });
       });
+      
+      // return;
       
       try {
       
@@ -1041,7 +1046,7 @@ export default function Listagem({
         title: "NPE Já usado !!!",
         html:
           `Existem NPE usados ​​entre <b>${npeUsedFrom}</b> e <b>${temp.npef}</b><br><br>` +
-          `Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : ${temp.nextNPE.foco.name}</b><br><b> Ensaio : ${temp.nextNPE.type_assay.name}</b><br><b> Local : ${temp.nextNPE.local.name_local_culture}</b><br><b>Epoca : ${temp.nextNPE.epoca}</b><br><b>Tecnologia : ${temp.nextNPE.tecnologia.name}</b></p><br>` +
+          `Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : ${temp.nextNPE?.foco.name}</b><br><b> Ensaio : ${temp.nextNPE?.type_assay.name}</b><br><b> Local : ${temp.nextNPE.local.name_local_culture}</b><br><b>Epoca : ${temp.nextNPE.epoca}</b><br><b>Tecnologia : ${temp.nextNPE.tecnologia.name}</b></p><br>` +
           `O próximo NPE disponível é <strong>${
             Number(temp.nextAvailableNPE) + 1
           }</strong></div>`,
