@@ -100,7 +100,7 @@ export class ImportAssayListController {
             if (spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]
             || (spreadSheet.length - 1) === Number(row)) {
               if ((spreadSheet.length - 1) === Number(row)
-               && spreadSheet[row][1] === spreadSheet[Number(row) - 1][1]) {
+               && spreadSheet[row][1] === spreadSheet[Number(row) - 1][4]) {
                 validateAll.FOCO.push(spreadSheet[row][2]);
                 validateAll.ENSAIO.push(spreadSheet[row][3]);
                 validateAll.TECNOLOGIA.push(spreadSheet[row][5]);

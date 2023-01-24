@@ -161,13 +161,9 @@ export default function AtualizarLocal({
   const pages = Math.ceil(total / take);
 
   const [orderBy, setOrderBy] = useState<string>('');
-  const [typeOrder, setTypeOrder] = useState<string>('');
+  const [typeOrder, setTypeOrder] = useState<string>('desc');
 
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
-
-  // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
-  //   orderBy == "tecnologia" ? "tecnologia.cod_tec" : orderBy
-  // }&typeOrder=${typeOrder}`;
 
   const formik = useFormik<IUpdateExperimento>({
     initialValues: {
@@ -221,12 +217,10 @@ export default function AtualizarLocal({
     // parametersFilter = `${parametersFilter}&${pathExtra}`;
     parametersFilter = `${parametersFilter}&skip=${
       page * Number(take)
-    }&take=${take}&orderBy=${
-      orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy
-    }&typeOrder=${typeOrder}`;
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
-    setFiltersParams(parametersFilter);
-    setCookies('filtersParams', parametersFilter);
+    // setFiltersParams(parametersFilter);
+    // setCookies('filtersParams', parametersFilter);
 
     await experimentGenotipeService
       .getAll(parametersFilter)
@@ -246,69 +240,19 @@ export default function AtualizarLocal({
     getTreatments(value);
   }, [idExperiment]);
 
-  // Call that function when change type order value.
-  // useEffect(() => {
-  //   getTreatments(filter);
-  // }, [typeOrder]);
+  useEffect(() => {
+    getTreatments(filter);
+  }, [typeOrder]);
 
   useMemo(() => {
     handlePagination(currentPage);
   }, [take]);
-
-  // async function getTreatments() {
-  //   await experimentGenotipeService
-  //     .getAll(`&idExperiment=${idExperiment}`)
-  //     .then(({ response, total: allTotal }) => {
-  //       setTreatments(response);
-  //     });
-  // }
 
   async function handleOrder(
     column: string,
     order: string | any,
     name: any,
   ): Promise<void> {
-    // let typeOrder: any;
-    // let parametersFilter: any;
-    // if (order === 1) {
-    //   typeOrder = "asc";
-    // } else if (order === 2) {
-    //   typeOrder = "desc";
-    // } else {
-    //   typeOrder = "";
-    // }
-
-    // if (filter && typeof filter !== "undefined") {
-    //   if (typeOrder !== "") {
-    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-    //   } else {
-    //     parametersFilter = filter;
-    //   }
-    // } else if (typeOrder !== "") {
-    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    // } else {
-    //   parametersFilter = filter;
-    // }
-
-    // // await materiaisService.getAll(`${parametersFilter}&skip=0&take=${take}`)
-    // //   .then(({ status, response }: any) => {
-    // //   if (status === 200) {
-    // //     setMateriais(response);
-    // //   }
-    // // });
-
-    // if (orderList === 2) {
-    //   setOrder(0);
-    //   setArrowOrder(<AiOutlineArrowDown />);
-    // } else {
-    //   setOrder(orderList + 1);
-    //   if (orderList === 1) {
-    //     setArrowOrder(<AiOutlineArrowUp />);
-    //   } else {
-    //     setArrowOrder("");
-    //   }
-    // }
-
     // Gobal manage orders
     const {
       typeOrderG, columnG, orderByG, arrowOrder,

@@ -19,6 +19,7 @@ export class ExperimentGenotipeController {
   private printedHistoryController = new PrintHistoryController();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: experiment-genotipe.controller.ts:22 ~ ExperimentGenotipeController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
@@ -216,8 +217,6 @@ export class ExperimentGenotipeController {
         }
       }
 
-      console.log(parameters);
-      
       const select = {
         id: true,
         safra: { select: { safraName: true, culture: true } },
@@ -382,6 +381,7 @@ export class ExperimentGenotipeController {
       if (parameters.AND.length === 0) {
         delete parameters.AND;
       }
+      console.log(parameters);
 
       const response: object | any = await this.ExperimentGenotipeRepository.findAll(
         parameters,
