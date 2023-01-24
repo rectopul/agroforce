@@ -989,7 +989,7 @@ export default function Listagem({
 
   function selectableFilter(rowData: any) {
     if (isOpenModal || rowData?.status_experiment == 'EXP. SORTEADO') {
-      return true;
+      return false;
     }
 
     return true;
