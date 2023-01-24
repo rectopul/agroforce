@@ -64,16 +64,16 @@ import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactor
 import ComponentLoading from '../../../../components/Loading';
 
 export default function Listagem({
-      allTreatments,
-      assaySelect,
-      genotypeSelect,
-      itensPerPage,
-      filterApplication,
-      idSafra,
-      filterBeforeEdit,
-      typeOrderServer,
-      orderByserver,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allTreatments,
+  assaySelect,
+  genotypeSelect,
+  itensPerPage,
+  filterApplication,
+  idSafra,
+  filterBeforeEdit,
+  typeOrderServer,
+  orderByserver,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const [loading, setLoading] = useState<boolean>(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -742,9 +742,8 @@ export default function Listagem({
       .getAll(`${filterParam}&excel=true`)
       .then(({ status, response }) => {
         if (status === 200) {
-          
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, response, "Tratamentos");
+          XLSX.utils.book_append_sheet(workBook, response, 'Tratamentos');
 
           // Buffer
           XLSX.write(workBook, {
@@ -988,8 +987,8 @@ export default function Listagem({
   }
 
   function selectableFilter(rowData: any) {
-    if (isOpenModal || rowData?.status_experiment == 'EXP. SORTEADO') {
-      return true;
+    if (isOpenModal || rowData?.status_experiment === 'EXP. SORTEADO') {
+      return false;
     }
 
     return true;

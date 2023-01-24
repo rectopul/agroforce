@@ -138,13 +138,12 @@ export class ImportGenotypeController {
                 validateAll.PROGENITORES_ORIGEM.push(spreadSheet[row][18]);
                 validateAll.PARENTESCO_COMPLETO.push(spreadSheet[row][19]);
               }
-              console.log('🚀 ~ file: import-genotype.controller.ts:150 ~ ImportGenotypeController ~ || ~ validateAll', validateAll);
 
               for (const property in validateAll) {
                 const result = allEqual(validateAll[property]);
                 if (!result) {
                   responseIfError[Number(0)]
-                  += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo ID_DADOS(${spreadSheet[row][1]}) devem ser iguais. </li> <br>`;
+                  += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do ID_DADOS-${spreadSheet[row][1]} devem ser iguais. favor checar. </li> <br>`;
                 }
               }
               validateAll = {

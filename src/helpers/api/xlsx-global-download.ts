@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-param-reassign */
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { CulturaController } from 'src/controllers/cultura.controller';
@@ -19,82 +21,8 @@ import { GenotypeTreatmentController } from 'src/controllers/genotype-treatment/
 import { ExperimentController } from 'src/controllers/experiment/experiment.controller';
 import { NpeController } from 'src/controllers/npe/npe.controller';
 import { QuadraController } from 'src/controllers/block/quadra.controller';
+import moment from 'moment';
 import { ExperimentGenotipeController } from '../../controllers/experiment-genotipe.controller';
-
-async function createXls(options: any, controller: string) {
-  let workSheet: any;
-  switch (controller) {
-    case 'TMG-CULTURA':
-      workSheet = callTmgCulturaXlsxDownload(options);
-      break;
-    case 'TMG-USUARIO':
-      workSheet = callTmgUsuarioXlsxDownload(options);
-      break;
-    case 'TMG-SETOR':
-      workSheet = callTmgSetorXlsxDownload(options);
-      break;
-    case 'TMG-SAFRA':
-      workSheet = callTmgSafraXlsxDownload(options);
-      break;
-    case 'TMG-GENOTIPE':
-      workSheet = callTmgGenotipeXlsxDownload(options);
-      break;
-    case 'TMG-LOTE':
-      workSheet = callTmgLoteXlsxDownload(options);
-      break;
-    case 'ENSAIO-TIPO_DE_ENSAIO':
-      workSheet = callEnsaioTipoDeEnsaioXlsxDownload(options);
-      break;
-    case 'ENSAIO-FOCO':
-      workSheet = callEnsaioFocoXlsxDownload(options);
-      break;
-    case 'ENSAIO-TECHNOLOGIA':
-      workSheet = callEnsaioTechnologiaXlsxDownload(options);
-      break;
-    case 'DELINEAMENTO':
-      workSheet = callDelineamentoXlsxDownload(options);
-      break;
-    case 'LOCAL-LUGAR_CULTURA':
-      workSheet = callLocalLugarCulturaXlsxDownload(options);
-      break;
-    case 'LOCAL-UNIDADE-CULTURA':
-      workSheet = callLocalUnidadeCulturaXlsxDownload(options);
-      break;
-    case 'QUADRAS-LAYOUT':
-      workSheet = callQuadrasLayoutXlsxDownload(options);
-      break;
-    case 'RD':
-      workSheet = callRdXlsxDownload(options);
-      break;
-    case 'ENSAIO-ENSAIO':
-      workSheet = callEnsaioEnsaioXlsxDownload(options);
-      break;
-    case 'ENSAIO-GENOTIPE':
-      workSheet = callEnsaioGenotipeXlsxDownload(options);
-      break;
-    case 'EXPERIMENTOS-EXPERIMENTO':
-      workSheet = callExperimentosExperimentoXlsxDownload(options);
-      break;
-    case 'EXPERIMENT-GENOTIPE':
-      workSheet = callExperimentGenotipeXlsxDownload(options);
-      break;
-    case 'AMBIENTE-AMBIENTE':
-      workSheet = callAmbienteAmbienteXlsxDownload(options);
-      break;
-    case 'QUADRAS-EXCEL':
-      workSheet = callQuadrasExcelXlsxDownload(options);
-      break;
-    case 'QUADRAS-EXCEL_SINTETICO':
-      workSheet = callQuadrasExcelSinteticoXlsxDownload(options);
-      break;
-    case 'QUADRAS-EXCEL_ANALYTICS':
-      workSheet = callQuadrasExcelAnalyticsXlsxDownload(options);
-      break;
-    default:
-      Swal.fire('Invalid controller name');
-  }
-  return workSheet;
-}
 
 async function callExperimentGenotipeXlsxDownload(options: any) {
   const Controller = new ExperimentGenotipeController();
@@ -127,11 +55,11 @@ async function callExperimentGenotipeXlsxDownload(options: any) {
       return newItem;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -168,11 +96,11 @@ async function callTmgCulturaXlsxDownload(options: any) {
       return row;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -216,11 +144,11 @@ async function callTmgUsuarioXlsxDownload(options: any) {
       return line;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -257,11 +185,11 @@ async function callTmgSetorXlsxDownload(options: any) {
       return row;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -304,11 +232,11 @@ async function callTmgSafraXlsxDownload(options: any) {
       return row;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -329,31 +257,8 @@ async function callTmgGenotipeXlsxDownload(options: any) {
   do {
     const { response, status } = await Controller.getAll(options);
     const newData = response.map((row: any) => {
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      row.DT = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
-
-      row.tecnologia = `${row.tecnologia.cod_tec} ${row.tecnologia.name}`;
-
+      row.dt_export = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
+      
       row.CULTURA = row.culture.name;
       row.NOME_GENÓTIPO = row.name_genotipo;
       row.NOME_PRINCIPAL = row.name_main;
@@ -361,7 +266,7 @@ async function callTmgGenotipeXlsxDownload(options: any) {
       row.NOME_EXPERIMENTAL = row.name_experiment;
       row.NOME_ALTERNATIVO = row.name_alter;
       row.ELITE_NOME = row.elit_name;
-      row.TECNOLOGIA = row.tecnologia;
+      row.TECNOLOGIA = `${row.tecnologia.cod_tec} ${row.tecnologia.name}`;
       row.N_DE_LOTES = row.numberLotes;
       row.TIPO = row.type;
       row.GMR = row.gmr;
@@ -373,6 +278,8 @@ async function callTmgGenotipeXlsxDownload(options: any) {
       row.PROGENITOR_M_ORIGEM = row.progenitor_m_origem;
       row.PROGENITORES_ORIGEM = row.progenitores_origem;
       row.PARENTESCO_COMPLETO = row.parentesco_completo;
+      row.DT_EXPORT = row.dt_export;
+      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
       row.DATA = row.DT;
 
       delete row.culture;
@@ -408,11 +315,11 @@ async function callTmgGenotipeXlsxDownload(options: any) {
       return row;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -431,35 +338,56 @@ async function callTmgLoteXlsxDownload(options: any) {
   options.take = 1000;
 
   do {
-    const { response, status } = await Controller.getAll(options);
-    const newData = response.map((row: any) => {
-      if (row.status === 0) {
-        row.status = 'Inativos' as any;
-      } else {
-        row.status = 'Ativos' as any;
-      }
-      row.Nome = row.safraName;
-      row.Ano = row.year;
-      row.Início_Plantio = row.plantingStartTime;
-      row.Fim_Plantio = row.plantingEndTime;
-      row.Status = row.status;
+    const { response } = await Controller.getAll(options);
+    const newData = response.map((item: any) => {
+      const newItem = item;
 
-      delete row.safraName;
-      delete row.year;
-      delete row.plantingStartTime;
-      delete row.plantingEndTime;
-      delete row.status;
-      delete row.id;
-      delete row.tableData;
+      newItem.dt_export = new Date(newItem.dt_export);
+      newItem.dt_export = new Date(
+        newItem.dt_export.toISOString().slice(0, -1),
+      );
 
-      return row;
+      newItem.dt_export = moment(newItem.dt_export).format('DD-MM-YYYY hh:mm:ss');
+
+      newItem.CULTURA = item?.genotipo.culture.name;
+      newItem.ANO = item?.year;
+      newItem.SAFRA = item?.safra.safraName;
+      newItem.COD_LOTE = item?.cod_lote;
+      newItem.NCC = item?.ncc;
+      newItem.FASE = item?.fase;
+      newItem.PESO = item?.peso;
+      newItem.QUANT_SEMENTES = item?.quant_sementes;
+      newItem.DT_GOM = new Date();
+      newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
+      newItem.NOME_PRINCIPAL = item?.genotipo.name_main;
+      newItem.GMR = item?.genotipo.gmr;
+      newItem.BGM = item?.genotipo.bgm;
+      newItem.TECNOLOGIA = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
+      newItem.DT_EXPORT = newItem.dt_export;
+
+      delete newItem.quant_sementes;
+      delete newItem.peso;
+      delete newItem.fase;
+      delete newItem.ncc;
+      delete newItem.cod_lote;
+      delete newItem.year;
+      delete newItem.id_s2;
+      delete newItem.id_dados;
+      delete newItem.DT;
+      delete newItem.dt_export;
+      delete newItem.id;
+      delete newItem.id_genotipo;
+      delete newItem.genotipo;
+      delete newItem.safra;
+
+      return newItem;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -502,11 +430,11 @@ async function callEnsaioTipoDeEnsaioXlsxDownload(options: any) {
       return newRow;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -549,11 +477,11 @@ async function callEnsaioFocoXlsxDownload(options: any) {
       return row;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -614,11 +542,11 @@ async function callEnsaioTechnologiaXlsxDownload(options: any) {
       return row;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -662,11 +590,11 @@ async function callDelineamentoXlsxDownload(options: any) {
       return row;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -693,17 +621,17 @@ async function callLocalLugarCulturaXlsxDownload(options: any) {
       let hours: string;
       let minutes: string;
       let seconds: string;
-      if (String(dataExp.getHours()).length == 1) {
+      if (String(dataExp.getHours()).length === 1) {
         hours = `0${String(dataExp.getHours())}`;
       } else {
         hours = String(dataExp.getHours());
       }
-      if (String(dataExp.getMinutes()).length == 1) {
+      if (String(dataExp.getMinutes()).length === 1) {
         minutes = `0${String(dataExp.getMinutes())}`;
       } else {
         minutes = String(dataExp.getMinutes());
       }
-      if (String(dataExp.getSeconds()).length == 1) {
+      if (String(dataExp.getSeconds()).length === 1) {
         seconds = `0${String(dataExp.getSeconds())}`;
       } else {
         seconds = String(dataExp.getSeconds());
@@ -738,11 +666,11 @@ async function callLocalLugarCulturaXlsxDownload(options: any) {
       return row;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -841,11 +769,11 @@ async function callLocalUnidadeCulturaXlsxDownload(options: any) {
       return newRow;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -892,11 +820,11 @@ async function callQuadrasLayoutXlsxDownload(options: any) {
       return row;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -939,11 +867,11 @@ async function callRdXlsxDownload(options: any) {
       return newItem;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -1000,11 +928,11 @@ async function callEnsaioEnsaioXlsxDownload(options: any) {
       return newItem;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -1044,11 +972,11 @@ async function callEnsaioGenotipeXlsxDownload(options: any) {
       return newItem;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -1116,11 +1044,11 @@ async function callExperimentosExperimentoXlsxDownload(options: any) {
       return newItem;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -1183,11 +1111,11 @@ async function callAmbienteAmbienteXlsxDownload(options: any) {
       return row;
     });
 
-    if (count == 1) {
+    if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
       options.skip = 1000;
-      count++;
+      count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
@@ -1207,7 +1135,7 @@ async function callQuadrasExcelXlsxDownload(options: any) {
 
   do {
     const { response, status } = await Controller.getAll(options);
-    if (status == 200) {
+    if (status === 200) {
       const newData = response.map((row: any) => {
         if (row.status === 0) {
           row.status = 'Inativo' as any;
@@ -1246,11 +1174,11 @@ async function callQuadrasExcelXlsxDownload(options: any) {
         return row;
       });
 
-      if (count == 1) {
+      if (count === 1) {
         workSheet = XLSX.utils.json_to_sheet(newData);
         res = response;
         options.skip = 1000;
-        count++;
+        count += 1;
       } else {
         workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
         res = response;
@@ -1277,7 +1205,7 @@ async function callQuadrasExcelSinteticoXlsxDownload(options: any) {
 
   do {
     const { response, status } = await Controller.getAll(options);
-    if (status == 200) {
+    if (status === 200) {
       const experimentArray: any = [];
       const object: any = {};
       const experimentObject: any = {
@@ -1320,12 +1248,12 @@ async function callQuadrasExcelSinteticoXlsxDownload(options: any) {
         return row;
       });
 
-      if (count == 1) {
+      if (count === 1) {
         workSheet = XLSX.utils.json_to_sheet(newData);
         res = response;
         options.skip = 1000;
         // status = status;
-        count++;
+        count += 1;
       } else {
         workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
         res = response;
@@ -1352,7 +1280,7 @@ async function callQuadrasExcelAnalyticsXlsxDownload(options: any) {
 
   do {
     const { response, status } = await Controller.getAll(options);
-    if (status == 200) {
+    if (status === 200) {
       const lines: any = [];
       response.forEach(async (block: any) => {
         await block.experiment?.forEach(async (experiment: any) => {
@@ -1385,12 +1313,12 @@ async function callQuadrasExcelAnalyticsXlsxDownload(options: any) {
         });
       });
 
-      if (count == 1) {
+      if (count === 1) {
         workSheet = XLSX.utils.json_to_sheet(lines);
         res = response;
         options.skip = 1000;
         // status = status;
-        count++;
+        count += 1;
       } else {
         workSheet = XLSX.utils.sheet_add_json(workSheet, lines, { origin: -1, skipHeader: true });
         res = response;
@@ -1404,6 +1332,81 @@ async function callQuadrasExcelAnalyticsXlsxDownload(options: any) {
     }
   } while (res.length > 0);
   return { status: 200, sheet: workSheet };
+}
+
+async function createXls(options: any, controller: string) {
+  let workSheet: any;
+  switch (controller) {
+    case 'TMG-CULTURA':
+      workSheet = callTmgCulturaXlsxDownload(options);
+      break;
+    case 'TMG-USUARIO':
+      workSheet = callTmgUsuarioXlsxDownload(options);
+      break;
+    case 'TMG-SETOR':
+      workSheet = callTmgSetorXlsxDownload(options);
+      break;
+    case 'TMG-SAFRA':
+      workSheet = callTmgSafraXlsxDownload(options);
+      break;
+    case 'TMG-GENOTIPE':
+      workSheet = callTmgGenotipeXlsxDownload(options);
+      break;
+    case 'TMG-LOTE':
+      workSheet = callTmgLoteXlsxDownload(options);
+      break;
+    case 'ENSAIO-TIPO_DE_ENSAIO':
+      workSheet = callEnsaioTipoDeEnsaioXlsxDownload(options);
+      break;
+    case 'ENSAIO-FOCO':
+      workSheet = callEnsaioFocoXlsxDownload(options);
+      break;
+    case 'ENSAIO-TECHNOLOGIA':
+      workSheet = callEnsaioTechnologiaXlsxDownload(options);
+      break;
+    case 'DELINEAMENTO':
+      workSheet = callDelineamentoXlsxDownload(options);
+      break;
+    case 'LOCAL-LUGAR_CULTURA':
+      workSheet = callLocalLugarCulturaXlsxDownload(options);
+      break;
+    case 'LOCAL-UNIDADE-CULTURA':
+      workSheet = callLocalUnidadeCulturaXlsxDownload(options);
+      break;
+    case 'QUADRAS-LAYOUT':
+      workSheet = callQuadrasLayoutXlsxDownload(options);
+      break;
+    case 'RD':
+      workSheet = callRdXlsxDownload(options);
+      break;
+    case 'ENSAIO-ENSAIO':
+      workSheet = callEnsaioEnsaioXlsxDownload(options);
+      break;
+    case 'ENSAIO-GENOTIPE':
+      workSheet = callEnsaioGenotipeXlsxDownload(options);
+      break;
+    case 'EXPERIMENTOS-EXPERIMENTO':
+      workSheet = callExperimentosExperimentoXlsxDownload(options);
+      break;
+    case 'EXPERIMENT-GENOTIPE':
+      workSheet = callExperimentGenotipeXlsxDownload(options);
+      break;
+    case 'AMBIENTE-AMBIENTE':
+      workSheet = callAmbienteAmbienteXlsxDownload(options);
+      break;
+    case 'QUADRAS-EXCEL':
+      workSheet = callQuadrasExcelXlsxDownload(options);
+      break;
+    case 'QUADRAS-EXCEL_SINTETICO':
+      workSheet = callQuadrasExcelSinteticoXlsxDownload(options);
+      break;
+    case 'QUADRAS-EXCEL_ANALYTICS':
+      workSheet = callQuadrasExcelAnalyticsXlsxDownload(options);
+      break;
+    default:
+      Swal.fire('Invalid controller name');
+  }
+  return workSheet;
 }
 
 export default createXls;
