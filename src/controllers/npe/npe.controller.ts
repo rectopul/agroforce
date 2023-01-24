@@ -201,17 +201,14 @@ export class NpeController {
           const next = elements.find((item: any, idx:any) => item.group?.id === groupId && idx > index);
           
           if (next) {
-
-            
-            
-            /*
-            SELECT @npei_search:= MIN(npe.npei) as next_npe
-FROM npe 
-WHERE (npe.npei >= @npe) 
-AND NOT EXIST(SELECT n2.id FROM npe n2 WHERE n2.id = npe.id)
-GROUP BY npe.safraId, npe.groupId
-HAVING ((npe.safraId = @safra AND npe.groupId = @grupo));
-
+            /**
+             * SELECT @npei_search:= MIN(npe.npei) as next_npe
+             * FROM npe
+             * WHERE (npe.npei >= @npe)
+             * AND NOT EXIST(SELECT n2.id FROM npe n2 WHERE n2.id = npe.id)
+             * GROUP BY npe.safraId, npe.groupId
+             * HAVING ((npe.safraId = @safra AND npe.groupId = @grupo));
+             * 
              */
 
             if (!newItem.npeQT) {
@@ -251,16 +248,17 @@ HAVING ((npe.safraId = @safra AND npe.groupId = @grupo));
               menor = npe_x_exp.prox_npe;
             }
           }
-          
-          item.npeQT = menor;
+          // 185 (menor) - 179 (prox_npe) = 6
+          // 201 (menor) - 179 (prox_npe) = 22
+          if(typeof item.nextNPE == 'object') {
+            item.npeQT = menor - item.prox_npe;
+          } else {
+            item.npeQT = 'N/A';
+          }
         }
-        
-        console.log('message', stat, res, msg);
+        //console.log('message', stat, res, msg);
       }
-      
-      
       // console.log('npe:', response);
-      
       if (!response || response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhuma NPE cadastrada',

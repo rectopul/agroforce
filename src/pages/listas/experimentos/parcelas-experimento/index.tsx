@@ -283,6 +283,8 @@ export default function Listagem({
       filterCodTec: '',
       filterExperimentName: '',
       filterPlacingPlace: '',
+      filterGrpTo: '',
+      filterGrpFrom: '',
     },
     onSubmit: async ({
       filterFoco,

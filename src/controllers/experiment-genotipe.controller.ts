@@ -208,14 +208,16 @@ export class ExperimentGenotipeController {
 
       if (options.filterGrpFrom || options.filterGrpTo) {
         if (options.filterGrpFrom && options.filterGrpTo) {
-          parameters.group = JSON.parse(` {"group": {"gte": ${Number(options.filterGrpFrom)}, "lte": ${Number(options.filterGrpTo)} } }`);
+          parameters.group = JSON.parse(`{"gte": ${Number(options.filterGrpFrom)}, "lte": ${Number(options.filterGrpTo)} }`);
         } else if (options.filterGrpFrom) {
-          parameters.group = JSON.parse(`{"group": {"gte": ${Number(options.filterGrpFrom)} } }`);
+          parameters.group = JSON.parse(`{"gte": ${Number(options.filterGrpFrom)} }`);
         } else if (options.filterGrpTo) {
-          parameters.group = JSON.parse(` {"group": {"lte": ${Number(options.filterGrpTo)} } }`);
+          parameters.group = JSON.parse(`{"lte": ${Number(options.filterGrpTo)} }`);
         }
       }
 
+      console.log(parameters);
+      
       const select = {
         id: true,
         safra: { select: { safraName: true, culture: true } },
