@@ -758,7 +758,6 @@ export default function Listagem({
     const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
 
     await genotipoService.getAll(filterParam).then(({ response, status }) => {
-      console.log('🚀 ~ file: index.tsx:781 ~ awaitgenotipoService.getAll ~ response', response);
       if (status === 200) {
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, response, 'Genótipos');

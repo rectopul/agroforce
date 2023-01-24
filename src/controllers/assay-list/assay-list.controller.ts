@@ -148,7 +148,6 @@ export class AssayListController {
   }
 
   async update(data: any) {
-    console.log('🚀 ~ file: assay-list.controller.ts:146 ~ AssayListController ~ update ~ data', data);
     try {
       const assayList: any = await this.assayListRepository.findById(data.id);
 

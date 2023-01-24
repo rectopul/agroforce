@@ -159,7 +159,6 @@ export class GenotipoController {
         const maxDt = Math.max(...dts);
         genotipo.dt_export = new Date(maxDt);
       });
-      console.log('🚀 ~ file: genotipo.controller.ts:160 ~ GenotipoController ~ response.map ~ response', response);
 
       if (!response || response.total <= 0) {
         return {

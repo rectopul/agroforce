@@ -1,15 +1,16 @@
 import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
+import createXls from 'src/helpers/api/xlsx-global-download';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import handleError from '../../shared/utils/handleError';
 import { GenotypeTreatmentRepository } from '../../repository/genotype-treatment/genotype-treatment.repository';
 import { countTreatmentsNumber } from '../../shared/utils/counts';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
-import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class GenotypeTreatmentController {
   genotypeTreatmentRepository = new GenotypeTreatmentRepository();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: genotype-treatment.controller.ts:13 ~ GenotypeTreatmentController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
@@ -307,7 +308,6 @@ export class GenotypeTreatmentController {
   }
 
   async update(data: any) {
-    console.log('🚀 ~ file: genotype-treatment.controller.ts:304 ~ GenotypeTreatmentController ~ update ~ data', data);
     try {
       if (data.id) {
         const response: any = await this.genotypeTreatmentRepository.findById(data.id);
