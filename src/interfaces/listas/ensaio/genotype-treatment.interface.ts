@@ -35,6 +35,7 @@ export interface ITreatmentFilter {
   filterStatus: string
   filterCodTec: string
   filterStatusAssay: string
+  filterStatusExperiment: string
   filterGenotypeName: string
   filterNcaFrom: string
   filterNcaTo: string

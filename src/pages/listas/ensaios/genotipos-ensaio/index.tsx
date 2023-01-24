@@ -88,7 +88,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.genotypeTreatment || {
     id: 0,
     table_preferences:
-      'id,foco,type_assay,tecnologia,ggen,gli,bgm,bgmGenotype,gmr,treatments_number,status,statusAssay,genotipoName,nca',
+      'id,foco,type_assay,tecnologia,ggen,gli,bgm,bgmGenotype,gmr,treatments_number,status,statusAssay,status_experiment,genotipoName,nca',
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
@@ -175,6 +175,12 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
+      title: 'Status do Tratamento',
+      value: 'status_experiment',
+      defaultChecked: () => camposGerenciados.includes('status_experiment'),
+    },
+    {
+      name: 'CamposGerenciados[]',
       title: 'Nome do genótipo',
       value: 'genotipoName',
       defaultChecked: () => camposGerenciados.includes('genotipoName'),
@@ -238,6 +244,7 @@ export default function Listagem({
       filterTreatmentsNumber: checkValue('filterTreatmentsNumber'),
       filterStatus: checkValue('filterStatus'),
       filterStatusAssay: checkValue('filterStatusAssay'),
+      filterStatusExperiment: checkValue('filterStatusExperiment'),
       filterGenotypeName: checkValue('filterGenotypeName'),
       filterNcaTo: checkValue('filterNcaTo'),
       filterNcaFrom: checkValue('filterNcaFrom'),
@@ -275,7 +282,7 @@ export default function Listagem({
       filterNtTo,
       filterNtFrom,
       filterStatusT,
-      // filterStatus,
+      filterStatusExperiment,
       filterCodTec,
     }) => {
       if (!functionsUtils?.isNumeric(filterBgmFrom)) {
@@ -303,7 +310,7 @@ export default function Listagem({
 
       // const filterStatus = selecionados.substr(0, selecionados.length - 1);
       const filterStatus = statusFilterSelected?.join(',')?.toLowerCase();
-      const parametersFilter = `filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmGenotypeTo=${filterBgmGenotypeTo}&filterBgmGenotypeFrom=${filterBgmGenotypeFrom}&filterGgenCod=${filterGgenCod}&filterGgenName=${filterGgenName}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNcaFrom=${filterNcaFrom}&filterNcaTo=${filterNcaTo}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}&status_experiment=${filterStatus}`;
+      const parametersFilter = `filterGmrTo=${filterGmrTo}&filterGmrFrom=${filterGmrFrom}&filterBgmGenotypeTo=${filterBgmGenotypeTo}&filterBgmGenotypeFrom=${filterBgmGenotypeFrom}&filterGgenCod=${filterGgenCod}&filterGgenName=${filterGgenName}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNcaFrom=${filterNcaFrom}&filterNcaTo=${filterNcaTo}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}&status_experiment=${filterStatusExperiment}`;
 
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEdit', filtersParams);
@@ -644,6 +651,17 @@ export default function Listagem({
           }),
         );
       }
+      if (columnOrder[item] === 'status_experiment') {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Status Tratamento',
+            title: 'status_experiment',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
+      }
       if (columnOrder[item] === 'genotipoName') {
         tableFields.push(
           headerTableFactoryGlobal({
@@ -898,12 +916,43 @@ export default function Listagem({
     const ncaButton = document.querySelector("input[id='nca']:checked");
     const inputFile: any = document.getElementById('import');
     event.preventDefault();
+    
     if (genotypeButton) {
       const checkedTreatments: any = rowsSelected.map((item: any) => ({
         id: item.id,
         idGenotipo: item.id_genotipo,
         idLote: item.id_lote,
       }));
+      
+      console.log('checkedTreatments', checkedTreatments);
+      
+      let error = false;
+      let message = '';
+      
+      //iterate checkedTreatments
+      for (const item of checkedTreatments) {
+        
+        console.log('item', item);
+        try {
+          const {status, response} = await genotypeTreatmentService.getOne({id: item.id});
+          if(status == 200) {
+            if(response.status_experiment == 'EXP. SORTEADO') {
+              error = true;
+              message+= 'Não é possível alterar genótipo de tratamentos com status EXP. SORTEADO: ID: ' + item.id + `\n`;
+              console.log('response', response);
+            }
+          }
+        }catch (e){
+          console.log('error', e);
+        }
+      }
+      
+      if(error) {
+        Swal.fire(message);
+        setIsOpenModal(false);
+        return;
+      }
+      
 
       const checkedTreatmentsLocal = JSON.stringify(checkedTreatments);
       localStorage.setItem('checkedTreatments', checkedTreatmentsLocal);
@@ -943,8 +992,8 @@ export default function Listagem({
       router.push(
         '/listas/ensaios/genotipos-ensaio/substituicao?value=ensaios',
       );
-    } else if (inputFile?.files.length !== 0) {
-      readExcel(inputFile.files);
+    } else if (inputFile?.files.length !== 0 && inputFile !== null) {
+      readExcel(inputFile?.files);
     } else {
       Swal.fire('Selecione alguma opção ou import');
     }
