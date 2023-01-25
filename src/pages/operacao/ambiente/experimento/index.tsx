@@ -188,6 +188,7 @@ export default function Listagem({
 
   const [colorStar, setColorStar] = useState<string>("");
   const [NPESelectedRow, setNPESelectedRow] = useState<any>(null);
+  
   const [npeUsedFrom, setNpeUsedFrom] = useState<number>(0);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
@@ -206,6 +207,9 @@ export default function Listagem({
   const [allNPERecords, setAllNPERecords] = useState<any[]>([]);
   const [isNccAvailable, setIsNccAvailable] = useState<boolean>(true);
   const [isOverLap, setIsOverLap] = useState<boolean>(false);
+  // @todo: Solução paliativa para mostrar ambientes com erro, no multi-sorteio, remover;
+  const [NPEFirstOverlapRow, setNPEFirstOverlapRow] = useState<any>(null);
+  
   const [data, setData] = useState<any[]>([]);
   // let selectedNPE = JSON.parse(localStorage.getItem('selectedNPE') as string);
 
@@ -810,6 +814,8 @@ export default function Listagem({
         }
         if (allNPERecords[key].isOverLap == true) {
           isOverLap = true;
+          if(!NPEFirstOverlapRow)
+            setNPEFirstOverlapRow(allNPERecords[key].env);
         }
       }
     }
@@ -1025,15 +1031,17 @@ export default function Listagem({
       }
       
     } else if (isNccAvailable == false && isOverLap == true) {
-      const temp = NPESelectedRow;
+      const temp = NPEFirstOverlapRow;
       Swal.fire({
         title: "NPE Já usado !!!",
         html:
           `Existem NPE usados ​​entre <b>${npeUsedFrom}</b> e <b>${temp.npef}</b><br><br>` +
-          `Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : ${temp.nextNPE.foco.name}</b><br><b> Ensaio : ${temp.nextNPE.type_assay.name}</b><br><b> Local : ${temp.nextNPE.local.name_local_culture}</b><br><b>Epoca : ${temp.nextNPE.epoca}</b><br><b>Tecnologia : ${temp.nextNPE.tecnologia.name}</b></p><br>` +
-          `O próximo NPE disponível é <strong>${
-            Number(temp.nextAvailableNPE) + 1
-          }</strong><br><strong>Ncc não está presente nos registros</strong></div>`,
+          `Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'>`+
+          `<b> Foco : ${temp.nextNPE?.foco?.name}</b><br><b> Ensaio : ${temp.nextNPE?.type_assay?.name}</b><br>` +
+          `<b> Local : ${temp.nextNPE?.local?.name_local_culture}</b><br><b>Epoca : ${temp.nextNPE?.epoca}</b><br>` +
+          `<b>Tecnologia : ${temp.nextNPE?.tecnologia?.name}</b></p><br>` +
+          `O próximo NPE disponível é <strong>${Number(temp.nextAvailableNPE) + 1}</strong><br>`+
+          `<strong>Ncc não está presente nos registros</strong></div>`,
         icon: "warning",
         showCloseButton: true,
         closeButtonHtml:
@@ -1059,15 +1067,22 @@ export default function Listagem({
         showCancelButton: true,
       });
     } else if (isOverLap == true) {
-      const temp = NPESelectedRow;
+      const temp = NPEFirstOverlapRow;
+
+      let infos = ``;
+      if(typeof temp.nextNPE == 'object') {
+        infos = `Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'>` +
+          `<b> Foco : ${temp.nextNPE?.foco?.name}</b><br><b> Ensaio : ${temp.nextNPE?.type_assay?.name}</b><br>` +
+          `<b> Local : ${temp.nextNPE?.local?.name_local_culture}</b><br><b>Epoca : ${temp.nextNPE?.epoca}</b><br>` +
+          `<b>Tecnologia : ${temp.nextNPE?.tecnologia?.name}</b></p><br>`;
+      }
+      
       Swal.fire({
         title: "NPE Já usado !!!",
         html:
           `Existem NPE usados ​​entre <b>${npeUsedFrom}</b> e <b>${temp.npef}</b><br><br>` +
-          `Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'><b> Foco : ${temp.nextNPE?.foco.name}</b><br><b> Ensaio : ${temp.nextNPE?.type_assay.name}</b><br><b> Local : ${temp.nextNPE.local.name_local_culture}</b><br><b>Epoca : ${temp.nextNPE.epoca}</b><br><b>Tecnologia : ${temp.nextNPE.tecnologia.name}</b></p><br>` +
-          `O próximo NPE disponível é <strong>${
-            Number(temp.nextAvailableNPE) + 1
-          }</strong></div>`,
+          infos + 
+          `O próximo NPE disponível é <strong>${Number(temp.nextAvailableNPE) + 1}</strong></div>`,
         icon: "warning",
         showCloseButton: true,
         closeButtonHtml:
@@ -1166,7 +1181,7 @@ export default function Listagem({
                         : "#d3d3d3"
                       : rowData.npef >= rowData.nextNPE.npei_i
                       ? "#FF5349"
-                      : "#d3d3d3",
+                      : "#f9fafb",
                   height: 40,
                 }),
                 search: false,
