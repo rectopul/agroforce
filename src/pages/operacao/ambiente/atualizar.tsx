@@ -154,9 +154,9 @@ export default function NovoLocal({
                   title: "NPE Já usado !!!",
                   html:
                     `Não foi possível atualizar o prox npe, o prox npe inserido já foi usado pela parcela.<br/>` +
-                    `Cultura: ${idCulture}<br>` +
-                    `Safra: ${idSafra}<br>` +
-                    `GroupId: ${groupId}<br>` +
+                    // `Cultura: ${idCulture}<br>` +
+                    // `Safra: ${idSafra}<br>` +
+                    // `GroupId: ${groupId}<br>` +
                     `Próx NPE: ${values.prox_npe}<br>`,
                 });
               }

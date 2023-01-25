@@ -1162,11 +1162,11 @@ export default function Listagem({
                   backgroundColor:
                     NPESelectedRow?.tableData?.id === rowData.tableData.id
                       ? NPESelectedRow.npef >= NPESelectedRow.nextNPE.npei_i
-                        ? "#FF5349"
+                        ? "#de1e14"
                         : "#d3d3d3"
-                      : rowData.npef > rowData.nextNPE.npei_i
+                      : rowData.npef >= rowData.nextNPE.npei_i
                       ? "#FF5349"
-                      : "#f9fafb",
+                      : "#d3d3d3",
                   height: 40,
                 }),
                 search: false,

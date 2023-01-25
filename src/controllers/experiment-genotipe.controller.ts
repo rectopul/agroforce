@@ -431,9 +431,19 @@ export class ExperimentGenotipeController {
         max_NPE_1: number | null,
         maxnpe: number | null,
       } = await prisma.$queryRaw`SELECT 
-        (EXISTS (SELECT npe FROM experiment_genotipe WHERE npe = ${npefSearch})) as count_npe_exists, 
+        (EXISTS (
+            SELECT npe FROM experiment_genotipe WHERE 1=1 
+            AND npe = ${npefSearch} 
+            AND groupId = ${groupId}
+            AND ('' = ${safraId} OR gn.idSafra = ${safraId})
+        )) as count_npe_exists, 
         (MAX(gn.npe) + 1) as max_NPE_1,
-        IF( (EXISTS (SELECT npe FROM experiment_genotipe WHERE npe = ${npefSearch})) > 0, (MAX(gn.npe) + 1), ${npefSearch}) as maxnpe
+        IF( (EXISTS (
+            SELECT npe FROM experiment_genotipe WHERE 1=1 
+            AND npe = ${npefSearch} 
+            AND groupId = ${groupId} 
+            AND ('' = ${safraId} OR gn.idSafra = ${safraId})
+        )) > 0, (MAX(gn.npe) + 1), ${npefSearch}) as maxnpe
         FROM experiment_genotipe gn
         WHERE 1 = 1
         AND gn.groupId = ${groupId}
