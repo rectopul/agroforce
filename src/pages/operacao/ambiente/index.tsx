@@ -593,7 +593,7 @@ export default function Listagem({
   }
 
   async function getValuesColumns(): Promise<void> {
-    const els: any = document.querySelectorAll("input[type='checkbox'");
+    const els: any = document.querySelectorAll("input[type='checkbox']");
     let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
