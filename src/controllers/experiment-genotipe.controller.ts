@@ -432,7 +432,7 @@ export class ExperimentGenotipeController {
         maxnpe: number | null,
       } = await prisma.$queryRaw`SELECT 
         (EXISTS (SELECT npe FROM experiment_genotipe WHERE npe = ${npefSearch})) as count_npe_exists, 
-        (MAX(gn.npe) + 1) as max_NPE_1, 
+        (MAX(gn.npe) + 1) as max_NPE_1,
         IF( (EXISTS (SELECT npe FROM experiment_genotipe WHERE npe = ${npefSearch})) > 0, (MAX(gn.npe) + 1), ${npefSearch}) as maxnpe
         FROM experiment_genotipe gn
         WHERE 1 = 1

@@ -715,6 +715,8 @@ export default function Listagem({
             p.npeQT = p.npef - p.npei + 1;
             env.npef = i - 1;
             env.npefView = i - 1;
+
+            p.npefView = p.npef;
             
             console.log('p.npeQT', p.npeQT);
 
@@ -733,6 +735,9 @@ export default function Listagem({
           });
           
           console.log('env.npef', env.npef, 'env.nextNPE.npei_i', env.nextNPE.npei_i);
+          
+          console.log('response.experiments', response);
+          
 
           /**
            * No caso temos o ENV1 com NPEI = 101 e NPEF = 101 e NPEI_I = 101 e PROX_NPE = 101
@@ -748,7 +753,7 @@ export default function Listagem({
           // se tiver zero experimentos o npef é igual ao npei
           // IMPORTANTE: essa mudança no npef só é feita após a verificação de sobreposição;
           if(response.length === 0) {
-            //env.npef = env.prox_npe;
+            env.npef = env.prox_npe;
             env.npefView = env.prox_npe;
           }
           
@@ -869,7 +874,8 @@ export default function Listagem({
     
     allNPERecords.map(async (item: any) => {
     
-      let nextNPE = item.env?.npef + 1; // 117 == 118
+      let npef = Number(item.env?.npef);
+      let nextNPE = npef + 1; // 117 == 118
       
       // se tiver experimentos no env atual
       if(item.data.length > 0) {
@@ -889,21 +895,33 @@ export default function Listagem({
         npeToUpdate.push(temp);
       }
     });
-
+    
+    
     console.log('npeToUpdate: ', npeToUpdate); // atenção se não houver experimentos não atualiza o status do env
     console.log('experiment_genotipo.length', experiment_genotipo.length);
-    
+
     // SEMPRE QUE FOR USAR FUNÇÃO ASSINCRONA USAR FOR PARA OBTER O RESULTADO ANTES DE EXECUTAR O RESTANTE DO CÓDIGO;
     for (const item of Object.values(npeToUpdate)) {
       const result = await getLastNpeDisponible({
-        safraId: item.safraId, 
-        groupId: item.groupId, 
-        npefSearch: item.prox_npe
+        safraId: Number(item.safraId), 
+        groupId: Number(item.groupId), 
+        npefSearch: Number(item.prox_npe)
       });
       console.log('result', result, 'item:', item);
-
-      item.prox_npe = result.maxNPE;
       
+      if(result.maxNPE != null && result.count_npe_exists == 0) {
+        item.prox_npe = result.maxNPE;
+      }
+    }
+
+    for (let i = 0; i < npeToUpdate.length; i++) {
+      const item = npeToUpdate[i];
+      const result = await getLastNpeDisponible({
+        safraId: Number(item.safraId),
+        groupId: Number(item.groupId),
+        npefSearch: Number(item.prox_npe)
+      });
+      console.log('for (let i = 0; i < npeToUpdate.length; i++)','result', result, 'item:', item);
     }
     
     console.log('npeToUpdate -- ATUALIZADO: ', npeToUpdate);
