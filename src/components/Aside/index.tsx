@@ -9,18 +9,17 @@ import { BsGear } from 'react-icons/bs';
 import { useRouter } from 'next/router';
 import { ButtonAside } from './ButtonAside';
 
-const versionApp = '0.0.21.10';
+const versionApp = '0.0.22.1';
 
 export function Aside({ moduloActive }: any) {
+  const aArray = versionApp.split('.');
 
-  var aArray = versionApp.split(".");
-
-  let prev = aArray.splice(0, aArray.length - 1);
-  let next = aArray.splice(-1);
+  const prev = aArray.splice(0, aArray.length - 1);
+  const next = aArray.splice(-1);
   console.log(prev.join('.'), next.join('.'));
-  
+
   // aArray.toLowerCase() === aArray[aArray.length-1].toLowerCase();
-  
+
   return (
     <aside
       style={{ height: 'auto' }}
@@ -103,7 +102,11 @@ export function Aside({ moduloActive }: any) {
         <span className="text-xs text-center text-gray-300">
           Versão:
           {' '}
-          {prev.join('.')}<span style={{ color: '#00567b' }}>.{next}</span>
+          {prev.join('.')}
+          <span style={{ color: '#00567b' }}>
+            .
+            {next}
+          </span>
         </span>
       </div>
     </aside>

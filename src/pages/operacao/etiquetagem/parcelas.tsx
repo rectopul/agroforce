@@ -717,7 +717,7 @@ export default function Listagem({
   async function handleSubmit(inputCode: any) {
     let countNca = 0;
     parcelas.map((item: any) => {
-      if (item.nca === inputCode) {
+      if (item.nca == inputCode) {
         if (item.status !== 'IMPRESSO') {
           setParcelasToPrint((current: any) => [...current, item.id]);
           countNca += 1;
