@@ -177,7 +177,7 @@ export default function Listagem({
     },
     {
       name: "CamposGerenciados[]",
-      title: "Status do Tratamento",
+      title: "Status Trat.",
       value: "status_experiment",
       defaultChecked: () => camposGerenciados.includes("status_experiment"),
     },
@@ -656,7 +656,7 @@ export default function Listagem({
       if (columnOrder[item] === "status_experiment") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Status Tratamento",
+            name: "Status Trat.",
             title: "status_experiment",
             orderList,
             fieldOrder,

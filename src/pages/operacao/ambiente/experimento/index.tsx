@@ -53,7 +53,7 @@ import LoadingComponent from "../../../../components/Loading";
 import ITabs from "../../../../shared/utils/dropdown";
 import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
 import handleError from "../../../../shared/utils/handleError";
-import { prisma } from '../../../api/db/db';
+import { prisma } from "../../../api/db/db";
 
 interface IFilter {
   filterFoco: string;
@@ -132,7 +132,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.experimento || {
     id: 0,
     table_preferences:
-      "id,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,countNT,npeQT",
+      "id,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,countNT,npei,npefView,npeQT",
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences
@@ -176,12 +176,12 @@ export default function Listagem({
     {
       name: "CamposGerenciados[]",
       title: "NPE Inicial",
-      value: "repetitionsNumber",
+      value: "npei",
     },
     {
       name: "CamposGerenciados[]",
       title: "NPE Final",
-      value: "repetitionsNumber",
+      value: "npefView",
     },
     { name: "CamposGerenciados[]", title: "QT NPE", value: "npeQT" },
   ]);
@@ -463,47 +463,51 @@ export default function Listagem({
           })
         );
       }
+      if (columnCampos[index] === "countNT") {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Qtd Genótipos",
+            title: "countNT",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
+      }
+      if (columnCampos[index] === "npei") {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "NPE Inicial",
+            title: "npei",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
+      }
+      if (columnCampos[index] === "npefView") {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "NPE Final",
+            title: "npefView",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
+      }
+      if (columnCampos[index] === "npeQT") {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "QT NPE",
+            title: "npeQT",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
+      }
     });
-
-    tableFields.push(
-      headerTableFactoryGlobal({
-        name: "Qtd Genótipos",
-        title: "countNT",
-        orderList,
-        fieldOrder,
-        handleOrder,
-      })
-    );
-
-    tableFields.push(
-      headerTableFactoryGlobal({
-        name: "NPE Inicial",
-        title: "npei",
-        orderList,
-        fieldOrder,
-        handleOrder,
-      })
-    );
-
-    tableFields.push(
-      headerTableFactoryGlobal({
-        name: "NPE Final",
-        title: "npefView",
-        orderList,
-        fieldOrder,
-        handleOrder,
-      })
-    );
-
-    tableFields.push(
-      headerTableFactoryGlobal({
-        name: "QT NPE",
-        title: "npeQT",
-        orderList,
-        fieldOrder,
-        handleOrder,
-      })
-    );
 
     return tableFields;
   }
@@ -683,16 +687,16 @@ export default function Listagem({
 
       let orderBy1 = "orderDraw";
       let typeOrder1 = "asc";
-      
+
       let orderBy2 = "assay_list.gli";
       let typeOrder2 = "asc";
-      
+
       const orderBy = [orderBy1, orderBy2];
       const typeOrder = [typeOrder1, typeOrder2];
-      
+
       tempFilter = `${tempFilter}&orderBy=${orderBy1}&typeOrder=${typeOrder1}&orderBy=${orderBy2}&typeOrder=${typeOrder2}`;
       tempFilter = `${tempFilter}&orderBy=&typeOrder=`;
-      
+
       let count1 = 0;
 
       await experimentService
@@ -710,7 +714,7 @@ export default function Listagem({
               i = p.npef + 1;
               // npeRequisitada
               env.npeRequisitada++;
-              
+
               i >= env.nextNPE.npei_i && npeUsedFrom == 0
                 ? setNpeUsedFrom(env.nextNPE.npei_i)
                 : "";
@@ -721,8 +725,8 @@ export default function Listagem({
             env.npefView = i - 1;
 
             p.npefView = p.npef;
-            
-            console.log('p.npeQT', p.npeQT);
+
+            console.log("p.npeQT", p.npeQT);
 
             // enable disable button && isNCCAvailable
             p.assay_list?.genotype_treatment?.map((exp: any) => {
@@ -737,11 +741,15 @@ export default function Listagem({
               }
             });
           });
-          
-          console.log('env.npef', env.npef, 'env.nextNPE.npei_i', env.nextNPE.npei_i);
-          
-          console.log('response.experiments', response);
-          
+
+          console.log(
+            "env.npef",
+            env.npef,
+            "env.nextNPE.npei_i",
+            env.nextNPE.npei_i
+          );
+
+          console.log("response.experiments", response);
 
           /**
            * No caso temos o ENV1 com NPEI = 101 e NPEF = 101 e NPEI_I = 101 e PROX_NPE = 101
@@ -756,11 +764,11 @@ export default function Listagem({
 
           // se tiver zero experimentos o npef é igual ao npei
           // IMPORTANTE: essa mudança no npef só é feita após a verificação de sobreposição;
-          if(response.length === 0) {
+          if (response.length === 0) {
             env.npef = env.prox_npe;
             env.npefView = env.prox_npe;
           }
-          
+
           const temp = {
             env,
             data: response,
@@ -783,10 +791,14 @@ export default function Listagem({
             temp.isNccAvailable = true;
           }
 
-          console.log('contagem de lotes sem NCC dos tratamentos de genótipos (count)', count, '<<genotype_treatment>>');
-          console.log('contagem de sobreposições (count1): ', count1);
-          console.log('temp.isOverLap: ', temp.isOverLap);
-          
+          console.log(
+            "contagem de lotes sem NCC dos tratamentos de genótipos (count)",
+            count,
+            "<<genotype_treatment>>"
+          );
+          console.log("contagem de sobreposições (count1): ", count1);
+          console.log("temp.isOverLap: ", temp.isOverLap);
+
           setAllNPERecords((prev) => [...prev, temp]);
           count = 0;
         });
@@ -821,26 +833,30 @@ export default function Listagem({
     }
     setIsNccAvailable(isNccAvailable);
     setIsOverLap(isOverLap);
-    
-    console.log('isNccAvailable', isNccAvailable);
-    console.log('isOverLap', isOverLap);
-    
+
+    console.log("isNccAvailable", isNccAvailable);
+    console.log("isOverLap", isOverLap);
+
     if (!isNccAvailable || isOverLap) {
       setSortearDisable(true);
     }
   }, [allNPERecords, NPESelectedRow]);
 
-  async function getLastNpeDisponible({safraId, groupId, npefSearch}: any) {
+  async function getLastNpeDisponible({ safraId, groupId, npefSearch }: any) {
     let body = {
       safraId: safraId,
       groupId: groupId,
       npefSearch: npefSearch,
     };
-    const {status, response } = await experimentGenotipeService.getLastNpeDisponible(body);
-    console.log('getLastNpeDisponible.response', response);
-    return { maxNPE: response[0]?.maxnpe, count_npe_exists: response[0].count_npe_exists };
+    const { status, response } =
+      await experimentGenotipeService.getLastNpeDisponible(body);
+    console.log("getLastNpeDisponible.response", response);
+    return {
+      maxNPE: response[0]?.maxnpe,
+      count_npe_exists: response[0].count_npe_exists,
+    };
   }
-  
+
   async function createExperimentGenotipe({
     experiment_genotipo,
     total_consumed,
@@ -859,7 +875,7 @@ export default function Listagem({
     }, []);
 
     const tempExperimentObj: any[] = [];
-    
+
     experiment_genotipo.map((item: any) => {
       const data: any = {};
       data.id = Number(item.idExperiment);
@@ -875,16 +891,15 @@ export default function Listagem({
       }
       return unique;
     }, []);
-    
+
     const npeToUpdate: any[] = [];
-    
+
     allNPERecords.map(async (item: any) => {
-    
       let npef = Number(item.env?.npef);
       let nextNPE = npef + 1; // 117 == 118
-      
+
       // se tiver experimentos no env atual
-      if(item.data.length > 0) {
+      if (item.data.length > 0) {
         const temp = {
           id: item.env?.id,
           npef: item.env?.npef,
@@ -897,25 +912,24 @@ export default function Listagem({
           status: 3, // quando não houver experimentos não atualiza o status
           prox_npe: nextNPE,
         };
-        
+
         npeToUpdate.push(temp);
       }
     });
-    
-    
-    console.log('npeToUpdate: ', npeToUpdate); // atenção se não houver experimentos não atualiza o status do env
-    console.log('experiment_genotipo.length', experiment_genotipo.length);
+
+    console.log("npeToUpdate: ", npeToUpdate); // atenção se não houver experimentos não atualiza o status do env
+    console.log("experiment_genotipo.length", experiment_genotipo.length);
 
     // SEMPRE QUE FOR USAR FUNÇÃO ASSINCRONA USAR FOR PARA OBTER O RESULTADO ANTES DE EXECUTAR O RESTANTE DO CÓDIGO;
     for (const item of Object.values(npeToUpdate)) {
       const result = await getLastNpeDisponible({
-        safraId: Number(item.safraId), 
-        groupId: Number(item.groupId), 
-        npefSearch: Number(item.prox_npe)
+        safraId: Number(item.safraId),
+        groupId: Number(item.groupId),
+        npefSearch: Number(item.prox_npe),
       });
-      console.log('result', result, 'item:', item);
-      
-      if(result.maxNPE != null && result.count_npe_exists == 0) {
+      console.log("result", result, "item:", item);
+
+      if (result.maxNPE != null && result.count_npe_exists == 0) {
         item.prox_npe = result.maxNPE;
       }
     }
@@ -925,20 +939,26 @@ export default function Listagem({
       const result = await getLastNpeDisponible({
         safraId: Number(item.safraId),
         groupId: Number(item.groupId),
-        npefSearch: Number(item.prox_npe)
+        npefSearch: Number(item.prox_npe),
       });
-      console.log('for (let i = 0; i < npeToUpdate.length; i++)','result', result, 'item:', item);
+      console.log(
+        "for (let i = 0; i < npeToUpdate.length; i++)",
+        "result",
+        result,
+        "item:",
+        item
+      );
     }
-    
-    console.log('npeToUpdate -- ATUALIZADO: ', npeToUpdate);
-    
+
+    console.log("npeToUpdate -- ATUALIZADO: ", npeToUpdate);
+
     if (experiment_genotipo.length > 0) {
       setLoading(true);
 
       await experimentGenotipeService
-        .create({experiment_genotipo, gt, experimentObj, npeToUpdate})
+        .create({ experiment_genotipo, gt, experimentObj, npeToUpdate })
         .then((response) => {
-          console.log('response', response);
+          console.log("response", response);
           if (response.status === 200) {
             Swal.fire({
               title: "Sorteio salvo com sucesso.",
@@ -972,9 +992,9 @@ export default function Listagem({
 
       allNPERecords?.map((npe: any) => {
         let npei = Number(npe.data[0]?.npei);
-        
+
         let groupId: number = npe.env?.group?.id;
-        
+
         npe.data.map((item: any) => {
           item.seq_delineamento?.map((sd: any) => {
             const gt = item.assay_list.genotype_treatment.filter(
@@ -1008,28 +1028,25 @@ export default function Listagem({
           });
         });
       });
-      
+
       // return;
-      
+
       try {
-      
         createExperimentGenotipe({
           experiment_genotipo,
           total_consumed: experiment_genotipo.length,
           genotipo_treatment,
         });
-        
       } catch (e: any) {
-        console.log('validateConsumedData -> e', e);
+        console.log("validateConsumedData -> e", e);
         Swal.fire({
-          html: 'Erro ao sortear experimentos: ' + e,
-          width: '800',
+          html: "Erro ao sortear experimentos: " + e,
+          width: "800",
           didClose: () => {
             router.reload();
           },
         });
       }
-      
     } else if (isNccAvailable == false && isOverLap == true) {
       const temp = NPEFirstOverlapRow;
       Swal.fire({
@@ -1050,7 +1067,7 @@ export default function Listagem({
         confirmButtonText: "Acesse o NPE e atualize",
       }).then((result) => {
         if (result.isConfirmed) {
-          window.open("/config/ambiente", "_ blank");
+          window.open("/operacao/ambiente", "_ blank");
           // router.push({
           //   pathname: "/config/npe",
           // });
@@ -1058,14 +1075,28 @@ export default function Listagem({
       });
     } else if (isNccAvailable == false) {
       Swal.fire({
-        title: "Ncc não está presente nos registros",
-        html: "<strong>Ncc não está presente nos registros, tente novamente após adicionar Ncc</strong>",
+        title: "NCC não está presente nos registros do experimento em destaque",
+        html: `Favor checar os genotipos do ensaio relacionados a este ensaio/experimento e selecione um NCC para o mesmo.</b><br>`,
         icon: "warning",
         showCloseButton: true,
         closeButtonHtml:
           '<span style="background-color:#FF5349; color:#fff; width:35px; height:35px; border-radius:35px; font-size:23px;font-weight:600">x</span>',
-        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "Acesse aqui e atualize",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.open("/listas/ensaios/genotipos-ensaio", "_ blank");
+        }
       });
+      // Swal.fire({
+      //   title: "Ncc não está presente nos registros",
+      //   html: "<strong>Ncc não está presente nos registros, tente novamente após adicionar Ncc</strong>",
+      //   icon: "warning",
+      //   showCloseButton: true,
+      //   closeButtonHtml:
+      //     '<span style="background-color:#FF5349; color:#fff; width:35px; height:35px; border-radius:35px; font-size:23px;font-weight:600">x</span>',
+      //   showCancelButton: true,
+      // });
     } else if (isOverLap == true) {
       const temp = NPEFirstOverlapRow;
 
@@ -1091,7 +1122,7 @@ export default function Listagem({
         confirmButtonText: "Acesse o NPE e atualize",
       }).then((result) => {
         if (result.isConfirmed) {
-          window.open("/config/ambiente", "_ blank");
+          window.open("/operacao/ambiente", "_ blank");
         }
       });
     }
