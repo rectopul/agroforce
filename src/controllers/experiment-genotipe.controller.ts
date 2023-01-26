@@ -207,16 +207,29 @@ export class ExperimentGenotipeController {
         }
       }
 
+      // if (options.filterGrpFrom || options.filterGrpTo) {
+      //   if (options.filterGrpFrom && options.filterGrpTo) {
+      //     parameters.groupId = JSON.parse(`{"gte": ${Number(options.filterGrpFrom)}, "lte": ${Number(options.filterGrpTo)} }`);
+      //   } else if (options.filterGrpFrom) {
+      //     parameters.groupId = JSON.parse(`{"gte": ${Number(options.filterGrpFrom)} }`);
+      //   } else if (options.filterGrpTo) {
+      //     parameters.groupId = JSON.parse(`{"lte": ${Number(options.filterGrpTo)} }`);
+      //   }
+      // }
+
       if (options.filterGrpFrom || options.filterGrpTo) {
         if (options.filterGrpFrom && options.filterGrpTo) {
-          parameters.group = JSON.parse(`{"gte": ${Number(options.filterGrpFrom)}, "lte": ${Number(options.filterGrpTo)} }`);
+          parameters.group = JSON.parse(` {"group": {"gte": ${Number(options.filterGrpFrom)}, "lte": ${Number(options.filterGrpTo)} } }`);
         } else if (options.filterGrpFrom) {
-          parameters.group = JSON.parse(`{"gte": ${Number(options.filterGrpFrom)} }`);
+          parameters.group = JSON.parse(`{"group": {"gte": ${Number(options.filterGrpFrom)} } }`);
         } else if (options.filterGrpTo) {
-          parameters.group = JSON.parse(`{"lte": ${Number(options.filterGrpTo)} }`);
+          parameters.group = JSON.parse(` {"group": {"lte": ${Number(options.filterGrpTo)} } }`);
         }
       }
+      
 
+      console.log('parameters',parameters);
+      
       const select = {
         id: true,
         safra: { select: { safraName: true, culture: true } },
@@ -330,6 +343,10 @@ export class ExperimentGenotipeController {
       if (options.idTecnologia) {
         parameters.idTecnologia = Number(options.idTecnologia);
       }
+      
+      if(options.groupId){
+        parameters.groupId = Number(options.groupId);
+      }
 
       if (options.nt) {
         if (typeof options.nt === 'number') {
@@ -381,7 +398,6 @@ export class ExperimentGenotipeController {
       if (parameters.AND.length === 0) {
         delete parameters.AND;
       }
-      console.log(parameters);
 
       const response: object | any = await this.ExperimentGenotipeRepository.findAll(
         parameters,
@@ -415,9 +431,19 @@ export class ExperimentGenotipeController {
         max_NPE_1: number | null,
         maxnpe: number | null,
       } = await prisma.$queryRaw`SELECT 
-        (EXISTS (SELECT npe FROM experiment_genotipe WHERE npe = ${npefSearch})) as count_npe_exists, 
-        (MAX(gn.npe) + 1) as max_NPE_1, 
-        IF( (EXISTS (SELECT npe FROM experiment_genotipe WHERE npe = ${npefSearch})) > 0, (MAX(gn.npe) + 1), ${npefSearch}) as maxnpe
+        (EXISTS (
+            SELECT npe FROM experiment_genotipe WHERE 1=1 
+            AND npe = ${npefSearch} 
+            AND groupId = ${groupId}
+            AND ('' = ${safraId} OR gn.idSafra = ${safraId})
+        )) as count_npe_exists, 
+        (MAX(gn.npe) + 1) as max_NPE_1,
+        IF( (EXISTS (
+            SELECT npe FROM experiment_genotipe WHERE 1=1 
+            AND npe = ${npefSearch} 
+            AND groupId = ${groupId} 
+            AND ('' = ${safraId} OR gn.idSafra = ${safraId})
+        )) > 0, (MAX(gn.npe) + 1), ${npefSearch}) as maxnpe
         FROM experiment_genotipe gn
         WHERE 1 = 1
         AND gn.groupId = ${groupId}

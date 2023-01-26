@@ -49,6 +49,7 @@ interface INpeProps {
   epoca: number | any;
   tecnologia: string | any;
   cod_tec: number | any;
+  groupId: number | any;
   type_assay: string | any;
   npei: number | any;
   npef: number | any;
@@ -108,6 +109,7 @@ export default function NovoLocal({
       tecnologia: npe?.tecnologia?.name,
       cod_tec: npe?.tecnologia?.cod_tec,
       type_assay: npe?.type_assay?.name,
+      groupId: Number(npe?.group?.id),
       npei: Number(npe?.npei),
       npef: Number(npe?.npef),
       status: Number(npe?.status),
@@ -122,7 +124,8 @@ export default function NovoLocal({
       const parametersFilter = `filterStatus=1&npei=${values.prox_npe}`;
       await npeService.getAll(parametersFilter).then(async (response) => {
         if (response.total <= 0 || npe[0]?.id === response[0]?.id) {
-          const paramFilter = `id_culture=${idCulture}&id_safra=${idSafra}&npe=${values.prox_npe}`;
+          const groupId = values.groupId;
+          const paramFilter = `id_culture=${idCulture}&id_safra=${idSafra}&npe=${values.prox_npe}&groupId=${groupId}`;
           await experimentGenotipeService
             .getAll(paramFilter)
             .then(async (response) => {
@@ -147,9 +150,15 @@ export default function NovoLocal({
                   });
               } else {
                 setLoading(false);
-                Swal.fire(
-                  'Não foi possível atualizar o prox npe, o prox npe inserido já foi usado pela parcela.',
-                );
+                Swal.fire({
+                  title: "NPE Já usado !!!",
+                  html:
+                    `Não foi possível atualizar o prox npe, o prox npe inserido já foi usado pela parcela.<br/>` +
+                    // `Cultura: ${idCulture}<br>` +
+                    // `Safra: ${idSafra}<br>` +
+                    // `GroupId: ${groupId}<br>` +
+                    `Próx NPE: ${values.prox_npe}<br>`,
+                });
               }
             });
         } else {

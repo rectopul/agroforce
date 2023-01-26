@@ -17,8 +17,13 @@ function getAll(parameters: any) {
   return fetchWrapper.get(baseUrl, parameters);
 }
 
+function getOne(data: { id: any }) {
+  return fetchWrapper.post(`${baseUrl}/getOne`, data);
+}
+
 export const genotypeTreatmentService = {
   getAll,
   create,
   update,
+  getOne,
 };
