@@ -146,7 +146,6 @@ export class ImportGenotypeController {
                   += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do ID_DADOS-${spreadSheet[row][1]} devem ser iguais. favor checar. </li> <br>`;
                 }
               }
-              console.log('🚀 ~ file: import-genotype.controller.ts:150 ~ ImportGenotypeController ~ || ~ validateAll', validateAll);
 
               validateAll = {
                 NOME_PUBLICO: [],

@@ -50,6 +50,7 @@ async function get(url: any, params: any) {
 }
 
 async function post(url: any, body: any) {
+  console.log('🚀 ~ file: fetch-wrapper.ts:53 ~ post ~ body', body);
   const requestOptions: object | any = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeader(url) },
@@ -82,11 +83,10 @@ async function deleted(url: any, body: any) {
 }
 
 async function postFile(url: any, body: any) {
-  
   const requestOptions: object | any = {
     method: 'POST',
     headers: { ...authHeader(url) },
-    body: body
+    body,
   };
   const response = await fetch(url, requestOptions);
   return handleResponse(response);
