@@ -763,7 +763,7 @@ export default function Listagem({
       .then(({ status, response }) => {
         if (status === 200) {
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, response, "Tratamentos");
+          XLSX.utils.book_append_sheet(workBook, response, 'Tratamentos');
 
           // Buffer
           XLSX.write(workBook, {
@@ -1720,9 +1720,11 @@ export const getServerSideProps: GetServerSideProps = async ({
   const idSafra = req.cookies.safraId;
 
   // RR
+
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : "";
+    : 'asc';
+
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
@@ -1733,12 +1735,9 @@ export const getServerSideProps: GetServerSideProps = async ({
   const baseUrlTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
   const baseUrlAssay = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
-  const filterApplication =
-    req.cookies.filterBeforeEdit ||
-    `&id_culture=${idCulture}&id_safra=${idSafra}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
-  // const filterApplication =
-  //   req.cookies.filterBeforeEdit ||
-  //   `&id_culture=${idCulture}&id_safra=${idSafra}&status_experiment=${"IMPORTADO"}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
+  const filterApplication = req.cookies.filterBeforeEdit
+    || `&id_culture=${idCulture}&id_safra=${idSafra}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
+
 
   removeCookies("filterBeforeEdit", { req, res });
   removeCookies("pageBeforeEdit", { req, res });
@@ -1774,11 +1773,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     newItem.name = item.gli;
     return newItem;
   });
-
-  // const teste: any = {};
-  // teste.id = "";
-  // teste.name = "Selecione";
-  // assaySelect.unshift(teste);
 
   const genotypeSelect = allTreatments?.map((item: any) => {
     const newItem: any = {};

@@ -284,6 +284,7 @@ export default function Import({
       setFilter(parametersFilter);
 
       setLoading(true);
+      setCurrentPage(0);
       await getAllLogs(`${parametersFilter}`, currentPage);
       setTimeout(() => {
         setLoading(false);
@@ -292,13 +293,11 @@ export default function Import({
     },
   });
 
-  async function getAllLogs(parametersFilter: any, newPage: any) {
+  async function getAllLogs(parametersFilter: any, newPage: any = 0) {
     setCurrentPage(newPage);
 
-    parametersFilter = `${parametersFilter}&skip=${
-      newPage * Number(take)
-    }&take=${take}`;
-
+    parametersFilter = `${parametersFilter}&skip=${newPage * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
     await logImportService
       .getAll(parametersFilter)
       .then(({ response, total: allTotal }) => {
@@ -312,76 +311,8 @@ export default function Import({
 
   // Call that function when change type order value.
   useEffect(() => {
-    getAllLogs(filter, currentPage);
+    getAllLogs(filter);
   }, [typeOrder]);
-
-  // async function handleOrder(
-  //   column: string,
-  //   order: string | any,
-  // ): Promise<void> {
-  //   let orderType: any;
-  //   let parametersFilter: any;
-  //   if (order === 1) {
-  //     orderType = 'asc';
-  //   } else if (order === 2) {
-  //     orderType = 'desc';
-  //   } else {
-  //     orderType = '';
-  //   }
-
-  //   setOrderBy(column);
-  //   setTypeOrder(orderType);
-
-  //   if (filter && typeof filter !== 'undefined') {
-  //     if (orderType !== '') {
-  //       parametersFilter = `${filter}&orderBy=${column}&typeOrder=${orderType}`;
-  //     } else {
-  //       parametersFilter = filter;
-  //     }
-  //   } else if (orderType !== '') {
-  //     parametersFilter = `orderBy=${column}&typeOrder=${orderType}`;
-  //   } else {
-  //     parametersFilter = filter;
-  //   }
-
-  //   await logImportService
-  //     .getAll(`${parametersFilter}&skip=0&take=${take}`)
-  //     .then((response) => {
-  //       if (response.status === 200) {
-  //         setLogs(response.response);
-  //       }
-  //     });
-
-  //   if (orderList === 2) {
-  //     setOrder(0);
-  //     setArrowOrder(<AiOutlineArrowDown />);
-  //   } else {
-  //     setOrder(orderList + 1);
-  //     if (orderList === 1) {
-  //       setArrowOrder(<AiOutlineArrowUp />);
-  //     } else {
-  //       setArrowOrder('');
-  //     }
-  //   }
-  // }
-
-  // function headerTableFactory(name: any, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: true,
-  //   };
-  // }
 
   async function downloadFile(rowData: any) {
     const filename = `/log_import/${rowData.filePath}`;
@@ -547,10 +478,11 @@ export default function Import({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    // eslint-disable-next-line no-unused-expressions, no-nested-ternary
+    typeOrderG !== '' ? (typeOrderG == 'desc' ? setOrder(1) : setOrder(2)) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
