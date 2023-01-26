@@ -715,12 +715,9 @@ export default function Listagem({
   }
 
   async function handleSubmit(inputCode: any) {
-    // const inputCode: any = (
-    //   document.getElementById("inputCode") as HTMLInputElement
-    // )?.value;
     let countNca = 0;
     parcelas.map((item: any) => {
-      if (item.nca == inputCode) {
+      if (item.nca === inputCode) {
         if (item.status !== 'IMPRESSO') {
           setParcelasToPrint((current: any) => [...current, item.id]);
           countNca += 1;
@@ -751,9 +748,6 @@ export default function Listagem({
   }
 
   async function verifyAgain(inputCode: any) {
-    // const inputCode: any = (
-    //   document.getElementById("inputCode") as HTMLInputElement
-    // )?.value;
     let countNca = 0;
     let secondNca = '';
 
@@ -810,15 +804,11 @@ export default function Listagem({
         count: 'print',
       });
       cleanState();
-      // setIsOpenModal(false);
 
-      // const parcelsByNCA = parcelas.filter((i: any) => i.nca == inputCode);
-      // const parcels = parcelsByNCA.map((i: any) => ({
-      //   ...i,
-      //   envelope: i?.type_assay?.envelope?.filter(
-      //     (x: any) => x.id_safra === idSafra,
-      //   )[0]?.seeds,
-      // }));
+      const {
+        response: newParcels,
+      }: IReturnObject = await experimentGenotipeService.getAll(filter);
+
       if (parcels) {
         localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
 
@@ -835,6 +825,59 @@ export default function Listagem({
         handlePagination(currentPage);
         // router.push("imprimir");
       }
+    }
+
+    setIsLoading(false);
+  }
+
+  async function reprint() {
+    setIsLoading(true);
+    const idList = rowsSelected.map((item: any) => item.id);
+
+    const validateSeeds: any = [];
+    const parcels = rowsSelected.map((item: any) => {
+      item.type_assay.envelope?.filter(
+        (seed: any) => seed.id_safra === idSafra,
+      );
+      if (item.type_assay.envelope?.length === 0) {
+        validateSeeds.push(true);
+      } else {
+        return item;
+      }
+    });
+    if (validateSeeds.includes(true)) {
+      Swal.fire('Sementes não cadastradas no tipo de ensaio');
+      setLoading(false);
+      setIsLoading(false);
+      return;
+    }
+    await experimentGenotipeService.update({
+      idList,
+      status: 'IMPRESSO',
+      userId: userLogado.id,
+      count: 'reprint',
+    });
+
+    cleanState();
+
+    const {
+      response: newParcels,
+    }: IReturnObject = await experimentGenotipeService.getAll(filter);
+
+    if (newParcels) {
+      localStorage.setItem('parcelasToPrint', JSON.stringify(newParcels));
+
+      // setStateIframe(stateIframe + 1);
+
+      resetIframe();
+
+      // -- AQUI
+      setIsOpenModalPrint(true);
+      setUrlPrint('imprimir');
+      cleanState();
+      setTimeout(() => (inputRef?.current as any)?.focus(), 2000);
+      handlePagination(currentPage);
+      // router.push("imprimir");
     }
 
     setIsLoading(false);
@@ -912,34 +955,6 @@ export default function Listagem({
     if (e?.charCode === 13 || e?.charCode === 10) validateInput();
   }
 
-  // function generateEAN13digit(code: any) {
-  //   let sum = 0;
-  //   for (let i = 11; i >= 0; i--) {
-  //     sum += parseInt(code[i]) * (i % 2 == 0 ? 1 : 3);
-  //   }
-  //   return (10 - (sum % 10)) % 10;
-  // }
-
-  // function generateEAN8Digit(code: any) {
-  //   let sum1 = 0;
-  //   let sum2 = 0;
-
-  //   for (let i = 6; i >= 0; i--) {
-  //     if (i % 2 != 0) {
-  //       sum1 += parseInt(code[i]);
-  //     } else {
-  //       sum2 += parseInt(code[i]);
-  //     }
-  //   }
-  //   sum2 = sum2 * 3;
-
-  //   let sum = sum1 + sum2;
-  //   let checkSum = 10 - (sum % 10);
-  //   if (checkSum == 10) checkSum = 0;
-
-  //   return checkSum;
-  // }
-
   async function validateInput() {
     const inputCode: any = (
       document.getElementById('inputCode') as HTMLInputElement
@@ -980,49 +995,6 @@ export default function Listagem({
         : setValidateNcaOne('bg-green-600');
       writeOff(withoutDigit);
     }
-  }
-
-  async function reprint() {
-    setIsLoading(true);
-    const idList = rowsSelected.map((item: any) => item.id);
-
-    const validateSeeds: any = [];
-    const parcels = rowsSelected.map((item: any) => {
-      item.type_assay.envelope?.filter(
-        (seed: any) => seed.id_safra === idSafra,
-      );
-      if (item.type_assay.envelope?.length === 0) {
-        validateSeeds.push(true);
-      } else {
-        return item;
-      }
-    });
-    if (validateSeeds.includes(true)) {
-      Swal.fire('Sementes não cadastradas no tipo de ensaio');
-      setLoading(false);
-      setIsLoading(false);
-      return;
-    }
-    await experimentGenotipeService.update({
-      idList,
-      status: 'REIMPRESSO',
-      userId: userLogado.id,
-      count: 'reprint',
-    });
-    // const parcels = rowsSelected.map((i: any) => ({
-    //   ...i,
-    //   envelope: i?.type_assay?.envelope?.filter(
-    //     (x: any) => x.id_safra === idSafra,
-    //   )[0]?.seeds,
-    // }));
-    if (parcels?.length > 0) {
-      localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
-      // router.push("imprimir");
-      window.open('imprimir', '_blank');
-      handlePagination(currentPage);
-    }
-
-    setIsLoading(false);
   }
 
   useEffect(() => {

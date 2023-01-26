@@ -143,7 +143,7 @@ export class ImportGenotypeController {
                 const result = allEqual(validateAll[property]);
                 if (!result) {
                   responseIfError[Number(0)]
-                  += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo ID_DADOS(${spreadSheet[row][1]}) devem ser iguais. </li> <br>`;
+                  += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do ID_DADOS-${spreadSheet[row][1]} devem ser iguais. favor checar. </li> <br>`;
                 }
               }
               console.log('🚀 ~ file: import-genotype.controller.ts:150 ~ ImportGenotypeController ~ || ~ validateAll', validateAll);
@@ -679,7 +679,7 @@ export class ImportGenotypeController {
 
               if (configModule.response[0]?.fields[column] === 'Elite_Nome') {
                 if (spreadSheet[row][column] !== null) {
-                  this.aux.elite_name = spreadSheet[row][column];
+                  this.aux.elit_name = spreadSheet[row][column];
                 }
               }
 

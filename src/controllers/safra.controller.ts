@@ -1,8 +1,8 @@
+import createXls from 'src/helpers/api/xlsx-global-download';
 import { SafraRepository } from '../repository/safra.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
 import handleError from '../shared/utils/handleError';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
-import createXls from 'src/helpers/api/xlsx-global-download';
 
 interface Safra {
   id: number;
@@ -57,6 +57,7 @@ export class SafraController {
       }
       const select = {
         id: true,
+        culture: true,
         safraName: true,
         year: true,
         plantingStartTime: true,
