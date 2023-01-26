@@ -12,6 +12,15 @@ import { ButtonAside } from './ButtonAside';
 const versionApp = '0.0.21.10';
 
 export function Aside({ moduloActive }: any) {
+
+  var aArray = versionApp.split(".");
+
+  let prev = aArray.splice(0, aArray.length - 1);
+  let next = aArray.splice(-1);
+  console.log(prev.join('.'), next.join('.'));
+  
+  // aArray.toLowerCase() === aArray[aArray.length-1].toLowerCase();
+  
   return (
     <aside
       style={{ height: 'auto' }}
@@ -94,7 +103,7 @@ export function Aside({ moduloActive }: any) {
         <span className="text-xs text-center text-gray-300">
           Versão:
           {' '}
-          {versionApp}
+          {prev.join('.')}<span style={{ color: '#00567b' }}>.{next}</span>
         </span>
       </div>
     </aside>
