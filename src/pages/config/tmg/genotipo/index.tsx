@@ -312,35 +312,6 @@ export default function Listagem({
     order: string | any,
     name: string | any,
   ): Promise<void> {
-    // // Manage orders of colunms
-    // const parametersFilter = await tableGlobalFunctions.handleOrderGlobal(
-    //   column,
-    //   order,
-    //   filter,
-    //   'genotipo',
-    // );
-
-    // const value = await tableGlobalFunctions.skip(currentPage, parametersFilter);
-
-    // await genotipoService.getAll(value).then((response) => {
-    //   if (response.status === 200) {
-    //     setGenotipo(response.response);
-    //     setFiltersParams(parametersFilter);
-    //   }
-    // });
-
-    // if (orderList === 2) {
-    //   setOrder(0);
-    //   setArrowOrder(<AiOutlineArrowDown />);
-    // } else {
-    //   setOrder(orderList + 1);
-    //   if (orderList === 1) {
-    //     setArrowOrder(<AiOutlineArrowUp />);
-    //   } else {
-    //     setArrowOrder('');
-    //   }
-    // }
-
     setLoading(true);
 
     // Gobal manage orders
@@ -353,6 +324,7 @@ export default function Listagem({
     setOrderBy(columnG);
     typeOrderG !== '' ? (typeOrderG == 'desc' ? setOrder(1) : setOrder(2)) : '';
     setArrowOrder(arrowOrder);
+    setLoading(true);
     setTimeout(() => {
       setLoading(false);
     }, 100);
@@ -758,7 +730,6 @@ export default function Listagem({
     const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
 
     await genotipoService.getAll(filterParam).then(({ response, status }) => {
-      console.log('🚀 ~ file: index.tsx:781 ~ awaitgenotipoService.getAll ~ response', response);
       if (status === 200) {
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, response, 'Genótipos');

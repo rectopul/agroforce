@@ -51,6 +51,9 @@ async function callExperimentGenotipeXlsxDownload(options: any) {
       newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
       newItem.NCA = item.nca;
       newItem.STATUS_EXP = item.experiment.status;
+      newItem.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+      newItem.DATA = newItem.DT;
+
       delete newItem.id;
       return newItem;
     });
@@ -88,6 +91,8 @@ async function callTmgCulturaXlsxDownload(options: any) {
       row.COD_REDUZIDO = row.name;
       row.NOME = row.desc;
       row.STATUS = row.status;
+      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+      row.DATA = row.DT;
 
       delete row.desc;
       delete row.status;
@@ -133,6 +138,9 @@ async function callTmgUsuarioXlsxDownload(options: any) {
       line.STATUS = line.status;
       line.CPF = line.cpf;
 
+      line.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+      line.DATA = line.DT;
+
       delete line.avatar;
       delete line.id;
       delete line.email;
@@ -177,6 +185,9 @@ async function callTmgSetorXlsxDownload(options: any) {
       row.NOME = row.name;
       row.STATUS = row.status;
 
+      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+      row.DATA = row.DT;
+
       delete row.name;
       delete row.status;
       delete row.id;
@@ -215,13 +226,19 @@ async function callTmgSafraXlsxDownload(options: any) {
       } else {
         row.status = 'Ativos' as any;
       }
-      row.Nome = row.safraName;
-      row.Ano = row.year;
-      row.Início_Plantio = row.plantingStartTime;
-      row.Fim_Plantio = row.plantingEndTime;
-      row.Status = row.status;
+
+      row.CULTURA = row.culture.name;
+      row.NOME = row.safraName;
+      row.ANO = row.year;
+      row.INICIO_PLANTIO = row.plantingStartTime;
+      row.FIM_PLANTIO = row.plantingEndTime;
+      row.STATUS = row.status;
+
+      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+      row.DATA = row.DT;
 
       delete row.safraName;
+      delete row.culture;
       delete row.year;
       delete row.plantingStartTime;
       delete row.plantingEndTime;
@@ -257,8 +274,6 @@ async function callTmgGenotipeXlsxDownload(options: any) {
   do {
     const { response, status } = await Controller.getAll(options);
     const newData = response.map((row: any) => {
-      row.dt_export = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
-      
       row.CULTURA = row.culture.name;
       row.NOME_GENÓTIPO = row.name_genotipo;
       row.NOME_PRINCIPAL = row.name_main;
@@ -278,6 +293,7 @@ async function callTmgGenotipeXlsxDownload(options: any) {
       row.PROGENITOR_M_ORIGEM = row.progenitor_m_origem;
       row.PROGENITORES_ORIGEM = row.progenitores_origem;
       row.PARENTESCO_COMPLETO = row.parentesco_completo;
+      row.dt_export = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
       row.DT_EXPORT = row.dt_export;
       row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
       row.DATA = row.DT;
@@ -421,6 +437,9 @@ async function callEnsaioTipoDeEnsaioXlsxDownload(options: any) {
         : '';
       newRow.STATUS = newRow.status;
 
+      newRow.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+      newRow.DATA = newRow.DT;
+
       delete newRow.name;
       delete newRow.culture;
       delete newRow.protocol_name;
@@ -466,6 +485,9 @@ async function callEnsaioFocoXlsxDownload(options: any) {
       row.GRUPO = row?.group.group;
       row.STATUS = row?.status;
 
+      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+      row.DATA = row.DT;
+
       delete row.name;
       delete row.group;
       delete row.status;
@@ -502,34 +524,18 @@ async function callEnsaioTechnologiaXlsxDownload(options: any) {
   do {
     const { response, status } = await Controller.getAll(options);
     const newData = response.map((row: any) => {
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      row.DT = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
-
+      row.dt_export = new Date(row.dt_export);
+      row.dt_export = new Date(
+        row.dt_export.toISOString().slice(0, -1),
+      );
       row.CULTURA = row.culture.desc;
       row.NOME = row.name;
       row.DESC = row.desc;
       row.COD_TEC = row.cod_tec;
-      row.DT_GOM = row.DT;
+      row.dt_export = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
+      row.DT_EXPORT = row.dt_export;
+      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+      row.DATA = row.DT;
 
       delete row.culture;
       delete row.id;
@@ -579,6 +585,9 @@ async function callDelineamentoXlsxDownload(options: any) {
       row.TRAT_REPETIÇÃO = row?.trat_repeticao;
       row.STATUS = row?.status;
 
+      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+      row.DATA = row.DT;
+
       delete row.name;
       delete row.repeticao;
       delete row.trat_repeticao;
@@ -617,29 +626,6 @@ async function callLocalLugarCulturaXlsxDownload(options: any) {
     const newData = response.map((row: any) => {
       row.status = row.status === 0 ? 'Inativo' : 'Ativo';
 
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      row.DT = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
-
       row.NOME_LUGAR_CULTURA = row.name_local_culture;
       row.RÓTULO = row.label;
       row.MLOC = row.mloc;
@@ -648,7 +634,9 @@ async function callLocalLugarCulturaXlsxDownload(options: any) {
       row.REGIÃO = row.label_region;
       row.LOCALIDADE = row.name_locality;
       row.STATUS = row.status;
-      row.DT_GOM = row.DT;
+
+      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+      row.DATA = row.DT;
 
       delete row.name_local_culture;
       delete row.label;
@@ -692,57 +680,11 @@ async function callLocalUnidadeCulturaXlsxDownload(options: any) {
     const { response, status } = await Controller.getAll(options);
     const newData = response.map((row: any) => {
       const newRow = row;
-      const dataExp = new Date();
-      let hours: string;
-      let minutes: string;
-      let seconds: string;
-      if (String(dataExp.getHours()).length === 1) {
-        hours = `0${String(dataExp.getHours())}`;
-      } else {
-        hours = String(dataExp.getHours());
-      }
-      if (String(dataExp.getMinutes()).length === 1) {
-        minutes = `0${String(dataExp.getMinutes())}`;
-      } else {
-        minutes = String(dataExp.getMinutes());
-      }
-      if (String(dataExp.getSeconds()).length === 1) {
-        seconds = `0${String(dataExp.getSeconds())}`;
-      } else {
-        seconds = String(dataExp.getSeconds());
-      }
-      newRow.DT = `${dataExp.toLocaleDateString(
-        'pt-BR',
-      )} ${hours}:${minutes}:${seconds}`;
-
-      let dtHours: string;
-      let dtMinutes: string;
-      let dtSeconds: string;
 
       newRow.dt_export = new Date(newRow.dt_export);
       newRow.dt_export = new Date(
         newRow.dt_export.toISOString().slice(0, -1),
       );
-
-      if (String(newRow.dt_export.getHours()).length === 1) {
-        dtHours = `0${String(newRow.dt_export.getHours())}`;
-      } else {
-        dtHours = String(newRow.dt_export.getHours());
-      }
-      if (String(newRow.dt_export.getMinutes()).length === 1) {
-        dtMinutes = `0${String(newRow.dt_export.getMinutes())}`;
-      } else {
-        dtMinutes = String(newRow.dt_export.getMinutes());
-      }
-      if (String(newRow.dt_export.getSeconds()).length === 1) {
-        dtSeconds = `0${String(newRow.dt_export.getSeconds())}`;
-      } else {
-        dtSeconds = String(newRow.dt_export.getSeconds());
-      }
-
-      newRow.EXPORT = `${newRow.dt_export.toLocaleDateString(
-        'pt-BR',
-      )} ${dtHours}:${dtMinutes}:${dtSeconds}`;
 
       newRow.NOME_UNIDADE_CULTURA = newRow?.name_unity_culture;
       newRow.ANO = newRow?.year;
@@ -753,8 +695,10 @@ async function callLocalUnidadeCulturaXlsxDownload(options: any) {
       newRow.PAÍS = newRow.local?.label_country;
       newRow.REGIÃO = newRow.local?.label_region;
       newRow.LOCALIDADE = newRow.local?.name_locality;
-      newRow.DT_GOM = newRow.DT;
-      newRow.DT_EXPORT = row.EXPORT;
+      row.dt_export = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
+      row.DT_EXPORT = row.dt_export;
+      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+      row.DATA = row.DT;
 
       delete newRow.year;
       delete newRow.name_unity_culture;
@@ -807,6 +751,9 @@ async function callQuadrasLayoutXlsxDownload(options: any) {
       row.PARCELAS = row.parcelas;
       row.STATUS = row.status;
 
+      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+      row.DATA = row.DT;
+
       delete row.esquema;
       delete row.plantadeira;
       delete row.tiros;
@@ -854,6 +801,9 @@ async function callRdXlsxDownload(options: any) {
       newItem.STATUS = item.state;
       newItem.INICIO_EM = item.created_at;
       newItem.FIM_EM = item.updated_at;
+
+      newItem.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+      newItem.DATA = newItem.DT;
 
       delete newItem.safra;
       delete newItem.user;
@@ -907,6 +857,9 @@ async function callEnsaioEnsaioXlsxDownload(options: any) {
       newItem.OBSERVAÇÕES = newItem?.comments;
       newItem.NÚMERO_DE_TRATAMENTOS = newItem?.countNT;
 
+      newItem.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+      newItem.DATA = newItem.DT;
+
       delete newItem.safra;
       delete newItem.treatmentsNumber;
       delete newItem.project;
@@ -953,6 +906,7 @@ async function callEnsaioGenotipeXlsxDownload(options: any) {
   do {
     const { response, status } = await Controller.getAll(options);
     const newData = response.map((item: any) => {
+      console.log('🚀 ~ file: xlsx-global-download.ts:909 ~ newData ~ item', item);
       const newItem: any = {};
       newItem.CULTURA = item.safra.culture.name;
       newItem.SAFRA = item.safra.safraName;
@@ -962,13 +916,16 @@ async function callEnsaioGenotipeXlsxDownload(options: any) {
       newItem.GGEN = `${item.genotipo.tecnologia.cod_tec} ${item.genotipo.tecnologia.name}`;
       newItem.GLI = item.assay_list.gli;
       newItem.BGM = item.assay_list.bgm;
-      newItem.BGM_Genótipo = item.genotipo.bgm;
+      newItem.BGM_GENÓTIPO = item.genotipo.bgm;
       newItem.GMR_GEN = item.genotipo.gmr;
       newItem.NT = item.treatments_number;
       newItem.STATUS_T = item.status;
       newItem.STATUS_ENSAIO = item.assay_list.status;
       newItem.GENOTIPO = item.genotipo.name_genotipo;
       newItem.NCA = item?.lote?.ncc;
+
+      newItem.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+      newItem.DATA = newItem.DT;
       return newItem;
     });
 
@@ -1018,6 +975,9 @@ async function callExperimentosExperimentoXlsxDownload(options: any) {
       newItem.OBSERVAÇÕES = item?.comments;
       newItem.COUNT_NT = newItem.countNT;
       newItem.NPE_QT = newItem.npeQT;
+
+      newItem.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+      newItem.DATA = newItem.DT;
 
       delete newItem.id;
       delete newItem.safra;
@@ -1088,10 +1048,14 @@ async function callAmbienteAmbienteXlsxDownload(options: any) {
       row.PROX_NPE = row.prox_npe;
       row.GRUPO = row.group.group;
 
+      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+      row.DATA = row.DT;
+
       delete row.nextAvailableNPE;
       delete row.prox_npe;
 
       delete row.edited;
+      delete row.npeRequisitada;
       delete row.local;
       delete row.safra;
       delete row.foco;
@@ -1154,6 +1118,8 @@ async function callQuadrasExcelXlsxDownload(options: any) {
         row.DISPARO_FIXO = row.disparo_fixo;
         row.STATUS_ALOCADO = row.allocation;
         row.STATUS = row.status;
+        row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
+        row.DATA = row.DT;
 
         delete row.cod_quadra;
         delete row.local;

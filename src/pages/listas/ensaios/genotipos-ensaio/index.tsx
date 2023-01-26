@@ -337,9 +337,7 @@ export default function Listagem({
     // parametersFilter = `${parametersFilter}&${pathExtra}`;
     parametersFilter = `${parametersFilter}&skip=${
       page * Number(take)
-    }&take=${take}&orderBy=${
-      orderBy == 'tecnologia' ? 'genotipo.tecnologia.cod_tec' : orderBy
-    }&typeOrder=${typeOrder}`;
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
@@ -987,7 +985,7 @@ export default function Listagem({
   }
 
   function selectableFilter(rowData: any) {
-    if (isOpenModal || rowData?.status_experiment === 'EXP. SORTEADO') {
+    if (isOpenModal || rowData?.status_experiment == 'EXP. SORTEADO') {
       return false;
     }
 
@@ -1664,9 +1662,10 @@ export const getServerSideProps: GetServerSideProps = async ({
   const idSafra = req.cookies.safraId;
 
   // RR
+
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : '';
+    : 'asc';
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
@@ -1679,9 +1678,6 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const filterApplication = req.cookies.filterBeforeEdit
     || `&id_culture=${idCulture}&id_safra=${idSafra}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
-  // const filterApplication =
-  //   req.cookies.filterBeforeEdit ||
-  //   `&id_culture=${idCulture}&id_safra=${idSafra}&status_experiment=${"IMPORTADO"}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
@@ -1717,11 +1713,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     newItem.name = item.gli;
     return newItem;
   });
-
-  // const teste: any = {};
-  // teste.id = "";
-  // teste.name = "Selecione";
-  // assaySelect.unshift(teste);
 
   const genotypeSelect = allTreatments?.map((item: any) => {
     const newItem: any = {};

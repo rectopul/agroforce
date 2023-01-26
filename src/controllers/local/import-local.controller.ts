@@ -82,7 +82,8 @@ export class ImportLocalController {
           if (spreadSheet.length > 2) {
             if (spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]
             || (spreadSheet.length - 1) === Number(row)) {
-              if ((spreadSheet.length - 1) === Number(row)) {
+              if ((spreadSheet.length - 1) === Number(row)
+              && spreadSheet[row][1] === spreadSheet[Number(row) - 1][4]) {
                 validateAll.ROTULO.push(spreadSheet[row][5]);
                 validateAll.MLOC.push(spreadSheet[row][6]);
                 validateAll.ENDERECO.push(spreadSheet[row][7]);
@@ -97,6 +98,7 @@ export class ImportLocalController {
                   += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo Nome do Lugar de Cultura(${spreadSheet[row][4]}) devem ser iguais. </li> <br>`;
                 }
               }
+              console.log('🚀 ~ file: import-local.controller.ts:95 ~ ImportLocalController ~ || ~ validateAll', validateAll);
               validateAll = {
                 ROTULO: [],
                 MLOC: [],

@@ -201,6 +201,16 @@ export class NpeController {
           const next = elements.find((item: any, idx:any) => item.group?.id === groupId && idx > index);
           
           if (next) {
+            /**
+             * SELECT @npei_search:= MIN(npe.npei) as next_npe
+             * FROM npe
+             * WHERE (npe.npei >= @npe)
+             * AND NOT EXIST(SELECT n2.id FROM npe n2 WHERE n2.id = npe.id)
+             * GROUP BY npe.safraId, npe.groupId
+             * HAVING ((npe.safraId = @safra AND npe.groupId = @grupo));
+             * 
+             */
+
             if (!newItem.npeQT) {
               newItem.npeQT = next.npei_i - newItem.npef; // quantidade disponivel
             }
@@ -218,8 +228,37 @@ export class NpeController {
         });
       }
       
+      for(let i = 0; i < response.length; i++) {
+        const item = response[i];
+        
+        const {stat, res, msg} = await this.getMinNPE({
+          npe_id: item.id,
+          safra:item.safraId, 
+          grupo: item.group.id,
+          prox_npe: item.prox_npe
+        });
+
+        if (stat == 200) {
+          let menor = null;
+          for(let j = 0; j < res.length; j++) {
+            const npe_x_exp = res[j];
+            if (menor == null) {
+              menor = npe_x_exp.prox_npe;
+            } else if (npe_x_exp.prox_npe < menor) {
+              menor = npe_x_exp.prox_npe;
+            }
+          }
+          // 185 (menor) - 179 (prox_npe) = 6
+          // 201 (menor) - 179 (prox_npe) = 22
+          if(typeof item.nextNPE == 'object') {
+            item.npeQT = menor - item.prox_npe;
+          } else {
+            item.npeQT = 'N/A';
+          }
+        }
+        //console.log('message', stat, res, msg);
+      }
       // console.log('npe:', response);
-      
       if (!response || response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhuma NPE cadastrada',
@@ -232,6 +271,71 @@ export class NpeController {
     }
   }
 
+  async getMinNPE(options: any) {
+
+    const npe_id = options.npe_id;
+    const prox_npe = options.prox_npe;
+    const safra = options.safra;
+    const grupo = options.grupo;
+
+    /**
+     * @todo: carrega nas parcelas do exp. >= 179
+     * MIN(npe)
+     * WHERE npe >= 179
+     * RESUlTADO: 185 das parcelas
+     */
+
+    /**
+     * no cadastro de amb
+     * MIN(prox_npe) where prox_npe >= 179 AND NOT EXISTS(SELECT n2.id FROM npe n2 WHERE n2.id = n.id)
+     * RESULTADO: 279
+     *
+     * 185 - 179(prox_npe) = 6
+     */
+    
+    try {
+      const response: any = await prisma.$queryRaw`SELECT * FROM (
+    (
+    # consulta todas as parcelas onde pega o primeiro npe lançado acima do prox_npe do ambiente
+    SELECT MIN(x1.npe) as prox_npe,
+    'experiment_genotipe' as ref,
+    'parcelas' as apelido
+    FROM experiment_genotipe x1
+    WHERE 1=1
+    AND x1.npe >= ${prox_npe}
+    GROUP BY x1.idSafra, x1.groupId
+    HAVING ((x1.idSafra = ${safra} AND x1.groupId = ${grupo}))
+    )
+	
+	UNION
+	
+    (
+	  # consulta que pega menor npe utilizado
+	  SELECT MIN(npe.prox_npe) as prox_npe,
+		    'npe' as referencia,
+        'ambiente' as apelido
+	  FROM npe 
+	  WHERE 1=1
+        AND (npe.prox_npe > ${prox_npe}) 
+        AND npe.id <> ${npe_id}
+	  GROUP BY npe.safraId, npe.groupId
+	  HAVING ((npe.safraId = ${safra} AND npe.groupId = ${grupo}))
+    )
+) as x
+ORDER BY x.prox_npe ASC`;
+
+      if (response) {
+        return { stat: 200, res:response, msg: 'NPE encontrada' };
+      }
+
+      return {stat: 405, res: [], msg: 'Id da Npe não informado'};
+    } catch (error: any) {
+      handleError('getMinNpe Controller', 'getMinNpe', error.message);
+      throw new Error('[Controller] - getMinNpe NPE erro');
+    }
+
+  }
+  
   async getOne(id: number) {
     try {
       if (id) {

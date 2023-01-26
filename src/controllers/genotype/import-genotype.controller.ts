@@ -120,7 +120,7 @@ export class ImportGenotypeController {
           if (spreadSheet.length > 2) {
             if (spreadSheet[row][1] !== spreadSheet[Number(row) - 1][1]
             || (spreadSheet.length - 1) === Number(row)) {
-              if ((spreadSheet.length - 1) === Number(row)) {
+              if ((spreadSheet.length - 1) === Number(row) && spreadSheet[row][1] === spreadSheet[Number(row) - 1][1]) {
                 validateAll.NOME_PRINCIPAL.push(spreadSheet[row][4]);
                 validateAll.NOME_PUBLICO.push(spreadSheet[row][5]);
                 validateAll.NOME_EXPERIMENTAL.push(spreadSheet[row][6]);
@@ -146,6 +146,8 @@ export class ImportGenotypeController {
                   += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do ID_DADOS-${spreadSheet[row][1]} devem ser iguais. favor checar. </li> <br>`;
                 }
               }
+              console.log('🚀 ~ file: import-genotype.controller.ts:150 ~ ImportGenotypeController ~ || ~ validateAll', validateAll);
+
               validateAll = {
                 NOME_PUBLICO: [],
                 NOME_PRINCIPAL: [],
@@ -163,6 +165,7 @@ export class ImportGenotypeController {
                 PROGENITOR_M_ORIGEM: [],
                 PROGENITORES_ORIGEM: [],
                 PARENTESCO_COMPLETO: [],
+
               };
               validateAll.NOME_PRINCIPAL.push(spreadSheet[row][4]);
               validateAll.NOME_PUBLICO.push(spreadSheet[row][5]);
@@ -676,7 +679,7 @@ export class ImportGenotypeController {
 
               if (configModule.response[0]?.fields[column] === 'Elite_Nome') {
                 if (spreadSheet[row][column] !== null) {
-                  this.aux.elite_name = spreadSheet[row][column];
+                  this.aux.elit_name = spreadSheet[row][column];
                 }
               }
 

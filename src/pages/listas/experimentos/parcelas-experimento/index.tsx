@@ -148,6 +148,12 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes('culture'),
     },
     {
+      name: "CamposGerenciados[]",
+      title: "GRP",
+      value: "grp",
+      defaultChecked: () => camposGerenciados.includes("grp"),
+    },
+    {
       name: 'CamposGerenciados[]',
       title: 'StatusT',
       value: 'status_t',
@@ -277,6 +283,8 @@ export default function Listagem({
       filterCodTec: '',
       filterExperimentName: '',
       filterPlacingPlace: '',
+      filterGrpTo: '',
+      filterGrpFrom: '',
     },
     onSubmit: async ({
       filterFoco,
@@ -301,6 +309,8 @@ export default function Listagem({
       filterCodTec,
       filterExperimentName,
       filterPlacingPlace,
+      filterGrpTo,
+      filterGrpFrom,
     }) => {
       if (!functionsUtils?.isNumeric(filterRepFrom)) {
         return Swal.fire('O campo REP EXP não pode ter ponto ou vírgula.');
@@ -334,7 +344,7 @@ export default function Listagem({
       // const filterStatus = selecionados.substr(0, selecionados.length - 1);
       const filterStatus = statusFilterSelected?.join(',');
 
-      const parametersFilter = `&filterStatusT=${filterStatusT}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNcaTo=${filterNcaTo}&filterNcaFrom=${filterNcaFrom}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterCodTec=${filterCodTec}&filterExperimentName=${filterExperimentName}&filterRepTo=${filterRepTo}&filterRepFrom=${filterRepFrom}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterPlacingPlace=${filterPlacingPlace}`;
+      const parametersFilter = `&filterStatusT=${filterStatusT}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNcaTo=${filterNcaTo}&filterNcaFrom=${filterNcaFrom}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterCodTec=${filterCodTec}&filterExperimentName=${filterExperimentName}&filterRepTo=${filterRepTo}&filterRepFrom=${filterRepFrom}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterPlacingPlace=${filterPlacingPlace}&filterGrpTo=${filterGrpTo}&filterGrpFrom=${filterGrpFrom}`;
       // setFiltersParams(parametersFilter);
       // setCookies('filterBeforeEdit', filtersParams);
       // await genotypeTreatmentService
@@ -634,6 +644,17 @@ export default function Listagem({
             fieldOrder,
             handleOrder,
           }),
+        );
+      }
+      if (columnOrder[item] === "grp") {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "GRP",
+            title: "group.group",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
         );
       }
       if (columnOrder[item] === 'genotipo') {
@@ -1367,6 +1388,31 @@ export default function Listagem({
                         name="filterNcaTo"
                         onChange={formik.handleChange}
                         defaultValue={checkValue('filterNcaTo')}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-1/3 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      GRP
+                    </label>
+                    <div className="flex">
+                      <Input
+                        type="number"
+                        placeholder="De"
+                        id="filterGrpFrom"
+                        name="filterGrpFrom"
+                        defaultValue={checkValue("filterGrpFrom")}
+                        onChange={formik.handleChange}
+                      />
+                      <Input
+                        type="number"
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterGrpTo"
+                        name="filterGrpTo"
+                        defaultValue={checkValue("filterGrpTo")}
+                        onChange={formik.handleChange}
                       />
                     </div>
                   </div>

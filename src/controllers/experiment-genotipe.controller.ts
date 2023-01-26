@@ -19,6 +19,7 @@ export class ExperimentGenotipeController {
   private printedHistoryController = new PrintHistoryController();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: experiment-genotipe.controller.ts:22 ~ ExperimentGenotipeController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
@@ -206,6 +207,16 @@ export class ExperimentGenotipeController {
         }
       }
 
+      if (options.filterGrpFrom || options.filterGrpTo) {
+        if (options.filterGrpFrom && options.filterGrpTo) {
+          parameters.group = JSON.parse(`{"gte": ${Number(options.filterGrpFrom)}, "lte": ${Number(options.filterGrpTo)} }`);
+        } else if (options.filterGrpFrom) {
+          parameters.group = JSON.parse(`{"gte": ${Number(options.filterGrpFrom)} }`);
+        } else if (options.filterGrpTo) {
+          parameters.group = JSON.parse(`{"lte": ${Number(options.filterGrpTo)} }`);
+        }
+      }
+
       const select = {
         id: true,
         safra: { select: { safraName: true, culture: true } },
@@ -370,6 +381,7 @@ export class ExperimentGenotipeController {
       if (parameters.AND.length === 0) {
         delete parameters.AND;
       }
+      console.log(parameters);
 
       const response: object | any = await this.ExperimentGenotipeRepository.findAll(
         parameters,
@@ -409,6 +421,7 @@ export class ExperimentGenotipeController {
         FROM experiment_genotipe gn
         WHERE 1 = 1
         AND gn.groupId = ${groupId}
+        AND ('' = ${safraId} OR gn.idSafra = ${safraId})
         ORDER BY npe DESC`;
 
       if (!response) throw new Error('Grupo não encontrado');

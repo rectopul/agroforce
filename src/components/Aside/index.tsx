@@ -9,7 +9,7 @@ import { BsGear } from 'react-icons/bs';
 import { useRouter } from 'next/router';
 import { ButtonAside } from './ButtonAside';
 
-const versionApp = '0.0.21.1';
+const versionApp = '0.0.21.5';
 
 export function Aside({ moduloActive }: any) {
   return (
