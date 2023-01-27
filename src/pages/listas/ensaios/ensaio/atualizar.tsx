@@ -878,7 +878,6 @@ export default function AtualizarTipoEnsaio({
   }
 
   useEffect(() => {
-    // console.log('table', table);
     table === "genotipo" ? handlePagination() : handlePaginationExperiments();
     table === "genotipo" ? handleTotalPages() : handleTotalPagesExperiments();
   }, [currentPage, take, table]);

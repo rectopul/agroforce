@@ -155,7 +155,7 @@ model local {
   created_by         Int
   adress             String?
   id_country         Int
-  id_local_culture   Int            @unique
+  id_local_culture   Int
   id_locality        Int
   id_region          Int
   label              String
@@ -666,16 +666,14 @@ model PrintHistory {
 }
 
 model reportes {
-  id          Int      @id @default(autoincrement())
-  madeBy      Int?
-  madeIn      DateTime @default(now())
-  module      String?
-  operation   String?
-  idOperation Int?
-  name        String?
-  ip          String?
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  madeIn    DateTime @default(now())
+  module    String?
+  operation String?
+  oldValue  String
 
-  user user? @relation(fields: [madeBy], references: [id])
+  user user? @relation(fields: [userId], references: [id])
 }
 
 model AllocatedExperiment {

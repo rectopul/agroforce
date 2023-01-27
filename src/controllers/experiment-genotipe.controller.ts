@@ -89,11 +89,12 @@ export class ExperimentGenotipeController {
         statusParams.forEach((_: any, index: number) => {
           parameters.OR.push(
             JSON.parse(
-              `{ "experiment": {"status": {"contains": "${statusParams[index]}" } } }`,
+              `{"status": {"contains": "${statusParams[index]}" } }`,
             ),
           );
         });
       }
+
       if (options.ensaio) {
         parameters.AND.push(
           JSON.parse(
@@ -225,8 +226,6 @@ export class ExperimentGenotipeController {
           parameters.group = JSON.parse(` {"group": {"lte": ${Number(options.filterGrpTo)} } }`);
         }
       }
-
-      console.log('parameters', parameters);
 
       const select = {
         id: true,

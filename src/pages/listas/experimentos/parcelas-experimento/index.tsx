@@ -340,7 +340,6 @@ export default function Listagem({
 
       // const filterStatus = selecionados.substr(0, selecionados.length - 1);
       const filterStatus = statusFilterSelected?.join(",");
-      console.log({ filterStatus });
 
       const parametersFilter = `&filterStatusT=${filterStatusT}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNcaTo=${filterNcaTo}&filterNcaFrom=${filterNcaFrom}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterCodTec=${filterCodTec}&filterExperimentName=${filterExperimentName}&filterRepTo=${filterRepTo}&filterRepFrom=${filterRepFrom}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterPlacingPlace=${filterPlacingPlace}&filterGrpTo=${filterGrpTo}&filterGrpFrom=${filterGrpFrom}`;
       // setFiltersParams(parametersFilter);
@@ -757,7 +756,6 @@ export default function Listagem({
     //       const filterParam1 = `${filter}&skip=${skip}&take=${take}`;
     //       await experimentGenotipeService.getAll(filterParam1).then(({ status, response }) => {
     //         // logic
-    //         console.log(response);
     //         res = response;
     //         skip += 1000;
     //       })
@@ -766,7 +764,6 @@ export default function Listagem({
     await experimentGenotipeService
       .getAll(filterParam)
       .then(({ status, response }) => {
-        // console.log('parcelas do experimento', response)
         if (status === 200) {
           // const expGenCon = new ExperimentGenotipeController();
           // expGenCon.createXls();

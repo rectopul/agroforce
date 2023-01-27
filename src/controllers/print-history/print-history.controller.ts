@@ -24,25 +24,17 @@ export class PrintHistoryController {
     }
   }
 
-  async create({ idList, userId, status }: any) {
+  async create({
+    userId, operation, module, oldValue,
+  }: any) {
     try {
-      if (Array.isArray(idList)) {
-        idList.forEach(async (_: any, index: any) => {
-          const data = {
-            experimentGenotypeId: idList[index],
-            status,
-            userId,
-          };
-          await this.printHistoryRepository.create(data);
-        });
-      } else {
-        const data = {
-          experimentGenotypeId: idList,
-          status,
-          userId,
-        };
-        await this.printHistoryRepository.create(data);
-      }
+      const data = {
+        module,
+        userId,
+        operation,
+        oldValue,
+      };
+      await this.printHistoryRepository.create(data);
     } catch (error: any) {
       handleError('Histórico de impressão Controller', 'Create', error.message);
       throw new Error('[Controller] - Create Histórico de impressão erro');

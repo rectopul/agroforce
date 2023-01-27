@@ -259,10 +259,8 @@ export class NpeController {
           }
         }
         
-        console.log('Calculate getMinNPE for NPE list', stat, res, msg);
         
       }
-      // console.log('npe:', response);
       if (!response || response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhuma NPE cadastrada',

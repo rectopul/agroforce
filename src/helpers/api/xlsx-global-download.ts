@@ -906,7 +906,6 @@ async function callEnsaioGenotipeXlsxDownload(options: any) {
   do {
     const { response, status } = await Controller.getAll(options);
     const newData = response.map((item: any) => {
-      console.log('🚀 ~ file: xlsx-global-download.ts:909 ~ newData ~ item', item);
       const newItem: any = {};
       newItem.CULTURA = item.safra.culture.name;
       newItem.SAFRA = item.safra.safraName;

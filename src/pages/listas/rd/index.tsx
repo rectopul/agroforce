@@ -80,14 +80,14 @@ interface TabPanelProps {
 }
 
 export default function Import({
-          allLogs,
-          totalItems,
-          itensPerPage,
-          filterApplication,
-          uploadInProcess,
-          idSafra,
-          idCulture,
-        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allLogs,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  uploadInProcess,
+  idSafra,
+  idCulture,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const router = useRouter();
@@ -328,19 +328,19 @@ export default function Import({
     const filename = `/log_import/${rowData.filePath}`;
 
     await importService.checkFile().then((res) => {
-      if(res.status == 400){
+      if (res.status == 400) {
         Swal.fire('No File Available To Download');
-      }else{
+      } else {
         const validFileName = res.files;
         let valid = false;
-  
+
         if (validFileName.length > 0) {
           validFileName.map((e: any) => {
             if (e == rowData.filePath) {
               valid = true;
             }
           });
-  
+
           if (valid) {
             const element = document.createElement('a');
             element.setAttribute('href', filename);
@@ -824,7 +824,7 @@ export default function Import({
                       table="PARCELS"
                       moduleId={30}
                     />
-                  )}
+                )}
 
                 <div className="h-10" />
               </TabPanel>
@@ -869,7 +869,7 @@ export default function Import({
                       table="ALLOCATION"
                       moduleId={31}
                     />
-                  )}
+                )}
                 {(Router?.importar == 'etiquetas_impressas'
                   || !Router.importar) && (
                     <ComponentImport
@@ -878,7 +878,7 @@ export default function Import({
                       table="TAG_PRINTED" // AINDA NÃO SEI NOME CORRETO
                       moduleId={0} // AINDA NÃO SEI CODIGO CORRETO
                     />
-                  )}
+                )}
               </TabPanel>
             </Box>
           </div>
@@ -1003,7 +1003,7 @@ export default function Import({
                 options={{
                   showTitle: false,
                   maxBodyHeight: `calc(100vh - ${statusAccordionFilter ? 488 : 346
-                    }px)`,
+                  }px)`,
                   headerStyle: {
                     zIndex: 1,
                   },

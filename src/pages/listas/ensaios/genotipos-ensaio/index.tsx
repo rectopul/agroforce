@@ -926,14 +926,12 @@ export default function Listagem({
         idLote: item.id_lote,
       }));
 
-      console.log("checkedTreatments", checkedTreatments);
 
       let error = false;
       let message = "";
 
       //iterate checkedTreatments
       for (const item of checkedTreatments) {
-        console.log("item", item);
         try {
           const { status, response } = await genotypeTreatmentService.getOne({
             id: item.id,
@@ -945,7 +943,6 @@ export default function Listagem({
                 "Não é possível alterar genótipo de tratamentos com status EXP. SORTEADO: ID: " +
                 item.id +
                 `\n`;
-              console.log("response", response);
             }
           }
         } catch (e) {
