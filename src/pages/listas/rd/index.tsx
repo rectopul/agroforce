@@ -130,7 +130,7 @@ export default function Import({
               filePath,
             });
             setImportLoading(false);
-            handlePagination(currentPage);
+            handlePagination();
             Swal.fire({
               html: message,
               width: '800',
@@ -148,7 +148,7 @@ export default function Import({
               filePath,
             });
             setImportLoading(false);
-            handlePagination(currentPage);
+            handlePagination();
             Swal.fire({
               html: message,
               width: '800',
