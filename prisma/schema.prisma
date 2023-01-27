@@ -155,7 +155,7 @@ model local {
   created_by         Int
   adress             String?
   id_country         Int
-  id_local_culture   Int            @unique
+  id_local_culture   Int
   id_locality        Int
   id_region          Int
   label              String
