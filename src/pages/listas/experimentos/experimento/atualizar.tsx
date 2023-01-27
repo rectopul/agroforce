@@ -214,9 +214,11 @@ export default function AtualizarLocal({
     // setCookies('fieldOrder', fieldOrder);
 
     // parametersFilter = `${parametersFilter}&${pathExtra}`;
+    console.log('🚀 ~ file: atualizar.tsx:221 ~ getTreatments ~ orderBy', orderBy);
     parametersFilter = `${parametersFilter}&skip=${
       page * Number(take)
     }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+    console.log('🚀 ~ file: atualizar.tsx:221 ~ getTreatments ~ parametersFilter', parametersFilter);
 
     // setFiltersParams(parametersFilter);
     // setCookies('filtersParams', parametersFilter);
@@ -253,8 +255,11 @@ export default function AtualizarLocal({
     name: any
   ): Promise<void> {
     // Gobal manage orders
-    const { typeOrderG, columnG, orderByG, arrowOrder } =
-      await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    console.log('🚀 ~ file: atualizar.tsx:260 ~ columnG', columnG);
+
 
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);

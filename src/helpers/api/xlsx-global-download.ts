@@ -922,7 +922,7 @@ async function callEnsaioGenotipeXlsxDownload(options: any) {
       newItem.STATUS_T = item.status;
       newItem.STATUS_ENSAIO = item.assay_list.status;
       newItem.GENOTIPO = item.genotipo.name_genotipo;
-      newItem.NCA = item?.lote?.ncc;
+      newItem.NCA = String(item.lote.ncc);
 
       newItem.DT = moment().format('DD-MM-YYYY hh:mm:ss');
       newItem.DATA = newItem.DT;

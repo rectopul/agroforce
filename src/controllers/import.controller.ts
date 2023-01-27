@@ -144,6 +144,10 @@ export class ImportController {
   }
 
   async validateProtocol(data: object | any) {
+    if (data.spreadSheet.length < 2) {
+      return { status: 400, message: 'PLANILHA VAZIA, FAVOR IMPORTAR UMA PLANILHA COM LINHAS' };
+    }
+
     const {
       status,
       response: responseLog,
@@ -173,8 +177,10 @@ export class ImportController {
         });
         return { status: 400, message: protocolMessage };
       }
+
       const protocolLevel = String(data.spreadSheet[1][0]);
       const newData = removeProtocolLevel(data);
+
       switch (protocolLevel) {
         case 'TECHNOLOGY_S2':
           return await ImportTechnologyController.validate(responseLog?.id, newData);

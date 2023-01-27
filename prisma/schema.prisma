@@ -163,7 +163,7 @@ model local {
   label_region       String
   mloc               String?
   name_country       String
-  name_local_culture String
+  name_local_culture String         @unique
   name_locality      String
   name_region        String
   cultureUnity       cultureUnity[]
@@ -533,7 +533,7 @@ model log_import {
   invalid_data String?   @db.LongText
   executeTime  String?
   totalRecords Int?
-  filePath    String?  
+  filePath     String?
 
   safra safra @relation(fields: [idSafra], references: [id])
   user  user  @relation(fields: [user_id], references: [id])

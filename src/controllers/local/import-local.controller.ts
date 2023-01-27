@@ -46,6 +46,7 @@ export class ImportLocalController {
     const localTemp: Array<string> = [];
     const responseIfError: Array<string> = [];
     let validateAll: any = {};
+    const uniqueLocalName: any = [];
     const allEqual = (arr: any) => arr.every((val: any) => val === arr[0]);
 
     const headers = [
@@ -79,6 +80,22 @@ export class ImportLocalController {
       configModule.response[0]?.fields.push('DT');
       for (const row in spreadSheet) {
         if (row !== '0') {
+          if (uniqueLocalName?.includes(spreadSheet[row][4])) {
+            await logImportController.update({
+              id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: `Erro na linha ${Number(row) + 1}. Nome do local de cultura duplicados na planilha`,
+            });
+            uniqueLocalName[row] = spreadSheet[row][4];
+            return { status: 200, message: `Erro na linha ${Number(row) + 1}. Nome do local de cultura duplicados na planilha` };
+          }
+          if (localTemp?.includes(spreadSheet[row][2])) {
+            await logImportController.update({
+              id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: `Erro na linha ${Number(row) + 1}. Unidades de cultura duplicadas na planilha`,
+            });
+            localTemp[row] = spreadSheet[row][2];
+            return { status: 200, message: `Erro na linha ${Number(row) + 1}. Unidades de cultura duplicados na tabela` };
+          }
+          localTemp[row] = spreadSheet[row][2];
+          uniqueLocalName[row] = spreadSheet[row][4];
           if (spreadSheet.length > 2) {
             if (spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]
             || (spreadSheet.length - 1) === Number(row)) {
@@ -98,7 +115,6 @@ export class ImportLocalController {
                   += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo Nome do Lugar de Cultura(${spreadSheet[row][4]}) devem ser iguais. </li> <br>`;
                 }
               }
-              console.log('🚀 ~ file: import-local.controller.ts:95 ~ ImportLocalController ~ || ~ validateAll', validateAll);
               validateAll = {
                 ROTULO: [],
                 MLOC: [],
@@ -123,14 +139,7 @@ export class ImportLocalController {
             }
           }
         }
-        if (localTemp?.includes(spreadSheet[row][2])) {
-          await logImportController.update({
-            id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela`,
-          });
-          localTemp[row] = spreadSheet[row][2];
-          return { status: 200, message: `Erro na linha ${Number(row) + 1}. Unidades de cultura duplicados na tabela` };
-        }
-        localTemp[row] = spreadSheet[row][2];
+
         for (const column in spreadSheet[row]) {
           if (row === '0') {
             // if (!(spreadSheet[row][column]?.toUpperCase())
@@ -372,9 +381,11 @@ export class ImportLocalController {
                   } else if (spreadSheet[0][column]?.includes('CP_LIBELLE')) {
                     localCultureDTO.label = (spreadSheet[row][column]?.toString());
                   } else if (spreadSheet[0][column]?.includes('MLOC')) {
-                    localCultureDTO.mloc = (spreadSheet[row][column]?.toString());
+                    localCultureDTO.mloc = spreadSheet[row][column]
+                      ? String(spreadSheet[row][column]) : null;
                   } else if (spreadSheet[0][column]?.includes('Endereço')) {
-                    localCultureDTO.adress = (spreadSheet[row][column]?.toString());
+                    localCultureDTO.adress = spreadSheet[row][column]
+                      ? String(spreadSheet[row][column]) : null;
                   } else if (spreadSheet[0][column]?.includes('Identificador de localidade')) {
                     localCultureDTO.id_locality = Number(spreadSheet[row][column]);
                   } else if (spreadSheet[0][column]?.includes('Nome da localidade')) {
@@ -398,7 +409,7 @@ export class ImportLocalController {
                 localCultureDTO.created_by = Number(createdBy);
                 unityCultureDTO.created_by = Number(createdBy);
                 const { response } = await localController.getAll(
-                  { id_local_culture: localCultureDTO.id_local_culture },
+                  { name_local_culture: localCultureDTO.name_local_culture },
                 );
                 const {
                   response: unityExist,
