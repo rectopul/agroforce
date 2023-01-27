@@ -19,7 +19,6 @@ export class ExperimentGenotipeController {
   private printedHistoryController = new PrintHistoryController();
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: experiment-genotipe.controller.ts:22 ~ ExperimentGenotipeController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
@@ -226,10 +225,9 @@ export class ExperimentGenotipeController {
           parameters.group = JSON.parse(` {"group": {"lte": ${Number(options.filterGrpTo)} } }`);
         }
       }
-      
 
-      console.log('parameters',parameters);
-      
+      console.log('parameters', parameters);
+
       const select = {
         id: true,
         safra: { select: { safraName: true, culture: true } },
@@ -343,8 +341,8 @@ export class ExperimentGenotipeController {
       if (options.idTecnologia) {
         parameters.idTecnologia = Number(options.idTecnologia);
       }
-      
-      if(options.groupId){
+
+      if (options.groupId) {
         parameters.groupId = Number(options.groupId);
       }
 
@@ -537,7 +535,7 @@ export class ExperimentGenotipeController {
       let counter = 1;
       if (count === 'print') {
         status = 'IMPRESSO';
-        counter = 2;
+        counter = 1;
       } else if (count === 'reprint') {
         await idList.map(async (id: any) => {
           const { response }: any = await this.getOne(id);

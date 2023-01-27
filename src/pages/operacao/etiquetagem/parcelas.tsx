@@ -779,8 +779,12 @@ export default function Listagem({
     if (colorVerify === 'bg-green-600') {
       setIsLoading(true);
 
+      const parcelsToPrint = parcelas.filter(
+        (parcela: any) => parcelasToPrint.includes(parcela.id),
+      );
       const validateSeeds: any = [];
-      const parcels = parcelas.map((item: any) => {
+
+      const parcels = parcelsToPrint.map((item: any) => {
         item.type_assay.envelope?.filter(
           (seed: any) => seed.id_safra === idSafra,
         );
@@ -803,11 +807,12 @@ export default function Listagem({
         userId: userLogado.id,
         count: 'print',
       });
-      cleanState();
 
-      const {
-        response: newParcels,
-      }: IReturnObject = await experimentGenotipeService.getAll(filter);
+      parcels.map((parcela: any) => {
+        parcela.counter += 1;
+        return parcela;
+      });
+      cleanState();
 
       if (parcels) {
         localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
@@ -858,14 +863,14 @@ export default function Listagem({
       count: 'reprint',
     });
 
+    parcels.map((parcela: any) => {
+      parcela.counter += 1;
+      return parcela;
+    });
     cleanState();
 
-    const {
-      response: newParcels,
-    }: IReturnObject = await experimentGenotipeService.getAll(filter);
-
-    if (newParcels) {
-      localStorage.setItem('parcelasToPrint', JSON.stringify(newParcels));
+    if (parcels) {
+      localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
 
       // setStateIframe(stateIframe + 1);
 

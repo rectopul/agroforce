@@ -192,6 +192,16 @@ export default function Import({
       setModuleId(moduleId);
       setTable(table);
       setFile(value.files[0]);
+      if (value.files[0]?.size > 8388608) {
+        Swal.fire({
+          html: 'O tamanho do arquivo deve ser menor que 8mb',
+          width: '800',
+          didClose: () => {
+            router.reload();
+          },
+        });
+        return;
+      }
 
       if (file) {
         const formData = new FormData();

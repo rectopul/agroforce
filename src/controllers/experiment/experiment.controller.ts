@@ -1,4 +1,5 @@
 import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
+import createXls from 'src/helpers/api/xlsx-global-download';
 import handleError from '../../shared/utils/handleError';
 import { ExperimentRepository } from '../../repository/experiment.repository';
 import { ReporteRepository } from '../../repository/reporte.repository';
@@ -11,7 +12,6 @@ import { ExperimentGenotipeController } from '../experiment-genotipe.controller'
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 import { NpeController } from '../npe/npe.controller';
 import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';
-import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -258,13 +258,12 @@ export class ExperimentController {
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
-      
       if (options.orderBy) {
         // verifica se options.orderBy é objeto entra também
         if (!options.excel || (typeof options.orderBy === 'object')) {
           if (typeof options.orderBy !== 'string' || typeof options.typeOrder !== 'string') {
             if (options.orderBy[2] == '' || !options.orderBy[2]) {
-              /** 
+              /**
                * @todo: Refatorar esse código para verificar se cada orderBy tem ponto se tiver é uma relação
                */
               const tempOrder = handleOrderForeign(options.orderBy[1], options.typeOrder[1]);
@@ -435,16 +434,15 @@ export class ExperimentController {
       const { status } = await experimentGenotipeController.deleteAll(data.id);
 
       if (status === 200) {
-
         const response = await this.experimentRepository.delete(Number(data.id));
-        
+
         const { response: assayList } = await this.assayListController.getOne(Number(experimentExist?.idAssayList));
-        
+
         console.log('assayList', assayList);
-        
+
         // filter experiments with status 'IMPORTADO'
         const experiments_importeds = assayList?.experiment.filter((experiment: any) => experiment.status === 'IMPORTADO');
-        
+
         // if there are only experiments in 'IMPORTED' status or have no experiments, change status assayList to 'IMPORTADO' AND change status genotype_treatment to 'IMPORTADO'
         if (experiments_importeds?.length === assayList?.experiment.length || !assayList?.experiment.length) {
           await this.assayListController.update({
@@ -458,7 +456,7 @@ export class ExperimentController {
             });
           });
         }
-        
+
         // if (!assayList?.experiment.length) {
         //   await this.assayListController.update({
         //     id: experimentExist?.idAssayList,
@@ -471,7 +469,7 @@ export class ExperimentController {
         //     });
         //   });
         // }
-        
+
         const { response: ambiente } = await npeController.getAll({
           safraId: experimentExist?.idSafra,
           localId: experimentExist?.idLocal,
@@ -480,7 +478,7 @@ export class ExperimentController {
           filterCodTecnologia: experimentExist?.assay_list?.tecnologia?.cod_tec,
           typeAssayId: experimentExist?.assay_list?.type_assay?.id,
         });
-        
+
         const { response: experiment } = await this.getAll({
           idSafra: experimentExist?.idSafra,
           idLocal: experimentExist?.idLocal,
@@ -489,7 +487,7 @@ export class ExperimentController {
           Tecnologia: experimentExist?.assay_list?.tecnologia?.cod_tec,
           TypeAssay: experimentExist?.assay_list?.type_assay?.id,
         });
-        
+
         if (ambiente.length > 0 && experiment.length === 0) {
           await npeController.update({
             id: ambiente[0]?.id,

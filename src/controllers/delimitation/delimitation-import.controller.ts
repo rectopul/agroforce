@@ -84,6 +84,9 @@ export class ImportDelimitationController {
                     'a cultura e diferente da selecionada',
                   );
                 }
+              } else {
+                responseIfError[Number(column)]
+                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
             }
 
@@ -139,6 +142,26 @@ export class ImportDelimitationController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              } else if (typeof (spreadSheet[row][column]) !== 'number'
+               || Number(spreadSheet[row][column]) < 0) {
+                responseIfError[Number(column)]
+                  += responsePositiveNumericFactory(
+                    (Number(column) + 1),
+                    row,
+                    spreadSheet[0][column],
+                  );
+              } else if (spreadSheet[Number(row) - 1][1]
+                !== spreadSheet[row][1]
+                || row === '1') {
+                if (spreadSheet[row][column] !== 1) {
+                  responseIfError[Number(column)]
+                  += responseGenericFactory(
+                      Number(column) + 1,
+                      row,
+                      spreadSheet[0][column],
+                      'o sorteio deve começar em 1',
+                    );
+                }
               }
             }
 

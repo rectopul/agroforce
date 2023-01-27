@@ -41,5 +41,5 @@ export const importService = {
   validate,
   validateProtocol,
   uploadFile,
-  checkFile
+  checkFile,
 };
