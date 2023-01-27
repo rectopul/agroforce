@@ -89,17 +89,17 @@ interface IData {
 }
 
 export default function TipoEnsaio({
-  allTypeAssay,
-  itensPerPage,
-  filterApplication,
-  totalItems,
-  idCulture,
-  safraId,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer, // RR
-  orderByserver, // RR
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+          allTypeAssay,
+          itensPerPage,
+          filterApplication,
+          totalItems,
+          idCulture,
+          safraId,
+          pageBeforeEdit,
+          filterBeforeEdit,
+          typeOrderServer, // RR
+          orderByserver, // RR
+        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState<boolean>(false);
   const { TabsDropDowns } = ITabs.default;
 
@@ -532,7 +532,7 @@ export default function TipoEnsaio({
             title: "envelope.seeds",
             orderList,
             fieldOrder,
-            handleOrder: returnFalse,
+            handleOrder,
           })
         );
       }
@@ -543,7 +543,7 @@ export default function TipoEnsaio({
             title: "envelope.safra.safraName",
             orderList,
             fieldOrder,
-            handleOrder: returnFalse,
+            handleOrder,
           })
         );
       }

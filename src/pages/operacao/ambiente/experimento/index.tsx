@@ -115,12 +115,12 @@ interface IData {
 }
 
 export default function Listagem({
-  itensPerPage,
-  filterApplication,
-  idSafra,
-  pageBeforeEdit,
-  filterBeforeEdit,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+                                                          itensPerPage,
+                                                          filterApplication,
+                                                          idSafra,
+                                                          pageBeforeEdit,
+                                                          filterBeforeEdit,
+                                                        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs;
 
   const tableRef = useRef<any>(null);
@@ -151,6 +151,7 @@ export default function Listagem({
   const [lastExperimentNPE, setLastExperimentNPE] = useState<number>(0);
   const [arrowOrder, setArrowOrder] = useState<any>("");
   const [SortearDisable, setSortearDisable] = useState<boolean>(false);
+  const [npeDataItems, setNpeDataItems] = useState<any>();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
@@ -630,10 +631,15 @@ export default function Listagem({
     setCurrentPage(page);
 
     if (NPESelectedRow) {
-      const skip = currentPage * Number(take);
-      setExperimentoNew(experimentos.slice(skip, skip + take));
+      const skip = page * Number(take);
+      setNpeDataItems(npeData?.data.slice(skip, skip + take));
     }
   }
+
+  useEffect(() => {
+    console.log("npeDataItems :", npeDataItems);
+    
+  }, [npeDataItems, currentPage]);
 
   // useLayoutEffect(() => {
   //   handlePagination();
@@ -806,10 +812,19 @@ export default function Listagem({
   }
 
   useEffect(() => {
+    setCurrentPage(0);
+  }, [NPESelectedRow])
+
+  useEffect(() => {
+    setNpeDataItems(npeData?.data.slice(0, take));
+  }, [npeData])
+
+  useEffect(() => {
     const env = allNPERecords?.filter((ele: any) =>
       ele?.env.id == NPESelectedRow?.id ? ele : ""
     );
     setNpeData(env ? env[0] : "");
+    setTotalItems(env ? env[0]?.data.length : 0);
 
     //STEWART
     if (env) {
@@ -1184,7 +1199,7 @@ export default function Listagem({
         >
           <div
             className={`w-full ${
-              selectedNPE?.length > 3 && "max-h-40 overflow-y-scroll"
+              selectedNPE?.length > 3 && "overflow-y-scroll"
             } mb-4`}
           >
             <MaterialTable
@@ -1236,7 +1251,7 @@ export default function Listagem({
                 style={{ background: "#f9fafb" }}
                 columns={columns}
                 // data={experimentosNew}
-                data={npeData?.data}
+                data={npeDataItems}
                 options={{
                   showTitle: false,
                   //maxBodyHeight: `calc(100vh - 400px)`,
@@ -1255,8 +1270,8 @@ export default function Listagem({
                   }),
                   search: false,
                   filtering: false,
-                  pageSize: itensPerPage,
-                  paging: false, //PAGINACAO DESATIVADA TEMPORARIAMENTE
+                  pageSize: Number(take),
+                  // paging: false, //PAGINACAO DESATIVADA TEMPORARIAMENTE
                 }}
                 components={{
                   Toolbar: () => (
@@ -1444,10 +1459,14 @@ export const getServerSideProps: GetServerSideProps = async ({
   res,
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage =
-    (await (
-      await PreferencesControllers.getConfigGerais()
-    )?.response[0]?.itens_per_page) ?? 10;
+  // const itensPerPage =
+  //   (await (
+  //     await PreferencesControllers.getConfigGerais()
+  //   )?.response[0]?.itens_per_page) ?? 10;
+
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
+    : 10;
 
   const idSafra = Number(req.cookies.safraId);
 

@@ -45,13 +45,7 @@ export class TypeAssayController {
         name: true,
         culture: true,
         protocol_name: true,
-        envelope: {
-          select: {
-            seeds: true,
-            id_safra: true,
-            safra: true,
-          },
-        },
+        envelope: { select: { id_safra: true, safra: true, seeds: true } },
         status: true,
       };
 
@@ -67,9 +61,11 @@ export class TypeAssayController {
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
-      if (options.orderBy) {
+      if (options.orderBy != 'envelope.seeds' && options.orderBy != "envelope.safra.safraName") {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+      }else{
+        orderBy = `{ "name": "desc"}`;
       }
 
       const response = await this.typeAssayRepository.findAll(
@@ -87,6 +83,13 @@ export class TypeAssayController {
           }
         });
       });
+
+      if(options.orderBy == 'envelope.seeds' && options.typeOrder == 'asc'){
+        response.sort((a: any, b: any) => b.envelope.seeds - a.envelope.seeds);
+      }else if(options.orderBy == 'envelope.seeds' && options.typeOrder == 'desc'){
+        response.sort((a: any, b: any) => a.envelope.seeds - b.envelope.seeds);
+      }
+
       if (!response || response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'Nenhum envelope encontrado',
