@@ -531,27 +531,32 @@ export class ExperimentGenotipeController {
     idList, npe, status, userId = 0, count,
   }: any) {
     try {
+      let operation;
       let counter = 1;
       if (count === 'print') {
-        status = 'IMPRESSO';
+        operation = 'IMPRESSO';
         counter = 1;
       } else if (count === 'reprint') {
         await idList.map(async (id: any) => {
           const { response }: any = await this.getOne(id);
           const newCount = response.counter + 1;
-          status = 'IMPRESSO';
+          operation = 'IMPRESSO';
           await this.ExperimentGenotipeRepository.printed(id, status, newCount);
         });
       } else if (count === 'writeOff') {
         counter = 0;
-        status = 'EM ETIQUETAGEM';
+        operation = 'EM ETIQUETAGEM';
         await this.ExperimentGenotipeRepository.writeOff(npe, status, counter);
-        status = 'BAIXA';
-        await this.printedHistoryController.create({ idList, userId, status });
+        operation = 'BAIXA';
+        await this.printedHistoryController.create({
+          userId, operation, module, oldValue,
+        });
         return { status: 200 };
       }
       await this.ExperimentGenotipeRepository.printed(idList, status, counter);
-      await this.printedHistoryController.create({ idList, userId, status });
+      await this.printedHistoryController.create({
+        userId, operation, module, oldValue,
+      });
       return { status: 200 };
     } catch (error: any) {
       handleError('Parcelas controller', 'Update', error.message);
