@@ -60,9 +60,11 @@ export class FocoController {
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
-      if (options.orderBy) {
+      if (options.orderBy != 'group.group') {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
+      }else{
+        orderBy = `{ "name": "desc"}`;
       }
 
       const response: object | any = await this.focoRepository.findAll(
@@ -86,6 +88,12 @@ export class FocoController {
             }
           });
         });
+      }
+
+      if(options.orderBy == 'group.group' && options.typeOrder == 'asc'){
+        response.sort((a: any, b: any) => b.group.group - a.group.group);
+      }else if(options.orderBy == 'group.group' && options.typeOrder == 'desc'){
+        response.sort((a: any, b: any) => a.group.group - b.group.group);
       }
 
       if (!response || response.total <= 0) {

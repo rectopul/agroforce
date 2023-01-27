@@ -318,22 +318,33 @@ export class ImportController {
   async checkFile(req: any) {
     const filePath: any = [];
     const res = new Promise(async (resolve, reject) => {
-      await fs.readdir('./public/log_import', (err, files) => {
-        files.forEach((file) => {
-          filePath.push(file);
+      const dir = './public/log_import';
+
+      if(!fs.existsSync(dir)){
+        resolve({
+          message: 'no files',
+          files: [],
+          status: 400
         });
-        if (filePath.length > 0) {
-          resolve({
-            message: 'files fetched success',
-            files: filePath,
+      }else{
+        await fs.readdir('./public/log_import', (err, files) => {
+          files.forEach((file) => {
+            filePath.push(file);
           });
-        } else {
-          reject({
-            message: 'no files',
-            files: [],
-          });
-        }
-      });
+          if (filePath.length > 0) {
+            resolve({
+              message: 'files fetched success',
+              files: filePath,
+            });
+          } else {
+            reject({
+              message: 'no files',
+              files: [],
+              status: 400
+            });
+          }
+        });
+      }
     });
 
     return res;

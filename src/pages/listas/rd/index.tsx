@@ -80,14 +80,14 @@ interface TabPanelProps {
 }
 
 export default function Import({
-      allLogs,
-      totalItems,
-      itensPerPage,
-      filterApplication,
-      uploadInProcess,
-      idSafra,
-      idCulture,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+          allLogs,
+          totalItems,
+          itensPerPage,
+          filterApplication,
+          uploadInProcess,
+          idSafra,
+          idCulture,
+        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const router = useRouter();
@@ -383,25 +383,29 @@ export default function Import({
     const filename = `/log_import/${rowData.filePath}`;
 
     await importService.checkFile().then((res) => {
-      const validFileName = res.files;
-      let valid = false;
-
-      if (validFileName.length > 0) {
-        validFileName.map((e: any) => {
-          if (e == rowData.filePath) {
-            valid = true;
+      if(res.status == 400){
+        Swal.fire('No File Available To Download');
+      }else{
+        const validFileName = res.files;
+        let valid = false;
+  
+        if (validFileName.length > 0) {
+          validFileName.map((e: any) => {
+            if (e == rowData.filePath) {
+              valid = true;
+            }
+          });
+  
+          if (valid) {
+            const element = document.createElement('a');
+            element.setAttribute('href', filename);
+            element.setAttribute('download', rowData.filePath);
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+          } else {
+            Swal.fire('No File Available To Download');
           }
-        });
-
-        if (valid) {
-          const element = document.createElement('a');
-          element.setAttribute('href', filename);
-          element.setAttribute('download', rowData.filePath);
-          document.body.appendChild(element);
-          element.click();
-          document.body.removeChild(element);
-        } else {
-          Swal.fire('No File Available To Download');
         }
       }
     });

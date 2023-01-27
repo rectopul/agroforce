@@ -85,16 +85,16 @@ interface IData {
 }
 
 export default function Listagem({
-  totalItems,
-  itensPerPage,
-  cultureId,
-  safraId,
-  filterApplication,
-  pageBeforeEdit,
-  filterBeforeEdit,
-  typeOrderServer,
-  orderByserver,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+          totalItems,
+          itensPerPage,
+          cultureId,
+          safraId,
+          filterApplication,
+          pageBeforeEdit,
+          filterBeforeEdit,
+          typeOrderServer,
+          orderByserver,
+        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
 
   const tableRef = useRef<any>(null);
@@ -149,7 +149,7 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const pathExtra = `skip=${
     currentPage * Number(take)
@@ -471,7 +471,7 @@ export default function Listagem({
             title: "group.group",
             orderList,
             fieldOrder,
-            handleOrder: returnFalse,
+            handleOrder,
           })
         );
       }
