@@ -71,6 +71,7 @@ export default function Listagem({
   filterBeforeEdit,
   typeOrderServer,
   orderByserver,
+  filterSelectStatusParcel,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState<boolean>(false);
   const { TabsDropDowns } = ITabs.default;
@@ -225,7 +226,9 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("IMPRESSO"),
     },
   ]);
-  const [statusFilterSelected, setStatusFilterSelected] = useState<any>([]);
+  const [statusFilterSelected, setStatusFilterSelected] = useState<any>(
+    filterSelectStatusParcel
+  );
 
   // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>("");
@@ -1073,6 +1076,7 @@ export default function Listagem({
         onRequestClose={() => {
           setIsOpenModal(!isOpenModal);
         }}
+        style={{ overlay: { zIndex: 1000 } }}
         overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
         className="flex
           flex-col
@@ -1497,6 +1501,10 @@ export default function Listagem({
                         onClick={() => {
                           setRadioStatus();
                           setIsOpenModal(!isOpenModal);
+                          setCookies(
+                            "filterSelectStatusParcel",
+                            statusFilterSelected
+                          );
                         }}
                         bgColor="bg-blue-600"
                         icon={<RiArrowUpDownLine size={20} />}
@@ -1675,6 +1683,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies("filterBeforeEditTypeOrder", { req, res });
     removeCookies("filterBeforeEditOrderBy", { req, res });
     removeCookies("lastPage", { req, res });
+    removeCookies("filterSelectStatusParcel", { req, res });
   }
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
@@ -1702,11 +1711,16 @@ export const getServerSideProps: GetServerSideProps = async ({
     ? req.cookies.filterBeforeEditOrderBy
     : "npe";
 
+  const filterSelectStatusParcel = req.cookies.filterSelectStatusParcel
+    ? JSON?.parse(req.cookies.filterSelectStatusParcel)
+    : [];
+
   removeCookies("filterBeforeEdit", { req, res });
   removeCookies("pageBeforeEdit", { req, res });
   removeCookies("filterBeforeEditTypeOrder", { req, res });
   removeCookies("filterBeforeEditOrderBy", { req, res });
   removeCookies("lastPage", { req, res });
+  removeCookies("filterSelectStatusParcel", { req, res });
 
   const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}`;
 
@@ -1781,6 +1795,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       filterBeforeEdit,
       orderByserver,
       typeOrderServer,
+      filterSelectStatusParcel,
     },
   };
 };

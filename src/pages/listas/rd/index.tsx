@@ -130,7 +130,7 @@ export default function Import({
               filePath,
             });
             setImportLoading(false);
-            handlePagination();
+            handlePagination(currentPage);
             Swal.fire({
               html: message,
               width: '800',
@@ -148,7 +148,7 @@ export default function Import({
               filePath,
             });
             setImportLoading(false);
-            handlePagination();
+            handlePagination(currentPage);
             Swal.fire({
               html: message,
               width: '800',
@@ -629,8 +629,8 @@ export default function Import({
     }
   }
 
-  async function handlePagination(): Promise<void> {
-    await getAllLogs(filter);
+  async function handlePagination(page: any): Promise<void> {
+    await getAllLogs(filter, page); // handle pagination globly
   }
 
   function filterFieldFactory(title: string, name: string) {
@@ -750,10 +750,10 @@ export default function Import({
     );
   }
 
-  useEffect(() => {
-    handlePagination();
-    handleTotalPages();
-  }, [currentPage]);
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   return (
     <>
@@ -1125,18 +1125,26 @@ export default function Import({
                   ),
                   Pagination: (props) => (
                     <div
-                      className="flex h-20 gap-2 pr-2 py-5 bg-gray-50"
+                      className="flex
+                      h-20
+                      gap-2
+                      pr-2
+                      py-5
+                      bg-gray-50
+                    "
                       {...props}
                     >
                       <Button
-                        onClick={() => setCurrentPage(0)}
+                        onClick={() => handlePagination(0)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdFirstPage size={18} />}
                         disabled={currentPage < 1}
                       />
                       <Button
-                        onClick={() => setCurrentPage(currentPage - 1)}
+                        onClick={() => {
+                          handlePagination(currentPage - 1);
+                        }}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiLeftArrow size={15} />}
@@ -1147,7 +1155,7 @@ export default function Import({
                         .map((value, index) => (
                           <Button
                             key={index}
-                            onClick={() => setCurrentPage(index)}
+                            onClick={() => handlePagination(index)}
                             value={`${currentPage + 1}`}
                             bgColor="bg-blue-600"
                             textColor="white"
@@ -1155,21 +1163,21 @@ export default function Import({
                           />
                         ))}
                       <Button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        bgColor="bg-blue-600"
+                        onClick={() => handlePagination(currentPage + 1)}
+                        bgColor="bg-blue-600 RR"
                         textColor="white"
                         icon={<BiRightArrow size={15} />}
                         disabled={currentPage + 1 >= pages}
                       />
                       <Button
-                        onClick={() => setCurrentPage(pages)}
+                        onClick={() => handlePagination(pages - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<MdLastPage size={18} />}
                         disabled={currentPage + 1 >= pages}
                       />
                     </div>
-                  ) as any,
+                ) as any,
                 }}
               />
             </div>

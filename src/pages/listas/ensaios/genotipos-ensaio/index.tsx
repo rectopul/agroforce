@@ -73,6 +73,7 @@ export default function Listagem({
   filterBeforeEdit,
   typeOrderServer,
   orderByserver,
+  filterSelectStatusEssay,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
   const [loading, setLoading] = useState<boolean>(false);
@@ -209,7 +210,9 @@ export default function Listagem({
       defaultChecked: () => camposGerenciados.includes("EXP IMP."),
     },
   ]);
-  const [statusFilterSelected, setStatusFilterSelected] = useState<any>([]);
+  const [statusFilterSelected, setStatusFilterSelected] = useState<any>(
+    filterSelectStatusEssay
+  );
 
   // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>(typeOrderServer);
@@ -763,7 +766,7 @@ export default function Listagem({
       .then(({ status, response }) => {
         if (status === 200) {
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, response, 'Tratamentos');
+          XLSX.utils.book_append_sheet(workBook, response, "Tratamentos");
 
           // Buffer
           XLSX.write(workBook, {
@@ -1529,6 +1532,10 @@ export default function Listagem({
                         onClick={() => {
                           setRadioStatus();
                           setIsOpenModal(!isOpenModal);
+                          setCookies(
+                            "filterSelectStatusEssay",
+                            statusFilterSelected
+                          );
                         }}
                         bgColor="bg-blue-600"
                         icon={<RiArrowUpDownLine size={20} />}
@@ -1704,6 +1711,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies("filterBeforeEditTypeOrder", { req, res });
     removeCookies("filterBeforeEditOrderBy", { req, res });
     removeCookies("lastPage", { req, res });
+    removeCookies("filterSelectStatusEssay", { req, res });
   }
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
@@ -1720,21 +1728,24 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : 'asc';
-
+    : "asc";
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
     : "";
 
+  const filterSelectStatusEssay = req.cookies.filterSelectStatusEssay
+    ? JSON?.parse(req.cookies.filterSelectStatusEssay)
+    : [];
+
   const { publicRuntimeConfig } = getConfig();
   const baseUrlTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
   const baseUrlAssay = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
-  const filterApplication = req.cookies.filterBeforeEdit
-    || `&id_culture=${idCulture}&id_safra=${idSafra}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
-
+  const filterApplication =
+    req.cookies.filterBeforeEdit ||
+    `&id_culture=${idCulture}&id_safra=${idSafra}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
 
   removeCookies("filterBeforeEdit", { req, res });
   removeCookies("pageBeforeEdit", { req, res });
@@ -1743,6 +1754,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies("filterBeforeEditTypeOrder", { req, res });
   removeCookies("filterBeforeEditOrderBy", { req, res });
   removeCookies("lastPage", { req, res });
+  removeCookies("filterSelectStatusEssay", { req, res });
 
   const param = `&id_culture=${idCulture}&id_safra=${idSafra}`;
 
@@ -1792,6 +1804,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       filterBeforeEdit,
       orderByserver, // RR
       typeOrderServer, // RR
+      filterSelectStatusEssay,
     },
   };
 };
