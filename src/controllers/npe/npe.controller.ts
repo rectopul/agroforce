@@ -409,9 +409,9 @@ export class NpeController {
           if (!npe) return { status: 400, message: 'Npe não encontrado' };
           if (data.status === 0 || data.status === 1) {
             const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-            await this.reporteRepository.create({
-              madeBy: npe.created_by, module: 'Npe', operation, name: JSON.stringify(npe.safraId), ip: JSON.stringify(ip), idOperation: npe.id,
-            });
+            // await this.reporteRepository.create({
+            //   madeBy: npe.created_by, module: 'Npe', operation, name: JSON.stringify(npe.safraId), ip: JSON.stringify(ip), idOperation: npe.id,
+            // });
           }
           return { status: 200, message: 'Npe atualizada' };
         }
@@ -451,9 +451,9 @@ export class NpeController {
 
       if (statusAssay === 200) {
         const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-        await this.reporteRepository.create({
-          madeBy: data.userId, module: 'NPE', operation: 'Exclusão', name: response.npe, ip: JSON.stringify(ip), idOperation: response.id,
-        });
+        // await this.reporteRepository.create({
+        //   madeBy: data.userId, module: 'NPE', operation: 'Exclusão', name: response.npe, ip: JSON.stringify(ip), idOperation: response.id,
+        // });
         await this.npeRepository.delete(Number(data.id));
         return { status: 200, message: 'NPE excluída' };
       }

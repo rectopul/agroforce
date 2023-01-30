@@ -30,9 +30,9 @@ export class GroupController {
       if (groupAlreadyExists) return { status: 400, message: 'Dados já cadastrados' };
 
       const grupo = await this.groupRepository.create(data);
-      await this.reporteRepository.create({
-        madeBy: grupo.created_by, module: 'Foco-Grupo', operation: 'Cadastro', name: JSON.stringify(grupo.id_foco), ip: JSON.stringify(ip), idOperation: grupo.id,
-      });
+      // await this.reporteRepository.create({
+      //   madeBy: grupo.created_by, module: 'Foco-Grupo', operation: 'Cadastro', name: JSON.stringify(grupo.id_foco), ip: JSON.stringify(ip), idOperation: grupo.id,
+      // });
 
       return { status: 200, message: 'grupo cadastrado' };
     } catch (error: any) {
@@ -50,9 +50,9 @@ export class GroupController {
       if (!group) return { status: 400, message: 'grupo não existente' };
 
       const grupo = await this.groupRepository.update(data.id, data);
-      await this.reporteRepository.create({
-        madeBy: grupo.created_by, module: 'Foco-Grupo', operation: 'Edição', name: JSON.stringify(grupo.id_foco), ip: JSON.stringify(ip), idOperation: grupo.id,
-      });
+      // await this.reporteRepository.create({
+      //   madeBy: grupo.created_by, module: 'Foco-Grupo', operation: 'Edição', name: JSON.stringify(grupo.id_foco), ip: JSON.stringify(ip), idOperation: grupo.id,
+      // });
       return { status: 200, message: 'grupo atualizado' };
     } catch (error: any) {
       handleError('Grupo controller', 'Update', error.message);

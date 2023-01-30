@@ -153,14 +153,14 @@ export class CulturaController {
       }
       const culture = await this.culturaRepository.create(data);
 
-      await this.reporteRepository.create({
-        madeBy: data.created_by,
-        module: 'Cultura',
-        operation: 'Cadastro',
-        name: data.desc,
-        ip: JSON.stringify(ip),
-        idOperation: culture.id,
-      });
+      // await this.reporteRepository.create({
+      //   madeBy: data.created_by,
+      //   module: 'Cultura',
+      //   operation: 'Cadastro',
+      //   name: data.desc,
+      //   ip: JSON.stringify(ip),
+      //   idOperation: culture.id,
+      // });
       return { status: 200, message: 'Cultura cadastrada' };
     } catch (err) {
       console.log(err);
@@ -193,24 +193,24 @@ export class CulturaController {
       await this.culturaRepository.update(data.id, culture);
 
       if (data.status === 1) {
-        await this.reporteRepository.create({
-          madeBy: data.created_by,
-          module: 'Cultura',
-          operation: 'Edição',
-          idOperation: data.id,
-          name: data.desc,
-          ip: JSON.stringify(ip),
-        });
+        // await this.reporteRepository.create({
+        //   madeBy: data.created_by,
+        //   module: 'Cultura',
+        //   operation: 'Edição',
+        //   idOperation: data.id,
+        //   name: data.desc,
+        //   ip: JSON.stringify(ip),
+        // });
       }
       if (data.status === 0) {
-        await this.reporteRepository.create({
-          madeBy: data.created_by,
-          module: 'Cultura',
-          operation: 'Inativação',
-          idOperation: data.id,
-          name: data.desc,
-          ip: JSON.stringify(ip),
-        });
+        // await this.reporteRepository.create({
+        //   madeBy: data.created_by,
+        //   module: 'Cultura',
+        //   operation: 'Inativação',
+        //   idOperation: data.id,
+        //   name: data.desc,
+        //   ip: JSON.stringify(ip),
+        // });
       }
 
       return { status: 200, message: 'Cultura atualizada' };

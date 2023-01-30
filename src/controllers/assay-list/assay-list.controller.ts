@@ -172,9 +172,9 @@ export class AssayListController {
       const operation = data.status === 1 ? 'Ativação' : 'Inativação';
       if (status === 200) {
         const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-        await this.reporteRepository.create({
-          madeBy: data.userId, module: 'Ensaio', operation, name: response.type_assay.name, ip: JSON.stringify(ip), idOperation: response.id,
-        });
+        // await this.reporteRepository.create({
+        //   madeBy: data.userId, module: 'Ensaio', operation, name: response.type_assay.name, ip: JSON.stringify(ip), idOperation: response.id,
+        // });
         await this.assayListRepository.delete(Number(data.id));
         return { status: 200, message: 'Lista de ensaio excluída' };
       }

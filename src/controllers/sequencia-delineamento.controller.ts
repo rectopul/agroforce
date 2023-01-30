@@ -49,9 +49,9 @@ export class SequenciaDelineamentoController {
       if (!sequenciaDelineamento) return { status: 400, message: 'Sequência de delineamento não encontrado!' };
       if (data.status === 0 || data.status === 1) {
         const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-        await this.reporteRepository.create({
-          madeBy: data.created_by, module: 'Seq. Delineamento', operation, name: data.name, ip: JSON.stringify(ip), idOperation: data.id,
-        });
+        // await this.reporteRepository.create({
+        //   madeBy: data.created_by, module: 'Seq. Delineamento', operation, name: data.name, ip: JSON.stringify(ip), idOperation: data.id,
+        // });
       }
       await this.SequenciaDelineamentoRepository.update(
         data.id,
