@@ -35,9 +35,9 @@ export class EnvelopeController {
       }
 
       const semente: any = await this.envelopeRepository.create(data);
-      await this.reporteRepository.create({
-        madeBy: semente.created_by, module: 'Qtd de Sementes', operation: 'Cadastro', name: JSON.stringify(semente.id_type_assay), ip: JSON.stringify(ip), idOperation: semente.id,
-      });
+      // await this.reporteRepository.create({
+      //   madeBy: semente.created_by, module: 'Qtd de Sementes', operation: 'Cadastro', name: JSON.stringify(semente.id_type_assay), ip: JSON.stringify(ip), idOperation: semente.id,
+      // });
       return { status: 200, message: 'envelope cadastrado' };
     } catch (error: any) {
       handleError('Envelope controller', 'Create', error.message);
@@ -54,9 +54,9 @@ export class EnvelopeController {
       if (!envelope) return { status: 400, message: 'envelope não existente' };
 
       const semente: any = await this.envelopeRepository.update(data.id, data);
-      await this.reporteRepository.create({
-        madeBy: semente.created_by, module: 'Qtd de Sementes', operation: 'Edição', name: JSON.stringify(semente.id_type_assay), ip: JSON.stringify(ip), idOperation: semente.id,
-      });
+      // await this.reporteRepository.create({
+      //   madeBy: semente.created_by, module: 'Qtd de Sementes', operation: 'Edição', name: JSON.stringify(semente.id_type_assay), ip: JSON.stringify(ip), idOperation: semente.id,
+      // });
 
       return { status: 200, message: 'envelope atualizado' };
     } catch (error: any) {

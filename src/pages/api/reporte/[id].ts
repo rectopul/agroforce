@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { ReporteController } from '../../../controllers/reporte/reporte.controller';
+import { ReporteController } from '../../../controllers/reportes/reporte.controller';
 import { apiHandler } from '../../../helpers/api';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {

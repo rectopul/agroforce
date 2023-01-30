@@ -16,7 +16,6 @@ export function Aside({ moduloActive }: any) {
 
   const prev = aArray.splice(0, aArray.length - 1);
   const next = aArray.splice(-1);
-  console.log(prev.join('.'), next.join('.'));
 
   // aArray.toLowerCase() === aArray[aArray.length-1].toLowerCase();
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-console */
@@ -5,14 +6,14 @@
 /* eslint-disable max-len */
 import handleError from '../../shared/utils/handleError';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
-import { PrintHistoryRepository } from '../../repository/print-history.repository';
+import { ReporteRepository } from '../../repository/reporte.repository';
 
-export class PrintHistoryController {
-  printHistoryRepository = new PrintHistoryRepository();
+export class ReporteController {
+  reporteRepository = new ReporteRepository();
 
   async getOne(id: number) {
     try {
-      const response = await this.printHistoryRepository.findById(id);
+      const response = await this.reporteRepository.findOne(id);
 
       if (response) {
         return { status: 200, response };
@@ -24,25 +25,18 @@ export class PrintHistoryController {
     }
   }
 
-  async create({ idList, userId, status }: any) {
+  async create({
+    userId, operation, module, oldValue,
+  }: any) {
     try {
-      if (Array.isArray(idList)) {
-        idList.forEach(async (_: any, index: any) => {
-          const data = {
-            experimentGenotypeId: idList[index],
-            status,
-            userId,
-          };
-          await this.printHistoryRepository.create(data);
-        });
-      } else {
-        const data = {
-          experimentGenotypeId: idList,
-          status,
-          userId,
-        };
-        await this.printHistoryRepository.create(data);
-      }
+      oldValue = String(oldValue);
+      const data = {
+        module,
+        userId,
+        operation,
+        oldValue,
+      };
+      await this.reporteRepository.create(data);
     } catch (error: any) {
       handleError('Histórico de impressão Controller', 'Create', error.message);
       throw new Error('[Controller] - Create Histórico de impressão erro');
@@ -51,11 +45,11 @@ export class PrintHistoryController {
 
   async update(data: any) {
     try {
-      const history = await this.printHistoryRepository.findById(data.id);
+      const history = await this.reporteRepository.findOne(data.id);
 
       if (!history) return { status: 404, message: 'Histórico de impressão não existente' };
 
-      const response = await this.printHistoryRepository.update(data.id, data);
+      const response = await this.reporteRepository.update(data.id, data);
       if (response) {
         return { status: 200, response, message: 'Histórico de impressão atualizado' };
       }
@@ -67,57 +61,51 @@ export class PrintHistoryController {
   }
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: reporte.controller.ts:64 ~ ReporteController ~ getAll ~ options', options);
     const parameters: object | any = {};
     parameters.AND = [];
     parameters.OR = [];
     let orderBy: object | any = '';
     try {
       const select = {
-        id: true,
-        experimentGenotypeId: true,
-        status: true,
-        userId: true,
-        modulo: true,
-        createdAt: true,
+        madeIn: true,
+        module: true,
+        operation: true,
+        oldValue: true,
         user: true,
-        experiment_genotipe: true,
       };
 
       if (options.filterOperation) {
         const statusParams = options.filterOperation?.split(',');
-        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
-        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
-        parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[2]}" } }`));
+        parameters.OR.push(JSON.parse(`{"operation": {"equals": "${statusParams[0]}" } }`));
+        parameters.OR.push(JSON.parse(`{"operation": {"equals": "${statusParams[1]}" } }`));
+        parameters.OR.push(JSON.parse(`{"operation": {"equals": "${statusParams[2]}" } }`));
+        parameters.OR.push(JSON.parse(`{"operation": {"equals": "${statusParams[3]}" } }`));
+        parameters.OR.push(JSON.parse(`{"operation": {"equals": "${statusParams[4]}" } }`));
+        parameters.OR.push(JSON.parse(`{"operation": {"equals": "${statusParams[5]}" } }`));
+        parameters.OR.push(JSON.parse(`{"operation": {"equals": "${statusParams[6]}" } }`));
       }
 
       if (options.filterMadeBy) {
         parameters.user = JSON.parse(`{ "name": { "contains":"${options.filterMadeBy}" } }`);
       }
 
+      if (options.filterModule) {
+        parameters.module = JSON.parse(`{ "contains":"${options.filterModule}" }`);
+      }
+
+      if (options.filterValue) {
+        parameters.oldValue = JSON.parse(`{ "contains":"${options.filterValue}" }`);
+      }
+
       if (options.filterStartDate || options.filterEndDate) {
         if (options.filterStartDate && options.filterEndDate) {
-          parameters.AND.push({ createdAt: { gte: new Date(`${options.filterStartDate}T00:00:00.000z`), lte: new Date(`${options.filterEndDate}T23:59:59.999z`) } });
+          parameters.AND.push({ madeIn: { gte: new Date(`${options.filterStartDate}T00:00:00.000z`), lte: new Date(`${options.filterEndDate}T23:59:59.999z`) } });
         } else if (options.filterStartDate) {
-          parameters.AND.push({ createdAt: { gte: new Date(`${options.filterStartDate}T00:00:00.000z`) } });
+          parameters.AND.push({ madeIn: { gte: new Date(`${options.filterStartDate}T00:00:00.000z`) } });
         } else if (options.filterEndDate) {
-          parameters.AND.push({ createdAt: { lte: new Date(`${options.filterEndDate}T23:59:59.999z`) } });
+          parameters.AND.push({ madeIn: { lte: new Date(`${options.filterEndDate}T23:59:59.999z`) } });
         }
-      }
-
-      if (options.id) {
-        parameters.id = Number(options.id);
-      }
-
-      if (options.experimentGenotypeId) {
-        parameters.experimentGenotypeId = Number(options.experimentGenotypeId);
-      }
-
-      if (options.status) {
-        parameters.status = JSON.parse(`{ "contains":"${options.status}" }`);
-      }
-
-      if (options.user) {
-        parameters.user = JSON.parse(`{ "name": { "contains":"${options.user}" } }`);
       }
 
       const take = (options.take) ? Number(options.take) : undefined;
@@ -137,7 +125,7 @@ export class PrintHistoryController {
         delete parameters.AND;
       }
 
-      const response: object | any = await this.printHistoryRepository.findAll(
+      const response: object | any = await this.reporteRepository.findAll(
         parameters,
         select,
         take,
@@ -152,19 +140,6 @@ export class PrintHistoryController {
     } catch (error: any) {
       handleError('Histórico de impressão Controller', 'GetAll', error.message);
       throw new Error('[Controller] - GetAll Histórico de impressão erro');
-    }
-  }
-
-  async deleteAll(idList: any) {
-    try {
-      const response = await this.printHistoryRepository.deleteMany(idList);
-      if (response) {
-        return { status: 200 };
-      }
-      return { status: 400 };
-    } catch (error: any) {
-      handleError('Histórico de impressão Controller', 'DeleteAll', error.message);
-      throw new Error('[Controller] - DeleteAll Histórico de impressão erro');
     }
   }
 }

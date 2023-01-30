@@ -1,15 +1,15 @@
 /* eslint-disable camelcase */
+import createXls from 'src/helpers/api/xlsx-global-download';
 import handleError from '../shared/utils/handleError';
 import { TypeAssayRepository } from '../repository/tipo-ensaio.repository';
-import { ReporteRepository } from '../repository/reporte.repository';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
-import createXls from 'src/helpers/api/xlsx-global-download';
+import { ReporteController } from './reportes/reporte.controller';
 
 export class TypeAssayController {
   typeAssayRepository = new TypeAssayRepository();
 
-  reporteRepository = new ReporteRepository();
+  reporteController = new ReporteController();
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
@@ -61,11 +61,11 @@ export class TypeAssayController {
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
-      if (options.orderBy != 'envelope.seeds' && options.orderBy != "envelope.safra.safraName") {
+      if (options.orderBy != 'envelope.seeds' && options.orderBy != 'envelope.safra.safraName') {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
-      }else{
-        orderBy = `{ "name": "desc"}`;
+      } else {
+        orderBy = '{ "name": "desc"}';
       }
 
       const response = await this.typeAssayRepository.findAll(
@@ -84,9 +84,9 @@ export class TypeAssayController {
         });
       });
 
-      if(options.orderBy == 'envelope.seeds' && options.typeOrder == 'asc'){
+      if (options.orderBy == 'envelope.seeds' && options.typeOrder == 'asc') {
         response.sort((a: any, b: any) => b.envelope.seeds - a.envelope.seeds);
-      }else if(options.orderBy == 'envelope.seeds' && options.typeOrder == 'desc'){
+      } else if (options.orderBy == 'envelope.seeds' && options.typeOrder == 'desc') {
         response.sort((a: any, b: any) => a.envelope.seeds - b.envelope.seeds);
       }
 
@@ -133,14 +133,12 @@ export class TypeAssayController {
 
   async create(data: object | any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-
       const assayTypeAlreadyExist = await this.getByData(data);
       if (assayTypeAlreadyExist.status === 200) return { status: 404, message: 'Tipo de ensaio já existe, favor checar registros inativos.' };
       const response = await this.typeAssayRepository.create(data);
 
-      await this.reporteRepository.create({
-        madeBy: response.created_by, module: 'Tipo de Ensaio', operation: 'Cadastro', name: response.name, ip: JSON.stringify(ip), idOperation: response.id,
+      await this.reporteController.create({
+        userId: data.created_by, module: 'TIPO DE ENSAIO', operation: 'CRIAÇÃO', oldValue: data.name,
       });
       if (!response) {
         return { status: 400, response: [], message: 'Tipo de ensaio não cadastrado' };
@@ -155,7 +153,6 @@ export class TypeAssayController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
       if (data) {
         const assayTypeAlreadyExist = await this.getOne(data.id);
         if (assayTypeAlreadyExist.status !== 200) return { status: 400, message: 'Tipo de ensaio não encontrado' };
@@ -164,13 +161,13 @@ export class TypeAssayController {
           return { status: 400, response: [], message: 'Tipo de ensaio não atualizado' };
         }
         if (response.status === 1) {
-          await this.reporteRepository.create({
-            madeBy: response.created_by, module: 'Tipo de Ensaio', operation: 'Edição', name: response.name, ip: JSON.stringify(ip), idOperation: response.id,
+          await this.reporteController.create({
+            userId: data.created_by, module: 'TIPO DE ENSAIO', operation: 'INATIVAÇÃO', oldValue: data.name,
           });
         }
         if (response.status === 0) {
-          await this.reporteRepository.create({
-            madeBy: response.created_by, module: 'Tipo de Ensaio', operation: 'Inativação', name: response.name, ip: JSON.stringify(ip), idOperation: response.id,
+          await this.reporteController.create({
+            userId: data.created_by, module: 'TIPO DE ENSAIO', operation: 'ATIVAÇÃO', oldValue: data.name,
           });
         }
         return { status: 200, response };

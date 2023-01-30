@@ -1,44 +1,35 @@
-/* eslint-disable camelcase */
-/* eslint-disable react/no-array-index-key */
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-return-assign */
-import React, { useRef } from "react";
-import { removeCookies, setCookies } from "cookies-next";
-import { useFormik } from "formik";
-import MaterialTable from "material-table";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import getConfig from "next/config";
-import { RequestInit } from "next/dist/server/web/spec-extension/request";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import getConfig from 'next/config';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect, useState, useRef } from 'react';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from "react-beautiful-dnd";
-import { BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { BsDownload } from "react-icons/bs";
+} from 'react-beautiful-dnd';
 import {
-  RiArrowUpDownLine,
-  RiCloseCircleFill,
-  RiFileExcel2Line,
-} from "react-icons/ri";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import Modal from "react-modal";
-import * as XLSX from "xlsx";
-import Swal from "sweetalert2";
-import readXlsxFile from "read-excel-file";
+  AiOutlineArrowDown,
+  AiOutlineArrowUp,
+  AiTwotoneStar,
+} from 'react-icons/ai';
 import {
-  ITreatment,
-  ITreatmentFilter,
-  ITreatmentGrid,
-} from "../../interfaces/listas/ensaio/genotype-treatment.interface";
-import { IGenerateProps } from "../../interfaces/shared/generate-props.interface";
-import ComponentLoading from "../../components/Loading";
-
+  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
+} from 'react-icons/bi';
+import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RiFileExcel2Line, RiSettingsFill } from 'react-icons/ri';
+import Swal from 'sweetalert2';
+import * as XLSX from 'xlsx';
+import { removeCookies, setCookies } from 'cookies-next';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { BsTrashFill } from 'react-icons/bs';
+import { reporteService, userPreferencesService } from 'src/services';
+import { UserPreferenceController } from '../../controllers/user-preference.controller';
 import {
   AccordionFilter,
   Button,
@@ -47,84 +38,157 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
-} from "../../components";
-import { UserPreferenceController } from "../../controllers/user-preference.controller";
-import { reporteService, userPreferencesService } from "../../services";
-import * as ITabs from "../../shared/utils/dropdown";
-import { functionsUtils } from "../../shared/utils/functionsUtils";
-import { tableGlobalFunctions } from "../../helpers";
-import headerTableFactoryGlobal from "../../shared/utils/headerTableFactory";
+  ButtonDeleteConfirmation,
+  SelectMultiple,
+} from '../../components';
+import * as ITabs from '../../shared/utils/dropdown';
+import { tableGlobalFunctions } from '../../helpers';
+import headerTableFactoryGlobal from '../../shared/utils/headerTableFactory';
+import ComponentLoading from '../../components/Loading';
+import { functionsUtils } from '../../shared/utils/functionsUtils';
+
+interface IFilter {
+  filterMadeBy: object | any;
+  filterStartDate: string | any;
+  filterEndDate: string | any;
+  filterModule: string | any;
+  filterOperation: string | any;
+  filterValue: string | any;
+  orderBy: object | any;
+  typeOrder: object | any;
+}
+interface IGenerateProps {
+  name: string | undefined;
+  title: string | number | readonly string[] | undefined;
+  value: string | number | readonly string[] | undefined;
+}
 
 export default function Listagem({
-  totalItems,
+  allReportes,
   itensPerPage,
   filterApplication,
-  idCulture,
-  idSafra,
   filterBeforeEdit,
-  orderByserver,
+  totalItems,
   typeOrderServer,
+  orderByserver,
+  safraId,
+  idCulture,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const [loading, setLoading] = useState<boolean>(false);
+
   const { tabsReport } = ITabs.default;
 
-  const tabsDropDowns = tabsReport.map((i) =>
-    i.titleTab === "RELATORIOS" ? { ...i, statusTab: true } : i
-  );
+  const tabsDropDowns = tabsReport.map((i) => (i.titleTab === 'RELATORIOS' ? { ...i, statusTab: true } : i));
 
   const tableRef = useRef<any>(null);
 
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.reporte || {
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const preferences = userLogado.preferences.reportes || {
     id: 0,
-    table_preferences: "madeBy,madeIn,module,operation",
+    table_preferences: 'id,user,createdAt,modulo,status,parcela',
   };
-
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences
+    preferences.table_preferences,
   );
-  const [reportes, setReportes] = useState<ITreatment[] | any>([]);
+  const [npe, setNPE] = useState(allReportes);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(
-    typeOrderServer == "desc" ? 1 : 2
+    typeOrderServer == 'desc' ? 1 : 2,
   );
-  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
+  const [arrowOrder, setArrowOrder] = useState<any>('');
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [itemsTotal, setTotalItems] = useState<number>(totalItems);
+  const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
+  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [statusAccordionFilter, setStatusAccordionFilter] = useState<boolean>(false);
+  const [statusFilterSelected, setStatusFilterSelected] = useState<any>([]);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
-      name: "CamposGerenciados[]",
-      title: "Feito Por",
-      value: "madeBy",
-      defaultChecked: () => camposGerenciados.includes("madeBy"),
+      name: 'CamposGerenciados[]',
+      title: 'Feito Por',
+      value: 'user',
+      defaultChecked: () => camposGerenciados.includes('user'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Feito Em",
-      value: "madeIn",
-      defaultChecked: () => camposGerenciados.includes("madeIn"),
+      name: 'CamposGerenciados[]',
+      title: 'Feito Em',
+      value: 'madeIn',
+      defaultChecked: () => camposGerenciados.includes('madeIn'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Módulo",
-      value: "module",
-      defaultChecked: () => camposGerenciados.includes("module"),
+      name: 'CamposGerenciados[]',
+      title: 'Módulo',
+      value: 'module',
+      defaultChecked: () => camposGerenciados.includes('module'),
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Operação",
-      value: "operation",
-      defaultChecked: () => camposGerenciados.includes("operation"),
+      name: 'CamposGerenciados[]',
+      title: 'Operação',
+      value: 'operation',
+      defaultChecked: () => camposGerenciados.includes('operation'),
+    },
+    {
+      name: 'CamposGerenciados[]',
+      title: 'Valor',
+      value: 'value',
+      defaultChecked: () => camposGerenciados.includes('value'),
     },
   ]);
-  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [statusAccordionFilter, setStatusAccordionFilter] =
-    useState<boolean>(false);
-  // const take: number = itensPerPage;
+  const [statusFilter, setStatusFilter] = useState<IGenerateProps[]>(() => [
+    {
+      name: 'StatusCheckbox',
+      title: 'IMPRESSO',
+      value: 'IMPRESSO',
+      defaultChecked: () => camposGerenciados.includes('IMPRESSO'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'REIMPRESSO',
+      value: 'REIMPRESSO',
+      defaultChecked: () => camposGerenciados.includes('REIMPRESSO'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'BAIXA',
+      value: 'BAIXA',
+      defaultChecked: () => camposGerenciados.includes('BAIXA'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'CRIAÇÃO',
+      value: 'CRIAÇÃO',
+      defaultChecked: () => camposGerenciados.includes('CRIAÇÃO'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'EDIÇÃO',
+      value: 'EDIÇÃO',
+      defaultChecked: () => camposGerenciados.includes('EDIÇÃO'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'EXCLUSÃO',
+      value: 'EXCLUSÃO',
+      defaultChecked: () => camposGerenciados.includes('EXCLUSÃO'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'ATIVAÇÃO',
+      value: 'ATIVAÇÃO',
+      defaultChecked: () => camposGerenciados.includes('ATIVAÇÃO'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'INATIVAÇÃO',
+      value: 'INATIVAÇÃO',
+      defaultChecked: () => camposGerenciados.includes('INATIVAÇÃO'),
+    },
+  ]);
+  // const [orderBy, setOrderBy] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>('');
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
+  const [filtersParams, setFiltersParams] = useState<any>(filterBeforeEdit); // Set filter Parameter
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
@@ -133,56 +197,28 @@ export default function Listagem({
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
-  const formik = useFormik<any>({
+  const filterStatusBeforeEdit = filterApplication.split('');
+
+  const formik = useFormik<IFilter>({
     initialValues: {
-      filterFoco: "",
-      filterTypeAssay: "",
-      filterTechnology: "",
-      filterGli: "",
-      filterBgm: "",
-      filterTreatmentsNumber: "",
-      filterStatus: "",
-      filterCodTec: "",
-      filterStatusAssay: "",
-      filterGenotypeName: "",
-      filterNca: "",
-      orderBy: "",
-      typeOrder: "",
-      filterBgmTo: "",
-      filterBgmFrom: "",
-      filterNtTo: "",
-      filterNtFrom: "",
-      filterStatusT: "",
+      filterMadeBy: '',
+      filterStartDate: '',
+      filterEndDate: '',
+      filterModule: '',
+      filterOperation: '',
+      filterValue: '',
+      orderBy: '',
+      typeOrder: '',
     },
     onSubmit: async ({
-      filterFoco,
-      filterTypeAssay,
-      filterTechnology,
-      filterGli,
-      filterBgm,
-      filterTreatmentsNumber,
-      filterStatusAssay,
-      filterGenotypeName,
-      filterNca,
-      filterBgmTo,
-      filterBgmFrom,
-      filterNtTo,
-      filterNtFrom,
-      filterStatusT,
-      filterCodTec,
+      filterMadeBy,
+      filterStartDate,
+      filterEndDate,
+      filterModule,
+      filterValue,
     }) => {
-      const allCheckBox: any = document.querySelectorAll(
-        "input[name='StatusCheckbox']"
-      );
-      let selecionados = "";
-      for (let i = 0; i < allCheckBox.length; i += 1) {
-        if (allCheckBox[i].checked) {
-          selecionados += `${allCheckBox[i].value},`;
-        }
-      }
-
-      const filterStatus = selecionados.substr(0, selecionados.length - 1);
-      const parametersFilter = `&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterTechnology=${filterTechnology}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNca=${filterNca}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterStatusT=${filterStatusT}&filterCodTec=${filterCodTec}&id_culture=${idCulture}`;
+      const filterOperation = statusFilterSelected?.join(',')?.toUpperCase();
+      const parametersFilter = `filterMadeBy=${filterMadeBy}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}&filterModule=${filterModule}&filterOperation=${filterOperation}&filterValue=${filterValue}`;
 
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -195,26 +231,25 @@ export default function Listagem({
   async function callingApi(parametersFilter: any, page: any = 0) {
     setCurrentPage(page);
 
-    setCookies("filterBeforeEdit", parametersFilter);
-    setCookies("filterBeforeEditTypeOrder", typeOrder);
-    setCookies("filterBeforeEditOrderBy", orderBy);
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
 
-    //parametersFilter = `${parametersFilter}&${pathExtra}`;
     parametersFilter = `${parametersFilter}&skip=${
       page * Number(take)
     }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
     setFiltersParams(parametersFilter);
-    setCookies("filtersParams", parametersFilter);
+    setCookies('filtersParams', parametersFilter);
 
     await reporteService
       .getAll(parametersFilter)
       .then((response) => {
         if (response.status === 200 || response.status === 400) {
-          setReportes(response.response);
+          setNPE(response.response);
           setTotalItems(response.total);
-          tableRef?.current?.dataManager?.changePageSize(
-            response.total >= take ? take : response.total
+          tableRef.current.dataManager.changePageSize(
+            response.total >= take ? take : response.total,
           );
         }
       })
@@ -228,123 +263,26 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleOrder(
-    column: string,
-    order: number,
-    name: any
-  ): Promise<void> {
-    // let typeOrder: any;
-    // let parametersFilter: any;
-    // if (order === 1) {
-    //   typeOrder = 'asc';
-    // } else if (order === 2) {
-    //   typeOrder = 'desc';
-    // } else {
-    //   typeOrder = '';
-    // }
-    // setOrderBy(column);
-    // setOrderType(typeOrder);
-    // if (filter && typeof filter !== 'undefined') {
-    //   if (typeOrder !== '') {
-    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-    //   } else {
-    //     parametersFilter = filter;
-    //   }
-    // } else if (typeOrder !== '') {
-    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    // } else {
-    //   parametersFilter = filter;
-    // }
-
-    // await reporteService
-    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
-    //   .then(({ status, response }) => {
-    //     if (status === 200) {
-    //       setReportes(response);
-    //     }
-    //   });
-
-    // if (orderList === 2) {
-    //   setOrder(0);
-    // } else {
-    //   setOrder(orderList + 1);
-    // }
-    // Gobal manage orders
-    const { typeOrderG, columnG, orderByG, arrowOrder } =
-      await tableGlobalFunctions.handleOrderG(column, order, orderList);
-
-    setFieldOrder(columnG);
-    setTypeOrder(typeOrderG);
-    setOrderBy(columnG);
-    typeOrderG !== "" ? (typeOrderG == "desc" ? setOrder(1) : setOrder(2)) : "";
-  }
-
-  // function headerTableFactory(name: string, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: true,
-  //   };
-  // }
-
-  // function dateTableFactory(name: string, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: "madeIn",
-  //     width: 0,
-  //     sorting: true,
-  //     render: (rowData: any) => (
-  //       <div>
-  //         {`${
-  //           rowData.madeIn
-  //             ? functionsUtils?.formatDate(new Date(rowData.madeIn))
-  //             : null
-  //         }`}
-  //       </div>
-  //     ),
-  //   };
-  // }
-
-  function orderColumns(columnsOrder: string): Array<object> {
-    const columnOrder: any = columnsOrder.split(",");
+  function colums(camposGerenciados: any): any {
+    const columnCampos: any = camposGerenciados.split(',');
     const tableFields: any = [];
-    Object.keys(columnOrder).forEach((item: any) => {
-      if (columnOrder[item] === "madeBy") {
+    Object.keys(columnCampos).forEach((item: any) => {
+      if (columnCampos[item] === 'user') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Feito Por",
-            title: "user.name",
+            name: 'Feito Por',
+            title: 'user.name',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnOrder[item] === "madeIn") {
+      if (columnCampos[item] === 'madeIn') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Feito Em",
-            title: "madeIn",
+            name: 'Feito Em',
+            title: 'madeIn',
             orderList,
             fieldOrder,
             handleOrder,
@@ -357,40 +295,72 @@ export default function Listagem({
                 }`}
               </div>
             ),
-          })
+          }),
         );
       }
-      if (columnOrder[item] === "module") {
+      if (columnCampos[item] === 'module') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Módulo",
-            title: "module",
+            name: 'Módulo',
+            title: 'module',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnOrder[item] === "operation") {
+      if (columnCampos[item] === 'operation') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Operação",
-            title: "operation",
+            name: 'Operação',
+            title: 'operation',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
+        );
+      }
+      if (columnCampos[item] === 'value') {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'Valor',
+            title: 'oldValue',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
         );
       }
     });
     return tableFields;
   }
 
-  const columns = orderColumns(camposGerenciados);
+  const columns = colums(camposGerenciados);
+
+  async function handleOrder(
+    column: string,
+    order: string | any,
+    name: any,
+  ): Promise<void> {
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+
+    setFieldOrder(columnG);
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    typeOrderG !== '' ? (typeOrderG == 'desc' ? setOrder(1) : setOrder(2)) : '';
+    setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 100);
+  }
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = "";
+    let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -406,16 +376,16 @@ export default function Listagem({
           module_id: 31,
         })
         .then((response) => {
-          userLogado.preferences.reporte = {
+          userLogado.preferences.reportes = {
             id: response.response.id,
             userId: preferences.userId,
             table_preferences: campos,
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
-      userLogado.preferences.reporte = {
+      userLogado.preferences.reportes = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
@@ -424,7 +394,7 @@ export default function Listagem({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -447,40 +417,76 @@ export default function Listagem({
     setLoading(true);
     await reporteService.getAll(filter).then(({ status, response }) => {
       if (status === 200) {
-        const newData = response.map((item: any) => {
-          const newItem: any = {};
-          newItem.Safra = item.safra.safraName;
-          newItem.Foco = item.assay_list.foco.name;
-          newItem.Ensaio = item.assay_list.type_assay.name;
-          newItem.Tecnologia = `${item.assay_list.tecnologia.cod_tec} ${item.assay_list.tecnologia.name}`;
-          newItem.Gli = item.assay_list.gli;
-          newItem.Bgm = item.assay_list.bgm;
-          newItem.Nt = item.treatments_number;
-          newItem.StatusT = item.status;
-          newItem.StatusEnsaio = item.assay_list.status;
-          newItem.Genotipo = item.genotipo.name_genotipo;
-          newItem.Nca = item?.lote?.ncc;
-          return newItem;
+        const newData = response.map((row: any) => {
+          const newRow = row;
+
+          let dtHours: string;
+          let dtMinutes: string;
+          let dtSeconds: string;
+
+          newRow.createdAt = new Date(newRow.createdAt);
+          newRow.createdAt = new Date(
+            newRow.createdAt.toISOString().slice(0, -1),
+          );
+
+          if (String(newRow.createdAt.getHours()).length === 1) {
+            dtHours = `0${String(newRow.createdAt.getHours())}`;
+          } else {
+            dtHours = String(newRow.createdAt.getHours());
+          }
+          if (String(newRow.createdAt.getMinutes()).length === 1) {
+            dtMinutes = `0${String(newRow.createdAt.getMinutes())}`;
+          } else {
+            dtMinutes = String(newRow.createdAt.getMinutes());
+          }
+          if (String(newRow.createdAt.getSeconds()).length === 1) {
+            dtSeconds = `0${String(newRow.createdAt.getSeconds())}`;
+          } else {
+            dtSeconds = String(newRow.createdAt.getSeconds());
+          }
+
+          newRow.FEITO_POR = row.user.name;
+          newRow.FEITO_EM = `${newRow.madeIn.toLocaleDateString(
+            'en-US',
+          )} ${dtHours}:${dtMinutes}:${dtSeconds}`;
+
+          newRow.MODULO = row.module;
+          newRow.OPERACAO = row.operation;
+          newRow.VALOR = row.value;
+
+          delete newRow.id;
+          delete newRow.value;
+          delete newRow.operation;
+          delete newRow.userId;
+          delete newRow.user;
+          delete newRow.madeIn;
+          delete newRow.module;
+          return newRow;
         });
+
         const workSheet = XLSX.utils.json_to_sheet(newData);
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "Tratamentos");
+        XLSX.utils.book_append_sheet(
+          workBook,
+          workSheet,
+          'Histórico-Etiquetagem',
+        );
 
         // Buffer
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "buffer",
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: "xlsx", // xlsx
-          type: "binary",
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, "Tratamentos-genótipo.xlsx");
+        XLSX.writeFile(workBook, 'Histórico-Etiquetagem.xlsx');
       } else {
         setLoading(false);
-        Swal.fire("Não existem registros para serem exportados, favor checar.");
+        Swal.fire('Não existem registros para serem exportados, favor checar.');
       }
     });
     setLoading(false);
@@ -494,42 +500,34 @@ export default function Listagem({
   }
 
   async function handlePagination(page: any): Promise<void> {
-    // const skip = currentPage * Number(take);
-    // let parametersFilter;
-    // if (orderType) {
-    //   parametersFilter = `skip=${skip}&take=${take}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    // } else {
-    //   parametersFilter = `skip=${skip}&take=${take}`;
-    // }
-
-    // if (filter) {
-    //   parametersFilter = `${parametersFilter}&${filter}`;
-    // }
-    // await reporteService
-    //   .getAll(parametersFilter)
-    //   .then(({ status, response }) => {
-    //     if (status === 200) {
-    //       setReportes(response);
-    //     }
-    //   });
     await callingApi(filter, page); // handle pagination globly
   }
 
-  function filterFieldFactory(title: string, name: string) {
+  function filterFieldFactory(title: any, name: any) {
     return (
-      <div className="h-7 w-1/2 ml-2">
+      <div className="h-4 w-1/4 ml-2">
         <label className="block text-gray-900 text-sm font-bold mb-1">
           {name}
         </label>
         <Input
           type="text"
           placeholder={name}
+          defaultValue={checkValue(title)}
           id={title}
           name={title}
           onChange={formik.handleChange}
         />
       </div>
     );
+  }
+
+  // Checking defualt values
+  function checkValue(value: any) {
+    const parameter = tableGlobalFunctions.getValuesForFilter(
+      value,
+      filtersParams,
+    );
+    return parameter;
   }
 
   // useEffect(() => {
@@ -540,10 +538,10 @@ export default function Listagem({
   return (
     <>
       {loading && <ComponentLoading text="" />}
-      <Head>
-        <title>Listagem de genótipos do ensaio</title>
-      </Head>
 
+      <Head>
+        <title>Listagem do Histórico de Etiquetagem</title>
+      </Head>
       <Content contentHeader={tabsDropDowns} moduloActive="relatorios">
         <main
           className="h-full w-full
@@ -554,7 +552,7 @@ export default function Listagem({
         "
         >
           <AccordionFilter
-            title="Filtrar relatórios"
+            title="Filtrar Histórico de Etiquetagem"
             onChange={(_, e) => setStatusAccordionFilter(e)}
           >
             <div className="w-full flex gap-2">
@@ -562,21 +560,51 @@ export default function Listagem({
                 className="flex flex-col
                   w-full
                   items-center
-                  px-1
+                  px-0
                   bg-white
                 "
                 onSubmit={formik.handleSubmit}
               >
-                <div
-                  className="w-full h-full
-                  flex
-                  justify-center
-                  pb-0
-                "
-                >
-                  {filterFieldFactory("filterMadeBy", "Feito Por")}
-                  {filterFieldFactory("filterMadeIn", "Feito Em")}
-                  {filterFieldFactory("filterOperation", "Operação")}
+                <div className="w-full h-full flex justify-center pb-0">
+                  {filterFieldFactory('filterMadeBy', 'Feito Por')}
+
+                  <div className="h-10 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Inicio De:
+                    </label>
+                    <Input
+                      type="date"
+                      id="filterStartDate"
+                      name="filterStartDate"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+                  <div className="h-10 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Inicio Até:
+                    </label>
+                    <Input
+                      type="date"
+                      id="filterEndDate"
+                      name="filterEndDate"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+
+                  {filterFieldFactory('filterModule', 'Módulo')}
+
+                  {filterFieldFactory('filterValue', 'Valor')}
+
+                  <div className="h-10 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Operação
+                    </label>
+                    <SelectMultiple
+                      data={statusFilter.map((i: any) => i.title)}
+                      values={statusFilterSelected}
+                      onChange={(e: any) => setStatusFilterSelected(e)}
+                    />
+                  </div>
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
@@ -587,7 +615,6 @@ export default function Listagem({
                         setLoading(true);
                       }}
                       value="Filtrar"
-                      type="submit"
                       bgColor="bg-blue-600"
                       textColor="white"
                       icon={<BiFilterAlt size={20} />}
@@ -602,9 +629,9 @@ export default function Listagem({
           <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
-              style={{ background: "#f9fafb" }}
+              style={{ background: '#f9fafb' }}
               columns={columns}
-              data={reportes}
+              data={npe}
               options={{
                 showTitle: false,
                 maxBodyHeight: `calc(100vh - ${
@@ -613,7 +640,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 1,
                 },
-                rowStyle: { background: "#f9fafb", height: 35 },
+                rowStyle: { background: '#f9fafb', height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: Number(take),
@@ -621,7 +648,7 @@ export default function Listagem({
               components={{
                 Toolbar: () => (
                   <div
-                    className="w-full max-h-96
+                    className="w-full max-h-max
                     flex
                     items-center
                     justify-between
@@ -633,8 +660,23 @@ export default function Listagem({
                     border-gray-200
                   "
                   >
+                    {/* <div className="h-12">
+                      <Button
+                        title="Importar Planilha"
+                        value="Importar Planilha"
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        onClick={() => { }}
+                        href="npe/importar-planilha"
+                        icon={<RiFileExcel2Line size={20} />}
+                      />
+                    </div> */}
+
+                    <div />
                     <strong className="text-blue-600">
-                      Total registrado: {itemsTotal}
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
                     </strong>
 
                     <div
@@ -670,18 +712,18 @@ export default function Listagem({
                                         draggableId={String(generate.title)}
                                         index={index}
                                       >
-                                        {(providers) => (
+                                        {(provided) => (
                                           <li
-                                            ref={providers.innerRef}
-                                            {...providers.draggableProps}
-                                            {...providers.dragHandleProps}
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
                                           >
                                             <CheckBox
                                               name={generate.name}
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value
+                                                generate.value,
                                               )}
                                             />
                                           </li>
@@ -696,9 +738,10 @@ export default function Listagem({
                           </AccordionFilter>
                         </div>
                       </div>
+
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
-                          title="Exportar planilha de tratamentos"
+                          title="Exportar planilha de NPE"
                           icon={<RiFileExcel2Line size={20} />}
                           bgColor="bg-blue-600"
                           textColor="white"
@@ -706,63 +749,71 @@ export default function Listagem({
                             downloadExcel();
                           }}
                         />
+                        {/* <div style={{ width: 20 }} /> */}
+                        {/* <Button
+                          title="Configurar Importação de Planilha"
+                          icon={<RiSettingsFill size={20} />}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          onClick={() => {}}
+                          href="npe/importar-planilha/config-planilha"
+                        /> */}
                       </div>
                     </div>
                   </div>
                 ),
-                Pagination: (props) =>
-                  (
-                    <div
-                      className="flex
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => handlePagination(0)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage < 1}
-                      />
-                      <Button
-                        onClick={() => handlePagination(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill("")
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => handlePagination(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => handlePagination(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => handlePagination(pages - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => handlePagination(0)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage < 1}
+                    />
+                    <Button
+                      onClick={() => handlePagination(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => handlePagination(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => handlePagination(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => handlePagination(pages - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
                   ) as any,
               }}
             />
@@ -777,81 +828,81 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
 }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page;
+  const { safraId } = req.cookies;
+  const idCulture = req.cookies.cultureId;
+  const { token } = req.cookies;
+
+  // Last page
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
+
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
+    removeCookies('itensPage', { req, res });
+  }
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
+
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : "";
-  const { token } = req.cookies;
-  const idCulture = req.cookies.cultureId;
-  const idSafra = req.cookies.safraId;
+    : '';
 
-  const { publicRuntimeConfig } = getConfig();
-  const baseUrl = `${publicRuntimeConfig.apiUrl}/reporte`;
-
-  // Last page
-  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
-
-  if (lastPageServer == undefined || lastPageServer == "No") {
-    removeCookies("filterBeforeEdit", { req, res });
-    removeCookies("pageBeforeEdit", { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });
-  }
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
+    : 10;
 
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : "";
+    : 'desc';
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : "";
+    : 'madeIn';
 
-  const filterApplication =
-    req.cookies.filterBeforeEdit ||
-    `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : '';
 
-  removeCookies("filterBeforeEdit", { req, res });
-  removeCookies("pageBeforeEdit", { req, res });
-  removeCookies("filterBeforeEditTypeOrder", { req, res });
-  removeCookies("filterBeforeEditOrderBy", { req, res });
-  removeCookies("lastPage", { req, res });
+  // //RR
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('takeBeforeEdit', { req, res });
+  removeCookies('lastPage', { req, res });
 
-  const param = `&id_culture=${idCulture}&id_safra=${idSafra}`;
-
+  const { publicRuntimeConfig } = getConfig();
+  const baseUrl = `${publicRuntimeConfig.apiUrl}/reporte`;
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${idCulture}&id_safra=${safraId}`;
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
   const { response: allReportes = [], total: totalItems = 0 } = await fetch(
     urlParameters.toString(),
-    requestOptions
+    requestOptions,
   ).then((response) => response.json());
+
   return {
     props: {
       allReportes,
       totalItems,
       itensPerPage,
       filterApplication,
-      idCulture,
-      idSafra,
-      pageBeforeEdit,
       filterBeforeEdit,
-      orderByserver,
-      typeOrderServer,
+      orderByserver, // RR
+      typeOrderServer, // RR
+      safraId,
+      idCulture,
     },
   };
 };

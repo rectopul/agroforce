@@ -16,7 +16,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (req.method) {
     case 'POST':
-      console.log('req.body',req.body, req.body?.id);
       const result = await genotypeTreatmentController.getOne(Number(req.body?.id));
       res.status(200).json(result);
       break;

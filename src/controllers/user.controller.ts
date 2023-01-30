@@ -1,12 +1,12 @@
+import createXls from 'src/helpers/api/xlsx-global-download';
 import { UsersPermissionsRepository } from '../repository/user-permission.repository';
 import { functionsUtils } from '../shared/utils/functionsUtils';
 import handleError from '../shared/utils/handleError';
 import { UserRepository } from '../repository/user.repository';
 import { UserCultureController } from './user-culture.controller';
 import { UserPermissionController } from './user-permission.controller';
-import { ReporteRepository } from '../repository/reporte.repository';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
-import createXls from 'src/helpers/api/xlsx-global-download';
+import { ReporteController } from './reportes/reporte.controller';
 
 export class UserController {
   userRepository = new UserRepository();
@@ -17,7 +17,7 @@ export class UserController {
 
   userPermissionsController = new UserPermissionController();
 
-  reporteRepository = new ReporteRepository();
+  reporteController = new ReporteController();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -146,8 +146,6 @@ export class UserController {
 
   async create(data: object | any) {
     try {
-    //  const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-
       const parameters: any = {};
       if (data !== null && data !== undefined) {
         data.password = functionsUtils.Crypto(data.password, 'cipher');
@@ -214,9 +212,9 @@ export class UserController {
               { cultureId: data.cultureId, userId: response.id, created_by: data.created_by },
             );
           }
-          // await this.reporteRepository.create({
-          //   madeBy: data.created_by, module: 'Usuários', operation: 'Cadastro', name: data.name, idOperation: response.id, ip: JSON.stringify(ip),
-          // });
+          await this.reporteController.create({
+            userId: data.created_by, module: 'USUÁRIOS', operation: 'CADASTRO', oldValue: data.name,
+          });
           return { status: 200, message: 'users inseridos' };
         }
         return { status: 400, message: 'houve um erro, tente novamente' };
@@ -357,14 +355,14 @@ export class UserController {
           }
 
           if (data.status === 1) {
-            await this.reporteRepository.create({
-              madeBy: data.created_by, module: 'Usuários', operation: 'Edição', idOperation: data.id, name: data.name, ip: JSON.stringify(ip),
-            });
+            // await this.reporteRepository.create({
+            //   madeBy: data.created_by, module: 'Usuários', operation: 'Edição', idOperation: data.id, name: data.name, ip: JSON.stringify(ip),
+            // });
           }
           if (data.status === 0) {
-            await this.reporteRepository.create({
-              madeBy: data.created_by, module: 'Usuários', operation: 'Inativação', idOperation: data.id, name: data.name, ip: JSON.stringify(ip),
-            });
+            // await this.reporteRepository.create({
+            //   madeBy: data.created_by, module: 'Usuários', operation: 'Inativação', idOperation: data.id, name: data.name, ip: JSON.stringify(ip),
+            // });
           }
           return { status: 200, message: { message: 'Usuário atualizada' } };
         }

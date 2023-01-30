@@ -137,9 +137,9 @@ export class DepartamentController {
 
       const setor = await this.departamentRepository.create(data);
 
-      await this.reporteRepository.create({
-        madeBy: data.created_by, module: 'Setor', operation: 'Cadastro', name: data.name, ip: JSON.stringify(ip), idOperation: setor.id,
-      });
+      // await this.reporteRepository.create({
+      //   madeBy: data.created_by, module: 'Setor', operation: 'Cadastro', name: data.name, ip: JSON.stringify(ip), idOperation: setor.id,
+      // });
       return { status: 200, message: 'Setor cadastrado' };
     } catch (error: any) {
       handleError('Setor Controller', 'Create', error.message);

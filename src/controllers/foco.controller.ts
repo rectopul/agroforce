@@ -1,9 +1,9 @@
+import createXls from 'src/helpers/api/xlsx-global-download';
 import handleError from '../shared/utils/handleError';
 import { FocoRepository } from '../repository/foco.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
-import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class FocoController {
   public readonly required = 'Campo obrigatório';
@@ -63,8 +63,8 @@ export class FocoController {
       if (options.orderBy != 'group.group') {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
-      }else{
-        orderBy = `{ "name": "desc"}`;
+      } else {
+        orderBy = '{ "name": "desc"}';
       }
 
       const response: object | any = await this.focoRepository.findAll(
@@ -90,9 +90,9 @@ export class FocoController {
         });
       }
 
-      if(options.orderBy == 'group.group' && options.typeOrder == 'asc'){
+      if (options.orderBy == 'group.group' && options.typeOrder == 'asc') {
         response.sort((a: any, b: any) => b.group.group - a.group.group);
-      }else if(options.orderBy == 'group.group' && options.typeOrder == 'desc'){
+      } else if (options.orderBy == 'group.group' && options.typeOrder == 'desc') {
         response.sort((a: any, b: any) => a.group.group - b.group.group);
       }
 
@@ -124,8 +124,6 @@ export class FocoController {
 
   async create(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-
       const focoAlreadyExists = await this.focoRepository.findByName(
         { name: data.name, id_culture: data.id_culture },
       );
@@ -133,9 +131,9 @@ export class FocoController {
       if (focoAlreadyExists) return { status: 409, message: 'Foco já existe, favor checar registros inativos.' };
 
       const response = await this.focoRepository.create(data);
-      await this.reporteRepository.create({
-        madeBy: response.created_by, module: 'Foco', operation: 'Cadastro', name: response.name, ip: JSON.stringify(ip), idOperation: response.id,
-      });
+      // await this.reporteRepository.create({
+      //   madeBy: response.created_by, module: 'Foco', operation: 'Cadastro', name: response.name, ip: JSON.stringify(ip), idOperation: response.id,
+      // });
 
       if (response) {
         return { status: 200, response, message: { message: 'Foco criado' } };
@@ -155,14 +153,14 @@ export class FocoController {
         const foco = await this.focoRepository.update(data.id, data);
         if (!foco) return { status: 400, message: 'Foco não encontrado' };
         if (foco.status === 1) {
-          await this.reporteRepository.create({
-            madeBy: foco.created_by, module: 'Foco', operation: 'Edição', name: foco.name, ip: JSON.stringify(ip), idOperation: foco.id,
-          });
+          // await this.reporteRepository.create({
+          //   madeBy: foco.created_by, module: 'Foco', operation: 'Edição', name: foco.name, ip: JSON.stringify(ip), idOperation: foco.id,
+          // });
         }
         if (foco.status === 0) {
-          await this.reporteRepository.create({
-            madeBy: foco.created_by, module: 'Foco', operation: 'Inativação', name: foco.name, ip: JSON.stringify(ip), idOperation: foco.id,
-          });
+          // await this.reporteRepository.create({
+          //   madeBy: foco.created_by, module: 'Foco', operation: 'Inativação', name: foco.name, ip: JSON.stringify(ip), idOperation: foco.id,
+          // });
         }
 
         return { status: 200, message: 'Foco atualizada' };

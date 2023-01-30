@@ -158,9 +158,9 @@ export class LayoutQuadraController {
         const layout = await this.layoutQuadraRepository.update(data.id, data);
         if (data.status === 0 || data.status === 1) {
           const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-          await this.reporteRepository.create({
-            madeBy: layout.created_by, module: 'Quadra-Layout', operation, name: layout.esquema, ip: JSON.stringify(ip), idOperation: layout.id,
-          });
+          // await this.reporteRepository.create({
+          //   madeBy: layout.created_by, module: 'Quadra-Layout', operation, name: layout.esquema, ip: JSON.stringify(ip), idOperation: layout.id,
+          // });
         }
         if (!layout) return { status: 400, message: 'Layout de quadra não encontrado' };
         return { status: 200, message: 'Layout de quadra atualizada' };

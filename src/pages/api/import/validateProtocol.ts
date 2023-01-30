@@ -4,7 +4,6 @@ import { apiHandler } from '../../../helpers/api';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const Controller = new ImportController();
-  console.log('🚀 ~ file: validateProtocol.ts:10 ~ handler ~ req.body', req.body);
   switch (req.method) {
     case 'POST': {
       const response: any = await Controller.validateProtocol(req.body);

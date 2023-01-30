@@ -280,7 +280,6 @@ export class ExperimentController {
         }
       }
 
-      // console.log('orderBy', orderBy);
 
       const response: object | any = await this.experimentRepository.findAll(
         parameters,
@@ -438,7 +437,6 @@ export class ExperimentController {
 
         const { response: assayList } = await this.assayListController.getOne(Number(experimentExist?.idAssayList));
 
-        console.log('assayList', assayList);
 
         // filter experiments with status 'IMPORTADO'
         const experiments_importeds = assayList?.experiment.filter((experiment: any) => experiment.status === 'IMPORTADO');

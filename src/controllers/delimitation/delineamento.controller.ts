@@ -134,9 +134,9 @@ export class DelineamentoController {
         if (!delineamento) return { status: 400, message: 'Delineamento não encontrado' };
         if (data.status === 0 || data.status === 1) {
           const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-          await this.reporteRepository.create({
-            madeBy: delineamento.created_by, module: 'Delineamento', operation, name: delineamento.name, ip: JSON.stringify(ip), idOperation: delineamento.id,
-          });
+          // await this.reporteRepository.create({
+          //   madeBy: delineamento.created_by, module: 'Delineamento', operation, name: delineamento.name, ip: JSON.stringify(ip), idOperation: delineamento.id,
+          // });
         }
         return { status: 200, message: 'Delineamento atualizada' };
       }

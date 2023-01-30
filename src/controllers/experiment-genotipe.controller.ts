@@ -4,7 +4,7 @@ import { IReturnObject } from '../interfaces/shared/Import.interface';
 import handleError from '../shared/utils/handleError';
 import { ExperimentGroupController } from './experiment-group/experiment-group.controller';
 import { ExperimentController } from './experiment/experiment.controller';
-import { PrintHistoryController } from './print-history/print-history.controller';
+import { ReporteController } from './reportes/reporte.controller';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 import { prisma } from '../pages/api/db/db';
@@ -16,7 +16,7 @@ export class ExperimentGenotipeController {
 
   private experimentGroupController = new ExperimentGroupController();
 
-  private printedHistoryController = new PrintHistoryController();
+  private reporteController = new ReporteController();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -89,11 +89,12 @@ export class ExperimentGenotipeController {
         statusParams.forEach((_: any, index: number) => {
           parameters.OR.push(
             JSON.parse(
-              `{ "experiment": {"status": {"contains": "${statusParams[index]}" } } }`,
+              `{"status": {"contains": "${statusParams[index]}" } }`,
             ),
           );
         });
       }
+
       if (options.ensaio) {
         parameters.AND.push(
           JSON.parse(
@@ -225,8 +226,6 @@ export class ExperimentGenotipeController {
           parameters.group = JSON.parse(` {"group": {"lte": ${Number(options.filterGrpTo)} } }`);
         }
       }
-
-      console.log('parameters', parameters);
 
       const select = {
         id: true,
@@ -532,27 +531,41 @@ export class ExperimentGenotipeController {
     idList, npe, status, userId = 0, count,
   }: any) {
     try {
+      let operation;
       let counter = 1;
       if (count === 'print') {
-        status = 'IMPRESSO';
+        operation = 'IMPRESSO';
         counter = 1;
+        await idList.map(async (id: any) => {
+          const { response }: any = await this.getOne(id);
+          const newCount = response.counter + 1;
+          operation = 'IMPRESSO';
+          await this.ExperimentGenotipeRepository.printed(id, status, newCount);
+          await this.reporteController.create({
+            userId, operation, module: 'ETIQUETAGEM', oldValue: response.nca,
+          });
+        });
       } else if (count === 'reprint') {
         await idList.map(async (id: any) => {
           const { response }: any = await this.getOne(id);
           const newCount = response.counter + 1;
-          status = 'IMPRESSO';
           await this.ExperimentGenotipeRepository.printed(id, status, newCount);
+          operation = 'REIMPRESSO';
+          await this.reporteController.create({
+            userId, operation, module: 'ETIQUETAGEM', oldValue: response.nca,
+          });
         });
       } else if (count === 'writeOff') {
         counter = 0;
-        status = 'EM ETIQUETAGEM';
+        operation = 'EM ETIQUETAGEM';
         await this.ExperimentGenotipeRepository.writeOff(npe, status, counter);
-        status = 'BAIXA';
-        await this.printedHistoryController.create({ idList, userId, status });
+        operation = 'BAIXA';
+        await this.reporteController.create({
+          userId, operation, module: 'ETIQUETAGEM', oldValue: npe,
+        });
         return { status: 200 };
       }
-      await this.ExperimentGenotipeRepository.printed(idList, status, counter);
-      await this.printedHistoryController.create({ idList, userId, status });
+
       return { status: 200 };
     } catch (error: any) {
       handleError('Parcelas controller', 'Update', error.message);
@@ -562,15 +575,9 @@ export class ExperimentGenotipeController {
 
   async deleteAll(idExperiment: number) {
     try {
-      const parcelsToDelete: any = await this.getAll({ idExperiment });
-      const idList = parcelsToDelete[0]?.map(async (parcela: any) => parcela.id);
-      const { status } = await this.printedHistoryController.deleteAll(idList);
-      if (status === 200) {
-        const response = await this.ExperimentGenotipeRepository.deleteAll(Number(idExperiment));
-        if (response) {
-          return { status: 200, message: 'Parcelas excluídos' };
-        }
-        return { status: 400, message: 'Parcelas não excluídos' };
+      const response = await this.ExperimentGenotipeRepository.deleteAll(Number(idExperiment));
+      if (response) {
+        return { status: 200, message: 'Parcelas excluídos' };
       }
       return { status: 400, message: 'Erro ao excluir parcelas' };
     } catch (error: any) {
