@@ -219,9 +219,9 @@ export class QuadraController {
         if (!quadra) return { status: 400, message: 'Quadra não encontrado' };
         if (data.status === 0 || data.status === 1) {
           const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-          await this.reporteRepository.create({
-            madeBy: quadra.created_by, module: 'Quadras-Quadra', operation, name: quadra.esquema, ip: JSON.stringify(ip), idOperation: quadra.id,
-          });
+          // await this.reporteRepository.create({
+          //   madeBy: quadra.created_by, module: 'Quadras-Quadra', operation, name: quadra.esquema, ip: JSON.stringify(ip), idOperation: quadra.id,
+          // });
         }
         return { status: 200, message: 'Quadra atualizada' };
       }

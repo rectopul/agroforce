@@ -64,6 +64,10 @@ export class ExperimentGroupController {
         parameters.safraId = Number(options.safraId);
       }
 
+      if (options.id_safra) {
+        parameters.safraId = Number(options.id_safra);
+      }
+
       if (options.id) {
         parameters.id = Number(options.id);
       }
@@ -191,9 +195,17 @@ export class ExperimentGroupController {
 
   async update(data: any) {
     try {
-      const assayList: any = await this.experimentGroupRepository.findById(data.id);
+      const experimentGroup: any = await this.experimentGroupRepository.findById(data.id);
 
-      if (!assayList) return { status: 404, message: 'Grupo de experimento não existente' };
+      const { response: validate }: any = await this.getAll({
+        safraId: data.safraId,
+        filterExperimentGroup: data.name,
+      });
+      console.log('🚀 ~ file: experiment-group.controller.ts:204 ~ ExperimentGroupController ~ update ~ validate', validate);
+
+      if (validate.length > 0) return { status: 404, message: 'Nome do grupo já existe na safra' };
+
+      if (!experimentGroup) return { status: 404, message: 'Grupo de experimento não existente' };
 
       const response = await this.experimentGroupRepository.update(Number(data.id), data);
 

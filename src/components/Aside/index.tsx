@@ -9,14 +9,13 @@ import { BsGear } from 'react-icons/bs';
 import { useRouter } from 'next/router';
 import { ButtonAside } from './ButtonAside';
 
-const versionApp = '0.0.22.4'; // fix
+const versionApp = '0.0.23.0';
 
 export function Aside({ moduloActive }: any) {
   const aArray = versionApp.split('.');
 
   const prev = aArray.splice(0, aArray.length - 1);
   const next = aArray.splice(-1);
-  console.log(prev.join('.'), next.join('.'));
 
   // aArray.toLowerCase() === aArray[aArray.length-1].toLowerCase();
 

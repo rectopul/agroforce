@@ -1135,6 +1135,8 @@ export default function Listagem({
             onClick={() => {
               cleanState();
               setIsOpenModal(false);
+              // const ifr: any = document.getElementById('iframePrint');
+              // ifr!.style.display = 'none';
             }}
           >
             <RiCloseCircleFill
@@ -1210,32 +1212,6 @@ export default function Listagem({
             </div>
           </div>
 
-          {/* <div className="flex justify-end py-0">
-            <div className="h-10 w-40">
-              <Button
-                title="Cancelar"
-                value="Cancelar"
-                textColor="white"
-                disabled={
-                  !(
-                    validateNcaOne === "bg-red-600" ||
-                    validateNcaTwo === "bg-red-600"
-                  )
-                }
-                onClick={cleanState}
-                bgColor="bg-red-600"
-              />
-            </div>
-            <div className="h-10 w-40 ml-2">
-              <Button
-                title="Imprimir"
-                value="Imprimir"
-                textColor="white"
-                onClick={() => router.push("imprimir")}
-                bgColor="bg-green-600"
-              />
-            </div>
-          </div> */}
         </form>
       </Modal>
 
@@ -1333,6 +1309,31 @@ export default function Listagem({
                       values={statusFilterSelected}
                       onChange={(e: any) => setStatusFilterSelected(e)}
                     />
+                  </div>
+
+                  <div className="h-6 w-1/2 ml-2">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      NT
+                    </label>
+                    <div className="flex">
+                      <Input
+                        type="number"
+                        placeholder="De"
+                        id="filterNtFrom"
+                        name="filterNtFrom"
+                        onChange={formik.handleChange}
+                        defaultValue="filterNtFrom"
+                      />
+                      <Input
+                        type="number"
+                        style={{ marginLeft: 8 }}
+                        placeholder="Até"
+                        id="filterNtTo"
+                        name="filterNtTo"
+                        onChange={formik.handleChange}
+                        defaultValue="filterNtTo"
+                      />
+                    </div>
                   </div>
 
                   <div className="h-6 w-1/2 ml-2">

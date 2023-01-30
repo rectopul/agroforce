@@ -51,7 +51,9 @@ export class ExperimentGroupRepository {
   async update(id: number, data: any) {
     const result = await prisma.experimentGroup.update({
       where: { id },
-      data,
+      data: {
+        name: data.name,
+      },
     });
     return result;
   }

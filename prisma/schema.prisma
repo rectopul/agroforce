@@ -108,7 +108,6 @@ model user {
   users_cultures    users_cultures[]
   users_permissions users_permissions[]
   users_preferences users_preferences[]
-  PrintHistory      PrintHistory[]
   reportes          reportes[]
 }
 
@@ -155,7 +154,7 @@ model local {
   created_by         Int
   adress             String?
   id_country         Int
-  id_local_culture   Int            @unique
+  id_local_culture   Int
   id_locality        Int
   id_region          Int
   label              String
@@ -630,7 +629,6 @@ model experiment_genotipe {
   layout_quadra          layout_quadra?         @relation(fields: [blockLayoutId], references: [id])
   sequencia_delineamento sequencia_delineamento @relation(fields: [id_seq_delineamento], references: [id])
   lote                   lote?                  @relation(fields: [idLote], references: [id])
-  PrintHistory           PrintHistory[]
 
   @@unique([idExperiment, npe])
 }
@@ -653,29 +651,15 @@ model ExperimentGroup {
   @@unique([name, safraId])
 }
 
-model PrintHistory {
-  id                   Int      @id @default(autoincrement())
-  experimentGenotypeId Int
-  status               String
-  userId               Int
-  modulo               String   @default("ETIQUETAGEM")
-  createdAt            DateTime @default(now())
-
-  user                user                @relation(fields: [userId], references: [id])
-  experiment_genotipe experiment_genotipe @relation(fields: [experimentGenotypeId], references: [id])
-}
-
 model reportes {
-  id          Int      @id @default(autoincrement())
-  madeBy      Int?
-  madeIn      DateTime @default(now())
-  module      String?
-  operation   String?
-  idOperation Int?
-  name        String?
-  ip          String?
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  madeIn    DateTime @default(now())
+  module    String?
+  operation String?
+  oldValue  String
 
-  user user? @relation(fields: [madeBy], references: [id])
+  user user? @relation(fields: [userId], references: [id])
 }
 
 model AllocatedExperiment {
