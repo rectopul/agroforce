@@ -500,8 +500,8 @@ export class ExperimentGenotipeController {
 
         return exp_gen;
       }, {
-        maxWait: 5000,
-        timeout: 10000,
+        maxWait: 60000,
+        timeout: 120000,
       });
 
       if (response) {

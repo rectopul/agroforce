@@ -143,6 +143,9 @@ export default function Listagem({
   const [experimentos, setExperimento] = useState<IExperimento[]>([]);
   const [experimentosNew, setExperimentoNew] = useState<IExperimento[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
+  // conta número de chamadas assicronas
+  const [countAsync, setCountAsync] = useState<number>(0);
+  
   // const [currentPage, setCurrentPage] = useState<number>(
   //   Number(pageBeforeEdit)
   // );
@@ -633,7 +636,10 @@ export default function Listagem({
 
     if (NPESelectedRow) {
       const skip = page * Number(take);
-      setNpeDataItems(npeData?.data.slice(skip, skip + take));
+      let finish = skip + Number(take);
+      //let partial = npeData?.data.slice(skip, (skip + Number(take)));
+      let partial = npeData?.data.slice(skip, finish);
+      setNpeDataItems(partial);
     }
   }
 
@@ -646,6 +652,15 @@ export default function Listagem({
   //   handleTotalPages();
   // }, [currentPage]);
 
+  useEffect(() => {
+    console.log('Numero de processos executando:', countAsync);
+    if(countAsync > 0) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+  }, [countAsync]);
+  
   function filterFieldFactory(title: any, name: any) {
     return (
       <div className="h-10 w-1/2 ml-4">
@@ -685,7 +700,11 @@ export default function Listagem({
   };
 
   async function getExperiments(): Promise<void> {
-    selectedNPE.map(async (env: any) => {
+    setCountAsync(0);
+    
+    // object.values selectedNPE
+    for (const env of Object.values(selectedNPE)) {
+      //selectedNPE.map(async (env: any) => {
       let tempFilter = `idSafra=${env?.safraId}&idLocal=${env?.localId}&Foco=${env?.foco.id}&Epoca=${env?.epoca}&Tecnologia=${env?.tecnologia.cod_tec}&TypeAssay=${env?.type_assay.id}&Status=IMPORTADO&excel=true`;
       if (filter) {
         tempFilter = `${tempFilter}&${filter}`;
@@ -704,10 +723,12 @@ export default function Listagem({
       tempFilter = `${tempFilter}&orderBy=&typeOrder=`;
 
       let count1 = 0;
+      console.log('countAsync', countAsync);
+      setCountAsync(countAsync + 1);
 
       await experimentService
         .getAll(tempFilter)
-        .then(({ status, response, total }) => {
+        .then(({status, response, total}) => {
           let i = 0;
 
           response.length > 0 ? (i = env.prox_npe) : (i = env.npef);
@@ -807,8 +828,22 @@ export default function Listagem({
 
           setAllNPERecords((prev) => [...prev, temp]);
           count = 0;
+
+          //setLoading(false);
+          setCountAsync(countAsync - 1);
+        }).catch((error) => {
+          console.log("error", error);
+          setCountAsync(countAsync - 1);
+          Swal.fire({
+            title: `Houve um problema para listar o ambiente: ${env?.local?.name_local_culture}`,
+            html: 'DETALHES: ' + error
+          });
+        }).finally(() => {
+          setCountAsync(0);
         });
-    });
+      //});
+    }
+    // end for
   }
 
   useEffect(() => {
@@ -986,6 +1021,15 @@ export default function Listagem({
               showCancelButton: true,
             });
           }
+          setLoading(false);
+        }).catch((error) => {
+          setLoading(false);
+          console.log("error", error);
+          Swal.fire({
+            title: "Houve um problema sortear. ",
+            html: error
+          });
+          
         });
       setLoading(false);
     } else {
@@ -1268,7 +1312,13 @@ export default function Listagem({
                   }),
                   search: false,
                   filtering: false,
-                  pageSize: Number(take),
+                  // pageSize: Number(take),
+                  paging:true,
+                  pageSizeOptions:[10,50,100,200],
+                  emptyRowsWhenPaging: false,
+                  pageSize: 10,
+                  paginationType: "normal",
+                  //paging: true,
                   // paging: false, //PAGINACAO DESATIVADA TEMPORARIAMENTE
                 }}
                 components={{
@@ -1398,48 +1448,56 @@ export default function Listagem({
                       py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => handlePagination(currentPage - 10)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage <= 1}
-                      />
-                      <Button
-                        onClick={() => handlePagination(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill('')
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => handlePagination(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                          />
-                        ))}
-                      <Button
-                        onClick={() => handlePagination(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => handlePagination(currentPage + 10)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                        {...props}
+                      >
+
+                        <Button
+                          onClick={() => handlePagination(0)}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          icon={<MdFirstPage size={18} />}
+                          disabled={currentPage <= 1}
+                        />
+                        <Button
+                          onClick={() => handlePagination(currentPage - 1)}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          icon={<BiLeftArrow size={15} />}
+                          disabled={currentPage <= 0}
+                        />
+                        {Array(1)
+                          .fill("")
+                          .map((value, index) => (
+                            <Button
+                              key={index}
+                              onClick={() => handlePagination(index)}
+                              value={`${currentPage + 1}`}
+                              bgColor="bg-blue-600"
+                              textColor="white"
+                            />
+                          ))}
+                        <Button
+                          onClick={() => handlePagination(currentPage + 1)}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          icon={<BiRightArrow size={15} />}
+                          disabled={currentPage + 1 >= pages}
+                        />
+                        <Button
+                          onClick={() => handlePagination(pages - 1)}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          icon={<MdLastPage size={18} />}
+                          disabled={currentPage + 1 >= pages}
+                        />
+                        {/*<Button*/}
+                        {/*  onClick={() => handlePagination(currentPage + 10)}*/}
+                        {/*  bgColor="bg-blue-600"*/}
+                        {/*  textColor="white"*/}
+                        {/*  icon={<MdLastPage size={18} />}*/}
+                        {/*  disabled={currentPage + 1 >= pages}*/}
+                        {/*/>*/}
+                      </div>
                     ) as any,
                 }}
               />

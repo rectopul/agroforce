@@ -315,7 +315,8 @@ export class ExperimentController {
       return { status: 200, response, total: response.total };
     } catch (error: any) {
       handleError('Experimento controller', 'GetAll', error.message);
-      throw new Error('[Controller] - GetAll Experimento erro');
+      //throw new Error({name: 'teste', message: '[Controller] - GetAll Experimento erro: ', stack: error.message});
+      throw new Error(`[Controller] - GetAll Experimento erro: \r\n${error.message}`);
     }
   }
 

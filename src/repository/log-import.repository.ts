@@ -2,8 +2,8 @@ import { prisma } from '../pages/api/db/db';
 
 export class LogImportRepository {
   async create(data: any) {
-    if (!data.updated_at) {
-      data.updated_at = null;
+    if(!data.updated_at){
+      data.updated_at = null; // set explicitly to null
     }
     const result = await prisma.log_import.create({
       data,

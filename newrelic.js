@@ -6,14 +6,20 @@
  */
 
 let appName = '';
+let appKey = '18b962d388ad7784713bc30395071b16FFFFNRAL';
+
+if(process.env.COPYMOD === 'douglas') {
+  appKey='19471e81c068a309688e8ed0ec1641e0FFFFNRAL';
+}
+
 
 if (process.env.NODE_ENV === 'development') {
   appName = 'development';
-} else if (process.env.COPYMOD == 'tmg') {
+} else if (process.env.COPYMOD === 'tmg') {
   appName = 'tmg';
-} else if (process.env.COPYMOD == 'tmgdns-qa') {
+} else if (process.env.COPYMOD === 'tmgdns-qa') {
   appName = 'tmgdns-qa';
-} else if (process.env.COPYMOD * 1 == 2) {
+} else if (process.env.COPYMOD * 1 === 2) {
   appName = 'production2';
 } else if (typeof process.env.COPYMOD === 'undefined') {
   appName = process.env.COPYMOD;
@@ -29,7 +35,7 @@ exports.config = {
   /**
    * Your New Relic license key.
    */
-  license_key: '18b962d388ad7784713bc30395071b16FFFFNRAL',
+  license_key: appKey,
   logging: {
     /**
      * Level at which to log. 'trace' is most useful to New Relic when diagnosing
