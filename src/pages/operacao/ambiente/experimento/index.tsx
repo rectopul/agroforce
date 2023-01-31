@@ -9,7 +9,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   DragDropContext,
   Draggable,
@@ -635,7 +635,9 @@ export default function Listagem({
 
     if (NPESelectedRow) {
       const skip = page * Number(take);
-      let partial = npeData?.data.slice(skip, skip + take);
+      let finish = skip + Number(take);
+      //let partial = npeData?.data.slice(skip, (skip + Number(take)));
+      let partial = npeData?.data.slice(skip, finish);
       setNpeDataItems(partial);
     }
   }
@@ -1447,7 +1449,7 @@ export default function Listagem({
                       >
                         {currentPage}
                         <Button
-                          onClick={() => handlePagination(currentPage - 10)}
+                          onClick={() => handlePagination(0)}
                           bgColor="bg-blue-600"
                           textColor="white"
                           icon={<MdFirstPage size={18} />}
@@ -1479,12 +1481,19 @@ export default function Listagem({
                           disabled={currentPage + 1 >= pages}
                         />
                         <Button
-                          onClick={() => handlePagination(currentPage + 10)}
+                          onClick={() => handlePagination(pages - 1)}
                           bgColor="bg-blue-600"
                           textColor="white"
                           icon={<MdLastPage size={18} />}
                           disabled={currentPage + 1 >= pages}
                         />
+                        {/*<Button*/}
+                        {/*  onClick={() => handlePagination(currentPage + 10)}*/}
+                        {/*  bgColor="bg-blue-600"*/}
+                        {/*  textColor="white"*/}
+                        {/*  icon={<MdLastPage size={18} />}*/}
+                        {/*  disabled={currentPage + 1 >= pages}*/}
+                        {/*/>*/}
                       </div>
                     ) as any,
                 }}
