@@ -6,6 +6,8 @@ import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 import { ReporteController } from './reportes/reporte.controller';
 
+const os = require('os');
+
 export class TypeAssayController {
   typeAssayRepository = new TypeAssayRepository();
 
@@ -137,6 +139,7 @@ export class TypeAssayController {
       if (assayTypeAlreadyExist.status === 200) return { status: 404, message: 'Tipo de ensaio já existe, favor checar registros inativos.' };
       const response = await this.typeAssayRepository.create(data);
 
+      const hostName = os.hostname();
       await this.reporteController.create({
         userId: data.created_by, module: 'TIPO DE ENSAIO', operation: 'CRIAÇÃO', oldValue: data.name,
       });
