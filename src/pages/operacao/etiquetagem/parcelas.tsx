@@ -124,6 +124,7 @@ export default function Listagem({
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number>(0);
+  const [errorMessage, setErroMessage] = useState<string>('');
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
       name: 'CamposGerenciados[]',
@@ -707,6 +708,7 @@ export default function Listagem({
     setValidateNcaOne('bg-gray-300');
     setValidateNcaTwo('bg-gray-300');
     setParcelasToPrint([]);
+    setErroMessage('');
     // setIsOpenModal(!isOpenModal);
     if (isOpenModal) {
       (document.getElementById('inputCode') as HTMLInputElement).value = '';
@@ -734,9 +736,11 @@ export default function Listagem({
       colorVerify = 'bg-green-600';
       setGroupNameOne(response[0]?.name);
       setValidateNcaOne('bg-green-600');
+      setErroMessage('');
     } else {
       colorVerify = 'bg-red-600';
       setValidateNcaOne('bg-red-600');
+      setErroMessage('o NCA não existe dentro do grupo, favor clicar em limpar e tentar novamente');
     }
     setTotalMatch(countNca);
     if (colorVerify === 'bg-green-600') {
@@ -770,9 +774,11 @@ export default function Listagem({
       colorVerify = 'bg-green-600';
       setGroupNameTwo(response[0]?.name);
       setValidateNcaTwo('bg-green-600');
+      setErroMessage('');
     } else {
       colorVerify = 'bg-red-600';
       setValidateNcaTwo('bg-red-600');
+      setErroMessage('o NCA não existe dentro do grupo, favor clicar em limpar e tentar novamente');
     }
     setTotalMatch(countNca);
 
@@ -889,35 +895,10 @@ export default function Listagem({
   }
 
   async function writeOff(inputCode: any) {
-    // const inputCode: any = (
-    //   document.getElementById("inputCode") as HTMLInputElement
-    // )?.value;
     if (!doubleVerify) {
-      // let colorVerify = "";
-      // if (inputCode == writeOffNca) {
-      //   colorVerify = "bg-green-600";
-      //   setValidateNcaOne("bg-green-600");
-      // } else {
-      //   colorVerify = "bg-red-600";
-      //   setValidateNcaOne("bg-red-600");
-      // }
-      // if (colorVerify === "bg-green-600") {
       (document.getElementById('inputCode') as HTMLInputElement).value = '';
       setDoubleVerify(true);
-      // } else {
-      // setDoubleVerify(false);
-      // }
     } else {
-      // let colorVerify = "";
-      // if (inputCode == writeOffNca) {
-      //   colorVerify = "bg-green-600";
-      //   setValidateNcaTwo("bg-green-600");
-      // } else {
-      //   colorVerify = "bg-red-600";
-      //   setValidateNcaTwo("bg-red-600");
-      // }
-      // if (colorVerify === "bg-green-600") {
-
       // NA CHAMADA TEM QUE SER MANDANDO O NUMERO DO NPE PARA A API DAR BAIXA
       let writeOffIdList = parcelas.filter(
         (item: any) => item.npe === inputCode,
@@ -939,8 +920,6 @@ export default function Listagem({
         cleanState();
         Swal.fire('Erro ao tentar dar baixa na parcela.');
       }
-
-      // }
     }
   }
 
@@ -957,6 +936,12 @@ export default function Listagem({
   }
 
   function onPressKey(e: any) {
+    const inputCode: any = (
+      document.getElementById('inputCode') as HTMLInputElement
+    )?.value;
+    if (inputCode?.length < 9) {
+      setErroMessage('o Código deve ser de 8 dígitos para baixa(NPE) é 13 para impressão(NCA)');
+    }
     if (e?.charCode === 13 || e?.charCode === 10) validateInput();
   }
 
@@ -970,6 +955,7 @@ export default function Listagem({
 
       if (doubleVerify) {
         if (functionsUtils?.generateDigitEAN13(inputCode) !== lastNumber) {
+          setErroMessage('o Dígito verificador não confere com o NCA, favor clicar em limpar e tentar novamente');
           setValidateNcaTwo('bg-red-600');
           return;
         }
@@ -977,6 +963,7 @@ export default function Listagem({
         verifyAgain(withoutDigit);
       } else {
         if (functionsUtils?.generateDigitEAN13(inputCode) !== lastNumber) {
+          setErroMessage('o Dígito verificador não confere com o NCA, favor clicar em limpar e tentar novamente');
           setValidateNcaOne('bg-red-600');
           return;
         }
@@ -984,20 +971,33 @@ export default function Listagem({
         handleSubmit(withoutDigit);
       }
     }
+
     if (inputCode?.length === 8) {
       const lastNumber = parseInt(inputCode?.substring(7, 8));
       const withoutDigit = parseInt(inputCode?.substring(0, 7));
 
       if (functionsUtils?.generateDigitEAN8(inputCode) !== lastNumber) {
         doubleVerify
-          ? setValidateNcaTwo('bg-red-600')
-          : setValidateNcaOne('bg-red-600');
+          ? (
+            setErroMessage('o Dígito verificador não confere com a NPE, favor clicar em limpar e tentar novamente'),
+            setValidateNcaTwo('bg-red-600')
+          )
+          : (
+            setErroMessage('o Dígito verificador não confere com a NPE, favor clicar em limpar e tentar novamente'),
+            setValidateNcaOne('bg-red-600')
+          );
         return;
       }
 
       doubleVerify
-        ? setValidateNcaTwo('bg-green-600')
-        : setValidateNcaOne('bg-green-600');
+        ? (
+          setErroMessage(''),
+          setValidateNcaTwo('bg-green-600')
+        )
+        : (
+          setErroMessage(''),
+          setValidateNcaOne('bg-green-600')
+        );
       writeOff(withoutDigit);
     }
   }
@@ -1010,11 +1010,6 @@ export default function Listagem({
   useEffect(() => {
     callingApi(filter);
   }, [typeOrder]);
-
-  // useEffect(() => {
-  //   handlePagination();
-  //   handleTotalPages();
-  // }, [currentPage]);
 
   function openModal() {
     setIsOpenModal(true);
@@ -1162,6 +1157,11 @@ export default function Listagem({
                 ref={inputRef}
               />
             </div>
+
+            <div className="w-24 h-24">
+              {errorMessage}
+            </div>
+
             <div className="w-20 h-7 ml-2">
               {(validateNcaOne === 'bg-red-600'
                 || validateNcaTwo === 'bg-red-600') && (
