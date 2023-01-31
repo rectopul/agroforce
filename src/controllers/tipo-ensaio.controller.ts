@@ -140,6 +140,7 @@ export class TypeAssayController {
       const response = await this.typeAssayRepository.create(data);
 
       const hostName = os.hostname();
+      console.log('🚀 ~ file: tipo-ensaio.controller.ts:143 ~ TypeAssayController ~ create ~ hostName', hostName);
       await this.reporteController.create({
         userId: data.created_by, module: 'TIPO DE ENSAIO', operation: 'CRIAÇÃO', oldValue: data.name,
       });
