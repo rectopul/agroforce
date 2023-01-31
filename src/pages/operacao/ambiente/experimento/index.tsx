@@ -834,6 +834,10 @@ export default function Listagem({
         }).catch((error) => {
           console.log("error", error);
           setCountAsync(countAsync - 1);
+          Swal.fire({
+            title: `Houve um problema para listar o ambiente: ${env?.local?.name_local_culture}`,
+            html: 'DETALHES: ' + error
+          });
         }).finally(() => {
           setCountAsync(0);
         });
@@ -1447,7 +1451,7 @@ export default function Listagem({
                     "
                         {...props}
                       >
-                        {currentPage}
+
                         <Button
                           onClick={() => handlePagination(0)}
                           bgColor="bg-blue-600"
