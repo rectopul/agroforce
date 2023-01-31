@@ -6,7 +6,8 @@
     "debug": "cross-env NODE_OPTIONS='--inspect' next dev",
     "devrc": "NODE_OPTIONS='-r @newrelic/next' next dev",
     "build": "next build",
-    "start": "NODE_OPTIONS='-r @newrelic/next' next start",
+    "start": "NODE_OPTIONS='-r @newrelic/next --max_old_space_size=4096' next start",
+    "startold": "NODE_OPTIONS='-r @newrelic/next' next start",
     "lint": "eslint --fix --ext .ts,.tsx ."
   },
   "dependencies": {
