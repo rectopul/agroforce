@@ -527,7 +527,7 @@ model log_import {
   table        String
   status       Int       @default(2)
   created_at   DateTime? @default(now())
-  updated_at   DateTime? @default(now())
+  updated_at   DateTime?
   state        String?
   invalid_data String?   @db.LongText
   executeTime  String?
