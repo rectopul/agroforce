@@ -67,6 +67,7 @@ export class ImportAssayListController {
         await logImportController.update({
           id: idLog,
           status: 1,
+          updated_at: new Date(Date.now()),
           state: 'INVALIDA',
           invalid_data: validate,
         });
@@ -438,9 +439,9 @@ export class ImportAssayListController {
       await logImportController.update({
         id: idLog,
         status: 1,
+        updated_at: new Date(Date.now()),
         state: 'INVALIDA',
         invalid_data: responseStringError,
-        updated_at: new Date(Date.now()),
       });
       return { status: 400, message: responseStringError };
     } catch (error: any) {

@@ -615,6 +615,7 @@ model experiment_genotipe {
   nt                  Int
   npe                 Int
   nca                 String?
+  groupValue          Int?
   status              String    @default("SORTEADO")
   status_t            String    @default("L")
   counter             Int       @default(0)
@@ -631,6 +632,7 @@ model experiment_genotipe {
   lote                   lote?                  @relation(fields: [idLote], references: [id])
 
   @@unique([idExperiment, npe])
+  @@unique([idSafra, groupValue, npe])
 }
 
 model ExperimentGroup {

@@ -173,6 +173,7 @@ export class ImportController {
           id: responseLog?.id,
           status: 1,
           state: 'INVALIDA',
+          updated_at: new Date(Date.now()),
           invalid_data: protocolMessage,
         });
         return { status: 400, message: protocolMessage };
@@ -190,7 +191,7 @@ export class ImportController {
           return await ImportGenotypeController.validate(responseLog?.id, false, newData);
         default:
           await this.logImportController.update({
-            id: responseLog?.id, table: 'PROTOCOL_LEVEL INVALIDO', status: 1, state: 'FALHA',
+            id: responseLog?.id, table: 'PROTOCOL_LEVEL INVALIDO', status: 1, updated_at: new Date(Date.now()), state: 'FALHA',
           });
           return { status: 400, response: [], message: 'Nenhum protocol_level configurado ' };
       }
@@ -200,6 +201,7 @@ export class ImportController {
       await this.logImportController.update({
         id: responseLog?.id,
         status: 1,
+        updated_at: new Date(Date.now()),
         state: 'FALHA',
         invalid_data: responseStringError,
       });
@@ -207,7 +209,12 @@ export class ImportController {
       throw new Error('[Controller] - Validate protocol erro');
     } finally {
       const executeTime = await calculatingExecutionTime(responseLog?.id);
-      await this.logImportController.update({ id: responseLog?.id, status: 1, executeTime });
+      await this.logImportController.update({
+        id: responseLog?.id,
+        status: 1,
+        updated_at: new Date(Date.now()),
+        executeTime,
+      });
     }
   }
 
@@ -232,7 +239,6 @@ export class ImportController {
       filePath: data.filePath,
     });
     try {
-      // await importblob(data.files[0]);
       if (!data.moduleId) return { status: 400, message: 'precisa ser informado o modulo que está sendo acessado!' };
 
       if (status === 400) {
@@ -317,7 +323,11 @@ export class ImportController {
       throw new Error('[Controller] - Validate general erro');
     } finally {
       const executeTime = await calculatingExecutionTime(responseLog?.id);
-      await this.logImportController.update({ id: responseLog?.id, status: 1, executeTime });
+      await this.logImportController.update({
+        id: responseLog?.id,
+        status: 1,
+        executeTime,
+      });
     }
   }
 
@@ -326,13 +336,13 @@ export class ImportController {
     const res = new Promise(async (resolve, reject) => {
       const dir = './public/log_import';
 
-      if(!fs.existsSync(dir)){
+      if (!fs.existsSync(dir)) {
         resolve({
           message: 'no files',
           files: [],
-          status: 400
+          status: 400,
         });
-      }else{
+      } else {
         await fs.readdir('./public/log_import', (err, files) => {
           files.forEach((file) => {
             filePath.push(file);
@@ -346,7 +356,7 @@ export class ImportController {
             reject({
               message: 'no files',
               files: [],
-              status: 400
+              status: 400,
             });
           }
         });

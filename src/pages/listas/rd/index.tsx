@@ -410,6 +410,13 @@ export default function Import({
     };
   }
 
+  function validateFinishDate(state: any, date: any) {
+    if (state == 'EM ANDAMENTO') {
+      return '';
+    }
+    return date;
+  }
+
   function columnsOrder(columnOrder: string) {
     const columnCampos: string[] = columnOrder.split(',');
     const tableFields: any = [];
@@ -459,6 +466,7 @@ export default function Import({
             orderList,
             fieldOrder,
             handleOrder,
+            render: (rowData: any) => validateFinishDate(rowData.state, rowData.updated_at),
           }),
         );
       }
