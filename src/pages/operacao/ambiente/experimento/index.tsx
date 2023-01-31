@@ -283,6 +283,11 @@ export default function Listagem({
       parametersFilter = filter;
     }
 
+    // NÃO É PARA FILTRAR NEM ORDENAR, SE NÃO PERDE O NPE SELECIONADO E AS MARCAÇÕES DE NCA VAZIO E NPE SOBREPOSTO;
+    // caso isso seja necessário, deve ser feito de outra forma, pois o usuário pode perder o que já selecionou;
+    // passando pelo método getExperiments;
+    return;
+    
     await experimentService
       .getAll(`${parametersFilter}&skip=0&take=${take}`)
       .then(({ status, response }: any) => {
@@ -754,7 +759,7 @@ export default function Listagem({
             p.npefView = p.npef;
 
             console.log('p.npeQT', p.npeQT);
-
+            
             // enable disable button && isNCCAvailable
             p.assay_list?.genotype_treatment?.map((exp: any) => {
               if (
@@ -818,6 +823,12 @@ export default function Listagem({
             temp.isNccAvailable = true;
           }
 
+          // // if name_local_culture == 'MT406SZ01' && epoca == '2'
+          // if(temp.env.local.name_local_culture == 'MT406SZ01' && temp.env.epoca == '2') {
+          //   // simulando NCC indisponível
+          //   temp.isNccAvailable = false;
+          // }
+          
           console.log(
             'contagem de lotes sem NCC dos tratamentos de genótipos (count)',
             count,
@@ -1203,6 +1214,29 @@ export default function Listagem({
     }
   }, [experimentos]);
 
+  function checkValidAmbiente(data: any, AllNPERecords: any) {
+    console.log('checkValidAmbiente', 'name_local_culture:', data?.local?.name_local_culture, 'data', data);
+    console.log('AllNPERecords', AllNPERecords);
+
+    const npe:any = Object.values(AllNPERecords).find((npe: any) => {
+      // find by data.id === env?.env?.id
+      if (data.id === npe?.env?.id) {
+        return true;
+      }
+    });
+    
+    console.log('npe.isNccAvailable', npe?.isNccAvailable);
+    
+    let retorno = true;
+    if (npe !== null && npe?.isNccAvailable == false) {
+      retorno = false;
+    }
+    
+    console.log('retorno', retorno, 'npe', npe);
+    
+    return retorno;
+  }
+  
   function checkValidLote(data: any) {
     let count = 0;
     data?.assay_list?.genotype_treatment?.map((exp: any) => {
@@ -1266,10 +1300,11 @@ export default function Listagem({
                     NPESelectedRow?.tableData?.id === rowData.tableData.id
                       ? NPESelectedRow.npef >= NPESelectedRow.nextNPE.npei_i
                         ? '#de1e14'
-                        : '#d3d3d3'
+                        : checkValidAmbiente(NPESelectedRow, allNPERecords)
+                          ?'#d3d3d3' :'#fc6924'
                       : rowData.npef >= rowData.nextNPE.npei_i
                         ? '#FF5349'
-                        : '#f9fafb',
+                        : checkValidAmbiente(NPESelectedRow, allNPERecords) ?'#f9fafb':'#ff8449',
                   height: 40,
                 }),
                 search: false,
