@@ -326,6 +326,7 @@ export class ImportController {
       await this.logImportController.update({
         id: responseLog?.id,
         status: 1,
+        updated_at: new Date(Date.now()),
         executeTime,
       });
     }
