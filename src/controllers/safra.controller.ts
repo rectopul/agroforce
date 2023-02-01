@@ -18,7 +18,7 @@ interface Safra {
 }
 
 type CreateSafra = Omit<Safra, 'id' | 'main_safra'>;
-type UpdateSafra = Omit<Safra, 'id_culture' | 'created_by' | 'main_safra'>;
+type UpdateSafra = Omit<Safra, 'id_culture' | 'main_safra'>;
 export class SafraController {
   public readonly required = 'Campo obrigatório';
 
@@ -162,7 +162,6 @@ export class SafraController {
   }
 
   async update(data: UpdateSafra) {
-    console.log('🚀 ~ file: safra.controller.ts:165 ~ SafraController ~ update ~ data', data);
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 

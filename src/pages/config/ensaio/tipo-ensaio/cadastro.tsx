@@ -19,7 +19,7 @@ interface ITypeAssayProps {
   id_culture: number;
   name: string | any;
   protocolName: string | any;
-  userId: number;
+  created_by: number;
   status: number;
 }
 
