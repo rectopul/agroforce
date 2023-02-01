@@ -9,7 +9,7 @@ interface DepartmentDTO {
 }
 
 type CreateDepartmentDTO = Omit<DepartmentDTO, 'id' | 'status'>;
-type UpdateDepartmentDTO = Omit<DepartmentDTO, 'created_by'>;
+type UpdateDepartmentDTO = Omit<DepartmentDTO, ''>;
 
 const { publicRuntimeConfig } = getConfig();
 

@@ -16,7 +16,6 @@ import ComponentLoading from '../../../../components/Loading';
 interface IDepartmentProps {
   id: number;
   name: string;
-  status: number;
 }
 
 export default function AtualizarSafra(item: IDepartmentProps) {
@@ -25,7 +24,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
   const tabsDropDowns = TabsDropDowns();
 
   const [loading, setLoading] = useState<boolean>(false);
-
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
@@ -35,7 +34,6 @@ export default function AtualizarSafra(item: IDepartmentProps) {
     initialValues: {
       id: item.id,
       name: item.name,
-      status: item.status,
     },
     onSubmit: async (values) => {
       validateInputs(values);
@@ -49,7 +47,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
         .update({
           id: item.id,
           name: capitalize(formik.values.name),
-          status: item.status,
+          created_by: userLogado?.id,
         })
         .then((response) => {
           if (response.status === 200) {
@@ -77,7 +75,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
 
   return (
     <>
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Atualizar setor</title>
       </Head>
@@ -129,7 +127,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<HiOutlineOfficeBuilding size={18} />}
-                onClick={() => {setLoading(true);}}
+                onClick={() => { setLoading(true); }}
               />
             </div>
           </div>

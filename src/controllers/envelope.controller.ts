@@ -1,13 +1,14 @@
 import { EnvelopeRepository } from '../repository/envelope.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
 import handleError from '../shared/utils/handleError';
+import { ReporteController } from './reportes/reporte.controller';
 
 export class EnvelopeController {
   public readonly required = 'Campo obrigatório';
 
   envelopeRepository = new EnvelopeRepository();
 
-  reporteRepository = new ReporteRepository();
+  reporteController = new ReporteController();
 
   async getOne({ id }: any) {
     try {
@@ -35,9 +36,9 @@ export class EnvelopeController {
       }
 
       const semente: any = await this.envelopeRepository.create(data);
-      // await this.reporteRepository.create({
-      //   madeBy: semente.created_by, module: 'Qtd de Sementes', operation: 'Cadastro', name: JSON.stringify(semente.id_type_assay), ip: JSON.stringify(ip), idOperation: semente.id,
-      // });
+      await this.reporteController.create({
+        userId: data.created_by, module: 'ENVELOPE', operation: 'CRIAÇÃO', oldValue: semente.seeds, ip: String(ip),
+      });
       return { status: 200, message: 'envelope cadastrado' };
     } catch (error: any) {
       handleError('Envelope controller', 'Create', error.message);
@@ -54,9 +55,9 @@ export class EnvelopeController {
       if (!envelope) return { status: 400, message: 'envelope não existente' };
 
       const semente: any = await this.envelopeRepository.update(data.id, data);
-      // await this.reporteRepository.create({
-      //   madeBy: semente.created_by, module: 'Qtd de Sementes', operation: 'Edição', name: JSON.stringify(semente.id_type_assay), ip: JSON.stringify(ip), idOperation: semente.id,
-      // });
+      await this.reporteController.create({
+        userId: data.created_by, module: 'ENVELOPE', operation: 'EDIÇÃO', oldValue: semente.seeds, ip: String(ip),
+      });
 
       return { status: 200, message: 'envelope atualizado' };
     } catch (error: any) {

@@ -29,6 +29,7 @@ import { removeCookies, setCookies } from 'cookies-next';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { BsTrashFill } from 'react-icons/bs';
 import { reporteService, userPreferencesService } from 'src/services';
+import moment from 'moment';
 import { UserPreferenceController } from '../../controllers/user-preference.controller';
 import {
   AccordionFilter,
@@ -78,7 +79,7 @@ export default function Listagem({
 
   const { tabsReport } = ITabs.default;
 
-  const tabsDropDowns = tabsReport.map((i) => (i.titleTab === 'RELATORIOS' ? { ...i, statusTab: true } : i));
+  const tabsDropDowns = tabsReport.map((i) => (i.titleTab === 'Logs' ? { ...i, statusTab: true } : i));
 
   const tableRef = useRef<any>(null);
 
@@ -420,39 +421,14 @@ export default function Listagem({
         const newData = response.map((row: any) => {
           const newRow = row;
 
-          let dtHours: string;
-          let dtMinutes: string;
-          let dtSeconds: string;
-
-          newRow.createdAt = new Date(newRow.createdAt);
-          newRow.createdAt = new Date(
-            newRow.createdAt.toISOString().slice(0, -1),
-          );
-
-          if (String(newRow.createdAt.getHours()).length === 1) {
-            dtHours = `0${String(newRow.createdAt.getHours())}`;
-          } else {
-            dtHours = String(newRow.createdAt.getHours());
-          }
-          if (String(newRow.createdAt.getMinutes()).length === 1) {
-            dtMinutes = `0${String(newRow.createdAt.getMinutes())}`;
-          } else {
-            dtMinutes = String(newRow.createdAt.getMinutes());
-          }
-          if (String(newRow.createdAt.getSeconds()).length === 1) {
-            dtSeconds = `0${String(newRow.createdAt.getSeconds())}`;
-          } else {
-            dtSeconds = String(newRow.createdAt.getSeconds());
-          }
+          newRow.madeIn = moment(row.madeIn).format('YYYY-MM-DD HH:MM:SS');
 
           newRow.FEITO_POR = row.user.name;
-          newRow.FEITO_EM = `${newRow.madeIn.toLocaleDateString(
-            'en-US',
-          )} ${dtHours}:${dtMinutes}:${dtSeconds}`;
-
+          newRow.FEITO_EM = newRow.madeIn;
           newRow.MODULO = row.module;
-          newRow.OPERACAO = row.operation;
-          newRow.VALOR = row.value;
+          newRow.OPERAÇÃO = row.operation;
+          newRow.VALOR = row.oldValue;
+          newRow.IP = row.ip;
 
           delete newRow.id;
           delete newRow.value;
@@ -469,7 +445,7 @@ export default function Listagem({
         XLSX.utils.book_append_sheet(
           workBook,
           workSheet,
-          'Histórico-Etiquetagem',
+          'LOGS',
         );
 
         // Buffer
@@ -483,7 +459,7 @@ export default function Listagem({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'Histórico-Etiquetagem.xlsx');
+        XLSX.writeFile(workBook, 'LOGS.xlsx');
       } else {
         setLoading(false);
         Swal.fire('Não existem registros para serem exportados, favor checar.');

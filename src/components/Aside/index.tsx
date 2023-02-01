@@ -52,7 +52,7 @@ export function Aside({ moduloActive }: any) {
         <ButtonAside
           title="Relatórios"
           icon={<FaBars size={32} />}
-          href="/relatorios"
+          href="/logs"
           active={moduloActive === 'relatorios'}
         />
         {/*

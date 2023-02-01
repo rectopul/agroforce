@@ -1,13 +1,13 @@
+import createXls from 'src/helpers/api/xlsx-global-download';
 import { DelineamentoRepository } from '../../repository/delineamento.repository';
-import { ReporteRepository } from '../../repository/reporte.repository';
 import handleError from '../../shared/utils/handleError';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
-import createXls from 'src/helpers/api/xlsx-global-download';
+import { ReporteController } from '../reportes/reporte.controller';
 
 export class DelineamentoController {
   Repository = new DelineamentoRepository();
 
-  reporteRepository = new ReporteRepository();
+  reporteController = new ReporteController();
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
@@ -130,13 +130,13 @@ export class DelineamentoController {
     try {
       if (data) {
         const delineamento = await this.Repository.update(data.id, data);
-        const operation = data.status === 1 ? 'Ativação' : 'Inativação';
+        const operation = data.status === 1 ? 'ATIVAÇÃO' : 'INATIVAÇÃO';
         if (!delineamento) return { status: 400, message: 'Delineamento não encontrado' };
-        if (data.status === 0 || data.status === 1) {
+        if (data.status === 1 || data.status === 0) {
           const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-          // await this.reporteRepository.create({
-          //   madeBy: delineamento.created_by, module: 'Delineamento', operation, name: delineamento.name, ip: JSON.stringify(ip), idOperation: delineamento.id,
-          // });
+          await this.reporteController.create({
+            userId: data.created_by, module: 'DELINEAMENTO', operation, oldValue: delineamento.name, ip: String(ip),
+          });
         }
         return { status: 200, message: 'Delineamento atualizada' };
       }

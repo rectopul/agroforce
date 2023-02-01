@@ -146,6 +146,7 @@ export class UserController {
 
   async create(data: object | any) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
       const parameters: any = {};
       if (data !== null && data !== undefined) {
         data.password = functionsUtils.Crypto(data.password, 'cipher');
@@ -213,7 +214,7 @@ export class UserController {
             );
           }
           await this.reporteController.create({
-            userId: data.created_by, module: 'USUÁRIOS', operation: 'CADASTRO', oldValue: data.name,
+            userId: data.created_by, module: 'USUÁRIOS', operation: 'CRIAÇÃO', oldValue: data.name, ip: String(ip),
           });
           return { status: 200, message: 'users inseridos' };
         }
@@ -355,15 +356,19 @@ export class UserController {
           }
 
           if (data.status === 1) {
-            // await this.reporteRepository.create({
-            //   madeBy: data.created_by, module: 'Usuários', operation: 'Edição', idOperation: data.id, name: data.name, ip: JSON.stringify(ip),
-            // });
+            await this.reporteController.create({
+              userId: parameters.created_by, module: 'USUÁRIOS', operation: 'ATIVAÇÃO', oldValue: parameters.name, ip: String(ip),
+            });
+          } else if (data.status === 0) {
+            await this.reporteController.create({
+              userId: parameters.created_by, module: 'USUÁRIOS', operation: 'INATIVAÇÃO', oldValue: parameters.name, ip: String(ip),
+            });
+          } else {
+            await this.reporteController.create({
+              userId: parameters.created_by, module: 'USUÁRIOS', operation: 'EDIÇÃO', oldValue: data.name, ip: String(ip),
+            });
           }
-          if (data.status === 0) {
-            // await this.reporteRepository.create({
-            //   madeBy: data.created_by, module: 'Usuários', operation: 'Inativação', idOperation: data.id, name: data.name, ip: JSON.stringify(ip),
-            // });
-          }
+
           return { status: 200, message: { message: 'Usuário atualizada' } };
         }
         return { status: 400, message: { message: 'Usuário não existe' } };

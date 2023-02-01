@@ -45,7 +45,7 @@ export class SequenciaDelineamentoController {
   async update(data: any) {
     try {
       const sequenciaDelineamento = await this.getOne(data.id);
-      const operation = data.status === 1 ? 'Ativação' : 'Inativação';
+      const operation = data.status === 1 ? 'ATIVAÇÃO' : 'INATIVAÇÃO';
       if (!sequenciaDelineamento) return { status: 400, message: 'Sequência de delineamento não encontrado!' };
       if (data.status === 0 || data.status === 1) {
         const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');

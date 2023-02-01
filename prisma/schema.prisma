@@ -660,6 +660,7 @@ model reportes {
   module    String?
   operation String?
   oldValue  String
+  ip        String?
 
   user user? @relation(fields: [userId], references: [id])
 }

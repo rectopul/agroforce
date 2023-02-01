@@ -1,14 +1,15 @@
+import createXls from 'src/helpers/api/xlsx-global-download';
 import handleError from '../../shared/utils/handleError';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { QuadraRepository } from '../../repository/quadra.repository';
 import { ReporteRepository } from '../../repository/reporte.repository';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
-import createXls from 'src/helpers/api/xlsx-global-download';
+import { ReporteController } from '../reportes/reporte.controller';
 
 export class QuadraController {
   quadraRepository = new QuadraRepository();
 
-  reporteRepository = new ReporteRepository();
+  reporteController = new ReporteController();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -17,8 +18,8 @@ export class QuadraController {
     try {
       options = await removeEspecialAndSpace(options);
       if (options.createFile) {
-        const {status, sheet} = await createXls(options, options.fileNumber == 1 ? 'QUADRAS-EXCEL' : options.fileNumber == 2 ? 'QUADRAS-EXCEL_SINTETICO' : 'QUADRAS-EXCEL_ANALYTICS');
-        return { status: status, response: sheet };
+        const { status, sheet } = await createXls(options, options.fileNumber == 1 ? 'QUADRAS-EXCEL' : options.fileNumber == 2 ? 'QUADRAS-EXCEL_SINTETICO' : 'QUADRAS-EXCEL_ANALYTICS');
+        return { status, response: sheet };
       }
       if (options.filterStatus) {
         if (options.filterStatus !== '2') parameters.status = Number(options.filterStatus);
@@ -214,14 +215,14 @@ export class QuadraController {
   async update(data: any) {
     try {
       if (data) {
-        const quadra = await this.quadraRepository.update(data.id, data);
-        const operation = data.status === 1 ? 'Ativação' : 'Inativação';
+        const quadra: any = await this.quadraRepository.update(data.id, data);
+        const operation = data.status === 1 ? 'ATIVAÇÃO' : 'INATIVAÇÃO';
         if (!quadra) return { status: 400, message: 'Quadra não encontrado' };
-        if (data.status === 0 || data.status === 1) {
+        if (data.status === 1 || data.status === 0) {
           const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-          // await this.reporteRepository.create({
-          //   madeBy: quadra.created_by, module: 'Quadras-Quadra', operation, name: quadra.esquema, ip: JSON.stringify(ip), idOperation: quadra.id,
-          // });
+          await this.reporteController.create({
+            userId: data.created_by, module: 'QUADRA', operation, oldValue: quadra.cod_quadra, ip: String(ip),
+          });
         }
         return { status: 200, message: 'Quadra atualizada' };
       }

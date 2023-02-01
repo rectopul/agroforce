@@ -1,14 +1,16 @@
-import { useFormik } from "formik";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { IoMdArrowBack } from "react-icons/io";
-import { MdDateRange } from "react-icons/md";
-import { safraService } from "src/services";
-import Swal from "sweetalert2";
-import { Button, Content, Input, Radio } from "../../../../components";
-import * as ITabs from "../../../../shared/utils/dropdown";
-import ComponentLoading from "../../../../components/Loading";
+import { useFormik } from 'formik';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { IoMdArrowBack } from 'react-icons/io';
+import { MdDateRange } from 'react-icons/md';
+import { safraService } from 'src/services';
+import Swal from 'sweetalert2';
+import {
+  Button, Content, Input, Radio,
+} from '../../../../components';
+import * as ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 interface ISafraProps {
   id_culture: number;
@@ -35,25 +37,23 @@ export default function Safra() {
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "TMG" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
-  const [checkInput, setCheckInput] = useState("text-black");
+  const [checkInput, setCheckInput] = useState('text-black');
   const [checkeBox, setCheckeBox] = useState<boolean>();
   const [checkeBox2, setCheckeBox2] = useState<boolean>();
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
 
   const formik = useFormik<ISafraProps>({
     initialValues: {
       id_culture: Number(culture),
-      safraName: "",
+      safraName: '',
       year: 0,
-      plantingStartTime: "",
-      plantingEndTime: "",
+      plantingStartTime: '',
+      plantingEndTime: '',
       main_safra: 0,
       status: 1,
       created_by: Number(userLogado.id),
@@ -61,12 +61,14 @@ export default function Safra() {
     onSubmit: async (values) => {
       const { main_safra, ...data } = values;
 
-      const { created_by, id_culture, status, ...inputs } = data;
+      const {
+        created_by, id_culture, status, ...inputs
+      } = data;
 
       validateInputs(inputs);
       if (!values.safraName || !values.year) {
         Swal.fire(
-          "Preencha todos os campos obrigatórios destacados em vermelho."
+          'Preencha todos os campos obrigatórios destacados em vermelho.',
         );
         setLoading(false);
         return;
@@ -75,14 +77,14 @@ export default function Safra() {
       let plantingEndTime;
 
       if (values.plantingStartTime) {
-        plantingStartTime = new Intl.DateTimeFormat("pt-BR").format(
-          new Date(formik.values.plantingStartTime)
+        plantingStartTime = new Intl.DateTimeFormat('pt-BR').format(
+          new Date(formik.values.plantingStartTime),
         );
       }
 
       if (values.plantingEndTime) {
-        plantingEndTime = new Intl.DateTimeFormat("pt-BR").format(
-          new Date(formik.values.plantingEndTime)
+        plantingEndTime = new Intl.DateTimeFormat('pt-BR').format(
+          new Date(formik.values.plantingEndTime),
         );
       }
 
@@ -98,7 +100,7 @@ export default function Safra() {
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire("Safra cadastrada com sucesso!");
+            Swal.fire('Safra cadastrada com sucesso!');
             setLoading(false);
             router.back();
           } else {
@@ -111,15 +113,15 @@ export default function Safra() {
 
   function validateInputs(values: Input) {
     if (!values.safraName || !values.year) {
-      const inputSafraName: any = document.getElementById("safraName");
-      const inputYear: any = document.getElementById("year");
-      inputSafraName.style.borderColor = "red";
-      inputYear.style.borderColor = "red";
+      const inputSafraName: any = document.getElementById('safraName');
+      const inputYear: any = document.getElementById('year');
+      inputSafraName.style.borderColor = 'red';
+      inputYear.style.borderColor = 'red';
     } else {
-      const inputSafraName: any = document.getElementById("safraName");
-      const inputYear: any = document.getElementById("year");
-      inputSafraName.style.borderColor = "";
-      inputYear.style.borderColor = "";
+      const inputSafraName: any = document.getElementById('safraName');
+      const inputYear: any = document.getElementById('year');
+      inputSafraName.style.borderColor = '';
+      inputYear.style.borderColor = '';
     }
   }
 

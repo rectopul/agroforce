@@ -26,7 +26,7 @@ export class ReporteController {
   }
 
   async create({
-    userId, operation, module, oldValue,
+    userId, operation, module, oldValue, ip,
   }: any) {
     try {
       oldValue = String(oldValue);
@@ -35,6 +35,7 @@ export class ReporteController {
         userId,
         operation,
         oldValue,
+        ip,
       };
       await this.reporteRepository.create(data);
     } catch (error: any) {
