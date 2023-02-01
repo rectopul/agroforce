@@ -60,7 +60,7 @@ export class FocoController {
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
-      if (options.orderBy != 'group.group') {
+      if (options.orderBy && options.orderBy != 'group.group') {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       } else {

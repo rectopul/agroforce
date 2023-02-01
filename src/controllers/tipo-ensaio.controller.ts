@@ -63,7 +63,7 @@ export class TypeAssayController {
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
 
-      if (options.orderBy != 'envelope.seeds' && options.orderBy != 'envelope.safra.safraName') {
+      if (options.orderBy && (options.orderBy != 'envelope.seeds' && options.orderBy != 'envelope.safra.safraName')) {
         orderBy = handleOrderForeign(options.orderBy, options.typeOrder);
         orderBy = orderBy || `{"${options.orderBy}":"${options.typeOrder}"}`;
       } else {
