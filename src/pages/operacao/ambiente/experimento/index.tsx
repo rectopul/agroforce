@@ -1217,13 +1217,17 @@ export default function Listagem({
   function checkValidAmbiente(data: any, AllNPERecords: any) {
     console.log('checkValidAmbiente', 'name_local_culture:', data?.local?.name_local_culture, 'data', data);
     console.log('AllNPERecords', AllNPERecords);
-
+    
+    const name_local_culture_current = data?.local?.name_local_culture;
+    
     const npe:any = Object.values(AllNPERecords).find((npe: any) => {
       // find by data.id === env?.env?.id
       if (data.id === npe?.env?.id) {
         return true;
       }
     });
+    
+    
     
     console.log('npe.isNccAvailable', npe?.isNccAvailable);
     
@@ -1304,7 +1308,7 @@ export default function Listagem({
                           ?'#d3d3d3' :'#fc6924'
                       : rowData.npef >= rowData.nextNPE.npei_i
                         ? '#FF5349'
-                        : checkValidAmbiente(NPESelectedRow, allNPERecords) ?'#f9fafb':'#ff8449',
+                        : checkValidAmbiente(rowData, allNPERecords) ?'#f9fafb':'#ff8449',
                   height: 40,
                 }),
                 search: false,
