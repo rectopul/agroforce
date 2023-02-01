@@ -20,8 +20,8 @@ import {
   Content,
   Input,
   Select,
-} from "../../../../components";
-import * as ITabs from "../../../../shared/utils/dropdown";
+} from '../../../../components';
+import * as ITabs from '../../../../shared/utils/dropdown';
 import ComponentLoading from '../../../../components/Loading';
 
 interface IDepartment {
@@ -185,7 +185,7 @@ export default function AtualizarUsuario({
         return;
       }
       if (values.password !== values.confirmPassword) {
-        Swal.fire("As senhas devem ser iguais");
+        Swal.fire('As senhas devem ser iguais');
         setLoading(false);
         return;
       }
@@ -230,13 +230,12 @@ export default function AtualizarUsuario({
           password: values.password,
           registration: values.registration,
           departmentId: values.departmentId,
-          status: values.status,
           cultures: auxObject,
           created_by: values.created_by,
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire("Usuário atualizado com sucesso!");
+            Swal.fire('Usuário atualizado com sucesso!');
             setLoading(false);
             router.back();
           } else {
@@ -527,7 +526,7 @@ export default function AtualizarUsuario({
                 bgColor="bg-blue-600"
                 icon={<RiUserSettingsLine size={18} />}
                 textColor="white"
-                onClick={() => {setLoading(true);}}
+                onClick={() => { setLoading(true); }}
               />
             </div>
           </div>

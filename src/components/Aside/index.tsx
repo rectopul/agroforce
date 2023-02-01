@@ -9,7 +9,7 @@ import { BsGear } from 'react-icons/bs';
 import { useRouter } from 'next/router';
 import { ButtonAside } from './ButtonAside';
 
-const versionApp = '0.0.23.3';
+const versionApp = '0.0.23.4';
 
 export function Aside({ moduloActive }: any) {
   const aArray = versionApp.split('.');
@@ -52,7 +52,7 @@ export function Aside({ moduloActive }: any) {
         <ButtonAside
           title="Relatórios"
           icon={<FaBars size={32} />}
-          href="/relatorios"
+          href="/logs"
           active={moduloActive === 'relatorios'}
         />
         {/*

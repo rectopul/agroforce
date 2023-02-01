@@ -12,13 +12,14 @@ import { ExperimentGenotipeController } from '../experiment-genotipe.controller'
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 import { NpeController } from '../npe/npe.controller';
 import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';
+import { ReporteController } from '../reportes/reporte.controller';
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
 
   assayListController = new AssayListController();
 
-  reporteRepository = new ReporteRepository();
+  reporteController = new ReporteController();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -280,7 +281,6 @@ export class ExperimentController {
         }
       }
 
-
       const response: object | any = await this.experimentRepository.findAll(
         parameters,
         select,
@@ -315,7 +315,7 @@ export class ExperimentController {
       return { status: 200, response, total: response.total };
     } catch (error: any) {
       handleError('Experimento controller', 'GetAll', error.message);
-      //throw new Error({name: 'teste', message: '[Controller] - GetAll Experimento erro: ', stack: error.message});
+      // throw new Error({name: 'teste', message: '[Controller] - GetAll Experimento erro: ', stack: error.message});
       throw new Error(`[Controller] - GetAll Experimento erro: \r\n${error.message}`);
     }
   }
@@ -435,9 +435,13 @@ export class ExperimentController {
 
       if (status === 200) {
         const response = await this.experimentRepository.delete(Number(data.id));
-
+        if (response) {
+          const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+          await this.reporteController.create({
+            userId: data.userId, module: 'EXPERIMENTO', operation: 'EXCLUSÃO', oldValue: response.experimentName, ip: String(ip),
+          });
+        }
         const { response: assayList } = await this.assayListController.getOne(Number(experimentExist?.idAssayList));
-
 
         // filter experiments with status 'IMPORTADO'
         const experiments_importeds = assayList?.experiment.filter((experiment: any) => experiment.status === 'IMPORTADO');
@@ -455,19 +459,6 @@ export class ExperimentController {
             });
           });
         }
-
-        // if (!assayList?.experiment.length) {
-        //   await this.assayListController.update({
-        //     id: experimentExist?.idAssayList,
-        //     status: 'IMPORTADO',
-        //   });
-        //   assayList?.genotype_treatment.map(async (treatment: any) => {
-        //     await genotypeTreatment.update({
-        //       id: treatment.id,
-        //       status_experiment: 'IMPORTADO',
-        //     });
-        //   });
-        // }
 
         const { response: ambiente } = await npeController.getAll({
           safraId: experimentExist?.idSafra,

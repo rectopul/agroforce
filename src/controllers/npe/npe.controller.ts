@@ -1,4 +1,5 @@
 import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
+import createXls from 'src/helpers/api/xlsx-global-download';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import handleError from '../../shared/utils/handleError';
 import { NpeRepository } from '../../repository/npe.repository';
@@ -7,9 +8,9 @@ import { GroupController } from '../group.controller';
 import { prisma } from '../../pages/api/db/db';
 import { ExperimentController } from '../experiment/experiment.controller';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
-import {ExperimentGenotipeController} from "../experiment-genotipe.controller";
+import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
+import { ReporteController } from '../reportes/reporte.controller';
 // import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
-import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class NpeController {
   npeRepository = new NpeRepository();
@@ -17,10 +18,10 @@ export class NpeController {
   groupController = new GroupController();
 
   experimentController = new ExperimentController();
-  
+
   experimentGenotipe = new ExperimentGenotipeController();
 
-  reporteRepository = new ReporteRepository();
+  reporteController = new ReporteController();
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
@@ -194,12 +195,12 @@ export class NpeController {
         const next_available_npe = response[response.length - 1].prox_npe;// proximo npe disponivel
         response.map(async (value: any, index: any, elements: any) => {
           const newItem = value;
-          const id = newItem.id;
+          const { id } = newItem;
           const groupId = newItem.group?.id;
-          //const next = elements[index + 1]; // FIXED: desta forma você não consegue pegar o proximo elemento verificando se está no mesmo grupo;
+          // const next = elements[index + 1]; // FIXED: desta forma você não consegue pegar o proximo elemento verificando se está no mesmo grupo;
           // find groupId next element in elements with same group.id
           const next = elements.find((item: any, idx:any) => item.group?.id === groupId && idx > index);
-          
+
           if (next) {
             /**
              * SELECT @npei_search:= MIN(npe.npei) as next_npe
@@ -208,7 +209,7 @@ export class NpeController {
              * AND NOT EXIST(SELECT n2.id FROM npe n2 WHERE n2.id = npe.id)
              * GROUP BY npe.safraId, npe.groupId
              * HAVING ((npe.safraId = @safra AND npe.groupId = @grupo));
-             * 
+             *
              */
 
             if (!newItem.npeQT) {
@@ -216,33 +217,33 @@ export class NpeController {
             }
             newItem.npeRequisitada = 0; // quantidade a ser consumida (contagem de experimentos)
             newItem.nextNPE = next;
-            //newItem.npefView = newItem.npef;
+            // newItem.npefView = newItem.npef;
           } else {
             newItem.npeQT = 'N/A';
             newItem.nextNPE = 0;
             newItem.npeRequisitada = 0;
-            //newItem.npefView = newItem.npef;
+            // newItem.npefView = newItem.npef;
           }
           newItem.nextAvailableNPE = next_available_npe;
           return newItem;
         });
       }
-      
-      for(let i = 0; i < response.length; i++) {
+
+      for (let i = 0; i < response.length; i++) {
         const item = response[i];
-        
+
         const optionsNPE = {
           npe_id: item.id,
-          safra:item.safraId,
+          safra: item.safraId,
           grupo: item.group.id,
-          prox_npe: item.prox_npe
+          prox_npe: item.prox_npe,
         };
-        
-        const {stat, res, msg} = await this.getMinNPE(optionsNPE);
+
+        const { stat, res, msg } = await this.getMinNPE(optionsNPE);
 
         if (stat == 200) {
           let minorNPE = null;
-          for(let j = 0; j < res.length; j++) {
+          for (let j = 0; j < res.length; j++) {
             const npe_x_exp = res[j];
             if (minorNPE == null) {
               minorNPE = npe_x_exp.prox_npe;
@@ -252,14 +253,12 @@ export class NpeController {
           }
           // 185 (minorNPE) - 179 (prox_npe) = 6
           // 201 (minorNPE) - 179 (prox_npe) = 22
-          if((typeof item.nextNPE == 'object' || item.nextNPE === null) && minorNPE !== null) {
+          if ((typeof item.nextNPE === 'object' || item.nextNPE === null) && minorNPE !== null) {
             item.npeQT = minorNPE - item.prox_npe;
           } else {
             item.npeQT = 'N/A';
           }
         }
-        
-        
       }
       if (!response || response.total <= 0) {
         return {
@@ -274,11 +273,10 @@ export class NpeController {
   }
 
   async getMinNPE(options: any) {
-
-    const npe_id = options.npe_id;
-    const prox_npe = options.prox_npe;
-    const safra = options.safra;
-    const grupo = options.grupo;
+    const { npe_id } = options;
+    const { prox_npe } = options;
+    const { safra } = options;
+    const { grupo } = options;
 
     /**
      * @todo: carrega nas parcelas do exp. >= 179
@@ -330,14 +328,13 @@ export class NpeController {
         return { stat: 200, res: response, msg: 'NPE encontrada' };
       }
 
-      return {stat: 405, res: [], msg: 'Id da Npe não informado'};
+      return { stat: 405, res: [], msg: 'Id da Npe não informado' };
     } catch (error: any) {
       handleError('getMinNpe Controller', 'getMinNpe', error.message);
       throw new Error('[Controller] - getMinNpe NPE erro');
     }
-
   }
-  
+
   async getOne(id: number) {
     try {
       if (id) {
@@ -353,9 +350,7 @@ export class NpeController {
       throw new Error('[Controller] - GetOne NPE erro');
     }
   }
-  
-  
-  
+
   async validateNpeiDBA(data: any) {
     try {
       if (data.safra) {
@@ -404,7 +399,7 @@ export class NpeController {
     try {
       if (data) {
         if (data.length === undefined) {
-          const operation = data.status === 1 ? 'Ativação' : 'Inativação';
+          const operation = data.status === 1 ? 'ATIVAÇÃO' : 'INATIVAÇÃO';
           const npe = await this.npeRepository.update(data.id, data);
           if (!npe) return { status: 400, message: 'Npe não encontrado' };
           if (data.status === 0 || data.status === 1) {
@@ -451,9 +446,9 @@ export class NpeController {
 
       if (statusAssay === 200) {
         const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-        // await this.reporteRepository.create({
-        //   madeBy: data.userId, module: 'NPE', operation: 'Exclusão', name: response.npe, ip: JSON.stringify(ip), idOperation: response.id,
-        // });
+        await this.reporteController.create({
+          userId: data.userId, module: 'AMBIENTE', operation: 'EXCLUSÃO', oldValue: response.npe, ip: String(ip),
+        });
         await this.npeRepository.delete(Number(data.id));
         return { status: 200, message: 'NPE excluída' };
       }

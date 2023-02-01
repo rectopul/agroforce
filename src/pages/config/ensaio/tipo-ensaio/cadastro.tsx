@@ -65,8 +65,6 @@ export default function NovoTipoEnsaio() {
         );
         return;
       }
-      const hostName = os.hostname();
-      console.log('🚀 ~ file: cadastro.tsx:69 ~ onSubmit: ~ hostName', hostName);
       setLoading(true);
 
       await typeAssayService

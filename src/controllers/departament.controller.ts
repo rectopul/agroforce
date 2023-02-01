@@ -1,11 +1,12 @@
 import {
   number, object, SchemaOf, string,
 } from 'yup';
+import createXls from 'src/helpers/api/xlsx-global-download';
 import { DepartamentRepository } from '../repository/departament.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
 import handleError from '../shared/utils/handleError';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
-import createXls from 'src/helpers/api/xlsx-global-download';
+import { ReporteController } from './reportes/reporte.controller';
 
 interface DepartmentDTO {
   id: number;
@@ -15,7 +16,7 @@ interface DepartmentDTO {
 }
 
 type CreateDepartmentDTO = Omit<DepartmentDTO, 'id' | 'status'>;
-type UpdateDepartmentDTO = Omit<DepartmentDTO, 'created_by'>;
+type UpdateDepartmentDTO = Omit<DepartmentDTO, ''>;
 type FindOne = Omit<DepartmentDTO, 'name' | 'created_by' | 'status'>;
 
 export class DepartamentController {
@@ -23,7 +24,7 @@ export class DepartamentController {
 
   departamentRepository = new DepartamentRepository();
 
-  reporteRepository = new ReporteRepository();
+  reporteController = new ReporteController();
 
   async getAllDepartaments() {
     try {
@@ -137,9 +138,9 @@ export class DepartamentController {
 
       const setor = await this.departamentRepository.create(data);
 
-      // await this.reporteRepository.create({
-      //   madeBy: data.created_by, module: 'Setor', operation: 'Cadastro', name: data.name, ip: JSON.stringify(ip), idOperation: setor.id,
-      // });
+      await this.reporteController.create({
+        userId: data.created_by, module: 'SETOR', operation: 'CRIAÇÃO', oldValue: setor.name, ip: String(ip),
+      });
       return { status: 200, message: 'Setor cadastrado' };
     } catch (error: any) {
       handleError('Setor Controller', 'Create', error.message);
@@ -149,6 +150,7 @@ export class DepartamentController {
 
   async updateDepartament(data: UpdateDepartmentDTO) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
       const departament = await this.departamentRepository.findOne(data.id);
 
       if (!departament) return { status: 400, message: 'Setor não existente' };
@@ -159,17 +161,20 @@ export class DepartamentController {
         return { status: 400, message: 'Esse item já está cadastro. favor consultar os inativos' };
       }
 
-      await this.departamentRepository.update(data.id, data);
-      // if (departament.status === 1) {
-      //   await this.reporteRepository.create({
-      //     madeBy: departament.created_by, module: 'Setor', operation: 'Edição', name: data.name, ip: JSON.stringify(ip), idOperation: departament.id,
-      //   });
-      // }
-      // if (departament.status === 0) {
-      //   await this.reporteRepository.create({
-      //     madeBy: departament.created_by, module: 'Setor', operation: 'Inativação', name: data.name, ip: JSON.stringify(ip), idOperation: departament.id,
-      //   });
-      // }
+      const response: any = await this.departamentRepository.update(data.id, data);
+      if (data.status === 1) {
+        await this.reporteController.create({
+          userId: data.created_by, module: 'SETOR', operation: 'ATIVAÇÃO', oldValue: response.name, ip: String(ip),
+        });
+      } else if (data.status === 0) {
+        await this.reporteController.create({
+          userId: data.created_by, module: 'SETOR', operation: 'INATIVAÇÃO', oldValue: response.name, ip: String(ip),
+        });
+      } else {
+        await this.reporteController.create({
+          userId: data.created_by, module: 'SETOR', operation: 'EDIÇÃO', oldValue: data.name, ip: String(ip),
+        });
+      }
       return { status: 200, message: 'Setor atualizado' };
     } catch (error: any) {
       handleError('Setor Controller', 'Update', error.message);

@@ -3,6 +3,7 @@ import { SafraRepository } from '../repository/safra.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
 import handleError from '../shared/utils/handleError';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
+import { ReporteController } from './reportes/reporte.controller';
 
 interface Safra {
   id: number;
@@ -17,13 +18,13 @@ interface Safra {
 }
 
 type CreateSafra = Omit<Safra, 'id' | 'main_safra'>;
-type UpdateSafra = Omit<Safra, 'id_culture' | 'created_by' | 'main_safra'>;
+type UpdateSafra = Omit<Safra, 'id_culture' | 'main_safra'>;
 export class SafraController {
   public readonly required = 'Campo obrigatório';
 
   safraRepository = new SafraRepository();
 
-  reporteRepository = new ReporteRepository();
+  reporteController = new ReporteController();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -149,9 +150,9 @@ export class SafraController {
 
       const safra = await this.safraRepository.create(data);
 
-      // await this.reporteRepository.create({
-      //   madeBy: data.created_by, module: 'Safra', operation: 'Cadastro', name: data.safraName, ip: JSON.stringify(ip), idOperation: safra.id,
-      // });
+      await this.reporteController.create({
+        userId: data.created_by, module: 'SAFRA', operation: 'CRIAÇÃO', oldValue: safra.safraName, ip: String(ip),
+      });
 
       return { status: 200, message: 'Safra cadastrada' };
     } catch (error: any) {
@@ -170,28 +171,31 @@ export class SafraController {
           return { status: 400, message: 'Safra não encontrado' };
         }
         const response = await this.safraRepository.update(data.id, data);
-        if (response.status === 0) {
-          // await this.reporteRepository.create({
-          //   madeBy: response.created_by, module: 'Safra', operation: 'Inativação', name: response.safraName, ip: JSON.stringify(ip), idOperation: response.id,
-          // });
+        if (data.status === 1) {
+          await this.reporteController.create({
+            userId: response.created_by, module: 'SAFRA', operation: 'ATIVAÇÃO', oldValue: response.safraName, ip: String(ip),
+          });
+        } else if (data.status === 0) {
+          await this.reporteController.create({
+            userId: response.created_by, module: 'SAFRA', operation: 'INATIVAÇÃO', oldValue: response.safraName, ip: String(ip),
+          });
         }
-        if (response.status === 1) {
-          // await this.reporteRepository.create({
-          //   madeBy: response.created_by, module: 'Safra', operation: 'Edição', name: response.safraName, ip: JSON.stringify(ip), idOperation: response.id,
-          // });
-        }
+
         if (!response) {
           return { status: 400, response: [], message: 'Safra não atualizado' };
         }
 
         return { status: 200, response };
       }
-      const safraAlreadyExists = await this.safraRepository.findBySafraName(
-        data,
-      );
-      if (safraAlreadyExists) {
-        return { status: 400, message: 'Safra já registrado' };
-      }
+      // const safraAlreadyExists = await this.safraRepository.findBySafraName(
+      //   data,
+      // );
+      // if (safraAlreadyExists) {
+      //   return { status: 400, message: 'Safra já registrado' };
+      // }
+      await this.reporteController.create({
+        userId: data.created_by, module: 'SAFRA', operation: 'EDIÇÃO', oldValue: data.safraName, ip: String(ip),
+      });
       const response = await this.safraRepository.update(data.id, data);
       if (!response) {
         return { status: 400, response: [], message: 'Safra não atualizado' };

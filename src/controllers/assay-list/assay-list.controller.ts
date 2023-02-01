@@ -1,3 +1,4 @@
+import createXls from 'src/helpers/api/xlsx-global-download';
 import handleError from '../../shared/utils/handleError';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { AssayListRepository } from '../../repository/assay-list.repository';
@@ -5,14 +6,14 @@ import { ReporteRepository } from '../../repository/reporte.repository';
 import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';
 import { functionsUtils } from '../../shared/utils/functionsUtils';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
-import createXls from 'src/helpers/api/xlsx-global-download';
+import { ReporteController } from '../reportes/reporte.controller';
 
 export class AssayListController {
   assayListRepository = new AssayListRepository();
 
   genotypeTreatmentController = new GenotypeTreatmentController();
 
-  reporteRepository = new ReporteRepository();
+  reporteController = new ReporteController();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -169,12 +170,11 @@ export class AssayListController {
       if (response?.status === 'EXP IMP.') return { status: 400, message: 'Ensaio já relacionado com um experimento ' };
 
       const { status } = await this.genotypeTreatmentController.deleteAll(data.id);
-      const operation = data.status === 1 ? 'Ativação' : 'Inativação';
       if (status === 200) {
         const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-        // await this.reporteRepository.create({
-        //   madeBy: data.userId, module: 'Ensaio', operation, name: response.type_assay.name, ip: JSON.stringify(ip), idOperation: response.id,
-        // });
+        await this.reporteController.create({
+          userId: data.userId, module: 'ENSAIO', operation: 'EXCLUSÃO', oldValue: response.gli, ip: String(ip),
+        });
         await this.assayListRepository.delete(Number(data.id));
         return { status: 200, message: 'Lista de ensaio excluída' };
       }
