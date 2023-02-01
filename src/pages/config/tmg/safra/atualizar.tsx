@@ -93,7 +93,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
           year: Number(formik.values.year),
           plantingStartTime,
           plantingEndTime,
-          status: formik.values.status,
+          created_by: userLogado?.id,
         })
         .then((response) => {
           if (response.status === 200) {
@@ -124,7 +124,7 @@ export default function AtualizarSafra(safra: ISafraProps) {
 
   return (
     <>
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Atualizar safra</title>
       </Head>

@@ -19,7 +19,7 @@ interface ITypeAssayProps {
   id_culture: number;
   name: string | any;
   protocolName: string | any;
-  created_by: number;
+  userId: number;
   status: number;
 }
 
@@ -65,8 +65,6 @@ export default function NovoTipoEnsaio() {
         );
         return;
       }
-      const hostName = os.hostname();
-      console.log('🚀 ~ file: cadastro.tsx:69 ~ onSubmit: ~ hostName', hostName);
       setLoading(true);
 
       await typeAssayService

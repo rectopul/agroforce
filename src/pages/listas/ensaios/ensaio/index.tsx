@@ -54,17 +54,17 @@ import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactor
 import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 
 export default function TipoEnsaio({
-      allAssay,
-      itensPerPage,
-      filterApplication,
-      totalItems,
-      idSafra,
-      idCulture,
-      pageBeforeEdit,
-      filterBeforeEdit,
-      typeOrderServer,
-      orderByserver,
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allAssay,
+  itensPerPage,
+  filterApplication,
+  totalItems,
+  idSafra,
+  idCulture,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  typeOrderServer,
+  orderByserver,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns('listas');
@@ -592,9 +592,8 @@ export default function TipoEnsaio({
       .getAll(filterParam)
       .then(({ status, response }) => {
         if (status === 200) {
-          
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, response, "Tipo_Ensaio");
+          XLSX.utils.book_append_sheet(workBook, response, 'Tipo_Ensaio');
 
           // Buffer
           XLSX.write(workBook, {

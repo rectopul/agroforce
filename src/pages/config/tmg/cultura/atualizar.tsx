@@ -18,7 +18,6 @@ export interface IUpdateCulture {
   id: number;
   name: string;
   desc: string;
-  status: number;
   created_by: number;
 }
 
@@ -41,7 +40,6 @@ export default function Cultura(culture: IUpdateCulture) {
       id: culture.id,
       name: culture.name,
       desc: culture.desc,
-      status: culture.status,
       created_by: 0,
     },
     onSubmit: async (values) => {
@@ -56,7 +54,6 @@ export default function Cultura(culture: IUpdateCulture) {
           id: culture.id,
           name: capitalize(formik.values.name),
           desc: capitalize(formik.values.desc),
-          status: formik.values.status,
           created_by: Number(userLogado.id),
         })
         .then((response) => {
@@ -91,7 +88,7 @@ export default function Cultura(culture: IUpdateCulture) {
 
   return (
     <>
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Atualizar cultura</title>
       </Head>
@@ -172,7 +169,7 @@ export default function Cultura(culture: IUpdateCulture) {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<RiPlantLine size={20} />}
-                onClick={() => {setLoading(true);}}
+                onClick={() => { setLoading(true); }}
               />
             </div>
           </div>

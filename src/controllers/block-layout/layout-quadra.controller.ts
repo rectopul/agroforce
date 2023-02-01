@@ -1,16 +1,17 @@
+import createXls from 'src/helpers/api/xlsx-global-download';
 import { LayoutQuadraRepository } from '../../repository/layout-quadra.repository';
 import { ReporteRepository } from '../../repository/reporte.repository';
 import handleError from '../../shared/utils/handleError';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 import { LayoutChildrenController } from '../layout-children.controller';
-import createXls from 'src/helpers/api/xlsx-global-download';
+import { ReporteController } from '../reportes/reporte.controller';
 
 export class LayoutQuadraController {
   layoutQuadraRepository = new LayoutQuadraRepository();
 
   layoutChildrenController = new LayoutChildrenController();
 
-  reporteRepository = new ReporteRepository();
+  reporteController = new ReporteController();
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
@@ -154,13 +155,13 @@ export class LayoutQuadraController {
   async update(data: any) {
     try {
       if (data) {
-        const operation = data.status === 1 ? 'Ativação' : 'Inativação';
+        const operation = data.status === 1 ? 'ATIVAÇÃO' : 'INATIVAÇÃO';
         const layout = await this.layoutQuadraRepository.update(data.id, data);
-        if (data.status === 0 || data.status === 1) {
+        if (data.status === 1 || data.status === 0) {
           const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-          // await this.reporteRepository.create({
-          //   madeBy: layout.created_by, module: 'Quadra-Layout', operation, name: layout.esquema, ip: JSON.stringify(ip), idOperation: layout.id,
-          // });
+          await this.reporteController.create({
+            userId: data.created_by, module: 'LAYOUT DE QUADRA', operation, oldValue: layout.esquema, ip: String(ip),
+          });
         }
         if (!layout) return { status: 400, message: 'Layout de quadra não encontrado' };
         return { status: 200, message: 'Layout de quadra atualizada' };

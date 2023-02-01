@@ -1,11 +1,12 @@
+/* eslint-disable camelcase */
 import {
   number, object, SchemaOf, string,
 } from 'yup';
 import { CulturaRepository } from '../repository/culture.repository';
-import { ReporteRepository } from '../repository/reporte.repository';
 import handleError from '../shared/utils/handleError';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 import createXls from '../helpers/api/xlsx-global-download';
+import { ReporteController } from './reportes/reporte.controller';
 
 interface CultureDTO {
   id: number;
@@ -24,7 +25,7 @@ export class CulturaController {
 
   culturaRepository = new CulturaRepository();
 
-  reporteRepository = new ReporteRepository();
+  reporteController = new ReporteController();
 
   async getAllCulture(options: any) {
     options = await removeEspecialAndSpace(options);
@@ -35,7 +36,7 @@ export class CulturaController {
     let select: any = [];
 
     try {
-      if(options.createFile) {
+      if (options.createFile) {
         const sheet = await createXls(options, 'TMG-CULTURA');
         return { status: 200, response: sheet };
       }
@@ -153,14 +154,9 @@ export class CulturaController {
       }
       const culture = await this.culturaRepository.create(data);
 
-      // await this.reporteRepository.create({
-      //   madeBy: data.created_by,
-      //   module: 'Cultura',
-      //   operation: 'Cadastro',
-      //   name: data.desc,
-      //   ip: JSON.stringify(ip),
-      //   idOperation: culture.id,
-      // });
+      await this.reporteController.create({
+        userId: data.created_by, module: 'CULTURA', operation: 'CRIAÇÃO', oldValue: data.name, ip: String(ip),
+      });
       return { status: 200, message: 'Cultura cadastrada' };
     } catch (err) {
       console.log(err);
@@ -168,13 +164,18 @@ export class CulturaController {
     }
   }
 
-  async updateCulture(data: UpdateCultureDTO) {
+  async updateCulture(data: any) {
+    console.log('🚀 ~ file: cultura.controller.ts:168 ~ CulturaController ~ updateCulture ~ data', data);
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json')
         .then((results) => results.json())
         .catch(() => '0.0.0.0');
 
       const culture = await this.culturaRepository.findOne(data.id);
+
+      const { created_by } = data;
+      // eslint-disable-next-line no-param-reassign
+      delete data.created_by;
 
       if (!culture) return { status: 400, message: 'Cultura não existente' };
 
@@ -186,35 +187,28 @@ export class CulturaController {
         return { status: 400, message: 'Cultura ja cadastrada' };
       }
 
-      culture.name = data.name;
-      culture.desc = data.desc;
-      culture.status = data.status;
-
-      await this.culturaRepository.update(data.id, culture);
+      const response = await this.culturaRepository.update(data.id, data);
+      if (!response) {
+        return { status: 400, response: [], message: 'Tipo de ensaio não atualizado' };
+      }
 
       if (data.status === 1) {
-        // await this.reporteRepository.create({
-        //   madeBy: data.created_by,
-        //   module: 'Cultura',
-        //   operation: 'Edição',
-        //   idOperation: data.id,
-        //   name: data.desc,
-        //   ip: JSON.stringify(ip),
-        // });
-      }
-      if (data.status === 0) {
-        // await this.reporteRepository.create({
-        //   madeBy: data.created_by,
-        //   module: 'Cultura',
-        //   operation: 'Inativação',
-        //   idOperation: data.id,
-        //   name: data.desc,
-        //   ip: JSON.stringify(ip),
-        // });
+        await this.reporteController.create({
+          userId: created_by, module: 'CULTURA', operation: 'ATIVAÇÃO', oldValue: response.desc, ip: String(ip),
+        });
+      } else if (data.status === 0) {
+        await this.reporteController.create({
+          userId: created_by, module: 'CULTURA', operation: 'INATIVAÇÃO', oldValue: response.desc, ip: String(ip),
+        });
+      } else {
+        await this.reporteController.create({
+          userId: created_by, module: 'CULTURA', operation: 'EDIÇÃO', oldValue: data.desc, ip: String(ip),
+        });
       }
 
       return { status: 200, message: 'Cultura atualizada' };
     } catch (err) {
+      console.log('🚀 ~ file: cultura.controller.ts:210 ~ CulturaController ~ updateCulture ~ err', err);
       return { status: 404, message: 'Erro ao atualizar' };
     }
   }

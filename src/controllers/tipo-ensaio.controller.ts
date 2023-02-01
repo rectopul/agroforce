@@ -135,14 +135,14 @@ export class TypeAssayController {
 
   async create(data: object | any) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+
       const assayTypeAlreadyExist = await this.getByData(data);
       if (assayTypeAlreadyExist.status === 200) return { status: 404, message: 'Tipo de ensaio já existe, favor checar registros inativos.' };
       const response = await this.typeAssayRepository.create(data);
 
-      const hostName = os.hostname();
-      console.log('🚀 ~ file: tipo-ensaio.controller.ts:143 ~ TypeAssayController ~ create ~ hostName', hostName);
       await this.reporteController.create({
-        userId: data.created_by, module: 'TIPO DE ENSAIO', operation: 'CRIAÇÃO', oldValue: data.name,
+        userId: data.created_by, module: 'TIPO DE ENSAIO', operation: 'CRIAÇÃO', oldValue: data.name, ip: String(ip),
       });
       if (!response) {
         return { status: 400, response: [], message: 'Tipo de ensaio não cadastrado' };
@@ -157,27 +157,34 @@ export class TypeAssayController {
 
   async update(data: any) {
     try {
-      if (data) {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+      const { created_by } = data;
+      delete data.created_by;
+      if (data.status || data.status == 0) {
         const assayTypeAlreadyExist = await this.getOne(data.id);
         if (assayTypeAlreadyExist.status !== 200) return { status: 400, message: 'Tipo de ensaio não encontrado' };
+
         const response = await this.typeAssayRepository.update(data.id, data);
         if (!response) {
           return { status: 400, response: [], message: 'Tipo de ensaio não atualizado' };
         }
         if (response.status === 1) {
           await this.reporteController.create({
-            userId: data.created_by, module: 'TIPO DE ENSAIO', operation: 'INATIVAÇÃO', oldValue: data.name,
+            userId: created_by, module: 'TIPO DE ENSAIO', operation: 'ATIVAÇÃO', oldValue: response.name, ip: String(ip),
           });
         }
         if (response.status === 0) {
           await this.reporteController.create({
-            userId: data.created_by, module: 'TIPO DE ENSAIO', operation: 'ATIVAÇÃO', oldValue: data.name,
+            userId: created_by, module: 'TIPO DE ENSAIO', operation: 'INATIVAÇÃO', oldValue: response.name, ip: String(ip),
           });
         }
         return { status: 200, response };
       }
       const assayTypeAlreadyExist = await this.getByData(data);
       if (assayTypeAlreadyExist.status === 200) return { status: 400, message: 'Tipo de ensaio já registrado' };
+      await this.reporteController.create({
+        userId: created_by, module: 'TIPO DE ENSAIO', operation: 'EDIÇÃO', oldValue: data.name, ip: String(ip),
+      });
       const response = await this.typeAssayRepository.update(data.id, data);
       if (!response) {
         return { status: 400, response: [], message: 'Tipo de ensaio não atualizado' };
