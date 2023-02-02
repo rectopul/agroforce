@@ -39,7 +39,6 @@ export class LogImportController {
   }
 
   async update(data: any) {
-    console.log('🚀 ~ file: log-import.controller.ts:42 ~ LogImportController ~ update ~ data', data);
     try {
       if (data.reset) {
         const response = await this.logImportRepository.reset();

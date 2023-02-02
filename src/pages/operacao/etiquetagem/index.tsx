@@ -28,6 +28,7 @@ import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import { AiOutlinePrinter } from 'react-icons/ai';
+import moment from 'moment';
 import { IGenerateProps } from '../../../interfaces/shared/generate-props.interface';
 
 import {
@@ -619,12 +620,13 @@ export default function Listagem({
 
           newItem.CULTURA = item.safra.culture.name;
           newItem.SAFRA = item.safra.safraName;
-          newItem.GRUPO = item.name;
+          newItem.GRUPO_DE_ETIQUETAGEM = item.name;
           newItem.QTDE_EXP = item.experimentAmount;
           newItem.ETIQ_A_IMPRIMIR = item.tagsToPrint;
           newItem.ETIQ_IMPRESSAS = item.tagsPrinted;
           newItem.TOTAL_ETIQUETAS = item.totalTags;
-          newItem.STATUS = item.status;
+          newItem.STATUS_GRUPO_EXP = item.status;
+          newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
           delete newItem.id;
           delete newItem.safraId;
@@ -1352,7 +1354,10 @@ export const getServerSideProps: GetServerSideProps = async ({
     credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
-  const { response: allExperimentGroup = [], total: totalItems = 0 } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
+  const {
+    response: allExperimentGroup = [],
+    total: totalItems = 0,
+  } = await fetch(urlParameters.toString(), requestOptions).then((response) => response.json());
 
   const safraId = idSafra;
 

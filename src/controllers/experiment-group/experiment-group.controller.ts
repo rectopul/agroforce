@@ -201,7 +201,6 @@ export class ExperimentGroupController {
         safraId: data.safraId,
         filterExperimentGroup: data.name,
       });
-      console.log('🚀 ~ file: experiment-group.controller.ts:204 ~ ExperimentGroupController ~ update ~ validate', validate);
 
       if (validate.length > 0) return { status: 404, message: 'Nome do grupo já existe na safra' };
 
