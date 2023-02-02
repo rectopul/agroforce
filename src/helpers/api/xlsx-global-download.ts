@@ -900,16 +900,20 @@ async function callEnsaioGenotipeXlsxDownload(options: any) {
       newItem.GGEN = `${item.genotipo.tecnologia.cod_tec} ${item.genotipo.tecnologia.name}`;
       newItem.GLI = item.assay_list.gli;
       newItem.BGM = item.assay_list.bgm;
-      newItem.BGM_GENÓTIPO = item.genotipo.bgm;
-      newItem.GMR_GEN = item.genotipo.gmr;
-      newItem.NT = item.treatments_number;
-      newItem.STATUS_T = item.status;
       newItem.STATUS_ENSAIO = item.assay_list.status;
-      newItem.GENOTIPO = item.genotipo.name_genotipo;
+      newItem.PROJETO = item.assay_list.project;
+      newItem.COMENTÁRIOS = item.assay_list.status;
+      newItem.FASE = item.lote.fase;
+      newItem.NT = item.treatments_number;
+      newItem.NOME_DO_GENOTIPO = item.genotipo.name_genotipo;
+      newItem.GMR_GEN = item.genotipo.gmr;
+      newItem.BGM_GENÓTIPO = item.genotipo.bgm;
+      newItem.STATUS_T = item.status;
       newItem.NCA = String(item.lote.ncc);
-
+      newItem.COD_LOTE = String(item.lote.cod_lote);
+      newItem.OBS = item.comments;
+      newItem.STATUS_TRAT = item.status_experiment;
       newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
-
       return newItem;
     });
 
@@ -942,24 +946,24 @@ async function callExperimentosExperimentoXlsxDownload(options: any) {
       newItem.CULTURA = item.assay_list?.safra?.culture?.name;
       newItem.SAFRA = item.assay_list?.safra?.safraName;
       newItem.FOCO = item.assay_list?.foco.name;
-      newItem.TIPO_DE_ENSAIO = item.assay_list?.type_assay.name;
-      newItem.TECNOLOGIA = `${item.assay_list?.tecnologia.cod_tec} ${item.assay_list?.tecnologia.name}`;
+      newItem.ENSAIO = item.assay_list?.type_assay.name;
       newItem.GLI = item.assay_list?.gli;
       newItem.NOME_DO_EXPERIMENTO = item?.experimentName;
+      newItem.TECNOLOGIA = `${item.assay_list?.tecnologia.cod_tec} ${item.assay_list?.tecnologia.name}`;
+      newItem.ÉPOCA = item?.period;
+      newItem.DELINEAMENTO = item.delineamento?.name;
+      newItem.REP = item.repetitionsNumber;
+      newItem.STATUS_EXP = item.status;
       newItem.BGM = item.assay_list?.bgm;
       newItem.STATUS_ENSAIO = item.assay_list?.status;
-      newItem.PLANTIO = newItem.local?.name_local_culture;
-      newItem.DELINEAMENTO = item.delineamento?.name;
+      newItem.LUGAR_PLANTIO = newItem.local?.name_local_culture;
       newItem.DENSIDADE = item?.density;
-      newItem.REP = item.repetitionsNumber;
-      newItem.ÉPOCA = item?.period;
       newItem.ORDEM_SORTEIO = item?.orderDraw;
       newItem.NLP = item?.nlp;
       newItem.CLP = item?.clp;
       newItem.OBSERVAÇÕES = item?.comments;
       newItem.COUNT_NT = newItem.countNT;
       newItem.NPE_QT = newItem.npeQT;
-
       newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete newItem.id;
@@ -1012,25 +1016,18 @@ async function callAmbienteAmbienteXlsxDownload(options: any) {
   do {
     const { response, status } = await Controller.getAll(options);
     const newData = response.map((row: any) => {
-      delete row.avatar;
-      if (row.status === 0) {
-        row.status = 'Inativo';
-      } else {
-        row.status = 'Ativo';
-      }
-
       row.CULTURA = row.safra?.culture?.name;
       row.SAFRA = row.safra?.safraName;
-      row.LOCAL = row.local?.name_local_culture;
+      row.LUGAR_DE_CULTURA = row.local?.name_local_culture;
+      row.STATUS = row.status;
       row.FOCO = row.foco?.name;
-      row.TIPO_ENSAIO = row.type_assay?.name;
+      row.ENSAIO = row.type_assay?.name;
       row.TECNOLOGIA = `${row.tecnologia?.cod_tec} ${row.tecnologia?.name}`;
       row.ÉPOCA = row?.epoca;
       row.NPEI = row.npei;
-      row.NPE_FINAL = row.npef;
       row.PROX_NPE = row.prox_npe;
-      row.GRUPO = row.group.group;
-
+      row.NPE_FINAL = row.npef;
+      row.GRP = row.group.group;
       row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete row.nextAvailableNPE;

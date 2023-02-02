@@ -747,51 +747,11 @@ export default function Listagem({
     const take = 10;
 
     const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
-    // await experimentGenotipeService
-    //   .getAll(filterParam)
-    //   .then(async ({ status, response }) => {
-    //     skip = 1000;
-    //     let res = response;
-    //     // writestream
-    //     while (res.length > 0) {
-    //       const filterParam1 = `${filter}&skip=${skip}&take=${take}`;
-    //       await experimentGenotipeService.getAll(filterParam1).then(({ status, response }) => {
-    //         // logic
-    //         res = response;
-    //         skip += 1000;
-    //       })
-    //     }
-    //   })
+
     await experimentGenotipeService
       .getAll(filterParam)
       .then(({ status, response }) => {
         if (status === 200) {
-          // const expGenCon = new ExperimentGenotipeController();
-          // expGenCon.createXls();
-          // const newData = response.map((item: any) => {
-          //   const newItem: any = {};
-          //   newItem.CULTURA = item.safra.culture.name;
-          //   newItem.SAFRA = item.safra.safraName;
-          //   newItem.FOCO = item.foco.name;
-          //   newItem.ENSAIO = item.type_assay.name;
-          //   newItem.TECNOLOGIA = `${item.tecnologia.cod_tec} ${item.tecnologia.name}`;
-          //   newItem.GLI = item.gli;
-          //   newItem.EXPERIMENTO = item.experiment.experimentName;
-          //   newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
-          //   newItem.DELINEAMENTO = item.experiment.delineamento.name;
-          //   newItem.REP = item.rep;
-          //   newItem.NT = item.nt;
-          //   newItem.NPE = item.npe;
-          //   newItem.STATUS_T = item.status_t;
-          //   newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
-          //   newItem.NCA = item.nca;
-          //   newItem.STATUS_EXP = item.experiment.status;
-
-          //   delete newItem.id;
-          //   return newItem;
-          // });
-
-          // let workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
           // workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
           XLSX.utils.book_append_sheet(workBook, response, 'Parcelas');

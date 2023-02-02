@@ -28,6 +28,7 @@ import Modal from 'react-modal';
 import * as XLSX from 'xlsx';
 import { HiArrowNarrowRight } from 'react-icons/hi';
 import { functionsUtils } from 'src/shared/utils/functionsUtils';
+import moment from 'moment';
 import { ITreatment } from '../../../interfaces/listas/ensaio/genotype-treatment.interface';
 import { IGenerateProps } from '../../../interfaces/shared/generate-props.interface';
 
@@ -622,13 +623,14 @@ export default function Listagem({
             newItem.EXPERIMENTO = item.experiment.experimentName;
             newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
             newItem.DELINEAMENTO = item.experiment.delineamento.name;
-            newItem.REP = item.rep;
+            newItem.REP_EXP = item.rep;
+            newItem.STATUS_PARCELA = item.status;
             newItem.NT = item.nt;
             newItem.NPE = item.npe;
             newItem.STATUS_T = item.status_t;
             newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
             newItem.NCA = item.nca;
-            newItem.STATUS_EXP = item.experiment.status;
+            newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
             delete newItem.id;
             return newItem;
@@ -1663,14 +1665,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
-  if (lastPageServer == undefined || lastPageServer == 'No') {
-    removeCookies('filterBeforeEdit', { req, res });
-    removeCookies('pageBeforeEdit', { req, res });
-    removeCookies('filterBeforeEditTypeOrder', { req, res });
-    removeCookies('filterBeforeEditOrderBy', { req, res });
-    removeCookies('lastPage', { req, res });
-  }
-
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;
@@ -1694,9 +1688,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   const experimentGroupId = query.id;
 
   const filterApplication = `&id_culture=${idCulture}&id_safra=${idSafra}&experimentGroupId=${experimentGroupId}`;
-
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
 
   const param = `&id_culture=${idCulture}&id_safra=${idSafra}&experimentGroupId=${experimentGroupId}`;
 
