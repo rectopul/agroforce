@@ -13,6 +13,7 @@
 -- DropForeignKey
 ALTER TABLE `PrintHistory` DROP FOREIGN KEY `PrintHistory_experimentGenotypeId_fkey`;
 
+DROP TABLE `PrintHistory`;
 -- DropForeignKey
 ALTER TABLE `PrintHistory` DROP FOREIGN KEY `PrintHistory_userId_fkey`;
 
@@ -33,7 +34,6 @@ ALTER TABLE `reportes` DROP COLUMN `idOperation`,
     ADD COLUMN `userId` INTEGER NOT NULL;
 
 -- DropTable
-DROP TABLE `PrintHistory`;
 
 -- CreateIndex
 CREATE UNIQUE INDEX `experiment_genotipe_idSafra_groupValue_npe_key` ON `experiment_genotipe`(`idSafra`, `groupValue`, `npe`);

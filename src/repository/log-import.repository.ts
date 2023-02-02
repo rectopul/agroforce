@@ -24,11 +24,9 @@ export class LogImportRepository {
     id: number,
     data: any,
   ) {
-    console.log('🚀 ~ file: log-import.repository.ts:27 ~ LogImportRepository ~ data', data);
     if (!data.updated_at) {
       data.updated_at = null;
     }
-    console.log('🚀 ~ file: log-import.repository.ts:29 ~ LogImportRepository ~ data', data);
     const result = await prisma.log_import.update({
       where: { id },
       data,

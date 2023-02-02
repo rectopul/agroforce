@@ -41,8 +41,6 @@ export class TypeAssayRepository {
   }
 
   async update(id: number, data: any) {
-    console.log('🚀 ~ file: tipo-ensaio.repository.ts:44 ~ TypeAssayRepository ~ update ~ id', id);
-    console.log('🚀 ~ file: tipo-ensaio.repository.ts:44 ~ TypeAssayRepository ~ update ~ data', data);
     const result = await prisma.type_assay.update({
       where: {
         id,

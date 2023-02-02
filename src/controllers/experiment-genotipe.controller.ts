@@ -1,5 +1,8 @@
+/* eslint-disable no-loop-func */
+/* eslint-disable no-await-in-loop */
 import { ExperimentGenotipeRepository } from 'src/repository/experiment-genotipe.repository';
 import * as XLSX from 'xlsx';
+import moment from 'moment';
 import { IReturnObject } from '../interfaces/shared/Import.interface';
 import handleError from '../shared/utils/handleError';
 import { ExperimentGroupController } from './experiment-group/experiment-group.controller';
@@ -244,6 +247,11 @@ export class ExperimentGenotipeController {
             local: {
               select: { name_local_culture: true },
             },
+            clp: true,
+            nlp: true,
+            comments: true,
+            density: true,
+            orderDraw: true,
             assay_list: {
               select: {
                 gli: true,
@@ -688,15 +696,23 @@ export class ExperimentGenotipeController {
         newItem.TECNOLOGIA = `${item.tecnologia.cod_tec} ${item.tecnologia.name}`;
         newItem.GLI = item.gli;
         newItem.EXPERIMENTO = item.experiment.experimentName;
-        newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
+        newItem.BGM = item.genotipo.bgm;
+        newItem.STATUS_ENSAIO = item.experiment.assay_list.status;
+        newItem.LUGAR_PLANTIO = item.experiment.local.name_local_culture;
         newItem.DELINEAMENTO = item.experiment.delineamento.name;
-        newItem.REP = item.rep;
+        newItem.REPETIÇÕES = item.rep;
+        newItem.DENSIDADE = item.experiment.densidade ? String(item.experiment.densidade) : '';
+        newItem.ORDEM_SORTEIO = item.experiment.orderDraw ? String(item.experiment.orderDraw) : '';
+        newItem.STATUS_EXP = item.experiment.status;
+        newItem.NLP = item.experiment.nlp ? String(item.experiment.nlp) : '';
+        newItem.CLP = item.experiment.clp ? String(item.experiment.clp) : '';
+        newItem.OBSERVAÇÕES = item.experiment.comments ? String(item.experiment.comments) : '';
+        newItem.STATUS_T = item.status_t;
         newItem.NT = item.nt;
         newItem.NPE = item.npe;
-        newItem.STATUS_T = item.status_t;
         newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
         newItem.NCA = item.nca;
-        newItem.STATUS_EXP = item.experiment.status;
+        newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
         delete newItem.id;
         return newItem;
@@ -719,15 +735,23 @@ export class ExperimentGenotipeController {
             newItem.TECNOLOGIA = `${item.tecnologia.cod_tec} ${item.tecnologia.name}`;
             newItem.GLI = item.gli;
             newItem.EXPERIMENTO = item.experiment.experimentName;
-            newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
+            newItem.BGM = item.genotipo.bgm;
+            newItem.STATUS_ENSAIO = item.experiment.assay_list.status;
+            newItem.LUGAR_PLANTIO = item.experiment.local.name_local_culture;
             newItem.DELINEAMENTO = item.experiment.delineamento.name;
-            newItem.REP = item.rep;
+            newItem.REPETIÇÕES = item.rep;
+            newItem.DENSIDADE = item.experiment.densidade ? String(item.experiment.densidade) : '';
+            newItem.ORDEM_SORTEIO = item.experiment.orderDraw ? String(item.experiment.orderDraw) : '';
+            newItem.STATUS_EXP = item.experiment.status;
+            newItem.NLP = item.experiment.nlp ? String(item.experiment.nlp) : '';
+            newItem.CLP = item.experiment.clp ? String(item.experiment.clp) : '';
+            newItem.OBSERVAÇÕES = item.experiment.comments ? String(item.experiment.comments) : '';
+            newItem.STATUS_T = item.status_t;
             newItem.NT = item.nt;
             newItem.NPE = item.npe;
-            newItem.STATUS_T = item.status_t;
             newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
             newItem.NCA = item.nca;
-            newItem.STATUS_EXP = item.experiment.status;
+            newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
             delete newItem.id;
             return newItem;
