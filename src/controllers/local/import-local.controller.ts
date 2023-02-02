@@ -100,7 +100,7 @@ export class ImportLocalController {
             if (spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]
             || (spreadSheet.length - 1) === Number(row)) {
               if ((spreadSheet.length - 1) === Number(row)
-              && spreadSheet[row][1] === spreadSheet[Number(row) - 1][4]) {
+              && spreadSheet[row][4] === spreadSheet[Number(row) - 1][4]) {
                 validateAll.ROTULO.push(spreadSheet[row][5]);
                 validateAll.MLOC.push(spreadSheet[row][6]);
                 validateAll.ENDERECO.push(spreadSheet[row][7]);

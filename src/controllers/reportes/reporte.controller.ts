@@ -62,7 +62,6 @@ export class ReporteController {
   }
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: reporte.controller.ts:64 ~ ReporteController ~ getAll ~ options', options);
     const parameters: object | any = {};
     parameters.AND = [];
     parameters.OR = [];

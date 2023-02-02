@@ -31,7 +31,6 @@ export class ReporteRepository {
   }
 
   async create(data: any) {
-    console.log('🚀 ~ file: reporte.repository.ts:34 ~ ReporteRepository ~ create ~ data', data);
     const reporte = await prisma.reportes.create({ data });
     return reporte;
   }

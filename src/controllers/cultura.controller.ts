@@ -165,7 +165,6 @@ export class CulturaController {
   }
 
   async updateCulture(data: any) {
-    console.log('🚀 ~ file: cultura.controller.ts:168 ~ CulturaController ~ updateCulture ~ data', data);
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json')
         .then((results) => results.json())
@@ -208,7 +207,6 @@ export class CulturaController {
 
       return { status: 200, message: 'Cultura atualizada' };
     } catch (err) {
-      console.log('🚀 ~ file: cultura.controller.ts:210 ~ CulturaController ~ updateCulture ~ err', err);
       return { status: 404, message: 'Erro ao atualizar' };
     }
   }
