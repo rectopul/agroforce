@@ -1,7 +1,7 @@
+import createXls from 'src/helpers/api/xlsx-global-download';
 import handleError from '../../shared/utils/handleError';
 import { LocalRepository } from '../../repository/local.repository';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
-import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class LocalController {
   localRepository = new LocalRepository();
@@ -85,6 +85,13 @@ export class LocalController {
         skip,
         orderBy,
       );
+
+      response.map((local: any) => {
+        const dts = local.cultureUnity.map((unity: any) => unity.dt_export);
+        const maxDt = Math.max(...dts);
+        local.dt_export = new Date(maxDt);
+      });
+
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }
