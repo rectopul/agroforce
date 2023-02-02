@@ -616,7 +616,7 @@ model experiment_genotipe {
   nt                  Int
   npe                 Int
   nca                 String?
-  groupValue          Int?
+  groupValue          Int?      @default(0)
   status              String    @default("SORTEADO")
   status_t            String    @default("L")
   counter             Int       @default(0)
