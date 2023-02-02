@@ -706,7 +706,7 @@ export default function Listagem({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'NPE.xlsx');
+        XLSX.writeFile(workBook, 'AMBIENTE.xlsx');
       } else {
         setLoading(false);
         Swal.fire('Não existem registros para serem exportados, favor checar.');

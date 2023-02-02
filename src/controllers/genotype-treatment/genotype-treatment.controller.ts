@@ -190,6 +190,8 @@ export class GenotypeTreatmentController {
             gli: true,
             bgm: true,
             status: true,
+            project: true,
+            comments: true,
           },
         },
         comments: true,

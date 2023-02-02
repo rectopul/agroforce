@@ -51,8 +51,7 @@ async function callExperimentGenotipeXlsxDownload(options: any) {
       newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
       newItem.NCA = item.nca;
       newItem.STATUS_EXP = item.experiment.status;
-      newItem.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      newItem.DT_GOM = newItem.DT;
+      newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete newItem.id;
       return newItem;
@@ -91,8 +90,7 @@ async function callTmgCulturaXlsxDownload(options: any) {
       row.COD_REDUZIDO = row.name;
       row.NOME = row.desc;
       row.STATUS = row.status;
-      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      row.DT_GOM = row.DT;
+      row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete row.desc;
       delete row.status;
@@ -137,9 +135,7 @@ async function callTmgUsuarioXlsxDownload(options: any) {
       line.TEL = line.tel;
       line.STATUS = line.status;
       line.CPF = line.cpf;
-
-      line.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      line.DT_GOM = line.DT;
+      line.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete line.avatar;
       delete line.id;
@@ -184,9 +180,7 @@ async function callTmgSetorXlsxDownload(options: any) {
       }
       row.NOME = row.name;
       row.STATUS = row.status;
-
-      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      row.DT_GOM = row.DT;
+      row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete row.name;
       delete row.status;
@@ -233,9 +227,7 @@ async function callTmgSafraXlsxDownload(options: any) {
       row.INICIO_PLANTIO = row.plantingStartTime;
       row.FIM_PLANTIO = row.plantingEndTime;
       row.STATUS = row.status;
-
-      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      row.DT_GOM = row.DT;
+      row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete row.safraName;
       delete row.culture;
@@ -286,17 +278,22 @@ async function callTmgGenotipeXlsxDownload(options: any) {
       row.TIPO = row.type;
       row.GMR = row.gmr;
       row.BGM = row.bgm;
-      row.CRUZA = row.cruza;
+      row.CRUZA_DE_ORIGEM = row.cruza;
       row.PROGENITOR_F_DIRETO = row.progenitor_f_direto;
       row.PROGENITOR_M_DIRETO = row.progenitor_m_direto;
       row.PROGENITOR_F_ORIGEM = row.progenitor_f_origem;
       row.PROGENITOR_M_ORIGEM = row.progenitor_m_origem;
       row.PROGENITORES_ORIGEM = row.progenitores_origem;
       row.PARENTESCO_COMPLETO = row.parentesco_completo;
+      row.ANO = String(row.lote[0]?.year);
+      row.COD_LOTE = String(row.lote[0]?.cod_lote);
+      row.NCC = String(row.lote[0]?.ncc);
+      row.PESO = row.lote[0]?.peso ? String(row.lote[0]?.peso) : '';
+      row.FASE = row.lote[0]?.fase ? String(row.lote[0]?.fase) : '';
+      row.QUANT_SEMENTES = row.lote[0]?.quant_sementes ? String(row.lote[0]?.quant_sementes) : '';
       row.dt_export = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
-      row.DT_EXPORT = row.dt_export;
-      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      row.DT_GOM = row.DT;
+      row.DT_RD = row.dt_export;
+      row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete row.culture;
       delete row.id_s1;
@@ -368,18 +365,18 @@ async function callTmgLoteXlsxDownload(options: any) {
       newItem.CULTURA = item?.genotipo.culture.name;
       newItem.ANO = item?.year;
       newItem.SAFRA = item?.safra.safraName;
-      newItem.COD_LOTE = item?.cod_lote;
-      newItem.NCC = item?.ncc;
-      newItem.FASE = item?.fase;
-      newItem.PESO = item?.peso;
+      newItem.COD_LOTE = String(item?.cod_lote);
+      newItem.NCC = String(item?.ncc);
+      newItem.FASE = item?.fase ? String(item?.fase) : '';
+      newItem.PESO = item?.peso ? String(item?.peso) : '';
       newItem.QUANT_SEMENTES = item?.quant_sementes;
       newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
-      newItem.NOME_PRINCIPAL = item?.genotipo.name_main;
-      newItem.GMR = item?.genotipo.gmr;
-      newItem.BGM = item?.genotipo.bgm;
+      newItem.NOME_PRINCIPAL = String(item?.genotipo.name_main);
+      newItem.GMR = item?.genotipo.gmr ? String(item?.genotipo.gmr) : '';
+      newItem.BGM = item?.genotipo.bgm ? String(item?.genotipo.bgm) : '';
       newItem.TECNOLOGIA = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
-      newItem.DT_EXPORT = newItem.dt_export;
-      newItem.DT_GOM = new Date();
+      newItem.DT_RD = newItem.dt_export;
+      newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete newItem.quant_sementes;
       delete newItem.peso;
@@ -425,25 +422,22 @@ async function callEnsaioTipoDeEnsaioXlsxDownload(options: any) {
     const { response, status } = await Controller.getAll(options);
     const newData = response.map((row: any) => {
       const newRow = row;
-
+      newRow.safra = row.envelope?.safra?.safraName;
       newRow.envelope = row.envelope.seeds;
       newRow.status = row.status === 0 ? 'Inativo' : 'Ativo';
       newRow.CULTURA = newRow.culture.name;
       newRow.NOME = newRow.name;
       newRow.NOME_PROTOCOLO = newRow.protocol_name;
       newRow.QUANT_SEMENTES = newRow.envelope;
-      newRow.SAFRA = newRow.envelope
-        ? newRow.envelope[0]?.safra.safraName
-        : '';
+      newRow.SAFRA = row.safra;
       newRow.STATUS = newRow.status;
-
-      newRow.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      newRow.DT_GOM = newRow.DT;
+      newRow.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete newRow.name;
       delete newRow.culture;
       delete newRow.protocol_name;
       delete newRow.envelope;
+      delete newRow.safra;
       delete newRow.status;
       delete newRow.id;
       return newRow;
@@ -484,9 +478,7 @@ async function callEnsaioFocoXlsxDownload(options: any) {
       row.NOME = row?.name;
       row.GRUPO = row?.group.group;
       row.STATUS = row?.status;
-
-      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      row.DT_GOM = row.DT;
+      row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete row.name;
       delete row.group;
@@ -533,9 +525,8 @@ async function callEnsaioTechnologiaXlsxDownload(options: any) {
       row.DESC = row.desc;
       row.COD_TEC = row.cod_tec;
       row.dt_export = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
-      row.DT_EXPORT = row.dt_export;
-      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      row.DT_GOM = row.DT;
+      row.DT_RD = row.dt_export;
+      row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete row.culture;
       delete row.id;
@@ -584,9 +575,7 @@ async function callDelineamentoXlsxDownload(options: any) {
       row.REPETIÇÃO = row?.repeticao;
       row.TRAT_REPETIÇÃO = row?.trat_repeticao;
       row.STATUS = row?.status;
-
-      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      row.DT_GOM = row.DT;
+      row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete row.name;
       delete row.repeticao;
@@ -634,9 +623,8 @@ async function callLocalLugarCulturaXlsxDownload(options: any) {
       row.REGIÃO = row.label_region;
       row.LOCALIDADE = row.name_locality;
       row.STATUS = row.status;
-
-      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      row.DT_GOM = row.DT;
+      row.DT_RD = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
+      row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete row.name_local_culture;
       delete row.label;
@@ -696,9 +684,8 @@ async function callLocalUnidadeCulturaXlsxDownload(options: any) {
       newRow.REGIÃO = newRow.local?.label_region;
       newRow.LOCALIDADE = newRow.local?.name_locality;
       row.dt_export = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
-      row.DT_EXPORT = row.dt_export;
-      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      row.DT_GOM = row.DT;
+      row.DT_DT = row.dt_export;
+      row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete newRow.year;
       delete newRow.name_unity_culture;
@@ -751,8 +738,7 @@ async function callQuadrasLayoutXlsxDownload(options: any) {
       row.PARCELAS = row.parcelas;
       row.STATUS = row.status;
 
-      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      row.DT_GOM = row.DT;
+      row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete row.esquema;
       delete row.plantadeira;
@@ -799,11 +785,10 @@ async function callRdXlsxDownload(options: any) {
       newItem.USUÁRIO = item.user.name;
       newItem.TABELA = item.table;
       newItem.STATUS = item.state;
-      newItem.INICIO_EM = item.created_at;
-      newItem.FIM_EM = item.updated_at;
-
-      newItem.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      newItem.DT_GOM = newItem.DT;
+      newItem.INICIO = item.created_at;
+      newItem.FIM = item.updated_at;
+      newItem.NOME_DO_ARQUIVO = newItem.filePath;
+      newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete newItem.safra;
       delete newItem.user;
@@ -812,6 +797,7 @@ async function callRdXlsxDownload(options: any) {
       delete newItem.created_at;
       delete newItem.updated_at;
       delete newItem.id;
+      delete newItem.filePath;
       delete newItem.status;
       delete newItem.invalid_data;
       return newItem;
@@ -857,8 +843,7 @@ async function callEnsaioEnsaioXlsxDownload(options: any) {
       newItem.OBSERVAÇÕES = newItem?.comments;
       newItem.NÚMERO_DE_TRATAMENTOS = newItem?.countNT;
 
-      newItem.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      newItem.DT_GOM = newItem.DT;
+      newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete newItem.safra;
       delete newItem.treatmentsNumber;
@@ -915,16 +900,20 @@ async function callEnsaioGenotipeXlsxDownload(options: any) {
       newItem.GGEN = `${item.genotipo.tecnologia.cod_tec} ${item.genotipo.tecnologia.name}`;
       newItem.GLI = item.assay_list.gli;
       newItem.BGM = item.assay_list.bgm;
-      newItem.BGM_GENÓTIPO = item.genotipo.bgm;
-      newItem.GMR_GEN = item.genotipo.gmr;
-      newItem.NT = item.treatments_number;
-      newItem.STATUS_T = item.status;
       newItem.STATUS_ENSAIO = item.assay_list.status;
-      newItem.GENOTIPO = item.genotipo.name_genotipo;
+      newItem.PROJETO = item.assay_list.project;
+      newItem.COMENTÁRIOS = item.assay_list.status;
+      newItem.FASE = item.lote.fase;
+      newItem.NT = item.treatments_number;
+      newItem.NOME_DO_GENOTIPO = item.genotipo.name_genotipo;
+      newItem.GMR_GEN = item.genotipo.gmr;
+      newItem.BGM_GENÓTIPO = item.genotipo.bgm;
+      newItem.STATUS_T = item.status;
       newItem.NCA = String(item.lote.ncc);
-
-      newItem.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      newItem.DT_GOM = newItem.DT;
+      newItem.COD_LOTE = String(item.lote.cod_lote);
+      newItem.OBS = item.comments;
+      newItem.STATUS_TRAT = item.status_experiment;
+      newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
       return newItem;
     });
 
@@ -957,26 +946,25 @@ async function callExperimentosExperimentoXlsxDownload(options: any) {
       newItem.CULTURA = item.assay_list?.safra?.culture?.name;
       newItem.SAFRA = item.assay_list?.safra?.safraName;
       newItem.FOCO = item.assay_list?.foco.name;
-      newItem.TIPO_DE_ENSAIO = item.assay_list?.type_assay.name;
-      newItem.TECNOLOGIA = `${item.assay_list?.tecnologia.cod_tec} ${item.assay_list?.tecnologia.name}`;
+      newItem.ENSAIO = item.assay_list?.type_assay.name;
       newItem.GLI = item.assay_list?.gli;
       newItem.NOME_DO_EXPERIMENTO = item?.experimentName;
+      newItem.TECNOLOGIA = `${item.assay_list?.tecnologia.cod_tec} ${item.assay_list?.tecnologia.name}`;
+      newItem.ÉPOCA = item?.period;
+      newItem.DELINEAMENTO = item.delineamento?.name;
+      newItem.REP = item.repetitionsNumber;
+      newItem.STATUS_EXP = item.status;
       newItem.BGM = item.assay_list?.bgm;
       newItem.STATUS_ENSAIO = item.assay_list?.status;
-      newItem.PLANTIO = newItem.local?.name_local_culture;
-      newItem.DELINEAMENTO = item.delineamento?.name;
+      newItem.LUGAR_PLANTIO = newItem.local?.name_local_culture;
       newItem.DENSIDADE = item?.density;
-      newItem.REP = item.repetitionsNumber;
-      newItem.ÉPOCA = item?.period;
       newItem.ORDEM_SORTEIO = item?.orderDraw;
       newItem.NLP = item?.nlp;
       newItem.CLP = item?.clp;
       newItem.OBSERVAÇÕES = item?.comments;
       newItem.COUNT_NT = newItem.countNT;
       newItem.NPE_QT = newItem.npeQT;
-
-      newItem.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      newItem.DT_GOM = newItem.DT;
+      newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete newItem.id;
       delete newItem.safra;
@@ -1028,27 +1016,19 @@ async function callAmbienteAmbienteXlsxDownload(options: any) {
   do {
     const { response, status } = await Controller.getAll(options);
     const newData = response.map((row: any) => {
-      delete row.avatar;
-      if (row.status === 0) {
-        row.status = 'Inativo';
-      } else {
-        row.status = 'Ativo';
-      }
-
       row.CULTURA = row.safra?.culture?.name;
       row.SAFRA = row.safra?.safraName;
-      row.LOCAL = row.local?.name_local_culture;
+      row.LUGAR_DE_CULTURA = row.local?.name_local_culture;
+      row.STATUS = row.status;
       row.FOCO = row.foco?.name;
-      row.TIPO_ENSAIO = row.type_assay?.name;
+      row.ENSAIO = row.type_assay?.name;
       row.TECNOLOGIA = `${row.tecnologia?.cod_tec} ${row.tecnologia?.name}`;
       row.ÉPOCA = row?.epoca;
       row.NPEI = row.npei;
-      row.NPE_FINAL = row.npef;
       row.PROX_NPE = row.prox_npe;
-      row.GRUPO = row.group.group;
-
-      row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-      row.DT_GOM = row.DT;
+      row.NPE_FINAL = row.npef;
+      row.GRP = row.group.group;
+      row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete row.nextAvailableNPE;
       delete row.prox_npe;
@@ -1117,8 +1097,7 @@ async function callQuadrasExcelXlsxDownload(options: any) {
         row.DISPARO_FIXO = row.disparo_fixo;
         row.STATUS_ALOCADO = row.allocation;
         row.STATUS = row.status;
-        row.DT = moment().format('DD-MM-YYYY hh:mm:ss');
-        row.DT_GOM = row.DT;
+        row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
         delete row.cod_quadra;
         delete row.local;
