@@ -141,7 +141,7 @@ export class ImportAssayListController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory(
-                    console.log('🚀 ~ file: import-assay-list.controller.ts:147 ~ ImportAssayListController ~ &&spreadSheet[row][1]===spreadSheet[Number ~ spreadSheet[row][1]', spreadSheet[row][1])(Number(column) + 1),
+                    (Number(column) + 1),
                     spreadSheet[row][spreadSheet[row].length - 1],
                     spreadSheet[0][column],
                   );
