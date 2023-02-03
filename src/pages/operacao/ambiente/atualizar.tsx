@@ -6,10 +6,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import Swal from 'sweetalert2';
-import {
-  experimentGenotipeService,
-  npeService,
-} from 'src/services';
+import { experimentGenotipeService, npeService } from 'src/services';
 import InputMask from 'react-input-mask';
 
 import { IoMdArrowBack } from 'react-icons/io';
@@ -124,7 +121,7 @@ export default function NovoLocal({
       const parametersFilter = `filterStatus=1&npei=${values.prox_npe}`;
       await npeService.getAll(parametersFilter).then(async (response) => {
         if (response.total <= 0 || npe[0]?.id === response[0]?.id) {
-          const groupId = values.groupId;
+          const { groupId } = values;
           const paramFilter = `id_culture=${idCulture}&id_safra=${idSafra}&npe=${values.prox_npe}&groupId=${groupId}`;
           await experimentGenotipeService
             .getAll(paramFilter)
@@ -151,13 +148,13 @@ export default function NovoLocal({
               } else {
                 setLoading(false);
                 Swal.fire({
-                  title: "NPE Já usado !!!",
+                  title: 'NPE Já usado !!!',
                   html:
-                    `Não foi possível atualizar o prox npe, o prox npe inserido já foi usado pela parcela.<br/>` +
+                    'Não foi possível atualizar o prox npe, o prox npe inserido já foi usado pela parcela.<br/>'
                     // `Cultura: ${idCulture}<br>` +
                     // `Safra: ${idSafra}<br>` +
                     // `GroupId: ${groupId}<br>` +
-                    `Próx NPE: ${values.prox_npe}<br>`,
+                    + `Próx NPE: ${values.prox_npe}<br>`,
                 });
               }
             });
@@ -205,7 +202,7 @@ export default function NovoLocal({
         <title>Atualizar Ambiente</title>
       </Head>
 
-      <Content contentHeader={tabsOperationMenu} moduloActive="config">
+      <Content contentHeader={tabsOperationMenu} moduloActive="operacao">
         <form
           className="
           w-full
@@ -456,7 +453,9 @@ export default function NovoLocal({
                 bgColor="bg-blue-600"
                 icon={<MdDateRange size={18} />}
                 textColor="white"
-                onClick={() => { setLoading(true); }}
+                onClick={() => {
+                  setLoading(true);
+                }}
               />
             </div>
           </div>
