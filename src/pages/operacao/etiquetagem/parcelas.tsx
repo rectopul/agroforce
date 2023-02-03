@@ -1306,7 +1306,7 @@ export default function Listagem({
 
                   <div className="h-10 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status EXP
+                      Status da parcela
                     </label>
                     <SelectMultiple
                       data={statusFilter.map((i: any) => i.title)}
