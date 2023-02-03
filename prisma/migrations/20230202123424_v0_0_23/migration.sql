@@ -13,9 +13,10 @@
 -- DropForeignKey
 ALTER TABLE `PrintHistory` DROP FOREIGN KEY `PrintHistory_experimentGenotypeId_fkey`;
 
-DROP TABLE `PrintHistory`;
 -- DropForeignKey
 ALTER TABLE `PrintHistory` DROP FOREIGN KEY `PrintHistory_userId_fkey`;
+
+DROP TABLE `PrintHistory`;
 
 -- DropForeignKey
 ALTER TABLE `reportes` DROP FOREIGN KEY `reportes_madeBy_fkey`;
