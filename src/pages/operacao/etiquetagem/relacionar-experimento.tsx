@@ -249,6 +249,8 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies("filtersParams", parametersFilter);
 
+    console.log('experimentService.getAll(parametersFilter)', parametersFilter);
+    
     await experimentService
       .getAll(parametersFilter)
       .then((response) => {
@@ -992,10 +994,14 @@ export const getServerSideProps: GetServerSideProps = async ({
   query,
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = await (
+  const itensPerPage = (await (
     await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page;
-
+  )?.response[0]?.itens_per_page) ?? 10;
+  
+  // (await (
+  //   await PreferencesControllers.getConfigGerais()
+  // )?.response[0]?.itens_per_page) ?? 5;
+  
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
 
@@ -1034,12 +1040,12 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const filterApplication =
     req.cookies.filterBeforeEdit ||
-    `&id_culture=${idCulture}&id_safra=${idSafra}&filterExperimentStatus=SORTEADO`;
+    `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}&filterExperimentStatus=SORTEADO`;
 
   removeCookies("filterBeforeEdit", { req, res });
   removeCookies("pageBeforeEdit", { req, res });
 
-  const param = `&id_culture=${idCulture}&id_safra=${idSafra}&filterExperimentStatus=SORTEADO`;
+  const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}&filterExperimentStatus=SORTEADO`;
 
   const urlParametersExperiment: any = new URL(baseUrlExperimento);
   urlParametersExperiment.search = new URLSearchParams(param).toString();
