@@ -3,7 +3,6 @@ import { ImportController } from '../../../controllers/import.controller';
 import { apiHandler } from '../../../helpers/api';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-
   const Controller = new ImportController();
   switch (req.method) {
     case 'POST': {
@@ -19,7 +18,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: '8mb',
+      sizeLimit: '16mb',
     },
   },
 };

@@ -742,7 +742,7 @@ export default function Listagem({
     } else {
       colorVerify = 'bg-red-600';
       setValidateNcaOne('bg-red-600');
-      setErroMessage('o NCA não existe dentro do grupo, favor clicar em limpar e tentar novamente');
+      setErroMessage('O NCA não existe dentro do grupo, favor clicar em limpar e tentar novamente');
     }
     setTotalMatch(countNca);
     if (colorVerify === 'bg-green-600') {
@@ -780,7 +780,7 @@ export default function Listagem({
     } else {
       colorVerify = 'bg-red-600';
       setValidateNcaTwo('bg-red-600');
-      setErroMessage('o NCA não existe dentro do grupo, favor clicar em limpar e tentar novamente');
+      setErroMessage('O NCA não existe dentro do grupo, favor clicar em limpar e tentar novamente');
     }
     setTotalMatch(countNca);
 
@@ -942,7 +942,7 @@ export default function Listagem({
       document.getElementById('inputCode') as HTMLInputElement
     )?.value;
     if (inputCode?.length < 9) {
-      setErroMessage('o Código deve ser de 8 dígitos para baixa(NPE) é 13 para impressão(NCA)');
+      setErroMessage('O código deve ser de 8 dígitos para baixa(NPE) e 13 para impressão(NCA)');
     }
     if (e?.charCode === 13 || e?.charCode === 10) validateInput();
   }
@@ -957,7 +957,7 @@ export default function Listagem({
 
       if (doubleVerify) {
         if (functionsUtils?.generateDigitEAN13(inputCode) !== lastNumber) {
-          setErroMessage('o Dígito verificador não confere com o NCA, favor clicar em limpar e tentar novamente');
+          setErroMessage('O dígito verificador não confere com o NCA, favor clicar em limpar e tentar novamente');
           setValidateNcaTwo('bg-red-600');
           return;
         }
@@ -965,7 +965,7 @@ export default function Listagem({
         verifyAgain(withoutDigit);
       } else {
         if (functionsUtils?.generateDigitEAN13(inputCode) !== lastNumber) {
-          setErroMessage('o Dígito verificador não confere com o NCA, favor clicar em limpar e tentar novamente');
+          setErroMessage('O dígito verificador não confere com o NCA, favor clicar em limpar e tentar novamente');
           setValidateNcaOne('bg-red-600');
           return;
         }
@@ -981,11 +981,11 @@ export default function Listagem({
       if (functionsUtils?.generateDigitEAN8(inputCode) !== lastNumber) {
         doubleVerify
           ? (
-            setErroMessage('o Dígito verificador não confere com a NPE, favor clicar em limpar e tentar novamente'),
+            setErroMessage('O dígito verificador não confere com a NPE, favor clicar em limpar e tentar novamente'),
             setValidateNcaTwo('bg-red-600')
           )
           : (
-            setErroMessage('o Dígito verificador não confere com a NPE, favor clicar em limpar e tentar novamente'),
+            setErroMessage('O dígito verificador não confere com a NPE, favor clicar em limpar e tentar novamente'),
             setValidateNcaOne('bg-red-600')
           );
         return;
@@ -1160,10 +1160,6 @@ export default function Listagem({
               />
             </div>
 
-            <div className="w-24 h-24">
-              {errorMessage}
-            </div>
-
             <div className="w-20 h-7 ml-2">
               {(validateNcaOne === 'bg-red-600'
                 || validateNcaTwo === 'bg-red-600') && (
@@ -1179,7 +1175,13 @@ export default function Listagem({
             </div>
           </div>
 
-          <div className="flex flex-1 mt-8">
+          <div className="flex h-6 mt-3">
+            <span className="text-xs text-red-600">
+              {errorMessage}
+            </span>
+          </div>
+
+          <div className="flex flex-1 mt-3">
             <div className="flex flex-1">
               <div className="bg-blue-600 w-1 h-34 mr-2" />
               <div>
