@@ -897,15 +897,27 @@ export default function Listagem({
   }
 
   async function writeOff(inputCode: any) {
+    let writeOffIdList = parcelas.filter(
+      (item: any) => item.npe === inputCode,
+    );
+
     if (!doubleVerify) {
       (document.getElementById('inputCode') as HTMLInputElement).value = '';
       setDoubleVerify(true);
+
+      if (writeOffIdList?.length > 0) {
+        setGenotypeNameOne(writeOffIdList[0]?.genotipo?.name_genotipo);
+        setNcaOne(writeOffIdList[0]?.nca);
+      }
     } else {
       // NA CHAMADA TEM QUE SER MANDANDO O NUMERO DO NPE PARA A API DAR BAIXA
-      let writeOffIdList = parcelas.filter(
-        (item: any) => item.npe === inputCode,
-      );
+      if (writeOffIdList?.length > 0) {
+        setGenotypeNameTwo(writeOffIdList[0]?.genotipo?.name_genotipo);
+        setNcaTwo(writeOffIdList[0]?.nca);
+      }
+
       writeOffIdList = writeOffIdList.map((item: any) => item.id);
+
       try {
         await experimentGenotipeService.update({
           idList: writeOffIdList,
