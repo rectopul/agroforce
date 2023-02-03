@@ -1033,7 +1033,7 @@ export default function Listagem({
   return (
     <>
       <Head>
-        <title>Listagem de parcelas</title>
+        <title>Listagem de impressão</title>
       </Head>
 
       {loading && <LoadingComponent text="" />}
@@ -1229,7 +1229,7 @@ export default function Listagem({
         "
         >
           <AccordionFilter
-            title="Filtrar parcelas dos experimentos"
+            title="Filtrar parcelas de impressão"
             onChange={(_, e) => setStatusAccordionFilter(e)}
           >
             <div className="w-full flex gap-2">
