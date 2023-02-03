@@ -1038,9 +1038,13 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { publicRuntimeConfig } = getConfig();
   const baseUrlExperimento = `${publicRuntimeConfig.apiUrl}/experiment`;
 
-  const filterApplication =
-    req.cookies.filterBeforeEdit ||
-    `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}&filterExperimentStatus=SORTEADO`;
+  // const filterApplication =
+  //   req.cookies.filterBeforeEdit ||
+  //   `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}&filterExperimentStatus=SORTEADO`;
+  
+  // experimentGroupId=21&safraId=32&grid=true
+  // Não pode trazer o filtro anterior, pois queremos todos os experimentos para incluir neste grupo e não só os experimentos do grupo 'experimentGroupId'.
+  const filterApplication = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}&filterExperimentStatus=SORTEADO`;
 
   removeCookies("filterBeforeEdit", { req, res });
   removeCookies("pageBeforeEdit", { req, res });

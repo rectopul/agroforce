@@ -541,7 +541,7 @@ export class ExperimentController {
     response.experiment_genotipe?.map((parcelas: any) => {
       if (parcelas.status === 'IMPRESSO') {
         printed += 1;
-      } else if (parcelas.status === 'EM ETIQUETAGEM') {
+      } else if (parcelas.status === 'EM ETIQUETAGEM' || parcelas.status === 'SORTEADO') {
         toPrint += 1;
       } else if (parcelas.status === 'ALOCADO') {
         allocated += 1;

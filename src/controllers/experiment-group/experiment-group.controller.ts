@@ -256,9 +256,14 @@ export class ExperimentGroupController {
     if (typeof idExperiment === 'number') {
       await this.experimentController.handleExperimentStatus(idExperiment);
     } else {
-      await idExperiment?.map(async (experimentId: number) => {
-        await this.experimentController.handleExperimentStatus(experimentId);
-      });
+      
+      for (const experimentId of Object.values(idExperiment)) {
+        await this.experimentController.handleExperimentStatus(<number>experimentId);
+      }
+
+      // await idExperiment?.map(async (experimentId: number) => {
+      //   await this.experimentController.handleExperimentStatus(experimentId);
+      // });
     }
     await this.handleGroupStatus(id);
   }
@@ -275,7 +280,7 @@ export class ExperimentGroupController {
         printed += 1;
       } else if (experiment.status === 'ETIQ. EM ANDAMENTO') {
         toPrint += 1;
-      } else if (experiment.status === 'ETIQ. NÃO INICIADA') {
+      } else if (experiment.status === 'ETIQ. NÃO INICIADA' || experiment.status === 'SORTEADO') {
         initial += 1;
       }
     });
