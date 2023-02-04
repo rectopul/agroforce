@@ -261,7 +261,9 @@ export default function Listagem({
   const [writeOffId, setWriteOffId] = useState<number>();
   const [writeOffNca, setWriteOffNca] = useState<number>();
   const [rowsSelected, setRowsSelected] = useState([]);
-
+  const [experimentGroupUpdated, setExperimentGroupUpdated] = useState<any>(experimentGroup);
+  
+  
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
@@ -680,6 +682,20 @@ export default function Listagem({
     setCurrentPage(page);
     await callingApi(filter, page); // handle pagination globly
   }
+  
+  async function reloadExperimentGroup(){
+    
+    console.log('reloadExperimentGroup', 'before', experimentGroup);
+    
+    const { response } = await experimentGroupService.getAll({
+      id: experimentGroupId,
+    });
+
+    setExperimentGroupUpdated(response[0]);
+
+    console.log('reloadExperimentGroup', 'after', experimentGroup);
+    
+  }
 
   function filterFieldFactory(title: string, name: string) {
     return (
@@ -839,6 +855,7 @@ export default function Listagem({
         (document.getElementById('inputCode') as HTMLInputElement).value = '';
         setTimeout(() => (inputRef?.current as any)?.focus(), 2000);
         handlePagination(currentPage);
+        reloadExperimentGroup();
         // router.push("imprimir");
       }
     }
@@ -893,6 +910,7 @@ export default function Listagem({
       cleanState();
       setTimeout(() => (inputRef?.current as any)?.focus(), 2000);
       handlePagination(currentPage);
+      reloadExperimentGroup();
       // router.push("imprimir");
     }
 
@@ -1509,25 +1527,25 @@ export default function Listagem({
                     <strong className="text-blue-600">
                       Qte. exp:
                       {' '}
-                      {experimentGroup.experimentAmount}
+                      {experimentGroupUpdated.experimentAmount}
                     </strong>
 
                     <strong className="text-blue-600">
                       Total etiq. a imp.:
                       {' '}
-                      {experimentGroup.tagsToPrint}
+                      {experimentGroupUpdated.tagsToPrint}
                     </strong>
 
                     <strong className="text-blue-600">
                       Total etiq. imp.:
                       {' '}
-                      {experimentGroup.tagsPrinted}
+                      {experimentGroupUpdated.tagsPrinted}
                     </strong>
 
                     <strong className="text-blue-600">
                       Total etiq.:
                       {' '}
-                      {experimentGroup.totalTags}
+                      {experimentGroupUpdated.totalTags}
                     </strong>
 
                     <div
