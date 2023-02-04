@@ -67,7 +67,11 @@ export class ImportExperimentController {
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
           let experimentName;
-          if (spreadSheet[row][9].toString().length < 2) {
+          // se o experimento tiver menos que 2 digitos, adiciona um 0 na frente
+          // ATENÇÃO O EP PODE VIR NO FORMATO NUMBER OU STRING INCLUSIVE NULO
+          if((typeof spreadSheet[row][9] !== 'number' && typeof spreadSheet[row][9] !== 'string') || spreadSheet[row][9] === null) {
+            experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_00`;
+          } else if (String(spreadSheet[row][9]).toString().length < 2) {
             experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_0${spreadSheet[row][9]}`;
           } else {
             experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_${spreadSheet[row][9]}`;
@@ -454,6 +458,7 @@ export class ImportExperimentController {
         id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
       handleError('Experimento controller', 'Validate Import', error.message);
+      console.log('import-experiment.controller.ts.error', error);
       return { status: 500, message: 'Erro ao validar planilha de experimento' };
     }
   }
