@@ -110,9 +110,12 @@ export class ExperimentGenotipeRepository extends BaseRepository {
     return result;
   }
 
-  async writeOff(npe: any, status: any, counter: number) {
+  async writeOff(idList: any, npe: any, status: any, counter: number) {
     const result = await prisma.experiment_genotipe.updateMany({
       where: {
+        id: {
+          in: idList,
+        },
         npe,
       },
       data: {

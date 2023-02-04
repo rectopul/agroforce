@@ -261,7 +261,9 @@ export default function Listagem({
   const [writeOffId, setWriteOffId] = useState<number>();
   const [writeOffNca, setWriteOffNca] = useState<number>();
   const [rowsSelected, setRowsSelected] = useState([]);
-
+  const [experimentGroupUpdated, setExperimentGroupUpdated] = useState<any>(experimentGroup);
+  
+  
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
@@ -335,8 +337,11 @@ export default function Listagem({
       setLoading(true);
 
       // Call filter with there parameter
-      const parametersFilter = `&filterStatusT=${filterStatusT}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterNameTec=${filterNameTec}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNcaTo=${filterNcaTo}&filterNcaFrom=${filterNcaFrom}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterCodTec=${filterCodTec}&filterExperimentName=${filterExperimentName}&filterRepTo=${filterRepTo}&filterRepFrom=${filterRepFrom}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterPlacingPlace=${filterPlacingPlace}`;
-
+      let parametersFilter = `&filterStatusT=${filterStatusT}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterNameTec=${filterNameTec}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNcaTo=${filterNcaTo}&filterNcaFrom=${filterNcaFrom}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterCodTec=${filterCodTec}&filterExperimentName=${filterExperimentName}&filterRepTo=${filterRepTo}&filterRepFrom=${filterRepFrom}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterPlacingPlace=${filterPlacingPlace}`;
+      
+      // add to parametersFilter the param experimentGroupId
+      parametersFilter = `${parametersFilter}&experimentGroupId=${experimentGroupId}`;
+      
       setLoading(true);
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -677,6 +682,20 @@ export default function Listagem({
     setCurrentPage(page);
     await callingApi(filter, page); // handle pagination globly
   }
+  
+  async function reloadExperimentGroup(){
+    
+    console.log('reloadExperimentGroup', 'before', experimentGroup);
+    
+    const { response } = await experimentGroupService.getAll({
+      id: experimentGroupId,
+    });
+
+    setExperimentGroupUpdated(response[0]);
+
+    console.log('reloadExperimentGroup', 'after', experimentGroup);
+    
+  }
 
   function filterFieldFactory(title: string, name: string) {
     return (
@@ -836,6 +855,7 @@ export default function Listagem({
         (document.getElementById('inputCode') as HTMLInputElement).value = '';
         setTimeout(() => (inputRef?.current as any)?.focus(), 2000);
         handlePagination(currentPage);
+        reloadExperimentGroup();
         // router.push("imprimir");
       }
     }
@@ -890,6 +910,7 @@ export default function Listagem({
       cleanState();
       setTimeout(() => (inputRef?.current as any)?.focus(), 2000);
       handlePagination(currentPage);
+      reloadExperimentGroup();
       // router.push("imprimir");
     }
 
@@ -1012,6 +1033,13 @@ export default function Listagem({
   useEffect(() => {
     callingApi(filter);
   }, [typeOrder]);
+  
+  // close ModalPrint on close Modal
+  useEffect(() => {
+    if (!isOpenModal) {
+      setIsOpenModalPrint(false);
+    }
+  }, [isOpenModal]);
 
   function openModal() {
     setIsOpenModal(true);
@@ -1132,6 +1160,7 @@ export default function Listagem({
             onClick={() => {
               cleanState();
               setIsOpenModal(false);
+              //setIsOpenModalPrint(false);
               // const ifr: any = document.getElementById('iframePrint');
               // ifr!.style.display = 'none';
             }}
@@ -1498,25 +1527,25 @@ export default function Listagem({
                     <strong className="text-blue-600">
                       Qte. exp:
                       {' '}
-                      {experimentGroup.experimentAmount}
+                      {experimentGroupUpdated.experimentAmount}
                     </strong>
 
                     <strong className="text-blue-600">
                       Total etiq. a imp.:
                       {' '}
-                      {experimentGroup.tagsToPrint}
+                      {experimentGroupUpdated.tagsToPrint}
                     </strong>
 
                     <strong className="text-blue-600">
                       Total etiq. imp.:
                       {' '}
-                      {experimentGroup.tagsPrinted}
+                      {experimentGroupUpdated.tagsPrinted}
                     </strong>
 
                     <strong className="text-blue-600">
                       Total etiq.:
                       {' '}
-                      {experimentGroup.totalTags}
+                      {experimentGroupUpdated.totalTags}
                     </strong>
 
                     <div
@@ -1667,6 +1696,17 @@ export const getServerSideProps: GetServerSideProps = async ({
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('filtersParams', { req, res });
+    removeCookies('lastPage', { req, res });
+    removeCookies('itensPage', { req, res });
+    removeCookies('filterSelectStatusGrupoExp', { req, res });
+  }
+  
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;

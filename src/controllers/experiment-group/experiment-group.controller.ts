@@ -71,6 +71,10 @@ export class ExperimentGroupController {
       if (options.id) {
         parameters.id = Number(options.id);
       }
+      
+      if(options.notId){
+        parameters.id = JSON.parse(`{"not": ${Number(options.notId)} }`);
+      }
 
       if (options.filterQtdExpFrom || options.filterQtdExpTo) {
         if (options.filterQtdExpFrom && options.filterQtdExpTo) {
@@ -197,13 +201,19 @@ export class ExperimentGroupController {
     try {
       const experimentGroup: any = await this.experimentGroupRepository.findById(data.id);
 
-      const { response: validate }: any = await this.getAll({
-        safraId: data.safraId,
-        filterExperimentGroup: data.name,
-      });
+      // if origin data from edit experimentGroup [operacao/etiquetagem/atualizar?id=]
+      if(data.safraId && data.name) {
+        
+        const { response: validate }: any = await this.getAll({
+          safraId: data.safraId,
+          filterExperimentGroup: data.name,
+          notId: data.id,
+        });
 
-      if (validate.length > 0) return { status: 404, message: 'Nome do grupo já existe na safra' };
-
+        if (validate.length > 0) return { status: 404, message: 'Nome do grupo já existe na safra' };
+        
+      }
+      
       if (!experimentGroup) return { status: 404, message: 'Grupo de experimento não existente' };
 
       const response = await this.experimentGroupRepository.update(Number(data.id), data);
@@ -237,6 +247,7 @@ export class ExperimentGroupController {
     let totalTags = 0;
     let tagsToPrint = 0;
     let tagsPrinted = 0;
+    /*
     response.experiment.map((item: any) => {
       item.experiment_genotipe.map((parcelas: any) => {
         totalTags += 1;
@@ -246,19 +257,41 @@ export class ExperimentGroupController {
           tagsPrinted += 1;
         }
       });
-    });
-    await this.update({
+    });/**/
+    
+    for(const experiment of response.experiment){
+      for(const parcelas of experiment.experiment_genotipe){
+        totalTags += 1;
+        if (parcelas.status === 'EM ETIQUETAGEM') {
+          tagsToPrint += 1;
+        } else if (parcelas.status === 'IMPRESSO') {
+          tagsPrinted += 1;
+        }
+      }
+    }
+    
+    const {status:statusUpdate, response: responseUpdate} = await this.update({
       id,
       totalTags,
       tagsToPrint,
       tagsPrinted,
     });
+    
+    console.log('[' + new Date().toISOString() + '] ', 'countEtiqueta', id, idExperiment);
+    console.log('statusUpdate', statusUpdate);
+    console.log('responseUpdate', responseUpdate);
+    
     if (typeof idExperiment === 'number') {
       await this.experimentController.handleExperimentStatus(idExperiment);
     } else {
-      await idExperiment?.map(async (experimentId: number) => {
-        await this.experimentController.handleExperimentStatus(experimentId);
-      });
+      
+      for (const experimentId of Object.values(idExperiment)) {
+        await this.experimentController.handleExperimentStatus(<number>experimentId);
+      }
+
+      // await idExperiment?.map(async (experimentId: number) => {
+      //   await this.experimentController.handleExperimentStatus(experimentId);
+      // });
     }
     await this.handleGroupStatus(id);
   }
@@ -275,7 +308,7 @@ export class ExperimentGroupController {
         printed += 1;
       } else if (experiment.status === 'ETIQ. EM ANDAMENTO') {
         toPrint += 1;
-      } else if (experiment.status === 'ETIQ. NÃO INICIADA') {
+      } else if (experiment.status === 'ETIQ. NÃO INICIADA' || experiment.status === 'SORTEADO') {
         initial += 1;
       }
     });

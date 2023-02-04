@@ -148,12 +148,12 @@ export default function AtualizarLocal({
     { name: "CamposGerenciados[]", title: "Tecnologia", value: "tecnologia" },
     { name: "CamposGerenciados[]", title: "NT", value: "nt" },
     { name: "CamposGerenciados[]", title: "Rep. trat.", value: "rep" },
-    { name: "CamposGerenciados[]", title: "T", value: "status" },
+    { name: "CamposGerenciados[]", title: "T", value: "status_t" },
     { name: "CamposGerenciados[]", title: "NCA", value: "nca" },
     { name: "CamposGerenciados[]", title: "NPE", value: "npe" },
     // { name: "CamposGerenciados[]", title: "Seq.", value: "sorteio" },
     { name: "CamposGerenciados[]", title: "Bloco", value: "bloco" },
-    { name: "CamposGerenciados[]", title: "Status parc", value: "experiment" },
+    { name: "CamposGerenciados[]", title: "Status parc", value: "status" },
   ]);
 
   const [take, setTake] = useState<any>(itensPerPage);
@@ -392,7 +392,7 @@ export default function AtualizarLocal({
           })
         );
       }
-      if (columnCampos[index] === "status") {
+      if (columnCampos[index] === "status_t") {
         tableFields.push(
           headerTableFactoryGlobal({
             name: "T",
@@ -442,11 +442,12 @@ export default function AtualizarLocal({
           })
         );
       }
-      if (columnCampos[index] === "experiment") {
+      if (columnCampos[index] === "status") {
         tableFields.push(
           headerTableFactoryGlobal({
             name: "Status parc",
-            title: "experiment.status",
+            //title: "experiment.status",
+            title: "status",
             orderList,
             fieldOrder,
             handleOrder,
@@ -545,6 +546,7 @@ export default function AtualizarLocal({
             newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
             newItem.NCA = item.nca;
             newItem.STATUS_EXP = item.experiment.status;
+            newItem.STATUS_PARC = item.status;
 
             delete newItem.id;
             return newItem;
