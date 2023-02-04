@@ -335,8 +335,11 @@ export default function Listagem({
       setLoading(true);
 
       // Call filter with there parameter
-      const parametersFilter = `&filterStatusT=${filterStatusT}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterNameTec=${filterNameTec}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNcaTo=${filterNcaTo}&filterNcaFrom=${filterNcaFrom}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterCodTec=${filterCodTec}&filterExperimentName=${filterExperimentName}&filterRepTo=${filterRepTo}&filterRepFrom=${filterRepFrom}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterPlacingPlace=${filterPlacingPlace}`;
-
+      let parametersFilter = `&filterStatusT=${filterStatusT}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterNameTec=${filterNameTec}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNcaTo=${filterNcaTo}&filterNcaFrom=${filterNcaFrom}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterCodTec=${filterCodTec}&filterExperimentName=${filterExperimentName}&filterRepTo=${filterRepTo}&filterRepFrom=${filterRepFrom}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterPlacingPlace=${filterPlacingPlace}`;
+      
+      // add to parametersFilter the param experimentGroupId
+      parametersFilter = `${parametersFilter}&experimentGroupId=${experimentGroupId}`;
+      
       setLoading(true);
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -1012,6 +1015,13 @@ export default function Listagem({
   useEffect(() => {
     callingApi(filter);
   }, [typeOrder]);
+  
+  // close ModalPrint on close Modal
+  useEffect(() => {
+    if (!isOpenModal) {
+      setIsOpenModalPrint(false);
+    }
+  }, [isOpenModal]);
 
   function openModal() {
     setIsOpenModal(true);
@@ -1132,6 +1142,7 @@ export default function Listagem({
             onClick={() => {
               cleanState();
               setIsOpenModal(false);
+              //setIsOpenModalPrint(false);
               // const ifr: any = document.getElementById('iframePrint');
               // ifr!.style.display = 'none';
             }}
