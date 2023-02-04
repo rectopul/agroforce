@@ -216,6 +216,11 @@ export default function Import({
           }
         }).then((res: any) => {
           setFilePath(res.filename);
+        }).catch((err: any) => {
+          Swal.fire({
+            html: 'Erro ao ler planilha: '+err.message,
+            width: '800',
+          });
         });
       }
 
@@ -310,8 +315,7 @@ export default function Import({
     parametersFilter = `${parametersFilter}&skip=${
       newPage * Number(take)
     }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
-    await logImportService
-      .getAll(parametersFilter)
+    await logImportService.getAll(parametersFilter)
       .then(({ response, total: allTotal }) => {
         setLogs(response);
         setTotalItems(allTotal);
