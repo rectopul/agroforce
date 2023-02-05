@@ -75,12 +75,10 @@ interface IFilter {
   typeOrder: object | any;
 }
 
-const CHILD_APP_URL = 'operacao/etiquetagem/imprimir' ?? 'http://localhost:3000';
-
-type Message = {
+export type Message = {
   type: string;
   value: string;
-};
+}
 
 export default function Listagem({
   allParcelas,
@@ -98,6 +96,8 @@ export default function Listagem({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { tabsOperation } = ITabs.default;
 
+  const CHILD_APP_URL = 'operacao/etiquetagem/imprimir' ?? 'http://localhost:3000';
+  
   const router = useRouter();
   const inputRef = useRef();
   const Iref = useRef();

@@ -5,16 +5,15 @@ import Swal from 'sweetalert2';
 
 import TagPrint from '../../../../components/TagPrint';
 
-type Message = {
+export type Message = {
   type: string;
   value: string;
-};
-
-const PARENT_APP_URL = '/operacao/etiquetagem/parcelas';
+}
 
 function PrintToTag() {
   const router = useRouter();
-
+  const PARENT_APP_URL = '/operacao/etiquetagem/parcelas';
+  
   const [tagType, setTagType] = useState(1);
   const [data, setData] = useState([]);
 
