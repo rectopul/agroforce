@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable vars-on-top */
 /* eslint-disable no-var */
-import { PrismaClient } from '@prisma/client';
+import {PrismaClient} from '@prisma/client';
 
 declare global {
   var prisma: PrismaClient | undefined;
@@ -9,7 +9,16 @@ declare global {
 
 export const prisma = global.prisma
   || new PrismaClient({
-    log: ['error'],
+    log: [
+      {
+        emit: 'stdout',
+        level: 'error',
+      },
+      // {
+      //   emit: 'event',
+      //   level: 'query',
+      // }
+    ],
   });
 
 if (process.env.NODE_ENV !== 'production') global.prisma = prisma;

@@ -49,11 +49,19 @@ export class ExperimentGroupRepository {
   }
 
   async update(id: number, data: any) {
+    
+    const newItem = data;
+    
+    if(newItem.safraId){
+      delete newItem.safraId;
+    }
+    
     const result = await prisma.experimentGroup.update({
       where: { id },
-      data: {
-        name: data.name,
-      },
+      data:newItem,
+      // data: {
+      //   name: data.name,
+      // },
     });
     return result;
   }
