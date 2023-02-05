@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 
 import TagPrint from '../../../../components/TagPrint';
 
-type Message = {
+interface Message {
   type: string;
   value: string;
 };

@@ -77,7 +77,7 @@ interface IFilter {
 
 const CHILD_APP_URL = 'operacao/etiquetagem/imprimir' ?? 'http://localhost:3000';
 
-type Message = {
+interface Message {
   type: string;
   value: string;
 };
