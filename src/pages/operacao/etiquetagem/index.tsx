@@ -58,7 +58,6 @@ import { IReturnObject } from '../../../interfaces/shared/Import.interface';
 import { tableGlobalFunctions } from '../../../helpers';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../components/Loading';
-import {deleteCookie} from "cookies-next/src";
 
 export default function Listagem({
   allExperimentGroup,
