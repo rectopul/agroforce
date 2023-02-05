@@ -75,6 +75,13 @@ interface IFilter {
   typeOrder: object | any;
 }
 
+const CHILD_APP_URL = 'operacao/etiquetagem/imprimir' ?? 'http://localhost:3000';
+
+type Message = {
+  type: string;
+  value: string;
+};
+
 export default function Listagem({
   allParcelas,
   totalItems,
@@ -94,7 +101,7 @@ export default function Listagem({
   const router = useRouter();
   const inputRef = useRef();
   const Iref = useRef();
-  const myRef = useRef(null);
+  const myRef = useRef<HTMLIFrameElement>(null);
 
   const tabsEtiquetagemMenu = tabsOperation.map((i: any) => (i.titleTab === 'ETIQUETAGEM'
     ? { ...i, statusTab: true }
@@ -1058,6 +1065,40 @@ export default function Listagem({
     setStateIframe(stateIframe + 1);
   }
 
+  useEffect(() => {
+    const handler = (event: MessageEvent) => {
+      // if (event.origin !== CHILD_APP_URL) {
+      //   // skip other messages from(for example.) extensions
+      //   return;
+      // }
+
+      const message: Message = event.data;
+      
+      console.log('menssage.parent', message);
+
+      if(message?.type == 'printed' && message?.value == '1'){
+        // close ModalPrint on close Modal
+        setIsOpenModalPrint(false);
+        cleanState();
+      }
+      
+      if (message?.type === 'printed') {
+      } else if (message?.type === 'theme-from-child') {
+      } else {
+        console.error('NOT_VALID_MESSAGE: ', JSON.stringify(message));
+      }
+    };
+
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+    
+  }, []);
+  
+  // https://github.com/andriishupta/cross-origin-iframe-communication-with-nextjs/blob/8bf38c9384afde8bfc5c533d8b6b719698574880/packages/parent-app/pages/index.tsx
+  const postMessage = (message: Message) => {
+    myRef?.current?.contentWindow?.postMessage(message, '*'); // OR use '*' to handle all origins
+  };
+
   return (
     <>
       <Head>
@@ -1098,6 +1139,7 @@ export default function Listagem({
           modalEtiquetaAutomatizada"
       >
         <h3>Impressão de etiquetas</h3>
+        
         <button
           type="button"
           className="flex absolute top-4 right-3 justify-end"
