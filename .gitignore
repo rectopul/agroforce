@@ -6,6 +6,7 @@
 .pnp.js
 /dev
 /public/log_import
+/xxnode_modulesxx
 
 # testing
 /coverage

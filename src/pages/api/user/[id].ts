@@ -5,7 +5,7 @@ import { apiHandler } from '../../../helpers/api';
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: '8mb',
+      sizeLimit: '16mb',
     },
   },
 };

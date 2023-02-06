@@ -186,9 +186,11 @@ export default function Listagem({
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
-  const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
-  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
+  // const [orderBy, setOrderBy] = useState<string>(orderByserver);
+  // const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [fieldOrder, setFieldOrder] = useState<any>('');
 
   const pathExtra = `skip=${
     currentPage * Number(take)
