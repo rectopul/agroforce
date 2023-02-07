@@ -36,7 +36,7 @@ export function SelectMultiple({ data = [], values = [], onChange }) {
 
     let newValues = [];
 
-    if (check == true) {
+    if (check === true) {
       newValues = data;
     } else {
       newValues = [];
@@ -123,7 +123,7 @@ export function SelectMultiple({ data = [], values = [], onChange }) {
               //type="button"
               className={classButtonItem}
               onClick={() => handleSelect(i)}
-              onBlur={() => setOpen(false)}
+              //onBlur={() => setOpen(false)}
             >
               <div>
                 {values?.some((x) => x === i) ? (
