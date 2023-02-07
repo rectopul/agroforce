@@ -49,6 +49,10 @@ export class ExperimentGenotipeController {
       //   );
       // }
 
+      if (options.status) {
+        parameters.status = options.status;
+      }
+
       if (options.filterNameTec) {
         parameters.tecnologia = JSON.parse(
           `{ "name": { "contains": "${options.filterNameTec}" } }`,
@@ -411,6 +415,7 @@ export class ExperimentGenotipeController {
         skip,
         orderBy,
       );
+
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }
@@ -551,53 +556,50 @@ export class ExperimentGenotipeController {
 
           await this.ExperimentGenotipeRepository.printed(id, status, newCount);
 
-          let idExperiment = response.idExperiment;
-          
-          const { response:resExp }: any = await this.experimentController.getOne(idExperiment);
+          const { idExperiment } = response;
+
+          const { response: resExp }: any = await this.experimentController.getOne(idExperiment);
           await this.experimentGroupController.countEtiqueta(
             resExp.experimentGroupId,
             idExperiment,
           );
-          
+
           await this.reporteController.create({
             userId, operation, module: 'ETIQUETAGEM', oldValue: response.nca,
           });
         });
       } else if (count === 'reprint') {
         await idList.map(async (id: any) => {
-          
           const { response }: any = await this.getOne(id);
           const newCount = response.counter + 1;
           operation = 'REIMPRESSO';
-          
+
           await this.ExperimentGenotipeRepository.printed(id, status, newCount);
 
-          let idExperiment = response.idExperiment;
+          const { idExperiment } = response;
 
-          const { response:resExp }: any = await this.experimentController.getOne(idExperiment);
+          const { response: resExp }: any = await this.experimentController.getOne(idExperiment);
           await this.experimentGroupController.countEtiqueta(
             resExp.experimentGroupId,
             idExperiment,
           );
-          
+
           await this.reporteController.create({
             userId, operation, module: 'ETIQUETAGEM', oldValue: response.nca,
           });
         });
       } else if (count === 'writeOff') {
-        
-        for(const id of idList){
-        
+        for (const id of idList) {
           counter = 0;
           operation = 'EM ETIQUETAGEM';
-          
+
           await this.ExperimentGenotipeRepository.writeOff(id, npe, status, counter);
 
           const { response }: any = await this.getOne(id);
 
-          let idExperiment = response.idExperiment;
+          const { idExperiment } = response;
 
-          const { response:resExp }: any = await this.experimentController.getOne(idExperiment);
+          const { response: resExp }: any = await this.experimentController.getOne(idExperiment);
           await this.experimentGroupController.countEtiqueta(
             resExp.experimentGroupId,
             idExperiment,
@@ -607,9 +609,8 @@ export class ExperimentGenotipeController {
           await this.reporteController.create({
             userId, operation, module: 'ETIQUETAGEM', oldValue: npe,
           });
-          
         }
-        
+
         // return { status: 200 };
       }
 
