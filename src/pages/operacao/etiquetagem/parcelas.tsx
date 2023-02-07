@@ -938,9 +938,18 @@ export default function Listagem({
   }
 
   async function writeOff(inputCode: any) {
+    let writeOffIdList = parcelas.filter(
+      (item: any) => item.npe === inputCode,
+    );
+
     if (!doubleVerify) {
       (document.getElementById('inputCode') as HTMLInputElement).value = '';
       setDoubleVerify(true);
+
+      if (writeOffIdList?.length > 0) {
+        setGenotypeNameOne(writeOffIdList[0]?.genotipo?.name_genotipo);
+        setNcaOne(writeOffIdList[0]?.nca);
+      }
     } else {
       let validateState = 0;
       // NA CHAMADA TEM QUE SER MANDANDO O NUMERO DO NPE PARA A API DAR BAIXA
@@ -958,7 +967,9 @@ export default function Listagem({
         setErroMessage('A NPE digitada não foi Impressa ainda');
         return;
       }
+
       writeOffIdList = writeOffIdList.map((item: any) => item.id);
+
       try {
         await experimentGenotipeService.update({
           idList: writeOffIdList,
@@ -1126,7 +1137,7 @@ export default function Listagem({
   return (
     <>
       <Head>
-        <title>Listagem de parcelas</title>
+        <title>Listagem de impressão</title>
       </Head>
 
       {loading && <LoadingComponent text="" />}
@@ -1324,7 +1335,7 @@ export default function Listagem({
         "
         >
           <AccordionFilter
-            title="Filtrar parcelas dos experimentos"
+            title="Filtrar parcelas de impressão"
             onChange={(_, e) => setStatusAccordionFilter(e)}
           >
             <div className="w-full flex gap-2">
@@ -1401,7 +1412,7 @@ export default function Listagem({
 
                   <div className="h-10 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      Status EXP
+                      Status da parcela
                     </label>
                     <SelectMultiple
                       data={statusFilter.map((i: any) => i.title)}
