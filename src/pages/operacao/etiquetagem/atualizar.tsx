@@ -160,9 +160,9 @@ export default function Listagem({
     setCurrentPage(page);
 
     setFilter(parametersFilter);
-    setCookies('filterBeforeEdit', parametersFilter);
-    setCookies('filterBeforeEditTypeOrder', typeOrder);
-    setCookies('filterBeforeEditOrderBy', orderBy);
+    // setCookies('filterBeforeEdit', parametersFilter);
+    // setCookies('filterBeforeEditTypeOrder', typeOrder);
+    // setCookies('filterBeforeEditOrderBy', orderBy);
 
     parametersFilter = `${parametersFilter}&skip=${
       page * Number(take)
@@ -171,7 +171,7 @@ export default function Listagem({
     }&typeOrder=${typeOrder}`;
 
     setFiltersParams(parametersFilter);
-    setCookies('filtersParams', parametersFilter);
+    // setCookies('filtersParams', parametersFilter);
 
     await experimentService
       .getAll(parametersFilter)
