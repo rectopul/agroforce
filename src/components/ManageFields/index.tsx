@@ -1,10 +1,11 @@
 import {DragDropContext, Draggable, Droppable, DropResult} from "react-beautiful-dnd";
 import {AccordionFilter} from "../AccordionFilter";
 import {Button} from "../Button";
-import {IoReloadSharp} from "react-icons/io5";
+import {IoReloadSharp, IoTrash} from "react-icons/io5";
 import {CheckBox} from "../CheckBox";
 import {userPreferencesService} from "../../services";
 import {useEffect, useState} from "react";
+import Swal from "sweetalert2";
 
 interface ManageFieldsProps {
   statusAccordionExpanded: boolean;
@@ -16,6 +17,7 @@ interface ManageFieldsProps {
   table: string;
   module_name: string;
   module_id: number;
+  OnSetStatusAccordion: Function;
   OnSetGeneratesProps: Function;
   OnSetCamposGerenciados: Function;
   OnColumnsOrder: Function;
@@ -33,7 +35,7 @@ interface IGenerateProps {
 export function ManageFields(props: ManageFieldsProps) {
   
   // const [statusAccordion, setStatusAccordion] = useState<boolean>(props.statusAccordionExpanded);
-  const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
+  const [statusAccordion, setStatusAccordion] = useState<boolean>(props.statusAccordionExpanded);
   
   const [camposGerenciados, setCamposGerenciados] = useState<any>(props.preferences.table_preferences);
 
@@ -42,28 +44,29 @@ export function ManageFields(props: ManageFieldsProps) {
   const [userLogado, setUserLogado] = useState<any>(props.userLogado);
   
   const [preferences, setPreferences] = useState<any>(props.preferences);
+
+  useEffect(() => {
+    reorderGeneratedProps();
+    props.OnSetGeneratesProps(generatesProps);
+  }, []);
   
-  //
   // useEffect(() => {
-  //  
+  //   console.log('useEffect', 'statusAccordion', statusAccordion);
   // }, [statusAccordion]);
-
-  useEffect(() => {
-    reordererGeneretesPros();
-  }, [generatesProps]);
   
-  useEffect(() => {
-    console.log('ManageFields', 'camposGerenciados', camposGerenciados);
-    props.OnColumnsOrder(camposGerenciados);
-  }, [camposGerenciados]);
-
-  function reordererGeneretesPros(){
-    let campos_arr = camposGerenciados.split(',');
+  // useEffect(() => {
+  //   console.log('ManageFields', 'camposGerenciados', camposGerenciados);
+  //   props.OnColumnsOrder(camposGerenciados);
+  // }, [camposGerenciados]);
+  
+  function reorderGeneratedProps(){
+    const campos_arr = camposGerenciados.split(',');
     const items = Array.from(generatesProps);
     // const [reorderedItem] = items.splice(result.source.index, 1);
     // const index: number = Number(result.destination?.index);
     //items.splice(index, 0, reorderedItem);
     
+    let items_restantes = items;
     const newItems = [];
     // iterate campos_arr
     for (let i = 0; i < campos_arr.length; i += 1) {
@@ -71,22 +74,24 @@ export function ManageFields(props: ManageFieldsProps) {
       for (let j = 0; j < items.length; j += 1) {
         if (campos_arr[i] === items[j].value) {
           newItems.push(items[j]);
+          items_restantes.splice(j, 1);
         }
       }
     }
     
-    // ordena items.value por campos_arr
-    items.sort((a, b) => {
-      return campos_arr.indexOf(a.value) - campos_arr.indexOf(b.value);
-    });
-    
+    for(let i = 0; i < items_restantes.length; i += 1){
+      newItems.push(items_restantes[i]);
+    }
+    console.log('items_restantes', items_restantes);
+    console.log('result', newItems);
+    setGeneratesProps(newItems);
     console.log('reordererGeneretesPros', items, newItems);
-    
   }
   
   // props.OnColumnsOrder(props.camposGerenciadosDefault);
   
   function handleOnDragEnd(result: DropResult): void {
+    console.log('====>handleOnDragEnd', 'result', result);
     setStatusAccordion(true);
     if (!result) return;
 
@@ -94,12 +99,67 @@ export function ManageFields(props: ManageFieldsProps) {
     const [reorderedItem] = items.splice(result.source.index, 1);
     const index: number = Number(result.destination?.index);
     items.splice(index, 0, reorderedItem);
+    console.log('====>handleOnDragEnd', 'items', items);
     setGeneratesProps(items);
-    props.OnSetGeneratesProps(items);
+    //props.OnSetGeneratesProps(items);
+    setStatusAccordion(true);
+  }
+  
+  async function clearPreferencesByUserAndModule(): Promise<void> {
+    
+    if(preferences.id === 0) return;
+    
+    await userPreferencesService
+      .deleted(preferences.id)
+      .then(({ status, response }) => {
+        console.log('response', response);
+        if (status === 200) {
+          setUserLogado({
+            ...userLogado,
+            preferences: {
+              ...userLogado.preferences,
+              [props.module_name]: {
+                id: 0,
+                userId: 0,
+                table_preferences: "",
+              },
+            },
+          });
+          setPreferences({
+            id: 0,
+            userId: 0,
+            table_preferences: "",
+          });
+          props.OnSetUserLogado({
+            ...userLogado,
+            preferences: {
+              ...userLogado.preferences,
+              [props.module_name]: {
+                id: 0,
+                userId: 0,
+                table_preferences: "",
+              },
+            },
+          });
+          props.OnSetPreferences({
+            id: 0,
+            userId: 0,
+            table_preferences: "",
+          });
+        }
+      })
+      .catch((error) => {
+        console.log('error', error);
+        Swal.fire({
+          title: "Falha ao excluir preferências",
+          html: "Ocorreu um erro ao excluir as preferências do usuário. Tente novamente mais tarde.\r\n" + JSON.stringify(error),
+          width: "800",
+        });
+      });
   }
 
   async function getValuesColumns(): Promise<void> {
-    const els: any = document.querySelectorAll("input[type='checkbox'][data-table='tbl_"+props.table+"']");
+    const els: any = document.querySelectorAll("ul[data-rbd-droppable-id='tbl_"+props.table+"'] input[type='checkbox']");
     let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
@@ -142,7 +202,7 @@ export function ManageFields(props: ManageFieldsProps) {
 
     let preferences1 = userLogado.preferences[props.module_name];
     
-    setStatusAccordion(false);
+    
     setUserLogado(userLogado);
     setPreferences(preferences1);
     setCamposGerenciados(campos);
@@ -152,20 +212,25 @@ export function ManageFields(props: ManageFieldsProps) {
     props.OnSetUserLogado(userLogado);
     props.OnSetPreferences(preferences1);
     props.OnSetCamposGerenciados(campos);
+    // manda para o pai os generetesProps ao clicar em atualizar, pois finalizamos nossa ordenação;
+    props.OnSetGeneratesProps(generatesProps);
     
+    setStatusAccordion(false);
   }
 
   return (
     <div className="border-solid border-2 border-blue-600 rounded">
       <div className="w-72">
-        {JSON.stringify(props.preferences.table_preferences)}
-        {statusAccordion}
+        <span style={{fontSize:9}}>
+          {JSON.stringify(props.preferences.table_preferences)}
+          {statusAccordion}
+        </span>
         <AccordionFilter
           title="Gerenciar Campos"
           grid={statusAccordion}
         >
           <DragDropContext onDragEnd={handleOnDragEnd}>
-            <Droppable droppableId="characters">
+            <Droppable droppableId={'tbl_'+props.table}>
               {(provided) => (
                 <ul
                   className="w-full h-full characters"
@@ -181,10 +246,21 @@ export function ManageFields(props: ManageFieldsProps) {
                       icon={<IoReloadSharp size={20}/>}
                     />
                   </div>
+                  
+                  <div className="h-8 mb-3">
+                    <Button
+                      value="Limpar Preferências"
+                      bgColor="bg-red-600"
+                      textColor="white"
+                      onClick={clearPreferencesByUserAndModule}
+                      icon={<IoTrash size={20}/>}
+                    />
+                  </div>
+                  
                   {generatesProps.map((generate, index) => (
                     <Draggable
-                      key={index}
-                      draggableId={String(generate.title)}
+                      key={String(generate.value)}
+                      draggableId={String(generate.value)}
                       index={index}
                     >
                       {(provider) => (
@@ -193,12 +269,14 @@ export function ManageFields(props: ManageFieldsProps) {
                           {...provider.draggableProps}
                           {...provider.dragHandleProps}
                         >
-                          <CheckBox 
-                            data-table={`tbl_${props.table}`}
+                          {camposGerenciados}
+                          {generate.value}
+                          <CheckBox
                             name={generate.name}
                             title={generate.title?.toString()}
                             value={generate.value}
-                            defaultChecked={camposGerenciados.includes(generate.value as string)}
+                            defaultChecked={camposGerenciados.split(',').indexOf(generate.value) > -1}
+                            // defaultChecked={camposGerenciados.includes(generate.value as string)}
                           />
                         </li>
                       )}

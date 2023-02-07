@@ -94,4 +94,17 @@ export class UserPreferenceController {
       throw new Error('[Controller] - create User Preferences erro');
     }
   }
+
+  async delete(id: number) {
+    try {
+      if (id) {
+        const response: object | any = await this.userPreferences.delete(id);
+        return { status: 200, response };
+      }
+      return { status: 400, message: 'id não informado' };
+    } catch (err) {
+      return { status: 400, message: err };
+    }
+  }
+  
 }

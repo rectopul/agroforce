@@ -7,7 +7,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import {
   DragDropContext,
   Draggable,
@@ -115,7 +115,6 @@ export default function AtualizarLocal({
     table_preferences:
       "repetitionExperience,genotipo,gmr,bgm,fase,tecnologia,nt,rep,status,nca,npe,sequence,block,experiment",
   });
-  
   const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
   
   const table = 'experiment_genotipe';
@@ -448,53 +447,56 @@ export default function AtualizarLocal({
         );
       }
     });
+    
+    console.log("======> PARENT: Ordenação das colunas: ", `'${columnsCampos}'`, tableFields);
+    
     return tableFields;
   }
 
   const columns = columnsOrder(camposGerenciados);
 
-  async function getValuesColumns(): Promise<void> {
-    const els: any = document.querySelectorAll("input[type='checkbox']");
-    let selecionados = "";
-    for (let i = 0; i < els.length; i += 1) {
-      if (els[i].checked) {
-        selecionados += `${els[i].value},`;
-      }
-    }
-    const totalString = selecionados.length;
-    const campos = selecionados.substr(0, totalString - 1);
-    if (preferences.id === 0) {
-      await userPreferencesService
-        .create({
-          table_preferences: campos,
-          userId: userLogado.id,
-          module_id: 30,
-        })
-        .then((response) => {
-          userLogado.preferences.parcelas = {
-            id: response.response.id,
-            userId: preferences.userId,
-            table_preferences: campos,
-          };
-          preferences.id = response.response.id;
-        });
-      localStorage.setItem("user", JSON.stringify(userLogado));
-    } else {
-      userLogado.preferences.parcelas = {
-        id: preferences.id,
-        userId: preferences.userId,
-        table_preferences: campos,
-      };
-      await userPreferencesService.update({
-        table_preferences: campos,
-        id: preferences.id,
-      });
-      localStorage.setItem("user", JSON.stringify(userLogado));
-    }
-
-    setStatusAccordion(false);
-    setCamposGerenciados(campos);
-  }
+  // async function getValuesColumns(): Promise<void> {
+  //   const els: any = document.querySelectorAll("input[type='checkbox']");
+  //   let selecionados = "";
+  //   for (let i = 0; i < els.length; i += 1) {
+  //     if (els[i].checked) {
+  //       selecionados += `${els[i].value},`;
+  //     }
+  //   }
+  //   const totalString = selecionados.length;
+  //   const campos = selecionados.substr(0, totalString - 1);
+  //   if (preferences.id === 0) {
+  //     await userPreferencesService
+  //       .create({
+  //         table_preferences: campos,
+  //         userId: userLogado.id,
+  //         module_id: 30,
+  //       })
+  //       .then((response) => {
+  //         userLogado.preferences.parcelas = {
+  //           id: response.response.id,
+  //           userId: preferences.userId,
+  //           table_preferences: campos,
+  //         };
+  //         preferences.id = response.response.id;
+  //       });
+  //     localStorage.setItem("user", JSON.stringify(userLogado));
+  //   } else {
+  //     userLogado.preferences.parcelas = {
+  //       id: preferences.id,
+  //       userId: preferences.userId,
+  //       table_preferences: campos,
+  //     };
+  //     await userPreferencesService.update({
+  //       table_preferences: campos,
+  //       id: preferences.id,
+  //     });
+  //     localStorage.setItem("user", JSON.stringify(userLogado));
+  //   }
+  //
+  //   setStatusAccordion(false);
+  //   setCamposGerenciados(campos);
+  // }
   
   // function handleOnDragEnd(result: DropResult): void {
   //   setStatusAccordion(true);
@@ -911,10 +913,10 @@ export default function AtualizarLocal({
                           Total registrado: {itemsTotal}
                         </strong>
                         <span style={{ fontSize: 9 }}>
-                        {JSON.stringify(preferences.table_preferences)}
+                        {JSON.stringify(preferences.table_preferences)}<br/>
                         {JSON.stringify(generatesProps)}
                         {JSON.stringify(preferences)}
-                          </span>
+                        </span>
                       </div>
                       <div className="flex flex-1 mb-6 justify-end">
                         <FieldItemsPerPage
@@ -933,7 +935,7 @@ export default function AtualizarLocal({
                     <div className="h-full flex items-center gap-2">
                       
                       <ManageFields 
-                        statusAccordionExpanded={true} 
+                        statusAccordionExpanded={false} 
                         generatesPropsDefault={generatesProps}
                         camposGerenciadosDefault={camposGerenciados}
                         preferences={preferences} 
@@ -942,7 +944,7 @@ export default function AtualizarLocal({
                         table={table} 
                         module_name={module_name} 
                         module_id={module_id} 
-                        
+                        OnSetStatusAccordion={(e: any) => { console.log('callback','setStatusAccordion', e); setStatusAccordion(e); }}
                         OnSetGeneratesProps={(e: any) => { console.log('callback','setGeneratesProps', e); setGeneratesProps(e); }}
                         OnSetCamposGerenciados={(e: any) => { console.log('callback','setCamposGerenciados', e); setCamposGerenciados(e); }}
                         OnColumnsOrder={(e: any) => { console.log('callback','columnsOrder', e); columnsOrder(e); }}
