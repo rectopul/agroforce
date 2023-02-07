@@ -97,7 +97,7 @@ export default function Listagem({
   const { tabsOperation } = ITabs.default;
 
   const CHILD_APP_URL = 'operacao/etiquetagem/imprimir' ?? 'http://localhost:3000';
-  
+
   const router = useRouter();
   const inputRef = useRef();
   const Iref = useRef();
@@ -269,8 +269,7 @@ export default function Listagem({
   const [writeOffNca, setWriteOffNca] = useState<number>();
   const [rowsSelected, setRowsSelected] = useState([]);
   const [experimentGroupUpdated, setExperimentGroupUpdated] = useState<any>(experimentGroup);
-  
-  
+
   const pathExtra = `skip=${
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
@@ -345,10 +344,10 @@ export default function Listagem({
 
       // Call filter with there parameter
       let parametersFilter = `&filterStatusT=${filterStatusT}&filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterNameTec=${filterNameTec}&filterGli=${filterGli}&filterBgm=${filterBgm}&filterTreatmentsNumber=${filterTreatmentsNumber}&filterStatus=${filterStatus}&filterStatusAssay=${filterStatusAssay}&filterGenotypeName=${filterGenotypeName}&filterNcaTo=${filterNcaTo}&filterNcaFrom=${filterNcaFrom}&id_safra=${idSafra}&filterBgmTo=${filterBgmTo}&filterBgmFrom=${filterBgmFrom}&filterNtTo=${filterNtTo}&filterNtFrom=${filterNtFrom}&filterCodTec=${filterCodTec}&filterExperimentName=${filterExperimentName}&filterRepTo=${filterRepTo}&filterRepFrom=${filterRepFrom}&filterNpeTo=${filterNpeTo}&filterNpeFrom=${filterNpeFrom}&filterPlacingPlace=${filterPlacingPlace}`;
-      
+
       // add to parametersFilter the param experimentGroupId
       parametersFilter = `${parametersFilter}&experimentGroupId=${experimentGroupId}`;
-      
+
       setLoading(true);
       setFilter(parametersFilter);
       setCurrentPage(0);
@@ -361,9 +360,9 @@ export default function Listagem({
     setCurrentPage(page);
 
     setFilter(parametersFilter);
-    setCookies('filterBeforeEdit', parametersFilter);
-    setCookies('filterBeforeEditTypeOrder', typeOrder);
-    setCookies('filterBeforeEditOrderBy', orderBy);
+    // setCookies('filterBeforeEdit', parametersFilter);
+    // setCookies('filterBeforeEditTypeOrder', typeOrder);
+    // setCookies('filterBeforeEditOrderBy', orderBy);
 
     // parametersFilter = `${parametersFilter}&${pathExtra}`;
     parametersFilter = `${parametersFilter}&skip=${
@@ -371,7 +370,7 @@ export default function Listagem({
     }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
     setFiltersParams(parametersFilter);
-    setCookies('filtersParams', parametersFilter);
+    // setCookies('filtersParams', parametersFilter);
 
     await experimentGenotipeService
       .getAll(parametersFilter)
@@ -689,11 +688,10 @@ export default function Listagem({
     setCurrentPage(page);
     await callingApi(filter, page); // handle pagination globly
   }
-  
-  async function reloadExperimentGroup(){
-    
+
+  async function reloadExperimentGroup() {
     console.log('reloadExperimentGroup', 'before', experimentGroup);
-    
+
     const { response } = await experimentGroupService.getAll({
       id: experimentGroupId,
     });
@@ -701,7 +699,6 @@ export default function Listagem({
     setExperimentGroupUpdated(response[0]);
 
     console.log('reloadExperimentGroup', 'after', experimentGroup);
-    
   }
 
   function filterFieldFactory(title: string, name: string) {
@@ -746,13 +743,22 @@ export default function Listagem({
 
   async function handleSubmit(inputCode: any) {
     let countNca = 0;
-    parcelas.map((item: any) => {
+    let validatePrint = 0;
+    let validateNca = 0;
+    const { response: parcels } = await experimentGenotipeService.getAll({
+      nca: inputCode,
+      idSafra,
+    });
+    parcels.map((item: any) => {
       if (item.nca == inputCode) {
-        if (item.status !== 'IMPRESSO') {
+        validateNca += 1;
+        if (item.status === 'EM ETIQUETAGEM') {
           setParcelasToPrint((current: any) => [...current, item.id]);
           countNca += 1;
           setGenotypeNameOne(item?.genotipo?.name_genotipo);
           setNcaOne(item.nca);
+        } else {
+          validatePrint += 1;
         }
       }
     });
@@ -760,7 +766,10 @@ export default function Listagem({
       id: experimentGroupId,
     });
     let colorVerify = '';
-    if (countNca > 0) {
+    if (validateNca == validatePrint) {
+      setValidateNcaOne('bg-red-600');
+      setErroMessage('Todos os NCA já foram impressos');
+    } else if (countNca > 0) {
       colorVerify = 'bg-green-600';
       setGroupNameOne(response[0]?.name);
       setValidateNcaOne('bg-green-600');
@@ -783,7 +792,11 @@ export default function Listagem({
     let countNca = 0;
     let secondNca = '';
 
-    parcelas.map((item: any) => {
+    const { response: parcelsAgain } = await experimentGenotipeService.getAll({
+      nca: inputCode,
+      idSafra,
+    });
+    parcelsAgain.map((item: any) => {
       if (item.nca == inputCode) {
         setGenotypeNameTwo(item?.genotipo?.name_genotipo);
         secondNca = item.nca;
@@ -813,7 +826,7 @@ export default function Listagem({
     if (colorVerify === 'bg-green-600') {
       setIsLoading(true);
 
-      const parcelsToPrint = parcelas.filter(
+      const parcelsToPrint = parcelsAgain.filter(
         (parcela: any) => parcelasToPrint.includes(parcela.id),
       );
       const validateSeeds: any = [];
@@ -929,10 +942,22 @@ export default function Listagem({
       (document.getElementById('inputCode') as HTMLInputElement).value = '';
       setDoubleVerify(true);
     } else {
+      let validateState = 0;
       // NA CHAMADA TEM QUE SER MANDANDO O NUMERO DO NPE PARA A API DAR BAIXA
       let writeOffIdList = parcelas.filter(
         (item: any) => item.npe === inputCode,
       );
+      writeOffIdList.map((item: any) => {
+        if (item.status !== 'IMPRESSO') {
+          validateState += 1;
+        }
+      });
+      if (writeOffIdList && validateState > 0) {
+        setValidateNcaTwo('bg-red-600');
+        setValidateNcaOne('bg-red-600');
+        setErroMessage('A NPE digitada não foi Impressa ainda');
+        return;
+      }
       writeOffIdList = writeOffIdList.map((item: any) => item.id);
       try {
         await experimentGenotipeService.update({
@@ -1040,7 +1065,7 @@ export default function Listagem({
   useEffect(() => {
     callingApi(filter);
   }, [typeOrder]);
-  
+
   // close ModalPrint on close Modal
   useEffect(() => {
     if (!isOpenModal) {
@@ -1073,15 +1098,15 @@ export default function Listagem({
       // }
 
       const message: Message = event.data;
-      
+
       console.log('menssage.parent', message);
 
-      if(message?.type == 'printed' && message?.value == '1'){
+      if (message?.type == 'printed' && message?.value == '1') {
         // close ModalPrint on close Modal
         setIsOpenModalPrint(false);
         cleanState();
       }
-      
+
       if (message?.type === 'printed') {
       } else if (message?.type === 'theme-from-child') {
       } else {
@@ -1091,9 +1116,8 @@ export default function Listagem({
 
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
-    
   }, []);
-  
+
   // https://github.com/andriishupta/cross-origin-iframe-communication-with-nextjs/blob/8bf38c9384afde8bfc5c533d8b6b719698574880/packages/parent-app/pages/index.tsx
   const postMessage = (message: Message) => {
     myRef?.current?.contentWindow?.postMessage(message, '*'); // OR use '*' to handle all origins
@@ -1139,7 +1163,7 @@ export default function Listagem({
           modalEtiquetaAutomatizada"
       >
         <h3>Impressão de etiquetas</h3>
-        
+
         <button
           type="button"
           className="flex absolute top-4 right-3 justify-end"
@@ -1202,7 +1226,7 @@ export default function Listagem({
             onClick={() => {
               cleanState();
               setIsOpenModal(false);
-              //setIsOpenModalPrint(false);
+              // setIsOpenModalPrint(false);
               // const ifr: any = document.getElementById('iframePrint');
               // ifr!.style.display = 'none';
             }}
@@ -1748,7 +1772,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('itensPage', { req, res });
     removeCookies('filterSelectStatusGrupoExp', { req, res });
   }
-  
+
   const pageBeforeEdit = req.cookies.pageBeforeEdit
     ? req.cookies.pageBeforeEdit
     : 0;

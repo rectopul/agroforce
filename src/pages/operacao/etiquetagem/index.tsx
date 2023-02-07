@@ -80,8 +80,6 @@ export default function Listagem({
 
   const tableRef = useRef<any>(null);
 
-  console.log({ filterSelectStatusGrupoExp });
-
   const [loading, setLoading] = useState<boolean>(false);
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
@@ -229,7 +227,6 @@ export default function Listagem({
       // filterStatus,
     }) => {
       const filterStatus = statusFilterSelected?.join(',');
-      console.log({ filterStatus });
 
       const parametersFilter = `&filterExperimentGroup=${filterExperimentGroup}&filterQtdExpTo=${filterQtdExpTo}&filterQtdExpFrom=${filterQtdExpFrom}&filterTotalEtiqImprimirTo=${filterTotalEtiqImprimirTo}&filterTotalEtiqImprimirFrom=${filterTotalEtiqImprimirFrom}&filterTotalEtiqImpressasTo=${filterTotalEtiqImpressasTo}&filterTotalEtiqImpressasFrom=${filterTotalEtiqImpressasFrom}&filterTotalEtiqTo=${filterTotalEtiqTo}&filterTotalEtiqFrom=${filterTotalEtiqFrom}&filterStatus=${filterStatus}&safraId=${safraId}&id_culture=${idCulture}`;
       // setFiltersParams(parametersFilter);
@@ -1317,6 +1314,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : '';
+  console.log('🚀 ~ file: index.tsx:1315 ~ req.cookies.filterBeforeEdit', req.cookies.filterBeforeEdit);
 
   const itensPerPage = req.cookies.takeBeforeEdit
     ? req.cookies.takeBeforeEdit
