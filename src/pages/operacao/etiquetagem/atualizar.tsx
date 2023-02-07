@@ -160,9 +160,9 @@ export default function Listagem({
     setCurrentPage(page);
 
     setFilter(parametersFilter);
-    setCookies('filterBeforeEdit', parametersFilter);
-    setCookies('filterBeforeEditTypeOrder', typeOrder);
-    setCookies('filterBeforeEditOrderBy', orderBy);
+    // setCookies('filterBeforeEdit', parametersFilter);
+    // setCookies('filterBeforeEditTypeOrder', typeOrder);
+    // setCookies('filterBeforeEditOrderBy', orderBy);
 
     parametersFilter = `${parametersFilter}&skip=${
       page * Number(take)
@@ -171,7 +171,7 @@ export default function Listagem({
     }&typeOrder=${typeOrder}`;
 
     setFiltersParams(parametersFilter);
-    setCookies('filtersParams', parametersFilter);
+    // setCookies('filtersParams', parametersFilter);
 
     await experimentService
       .getAll(parametersFilter)
@@ -670,7 +670,7 @@ export default function Listagem({
         isOpen={isOpenModalConfirm}
         text={`Tem certeza que deseja deletar ${
           isMultipleDelete
-            ? 'os items selecionados?'
+            ? `os ${selectedCheckBox?.length} items selecionados?`
             : `o item ${itemSelectedDelete?.experimentName}?`
         }`}
         onPress={isMultipleDelete ? deleteMultipleItems : deleteItem}
@@ -701,6 +701,16 @@ export default function Listagem({
               <div className="h-7 w-full flex gap-3 justify-end mt-6">
                 <div className="w-40">
                   <Button
+                    type="button"
+                    value="Voltar"
+                    bgColor="bg-red-600"
+                    textColor="white"
+                    icon={<IoMdArrowBack size={18} />}
+                    onClick={() => router.back()}
+                  />
+                </div>
+                <div className="w-40">
+                  <Button
                     type="submit"
                     value="Atualizar"
                     bgColor="bg-blue-600"
@@ -709,16 +719,6 @@ export default function Listagem({
                     onClick={() => {
                       setLoading(true);
                     }}
-                  />
-                </div>
-                <div className="w-40">
-                  <Button
-                    type="button"
-                    value="Voltar"
-                    bgColor="bg-red-600"
-                    textColor="white"
-                    icon={<IoMdArrowBack size={18} />}
-                    onClick={() => router.back()}
                   />
                 </div>
               </div>

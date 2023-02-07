@@ -45,7 +45,9 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
     const listTags = data.map((item: any) => (
       <div className="etiquetaModelo1">
         <div className="flexRow" style={{ fontSize: 16 }}>
-          <div className="flex1">{item?.npe}</div>
+          <div className="flex1">
+            {Number(item?.npe)?.toLocaleString("pt-BR")}
+          </div>
           <div className="flex1">
             {item?.npe && <BarCode valor={generateEAN8(item?.npe)} />}
           </div>
@@ -65,9 +67,20 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
           </div>
           {/* FIM CONTAGEM IMPRESSAO ETIQUETAS */}
         </div>
+        <div
+          className="flexRow"
+          style={{
+            fontSize: 7,
+            justifyContent: "flex-end",
+            marginTop: -7,
+            marginBottom: -4,
+          }}
+        >
+          <div>{generateEAN8(item?.npe)}</div>
+        </div>
         <div className="flexRow" style={{ fontSize: 9 }}>
           <div className="flex1">{item?.genotipo?.name_genotipo}</div>
-          <div>{item?.nca}</div>
+          <div>{Number(item?.nca)?.toLocaleString("pt-BR")}</div>
         </div>
         <div style={{ fontSize: 7.5 }}>
           {item?.experiment?.local?.name_local_culture}-{item?.gli}-
