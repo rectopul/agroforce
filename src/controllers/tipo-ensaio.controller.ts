@@ -77,17 +77,32 @@ export class TypeAssayController {
       );
 
       response.map((item: any) => {
-        item.envelope.map((envelope: any) => {
-          if (envelope.id_safra === Number(options.id_safra)) {
-            item.envelope = envelope;
-          }
-        });
+        if(item.envelope && item.envelope.length>0) { 
+          item.envelope.map((envelope: any) => {
+            if (envelope.id_safra === Number(options.id_safra)) {
+              item.envelope = envelope;
+            }
+          }) 
+        }else{
+            let env: any = {};
+            env.seeds = '';
+            env.safra = {
+              safraName : ''
+            };
+            item.envelope = env;
+        }
       });
 
       if(options.orderBy == 'envelope.seeds' && options.typeOrder == 'asc'){
         response.sort((a: any, b: any) => b.envelope.seeds - a.envelope.seeds);
       }else if(options.orderBy == 'envelope.seeds' && options.typeOrder == 'desc'){
         response.sort((a: any, b: any) => a.envelope.seeds - b.envelope.seeds);
+      }
+
+      if(options.orderBy == 'envelope.safra.safraName' && options.typeOrder == 'asc'){
+        response.sort((a: any, b: any) => b.envelope.safra.safraName - a.envelope.safra.safraName);
+      }else if(options.orderBy == 'envelope.safra.safraName' && options.typeOrder == 'desc'){
+        response.sort((a: any, b: any) => a.envelope.safra.safraName - b.envelope.safra.safraName);
       }
 
       if (!response || response.total <= 0) {
