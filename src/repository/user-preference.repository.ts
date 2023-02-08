@@ -45,4 +45,10 @@ export class UserPreferenceRepository {
     });
     return Result;
   }
+
+  async delete(id: number) {
+    const result = await prisma.users_preferences.delete({ where: { id } });
+    return result;
+  }
+  
 }
