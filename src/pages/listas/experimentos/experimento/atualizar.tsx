@@ -110,17 +110,21 @@ export default function AtualizarLocal({
   const [loading, setLoading] = useState<boolean>(false);
 
   const [userLogado, setUserLogado] = useState<any>(JSON.parse(localStorage.getItem("user") as string));
-  const [preferences, setPreferences] = useState<any>(userLogado.preferences.parcelas || {
-    id: 0,
-    table_preferences:
-      "repetitionExperience,genotipo,gmr,bgm,fase,tecnologia,nt,rep,status,nca,npe,sequence,block,experiment",
-  });
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
-  
   const table = 'experiment_genotipe';
   const module_name = 'parcelas';
   const module_id = 30;
-
+  // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
+  const identifier_preference = module_name + router.route;
+  const preferencesDefault = {
+    id: 0,
+    route_usage: router.route,
+    table_preferences:
+      "repetitionExperience,genotipo,gmr,bgm,fase,tecnologia,nt,rep,status,nca,npe,sequence,block,experiment",
+  };
+  
+  const [preferences, setPreferences] = useState<any>(userLogado.preferences[identifier_preference] || preferencesDefault);
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  
   const [materiais, setMateriais] = useState<any>(() => allItens);
   const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -145,7 +149,7 @@ export default function AtualizarLocal({
     {name: "CamposGerenciados[]", title: "NCA", value: "nca"},
     {name: "CamposGerenciados[]", title: "NPE", value: "npe"},
     // { name: "CamposGerenciados[]", title: "Seq.", value: "sorteio" },
-    {name: "CamposGerenciados[]", title: "Bloco", value: "bloco"},
+    {name: "CamposGerenciados[]", title: "Bloco", value: "block"},
     {name: "CamposGerenciados[]", title: "Status parc", value: "status"},
   ]);
 
@@ -373,11 +377,12 @@ export default function AtualizarLocal({
           })
         );
       }
-      if (columnCampos[index] === "treatments_number") {
+      if (columnCampos[index] === "rep") {
         tableFields.push(
           headerTableFactoryGlobal({
             name: "Rep trat",
-            title: "rep",
+            //title: "rep",
+            title: "experiment.assay_list.treatmentsNumber",
             orderList,
             fieldOrder,
             handleOrder,
@@ -912,11 +917,13 @@ export default function AtualizarLocal({
                         <strong className="text-blue-600">
                           Total registrado: {itemsTotal}
                         </strong>
-                        <span style={{ fontSize: 9 }}>
-                        {JSON.stringify(preferences.table_preferences)}<br/>
-                        {JSON.stringify(generatesProps)}
-                        {JSON.stringify(preferences)}
-                        </span>
+                        {/*<span style={{ fontSize: 9, width:300 }}>*/}
+                        {/*  {JSON.stringify(preferences.table_preferences)}*/}
+                        {/*  {JSON.stringify(generatesProps)}*/}
+                        {/*  {JSON.stringify(preferences)}*/}
+                        {/*  /!*{JSON.stringify(userLogado)}*!/*/}
+                        
+                        {/*</span>*/}
                       </div>
                       <div className="flex flex-1 mb-6 justify-end">
                         <FieldItemsPerPage
@@ -927,23 +934,20 @@ export default function AtualizarLocal({
                       </div>
                     </div>
                     
-                    <pre style={{ fontSize:9, width: 300 }}>
-                      {JSON.stringify(userLogado)}
-                    </pre>
-                    
-
                     <div className="h-full flex items-center gap-2">
                       
                       <ManageFields 
                         statusAccordionExpanded={false} 
                         generatesPropsDefault={generatesProps}
                         camposGerenciadosDefault={camposGerenciados}
-                        preferences={preferences} 
+                        preferences={preferences}
+                        preferencesDefault={preferencesDefault}
                         userLogado={userLogado} 
                         label="Gerenciar Campos" 
                         table={table} 
                         module_name={module_name} 
                         module_id={module_id} 
+                        identifier_preference={identifier_preference}
                         OnSetStatusAccordion={(e: any) => { console.log('callback','setStatusAccordion', e); setStatusAccordion(e); }}
                         OnSetGeneratesProps={(e: any) => { console.log('callback','setGeneratesProps', e); setGeneratesProps(e); }}
                         OnSetCamposGerenciados={(e: any) => { console.log('callback','setCamposGerenciados', e); setCamposGerenciados(e); }}
@@ -1020,6 +1024,7 @@ export default function AtualizarLocal({
                         />
                       </div>
                     </div>
+                    
                   </div>
                 ),
                 Pagination: (props) =>

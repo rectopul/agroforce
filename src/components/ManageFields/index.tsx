@@ -6,17 +6,26 @@ import {CheckBox} from "../CheckBox";
 import {userPreferencesService} from "../../services";
 import {useEffect, useState} from "react";
 import Swal from "sweetalert2";
+import {useRouter} from "next/router";
+
+interface IPreferences {
+  id: number;
+  userId?: number;
+  table_preferences: string;
+}
 
 interface ManageFieldsProps {
   statusAccordionExpanded: boolean;
   generatesPropsDefault: IGenerateProps[];
   camposGerenciadosDefault: any;
   label?: string;
-  preferences: any;
+  preferences: IPreferences;
+  preferencesDefault: IPreferences;
   userLogado: any;
   table: string;
   module_name: string;
   module_id: number;
+  identifier_preference: string;
   OnSetStatusAccordion: Function;
   OnSetGeneratesProps: Function;
   OnSetCamposGerenciados: Function;
@@ -33,6 +42,10 @@ interface IGenerateProps {
 }
 
 export function ManageFields(props: ManageFieldsProps) {
+
+  const router = useRouter();
+  
+  const preferencesDefault = props.preferencesDefault;
   
   // const [statusAccordion, setStatusAccordion] = useState<boolean>(props.statusAccordionExpanded);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(props.statusAccordionExpanded);
@@ -49,6 +62,10 @@ export function ManageFields(props: ManageFieldsProps) {
     reorderGeneratedProps();
     props.OnSetGeneratesProps(generatesProps);
   }, []);
+  
+  useEffect(() => {
+    props.OnSetPreferences(preferences);
+  }, [preferences]);
   
   // useEffect(() => {
   //   console.log('useEffect', 'statusAccordion', statusAccordion);
@@ -113,39 +130,29 @@ export function ManageFields(props: ManageFieldsProps) {
       .deleted(preferences.id)
       .then(({ status, response }) => {
         console.log('response', response);
+        
         if (status === 200) {
-          setUserLogado({
-            ...userLogado,
-            preferences: {
-              ...userLogado.preferences,
-              [props.module_name]: {
-                id: 0,
-                userId: 0,
-                table_preferences: "",
-              },
-            },
-          });
-          setPreferences({
-            id: 0,
-            userId: 0,
-            table_preferences: "",
-          });
-          props.OnSetUserLogado({
-            ...userLogado,
-            preferences: {
-              ...userLogado.preferences,
-              [props.module_name]: {
-                id: 0,
-                userId: 0,
-                table_preferences: "",
-              },
-            },
-          });
-          props.OnSetPreferences({
-            id: 0,
-            userId: 0,
-            table_preferences: "",
-          });
+          preferencesDefault.userId = userLogado.id;
+
+          delete userLogado.preferences[props.identifier_preference];
+          userLogado.preferences[props.identifier_preference] = preferencesDefault;
+          
+          console.log(`====> ${props.identifier_preference}::`,preferencesDefault);
+          
+          let preferences1 = userLogado.preferences[props.identifier_preference];
+
+          setUserLogado(userLogado);
+          setPreferences(preferencesDefault);
+          props.OnSetUserLogado(userLogado);
+          props.OnSetPreferences(preferencesDefault);
+
+          localStorage.setItem("user", JSON.stringify(userLogado));
+          
+          console.log('====>preferences antes de chamar getValuesColumns:', preferences);
+          console.log('====>preferences antes de chamar getValuesColumns:', preferences1);
+          
+          getValuesColumns();
+          
         }
       })
       .catch((error) => {
@@ -173,35 +180,59 @@ export function ManageFields(props: ManageFieldsProps) {
         .create({
           table_preferences: campos,
           userId: userLogado.id,
+          route_usage: router.route,
           module_id: props.module_id,
         })
         .then((response) => {
           
-          userLogado.preferences[props.module_name] = {
+          userLogado.preferences[props.identifier_preference] = {
             id: response.response.id,
-            userId: preferences.userId,
+            route_usage: router.route,
+            userId: userLogado.id,
             table_preferences: campos,
           };
           
-          preferences.id = response.response.id;
+          setPreferences(userLogado.preferences[props.identifier_preference]);
           
         });
       localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
-      userLogado.preferences[props.module_name] = {
+      userLogado.preferences[props.identifier_preference] = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
       };
-      await userPreferencesService.update({
+      console.log('atualização de preferências: ', userLogado.preferences[props.identifier_preference]);
+      
+      // verifica se existe alguma preferência salva no banco
+      await userPreferencesService.getAll({id: preferences.id})
+        .then((response) => {
+          console.log('response', response);
+        })
+        .catch((error) => {
+
+        });
+
+      const response = await userPreferencesService.update({
         table_preferences: campos,
-        id: props.preferences.id,
-      });
+        id: preferences.id,
+      })
+        .then((response) => {
+          console.log('===> UPDATE:','response:', response);
+          
+        })
+        .catch((error) => {
+          console.log('error', error);
+          Swal.fire({
+            title: "Falha ao atualizar preferências",
+            html: "Ocorreu um erro ao atualizar as preferências do usuário. Tente novamente mais tarde.\r\n" + JSON.stringify(error),
+            width: "800",
+          });
+        });
       localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
-    let preferences1 = userLogado.preferences[props.module_name];
-    
+    let preferences1 = userLogado.preferences[props.identifier_preference];
     
     setUserLogado(userLogado);
     setPreferences(preferences1);
@@ -215,16 +246,12 @@ export function ManageFields(props: ManageFieldsProps) {
     // manda para o pai os generetesProps ao clicar em atualizar, pois finalizamos nossa ordenação;
     props.OnSetGeneratesProps(generatesProps);
     
-    setStatusAccordion(false);
+     setStatusAccordion(false);
   }
 
   return (
     <div className="border-solid border-2 border-blue-600 rounded">
       <div className="w-72">
-        <span style={{fontSize:9}}>
-          {JSON.stringify(props.preferences.table_preferences)}
-          {statusAccordion}
-        </span>
         <AccordionFilter
           title="Gerenciar Campos"
           grid={statusAccordion}
@@ -247,15 +274,15 @@ export function ManageFields(props: ManageFieldsProps) {
                     />
                   </div>
                   
-                  <div className="h-8 mb-3">
-                    <Button
-                      value="Limpar Preferências"
-                      bgColor="bg-red-600"
-                      textColor="white"
-                      onClick={clearPreferencesByUserAndModule}
-                      icon={<IoTrash size={20}/>}
-                    />
-                  </div>
+                  {/*<div className="h-8 mb-3">*/}
+                  {/*  <Button*/}
+                  {/*    value="Limpar Preferências"*/}
+                  {/*    bgColor="bg-red-600"*/}
+                  {/*    textColor="white"*/}
+                  {/*    onClick={clearPreferencesByUserAndModule}*/}
+                  {/*    icon={<IoTrash size={20}/>}*/}
+                  {/*  />*/}
+                  {/*</div>*/}
                   
                   {generatesProps.map((generate, index) => (
                     <Draggable
@@ -269,14 +296,13 @@ export function ManageFields(props: ManageFieldsProps) {
                           {...provider.draggableProps}
                           {...provider.dragHandleProps}
                         >
-                          {camposGerenciados}
-                          {generate.value}
+                          {/*{generate.value}::{camposGerenciados}*/}
+                          
                           <CheckBox
                             name={generate.name}
                             title={generate.title?.toString()}
                             value={generate.value}
                             defaultChecked={camposGerenciados.split(',').indexOf(generate.value) > -1}
-                            // defaultChecked={camposGerenciados.includes(generate.value as string)}
                           />
                         </li>
                       )}
@@ -288,6 +314,12 @@ export function ManageFields(props: ManageFieldsProps) {
             </Droppable>
           </DragDropContext>
         </AccordionFilter>
+
+        {/*<span style={{fontSize:9}} className="w-30">*/}
+        {/*  Preferences COMP: {JSON.stringify(props.preferences.table_preferences,null, 2)}<br/>*/}
+        {/*  Status Acordion COMP: {statusAccordion}*/}
+        {/*</span>*/}
+        
       </div>
     </div>
   );

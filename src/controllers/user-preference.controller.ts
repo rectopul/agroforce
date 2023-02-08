@@ -13,6 +13,10 @@ export class UserPreferenceController {
     try {
       const select = { id: true, userId: true, table_preferences: true };
 
+      if(options.id){
+        parameters.id = Number(options.id);
+      }
+      
       if (options.userId) {
         parameters.userId = Number(options.userId);
       }
@@ -91,7 +95,7 @@ export class UserPreferenceController {
       return { status: 400, message: 'houve um erro, tente novamente' };
     } catch (error: any) {
       handleError('User Preferences controller', 'create', error.message);
-      throw new Error('[Controller] - create User Preferences erro');
+      throw new Error('[Controller] - create User Preferences erro: ' + error.message);
     }
   }
 
