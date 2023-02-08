@@ -17,8 +17,13 @@ function getAll(parameters: any) {
   return fetchWrapper.get(baseUrl, parameters);
 }
 
+function deleted(parameters: any) {
+  return fetchWrapper.deleted(baseUrl, parameters);
+}
+
 export const userPreferencesService = {
   getAll,
   create,
   update,
+  deleted
 };

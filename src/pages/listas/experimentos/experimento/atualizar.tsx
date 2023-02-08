@@ -38,7 +38,8 @@ import {
   Content,
   Input,
   InputMoney,
-  FieldItemsPerPage,
+  FieldItemsPerPage, 
+  ManageFields,
 } from "../../../../components";
 import * as ITabs from "../../../../shared/utils/dropdown";
 import { tableGlobalFunctions } from "../../../../helpers";
@@ -108,23 +109,27 @@ export default function AtualizarLocal({
   const tableRef = useRef<any>();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
-  const preferences = userLogado.preferences.parcelas || {
+  const [userLogado, setUserLogado] = useState<any>(JSON.parse(localStorage.getItem("user") as string));
+  const table = 'experiment_genotipe';
+  const module_name = 'parcelas';
+  const module_id = 30;
+  // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
+  const identifier_preference = module_name + router.route;
+  const preferencesDefault = {
     id: 0,
+    route_usage: router.route,
     table_preferences:
       "repetitionExperience,genotipo,gmr,bgm,fase,tecnologia,nt,rep,status,nca,npe,sequence,block,experiment",
   };
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences
-  );
-
+  
+  const [preferences, setPreferences] = useState<any>(userLogado.preferences[identifier_preference] || preferencesDefault);
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(preferences.table_preferences);
+  
   const [materiais, setMateriais] = useState<any>(() => allItens);
   const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
-  const [orderList, setOrder] = useState<number>(
-    typeOrderServer == "desc" ? 1 : 2
-  );
+  const [orderList, setOrder] = useState<number>(typeOrderServer == "desc" ? 1 : 2);
   // const [setArrowOrder] = useState<any>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [filter, setFilter] = useState<any>(filterApplication);
@@ -132,28 +137,20 @@ export default function AtualizarLocal({
   const [filtersParams, setFiltersParams] = useState<any>(""); // Set filter Parameter
   // const [colorStar, setColorStar] = useState<string>('');
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    {
-      name: "CamposGerenciados[]",
-      title: "Rep Exp",
-      value: "repetitionExperience",
-    },
-    {
-      name: "CamposGerenciados[]",
-      title: "Nome do genotipo",
-      value: "genotipo",
-    },
-    { name: "CamposGerenciados[]", title: "GMR_ens", value: "gmr" },
-    { name: "CamposGerenciados[]", title: "BGM_ens", value: "bgm" },
-    { name: "CamposGerenciados[]", title: "Fase", value: "fase" },
-    { name: "CamposGerenciados[]", title: "Tecnologia", value: "tecnologia" },
-    { name: "CamposGerenciados[]", title: "NT", value: "nt" },
-    { name: "CamposGerenciados[]", title: "Rep. trat.", value: "rep" },
-    { name: "CamposGerenciados[]", title: "T", value: "status_t" },
-    { name: "CamposGerenciados[]", title: "NCA", value: "nca" },
-    { name: "CamposGerenciados[]", title: "NPE", value: "npe" },
+    {name: "CamposGerenciados[]", title: "Rep Exp", value: "repetitionExperience",},
+    {name: "CamposGerenciados[]", title: "Nome do genotipo", value: "genotipo",},
+    {name: "CamposGerenciados[]", title: "GMR_ens", value: "gmr"},
+    {name: "CamposGerenciados[]", title: "BGM_ens", value: "bgm"},
+    {name: "CamposGerenciados[]", title: "Fase", value: "fase"},
+    {name: "CamposGerenciados[]", title: "Tecnologia", value: "tecnologia"},
+    {name: "CamposGerenciados[]", title: "NT", value: "nt"},
+    {name: "CamposGerenciados[]", title: "Rep. trat.", value: "rep"},
+    {name: "CamposGerenciados[]", title: "T", value: "status_t"},
+    {name: "CamposGerenciados[]", title: "NCA", value: "nca"},
+    {name: "CamposGerenciados[]", title: "NPE", value: "npe"},
     // { name: "CamposGerenciados[]", title: "Seq.", value: "sorteio" },
-    { name: "CamposGerenciados[]", title: "Bloco", value: "bloco" },
-    { name: "CamposGerenciados[]", title: "Status parc", value: "status" },
+    {name: "CamposGerenciados[]", title: "Bloco", value: "block"},
+    {name: "CamposGerenciados[]", title: "Status parc", value: "status"},
   ]);
 
   const [take, setTake] = useState<any>(itensPerPage);
@@ -256,8 +253,7 @@ export default function AtualizarLocal({
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
-
-
+    
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
@@ -381,11 +377,12 @@ export default function AtualizarLocal({
           })
         );
       }
-      if (columnCampos[index] === "treatments_number") {
+      if (columnCampos[index] === "rep") {
         tableFields.push(
           headerTableFactoryGlobal({
             name: "Rep trat",
-            title: "rep",
+            //title: "rep",
+            title: "experiment.assay_list.treatmentsNumber",
             orderList,
             fieldOrder,
             handleOrder,
@@ -455,64 +452,67 @@ export default function AtualizarLocal({
         );
       }
     });
+    
+    console.log("======> PARENT: Ordenação das colunas: ", `'${columnsCampos}'`, tableFields);
+    
     return tableFields;
   }
 
   const columns = columnsOrder(camposGerenciados);
 
-  async function getValuesColumns(): Promise<void> {
-    const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = "";
-    for (let i = 0; i < els.length; i += 1) {
-      if (els[i].checked) {
-        selecionados += `${els[i].value},`;
-      }
-    }
-    const totalString = selecionados.length;
-    const campos = selecionados.substr(0, totalString - 1);
-    if (preferences.id === 0) {
-      await userPreferencesService
-        .create({
-          table_preferences: campos,
-          userId: userLogado.id,
-          module_id: 30,
-        })
-        .then((response) => {
-          userLogado.preferences.parcelas = {
-            id: response.response.id,
-            userId: preferences.userId,
-            table_preferences: campos,
-          };
-          preferences.id = response.response.id;
-        });
-      localStorage.setItem("user", JSON.stringify(userLogado));
-    } else {
-      userLogado.preferences.parcelas = {
-        id: preferences.id,
-        userId: preferences.userId,
-        table_preferences: campos,
-      };
-      await userPreferencesService.update({
-        table_preferences: campos,
-        id: preferences.id,
-      });
-      localStorage.setItem("user", JSON.stringify(userLogado));
-    }
-
-    setStatusAccordion(false);
-    setCamposGerenciados(campos);
-  }
-
-  function handleOnDragEnd(result: DropResult): void {
-    setStatusAccordion(true);
-    if (!result) return;
-
-    const items = Array.from(generatesProps);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    const index: number = Number(result.destination?.index);
-    items.splice(index, 0, reorderedItem);
-    setGeneratesProps(items);
-  }
+  // async function getValuesColumns(): Promise<void> {
+  //   const els: any = document.querySelectorAll("input[type='checkbox']");
+  //   let selecionados = "";
+  //   for (let i = 0; i < els.length; i += 1) {
+  //     if (els[i].checked) {
+  //       selecionados += `${els[i].value},`;
+  //     }
+  //   }
+  //   const totalString = selecionados.length;
+  //   const campos = selecionados.substr(0, totalString - 1);
+  //   if (preferences.id === 0) {
+  //     await userPreferencesService
+  //       .create({
+  //         table_preferences: campos,
+  //         userId: userLogado.id,
+  //         module_id: 30,
+  //       })
+  //       .then((response) => {
+  //         userLogado.preferences.parcelas = {
+  //           id: response.response.id,
+  //           userId: preferences.userId,
+  //           table_preferences: campos,
+  //         };
+  //         preferences.id = response.response.id;
+  //       });
+  //     localStorage.setItem("user", JSON.stringify(userLogado));
+  //   } else {
+  //     userLogado.preferences.parcelas = {
+  //       id: preferences.id,
+  //       userId: preferences.userId,
+  //       table_preferences: campos,
+  //     };
+  //     await userPreferencesService.update({
+  //       table_preferences: campos,
+  //       id: preferences.id,
+  //     });
+  //     localStorage.setItem("user", JSON.stringify(userLogado));
+  //   }
+  //
+  //   setStatusAccordion(false);
+  //   setCamposGerenciados(campos);
+  // }
+  
+  // function handleOnDragEnd(result: DropResult): void {
+  //   setStatusAccordion(true);
+  //   if (!result) return;
+  //
+  //   const items = Array.from(generatesProps);
+  //   const [reorderedItem] = items.splice(result.source.index, 1);
+  //   const index: number = Number(result.destination?.index);
+  //   items.splice(index, 0, reorderedItem);
+  //   setGeneratesProps(items);
+  // }
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
@@ -917,6 +917,13 @@ export default function AtualizarLocal({
                         <strong className="text-blue-600">
                           Total registrado: {itemsTotal}
                         </strong>
+                        {/*<span style={{ fontSize: 9, width:300 }}>*/}
+                        {/*  {JSON.stringify(preferences.table_preferences)}*/}
+                        {/*  {JSON.stringify(generatesProps)}*/}
+                        {/*  {JSON.stringify(preferences)}*/}
+                        {/*  /!*{JSON.stringify(userLogado)}*!/*/}
+                        
+                        {/*</span>*/}
                       </div>
                       <div className="flex flex-1 mb-6 justify-end">
                         <FieldItemsPerPage
@@ -926,63 +933,84 @@ export default function AtualizarLocal({
                         />
                       </div>
                     </div>
-
+                    
                     <div className="h-full flex items-center gap-2">
-                      <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-72">
-                          <AccordionFilter
-                            title="Gerenciar Campos"
-                            grid={statusAccordion}
-                          >
-                            <DragDropContext onDragEnd={handleOnDragEnd}>
-                              <Droppable droppableId="characters">
-                                {(provided) => (
-                                  <ul
-                                    className="w-full h-full characters"
-                                    {...provided.droppableProps}
-                                    ref={provided.innerRef}
-                                  >
-                                    <div className="h-8 mb-3">
-                                      <Button
-                                        value="Atualizar"
-                                        bgColor="bg-blue-600"
-                                        textColor="white"
-                                        onClick={getValuesColumns}
-                                        icon={<IoReloadSharp size={20} />}
-                                      />
-                                    </div>
-                                    {generatesProps.map((generate, index) => (
-                                      <Draggable
-                                        key={index}
-                                        draggableId={String(generate.title)}
-                                        index={index}
-                                      >
-                                        {(provider) => (
-                                          <li
-                                            ref={provider.innerRef}
-                                            {...provider.draggableProps}
-                                            {...provider.dragHandleProps}
-                                          >
-                                            <CheckBox
-                                              name={generate.name}
-                                              title={generate.title?.toString()}
-                                              value={generate.value}
-                                              defaultChecked={camposGerenciados.includes(
-                                                generate.value as string
-                                              )}
-                                            />
-                                          </li>
-                                        )}
-                                      </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                  </ul>
-                                )}
-                              </Droppable>
-                            </DragDropContext>
-                          </AccordionFilter>
-                        </div>
-                      </div>
+                      
+                      <ManageFields 
+                        statusAccordionExpanded={false} 
+                        generatesPropsDefault={generatesProps}
+                        camposGerenciadosDefault={camposGerenciados}
+                        preferences={preferences}
+                        preferencesDefault={preferencesDefault}
+                        userLogado={userLogado} 
+                        label="Gerenciar Campos" 
+                        table={table} 
+                        module_name={module_name} 
+                        module_id={module_id} 
+                        identifier_preference={identifier_preference}
+                        OnSetStatusAccordion={(e: any) => { console.log('callback','setStatusAccordion', e); setStatusAccordion(e); }}
+                        OnSetGeneratesProps={(e: any) => { console.log('callback','setGeneratesProps', e); setGeneratesProps(e); }}
+                        OnSetCamposGerenciados={(e: any) => { console.log('callback','setCamposGerenciados', e); setCamposGerenciados(e); }}
+                        OnColumnsOrder={(e: any) => { console.log('callback','columnsOrder', e); columnsOrder(e); }}
+                        OnSetUserLogado={(e: any) => { console.log('callback','setUserLogado', e); setUserLogado(e); }}
+                        OnSetPreferences={(e: any) => { console.log('callback','setPreferences', e); setPreferences(e); }}
+                      ></ManageFields>
+                      
+                      {/*<div className="border-solid border-2 border-blue-600 rounded">*/}
+                      {/*  <div className="w-72">*/}
+                      {/*    <AccordionFilter*/}
+                      {/*      title="Gerenciar Campos"*/}
+                      {/*      grid={statusAccordion}*/}
+                      {/*    >*/}
+                      {/*      <DragDropContext onDragEnd={handleOnDragEnd}>*/}
+                      {/*        <Droppable droppableId="characters">*/}
+                      {/*          {(provided) => (*/}
+                      {/*            <ul*/}
+                      {/*              className="w-full h-full characters"*/}
+                      {/*              {...provided.droppableProps}*/}
+                      {/*              ref={provided.innerRef}*/}
+                      {/*            >*/}
+                      {/*              <div className="h-8 mb-3">*/}
+                      {/*                <Button*/}
+                      {/*                  value="Atualizar"*/}
+                      {/*                  bgColor="bg-blue-600"*/}
+                      {/*                  textColor="white"*/}
+                      {/*                  onClick={getValuesColumns}*/}
+                      {/*                  icon={<IoReloadSharp size={20} />}*/}
+                      {/*                />*/}
+                      {/*              </div>*/}
+                      {/*              {generatesProps.map((generate, index) => (*/}
+                      {/*                <Draggable*/}
+                      {/*                  key={index}*/}
+                      {/*                  draggableId={String(generate.title)}*/}
+                      {/*                  index={index}*/}
+                      {/*                >*/}
+                      {/*                  {(provider) => (*/}
+                      {/*                    <li*/}
+                      {/*                      ref={provider.innerRef}*/}
+                      {/*                      {...provider.draggableProps}*/}
+                      {/*                      {...provider.dragHandleProps}*/}
+                      {/*                    >*/}
+                      {/*                      <CheckBox*/}
+                      {/*                        name={generate.name}*/}
+                      {/*                        title={generate.title?.toString()}*/}
+                      {/*                        value={generate.value}*/}
+                      {/*                        defaultChecked={camposGerenciados.includes(*/}
+                      {/*                          generate.value as string*/}
+                      {/*                        )}*/}
+                      {/*                      />*/}
+                      {/*                    </li>*/}
+                      {/*                  )}*/}
+                      {/*                </Draggable>*/}
+                      {/*              ))}*/}
+                      {/*              {provided.placeholder}*/}
+                      {/*            </ul>*/}
+                      {/*          )}*/}
+                      {/*        </Droppable>*/}
+                      {/*      </DragDropContext>*/}
+                      {/*    </AccordionFilter>*/}
+                      {/*  </div>*/}
+                      {/*</div>*/}
 
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
@@ -996,6 +1024,7 @@ export default function AtualizarLocal({
                         />
                       </div>
                     </div>
+                    
                   </div>
                 ),
                 Pagination: (props) =>
