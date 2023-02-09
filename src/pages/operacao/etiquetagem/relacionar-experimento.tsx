@@ -204,7 +204,8 @@ export default function Listagem({
       filterCodTec,
       filterPeriod,
       filterDelineamento,
-      filterRepetition,
+      filterRepetitionTo,
+      filterRepetitionFrom,
     }) => {
       if (!functionsUtils?.isNumeric(filterPeriod)) {
         return Swal.fire('O campo Época não pode ter ponto ou vírgula.');
@@ -220,7 +221,7 @@ export default function Listagem({
         }
       }
 
-      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterCodTec=${filterCodTec}&filterPeriod=${filterPeriod}&filterRepetition=${filterRepetition}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterExperimentStatus=SORTEADO`;
+      const parametersFilter = `filterFoco=${filterFoco}&filterTypeAssay=${filterTypeAssay}&filterGli=${filterGli}&filterExperimentName=${filterExperimentName}&filterTecnologia=${filterTecnologia}&filterCodTec=${filterCodTec}&filterPeriod=${filterPeriod}&filterRepetitionTo=${filterRepetitionTo}&filterRepetitionFrom=${filterRepetitionFrom}&filterDelineamento=${filterDelineamento}&idSafra=${idSafra}&filterExperimentStatus=SORTEADO`;
 
       setLoading(true);
       setFilter(parametersFilter);
@@ -279,8 +280,9 @@ export default function Listagem({
     setLoading(true);
 
     // Global manage orders
-    const { typeOrderG, columnG, orderByG, arrowOrder } =
-      await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);

@@ -38,6 +38,7 @@ import {
 } from '@mui/material';
 import { fetchWrapper, tableGlobalFunctions } from 'src/helpers';
 import { useRouter } from 'next/router';
+import { removeCookies, setCookies } from 'cookies-next';
 import {
   AccordionFilter,
   CheckBox,
@@ -83,6 +84,10 @@ export default function Import({
   allLogs,
   totalItems,
   itensPerPage,
+  filterBeforeEdit,
+  typeOrderServer,
+  orderByserver,
+  pageBeforeEdit,
   filterApplication,
   uploadInProcess,
   idSafra,
@@ -169,6 +174,13 @@ export default function Import({
   }, [filePath]);
 
   async function readExcel(moduleId: number, table: string) {
+    setCookies('pageBeforeEdit', currentPage?.toString());
+    setCookies('filterBeforeEdit', filter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
+    setCookies('lastPage', 'atualizar');
+    setCookies('takeBeforeEdit', take);
+    setCookies('itensPage', itensPerPage);
     try {
       const value: any = document.getElementById(`inputFile-${moduleId}`);
       if (!value.files[0]) {
@@ -218,7 +230,7 @@ export default function Import({
           setFilePath(res.filename);
         }).catch((err: any) => {
           Swal.fire({
-            html: 'Erro ao ler planilha: '+err.message,
+            html: `Erro ao ler planilha: ${err.message}`,
             width: '800',
           });
         });
@@ -246,10 +258,12 @@ export default function Import({
   );
 
   const [logs, setLogs] = useState<LogData[]>(allLogs);
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(pageBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
-  const [filter, setFilter] = useState<any>(filterApplication);
-  const [orderList, setOrder] = useState<number>(0);
+  const [filter, setFilter] = useState<any>(filterBeforeEdit);
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == 'desc' ? 1 : 2,
+  );
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [statusAccordionFilter, setStatusAccordionFilter] = useState<boolean>(false);
@@ -264,8 +278,8 @@ export default function Import({
   ]);
   const [colorStar, setColorStar] = useState<string>('');
   const [orderBy, setOrderBy] = useState<string>('');
-  const [typeOrder, setTypeOrder] = useState<string>('');
-  const [fieldOrder, setFieldOrder] = useState<any>(null);
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -1204,19 +1218,57 @@ export default function Import({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
-  const PreferencesControllers = new UserPreferenceController();
-  // eslint-disable-next-line max-len
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) ?? 15;
-
+export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
   const { publicRuntimeConfig } = getConfig();
   const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);
   const idCulture = Number(req.cookies.cultureId);
 
-  const filterApplication = `&idSafra=${idSafra}`;
+  const pageBeforeEdit = req.cookies.pageBeforeEdit
+    ? req.cookies.pageBeforeEdit
+    : 0;
+
+  // Last page
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
+
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
+    removeCookies('itensPage', { req, res });
+    removeCookies('filterSelectStatusExp', { req, res });
+  }
+
+  const itensPerPage = req.cookies.takeBeforeEdit
+    ? req.cookies.takeBeforeEdit
+    : 10;
+
+  const filterBeforeEdit = req.cookies.filterBeforeEdit
+    ? req.cookies.filterBeforeEdit
+    : `&idSafra=${idSafra}`;
+
+  const filterApplication = req.cookies.filterBeforeEdit
+    ? `${req.cookies.filterBeforeEdit}`
+    : `idSafra=${idSafra}`;
+
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'asc';
+
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : 'created_at';
+
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('takeBeforeEdit', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
+  removeCookies('filterSelectStatusExp', { req, res });
+
   const param = `skip=0&take=${itensPerPage}&idSafra=${idSafra}`;
 
   const urlParameters: any = new URL(
@@ -1241,6 +1293,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
       allLogs,
       totalItems,
       itensPerPage,
+      filterBeforeEdit,
+      typeOrderServer,
+      orderByserver,
+      pageBeforeEdit,
       filterApplication,
       uploadInProcess,
       idSafra,
