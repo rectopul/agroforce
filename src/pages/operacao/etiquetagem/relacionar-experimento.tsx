@@ -71,7 +71,7 @@ interface IFilter {
   filterGli: string;
   filterExperimentName: string;
   filterTecnologia: string;
-  filterCod: string;
+  filterCodTec: string;
   filterPeriod: string;
   filterDelineamento: string;
   filterRepetition: string;
