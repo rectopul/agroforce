@@ -497,6 +497,17 @@ export class ImportGenotypeController {
                 }
               }
             }
+
+            if (configModule.response[0]?.fields[column] === 'Peso') {
+              if (isNaN(spreadSheet[row][column])) {
+                responseIfError[Number(column)] += responsePositiveNumericFactory(
+                  Number(column) + 1,
+                  row,
+                  spreadSheet[0][column],
+                );
+              }
+            }
+
             if (configModule.response[0]?.fields[column] === 'DT_EXPORT') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
@@ -850,7 +861,7 @@ export class ImportGenotypeController {
 
               if (configModule.response[0]?.fields[column] === 'Peso') {
                 if (spreadSheet[row][column] !== null) {
-                  this.aux.peso = Number(spreadSheet[row][column].toFixed(5));
+                  this.aux.peso = Number(spreadSheet[row][column]).toFixed(5);
                 }
               }
 
