@@ -1,10 +1,10 @@
+import createXls from 'src/helpers/api/xlsx-global-download';
 import handleError from '../shared/utils/handleError';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { LoteRepository } from '../repository/lote.repository';
 import { GenotipoController } from './genotype/genotipo.controller';
 import { countLotesNumber } from '../shared/utils/counts';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
-import createXls from 'src/helpers/api/xlsx-global-download';
 
 export class LoteController {
   loteRepository = new LoteRepository();

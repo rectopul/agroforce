@@ -126,7 +126,9 @@ export default function Listagem({
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
-  const [orderList, setOrder] = useState<number>(0);
+  const [orderList, setOrder] = useState<number>(
+    typeOrderServer == 'desc' ? 1 : 2,
+  );
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [afterFilter, setAfterFilter] = useState<boolean>(false);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
@@ -400,10 +402,10 @@ export default function Listagem({
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-    setFieldOrder(name);
+    setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
-    setOrder(orderByG);
+    typeOrderG !== '' ? (typeOrderG == 'desc' ? setOrder(1) : setOrder(2)) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -690,15 +692,11 @@ export default function Listagem({
   }
 
   async function reloadExperimentGroup() {
-    console.log('reloadExperimentGroup', 'before', experimentGroup);
-
     const { response } = await experimentGroupService.getAll({
       id: experimentGroupId,
     });
 
     setExperimentGroupUpdated(response[0]);
-
-    console.log('reloadExperimentGroup', 'after', experimentGroup);
   }
 
   function filterFieldFactory(title: string, name: string) {
@@ -734,6 +732,7 @@ export default function Listagem({
     setValidateNcaTwo('bg-gray-300');
     setParcelasToPrint([]);
     setErroMessage('');
+    setRowsSelected([]);
     // setIsOpenModal(!isOpenModal);
     if (isOpenModal) {
       (document.getElementById('inputCode') as HTMLInputElement).value = '';
@@ -748,6 +747,7 @@ export default function Listagem({
     const { response: parcels } = await experimentGenotipeService.getAll({
       nca: inputCode,
       idSafra,
+      experimentGroupId,
     });
     parcels.map((item: any) => {
       if (item.nca == inputCode) {
@@ -795,6 +795,7 @@ export default function Listagem({
     const { response: parcelsAgain } = await experimentGenotipeService.getAll({
       nca: inputCode,
       idSafra,
+      experimentGroupId,
     });
     parcelsAgain.map((item: any) => {
       if (item.nca == inputCode) {
@@ -842,7 +843,9 @@ export default function Listagem({
         }
       });
       if (validateSeeds.includes(true)) {
-        Swal.fire('Sementes não cadastradas no tipo de ensaio');
+        Swal.fire('Quantidade de sementes por envelope não cadastrada no tipo de ensaio');
+        setValidateNcaOne('bg-red-600');
+        setValidateNcaTwo('bg-red-600');
         setLoading(false);
         setIsLoading(false);
         return;
@@ -938,7 +941,7 @@ export default function Listagem({
   }
 
   async function writeOff(inputCode: any) {
-    let writeOffIdList = parcelas.filter(
+    const writeOffIdList = parcelas.filter(
       (item: any) => item.npe === inputCode,
     );
 
@@ -993,7 +996,8 @@ export default function Listagem({
     document.addEventListener('keydown', (e) => onPressEscape(e));
 
     return () => {
-      document.removeEventListener('keydown', (e) => console.log(e));
+      document.removeEventListener('keydown', (e) => {
+      });
     };
   }, []);
 
@@ -1109,8 +1113,6 @@ export default function Listagem({
       // }
 
       const message: Message = event.data;
-
-      console.log('menssage.parent', message);
 
       if (message?.type == 'printed' && message?.value == '1') {
         // close ModalPrint on close Modal

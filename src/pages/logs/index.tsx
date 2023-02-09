@@ -569,8 +569,6 @@ export default function Listagem({
 
                   {filterFieldFactory('filterModule', 'Módulo')}
 
-                  {filterFieldFactory('filterValue', 'Valor')}
-
                   <div className="h-10 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Operação
@@ -581,6 +579,8 @@ export default function Listagem({
                       onChange={(e: any) => setStatusFilterSelected(e)}
                     />
                   </div>
+
+                  {filterFieldFactory('filterValue', 'Valor')}
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
@@ -820,27 +820,17 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('itensPage', { req, res });
   }
 
-  const pageBeforeEdit = req.cookies.pageBeforeEdit
-    ? req.cookies.pageBeforeEdit
-    : 0;
+  const pageBeforeEdit = 0;
 
-  const filterBeforeEdit = req.cookies.filterBeforeEdit
-    ? req.cookies.filterBeforeEdit
-    : '';
+  const filterBeforeEdit = '';
 
-  const itensPerPage = req.cookies.takeBeforeEdit
-    ? req.cookies.takeBeforeEdit
-    : 10;
+  const itensPerPage = 10;
 
   // RR
-  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
-    ? req.cookies.filterBeforeEditTypeOrder
-    : 'desc';
+  const typeOrderServer = 'desc';
 
   // RR
-  const orderByserver = req.cookies.filterBeforeEditOrderBy
-    ? req.cookies.filterBeforeEditOrderBy
-    : 'madeIn';
+  const orderByserver = 'madeIn';
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit

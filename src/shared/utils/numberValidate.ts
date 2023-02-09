@@ -15,6 +15,6 @@ export function validateDouble(value: any): boolean {
 }
 
 export function validateDecimal(value: any): boolean {
-  const regex = /^\d+\.\d{0,2}$/;
+  const regex = /^\d+\.\d{0,5}$/;
   return (regex.test(value));
 }

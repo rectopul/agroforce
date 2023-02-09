@@ -5,14 +5,16 @@ import { IExperiments } from '../../interfaces/listas/experimento/experimento.in
 import { ExperimentController } from '../experiment/experiment.controller';
 import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
+import { ReporteController } from '../reportes/reporte.controller';
 
 export class ExperimentGroupController {
   experimentGroupRepository = new ExperimentGroupRepository();
 
   experimentController = new ExperimentController();
 
+  reporteController = new ReporteController();
+
   async getAll(options: any) {
-    console.log('🚀 ~ file: experiment-group.controller.ts:15 ~ ExperimentGroupController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     try {
@@ -189,6 +191,13 @@ export class ExperimentGroupController {
 
       if (assayListAlreadyExist) return { status: 400, message: 'Grupo de experimento já cadastrados' };
 
+      const { ip } = await fetch('https://api.ipify.org/?format=json')
+        .then((results) => results.json())
+        .catch(() => '0.0.0.0');
+      await this.reporteController.create({
+        userId: data.createdBy, module: 'GRUPO DE ETIQUETAGEM', operation: 'CRIAÇÃO', oldValue: data.name, ip: String(ip),
+      });
+
       const response = await this.experimentGroupRepository.create(data);
 
       return { status: 200, response, message: 'Grupo de experimento cadastrada' };
@@ -224,16 +233,21 @@ export class ExperimentGroupController {
     }
   }
 
-  async delete(id: number) {
+  async delete(data: any) {
     try {
-      const { status, response }: any = await this.getOne(Number(id));
+      const { status, response }: any = await this.getOne(Number(data.id));
       response.experiment.forEach(async (item: any) => {
         await this.experimentController.update({ id: item.id, experimentGroupId: null, status: 'SORTEADO' });
       });
 
       if (status !== 200) return { status: 400, message: 'Grupo de experimento não encontrada' };
 
-      await this.experimentGroupRepository.delete(Number(id));
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+      await this.reporteController.create({
+        userId: data.userId, module: 'GRUPO DE ETIQUETAGEM', operation: 'EXCLUSÃO', oldValue: response.name, ip: String(ip),
+      });
+
+      await this.experimentGroupRepository.delete(Number(data.id));
       return { status: 200, message: 'Grupo de experimento excluída' };
     } catch (error: any) {
       handleError('Grupo de experimento controller', 'Delete', error.message);
@@ -268,17 +282,13 @@ export class ExperimentGroupController {
         }
       }
     }
-
+    console.trace('experiment-group.controller.ts', 'countEtiqueta', totalTags, tagsToPrint, tagsPrinted);
     const { status: statusUpdate, response: responseUpdate } = await this.update({
       id,
       totalTags,
       tagsToPrint,
       tagsPrinted,
     });
-
-    console.log(`[${new Date().toISOString()}] `, 'countEtiqueta', id, idExperiment);
-    console.log('statusUpdate', statusUpdate);
-    console.log('responseUpdate', responseUpdate);
 
     if (typeof idExperiment === 'number') {
       await this.experimentController.handleExperimentStatus(idExperiment);
