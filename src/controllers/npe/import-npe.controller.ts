@@ -45,7 +45,7 @@ export class ImportNpeController {
     const experimentGenotipeController = new ExperimentGenotipeController();
 
     const npeTemp: Array<string> = [];
-    const npeiTemp: Array<number> = [];
+    const npeiTemp: Array<string> = [];
     const responseIfError: Array<string> = [];
     const headers = [
       'CULTURA',
@@ -73,7 +73,7 @@ export class ImportNpeController {
             // eslint-disable-next-line no-param-reassign
             spreadSheet[row][4] = `0${spreadSheet[row][4]}`;
           }
-          const npeInicial = spreadSheet[row][6];
+
           const npeName = `${spreadSheet[row][1]}_${spreadSheet[row][2]}_${spreadSheet[row][3]}_${spreadSheet[row][4]}_${spreadSheet[row][5]}_${spreadSheet[row][7]}`;
           const { response: validateNpe }: IReturnObject = await npeController.getAll({
             safraId: idSafra,
@@ -92,12 +92,9 @@ export class ImportNpeController {
             npeTemp[row] = npeName;
             responseIfError[0] += `<li style="text-align:left"> Erro na linha ${Number(row)}. Ambiente duplicados na tabela. </li> <br>`;
           }
-          if (npeiTemp.includes(npeInicial)) {
-            npeiTemp[row] = npeInicial;
-            responseIfError[0] += `<li style="text-align:left"> Erro na linha ${Number(row)}. NPEI duplicadas na tabela. </li> <br>`;
-          }
+
           npeTemp[row] = npeName;
-          npeiTemp[row] = npeInicial;
+
           for (const column in spreadSheet[row]) {
             this.aux.status = 1;
             this.aux.created_by = createdBy;
@@ -282,10 +279,21 @@ export class ImportNpeController {
                     );
                   } else {
                     this.aux.focoId = response[0]?.id;
-                    const { status: focoGroup }: IReturnObject = await groupController.getAll({
+                    const {
+                      status: focoGroup,
+                      response: group,
+                    }: IReturnObject = await groupController.getAll({
                       id_safra: idSafra,
                       id_foco: this.aux.focoId,
                     });
+                    const npeInicial = `${spreadSheet[row][6]}${group[0]?.group}`;
+
+                    if (npeiTemp.includes(npeInicial)) {
+                      npeiTemp[row] = npeInicial;
+                      responseIfError[0] += `<li style="text-align:left"> Erro na linha ${Number(row)}. NPEI dentro do mesmo grupo duplicadas na tabela. </li> <br>`;
+                    }
+                    npeiTemp[row] = npeInicial;
+
                     if (focoGroup !== 200) {
                       responseIfError[Number(column)] += responseGenericFactory(
                         Number(column) + 1,
