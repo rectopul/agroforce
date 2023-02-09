@@ -282,44 +282,8 @@ export default function Listagem({
     name: any
   ): Promise<void> {
     setLoading(true);
-    // let typeOrder: any;
-    // let parametersFilter: any;
-    // if (order === 1) {
-    //   typeOrder = "asc";
-    // } else if (order === 2) {
-    //   typeOrder = "desc";
-    // } else {
-    //   typeOrder = "";
-    // }
-    // setOrderBy(column);
-    // setOrderType(typeOrder);
-    // if (filter && typeof filter !== "undefined") {
-    //   if (typeOrder !== "") {
-    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-    //   } else {
-    //     parametersFilter = filter;
-    //   }
-    // } else if (typeOrder !== "") {
-    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    // } else {
-    //   parametersFilter = filter;
-    // }
 
-    // await experimentService
-    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
-    //   .then(({ status, response }: IReturnObject) => {
-    //     if (status === 200) {
-    //       setExperiments(response);
-    //     }
-    //   });
-
-    // if (orderList === 2) {
-    //   setOrder(0);
-    // } else {
-    //   setOrder(orderList + 1);
-    // }
-
-    // Gobal manage orders
+    // Global manage orders
     const { typeOrderG, columnG, orderByG, arrowOrder } =
       await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
@@ -333,50 +297,6 @@ export default function Listagem({
       setLoading(false);
     }, 100);
   }
-
-  // function headerTableFactory(name: string, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: true,
-  //   };
-  // }
-
-  // function tecnologiaHeaderFactory(name: string, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: "tecnologia",
-  //     width: 0,
-  //     sorting: true,
-  //     render: (rowData: any) => (
-  //       <div className="h-10 flex">
-  //         <div>
-  //           {`${rowData.assay_list.tecnologia.cod_tec} ${rowData.assay_list.tecnologia.name}`}
-  //         </div>
-  //       </div>
-  //     ),
-  //   };
-  // }
 
   function orderColumns(columnsOrder: string): Array<object> {
     const columnOrder: any = columnsOrder.split(",");
