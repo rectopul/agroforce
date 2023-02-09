@@ -24,3 +24,4 @@ export { SelectAutoComplete } from "./SelectAutoComplete";
 export { SelectAutoCompleteMaterial } from "./SelectAutoCompleteMaterial";
 export { SelectMultiple } from "./SelectMultiple";
 export { SelectMultipleMaterial } from "./SelectMultipleMaterial";
+export { ManageFields } from "./ManageFields";

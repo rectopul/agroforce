@@ -261,6 +261,7 @@ export class ExperimentGenotipeController {
                 gli: true,
                 bgm: true,
                 status: true,
+                treatmentsNumber: true,
                 tecnologia: {
                   select: {
                     name: true,

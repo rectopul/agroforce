@@ -10,6 +10,7 @@ interface IAccordionFilterProps {
   title?: string;
   children: ReactNode;
   grid?: boolean;
+  full?: boolean;
   onChange?: (event: React.SyntheticEvent, expanded: boolean) => void;
 }
 
@@ -17,6 +18,7 @@ export function AccordionFilter({
   title,
   children,
   grid = false,
+  full = false,
   onChange,
 }: IAccordionFilterProps) {
   return (
@@ -31,7 +33,9 @@ export function AccordionFilter({
         >
           <Typography>{title}</Typography>
         </AccordionSummary>
-        <AccordionDetails className="max-h-72 overflow-y-auto">
+        <AccordionDetails
+          className={`${full ? `w-full` : `max-h-72`} overflow-y-auto`}
+        >
           <Typography className="flex flex-col">{children}</Typography>
         </AccordionDetails>
       </Accordion>

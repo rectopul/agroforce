@@ -732,6 +732,7 @@ export default function Listagem({
     setValidateNcaTwo('bg-gray-300');
     setParcelasToPrint([]);
     setErroMessage('');
+    setRowsSelected([]);
     // setIsOpenModal(!isOpenModal);
     if (isOpenModal) {
       (document.getElementById('inputCode') as HTMLInputElement).value = '';

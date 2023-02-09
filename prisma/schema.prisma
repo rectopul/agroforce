@@ -140,6 +140,7 @@ model users_preferences {
   id                Int      @id @default(autoincrement())
   userId            Int
   module_id         Int
+  route_usage       String?
   table_preferences String?
   updated_at        DateTime @default(now())
   modules           modules  @relation(fields: [module_id], references: [id], map: "Users_Preferences_module_id_fkey")
