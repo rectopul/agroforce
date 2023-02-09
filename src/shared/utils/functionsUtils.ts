@@ -72,14 +72,18 @@ function countChildrenForSafra(dataChildren: [], safraId: number = 0) {
 }
 
 function formatDate(data: any) {
-  const dia = data.getDate().toString();
-  const diaF = dia.length === 1 ? `0${dia}` : dia;
-  const mes = (data.getMonth() + 1).toString(); // +1 pois no getMonth Janeiro começa com zero.
-  const mesF = mes.length === 1 ? `0${mes}` : mes;
-  const anoF = data.getFullYear();
-  const hour = data.getHours();
-  const min = data.getMinutes() < 10 ? `0${data.getMinutes()}` : data.getMinutes();
-  return `${diaF}/${mesF}/${anoF} ${hour}:${min}`;
+  if( data ){
+    const dia = data && data.getDate().toString();
+    const diaF = dia &&  dia.length === 1 ? `0${dia}` : dia;
+    const mes = data &&  (data.getMonth() + 1).toString(); // +1 pois no getMonth Janeiro começa com zero.
+    const mesF = mes && mes.length === 1 ? `0${mes}` : mes;
+    const anoF = data && data.getFullYear();
+    const hour = data && data.getHours();
+    const min = data && data.getMinutes() < 10 ? `0${ data && data.getMinutes()}` : data && data.getMinutes();
+    return `${diaF}/${mesF}/${anoF} ${hour}:${min}`;
+  }else{
+    return `null`;
+  }
 }
 
 function getFileExtension(filename: string) {
