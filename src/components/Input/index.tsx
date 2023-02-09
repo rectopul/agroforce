@@ -18,7 +18,7 @@ export function Input({ ...rest }: ITypeInputProps) {
         focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
         "
       {...rest}
-      step="0.01"
+      step="0.00001"
     />
   );
 }

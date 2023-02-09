@@ -302,44 +302,6 @@ export default function Listagem({
     order: number,
     name: any,
   ): Promise<void> {
-    // let typeOrder: any;
-    // let parametersFilter: any;
-    // if (order === 1) {
-    //   typeOrder = 'asc';
-    // } else if (order === 2) {
-    //   typeOrder = 'desc';
-    // } else {
-    //   typeOrder = '';
-    // }
-    // setOrderBy(column);
-    // setOrderType(typeOrder);
-    // if (filter && typeof filter !== 'undefined') {
-    //   if (typeOrder !== '') {
-    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-    //   } else {
-    //     parametersFilter = filter;
-    //   }
-    // } else if (typeOrder !== '') {
-    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    // } else {
-    //   parametersFilter = filter;
-    // }
-
-    // await experimentGroupService
-    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
-    //   .then(({ status, response }) => {
-    //     if (status === 200) {
-    //       setExperimentGroup(response);
-    //     }
-    //   });
-
-    // if (orderList === 2) {
-    //   setOrder(0);
-    // } else {
-    //   setOrder(orderList + 1);
-    // }
-
-    // Gobal manage orders
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
@@ -365,7 +327,10 @@ export default function Listagem({
     setIsLoading(true);
 
     const { status, message } = await experimentGroupService.deleted(
-      itemSelectedDelete?.id,
+      {
+        id: itemSelectedDelete?.id,
+        userId: userLogado.id,
+      },
     );
     if (status === 200) {
       // router.reload();
@@ -1314,7 +1279,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : '';
-  console.log('🚀 ~ file: index.tsx:1315 ~ req.cookies.filterBeforeEdit', req.cookies.filterBeforeEdit);
 
   const itensPerPage = req.cookies.takeBeforeEdit
     ? req.cookies.takeBeforeEdit

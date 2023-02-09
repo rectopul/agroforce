@@ -447,7 +447,7 @@ export class NpeController {
       if (statusAssay === 200) {
         const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
         await this.reporteController.create({
-          userId: data.userId, module: 'AMBIENTE', operation: 'EXCLUSÃO', oldValue: response.npe, ip: String(ip),
+          userId: data.userId, module: 'AMBIENTE', operation: 'EXCLUSÃO', oldValue: response.npei, ip: String(ip),
         });
         await this.npeRepository.delete(Number(data.id));
         return { status: 200, message: 'NPE excluída' };

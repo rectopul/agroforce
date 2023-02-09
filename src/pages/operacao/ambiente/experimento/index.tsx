@@ -247,7 +247,6 @@ export default function Listagem({
       await experimentService
         .getAll(`${parametersFilter}&skip=0&take=${take}`)
         .then((response) => {
-          console.log("chamou", take);
           setFilter(parametersFilter);
           setExperimento(response.response);
           setTotalItems(response.total);
@@ -654,7 +653,6 @@ export default function Listagem({
   }, [take]);
 
   useEffect(() => {
-    console.log("npeDataItems :", npeDataItems);
   }, [npeDataItems, currentPage]);
 
   // useLayoutEffect(() => {
@@ -663,7 +661,6 @@ export default function Listagem({
   // }, [currentPage]);
 
   useEffect(() => {
-    console.log("Numero de processos executando:", countAsync);
     if (countAsync > 0) {
       setLoading(true);
     } else {
@@ -733,7 +730,7 @@ export default function Listagem({
       tempFilter = `${tempFilter}&orderBy=&typeOrder=`;
 
       let count1 = 0;
-      console.log("countAsync", countAsync);
+      
       setCountAsync(countAsync + 1);
 
       await experimentService
@@ -763,7 +760,7 @@ export default function Listagem({
 
             p.npefView = p.npef;
 
-            console.log("p.npeQT", p.npeQT);
+            
 
             // enable disable button && isNCCAvailable
             p.assay_list?.genotype_treatment?.map((exp: any) => {
@@ -779,14 +776,14 @@ export default function Listagem({
             });
           });
 
-          console.log(
+          
             "env.npef",
             env.npef,
             "env.nextNPE.npei_i",
             env.nextNPE.npei_i
           );
 
-          console.log("response.experiments", response);
+          
 
           /**
            * No caso temos o ENV1 com NPEI = 101 e NPEF = 101 e NPEI_I = 101 e PROX_NPE = 101
@@ -834,13 +831,13 @@ export default function Listagem({
           //   temp.isNccAvailable = false;
           // }
 
-          console.log(
+          
             "contagem de lotes sem NCC dos tratamentos de genótipos (count)",
             count,
             "<<genotype_treatment>>"
           );
-          console.log("contagem de sobreposições (count1): ", count1);
-          console.log("temp.isOverLap: ", temp.isOverLap);
+          
+          
 
           setAllNPERecords((prev) => [...prev, temp]);
           count = 0;
@@ -849,7 +846,7 @@ export default function Listagem({
           setCountAsync(countAsync - 1);
         })
         .catch((error) => {
-          console.log("error", error);
+          
           setCountAsync(countAsync - 1);
           Swal.fire({
             title: `Houve um problema para listar o ambiente: ${env?.local?.name_local_culture}`,
@@ -903,8 +900,8 @@ export default function Listagem({
     setIsNccAvailable(isNccAvailable);
     setIsOverLap(isOverLap);
 
-    console.log("isNccAvailable", isNccAvailable);
-    console.log("isOverLap", isOverLap);
+    
+    
 
     if (!isNccAvailable || isOverLap) {
       setSortearDisable(true);
@@ -919,7 +916,7 @@ export default function Listagem({
     };
     const { status, response } =
       await experimentGenotipeService.getLastNpeDisponible(body);
-    console.log("getLastNpeDisponible.response", response);
+    
     return {
       maxNPE: response[0]?.maxnpe,
       count_npe_exists: response[0].count_npe_exists,
@@ -986,8 +983,8 @@ export default function Listagem({
       }
     });
 
-    console.log("npeToUpdate: ", npeToUpdate); // atenção se não houver experimentos não atualiza o status do env
-    console.log("experiment_genotipo.length", experiment_genotipo.length);
+    
+    
 
     // SEMPRE QUE FOR USAR FUNÇÃO ASSINCRONA USAR FOR PARA OBTER O RESULTADO ANTES DE EXECUTAR O RESTANTE DO CÓDIGO;
     for (const item of Object.values(npeToUpdate)) {
@@ -996,7 +993,7 @@ export default function Listagem({
         groupId: Number(item.groupId),
         npefSearch: Number(item.prox_npe),
       });
-      console.log("result", result, "item:", item);
+      
 
       if (result.maxNPE != null && result.count_npe_exists == 0) {
         item.prox_npe = result.maxNPE;
@@ -1010,7 +1007,7 @@ export default function Listagem({
         groupId: Number(item.groupId),
         npefSearch: Number(item.prox_npe),
       });
-      console.log(
+      
         "for (let i = 0; i < npeToUpdate.length; i++)",
         "result",
         result,
@@ -1019,7 +1016,7 @@ export default function Listagem({
       );
     }
 
-    console.log("npeToUpdate -- ATUALIZADO: ", npeToUpdate);
+    
 
     if (experiment_genotipo.length > 0) {
       setLoading(true);
@@ -1032,7 +1029,7 @@ export default function Listagem({
           npeToUpdate,
         })
         .then((response) => {
-          console.log("response", response);
+          
           if (response.status === 200) {
             Swal.fire({
               title: "Sorteio salvo com sucesso.",
@@ -1052,7 +1049,7 @@ export default function Listagem({
         })
         .catch((error) => {
           setLoading(false);
-          console.log("error", error);
+          
           Swal.fire({
             title: "Houve um problema sortear. ",
             html: error,
@@ -1065,9 +1062,9 @@ export default function Listagem({
   }
 
   function validateConsumedData() {
-    console.log("SortearDisable : ", SortearDisable);
-    console.log("isNccAvailable : ", isNccAvailable);
-    console.log("isOverLap : ", isOverLap);
+    
+    
+    
 
     if (!SortearDisable) {
       const experiment_genotipo: any[] = [];
@@ -1123,7 +1120,7 @@ export default function Listagem({
           genotipo_treatment,
         });
       } catch (e: any) {
-        console.log("validateConsumedData -> e", e);
+        
         Swal.fire({
           html: `Erro ao sortear experimentos: ${e}`,
           width: "800",
@@ -1236,14 +1233,14 @@ export default function Listagem({
   }, [experimentos]);
 
   function checkValidAmbiente(data: any, AllNPERecords: any) {
-    console.log(
+    
       "checkValidAmbiente",
       "name_local_culture:",
       data?.local?.name_local_culture,
       "data",
       data
     );
-    console.log("AllNPERecords", AllNPERecords);
+    
 
     const name_local_culture_current = data?.local?.name_local_culture;
 
@@ -1254,14 +1251,14 @@ export default function Listagem({
       }
     });
 
-    console.log("npe.isNccAvailable", npe?.isNccAvailable);
+    
 
     let retorno = true;
     if (npe !== null && npe?.isNccAvailable == false) {
       retorno = false;
     }
 
-    console.log("retorno", retorno, "npe", npe);
+    
 
     return retorno;
   }

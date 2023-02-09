@@ -112,7 +112,7 @@ export class ImportLocalController {
                 const result = allEqual(validateAll[property]);
                 if (!result) {
                   responseIfError[Number(0)]
-                  += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo Nome do Lugar de Cultura(${spreadSheet[row][4]}) devem ser iguais. </li> <br>`;
+                  += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo Nome do Lugar de Cultura(${spreadSheet[Number(row) - 1][4]}) devem ser iguais. </li> <br>`;
                 }
               }
               validateAll = {

@@ -108,11 +108,13 @@ export class ImportAssayListController {
                 validateAll.BGM.push(spreadSheet[row][6]);
                 validateAll.PROJETO.push(spreadSheet[row][7]);
               }
+              console.log('🚀 ~ file: import-assay-list.controller.ts:107 ~ ImportAssayListController ~ &&spreadSheet[row][4]===spreadSheet[Number ~ validateAll', validateAll);
+              console.log('🚀 ~ file: import-assay-list.controller.ts:118 ~ ImportAssayListController ~ || ~ spreadSheet[row][4]', spreadSheet[row][4]);
               for (const property in validateAll) {
                 const result = allEqual(validateAll[property]);
                 if (!result) {
                   responseIfError[Number(0)]
-                  += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo GLI(${spreadSheet[row][4]}) devem ser iguais. </li> <br>`;
+                  += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo GLI(${spreadSheet[Number(row) - 1][4]}) devem ser iguais. </li> <br>`;
                 }
               }
               validateAll = {
