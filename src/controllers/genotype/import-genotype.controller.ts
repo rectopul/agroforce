@@ -114,7 +114,7 @@ export class ImportGenotypeController {
               Number(25) + 1,
               row,
               spreadSheet[0][25],
-              'esta repetindo não planilha',
+              'esta repetido na planilha',
             );
           }
           if (spreadSheet.length > 2) {
