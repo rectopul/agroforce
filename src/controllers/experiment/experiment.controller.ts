@@ -22,6 +22,7 @@ export class ExperimentController {
   reporteController = new ReporteController();
 
   async getAll(options: any) {
+    console.log('🚀 ~ file: experiment.controller.ts:25 ~ ExperimentController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
@@ -255,21 +256,16 @@ export class ExperimentController {
         parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.gli}" } } }`));
       }
 
-      console.log('experiment.controller', 'options.take', options.take);
-      console.log('experiment.controller', 'options.skip', options.skip);
-      
       // se options.take for array, pega o primeiro valor
-      if(Array.isArray(options.take)) {
+      if (Array.isArray(options.take)) {
         options.take = options.take[0];
-        console.trace('experiment.controller', 'o parâmetro options.take está vindo como array', options.take);
       }
-      
+
       // se options.skip for array, pega o primeiro valor
-      if(Array.isArray(options.skip)) {
+      if (Array.isArray(options.skip)) {
         options.skip = options.skip[0];
-        console.trace('experiment.controller', 'o parâmetro options.skip está vindo como array', options.skip);
       }
-      
+
       const take = (options.take) ? Number(options.take) : undefined;
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
@@ -379,8 +375,18 @@ export class ExperimentController {
   async update(data: any) {
     try {
       const experimentGenotipeController = new ExperimentGenotipeController();
+      const experimentGroupController = new ExperimentGroupController();
       if (data.idList) {
+        const {
+          response: group,
+        } = await experimentGroupController.getOne(Number(data.experimentGroupId));
         await this.experimentRepository.relationGroup(data);
+        const { ip } = await fetch('https://api.ipify.org/?format=json')
+          .then((results) => results.json())
+          .catch(() => '0.0.0.0');
+        await this.reporteController.create({
+          userId: data.userId, module: 'GRUPO DE ETIQUETAGEM', operation: 'EDIÇÃO', oldValue: group.name, ip: String(ip),
+        });
         if (data.experimentGroupId) {
           const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
           await this.setParcelasStatus(idList);

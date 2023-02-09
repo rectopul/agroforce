@@ -367,6 +367,10 @@ export default function Listagem({
     return num ? Number(num).toFixed(1) : '';
   }
 
+  function formatPeso(num: number) {
+    return num ? Number(num).toFixed(5) : '';
+  }
+
   function columnsOrder(columnsCampos: string) {
     const columnCampos: string[] = columnsCampos.split(',');
     const tableFields: any = [];
@@ -431,6 +435,7 @@ export default function Listagem({
             orderList,
             fieldOrder,
             handleOrder,
+            render: (rowData: any) => formatPeso(rowData.peso),
           }),
         );
       }

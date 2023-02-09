@@ -141,10 +141,6 @@ export class CulturaController {
 
   async postCulture(data: CreateCultureDTO) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json')
-        .then((results) => results.json())
-        .catch(() => '0.0.0.0');
-
       const cultureAlreadyExists = await this.culturaRepository.findByName(
         data.name,
       );
@@ -154,6 +150,9 @@ export class CulturaController {
       }
       const culture = await this.culturaRepository.create(data);
 
+      const { ip } = await fetch('https://api.ipify.org/?format=json')
+        .then((results) => results.json())
+        .catch(() => '0.0.0.0');
       await this.reporteController.create({
         userId: data.created_by, module: 'CULTURA', operation: 'CRIAÇÃO', oldValue: data.name, ip: String(ip),
       });

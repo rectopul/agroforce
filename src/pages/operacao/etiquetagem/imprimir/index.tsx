@@ -13,7 +13,7 @@ export type Message = {
 function PrintToTag() {
   const router = useRouter();
   const PARENT_APP_URL = '/operacao/etiquetagem/parcelas';
-  
+
   const [tagType, setTagType] = useState(1);
   const [data, setData] = useState([]);
 
@@ -21,30 +21,25 @@ function PrintToTag() {
     localStorage.getItem('parcelasToPrint') as string,
   );
 
-
   useEffect(() => {
     const handler = (event: MessageEvent) => {
-      console.log('event.origin', event.origin);
       // if (event.origin !== PARENT_APP_URL) {
       //   // skip other messages from(for ex.) extensions
       //   return;
       // }
 
       const message: Message = event.data;
-
-      console.log('menssage.child', message);
-      
     };
 
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
   }, []);
-  
+
   // https://github.com/andriishupta/cross-origin-iframe-communication-with-nextjs/blob/main/packages/child-app/pages/index.tsx
   const postMessage = (message: Message) => {
     window.parent.postMessage(message, '*');
   };
-  
+
   useEffect(() => {
     if (parcelsToPrint?.length > 0) {
       setData(parcelsToPrint);
@@ -65,7 +60,7 @@ function PrintToTag() {
       window.print();
       localStorage.removeItem('parcelasToPrint');
       setTimeout(() => {
-        postMessage({type: 'printed', value: '1'});// close print
+        postMessage({ type: 'printed', value: '1' });// close print
       }, 1000);
     }
   }, [data]);

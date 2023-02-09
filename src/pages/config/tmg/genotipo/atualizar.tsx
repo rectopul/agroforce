@@ -913,54 +913,17 @@ export default function Atualizargenotipo({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    if (!filterApplication.includes("paramSelect")) {
-      filterApplication += `&paramSelect=${camposGerenciados}&id_genotipo=${idGenotipo}`;
-    }
+    const skip = 0;
+    const take = 10;
 
-    await loteService.getAll(filterApplication).then((response) => {
-      if (response.status === 200) {
-        const newData = response.response.map((row: any) => {
-          if (row.status === 0) {
-            row.status = "Inativo";
-          } else {
-            row.status = "Ativo";
-          }
 
-          row.ID_S2 = row.id_s2;
-          row.ID_DADOS = row.id_dados;
-          row.SAFRA = row.safra.safraName;
-          row.ANO = row.year;
-          row.COD_LOTE = row.cod_lote;
-          row.NCC = row.ncc;
-          row.FASE = row.fase;
-          row.PESO = row.peso;
-          row.QUANT_SEMENTES = row.quant_sementes;
-          row.GENOTIPO = row.genotipo.name_genotipo;
-          row.STATUS = row.status;
-          row.GMR = row.genotipo.gmr;
-          row.BGM = row.genotipo.bgm;
-          row.TECNOLOGIA = `${row.genotipo.tecnologia.cod_tec} ${row.genotipo.tecnologia.name}`;
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
 
-          delete row.id_s2;
-          delete row.id_dados;
-          delete row.safra;
-          delete row.year;
-          delete row.cod_lote;
-          delete row.ncc;
-          delete row.fase;
-          delete row.peso;
-          delete row.quant_sementes;
-          delete row.genotipo;
-          delete row.status;
-          delete row.id;
-          delete row.id_genotipo;
-
-          return row;
-        });
-
-        const workSheet = XLSX.utils.json_to_sheet(newData);
+    await loteService.getAll(filterParam).then(({ status, response }) => {
+      if (status === 200) {
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, workSheet, "lotes");
+        XLSX.utils.book_append_sheet(workBook, response, 'lotes');
+
 
         // Buffer
         XLSX.write(workBook, {
@@ -973,7 +936,9 @@ export default function Atualizargenotipo({
           type: "binary",
         });
         // Download
-        XLSX.writeFile(workBook, "Lotes.xlsx");
+        XLSX.writeFile(workBook, 'Lotes.xlsx');
+      } else {
+        Swal.fire('Não existem registros para serem exportados, favor checar.');
       }
     });
     setLoading(false);

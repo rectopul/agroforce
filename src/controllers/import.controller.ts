@@ -397,7 +397,7 @@ export class ImportController {
         await form.parse(req, async (err : any, fields: any, files: any) => {
           const oldpath = files.file.path;
           name = files.file.name;
-          const newpath = `./public/log_import/${timestamp}${files.file.name}`;
+          const newpath = `./public/log_import/${files.file.name}`;
           await fs.rename(oldpath, newpath, (err) => {
             if (err) {
               reject(err);
