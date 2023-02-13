@@ -14,10 +14,10 @@ export const prisma = global.prisma
         emit: 'stdout',
         level: 'error',
       },
-      // {
-      //   emit: 'event',
-      //   level: 'query',
-      // }
+      {
+        emit: 'event',
+        level: 'query',
+      }
     ],
   });
 
