@@ -16,6 +16,7 @@ export class FocoController {
   async getAll(options: any) {
     const parameters: object | any = {};
     let orderBy: object | any;
+    const equalsOrContains = options.importValidate ? 'equals' : 'contains';
     try {
       options = await removeEspecialAndSpace(options);
       if (options.createFile) {
@@ -27,7 +28,11 @@ export class FocoController {
       }
 
       if (options.filterSearch) {
-        parameters.name = JSON.parse(`{ "contains": "${options.filterSearch}" }`);
+        parameters.name = JSON.parse(`{ "${equalsOrContains}": "${options.filterSearch}" }`);
+      }
+
+      if (options.notId) {
+        parameters.id = JSON.parse(`{"not": ${Number(options.notId)} }`);
       }
 
       if (options.id_culture) {
@@ -167,10 +172,20 @@ export class FocoController {
 
         return { status: 200, message: 'Foco atualizada' };
       }
-      const focoAlreadyExists = await this.focoRepository.findByName(
-        { name: data.name, id_culture: data.id_culture, status: 1 },
-      );
-      if (focoAlreadyExists) return { status: 409, message: 'Foco já existe, favor checar registros inativos.' };
+      if (data.id_culture && data.name) {
+        const { response: validate }: any = await this.getAll({
+          id_culture: data.id_culture,
+          filterSearch: data.name,
+          notId: data.id,
+          importValidate: true,
+        });
+
+        if (validate.length > 0) return { status: 404, message: 'Foco já existe, favor checar registros inativos.' };
+      }
+      // const focoAlreadyExists = await this.focoRepository.findByName(
+      //   { name: data.name, id_culture: data.id_culture, status: 1 },
+      // );
+      // if (focoAlreadyExists) return { status: 409, message: 'Foco já existe, favor checar registros inativos.' };
 
       await this.reporteController.create({
         userId: data.created_by, module: 'FOCO', operation: 'EDIÇÃO', oldValue: data.name, ip: String(ip),

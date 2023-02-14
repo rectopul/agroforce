@@ -11,7 +11,7 @@ export class DelineamentoController {
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
-
+    const equalsOrContains = options.importValidate ? 'equals' : 'contains';
     try {
       options = await removeEspecialAndSpace(options);
       if (options.createFile) {
@@ -43,7 +43,7 @@ export class DelineamentoController {
       }
 
       if (options.filterName) {
-        parameters.name = JSON.parse(`{"contains": "${options.filterName}"}`);
+        parameters.name = JSON.parse(`{"${equalsOrContains}": "${options.filterName}"}`);
       }
 
       if (options.filterRepeat) {

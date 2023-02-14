@@ -108,8 +108,6 @@ export class ImportAssayListController {
                 validateAll.BGM.push(spreadSheet[row][6]);
                 validateAll.PROJETO.push(spreadSheet[row][7]);
               }
-              console.log('🚀 ~ file: import-assay-list.controller.ts:107 ~ ImportAssayListController ~ &&spreadSheet[row][4]===spreadSheet[Number ~ validateAll', validateAll);
-              console.log('🚀 ~ file: import-assay-list.controller.ts:118 ~ ImportAssayListController ~ || ~ spreadSheet[row][4]', spreadSheet[row][4]);
               for (const property in validateAll) {
                 const result = allEqual(validateAll[property]);
                 if (!result) {
@@ -192,9 +190,10 @@ export class ImportAssayListController {
                   );
               }
               const { response }: IReturnObject = await focoController.getAll({
-                name: spreadSheet[row][column],
+                filterSearch: spreadSheet[row][column],
                 id_culture: idCulture,
                 filterStatus: 1,
+                importValidate: true,
               });
               if (response?.length === 0) {
                 responseIfError[Number(column)]
@@ -220,6 +219,7 @@ export class ImportAssayListController {
                 filterName: spreadSheet[row][column],
                 id_culture: idCulture,
                 filterStatus: 1,
+                importValidate: true,
               });
               if (response?.length === 0) {
                 responseIfError[Number(column)]
@@ -244,6 +244,7 @@ export class ImportAssayListController {
               const { response }: IReturnObject = await assayListController.getAll({
                 filterGli: spreadSheet[row][4],
                 id_safra: idSafra,
+                importValidate: true,
               });
               if (response?.length > 0) {
                 responseIfError[Number(column)]
@@ -497,9 +498,15 @@ export class ImportAssayListController {
           if (row !== '0') {
             const { response: typeAssay }: IReturnObject = await typeAssayController.getAll({
               filterName: spreadSheet[row][3],
+              id_culture: idCulture,
+              importValidate: true,
             });
             const { response: foco }: IReturnObject = await focoController.getAll(
-              { name: spreadSheet[row][2], id_culture: idCulture },
+              {
+                filterSearch: spreadSheet[row][2],
+                id_culture: idCulture,
+                importValidate: true,
+              },
             );
             const { response: technology }: IReturnObject = await tecnologiaController.getAll({
               cod_tec: String(spreadSheet[row][5]),
