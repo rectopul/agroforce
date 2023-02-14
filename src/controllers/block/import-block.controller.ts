@@ -581,8 +581,11 @@ export class ImportBlockController {
                 if (configModule.response[0]?.fields[column] === 'LocalPrep') {
                   if (spreadSheet[row][column] !== '') {
                     const { response }: IReturnObject = await localController.getAll(
-                      { name_local_culture: spreadSheet[row][column] },
-                      importValidate: true,
+                      {
+                        name_local_culture: spreadSheet[row][column],
+                        importValidate: true,
+                      },
+
                     );
                     aux.local_preparo = response[0]?.id;
                   }
