@@ -126,6 +126,26 @@ function generateDigitEAN8(code: any) {
   return checkSum;
 }
 
+function convertKeyObjectRecursive(obj: any): any {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map((item: any) => convertKeyObjectRecursive(item));
+  }
+
+  return Object.keys(obj).reduce((acc: any, key: any) => {
+    // change key contains to equals
+    if(key === 'contains') {
+      acc['equals'] = convertKeyObjectRecursive(obj[key]);
+    } else {
+      acc[key] = convertKeyObjectRecursive(obj[key]);
+    }
+    return acc;
+  }, {});
+}
+
 export const functionsUtils = {
   validationCPF,
   Crypto,
@@ -135,4 +155,5 @@ export const functionsUtils = {
   isNumeric,
   generateDigitEAN13,
   generateDigitEAN8,
+  convertKeyObjectRecursive,
 };
