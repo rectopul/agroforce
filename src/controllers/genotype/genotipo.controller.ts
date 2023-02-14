@@ -12,6 +12,7 @@ export class GenotipoController {
     const parameters: object | any = {};
     parameters.AND = [];
     let orderBy: object | any;
+    const equalsOrContains = options.importValidate ? 'equals' : 'contains';
     let select: any = [];
     try {
       options = await removeEspecialAndSpace(options);
@@ -21,11 +22,11 @@ export class GenotipoController {
       }
 
       if (options.filterGenotipo) {
-        parameters.name_genotipo = JSON.parse(`{"contains":"${options.filterGenotipo}"}`);
+        parameters.name_genotipo = JSON.parse(`{"${equalsOrContains}":"${options.filterGenotipo}"}`);
       }
 
       if (options.filterMainName) {
-        parameters.name_main = JSON.parse(`{"contains":"${options.filterMainName}"}`);
+        parameters.name_main = JSON.parse(`{"${equalsOrContains}":"${options.filterMainName}"}`);
       }
 
       if (options.filterGmr) {
@@ -54,17 +55,17 @@ export class GenotipoController {
       }
 
       if (options.filterCodTecnologia) {
-        parameters.AND.push(JSON.parse(`{ "tecnologia": { "cod_tec": {"contains": "${options.filterCodTecnologia}" } } }`));
+        parameters.AND.push(JSON.parse(`{ "tecnologia": { "cod_tec": {"${equalsOrContains}": "${options.filterCodTecnologia}" } } }`));
       }
 
       if (options.filterTecnologiaDesc) {
-        parameters.AND.push(JSON.parse(`{ "tecnologia": { "name": {"contains": "${options.filterTecnologiaDesc}" } } }`));
+        parameters.AND.push(JSON.parse(`{ "tecnologia": { "name": {"${equalsOrContains}": "${options.filterTecnologiaDesc}" } } }`));
       }
 
       if (options.filterCruza) {
         let temp = options.filterCruza.split(' ');
         temp = temp[1] ? `${temp[0]}+${temp[1]}` : temp[0];
-        parameters.cruza = JSON.parse(`{"contains":"${temp}"}`);
+        parameters.cruza = JSON.parse(`{"${equalsOrContains}":"${temp}"}`);
       }
 
       if (options.paramSelect) {

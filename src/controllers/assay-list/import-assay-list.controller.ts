@@ -396,6 +396,7 @@ export class ImportAssayListController {
               const { response }: IReturnObject = await genotipoController.getAll({
                 filterGenotipo: spreadSheet[row][column],
                 id_culture: idCulture,
+                importValidate: true,
               });
               if (response?.length === 0) {
                 responseIfError[Number(column)]
@@ -413,6 +414,7 @@ export class ImportAssayListController {
                 const { response: genotype }: IReturnObject = await genotipoController.getAll({
                   filterGenotipo: spreadSheet[row][10],
                   id_culture: idCulture,
+                  importValidate: true,
                 });
                 const { response }: IReturnObject = await loteController.getAll({
                   filterNcc: spreadSheet[row][column],
@@ -515,7 +517,7 @@ export class ImportAssayListController {
             const { response: genotype }: IReturnObject = await genotipoController.getAll({
               filterGenotipo: spreadSheet[row][10],
               id_culture: idCulture,
-
+              importValidate: true,
             });
 
             const { response: lote }: IReturnObject = await loteController.getAll({

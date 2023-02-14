@@ -239,6 +239,7 @@ export class ImportGenotypeTreatmentController {
               } else {
                 const { status } = await genotipoController.getAll({
                   name_genotipo: spreadSheet[row][column],
+                  importValidate: true,
                 });
                 if (status === 400) {
                   responseIfError[Number(column)]
@@ -270,6 +271,7 @@ export class ImportGenotypeTreatmentController {
                   const { status, response } = await genotipoController.getAll({
                     name_genotipo: spreadSheet[row][10],
                     id_culture: idCulture,
+                    importValidate: true,
                   });
                   if (status !== 400) {
                     const validateNca = await response[0]?.lote.map((item: any) => {
@@ -308,6 +310,7 @@ export class ImportGenotypeTreatmentController {
                 });
                 const { response: genotipo } = await genotipoController.getAll({
                   name_genotipo: spreadSheet[row][10],
+                  importValidate: true,
                 });
                 const { response: lote } = await loteController.getAll({
                   ncc: spreadSheet[row][12],

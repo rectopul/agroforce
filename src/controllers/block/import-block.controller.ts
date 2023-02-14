@@ -129,6 +129,7 @@ export class ImportBlockController {
               } else {
                 const { response } = await localController.getAll({
                   name_local_culture: spreadSheet[row][column],
+                  importValidate: true,
                 });
                 if (response.total === 0) {
                   responseIfError[Number(column)]
@@ -581,6 +582,7 @@ export class ImportBlockController {
                   if (spreadSheet[row][column] !== '') {
                     const { response }: IReturnObject = await localController.getAll(
                       { name_local_culture: spreadSheet[row][column] },
+                      importValidate: true,
                     );
                     aux.local_preparo = response[0]?.id;
                   }

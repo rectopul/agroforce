@@ -218,6 +218,7 @@ export class ImportExperimentController {
               } else {
                 const { response } = await localController.getAll({
                   name_local_culture: spreadSheet[row][column],
+                  importValidate: true,
                 });
                 if (response.total === 0) {
                   responseIfError[Number(column)]
@@ -372,6 +373,7 @@ export class ImportExperimentController {
             if (row !== '0') {
               const { response: local } = await localController.getAll({
                 name_local_culture: spreadSheet[row][7],
+                importValidate: true,
               });
               const { response: assayList } = await assayListController.getAll({
                 gli: spreadSheet[row][4],
