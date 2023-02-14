@@ -339,6 +339,7 @@ export class ImportExperimentGenotypeController {
               } else {
                 const { status } = await genotipoController.getAll({
                   name_genotipo: spreadSheet[row][column],
+                  importValidate: true,
                 });
                 if (status === 400) {
                   responseIfError[Number(column)]
@@ -404,6 +405,7 @@ export class ImportExperimentGenotypeController {
 
                 const { response: genotipo } = await genotipoController.getAll({
                   name_genotipo: spreadSheet[row][14], // New genetic Name
+                  importValidate: true,
                 });
 
                 const { response: lote } = await loteController.getAll({

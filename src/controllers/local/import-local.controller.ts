@@ -196,7 +196,10 @@ export class ImportLocalController {
                 += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
             } else {
               const { response } = await localController.getAll(
-                { id_local_culture: Number(spreadSheet[row][3]) },
+                {
+                  id_local_culture: Number(spreadSheet[row][3]),
+                  importValidate: true,
+                },
               );
               const {
                 response: unityExist,
@@ -409,7 +412,10 @@ export class ImportLocalController {
                 localCultureDTO.created_by = Number(createdBy);
                 unityCultureDTO.created_by = Number(createdBy);
                 const { response } = await localController.getAll(
-                  { name_local_culture: localCultureDTO.name_local_culture },
+                  {
+                    name_local_culture: localCultureDTO.name_local_culture,
+                    importValidate: true,
+                  },
                 );
                 const {
                   response: unityExist,
