@@ -98,6 +98,7 @@ export class ImportExperimentGenotypeController {
             filterGenotypeName: spreadSheet[row][12],
             nca: String(spreadSheet[row][13]),
             take: 1,
+            importValidate: true,
           });
 
           if (parcels.length === 0) {
@@ -398,6 +399,7 @@ export class ImportExperimentGenotypeController {
                   filterGenotypeName: spreadSheet[row][12],
                   nca: String(spreadSheet[row][13]),
                   take: 1,
+                  importValidate: true,
                 });
 
                 const { response: genotipo } = await genotipoController.getAll({
