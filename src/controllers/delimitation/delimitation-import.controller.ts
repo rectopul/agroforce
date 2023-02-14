@@ -96,7 +96,12 @@ export class ImportDelimitationController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
               const delineamento: any = await delineamentoController.getAll(
-                { name: spreadSheet[row][column], id_culture: idCulture, status: 1 },
+                {
+                  name: spreadSheet[row][column],
+                  id_culture: idCulture,
+                  status: 1,
+                  importValidate: true,
+                },
               );
               if (delineamento.total > 0) {
                 responseIfError[Number(column)] += responseGenericFactory(

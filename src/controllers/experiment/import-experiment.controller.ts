@@ -69,7 +69,7 @@ export class ImportExperimentController {
           let experimentName;
           // se o experimento tiver menos que 2 digitos, adiciona um 0 na frente
           // ATENÇÃO O EP PODE VIR NO FORMATO NUMBER OU STRING INCLUSIVE NULO
-          if((typeof spreadSheet[row][9] !== 'number' && typeof spreadSheet[row][9] !== 'string') || spreadSheet[row][9] === null) {
+          if ((typeof spreadSheet[row][9] !== 'number' && typeof spreadSheet[row][9] !== 'string') || spreadSheet[row][9] === null) {
             experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_00`;
           } else if (String(spreadSheet[row][9]).toString().length < 2) {
             experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_0${spreadSheet[row][9]}`;
@@ -79,6 +79,7 @@ export class ImportExperimentController {
           const { response: experiment } = await experimentController.getAll({
             filterExperimentName: experimentName,
             idSafra,
+            importValidate: true,
           });
           if (experiment?.length > 0) {
             if (experiment[0].status?.toUpperCase() !== 'IMPORTADO') {
@@ -105,6 +106,7 @@ export class ImportExperimentController {
             const { response } = await assayListController.getAll({
               gli: spreadSheet[row][4],
               id_safra: idSafra,
+              importValidate: true,
             });
 
             assayList = response.length > 0 ? response[0] : [];
@@ -278,6 +280,7 @@ export class ImportExperimentController {
                   id_culture: idCulture,
                   name: spreadSheet[row][column],
                   filterStatus: 1,
+                  importValidate: true,
                 });
 
                 if (response?.length === 0) {
@@ -373,11 +376,13 @@ export class ImportExperimentController {
               const { response: assayList } = await assayListController.getAll({
                 gli: spreadSheet[row][4],
                 id_safra: idSafra,
+                importValidate: true,
               });
               const { response: delineamento } = await delineamentoController.getAll({
                 id_culture: idCulture,
                 name: spreadSheet[row][10],
                 filterStatus: 1,
+                importValidate: true,
               });
               const comments = spreadSheet[row][14]?.substr(0, 255) ? spreadSheet[row][14]?.substr(0, 255) : '';
               let experimentName;
@@ -389,6 +394,7 @@ export class ImportExperimentController {
               const { response: experiment } = await experimentController.getAll({
                 filterExperimentName: experimentName,
                 idSafra,
+                importValidate: true,
               });
               if (experiment.total > 0) {
                 await experimentController.update(

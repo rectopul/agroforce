@@ -72,18 +72,17 @@ function countChildrenForSafra(dataChildren: [], safraId: number = 0) {
 }
 
 function formatDate(data: any) {
-  if( data ){
+  if (data) {
     const dia = data && data.getDate().toString();
-    const diaF = dia &&  dia.length === 1 ? `0${dia}` : dia;
-    const mes = data &&  (data.getMonth() + 1).toString(); // +1 pois no getMonth Janeiro começa com zero.
+    const diaF = dia && dia.length === 1 ? `0${dia}` : dia;
+    const mes = data && (data.getMonth() + 1).toString(); // +1 pois no getMonth Janeiro começa com zero.
     const mesF = mes && mes.length === 1 ? `0${mes}` : mes;
     const anoF = data && data.getFullYear();
     const hour = data && data.getHours();
-    const min = data && data.getMinutes() < 10 ? `0${ data && data.getMinutes()}` : data && data.getMinutes();
+    const min = data && data.getMinutes() < 10 ? `0${data && data.getMinutes()}` : data && data.getMinutes();
     return `${diaF}/${mesF}/${anoF} ${hour}:${min}`;
-  }else{
-    return `null`;
   }
+  return 'null';
 }
 
 function getFileExtension(filename: string) {
@@ -117,13 +116,33 @@ function generateDigitEAN8(code: any) {
       sum2 += parseInt(code[i]);
     }
   }
-  sum2 = sum2 * 3;
+  sum2 *= 3;
 
-  let sum = sum1 + sum2;
+  const sum = sum1 + sum2;
   let checkSum = 10 - (sum % 10);
   if (checkSum == 10) checkSum = 0;
 
   return checkSum;
+}
+
+function convertKeyObjectRecursive(obj: any): any {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map((item: any) => convertKeyObjectRecursive(item));
+  }
+
+  return Object.keys(obj).reduce((acc: any, key: any) => {
+    // change key contains to equals
+    if(key === 'contains') {
+      acc['equals'] = convertKeyObjectRecursive(obj[key]);
+    } else {
+      acc[key] = convertKeyObjectRecursive(obj[key]);
+    }
+    return acc;
+  }, {});
 }
 
 export const functionsUtils = {
@@ -135,4 +154,5 @@ export const functionsUtils = {
   isNumeric,
   generateDigitEAN13,
   generateDigitEAN8,
+  convertKeyObjectRecursive,
 };

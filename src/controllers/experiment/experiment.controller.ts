@@ -22,8 +22,8 @@ export class ExperimentController {
   reporteController = new ReporteController();
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: experiment.controller.ts:25 ~ ExperimentController ~ getAll ~ options', options);
     const parameters: object | any = {};
+    const equalsOrContains = options.importValidate ? 'equals' : 'contains';
     let orderBy: object | any;
     parameters.AND = [];
     try {
@@ -54,31 +54,31 @@ export class ExperimentController {
       }
 
       if (options.filterExperimentName) {
-        parameters.experimentName = JSON.parse(`{ "contains":"${options.filterExperimentName}" }`);
+        parameters.experimentName = JSON.parse(`{ "${equalsOrContains}":"${options.filterExperimentName}" }`);
       }
       if (options.filterCodTec) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "cod_tec":  {"contains": "${options.filterCodTec}" } } } }`));
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "cod_tec":  {"${equalsOrContains}": "${options.filterCodTec}" } } } }`));
       }
       if (options.filterPeriod) {
         parameters.period = Number(options.filterPeriod);
       }
       if (options.filterFoco) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"foco": {"name": {"contains": "${options.filterFoco}" } } } }`));
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"foco": {"name": {"${equalsOrContains}": "${options.filterFoco}" } } } }`));
       }
       if (options.name_genotipo) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"name_genotipo": {"name": {"contains": "${options.filterFoco}" } } } }`));
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"name_genotipo": {"name": {"${equalsOrContains}": "${options.filterFoco}" } } } }`));
       }
       if (options.filterTypeAssay) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"type_assay": {"name": {"contains": "${options.filterTypeAssay}" } } } }`));
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"type_assay": {"name": {"${equalsOrContains}": "${options.filterTypeAssay}" } } } }`));
       }
       if (options.filterGli) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.filterGli}" } } }`));
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"${equalsOrContains}": "${options.filterGli}" } } }`));
       }
       if (options.filterTecnologia) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "name":  {"contains": "${options.filterTecnologia}" } } } }`));
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "name":  {"${equalsOrContains}": "${options.filterTecnologia}" } } } }`));
       }
       if (options.filterDelineamento) {
-        parameters.delineamento = JSON.parse(`{ "name": {"contains": "${options.filterDelineamento}" } }`);
+        parameters.delineamento = JSON.parse(`{ "name": {"${equalsOrContains}": "${options.filterDelineamento}" } }`);
       }
       if (options.experimentGroupId) {
         parameters.experimentGroupId = Number(options.experimentGroupId);
@@ -497,6 +497,7 @@ export class ExperimentController {
           Epoca: experimentExist?.period,
           Tecnologia: experimentExist?.assay_list?.tecnologia?.cod_tec,
           TypeAssay: experimentExist?.assay_list?.type_assay?.id,
+          importValidate: true,
         });
 
         if (ambiente.length > 0 && experiment.length === 0) {
