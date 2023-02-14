@@ -269,6 +269,7 @@ export class ImportNpeController {
                     name: spreadSheet[row][column],
                     id_culture: idCulture,
                     filterStatus: 1,
+                    importValidate: true,
                   });
                   if (focoStatus !== 200) {
                     responseIfError[Number(column)] += responseGenericFactory(
@@ -327,6 +328,7 @@ export class ImportNpeController {
                     name: spreadSheet[row][column],
                     id_culture: idCulture,
                     filterStatus: 1,
+                    importValidate: true,
                   });
                   if (ensaio.total === 0) {
                     responseIfError[Number(column)] += responseGenericFactory(
@@ -375,6 +377,7 @@ export class ImportNpeController {
                     name: spreadSheet[row][2],
                     id_culture: idCulture,
                     filterStatus: 1,
+                    importValidate: true,
                   });
 
                   if (response.length > 0) {
@@ -490,6 +493,7 @@ export class ImportNpeController {
                       name: spreadSheet[row][column],
                       id_culture: idCulture,
                       filterStatus: 1,
+                      importValidate: true,
                     },
                   );
                   npeDto.focoId = Number(foco.response[0]?.id);
@@ -497,7 +501,12 @@ export class ImportNpeController {
 
                 if (configModule.response[0]?.fields[column] === 'Ensaio') {
                   const ensaio: any = await typeAssayController.getAll(
-                    { name: spreadSheet[row][column], filterStatus: 1 },
+                    {
+                      name: spreadSheet[row][column],
+                      filterStatus: 1,
+                      id_culture: idCulture,
+                      importValidate: true,
+                    },
                   );
                   npeDto.typeAssayId = ensaio.response[0]?.id;
                 }

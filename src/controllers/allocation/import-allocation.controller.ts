@@ -157,6 +157,7 @@ export class ImportAllocationController {
                 const { status }: IReturnObject = await experimentController.getAll({
                   filterExperimentName: spreadSheet[row][column],
                   idSafra,
+                  importValidate: true,
                 });
                 if (status !== 200) {
                   responseIfError[Number(column)]
@@ -189,6 +190,7 @@ export class ImportAllocationController {
                 const { response }: IReturnObject = await experimentController.getAll({
                   id: spreadSheet[row][1],
                   idSafra,
+                  importValidate: true,
                 });
                 const allNpe = response[0]?.experiment_genotipe.map((item: any) => (item.status === 'IMPRESSO' ? item.npe : 0));
                 let npeRange = Number(spreadSheet[row][column]);
@@ -439,6 +441,7 @@ export class ImportAllocationController {
               const { response: experiment }: any = await experimentController.getAll({
                 filterExperimentName: spreadSheet[row][3],
                 idSafra,
+                importValidate: true,
               });
               const { response: blockLayout }: any = await layoutQuadraController.getAll({
                 esquema: quadra[0]?.esquema,

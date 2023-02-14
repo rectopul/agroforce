@@ -80,6 +80,7 @@ export class ImportGenotypeTreatmentController {
             filterTreatmentsNumber: Number(spreadSheet[row][6]),
             filterStatusT: spreadSheet[row][7],
             filterGenotypeName: spreadSheet[row][8],
+            importValidate: true,
           });
           if (treatments.length === 0) {
             responseIfError[0]
@@ -207,6 +208,7 @@ export class ImportGenotypeTreatmentController {
               } else {
                 const { status } = await genotypeTreatmentController.getAll({
                   name_genotipo: spreadSheet[row][column],
+                  importValidate: true,
                 });
                 if (status === 400) {
                   responseIfError[Number(column)]
@@ -302,6 +304,7 @@ export class ImportGenotypeTreatmentController {
                   treatments_number: spreadSheet[row][6],
                   name_genotipo: spreadSheet[row][8],
                   nca: spreadSheet[row][9],
+                  importValidate: true,
                 });
                 const { response: genotipo } = await genotipoController.getAll({
                   name_genotipo: spreadSheet[row][10],
