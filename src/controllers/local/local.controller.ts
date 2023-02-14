@@ -9,6 +9,7 @@ export class LocalController {
   async getAll(options: object | any) {
     const parameters: object | any = {};
     let select: any = [];
+    const equalsOrContains = options.importValidate ? 'equals' : 'contains';
     try {
       options = await removeEspecialAndSpace(options);
       if (options.createFile) {
@@ -17,31 +18,31 @@ export class LocalController {
       }
 
       if (options.filterNameLocalCulture) {
-        parameters.name_local_culture = JSON.parse(`{ "contains":"${options.filterNameLocalCulture}" }`);
+        parameters.name_local_culture = JSON.parse(`{ "${equalsOrContains}":"${options.filterNameLocalCulture}" }`);
       }
 
       if (options.filterLabel) {
-        parameters.label = JSON.parse(`{ "contains":"${options.filterLabel}" }`);
+        parameters.label = JSON.parse(`{ "${equalsOrContains}":"${options.filterLabel}" }`);
       }
 
       if (options.filterMloc) {
-        parameters.mloc = JSON.parse(`{ "contains":"${options.filterMloc}" }`);
+        parameters.mloc = JSON.parse(`{ "${equalsOrContains}":"${options.filterMloc}" }`);
       }
 
       if (options.filterAdress) {
-        parameters.adress = JSON.parse(`{ "contains":"${options.filterAdress}" }`);
+        parameters.adress = JSON.parse(`{ "${equalsOrContains}":"${options.filterAdress}" }`);
       }
 
       if (options.filterLabelCountry) {
-        parameters.label_country = JSON.parse(`{ "contains":"${options.filterLabelCountry}" }`);
+        parameters.label_country = JSON.parse(`{ "${equalsOrContains}":"${options.filterLabelCountry}" }`);
       }
 
       if (options.filterLabelRegion) {
-        parameters.label_region = JSON.parse(`{ "contains":"${options.filterLabelRegion}" }`);
+        parameters.label_region = JSON.parse(`{ "${equalsOrContains}":"${options.filterLabelRegion}" }`);
       }
 
       if (options.filterNameLocality) {
-        parameters.name_locality = JSON.parse(`{ "contains":"${options.filterNameLocality}" }`);
+        parameters.name_locality = JSON.parse(`{ "${equalsOrContains}":"${options.filterNameLocality}" }`);
       }
 
       if (options.id_local_culture) {

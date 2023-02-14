@@ -329,6 +329,7 @@ export class ImportAllocationController {
               } else {
                 const { status, response }: IReturnObject = await localController.getAll({
                   name_local_culture: spreadSheet[row][column],
+                  importValidate: true,
                 });
                 if (status !== 200) {
                   responseIfError[Number(column)]
