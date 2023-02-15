@@ -1387,20 +1387,23 @@ export default function Listagem({
                         />
                       </div>
 
-                      <div className="flex flex-1 items-center justify-center">
+                      <div className="flex items-center justify-center">
                         <strong className="text-600">Experimentos</strong>
                       </div>
 
-                      <div className="flex flex-1 items-center justify-center">
+                      <div className="flex flex-1 justify-center">
                         <strong className="text-blue-600">
                           {/* Total registrado: {experimentos?.length} */}
                           Total registrado: {npeData?.data?.length}
                         </strong>
                       </div>
 
-                      <div className="flex flex-1 mb-6 justify-end">
+                      <div
+                        className="flex mb-6 justify-end"
+                        style={{ width: 150 }}
+                      >
                         <FieldItemsPerPage
-                          widthClass="w-1/3"
+                          widthClass="w-full"
                           selected={take}
                           onChange={setTake}
                         />
