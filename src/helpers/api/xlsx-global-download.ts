@@ -937,7 +937,7 @@ async function callExperimentosExperimentoXlsxDownload(options: any) {
   let workSheet: any;
   let count = 1;
   delete options.createFile;
-  options.take = 1000;
+  options.take = 200;
 
   do {
     const { response, status } = await Controller.getAll(options);
@@ -994,12 +994,12 @@ async function callExperimentosExperimentoXlsxDownload(options: any) {
     if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
-      options.skip = 1000;
+      options.skip = 200;
       count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
-      options.skip += 1000;
+      options.skip += 200;
     }
   } while (res.length > 0);
   return workSheet;
