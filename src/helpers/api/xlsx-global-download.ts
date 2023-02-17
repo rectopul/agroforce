@@ -994,12 +994,12 @@ async function callExperimentosExperimentoXlsxDownload(options: any) {
     if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
-      options.skip = 200;
+      options.skip = 100;
       count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
-      options.skip += 200;
+      options.skip += 100;
     }
   } while (res.length > 0);
   return workSheet;
