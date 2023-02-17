@@ -10,7 +10,6 @@ import stylesCommon from '../../../shared/styles/common.module.css';
 
 export default function Permissoes({
   allRoutes,
-  permissions,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const [routes, setRoutes] = useState<any>(allRoutes);
@@ -45,16 +44,19 @@ export default function Permissoes({
       >
         <div className={stylesCommon.container}>
           <ul>
-            {permissions.map((permission: any, index: any) => (
-              <Route key={routes[index].id} route={routes[index].screenRoute} />              
-              {permissions.map((element: any) => (
-                <CheckBox
-                  name={element.title}
-                  title={element.title?.toString()}
-                  value={element.value}
-                  defaultChecked={element.checked}
-                />
-              ))}
+            {routes.slice(0, 1).map((route: any) => (
+              <>
+                <Route key={route.id} route={route.screenRoute} />
+                {route.permission[0]?.map((element: any) => (
+                  <CheckBox
+                    name={element.title}
+                    id={route.id}
+                    title={element.title?.toString()}
+                    value={element.value}
+                    defaultChecked={element.checked}
+                  />
+                ))}
+              </>
             ))}
           </ul>
           <div>
@@ -90,8 +92,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   } as RequestInit | undefined;
 
   const {
-    result: allRoutes,
-    permissions,
+    newResult: allRoutes,
   } = await fetch(
     urlParameters.toString(),
     requestOptions,
@@ -100,7 +101,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   return {
     props: {
       allRoutes,
-      permissions,
     },
   };
 };

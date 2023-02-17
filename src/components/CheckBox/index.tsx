@@ -5,6 +5,8 @@ type IAllPropsAndDataCheckBox = InputHTMLAttributes<HTMLInputElement> & {
 };
 
 export function CheckBox({ title, ...rest }: IAllPropsAndDataCheckBox) {
+  console.log('🚀 ~ file: index.tsx:8 ~ CheckBox ~ rest', rest);
+  console.log('🚀 ~ file: index.tsx:8 ~ CheckBox ~ title', title);
   return (
     <label className="w-full inline-flex items-center">
       <input

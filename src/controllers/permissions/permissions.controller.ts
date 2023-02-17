@@ -45,13 +45,18 @@ export class PermissionsController {
         });
       });
 
+      const newResult = result.map((element: any, index: number) => ({
+        ...element,
+        permission: permissions.filter((e, ind) => index === ind),
+      }));
+
       if (!result) {
         return {
           status: 400, result: [], message: 'nenhum resultado encontrado',
         };
       }
       return {
-        status: 200, result, permissions, total: result.total,
+        status: 200, newResult, total: result.total,
       };
     } catch (error: any) {
       handleError('Permissions controller', 'GetAll', error.message);
