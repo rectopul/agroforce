@@ -85,16 +85,16 @@ interface IData {
 }
 
 export default function Listagem({
-          allSafras,
-          totalItems,
-          itensPerPage,
-          filterApplication,
-          cultureId,
-          pageBeforeEdit,
-          filterBeforeEdit,
-          typeOrderServer, // RR
-          orderByserver, // RR
-        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allSafras,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  cultureId,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  typeOrderServer, // RR
+  orderByserver, // RR
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -588,7 +588,6 @@ export default function Listagem({
 
     await safraService.getAll(filterParam).then(({ status, response }) => {
       if (status === 200) {
-          
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, response, 'safras');
 

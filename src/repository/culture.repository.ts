@@ -1,5 +1,5 @@
 import { prisma } from '../pages/api/db/db';
-import {BaseRepository} from './base-repository';
+import { BaseRepository } from './base-repository';
 
 export class CulturaRepository extends BaseRepository {
   async findOne(id: number) {
