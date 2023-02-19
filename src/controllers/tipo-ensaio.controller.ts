@@ -74,7 +74,7 @@ export class TypeAssayController {
       } else {
         orderBy = '{ "name": "desc"}';
       }
-      console.log('🚀 ~ file: tipo-ensaio.controller.ts:66 ~ TypeAssayController ~ getAll ~ parameters', parameters);
+      //console.log(new Date().toISOString(), '🚀 ~ file: tipo-ensaio.controller.ts:66 ~ TypeAssayController ~ getAll ~ parameters', parameters);
 
       const response = await this.typeAssayRepository.findAll(
         parameters,
