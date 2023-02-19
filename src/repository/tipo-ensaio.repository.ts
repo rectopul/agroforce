@@ -29,7 +29,7 @@ export class TypeAssayRepository {
     }
     const count = await prisma.type_assay.count({ where });
     const result: object | any = await prisma.type_assay.findMany({
-      select, skip, take, where, orderBy: order,
+      select, skip, take, where, orderBy: order
     });
     result.total = count;
     return result;
