@@ -48,8 +48,8 @@ export class PrismaTransactionScope implements TransactionScope {
           }
         });
       },{
-        maxWait: 3600000 * 3, // default: 2000 === 3600000 ms == 1 hr => 1 hora * 3
-        timeout: 3600000 * 3, // default: 5000 === 3600000 ms == 1 hr => 1 hora * 3
+        maxWait: (3600000 * 3), // default: 2000 === 3600000 ms == 1 hr => 1 hora * 3
+        timeout: (3600000 * 3), // default: 5000 === 3600000 ms == 1 hr => 1 hora * 3
       });
     }
   }
