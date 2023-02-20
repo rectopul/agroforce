@@ -192,41 +192,85 @@ export class NpeController {
       );
 
       if (response.length > 0) {
-        const next_available_npe = response[response.length - 1].prox_npe;// proximo npe disponivel
-        response.map(async (value: any, index: any, elements: any) => {
-          const newItem = value;
-          const { id } = newItem;
-          const groupId = newItem.group?.id;
-          // const next = elements[index + 1]; // FIXED: desta forma você não consegue pegar o proximo elemento verificando se está no mesmo grupo;
-          // find groupId next element in elements with same group.id
-          const next = elements.find((item: any, idx:any) => item.group?.id === groupId && idx > index);
-
-          if (next) {
-            /**
-             * SELECT @npei_search:= MIN(npe.npei) as next_npe
-             * FROM npe
-             * WHERE (npe.npei >= @npe)
-             * AND NOT EXIST(SELECT n2.id FROM npe n2 WHERE n2.id = npe.id)
-             * GROUP BY npe.safraId, npe.groupId
-             * HAVING ((npe.safraId = @safra AND npe.groupId = @grupo));
-             *
-             */
-
-            if (!newItem.npeQT) {
-              newItem.npeQT = next.npei_i - newItem.npef; // quantidade disponivel
+        /**
+         * ATENÇÃO CASO O USUÁRIO ORDENE OS AMBIENTES POR QUALQUER OUTRO CAMPO QUE NÃO SEJA O PROX_NPE
+         * CARREGAR O NEXT_NPE DE CADA AMBIENTE SEPARADAMENTE
+         */
+        if(orderBy !== '{"prox_npe":"asc"}') {
+          
+          for(const npe of response) {
+            
+            if(typeof npe === 'object') {
+              
+              const orderByAux = '{"prox_npe":"asc"}';
+              const parametersAux: object | any = {};
+              parametersAux.AND = [];
+              parametersAux.npei = JSON.parse(`{"gt": ${Number(npe.npei)} }`);
+              parametersAux.group = { "group": { "equals": Number(npe.group?.id) } };
+              
+              const responseNextNPE = await this.npeRepository.findAll(
+                parametersAux,
+                select,
+                1,
+                0,
+                orderByAux,
+              );
+              
+              if(responseNextNPE.length > 0) {
+                const next = responseNextNPE[0];
+                if (!npe.npeQT) {
+                  npe.npeQT = next.npei_i - npe.npef; // quantidade disponivel
+                }
+                npe.npeRequisitada = 0; // quantidade a ser consumida (contagem de experimentos)
+                npe.nextNPE = next;
+              } else {
+                npe.npeQT = 'N/A';
+                npe.nextNPE = 0;
+                npe.npeRequisitada = 0;
+              }
+              
             }
-            newItem.npeRequisitada = 0; // quantidade a ser consumida (contagem de experimentos)
-            newItem.nextNPE = next;
-            // newItem.npefView = newItem.npef;
-          } else {
-            newItem.npeQT = 'N/A';
-            newItem.nextNPE = 0;
-            newItem.npeRequisitada = 0;
-            // newItem.npefView = newItem.npef;
+            
           }
-          newItem.nextAvailableNPE = next_available_npe;
-          return newItem;
-        });
+          
+        } else {
+          const next_available_npe = response[response.length - 1].prox_npe;// proximo npe disponivel
+          response.map(async (value: any, index: any, elements: any) => {
+            const newItem = value;
+            const { id } = newItem;
+            const groupId = newItem.group?.id;
+            // const next = elements[index + 1]; // FIXED: desta forma você não consegue pegar o proximo elemento verificando se está no mesmo grupo;
+            // find groupId next element in elements with same group.id
+            const next = elements.find((item: any, idx:any) => item.group?.id === groupId && idx > index);
+
+            if (next) {
+              /**
+               * SELECT @npei_search:= MIN(npe.npei) as next_npe
+               * FROM npe
+               * WHERE (npe.npei >= @npe)
+               * AND NOT EXIST(SELECT n2.id FROM npe n2 WHERE n2.id = npe.id)
+               * GROUP BY npe.safraId, npe.groupId
+               * HAVING ((npe.safraId = @safra AND npe.groupId = @grupo));
+               *
+               */
+
+              if (!newItem.npeQT) {
+                newItem.npeQT = next.npei_i - newItem.npef; // quantidade disponivel
+              }
+              newItem.npeRequisitada = 0; // quantidade a ser consumida (contagem de experimentos)
+              newItem.nextNPE = next;
+              // newItem.npefView = newItem.npef;
+            } else {
+              newItem.npeQT = 'N/A';
+              newItem.nextNPE = 0;
+              newItem.npeRequisitada = 0;
+              // newItem.npefView = newItem.npef;
+            }
+            newItem.nextAvailableNPE = next_available_npe;
+            return newItem;
+          });
+        }
+        
       }
 
       for (let i = 0; i < response.length; i++) {
