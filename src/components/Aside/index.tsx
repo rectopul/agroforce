@@ -9,7 +9,7 @@ import { BsGear } from 'react-icons/bs';
 import { useRouter } from 'next/router';
 import { ButtonAside } from './ButtonAside';
 
-const versionApp = '0.0.28.3';
+const versionApp = '0.0.28.4';
 
 export function Aside({ moduloActive }: any) {
   const aArray = versionApp.split('.');
