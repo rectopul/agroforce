@@ -935,9 +935,10 @@ async function callExperimentosExperimentoXlsxDownload(options: any) {
   const Controller = new ExperimentController();
   let res: any = [];
   let workSheet: any;
+  let take = 1000;
   let count = 1;
   delete options.createFile;
-  options.take = 200;
+  options.take = take;
 
   do {
     const { response, status } = await Controller.getAll(options);
@@ -994,12 +995,12 @@ async function callExperimentosExperimentoXlsxDownload(options: any) {
     if (count === 1) {
       workSheet = XLSX.utils.json_to_sheet(newData);
       res = response;
-      options.skip = 100;
+      options.skip = take;
       count += 1;
     } else {
       workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
       res = response;
-      options.skip += 100;
+      options.skip += take;
     }
   } while (res.length > 0);
   return workSheet;
