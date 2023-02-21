@@ -18,6 +18,7 @@ export class AssayListController {
   async getAll(options: any) {
     const parameters: object | any = {};
     parameters.AND = [];
+    const equalsOrContains = options.importValidate ? 'equals' : 'contains';
     let orderBy: object | any;
     try {
       options = await removeEspecialAndSpace(options);
@@ -26,31 +27,31 @@ export class AssayListController {
         return { status: 200, response: sheet };
       }
       if (options.filterFoco) {
-        parameters.foco = JSON.parse(`{ "name": { "contains": "${options.filterFoco}" } }`);
+        parameters.foco = JSON.parse(`{ "name": { "${equalsOrContains}": "${options.filterFoco}" } }`);
       }
       if (options.filterTypeAssay) {
-        parameters.type_assay = JSON.parse(`{ "name": { "contains": "${options.filterTypeAssay}" } }`);
+        parameters.type_assay = JSON.parse(`{ "name": { "${equalsOrContains}": "${options.filterTypeAssay}" } }`);
       }
       if (options.filterTechnology) {
-        parameters.AND.push(JSON.parse(`{ "tecnologia": { "name": {"contains": "${options.filterTechnology}" } } }`));
+        parameters.AND.push(JSON.parse(`{ "tecnologia": { "name": {"${equalsOrContains}": "${options.filterTechnology}" } } }`));
       }
       if (options.filterCod) {
-        parameters.AND.push(JSON.parse(`{ "tecnologia": { "cod_tec": {"contains": "${options.filterCod}" } } }`));
+        parameters.AND.push(JSON.parse(`{ "tecnologia": { "cod_tec": {"${equalsOrContains}": "${options.filterCod}" } } }`));
       }
       if (options.filterGenotipo) {
-        parameters.AND.push(JSON.parse(`{ "genotipo": {"name_genotipo": {"contains": "${options.filterGenotipo}" } } }`));
+        parameters.AND.push(JSON.parse(`{ "genotipo": {"name_genotipo": {"${equalsOrContains}": "${options.filterGenotipo}" } } }`));
       }
       if (options.filterGli) {
-        parameters.gli = JSON.parse(`{"contains": "${options.filterGli}" }`);
+        parameters.gli = JSON.parse(`{"${equalsOrContains}": "${options.filterGli}" }`);
       }
       if (options.filterBgm) {
-        parameters.bgm = JSON.parse(`{ "contains": "${options.filterBgm}" }`);
+        parameters.bgm = JSON.parse(`{ "${equalsOrContains}": "${options.filterBgm}" }`);
       }
       if (options.filterProject) {
-        parameters.project = JSON.parse(`{ "contains": "${options.filterProject}" }`);
+        parameters.project = JSON.parse(`{ "${equalsOrContains}": "${options.filterProject}" }`);
       }
       if (options.filterStatusAssay) {
-        parameters.status = JSON.parse(`{ "contains": "${options.filterStatusAssay}" }`);
+        parameters.status = JSON.parse(`{ "${equalsOrContains}": "${options.filterStatusAssay}" }`);
       }
 
       if (options.filterTratFrom || options.filterTratTo) {

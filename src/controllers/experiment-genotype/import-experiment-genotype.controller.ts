@@ -98,6 +98,7 @@ export class ImportExperimentGenotypeController {
             filterGenotypeName: spreadSheet[row][12],
             nca: String(spreadSheet[row][13]),
             take: 1,
+            importValidate: true,
           });
 
           if (parcels.length === 0) {
@@ -338,6 +339,7 @@ export class ImportExperimentGenotypeController {
               } else {
                 const { status } = await genotipoController.getAll({
                   name_genotipo: spreadSheet[row][column],
+                  importValidate: true,
                 });
                 if (status === 400) {
                   responseIfError[Number(column)]
@@ -398,10 +400,12 @@ export class ImportExperimentGenotypeController {
                   filterGenotypeName: spreadSheet[row][12],
                   nca: String(spreadSheet[row][13]),
                   take: 1,
+                  importValidate: true,
                 });
 
                 const { response: genotipo } = await genotipoController.getAll({
                   name_genotipo: spreadSheet[row][14], // New genetic Name
+                  importValidate: true,
                 });
 
                 const { response: lote } = await loteController.getAll({

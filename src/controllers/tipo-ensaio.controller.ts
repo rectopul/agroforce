@@ -16,6 +16,7 @@ export class TypeAssayController {
   async getAll(options: object | any) {
     const parameters: object | any = {};
     let orderBy: object | any;
+    const equalsOrContains = options.importValidate ? 'equals' : 'contains';
     parameters.AND = [];
     try {
       options = await removeEspecialAndSpace(options);
@@ -29,7 +30,7 @@ export class TypeAssayController {
       }
 
       if (options.filterName) {
-        parameters.name = JSON.parse(`{"contains":"${options.filterName}"}`);
+        parameters.name = JSON.parse(`{"${equalsOrContains}":"${options.filterName}"}`);
       }
 
       if (options.filterSeedsFrom || options.filterSeedsTo) {
@@ -59,6 +60,10 @@ export class TypeAssayController {
         parameters.name = options.name;
       }
 
+      if (options.notId) {
+        parameters.id = JSON.parse(`{"not": ${Number(options.notId)} }`);
+      }
+
       const take = (options.take) ? Number(options.take) : undefined;
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
@@ -69,6 +74,7 @@ export class TypeAssayController {
       } else {
         orderBy = '{ "name": "desc"}';
       }
+      //console.log(new Date().toISOString(), '🚀 ~ file: tipo-ensaio.controller.ts:66 ~ TypeAssayController ~ getAll ~ parameters', parameters);
 
       const response = await this.typeAssayRepository.findAll(
         parameters,
@@ -79,19 +85,19 @@ export class TypeAssayController {
       );
 
       response.map((item: any) => {
-        if(item.envelope && item.envelope.length>0) { 
+        if (item.envelope && item.envelope.length > 0) {
           item.envelope.map((envelope: any) => {
             if (envelope.id_safra === Number(options.id_safra)) {
               item.envelope = envelope;
             }
-          }) 
-        }else{
-            let env: any = {};
-            env.seeds = '';
-            env.safra = {
-              safraName : ''
-            };
-            item.envelope = env;
+          });
+        } else {
+          const env: any = {};
+          env.seeds = '';
+          env.safra = {
+            safraName: '',
+          };
+          item.envelope = env;
         }
       });
 
@@ -101,9 +107,9 @@ export class TypeAssayController {
         response.sort((a: any, b: any) => a.envelope.seeds - b.envelope.seeds);
       }
 
-      if(options.orderBy == 'envelope.safra.safraName' && options.typeOrder == 'asc'){
+      if (options.orderBy == 'envelope.safra.safraName' && options.typeOrder == 'asc') {
         response.sort((a: any, b: any) => b.envelope.safra.safraName - a.envelope.safra.safraName);
-      }else if(options.orderBy == 'envelope.safra.safraName' && options.typeOrder == 'desc'){
+      } else if (options.orderBy == 'envelope.safra.safraName' && options.typeOrder == 'desc') {
         response.sort((a: any, b: any) => a.envelope.safra.safraName - b.envelope.safra.safraName);
       }
 
@@ -171,6 +177,7 @@ export class TypeAssayController {
   }
 
   async update(data: any) {
+    console.log('🚀 ~ file: tipo-ensaio.controller.ts:179 ~ TypeAssayController ~ update ~ data', data);
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
       const { created_by } = data;
@@ -195,8 +202,18 @@ export class TypeAssayController {
         }
         return { status: 200, response };
       }
-      const assayTypeAlreadyExist = await this.getByData(data);
-      if (assayTypeAlreadyExist.status === 200) return { status: 400, message: 'Tipo de ensaio já registrado' };
+      if (data.id_culture && data.name) {
+        const { response: validate }: any = await this.getAll({
+          id_culture: data.id_culture,
+          filterName: data.name,
+          notId: data.id,
+          importValidate: true,
+        });
+
+        if (validate.length > 0) return { status: 404, message: 'Tipo de ensaio já existe, favor checar registros inativos.' };
+      }
+      // const assayTypeAlreadyExist = await this.getByData(data);
+      // if (assayTypeAlreadyExist.status === 200) return { status: 400, message: 'Tipo de ensaio já registrado' };
       await this.reporteController.create({
         userId: created_by, module: 'TIPO DE ENSAIO', operation: 'EDIÇÃO', oldValue: data.name, ip: String(ip),
       });

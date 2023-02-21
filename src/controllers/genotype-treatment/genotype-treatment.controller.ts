@@ -13,6 +13,7 @@ export class GenotypeTreatmentController {
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];
+    const equalsOrContains = options.importValidate ? 'equals' : 'contains';
     parameters.OR = [];
     try {
       options = await removeEspecialAndSpace(options);
@@ -103,25 +104,25 @@ export class GenotypeTreatmentController {
         }
       }
       if (options.filterFoco) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"foco": {"name": {"contains": "${options.filterFoco}" } } } }`));
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"foco": {"name": {"${equalsOrContains}": "${options.filterFoco}" } } } }`));
       }
       if (options.filterTypeAssay) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"type_assay": {"name": {"contains": "${options.filterTypeAssay}" } } } }`));
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"type_assay": {"name": {"${equalsOrContains}": "${options.filterTypeAssay}" } } } }`));
       }
       if (options.filterGli) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"contains": "${options.filterGli}" } } }`));
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"gli": {"${equalsOrContains}": "${options.filterGli}" } } }`));
       }
       if (options.filterTechnology) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "name":  {"contains": "${options.filterTechnology}" } } } }`));
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "name":  {"${equalsOrContains}": "${options.filterTechnology}" } } } }`));
       }
       if (options.filterCodTec) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "cod_tec":  {"contains": "${options.filterCodTec}" } } } }`));
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"tecnologia": { "cod_tec":  {"${equalsOrContains}": "${options.filterCodTec}" } } } }`));
       }
       if (options.filterGgenName) {
-        parameters.AND.push(JSON.parse(`{ "genotipo": {"tecnologia": { "name":  {"contains": "${options.filterGgenName}" } } } }`));
+        parameters.AND.push(JSON.parse(`{ "genotipo": {"tecnologia": { "name":  {"${equalsOrContains}": "${options.filterGgenName}" } } } }`));
       }
       if (options.filterGgenCod) {
-        parameters.AND.push(JSON.parse(`{ "genotipo": {"tecnologia": { "cod_tec":  {"contains": "${options.filterGgenCod}" } } } }`));
+        parameters.AND.push(JSON.parse(`{ "genotipo": {"tecnologia": { "cod_tec":  {"${equalsOrContains}": "${options.filterGgenCod}" } } } }`));
       }
       if (options.filterBgm) {
         if (typeof options.filterBgm === 'number') {
@@ -129,21 +130,21 @@ export class GenotypeTreatmentController {
         }
       }
       if (options.filterStatusAssay) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"${equalsOrContains}": "${options.filterStatusAssay}" } } }`));
       }
       if (options.filterGenotypeName) {
-        parameters.AND.push(JSON.parse(`{ "genotipo": {"name_genotipo":  {"contains": "${options.filterGenotypeName}" }  } }`));
+        parameters.AND.push(JSON.parse(`{ "genotipo": {"name_genotipo":  {"${equalsOrContains}": "${options.filterGenotypeName}" }  } }`));
       }
       if (options.filterStatusAssay) {
-        parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"contains": "${options.filterStatusAssay}" } } }`));
+        parameters.AND.push(JSON.parse(`{ "assay_list": {"status": {"${equalsOrContains}": "${options.filterStatusAssay}" } } }`));
       }
       if (options.status_experiment) {
         if (options.status_experiment.includes(',')) {
           const filter = options.status_experiment.split(',');
-          parameters.OR.push(JSON.parse(`{"assay_list": { "status": {"contains": "${filter[0]}" } } }`));
-          parameters.OR.push(JSON.parse(`{"assay_list": { "status": {"contains": "${filter[1]}" } } }`));
+          parameters.OR.push(JSON.parse(`{"assay_list": { "status": {"${equalsOrContains}": "${filter[0]}" } } }`));
+          parameters.OR.push(JSON.parse(`{"assay_list": { "status": {"${equalsOrContains}": "${filter[1]}" } } }`));
         } else {
-          parameters.AND.push(JSON.parse(`{"assay_list": { "status": {"contains": "${options.status_experiment}" } } }`));
+          parameters.AND.push(JSON.parse(`{"assay_list": { "status": {"${equalsOrContains}": "${options.status_experiment}" } } }`));
         }
       }
       const select = {
