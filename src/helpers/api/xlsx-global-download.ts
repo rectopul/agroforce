@@ -935,7 +935,7 @@ async function callExperimentosExperimentoXlsxDownload(options: any) {
   const Controller = new ExperimentController();
   let res: any = [];
   let workSheet: any;
-  let take = 1000;
+  let take = 200;
   let count = 1;
   delete options.createFile;
   options.take = take;
