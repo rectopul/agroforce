@@ -1,3 +1,5 @@
+/* eslint-disable guard-for-in */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-loop-func */
 /* eslint-disable no-await-in-loop */
 import { ExperimentGenotipeRepository } from 'src/repository/experiment-genotipe.repository';
@@ -418,10 +420,26 @@ export class ExperimentGenotipeController {
         orderBy,
       );
 
+      if (options.count) {
+        const {
+          tagsToPrint,
+          tagsPrinted,
+        } = await this.ExperimentGenotipeRepository.countTags(parameters);
+
+        response.tagsToPrint = tagsToPrint;
+        response.tagsPrinted = tagsPrinted;
+      }
+
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }
-      return { status: 200, response, total: response.total };
+      return {
+        status: 200,
+        response,
+        total: response.total,
+        tagsToPrint: response.tagsToPrint,
+        tagsPrinted: response.tagsPrinted,
+      };
     } catch (error: any) {
       handleError('Parcelas controller', 'GetAll', error.message);
       throw new Error('[Controller] - GetAll Parcelas erro');
@@ -530,6 +548,7 @@ export class ExperimentGenotipeController {
   }
 
   async getOne(id: number) {
+    console.log('🚀 ~ file: experiment-genotipe.controller.ts:535 ~ ExperimentGenotipeController ~ getOne ~ id:', id);
     try {
       const response = await this.ExperimentGenotipeRepository.findById(id);
 
@@ -552,22 +571,22 @@ export class ExperimentGenotipeController {
         operation = 'IMPRESSO';
         counter = 1;
         // idList é um array de ids de parcelas
-        
-        //await idList.map(async (id: any) => {
-        for(const id in idList) {
-          const {response}: any = await this.getOne(Number(id));
+
+        // await idList.map(async (id: any) => {
+        for (const id of idList) {
+          const { response }: any = await this.getOne(Number(id));
           const newCount = response.counter + 1;
           operation = 'IMPRESSO';
 
           await this.ExperimentGenotipeRepository.printed(Number(id), status, newCount);
 
-          const {idExperiment} = response;
+          const { idExperiment } = response;
 
           console.log('experiment-genotipe.controller.ts', 'update', 'idExperiment', idExperiment);
 
           console.log('parcela antes', response, 'status destino: ', status);
 
-          const {response: resExp}: any = await this.experimentController.getOne(idExperiment);
+          const { response: resExp }: any = await this.experimentController.getOne(idExperiment);
           // await this.experimentGroupController.countEtiqueta(
           //   resExp.experimentGroupId,
           //   idExperiment,
@@ -577,14 +596,13 @@ export class ExperimentGenotipeController {
             userId, operation, module: 'ETIQUETAGEM', oldValue: response.nca,
           });
         }
-        //});
+        // });
 
         // const { response: resExp }: any = await this.experimentController.getOne(idExperiment);
         // await this.experimentGroupController.countEtiqueta(
         //   resExp.experimentGroupId,
         //   idExperiment,
         // );
-        
       } else if (count === 'reprint') {
         await idList.map(async (id: any) => {
           const { response }: any = await this.getOne(id);

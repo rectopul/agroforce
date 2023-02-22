@@ -1715,6 +1715,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
     : '';
+
   const { token } = req.cookies;
   const idCulture = req.cookies.cultureId;
   const idSafra = req.cookies.safraId;
@@ -1738,8 +1739,14 @@ export const getServerSideProps: GetServerSideProps = async ({
   const baseUrlTreatment = `${publicRuntimeConfig.apiUrl}/genotype-treatment`;
   const baseUrlAssay = `${publicRuntimeConfig.apiUrl}/assay-list`;
 
-  const filterApplication = req.cookies.filterBeforeEdit
-    || `&id_culture=${idCulture}&id_safra=${idSafra}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
+  let filterApplication: any = '';
+  if (req.cookies.ncaEmpty) {
+    filterApplication = `${req.cookies.filterBeforeEdit}&filterNcaFrom=VAZIO&filterNcaTo=VAZIO`
+      || `&id_culture=${idCulture}&id_safra=${idSafra}&filterNcaFrom=VAZIO&filterNcaTo=VAZIO&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
+  } else {
+    filterApplication = req.cookies.filterBeforeEdit
+      || `&id_culture=${idCulture}&id_safra=${idSafra}&orderBy=gli&typeOrder=asc&orderBy=treatments_number&typeOrder=asc`;
+  }
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
@@ -1749,6 +1756,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('filterBeforeEditOrderBy', { req, res });
   removeCookies('lastPage', { req, res });
   removeCookies('filterSelectStatusEssay', { req, res });
+  removeCookies('ncaEmpty', { req, res });
 
   const param = `&id_culture=${idCulture}&id_safra=${idSafra}`;
 

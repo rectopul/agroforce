@@ -33,6 +33,7 @@ import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { removeCookies, setCookies } from 'cookies-next';
+import moment from 'moment';
 import {
   userPreferencesService,
   assayListService,
@@ -709,17 +710,23 @@ export default function AtualizarTipoEnsaio({
             newRow.SAFRA = row.safra.safraName;
             newRow.FASE = newRow.lote?.fase;
             newRow.ENSAIO = newRow.assay_list.type_assay.name;
-            newRow.TECNOLOGIA = `${newRow.genotipo?.tecnologia.cod_tec} ${newRow.genotipo?.tecnologia.name}`;
+            newRow.TECNOLOGIA = `${newRow.assay_list?.tecnologia.cod_tec} ${newRow.assay_list?.tecnologia.name}`;
             newRow.GLI = newRow.assay_list.gli;
+            newRow.STATUS_ENSAIO = newRow.assay_list.status;
+            newRow.PROJETO = newRow.assay_list.project;
+            newRow.COMENTARIOS = newRow.comments;
+            newRow.FASE = newRow.lote.fase;
+            newRow.GGEN = `${newRow.genotipo?.tecnologia.cod_tec} ${newRow.genotipo?.tecnologia.name}`;
             newRow.NT = newRow.treatments_number;
-            newRow.NOME_GENOTIPO = newRow.genotipo?.name_genotipo;
-            newRow.GMR_GENOTIPO = newRow.genotipo?.gmr;
-            newRow.BGM_GENOTIPO = newRow.genotipo?.bgm;
+            newRow.NOME_DO_GENOTIPO = newRow.genotipo?.name_genotipo;
+            newRow.GMR = newRow.genotipo?.gmr;
+            newRow.BGM = newRow.genotipo?.bgm;
             newRow.STATUS_T = newRow.status;
-            newRow.STATUS_EXPERIMENTO = newRow.status_experiment;
             newRow.NCA = newRow.lote?.ncc;
             newRow.COD_LOTE = newRow.lote?.cod_lote;
+            newRow.STATUS_TRAT = newRow.status_experiment;
             newRow.OBS = newRow.comments;
+            newRow.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
             delete row.id_lote;
             delete row.id_genotipo;
@@ -740,7 +747,7 @@ export default function AtualizarTipoEnsaio({
           XLSX.utils.book_append_sheet(
             workBook,
             workSheet,
-            'genotypeTreatments',
+            'Genotipo do ensaio',
           );
 
           // Buffer
@@ -754,7 +761,7 @@ export default function AtualizarTipoEnsaio({
             type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, 'Tratamentos-genótipos.xlsx');
+          XLSX.writeFile(workBook, 'Genotipo do ensaio.xlsx');
         } else {
           Swal.fire(
             'Não existem registros para serem exportados, favor checar.',
@@ -773,23 +780,18 @@ export default function AtualizarTipoEnsaio({
             newItem.CULTURA = item.assay_list?.safra?.culture?.name;
             newItem.SAFRA = item.assay_list?.safra?.safraName;
             newItem.FOCO = item.assay_list?.foco.name;
-            newItem.TIPO_DE_ENSAIO = item.assay_list?.type_assay.name;
+            newItem.ENSAIO = item.assay_list?.type_assay.name;
             newItem.TECNOLOGIA = `${item.assay_list?.tecnologia.cod_tec} ${item.assay_list?.tecnologia.name}`;
             newItem.GLI = item.assay_list?.gli;
-            newItem.NOME_DO_EXPERIMENTO = item?.experimentName;
             newItem.BGM = item.assay_list?.bgm;
-            newItem.STATUS_ENSAIO = item.assay_list?.status;
-            newItem.PLANTIO = newItem.local?.name_local_culture;
+            newItem.STATUS_DO_ENSAIO = item.assay_list?.status;
+            newItem.PROJETO = item?.assay_list?.project;
+            newItem.COMENTÁRIOS = item?.assay_list?.comments;
+            newItem.EXPERIMENTO_PLANEJADO = '';
             newItem.DELINEAMENTO = item.delineamento?.name;
-            newItem.DENSIDADE = item?.density;
             newItem.REP = item.repetitionsNumber;
-            newItem.ÉPOCA = item?.period;
-            newItem.ORDEM_SORTEIO = item?.orderDraw;
-            newItem.NLP = item?.nlp;
-            newItem.CLP = item?.clp;
-            newItem.OBS = item?.comments;
-            newItem.COUNT_NT = newItem.countNT;
-            newItem.NPE_QT = newItem.npeQT;
+            newItem.STATUS_EXP = item.status;
+            newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
             delete newItem.id;
             delete newItem.safra;
@@ -817,7 +819,7 @@ export default function AtualizarTipoEnsaio({
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Experimentos');
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'Experimento');
 
           // Buffer
           XLSX.write(workBook, {
@@ -830,7 +832,7 @@ export default function AtualizarTipoEnsaio({
             type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, 'Experimentos.xlsx');
+          XLSX.writeFile(workBook, 'Experimento.xlsx');
         }
       });
   };

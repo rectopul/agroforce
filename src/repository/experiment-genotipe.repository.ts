@@ -43,6 +43,15 @@ export class ExperimentGenotipeRepository extends BaseRepository {
     return result;
   }
 
+  async countTags(parameters: any) {
+    parameters.status = 'EM ETIQUETAGEM';
+    const tagsToPrint = await prisma.experiment_genotipe.count({ where: parameters });
+    parameters.status = 'IMPRESSO';
+    const tagsPrinted = await prisma.experiment_genotipe.count({ where: parameters });
+
+    return { tagsToPrint, tagsPrinted };
+  }
+
   async findById(id: number) {
     const result = await prisma.experiment_genotipe.findUnique({
       where: { id },

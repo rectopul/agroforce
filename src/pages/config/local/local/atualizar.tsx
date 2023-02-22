@@ -322,7 +322,7 @@ export default function AtualizarLocal({
     await unidadeCulturaService.getAll(`${filterApplication}&createFile=true`).then(({ status, response }) => {
       if (status === 200) {
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, response, 'unidade-cultura');
+        XLSX.utils.book_append_sheet(workBook, response, 'unidade de cultura');
 
         // buffer
         XLSX.write(workBook, {
@@ -335,7 +335,7 @@ export default function AtualizarLocal({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'Unidade-cultura.xlsx');
+        XLSX.writeFile(workBook, 'Unidade de cultura.xlsx');
       }
     });
     setLoading(false);

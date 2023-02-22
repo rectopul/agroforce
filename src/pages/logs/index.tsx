@@ -86,7 +86,7 @@ export default function Listagem({
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const preferences = userLogado.preferences.reportes || {
     id: 0,
-    table_preferences: 'id,user,createdAt,modulo,status,parcela',
+    table_preferences: 'id,madeIn,module,operation,ip,oldValue',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
