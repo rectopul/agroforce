@@ -353,6 +353,7 @@ export default function Listagem({
 
   // Call that function when change type order value.
   useEffect(() => {
+    // console.log('typeOrder', typeOrder);
     callingApi(filter);
   }, [typeOrder]);
 

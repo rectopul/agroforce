@@ -26,11 +26,19 @@ export class ExperimentController {
     const equalsOrContains = options.importValidate ? 'equals' : 'contains';
     let orderBy: object | any;
     parameters.AND = [];
+
+    // console.log('experimentos', 'options', options);
+    
     try {
       options = await removeEspecialAndSpace(options);
       if (options.createFile) {
-        const sheet = await createXls(options, 'EXPERIMENTOS-EXPERIMENTO');
-        return { status: 200, response: sheet };
+        try{
+          const sheet = await createXls(options, 'EXPERIMENTOS-EXPERIMENTO');
+          return { status: 200, response: sheet };
+        } catch (error) {
+          handleError('experiment.controller.ts', 'getAll', error);
+          return { status: 500, response: error };
+        }
       }
 
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
@@ -325,7 +333,7 @@ export class ExperimentController {
       }
       return { status: 200, response, total: response.total };
     } catch (error: any) {
-      handleError('Experimento controller', 'GetAll', error.message);
+      handleError('Experimento controller', 'GetAll', error.message + ' - ' + JSON.stringify(parameters));
       // throw new Error({name: 'teste', message: '[Controller] - GetAll Experimento erro: ', stack: error.message});
       throw new Error(`[Controller] - GetAll Experimento erro: \r\n${error.message}`);
     }

@@ -1,3 +1,4 @@
-export default function handleError(file: string, local: string, error: any) {
-  console.error(`[${file}] ${local} error \n ${error}`);
+export default function handleError(file: string, local: string, error: any, details?:any ) {
+  console.error(new Date().toISOString(), `[${file}] ${local} error \n ${error}`, details);
+  console.trace("rastreio de pilha");
 }
