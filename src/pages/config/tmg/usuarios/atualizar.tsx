@@ -582,15 +582,7 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
     },
   });
 
-  const responseProfile = await prisma.profile.findMany({
-    where: {
-      status: 1,
-    },
-    select: {
-      id: true,
-      name: true,
-    },
-  });
+  const responseProfile = await prisma.profile.findMany();
 
   const responseCulture = await prisma.culture.findMany({
     where: {

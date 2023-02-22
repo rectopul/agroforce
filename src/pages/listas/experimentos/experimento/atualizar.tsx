@@ -1,36 +1,38 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
-import { useFormik } from "formik";
-import MaterialTable from "material-table";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import getConfig from "next/config";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useFormik } from 'formik';
+import MaterialTable from 'material-table';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import getConfig from 'next/config';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import {
+  useEffect, useState, useRef, useMemo,
+} from 'react';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from "react-beautiful-dnd";
-import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
-import { BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { IoMdArrowBack } from "react-icons/io";
-import { IoReloadSharp } from "react-icons/io5";
-import { MdFirstPage, MdLastPage } from "react-icons/md";
-import { RiFileExcel2Line, RiOrganizationChart } from "react-icons/ri";
-import * as XLSX from "xlsx";
-import Swal from "sweetalert2";
-import { RequestInit } from "next/dist/server/web/spec-extension/request";
-import { experimentGenotipeService } from "src/services/experiment-genotipe.service";
-import { ITreatment } from "src/interfaces/listas/ensaio/genotype-treatment.interface";
-import { removeCookies, setCookies } from "cookies-next";
+} from 'react-beautiful-dnd';
+import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai';
+import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import { IoMdArrowBack } from 'react-icons/io';
+import { IoReloadSharp } from 'react-icons/io5';
+import { MdFirstPage, MdLastPage } from 'react-icons/md';
+import { RiFileExcel2Line, RiOrganizationChart } from 'react-icons/ri';
+import * as XLSX from 'xlsx';
+import Swal from 'sweetalert2';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { experimentGenotipeService } from 'src/services/experiment-genotipe.service';
+import { ITreatment } from 'src/interfaces/listas/ensaio/genotype-treatment.interface';
+import { removeCookies, setCookies } from 'cookies-next';
 import {
   experimentService,
   userPreferencesService,
-} from "../../../../services";
-import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
+} from '../../../../services';
+import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import {
   AccordionFilter,
   Button,
@@ -40,11 +42,11 @@ import {
   InputMoney,
   FieldItemsPerPage,
   ManageFields,
-} from "../../../../components";
-import * as ITabs from "../../../../shared/utils/dropdown";
-import { tableGlobalFunctions } from "../../../../helpers";
-import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
-import ComponentLoading from "../../../../components/Loading";
+} from '../../../../components';
+import * as ITabs from '../../../../shared/utils/dropdown';
+import { tableGlobalFunctions } from '../../../../helpers';
+import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+import ComponentLoading from '../../../../components/Loading';
 
 export interface IData {
   // allItens: any;
@@ -96,13 +98,11 @@ export default function AtualizarLocal({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
 
-  const tabsDropDowns = TabsDropDowns("listas");
+  const tabsDropDowns = TabsDropDowns('listas');
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "EXPERIMENTOS"
-      ? (tab.statusTab = true)
-      : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'EXPERIMENTOS'
+    ? (tab.statusTab = true)
+    : (tab.statusTab = false)));
 
   const router = useRouter();
 
@@ -110,10 +110,10 @@ export default function AtualizarLocal({
   const [loading, setLoading] = useState<boolean>(false);
 
   const [userLogado, setUserLogado] = useState<any>(
-    JSON.parse(localStorage.getItem("user") as string)
+    JSON.parse(localStorage.getItem('user') as string),
   );
-  const table = "experiment_genotipe";
-  const module_name = "parcelas";
+  const table = 'experiment_genotipe';
+  const module_name = 'parcelas';
   const module_id = 30;
   // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
   const identifier_preference = module_name + router.route;
@@ -121,14 +121,14 @@ export default function AtualizarLocal({
     id: 0,
     route_usage: router.route,
     table_preferences:
-      "repetitionExperience,genotipo,gmr,bgm,fase,tecnologia,nt,rep,status,nca,npe,sequence,block,experiment",
+      'repetitionExperience,genotipo,gmr,bgm,fase,tecnologia,nt,rep,status,nca,npe,sequence,block,experiment',
   };
 
   const [preferences, setPreferences] = useState<any>(
-    userLogado.preferences[identifier_preference] || preferencesDefault
+    userLogado.preferences[identifier_preference] || preferencesDefault,
   );
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences
+    preferences.table_preferences,
   );
 
   const [materiais, setMateriais] = useState<any>(() => allItens);
@@ -136,39 +136,38 @@ export default function AtualizarLocal({
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [itemsTotal, setTotaItems] = useState<number | any>(totalItems);
   const [orderList, setOrder] = useState<number>(
-    typeOrderServer == "desc" ? 1 : 2
+    typeOrderServer == 'desc' ? 1 : 2,
   );
   // const [setArrowOrder] = useState<any>("");
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [statusAccordionFilter, setStatusAccordionFilter] =
-    useState<boolean>(true);
+  const [statusAccordionFilter, setStatusAccordionFilter] = useState<boolean>(true);
   const [filter, setFilter] = useState<any>(filterApplication);
-  const [arrowOrder, setArrowOrder] = useState<any>("");
-  const [filtersParams, setFiltersParams] = useState<any>(""); // Set filter Parameter
+  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [filtersParams, setFiltersParams] = useState<any>(''); // Set filter Parameter
   // const [colorStar, setColorStar] = useState<string>('');
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     {
-      name: "CamposGerenciados[]",
-      title: "Rep Exp",
-      value: "repetitionExperience",
+      name: 'CamposGerenciados[]',
+      title: 'Rep Exp',
+      value: 'repetitionExperience',
     },
     {
-      name: "CamposGerenciados[]",
-      title: "Nome do genotipo",
-      value: "genotipo",
+      name: 'CamposGerenciados[]',
+      title: 'Nome do genotipo',
+      value: 'genotipo',
     },
-    { name: "CamposGerenciados[]", title: "GMR_ens", value: "gmr" },
-    { name: "CamposGerenciados[]", title: "BGM_ens", value: "bgm" },
-    { name: "CamposGerenciados[]", title: "Fase", value: "fase" },
-    { name: "CamposGerenciados[]", title: "Tecnologia", value: "tecnologia" },
-    { name: "CamposGerenciados[]", title: "NT", value: "nt" },
-    { name: "CamposGerenciados[]", title: "Rep. trat.", value: "rep" },
-    { name: "CamposGerenciados[]", title: "T", value: "status_t" },
-    { name: "CamposGerenciados[]", title: "NCA", value: "nca" },
-    { name: "CamposGerenciados[]", title: "NPE", value: "npe" },
+    { name: 'CamposGerenciados[]', title: 'GMR_ens', value: 'gmr' },
+    { name: 'CamposGerenciados[]', title: 'BGM_ens', value: 'bgm' },
+    { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
+    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
+    { name: 'CamposGerenciados[]', title: 'NT', value: 'nt' },
+    { name: 'CamposGerenciados[]', title: 'Rep. trat.', value: 'rep' },
+    { name: 'CamposGerenciados[]', title: 'T', value: 'status_t' },
+    { name: 'CamposGerenciados[]', title: 'NCA', value: 'nca' },
+    { name: 'CamposGerenciados[]', title: 'NPE', value: 'npe' },
     // { name: "CamposGerenciados[]", title: "Seq.", value: "sorteio" },
-    { name: "CamposGerenciados[]", title: "Bloco", value: "block" },
-    { name: "CamposGerenciados[]", title: "Status parc", value: "status" },
+    { name: 'CamposGerenciados[]', title: 'Bloco', value: 'block' },
+    { name: 'CamposGerenciados[]', title: 'Status parc', value: 'status' },
   ]);
 
   const [take, setTake] = useState<any>(itensPerPage);
@@ -184,12 +183,12 @@ export default function AtualizarLocal({
       id: experimento.id,
       foco: experimento.assay_list?.foco.name,
       ensaio: experimento.assay_list?.type_assay.name,
-      tecnologia: `${experimento?.assay_list?.tecnologia?.cod_tec || ""} ${
-        experimento?.assay_list?.tecnologia?.name || ""
+      tecnologia: `${experimento?.assay_list?.tecnologia?.cod_tec || ''} ${
+        experimento?.assay_list?.tecnologia?.name || ''
       }`,
       gli: experimento.assay_list?.gli,
       experimentName: experimento?.experimentName,
-      bgm: experimento.assay_list?.bgm || "",
+      bgm: experimento.assay_list?.bgm || '',
       local: experimento.local?.name_local_culture,
       delineamento: experimento.delineamento?.name,
       repetition: experimento.repetition,
@@ -210,7 +209,7 @@ export default function AtualizarLocal({
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire("Experimento atualizado com sucesso!");
+            Swal.fire('Experimento atualizado com sucesso!');
             router.back();
           } else {
             Swal.fire(response.message);
@@ -243,7 +242,7 @@ export default function AtualizarLocal({
           setTreatments(response.response);
           setTotaItems(response.total);
           tableRef?.current?.dataManager?.changePageSize(
-            response.total >= take ? take : response.total
+            response.total >= take ? take : response.total,
           );
         }
       });
@@ -265,18 +264,19 @@ export default function AtualizarLocal({
   async function handleOrder(
     column: string,
     order: string | any,
-    name: any
+    name: any,
   ): Promise<void> {
     // Gobal manage orders
-    const { typeOrderG, columnG, orderByG, arrowOrder } =
-      await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
     setOrderBy(columnG);
 
-    //getTreatments(filter);
-    typeOrderG !== "" ? (typeOrderG == "desc" ? setOrder(1) : setOrder(2)) : "";
+    // getTreatments(filter);
+    typeOrderG !== '' ? (typeOrderG == 'desc' ? setOrder(1) : setOrder(2)) : '';
     setArrowOrder(arrowOrder);
     setLoading(true);
     setTimeout(() => {
@@ -308,136 +308,136 @@ export default function AtualizarLocal({
   // }
 
   function formatDecimal(num: number) {
-    return num ? Number(num).toFixed(1) : "";
+    return num ? Number(num).toFixed(1) : '';
   }
 
   function columnsOrder(columnsCampos: string) {
-    const columnCampos: string[] = columnsCampos.split(",");
+    const columnCampos: string[] = columnsCampos.split(',');
     const tableFields: any = [];
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === "repetitionExperience") {
+      if (columnCampos[index] === 'repetitionExperience') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Rep Exp",
-            title: "rep",
+            name: 'Rep Exp',
+            title: 'rep',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "genotipo") {
+      if (columnCampos[index] === 'genotipo') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Nome do genotipo",
-            title: "genotipo.name_genotipo",
+            name: 'Nome do genotipo',
+            title: 'genotipo.name_genotipo',
             orderList,
             fieldOrder,
             handleOrder,
-            cellStyle: { color: "#039be5", fontWeight: "bold" },
-          })
+            cellStyle: { color: '#039be5', fontWeight: 'bold' },
+          }),
         );
       }
-      if (columnCampos[index] === "gmr") {
+      if (columnCampos[index] === 'gmr') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "GMR_ens",
-            title: "genotipo.gmr",
+            name: 'GMR_ens',
+            title: 'genotipo.gmr',
             orderList,
             fieldOrder,
             handleOrder,
             render: (rowData: any) => formatDecimal(rowData.genotipo.gmr),
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "bgm") {
+      if (columnCampos[index] === 'bgm') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "BGM_ens",
-            title: "genotipo.bgm",
+            name: 'BGM_ens',
+            title: 'genotipo.bgm',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "fase") {
+      if (columnCampos[index] === 'fase') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Fase",
-            title: "genotipo.lote[0].fase",
+            name: 'Fase',
+            title: 'genotipo.lote[0].fase',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "tecnologia") {
+      if (columnCampos[index] === 'tecnologia') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Tecnologia",
-            title: "tecnologia.cod_tec",
+            name: 'Tecnologia',
+            title: 'tecnologia.cod_tec',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "nt") {
+      if (columnCampos[index] === 'nt') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "NT",
-            title: "nt",
+            name: 'NT',
+            title: 'nt',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "rep") {
+      if (columnCampos[index] === 'rep') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Rep trat",
-            //title: "rep",
-            title: "experiment.assay_list.treatmentsNumber",
+            name: 'Rep trat',
+            // title: "rep",
+            title: 'experiment.assay_list.treatmentsNumber',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "status_t") {
+      if (columnCampos[index] === 'status_t') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "T",
-            title: "status_t",
+            name: 'T',
+            title: 'status_t',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "nca") {
+      if (columnCampos[index] === 'nca') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "NCA",
-            title: "nca",
+            name: 'NCA',
+            title: 'nca',
             orderList,
             fieldOrder,
             handleOrder,
-            cellStyle: { color: "#039be5", fontWeight: "bold" },
-          })
+            cellStyle: { color: '#039be5', fontWeight: 'bold' },
+          }),
         );
       }
-      if (columnCampos[index] === "npe") {
+      if (columnCampos[index] === 'npe') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "NPE",
-            title: "npe",
+            name: 'NPE',
+            title: 'npe',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
       // if (columnCampos[index] === "sequence") {
@@ -445,35 +445,35 @@ export default function AtualizarLocal({
       //     headerTableFactory("Sequence", "sequencia_delineamento.sorteio")
       //   );
       // }
-      if (columnCampos[index] === "block") {
+      if (columnCampos[index] === 'block') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Bloco",
-            title: "sequencia_delineamento.bloco",
+            name: 'Bloco',
+            title: 'sequencia_delineamento.bloco',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "status") {
+      if (columnCampos[index] === 'status') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Status parc",
-            //title: "experiment.status",
-            title: "status",
+            name: 'Status parc',
+            // title: "experiment.status",
+            title: 'status',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
     });
 
     console.log(
-      "======> PARENT: Ordenação das colunas: ",
+      '======> PARENT: Ordenação das colunas: ',
       `'${columnsCampos}'`,
-      tableFields
+      tableFields,
     );
 
     return tableFields;
@@ -557,6 +557,7 @@ export default function AtualizarLocal({
             newItem.ENSAIO = item.type_assay.name;
             newItem.TECNOLOGIA = `${item.tecnologia.cod_tec} ${item.tecnologia.name}`;
             newItem.GLI = item.gli;
+            newItem.BGM = item.bgm;
             newItem.EXPERIMENTO = item.experiment.experimentName;
             newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
             newItem.DELINEAMENTO = item.experiment.delineamento.name;
@@ -568,30 +569,31 @@ export default function AtualizarLocal({
             newItem.NCA = item.nca;
             newItem.STATUS_EXP = item.experiment.status;
             newItem.STATUS_PARC = item.status;
+            
 
             delete newItem.id;
             return newItem;
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, "Parcelas");
+          XLSX.utils.book_append_sheet(workBook, workSheet, 'Parcela do experimento');
 
           // Buffer
           XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "buffer",
+            bookType: 'xlsx', // xlsx
+            type: 'buffer',
           });
           // Binary
           XLSX.write(workBook, {
-            bookType: "xlsx", // xlsx
-            type: "binary",
+            bookType: 'xlsx', // xlsx
+            type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, "Parcelas.xlsx");
+          XLSX.writeFile(workBook, 'Parcela do experimento.xlsx');
         } else {
           setLoading(false);
           Swal.fire(
-            "Não existem registros para serem exportados, favor checar."
+            'Não existem registros para serem exportados, favor checar.',
           );
         }
       });
@@ -643,7 +645,7 @@ export default function AtualizarLocal({
           {name}
         </label>
         <Input
-          style={{ background: "#e5e7eb" }}
+          style={{ background: '#e5e7eb' }}
           disabled
           required
           id={title}
@@ -658,7 +660,7 @@ export default function AtualizarLocal({
     name: string,
     title: string,
     values: any,
-    type: string = "text"
+    type: string = 'text',
   ) {
     return (
       <div className="w-1/4 h-7 mt-7">
@@ -725,37 +727,37 @@ export default function AtualizarLocal({
             >
               <div className="w-full flex justify-between items-start gap-5 mt-1">
                 {fieldsFactory(
-                  "Foco",
-                  "foco",
-                  experimento.assay_list?.foco.name
+                  'Foco',
+                  'foco',
+                  experimento.assay_list?.foco.name,
                 )}
 
                 {fieldsFactory(
-                  "Ensaio",
-                  "type_assay",
-                  experimento.assay_list?.type_assay.name
+                  'Ensaio',
+                  'type_assay',
+                  experimento.assay_list?.type_assay.name,
                 )}
 
                 {fieldsFactory(
-                  "Tecnologia",
-                  "tecnologia",
-                  `${experimento.assay_list?.tecnologia.cod_tec} ${experimento.assay_list?.tecnologia.name}`
+                  'Tecnologia',
+                  'tecnologia',
+                  `${experimento.assay_list?.tecnologia.cod_tec} ${experimento.assay_list?.tecnologia.name}`,
                 )}
 
-                {fieldsFactory("GLI", "gli", experimento.assay_list?.gli)}
+                {fieldsFactory('GLI', 'gli', experimento.assay_list?.gli)}
 
                 {fieldsFactory(
-                  "Experimento",
-                  "experimentName",
-                  experimento.experimentName
+                  'Experimento',
+                  'experimentName',
+                  experimento.experimentName,
                 )}
 
-                {fieldsFactory("BGM", "bgm", experimento.assay_list?.bgm)}
+                {fieldsFactory('BGM', 'bgm', experimento.assay_list?.bgm)}
 
                 {fieldsFactory(
-                  "Status do ensaio",
-                  "status",
-                  experimento.assay_list?.status
+                  'Status do ensaio',
+                  'status',
+                  experimento.assay_list?.status,
                 )}
               </div>
             </div>
@@ -771,35 +773,35 @@ export default function AtualizarLocal({
             >
               <div className="w-full flex justify-between items-start gap-5 mt-3">
                 {fieldsFactory(
-                  "Lugar plantio",
-                  "local",
-                  experimento.local?.name_local_culture
+                  'Lugar plantio',
+                  'local',
+                  experimento.local?.name_local_culture,
                 )}
 
                 {fieldsFactory(
-                  "Delineamento",
-                  "delineamento",
-                  experimento.delineamento?.name
+                  'Delineamento',
+                  'delineamento',
+                  experimento.delineamento?.name,
                 )}
 
                 {fieldsFactory(
-                  "Repetições",
-                  "repetitionsNumber",
-                  experimento.repetitionsNumber
+                  'Repetições',
+                  'repetitionsNumber',
+                  experimento.repetitionsNumber,
                 )}
 
-                {fieldsFactory("Densidade", "density", experimento.density)}
+                {fieldsFactory('Densidade', 'density', experimento.density)}
 
                 {fieldsFactory(
-                  "Ordem de sorteio",
-                  "orderDraw",
-                  experimento.orderDraw
+                  'Ordem de sorteio',
+                  'orderDraw',
+                  experimento.orderDraw,
                 )}
 
                 {fieldsFactory(
-                  "Status do experimento",
-                  "status",
-                  experimento.status
+                  'Status do experimento',
+                  'status',
+                  experimento.status,
                 )}
               </div>
             </div>
@@ -819,10 +821,10 @@ export default function AtualizarLocal({
           "
             >
               <div className="w-full h-f10 flex justify-between items-start gap-5">
-                {updateFieldsFactory("NLP", "nlp", formik.values.nlp, "number")}
+                {updateFieldsFactory('NLP', 'nlp', formik.values.nlp, 'number')}
 
                 {/* {updateFieldMoney('EEL', 'eel', formik.values.eel)} */}
-                {updateFieldMoney("CLP", "clp", formik.values.clp)}
+                {updateFieldMoney('CLP', 'clp', formik.values.clp)}
 
                 {/* <input
                 style={{ border: 1, borderColor: '#000', width: 200 }}
@@ -914,15 +916,15 @@ export default function AtualizarLocal({
           overflow-y-hidden
         "
         >
-          <div style={{ marginTop: "1%" }} className="w-full h-auto">
+          <div style={{ marginTop: '1%' }} className="w-full h-auto">
             <MaterialTable
               tableRef={tableRef}
-              style={{ background: "#f9fafb" }}
+              style={{ background: '#f9fafb' }}
               columns={columns}
               data={treatments}
               options={{
                 showTitle: false,
-                //maxBodyHeight: "calc(100vh - 550px)",
+                // maxBodyHeight: "calc(100vh - 550px)",
                 maxBodyHeight: `calc(100vh - ${
                   statusAccordionFilter ? 600 : 320
                 }px)`,
@@ -951,15 +953,17 @@ export default function AtualizarLocal({
                     <div className="flex flex-row items-center w-full">
                       <div className="flex flex-1 justify-center">
                         <strong className="text-blue-600">
-                          Total registrado: {itemsTotal}
+                          Total registrado:
+                          {' '}
+                          {itemsTotal}
                         </strong>
-                        {/*<span style={{ fontSize: 9, width:300 }}>*/}
-                        {/*  {JSON.stringify(preferences.table_preferences)}*/}
-                        {/*  {JSON.stringify(generatesProps)}*/}
-                        {/*  {JSON.stringify(preferences)}*/}
-                        {/*  /!*{JSON.stringify(userLogado)}*!/*/}
+                        {/* <span style={{ fontSize: 9, width:300 }}> */}
+                        {/*  {JSON.stringify(preferences.table_preferences)} */}
+                        {/*  {JSON.stringify(generatesProps)} */}
+                        {/*  {JSON.stringify(preferences)} */}
+                        {/*  /!*{JSON.stringify(userLogado)}*!/ */}
 
-                        {/*</span>*/}
+                        {/* </span> */}
                       </div>
                       <div className="flex flex-1 mb-6 justify-end">
                         <FieldItemsPerPage
@@ -984,86 +988,86 @@ export default function AtualizarLocal({
                         module_id={module_id}
                         identifier_preference={identifier_preference}
                         OnSetStatusAccordion={(e: any) => {
-                          console.log("callback", "setStatusAccordion", e);
+                          console.log('callback', 'setStatusAccordion', e);
                           setStatusAccordion(e);
                         }}
                         OnSetGeneratesProps={(e: any) => {
-                          console.log("callback", "setGeneratesProps", e);
+                          console.log('callback', 'setGeneratesProps', e);
                           setGeneratesProps(e);
                         }}
                         OnSetCamposGerenciados={(e: any) => {
-                          console.log("callback", "setCamposGerenciados", e);
+                          console.log('callback', 'setCamposGerenciados', e);
                           setCamposGerenciados(e);
                         }}
                         OnColumnsOrder={(e: any) => {
-                          console.log("callback", "columnsOrder", e);
+                          console.log('callback', 'columnsOrder', e);
                           columnsOrder(e);
                         }}
                         OnSetUserLogado={(e: any) => {
-                          console.log("callback", "setUserLogado", e);
+                          console.log('callback', 'setUserLogado', e);
                           setUserLogado(e);
                         }}
                         OnSetPreferences={(e: any) => {
-                          console.log("callback", "setPreferences", e);
+                          console.log('callback', 'setPreferences', e);
                           setPreferences(e);
                         }}
-                      ></ManageFields>
+                      />
 
-                      {/*<div className="border-solid border-2 border-blue-600 rounded">*/}
-                      {/*  <div className="w-72">*/}
-                      {/*    <AccordionFilter*/}
-                      {/*      title="Gerenciar Campos"*/}
-                      {/*      grid={statusAccordion}*/}
-                      {/*    >*/}
-                      {/*      <DragDropContext onDragEnd={handleOnDragEnd}>*/}
-                      {/*        <Droppable droppableId="characters">*/}
-                      {/*          {(provided) => (*/}
-                      {/*            <ul*/}
-                      {/*              className="w-full h-full characters"*/}
-                      {/*              {...provided.droppableProps}*/}
-                      {/*              ref={provided.innerRef}*/}
-                      {/*            >*/}
-                      {/*              <div className="h-8 mb-3">*/}
-                      {/*                <Button*/}
-                      {/*                  value="Atualizar"*/}
-                      {/*                  bgColor="bg-blue-600"*/}
-                      {/*                  textColor="white"*/}
-                      {/*                  onClick={getValuesColumns}*/}
-                      {/*                  icon={<IoReloadSharp size={20} />}*/}
-                      {/*                />*/}
-                      {/*              </div>*/}
-                      {/*              {generatesProps.map((generate, index) => (*/}
-                      {/*                <Draggable*/}
-                      {/*                  key={index}*/}
-                      {/*                  draggableId={String(generate.title)}*/}
-                      {/*                  index={index}*/}
-                      {/*                >*/}
-                      {/*                  {(provider) => (*/}
-                      {/*                    <li*/}
-                      {/*                      ref={provider.innerRef}*/}
-                      {/*                      {...provider.draggableProps}*/}
-                      {/*                      {...provider.dragHandleProps}*/}
-                      {/*                    >*/}
-                      {/*                      <CheckBox*/}
-                      {/*                        name={generate.name}*/}
-                      {/*                        title={generate.title?.toString()}*/}
-                      {/*                        value={generate.value}*/}
-                      {/*                        defaultChecked={camposGerenciados.includes(*/}
-                      {/*                          generate.value as string*/}
-                      {/*                        )}*/}
-                      {/*                      />*/}
-                      {/*                    </li>*/}
-                      {/*                  )}*/}
-                      {/*                </Draggable>*/}
-                      {/*              ))}*/}
-                      {/*              {provided.placeholder}*/}
-                      {/*            </ul>*/}
-                      {/*          )}*/}
-                      {/*        </Droppable>*/}
-                      {/*      </DragDropContext>*/}
-                      {/*    </AccordionFilter>*/}
-                      {/*  </div>*/}
-                      {/*</div>*/}
+                      {/* <div className="border-solid border-2 border-blue-600 rounded"> */}
+                      {/*  <div className="w-72"> */}
+                      {/*    <AccordionFilter */}
+                      {/*      title="Gerenciar Campos" */}
+                      {/*      grid={statusAccordion} */}
+                      {/*    > */}
+                      {/*      <DragDropContext onDragEnd={handleOnDragEnd}> */}
+                      {/*        <Droppable droppableId="characters"> */}
+                      {/*          {(provided) => ( */}
+                      {/*            <ul */}
+                      {/*              className="w-full h-full characters" */}
+                      {/*              {...provided.droppableProps} */}
+                      {/*              ref={provided.innerRef} */}
+                      {/*            > */}
+                      {/*              <div className="h-8 mb-3"> */}
+                      {/*                <Button */}
+                      {/*                  value="Atualizar" */}
+                      {/*                  bgColor="bg-blue-600" */}
+                      {/*                  textColor="white" */}
+                      {/*                  onClick={getValuesColumns} */}
+                      {/*                  icon={<IoReloadSharp size={20} />} */}
+                      {/*                /> */}
+                      {/*              </div> */}
+                      {/*              {generatesProps.map((generate, index) => ( */}
+                      {/*                <Draggable */}
+                      {/*                  key={index} */}
+                      {/*                  draggableId={String(generate.title)} */}
+                      {/*                  index={index} */}
+                      {/*                > */}
+                      {/*                  {(provider) => ( */}
+                      {/*                    <li */}
+                      {/*                      ref={provider.innerRef} */}
+                      {/*                      {...provider.draggableProps} */}
+                      {/*                      {...provider.dragHandleProps} */}
+                      {/*                    > */}
+                      {/*                      <CheckBox */}
+                      {/*                        name={generate.name} */}
+                      {/*                        title={generate.title?.toString()} */}
+                      {/*                        value={generate.value} */}
+                      {/*                        defaultChecked={camposGerenciados.includes( */}
+                      {/*                          generate.value as string */}
+                      {/*                        )} */}
+                      {/*                      /> */}
+                      {/*                    </li> */}
+                      {/*                  )} */}
+                      {/*                </Draggable> */}
+                      {/*              ))} */}
+                      {/*              {provided.placeholder} */}
+                      {/*            </ul> */}
+                      {/*          )} */}
+                      {/*        </Droppable> */}
+                      {/*      </DragDropContext> */}
+                      {/*    </AccordionFilter> */}
+                      {/*  </div> */}
+                      {/* </div> */}
 
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
@@ -1079,59 +1083,58 @@ export default function AtualizarLocal({
                     </div>
                   </div>
                 ),
-                Pagination: (props) =>
-                  (
-                    <div
-                      className="flex
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => handlePagination(0)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage < 1}
-                      />
-                      <Button
-                        onClick={() => handlePagination(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill("")
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => handlePagination(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => handlePagination(currentPage + 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => handlePagination(pages - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => handlePagination(0)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage < 1}
+                    />
+                    <Button
+                      onClick={() => handlePagination(currentPage - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => handlePagination(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => handlePagination(currentPage + 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => handlePagination(pages - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
                   ) as any,
               }}
             />
@@ -1149,10 +1152,9 @@ export const getServerSideProps: GetServerSideProps = async ({
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
   // eslint-disable-next-line max-len
-  const itensPerPage =
-    (await (
-      await PreferencesControllers.getConfigGerais()
-    )?.response[0]?.itens_per_page) ?? 5;
+  const itensPerPage = (await (
+    await PreferencesControllers.getConfigGerais()
+  )?.response[0]?.itens_per_page) ?? 5;
 
   const { token } = req.cookies;
   const pageBeforeEdit = req.cookies.pageBeforeEdit
@@ -1160,8 +1162,8 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 0;
 
   const requestOptions: RequestInit | undefined = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   };
 
@@ -1176,12 +1178,12 @@ export const getServerSideProps: GetServerSideProps = async ({
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : "desc";
+    : 'desc';
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : "";
+    : '';
 
   // removeCookies('filterBeforeEdit', { req, res });
   // removeCookies('pageBeforeEdit', { req, res });
@@ -1194,7 +1196,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const baseUrlShow = `${publicRuntimeConfig.apiUrl}/experiment`;
   const experimento = await fetch(
     `${baseUrlShow}/${idExperiment}`,
-    requestOptions
+    requestOptions,
   ).then((response) => response.json());
 
   const allItens: any = [];
