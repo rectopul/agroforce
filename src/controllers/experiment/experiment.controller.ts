@@ -399,8 +399,14 @@ export class ExperimentController {
           const {ip} = await fetch('https://api.ipify.org/?format=json')
             .then((results) => results.json())
             .catch(() => '0.0.0.0');
-          await this.reporteController.create({userId: data.userId, module: 'GRUPO DE ETIQUETAGEM', operation: 'EDIÇÃO', oldValue: group.name, ip: String(ip),});
-
+          await this.reporteController.create({
+            userId: data.userId,
+            module: 'GRUPO DE ETIQUETAGEM',
+            operation: 'EDIÇÃO',
+            oldValue: group.name,
+            ip: String(ip),
+          });
+          
           const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
           await this.setParcelasStatus(idList);
           return {status: 200, message: 'Experimento atualizado'};

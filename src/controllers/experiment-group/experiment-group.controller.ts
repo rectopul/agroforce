@@ -282,7 +282,7 @@ export class ExperimentGroupController {
         }
       }
     }
-    console.trace('experiment-group.controller.ts', 'countEtiqueta', totalTags, tagsToPrint, tagsPrinted);
+    console.log('experiment-group.controller.ts', 'countEtiqueta', 'totalTags', totalTags, 'tagsToPrint', tagsToPrint, 'tagsPrinted', tagsPrinted);
     const { status: statusUpdate, response: responseUpdate } = await this.update({
       id,
       totalTags,
