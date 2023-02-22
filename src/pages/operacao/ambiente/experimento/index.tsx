@@ -1263,7 +1263,7 @@ export default function Listagem({
                         "
         >
           <div
-            className={`w-full ${
+            className={`w-full max-h-44 ${
               selectedNPE?.length > 3 && "overflow-y-scroll"
             } mb-4`}
           >
