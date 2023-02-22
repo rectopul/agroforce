@@ -551,25 +551,40 @@ export class ExperimentGenotipeController {
       if (count === 'print') {
         operation = 'IMPRESSO';
         counter = 1;
-        await idList.map(async (id: any) => {
-          const { response }: any = await this.getOne(id);
+        // idList é um array de ids de parcelas
+        
+        //await idList.map(async (id: any) => {
+        for(const id in idList) {
+          const {response}: any = await this.getOne(Number(id));
           const newCount = response.counter + 1;
           operation = 'IMPRESSO';
 
-          await this.ExperimentGenotipeRepository.printed(id, status, newCount);
+          await this.ExperimentGenotipeRepository.printed(Number(id), status, newCount);
 
-          const { idExperiment } = response;
+          const {idExperiment} = response;
 
-          const { response: resExp }: any = await this.experimentController.getOne(idExperiment);
-          await this.experimentGroupController.countEtiqueta(
-            resExp.experimentGroupId,
-            idExperiment,
-          );
+          console.log('experiment-genotipe.controller.ts', 'update', 'idExperiment', idExperiment);
+
+          console.log('parcela antes', response, 'status destino: ', status);
+
+          const {response: resExp}: any = await this.experimentController.getOne(idExperiment);
+          // await this.experimentGroupController.countEtiqueta(
+          //   resExp.experimentGroupId,
+          //   idExperiment,
+          // );
 
           await this.reporteController.create({
             userId, operation, module: 'ETIQUETAGEM', oldValue: response.nca,
           });
-        });
+        }
+        //});
+
+        // const { response: resExp }: any = await this.experimentController.getOne(idExperiment);
+        // await this.experimentGroupController.countEtiqueta(
+        //   resExp.experimentGroupId,
+        //   idExperiment,
+        // );
+        
       } else if (count === 'reprint') {
         await idList.map(async (id: any) => {
           const { response }: any = await this.getOne(id);
