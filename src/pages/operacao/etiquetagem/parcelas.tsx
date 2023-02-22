@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable camelcase */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
@@ -260,6 +261,8 @@ export default function Listagem({
   const [totalMatch, setTotalMatch] = useState<number>(0);
   const [genotypeNameOne, setGenotypeNameOne] = useState<string>('');
   const [genotypeNameTwo, setGenotypeNameTwo] = useState<string>('');
+  const [tagsToPrint, setTagsToPrint] = useState<number>();
+  const [tagsPrinted, setTagsPrinted] = useState<number>();
   const [ncaOne, setNcaOne] = useState<string>('');
   const [ncaTwo, setNcaTwo] = useState<string>('');
   const [groupNameOne, setGroupNameOne] = useState<string>('');
@@ -354,6 +357,8 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      console.log(parcelas);
+      reloadExperimentGroup();
       setLoading(false);
     },
   });
@@ -369,7 +374,7 @@ export default function Listagem({
     // parametersFilter = `${parametersFilter}&${pathExtra}`;
     parametersFilter = `${parametersFilter}&skip=${
       page * Number(take)
-    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}&count=${true}`;
 
     setFiltersParams(parametersFilter);
     // setCookies('filtersParams', parametersFilter);
@@ -380,6 +385,8 @@ export default function Listagem({
         if (response.status === 200 || response.status === 400) {
           setParcelas(response.response);
           setTotalItems(response.total);
+          setTagsToPrint(response.tagsToPrint);
+          setTagsPrinted(response.tagsPrinted);
           tableRef.current.dataManager.changePageSize(
             response.total >= take ? take : response.total,
           );
@@ -692,9 +699,7 @@ export default function Listagem({
   }
 
   async function reloadExperimentGroup() {
-    const { response } = await experimentGroupService.getAll({
-      id: experimentGroupId,
-    });
+    const { response } = await experimentGroupService.getAll({ id: experimentGroupId });
 
     setExperimentGroupUpdated(response[0]);
   }
@@ -1612,19 +1617,19 @@ export default function Listagem({
                     <strong className="text-blue-600">
                       Total etiq. a imp.:
                       {' '}
-                      {experimentGroupUpdated.tagsToPrint}
+                      {tagsToPrint}
                     </strong>
 
                     <strong className="text-blue-600">
                       Total etiq. imp.:
                       {' '}
-                      {experimentGroupUpdated.tagsPrinted}
+                      {tagsPrinted}
                     </strong>
 
                     <strong className="text-blue-600">
                       Total etiq.:
                       {' '}
-                      {experimentGroupUpdated.totalTags}
+                      {total}
                     </strong>
 
                     <div

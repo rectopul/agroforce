@@ -26,11 +26,19 @@ export class ExperimentController {
     const equalsOrContains = options.importValidate ? 'equals' : 'contains';
     let orderBy: object | any;
     parameters.AND = [];
+
+    // console.log('experimentos', 'options', options);
+    
     try {
       options = await removeEspecialAndSpace(options);
       if (options.createFile) {
-        const sheet = await createXls(options, 'EXPERIMENTOS-EXPERIMENTO');
-        return { status: 200, response: sheet };
+        try{
+          const sheet = await createXls(options, 'EXPERIMENTOS-EXPERIMENTO');
+          return { status: 200, response: sheet };
+        } catch (error) {
+          handleError('experiment.controller.ts', 'getAll', error);
+          return { status: 500, response: error };
+        }
       }
 
       if (options.filterRepetitionFrom || options.filterRepetitionTo) {
@@ -325,7 +333,7 @@ export class ExperimentController {
       }
       return { status: 200, response, total: response.total };
     } catch (error: any) {
-      handleError('Experimento controller', 'GetAll', error.message);
+      handleError('Experimento controller', 'GetAll', error.message + ' - ' + JSON.stringify(parameters));
       // throw new Error({name: 'teste', message: '[Controller] - GetAll Experimento erro: ', stack: error.message});
       throw new Error(`[Controller] - GetAll Experimento erro: \r\n${error.message}`);
     }
@@ -377,24 +385,39 @@ export class ExperimentController {
       const experimentGenotipeController = new ExperimentGenotipeController();
       const experimentGroupController = new ExperimentGroupController();
       if (data.idList) {
-        const {
-          response: group,
-        } = await experimentGroupController.getOne(Number(data.experimentGroupId));
+
+        /**
+         * limpa os experimentos
+         * caso seja exclusão de experimentos de um grupo, o método relationGroup irá limpar a coluna experimentGroupId de experiments
+         * caso seja atualização de status fará o fluxo normal
+         */
         await this.experimentRepository.relationGroup(data);
-        const { ip } = await fetch('https://api.ipify.org/?format=json')
-          .then((results) => results.json())
-          .catch(() => '0.0.0.0');
-        await this.reporteController.create({
-          userId: data.userId, module: 'GRUPO DE ETIQUETAGEM', operation: 'EDIÇÃO', oldValue: group.name, ip: String(ip),
-        });
+
         if (data.experimentGroupId) {
+          const {response: group} = await experimentGroupController.getOne(Number(data.experimentGroupId));
+
+          const {ip} = await fetch('https://api.ipify.org/?format=json')
+            .then((results) => results.json())
+            .catch(() => '0.0.0.0');
+          await this.reporteController.create({
+            userId: data.userId,
+            module: 'GRUPO DE ETIQUETAGEM',
+            operation: 'EDIÇÃO',
+            oldValue: group.name,
+            ip: String(ip),
+          });
+          
           const idList = await this.countExperimentGroupChildren(data.experimentGroupId);
           await this.setParcelasStatus(idList);
-          return { status: 200, message: 'Experimento atualizado' };
+          return {status: 200, message: 'Experimento atualizado'};
         }
-        const idList = await this.countExperimentGroupChildren(Number(data.newGroupId));
-        await this.setParcelasStatus(idList);
-        return { status: 200, message: 'Experimento atualizado' };
+
+        if (data.newGroupId) {
+          const idList = await this.countExperimentGroupChildren(Number(data.newGroupId));
+          await this.setParcelasStatus(idList);
+          return {status: 200, message: 'Experimento atualizado'};
+        }
+        
       }
       if (data.id) {
         const experimento: any = await this.experimentRepository.findOne(data.id);
@@ -529,7 +552,27 @@ export class ExperimentController {
     if (!response.status) {
       status = experimentAmount === 0 ? null : 'ETIQ. NÃO INICIADA';
     }
-    await experimentGroupController.update({ id: response.id, experimentAmount, status });
+    
+    if(experimentAmount === 0){
+      
+      await experimentGroupController.update({
+        id: response.id,
+        experimentAmount:experimentAmount,
+        status:status,
+        tagsToPrint: 0,
+        tagsPrinted: 0,
+        totalTags: 0,
+      });
+      
+    } else {
+      
+      await experimentGroupController.update({
+        id: response.id,
+        experimentAmount:experimentAmount,
+        status:status
+      });
+    }
+    
     return idList;
   }
 

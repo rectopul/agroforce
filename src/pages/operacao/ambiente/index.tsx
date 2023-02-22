@@ -353,6 +353,7 @@ export default function Listagem({
 
   // Call that function when change type order value.
   useEffect(() => {
+    // console.log('typeOrder', typeOrder);
     callingApi(filter);
   }, [typeOrder]);
 
@@ -725,7 +726,7 @@ export default function Listagem({
     await npeService.getAll(filterParam).then(({ status, response }) => {
       if (status === 200) {
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, response, 'npe');
+        XLSX.utils.book_append_sheet(workBook, response, 'Ambiente');
 
         // Buffer
         XLSX.write(workBook, {
@@ -738,7 +739,7 @@ export default function Listagem({
           type: 'binary',
         });
         // Download
-        XLSX.writeFile(workBook, 'NPE.xlsx');
+        XLSX.writeFile(workBook, 'Ambiente.xlsx');
       } else {
         Swal.fire('Não existem registros para serem exportados, favor checar.');
       }

@@ -283,62 +283,6 @@ export default function TipoEnsaio({
     order: string | any,
     name: string | any,
   ): Promise<void> {
-    // let typeOrder: any;
-    // let parametersFilter: any;
-    // if (order === 1) {
-    //   typeOrder = "asc";
-    // } else if (order === 2) {
-    //   typeOrder = "desc";
-    // } else {
-    //   typeOrder = "";
-    // }
-    // setOrderBy(column);
-    // setOrderType(typeOrder);
-    // if (filter && typeof filter !== "undefined") {
-    //   if (typeOrder !== "") {
-    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-    //   } else {
-    //     parametersFilter = filter;
-    //   }
-    // } else if (typeOrder !== "") {
-    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    // } else {
-    //   parametersFilter = filter;
-    // }
-    // await typeAssayService
-    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
-    //   .then((response) => {
-    //     if (response.status === 200) {
-    //       setTypeAssay(response.response);
-
-    //     }
-
-    //   });
-
-    // if (orderList === 2) {
-
-    //   setOrder(0);
-
-    //   setArrowOrder(<AiOutlineArrowDown />);
-
-    // } else {
-
-    //   setOrder(orderList + 1);
-
-    //   if (orderList === 1) {
-
-    //     setArrowOrder(<AiOutlineArrowUp />);
-
-    //   } else {
-
-    //     setArrowOrder("");
-
-    //   }
-
-    // }
-
-    // Gobal manage orders
-
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
@@ -355,91 +299,13 @@ export default function TipoEnsaio({
   }
 
   async function handleStatus(data: any): Promise<void> {
-    // if (status) {
-    //   status = 1;
-    // } else {
-    //   status = 0;
-    // }
-
     await typeAssayService.update({
       id: data?.id,
       status: data?.status === 1 ? 0 : 1,
       created_by: userLogado.id,
     });
 
-    // const index = typeAssay.findIndex(
-    //   (typeAssayIndex) => typeAssayIndex.id == id
-    // );
-
-    // if (index === -1) {
-    //   return;
-    // }
-
-    // setTypeAssay((oldUser) => {
-    //   const copy = [...oldUser];
-    //   copy[index].status = status;
-    //   return copy;
-    // });
-
     handlePagination(currentPage);
-  }
-
-  // function headerTableFactory(name: any, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-
-  //     field: title,
-
-  //     sorting: true,
-  //   };
-  // }
-
-  function idHeaderFactory() {
-    return {
-      title: <div className="flex items-center">{arrowOrder}</div>,
-
-      field: 'id',
-
-      width: 0,
-
-      sorting: false,
-
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-9 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="h-9 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
-          </div>
-        </div>
-      )),
-    };
   }
 
   function statusHeaderFactory() {

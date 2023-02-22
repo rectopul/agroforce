@@ -963,7 +963,7 @@ export class ImportGenotypeController {
                       id_dados: Number(this.aux.id_dados_lote),
                       year: Number(this.aux.year),
                       ncc: Number(this.aux.ncc),
-                      fase: this.aux.fase,
+                      fase: String(this.aux.fase),
                       peso: this.aux.peso,
                       quant_sementes: this.aux.quant_sementes,
                       dt_export: this.aux.dt_export,
@@ -987,10 +987,14 @@ export class ImportGenotypeController {
       });
       return { status: 200, message: 'Genótipo importado com sucesso' };
     } catch (error: any) {
+      
+      console.error('Genótipo controller error', 'Save Import', error);
+      
       await logImportController.update({
         id: idLog,
         status: 1,
         state: 'FALHA',
+        invalid_data: JSON.stringify(error),
         updated_at: new Date(Date.now()),
       });
       handleError('Genótipo controller', 'Save Import', error.message);
