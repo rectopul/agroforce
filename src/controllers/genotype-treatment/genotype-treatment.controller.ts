@@ -10,7 +10,6 @@ export class GenotypeTreatmentController {
   genotypeTreatmentRepository = new GenotypeTreatmentRepository();
 
   async getAll(options: any) {
-    console.log('🚀 ~ file: genotype-treatment.controller.ts:13 ~ GenotypeTreatmentController ~ getAll ~ options', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     parameters.AND = [];

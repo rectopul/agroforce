@@ -177,7 +177,6 @@ export class TypeAssayController {
   }
 
   async update(data: any) {
-    console.log('🚀 ~ file: tipo-ensaio.controller.ts:179 ~ TypeAssayController ~ update ~ data', data);
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
       const { created_by } = data;
