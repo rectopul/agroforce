@@ -44,7 +44,7 @@ export default function Permissoes({
       >
         <div className={stylesCommon.container}>
           <ul>
-            {routes.slice(0, 1).map((route: any) => (
+            {routes.map((route: any) => (
               <>
                 <Route key={route.id} route={route.screenRoute} />
                 {route.permission[0]?.map((element: any) => (
