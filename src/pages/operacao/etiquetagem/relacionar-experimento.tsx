@@ -573,23 +573,61 @@ export default function Listagem({
       </div>
     );
   }
-
+  
   async function handleSubmit() {
     setLoading(true);
     const experimentsSelected = rowsSelected.map(
       (item: IExperiments) => item.id,
     );
-    const { status }: IReturnObject = await experimentService.update({
+
+    // quando se usa Then força o usuário aguardar até que a execução esteja completa
+    await experimentService.update({
       idList: experimentsSelected,
       experimentGroupId: Number(experimentGroupId),
       userId: userLogado.id,
-    });
-    if (status !== 200) {
-      Swal.fire('Erro ao associar experimentos');
-      setLoading(false);
-    } else {
-      router.back();
-    }
+    })
+      .then((response) => {
+        if (response.status === 200) {
+
+          Swal.fire({
+            title: "Experimentos associados com sucesso.",
+            showDenyButton: false,
+            showCancelButton: false,
+            confirmButtonText: "Ok",
+          }).then(() => {
+            router.back();
+            //router.push("/operacao/ambiente");
+          });
+
+        } else {
+
+          Swal.fire('Erro ao associar experimentos');
+
+        }
+        setLoading(false);
+      })
+      .catch((error) => {
+
+        setLoading(false);
+
+        Swal.fire({
+          title: "Houve ao associar os experimentos ao grupo. ",
+          html: error,
+        });
+
+      });
+
+    // const { status }: IReturnObject = await experimentService.update({
+    //   idList: experimentsSelected,
+    //   experimentGroupId: Number(experimentGroupId),
+    //   userId: userLogado.id,
+    // });
+    // if (status !== 200) {
+    //   Swal.fire('Erro ao associar experimentos');
+    //   setLoading(false);
+    // } else {
+    //   router.back();
+    // }
   }
 
   // useEffect(() => {
