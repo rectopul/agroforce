@@ -14,6 +14,7 @@ export class TypeAssayController {
   reporteController = new ReporteController();
 
   async getAll(options: object | any) {
+    console.log('🚀 ~ file: tipo-ensaio.controller.ts:17 ~ TypeAssayController ~ getAll ~ options:', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     const equalsOrContains = options.importValidate ? 'equals' : 'contains';
@@ -74,7 +75,7 @@ export class TypeAssayController {
       } else {
         orderBy = '{ "name": "desc"}';
       }
-      //console.log(new Date().toISOString(), '🚀 ~ file: tipo-ensaio.controller.ts:66 ~ TypeAssayController ~ getAll ~ parameters', parameters);
+      // console.log(new Date().toISOString(), '🚀 ~ file: tipo-ensaio.controller.ts:66 ~ TypeAssayController ~ getAll ~ parameters', parameters);
 
       const response = await this.typeAssayRepository.findAll(
         parameters,

@@ -420,10 +420,26 @@ export class ExperimentGenotipeController {
         orderBy,
       );
 
+      if (options.count) {
+        const {
+          tagsToPrint,
+          tagsPrinted,
+        } = await this.ExperimentGenotipeRepository.countTags(parameters);
+
+        response.tagsToPrint = tagsToPrint;
+        response.tagsPrinted = tagsPrinted;
+      }
+
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }
-      return { status: 200, response, total: response.total };
+      return {
+        status: 200,
+        response,
+        total: response.total,
+        tagsToPrint: response.tagsToPrint,
+        tagsPrinted: response.tagsPrinted,
+      };
     } catch (error: any) {
       handleError('Parcelas controller', 'GetAll', error.message);
       throw new Error('[Controller] - GetAll Parcelas erro');
