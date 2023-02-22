@@ -270,7 +270,7 @@ export class ExperimentGroupController {
           tagsPrinted += 1;
         }
       });
-    });/* */
+    });/**/
 
     for (const experiment of response.experiment) {
       for (const parcelas of experiment.experiment_genotipe) {
@@ -282,7 +282,7 @@ export class ExperimentGroupController {
         }
       }
     }
-    console.trace('experiment-group.controller.ts', 'countEtiqueta', totalTags, tagsToPrint, tagsPrinted);
+    console.log('experiment-group.controller.ts', 'countEtiqueta', 'totalTags', totalTags, 'tagsToPrint', tagsToPrint, 'tagsPrinted', tagsPrinted);
     const { status: statusUpdate, response: responseUpdate } = await this.update({
       id,
       totalTags,
@@ -296,10 +296,6 @@ export class ExperimentGroupController {
       for (const experimentId of Object.values(idExperiment)) {
         await this.experimentController.handleExperimentStatus(<number>experimentId);
       }
-
-      // await idExperiment?.map(async (experimentId: number) => {
-      //   await this.experimentController.handleExperimentStatus(experimentId);
-      // });
     }
     await this.handleGroupStatus(id);
   }
