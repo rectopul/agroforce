@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable camelcase */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
@@ -354,6 +355,7 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
+      reloadExperimentGroup();
       setLoading(false);
     },
   });
@@ -695,6 +697,23 @@ export default function Listagem({
     const { response } = await experimentGroupService.getAll({
       id: experimentGroupId,
     });
+
+    let totalTags = 0;
+    let tagsToPrint = 0;
+    let tagsPrinted = 0;
+
+    for (const parcels of parcelas) {
+      totalTags += 1;
+      if (parcels.status === 'EM ETIQUETAGEM') {
+        tagsToPrint += 1;
+      } else if (parcels.status === 'IMPRESSO') {
+        tagsPrinted += 1;
+      }
+    }
+
+    response[0].tagsToPrint = tagsToPrint;
+    response[0].tagsPrinted = tagsPrinted;
+    response[0].totalTags = totalTags;
 
     setExperimentGroupUpdated(response[0]);
   }
