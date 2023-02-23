@@ -721,11 +721,8 @@ export class ExperimentGenotipeController {
         // );
       }
       
-      for(const id in experimentsGroupIds){
-        await this.experimentGroupController.countEtiqueta(
-          experimentsGroupIds[id],
-          idExperiment,
-        );
+      for(const id of experimentsGroupIds){
+        await this.experimentGroupController.countEtiqueta(id,idExperiment, (status === 'EM ETIQUETAGEM'));
       }
       
       // idExperiment.map(async (id: number) => {
