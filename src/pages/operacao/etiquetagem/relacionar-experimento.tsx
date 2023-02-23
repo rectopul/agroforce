@@ -585,6 +585,7 @@ export default function Listagem({
       idList: experimentsSelected,
       experimentGroupId: Number(experimentGroupId),
       userId: userLogado.id,
+      status: 'ETIQ. NÃO INICIADA'
     })
       .then((response) => {
         if (response.status === 200) {
