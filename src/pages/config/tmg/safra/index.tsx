@@ -43,6 +43,7 @@ import ITabs from '../../../../shared/utils/dropdown';
 import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
+import perm_can_do from '../../../../shared/utils/perm_can_do';
 
 interface IFilter {
   filterStatus: object | any;
@@ -423,7 +424,8 @@ export default function Listagem({
                   `/config/tmg/safra/atualizar?id=${rowData.id}&currentPage=${currentPage}&${filtersParams}`,
                 );
               }}
-              bgColor="bg-blue-600"
+              disabled={!perm_can_do('/config/tmg/safra', 'edit')}
+              bgColor={!perm_can_do('/config/tmg/safra', 'edit') ? 'bg-gray-300' : 'bg-blue-600'}
               textColor="white"
             />
           </div>
@@ -433,6 +435,8 @@ export default function Listagem({
               data={rowData}
               text="a safra"
               keyName="safraName"
+              disabled={!perm_can_do('/config/tmg/safra', 'disable')}
+              bgColor={!perm_can_do('/config/tmg/safra', 'disable') ? 'bg-gray-300' : 'bg-red-600'}
               onPress={handleStatusSafra}
             />
           </div>
@@ -830,7 +834,8 @@ export default function Listagem({
                       <Button
                         title="Cadastrar safra"
                         value="Cadastrar safra"
-                        bgColor="bg-blue-600"
+                        disabled={!perm_can_do('/config/tmg/safra', 'create')}
+                        bgColor={!perm_can_do('/config/tmg/safra', 'create') ? 'bg-gray-300' : 'bg-blue-600'}
                         textColor="white"
                         onClick={() => {
                           setCookies('pageBeforeEdit', currentPage?.toString());

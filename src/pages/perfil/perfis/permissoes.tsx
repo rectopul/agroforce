@@ -6,10 +6,12 @@ import { Fragment, useState } from 'react';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import { Button, CheckBox } from '../../../components';
 import { Content } from '../../../components/Content';
+import { profileService } from '../../../services';
 import stylesCommon from '../../../shared/styles/common.module.css';
 
 export default function Permissoes({
   allRoutes,
+  profileId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const [routes, setRoutes] = useState<any>(allRoutes);
@@ -22,15 +24,17 @@ export default function Permissoes({
     );
   }
 
-  function save() {
+  async function save() {
     const els: any = document.querySelectorAll("input[type='checkbox']");
-    let selecionados = '';
+    const selecionados: any = {};
 
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
-        selecionados += `${els[i].value},`;
+        selecionados[els[i].id] += (els[i].value ? `${els[i].value},` : '');
       }
     }
+
+    await profileService.update({ selecionados, profileId });
   }
 
   return (
@@ -50,7 +54,7 @@ export default function Permissoes({
                 {route.permission[0]?.map((element: any) => (
                   <CheckBox
                     name={element.title}
-                    id={route.id}
+                    id={route.screenRoute}
                     title={element.title?.toString()}
                     value={element.value}
                     defaultChecked={element.checked}
@@ -79,12 +83,12 @@ export const getServerSideProps: GetServerSideProps = async ({
   query,
 }: any) => {
   const { token } = req.cookies;
-  const { id } = query;
+  const profileId = query.id;
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/permissions`;
 
   const urlParameters: any = new URL(baseUrl);
-  urlParameters.search = new URLSearchParams(`profileId=${id}`).toString();
+  urlParameters.search = new URLSearchParams(`profileId=${profileId}`).toString();
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
@@ -101,6 +105,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   return {
     props: {
       allRoutes,
+      profileId,
     },
   };
 };

@@ -7,7 +7,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (req.method) {
     case 'GET': {
-      const resultGet = await permissionsController.getAll(req.query);
+      const resultGet = await permissionsController.listAll(req.query);
       res.status(200).json(resultGet);
       break;
     }

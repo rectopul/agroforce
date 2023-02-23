@@ -271,7 +271,7 @@ export class ExperimentGroupController {
           tagsPrinted += 1;
         }
       });
-    });/**/
+    });/* */
 
     for (const experiment of response.experiment) {
       for (const parcelas of experiment.experiment_genotipe) {

@@ -37,6 +37,7 @@ export class UsersPermissionsRepository {
         profileId: true,
         status: true,
         culture: { select: { name: true, desc: true } },
+        profile: true,
       },
       distinct: ['cultureId'],
     });

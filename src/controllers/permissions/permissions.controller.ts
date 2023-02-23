@@ -9,7 +9,7 @@ export class PermissionsController {
 
   profilePermissionsRepository = new ProfilePermissionsRepository();
 
-  async getAll(options: any) {
+  async listAll(options: any) {
     const parameters: object | any = {};
     try {
       const profiles = await this.profilePermissionsRepository.findAll({
@@ -57,6 +57,34 @@ export class PermissionsController {
       }
       return {
         status: 200, newResult, total: result.total,
+      };
+    } catch (error: any) {
+      handleError('Permissions controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll Permissions erro');
+    }
+  }
+
+  async getAll(options: any) {
+    const parameters: object | any = {};
+    try {
+      if (options.screenRoute) {
+        parameters.screenRoute = options.screenRoute;
+      }
+
+      if (options.action) {
+        parameters.action = options.action;
+      }
+      const response: object | any = await this.permissionsRepository.findAll(
+        parameters,
+      );
+
+      if (!response) {
+        return {
+          status: 400, response: [], message: 'nenhum resultado encontrado',
+        };
+      }
+      return {
+        status: 200, response, total: response.total,
       };
     } catch (error: any) {
       handleError('Permissions controller', 'GetAll', error.message);

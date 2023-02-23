@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import getConfig from 'next/config';
+import { ProfileController } from '../../../controllers/profile/profile.controller';
 import { SafraController } from '../../../controllers/safra.controller';
 import { UserPermissionController } from '../../../controllers/user-permission.controller';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
@@ -15,12 +16,14 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
   const PermissionController = new UserPermissionController();
   const PreferencesControllers = new UserPreferenceController();
   const safraController = new SafraController();
+  const profileController = new ProfileController();
 
   async function authenticate() {
     const user: any = await Controller.signInUSer(req.body);
     const preferences: object | any = {};
     const userCulture: object | any = {};
     const safras: object | any = {};
+    let permissions: any = {};
 
     if (user) {
       const validateLogin: object | any = await Controller.getAll({
@@ -31,6 +34,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
 
       userCulture.culturas = await PermissionController.getByUserID(user.id);
       userCulture.culturas = userCulture.culturas.response;
+      permissions = userCulture.culturas[0].profile.permissions;
 
       if (!userCulture.culturas || userCulture.culturas.status === 400 || userCulture.culturas.length === 0) throw new Error('Você está sem acesso as culturas, contate o seu lider!');
 
@@ -213,6 +217,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       preferences,
       userCulture,
       safras,
+      permissions,
     });
   }
 
