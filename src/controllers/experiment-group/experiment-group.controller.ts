@@ -256,7 +256,7 @@ export class ExperimentGroupController {
     }
   }
 
-  async countEtiqueta(id: number, idExperiment: any) {
+  async countEtiqueta(id: number, idExperiment: any, createGroup?: boolean) {
     const { response }: any = await this.getOne(id);
     let totalTags = 0;
     let tagsToPrint = 0;
