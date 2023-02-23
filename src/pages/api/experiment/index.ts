@@ -37,7 +37,8 @@ export const config = {
     // bodyParser: {
     //   sizeLimit: '16mb',
     // },
-    bodyParser: process.env.NODE_ENV !== 'production',
+    //bodyParser: process.env.NODE_ENV !== 'production',
+    bodyParser: false,
     responseLimit: false,
   },
 };

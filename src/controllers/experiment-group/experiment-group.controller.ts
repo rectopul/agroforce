@@ -256,7 +256,7 @@ export class ExperimentGroupController {
     }
   }
 
-  async countEtiqueta(id: number, idExperiment: any) {
+  async countEtiqueta(id: number, idExperiment: any, createGroup?: boolean) {
     const { response }: any = await this.getOne(id);
     let totalTags = 0;
     let tagsToPrint = 0;
@@ -291,14 +291,19 @@ export class ExperimentGroupController {
       tagsPrinted,
     });
 
-    if (typeof idExperiment === 'number') {
-      await this.experimentController.handleExperimentStatus(idExperiment);
-    } else {
-      for (const experimentId of Object.values(idExperiment)) {
-        await this.experimentController.handleExperimentStatus(<number>experimentId);
+    if(createGroup !== true) {
+      if (typeof idExperiment === 'number') {
+        await this.experimentController.handleExperimentStatus(idExperiment);
+      } else {
+        for (const experimentId of Object.values(idExperiment)) {
+          await this.experimentController.handleExperimentStatus(<number>experimentId);
+        }
       }
+      
     }
+
     await this.handleGroupStatus(id);
+    
   }
 
   async handleGroupStatus(id: number) {
