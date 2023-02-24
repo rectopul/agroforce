@@ -332,6 +332,7 @@ export class ExperimentGroupController {
     } else {
       status = 'ETIQ. EM ANDAMENTO';
     }
+    
     await this.update({ id, status });
   }
 }
