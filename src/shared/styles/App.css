@@ -138,8 +138,8 @@
 }
 
 .imprimir .etiqueta {
-  /* background-color: #ddd; */
-  background-color: #fff;
+  background-color: #ddd;
+  /* background-color: #fff; */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -154,12 +154,16 @@
   flex-direction: column;
   color: black;
   font-weight: bold;
-  border-radius: 2mm;
-  font-size: 14px;
+  /* border-radius: 2mm; */
+  font-size: 12px;
+  font-family: "Arial Black";
   width: 53mm;
   height: 13mm;
-  padding: 0 3mm;
-  font-family: "Arial Black";
+  /* padding: 0mm 3mm; */
+  /* Teste Stewart */
+  /* padding: 0.3mm 3mm 0mm 4mm; */
+  padding: 0.3mm 3mm;
+  margin-left: 2.5mm;
 }
 
 .etiquetaModelo2 {
@@ -168,7 +172,7 @@
   color: black;
   font-weight: bold;
   border-radius: 2mm;
-  font-size: 14px;
+  font-size: 12px;
   width: 53mm;
   padding: 1mm 3mm;
   margin: 2mm;
@@ -206,6 +210,6 @@
   flex: 1;
 }
 
-.modalEtiquetaAutomatizada{
+.modalEtiquetaAutomatizada {
   top: 100px;
 }
