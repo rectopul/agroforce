@@ -674,17 +674,17 @@ async function callLocalUnidadeCulturaXlsxDownload(options: any) {
         newRow.dt_export.toISOString().slice(0, -1),
       );
 
-      newRow.NOME_UNIDADE_CULTURA = newRow?.name_unity_culture;
-      newRow.ANO = newRow?.year;
-      newRow.NOME_LUGAR_CULTURA = newRow.local?.name_local_culture;
+      newRow.NOME_DO_LUGAR_CULTURA = newRow.local?.name_local_culture;
       newRow.RÓTULO = newRow.local?.label;
       newRow.MLOC = newRow.local?.mloc;
-      newRow.FAZENDA = newRow.local?.adress;
+      newRow.NOME_DA_FAZENDA = newRow.local?.adress;
       newRow.PAÍS = newRow.local?.label_country;
       newRow.REGIÃO = newRow.local?.label_region;
       newRow.LOCALIDADE = newRow.local?.name_locality;
+      newRow.NOME_UNIDADE_CULTURA = newRow?.name_unity_culture;
+      newRow.ANO = newRow?.year;
       row.dt_export = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
-      row.DT_DT = row.dt_export;
+      row.DT_RD = row.dt_export;
       row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete newRow.year;
@@ -780,13 +780,11 @@ async function callRdXlsxDownload(options: any) {
     const newData = response.map((item: any) => {
       const newItem = item;
 
-      newItem.CULTURA = item.safra.culture.name;
-      newItem.SAFRA = item.safra.safraName;
       newItem.USUÁRIO = item.user.name;
       newItem.TABELA = item.table;
-      newItem.STATUS = item.state;
       newItem.INICIO = item.created_at;
       newItem.FIM = item.updated_at;
+      newItem.STATUS = item.state;
       newItem.NOME_DO_ARQUIVO = newItem.filePath;
       newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
@@ -835,14 +833,13 @@ async function callEnsaioEnsaioXlsxDownload(options: any) {
       newItem.PROTOCOLO = newItem?.protocol_name;
       newItem.FOCO = newItem.foco?.name;
       newItem.TIPO_DE_ENSAIO = newItem.type_assay?.name;
-      newItem.TECNOLOGIA = `${newItem.tecnologia.cod_tec} ${newItem.tecnologia.name}`;
       newItem.GLI = newItem?.gli;
+      newItem.TECNOLOGIA = `${newItem.tecnologia.cod_tec} ${newItem.tecnologia.name}`;
+      newItem.NÚMERO_DE_TRATAMENTOS = newItem?.countNT;
+      newItem.STATUS_DO_ENSAIO = newItem?.status;
       newItem.BGM = newItem?.bgm;
-      newItem.STATUS = newItem?.status;
       newItem.PROJETO = newItem?.project;
       newItem.OBSERVAÇÕES = newItem?.comments;
-      newItem.NÚMERO_DE_TRATAMENTOS = newItem?.countNT;
-
       newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete newItem.safra;
@@ -897,17 +894,17 @@ async function callEnsaioGenotipeXlsxDownload(options: any) {
       newItem.FOCO = item.assay_list.foco.name;
       newItem.ENSAIO = item.assay_list.type_assay.name;
       newItem.TECNOLOGIA = `${item.assay_list.tecnologia.cod_tec} ${item.assay_list.tecnologia.name}`;
-      newItem.GGEN = `${item.genotipo.tecnologia.cod_tec} ${item.genotipo.tecnologia.name}`;
       newItem.GLI = item.assay_list.gli;
       newItem.BGM = item.assay_list.bgm;
       newItem.STATUS_ENSAIO = item.assay_list.status;
       newItem.PROJETO = item.assay_list.project;
       newItem.COMENTÁRIOS = item.assay_list.status;
       newItem.FASE = item.lote.fase;
+      newItem.GGEN = `${item.genotipo.tecnologia.cod_tec} ${item.genotipo.tecnologia.name}`;
       newItem.NT = item.treatments_number;
       newItem.NOME_DO_GENOTIPO = item.genotipo.name_genotipo;
-      newItem.GMR_GEN = item.genotipo.gmr;
-      newItem.BGM_GENÓTIPO = item.genotipo.bgm;
+      newItem.GMR = item.genotipo.gmr;
+      newItem.BGM = item.genotipo.bgm;
       newItem.STATUS_T = item.status;
       newItem.NCA = String(item.lote.ncc);
       newItem.COD_LOTE = String(item.lote.cod_lote);
@@ -935,7 +932,7 @@ async function callExperimentosExperimentoXlsxDownload(options: any) {
   const Controller = new ExperimentController();
   let res: any = [];
   let workSheet: any;
-  let take = 200;
+  const take = 200;
   let count = 1;
   delete options.createFile;
   options.take = take;
@@ -1022,10 +1019,10 @@ async function callAmbienteAmbienteXlsxDownload(options: any) {
       row.LUGAR_DE_CULTURA = row.local?.name_local_culture;
       row.STATUS = row.status;
       row.FOCO = row.foco?.name;
+      row.ÉPOCA = row?.epoca;
       row.ENSAIO = row.type_assay?.name;
       row.TECNOLOGIA = `${row.tecnologia?.cod_tec} ${row.tecnologia?.name}`;
-      row.ÉPOCA = row?.epoca;
-      row.NPEI = row.npei;
+      row.NPE_INICIAL = row.npei;
       row.PROX_NPE = row.prox_npe;
       row.NPE_FINAL = row.npef;
       row.GRP = row.group.group;

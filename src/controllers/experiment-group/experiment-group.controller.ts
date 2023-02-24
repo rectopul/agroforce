@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import handleError from '../../shared/utils/handleError';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { ExperimentGroupRepository } from '../../repository/experiment-group.repository';
@@ -255,7 +256,7 @@ export class ExperimentGroupController {
     }
   }
 
-  async countEtiqueta(id: number, idExperiment: any) {
+  async countEtiqueta(id: number, idExperiment: any, createGroup?: boolean) {
     const { response }: any = await this.getOne(id);
     let totalTags = 0;
     let tagsToPrint = 0;
@@ -270,7 +271,7 @@ export class ExperimentGroupController {
           tagsPrinted += 1;
         }
       });
-    });/* */
+    });/**/
 
     for (const experiment of response.experiment) {
       for (const parcelas of experiment.experiment_genotipe) {
@@ -282,7 +283,7 @@ export class ExperimentGroupController {
         }
       }
     }
-    console.trace('experiment-group.controller.ts', 'countEtiqueta', totalTags, tagsToPrint, tagsPrinted);
+    console.log('experiment-group.controller.ts', 'countEtiqueta', 'totalTags', totalTags, 'tagsToPrint', tagsToPrint, 'tagsPrinted', tagsPrinted);
     const { status: statusUpdate, response: responseUpdate } = await this.update({
       id,
       totalTags,
@@ -290,18 +291,19 @@ export class ExperimentGroupController {
       tagsPrinted,
     });
 
-    if (typeof idExperiment === 'number') {
-      await this.experimentController.handleExperimentStatus(idExperiment);
-    } else {
-      for (const experimentId of Object.values(idExperiment)) {
-        await this.experimentController.handleExperimentStatus(<number>experimentId);
+    if(createGroup !== true) {
+      if (typeof idExperiment === 'number') {
+        await this.experimentController.handleExperimentStatus(idExperiment);
+      } else {
+        for (const experimentId of Object.values(idExperiment)) {
+          await this.experimentController.handleExperimentStatus(<number>experimentId);
+        }
       }
-
-      // await idExperiment?.map(async (experimentId: number) => {
-      //   await this.experimentController.handleExperimentStatus(experimentId);
-      // });
+      
     }
+
     await this.handleGroupStatus(id);
+    
   }
 
   async handleGroupStatus(id: number) {
@@ -330,6 +332,7 @@ export class ExperimentGroupController {
     } else {
       status = 'ETIQ. EM ANDAMENTO';
     }
+    
     await this.update({ id, status });
   }
 }

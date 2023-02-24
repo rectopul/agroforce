@@ -1138,6 +1138,7 @@ export default function Listagem({
         confirmButtonText: "Acesse aqui e atualize",
       }).then((result) => {
         if (result.isConfirmed) {
+          setCookies("ncaEmpty", true);
           window.open("/listas/ensaios/genotipos-ensaio", "_ blank");
         }
       });
@@ -1263,7 +1264,7 @@ export default function Listagem({
                         "
         >
           <div
-            className={`w-full max-h-44 ${
+            className={`w-full ${
               selectedNPE?.length > 3 && "overflow-y-scroll"
             } mb-4`}
           >
