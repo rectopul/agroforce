@@ -93,15 +93,15 @@ export class TypeAssayController {
         }
       });
 
-      if(options.orderBy == 'envelope.seeds' && options.typeOrder == 'asc'){
+      if(options.orderBy == 'envelope.seeds' && options.typeOrder == 'desc'){
         response.sort((a: any, b: any) => b.envelope.seeds - a.envelope.seeds);
-      }else if(options.orderBy == 'envelope.seeds' && options.typeOrder == 'desc'){
+      }else if(options.orderBy == 'envelope.seeds' && options.typeOrder == 'asc'){
         response.sort((a: any, b: any) => a.envelope.seeds - b.envelope.seeds);
       }
 
-      if(options.orderBy == 'envelope.safra.safraName' && options.typeOrder == 'asc'){
+      if(options.orderBy == 'envelope.safra.safraName' && options.typeOrder == 'desc'){
         response.sort((a: any, b: any) => b.envelope.safra.safraName - a.envelope.safra.safraName);
-      }else if(options.orderBy == 'envelope.safra.safraName' && options.typeOrder == 'desc'){
+      }else if(options.orderBy == 'envelope.safra.safraName' && options.typeOrder == 'asck'){
         response.sort((a: any, b: any) => a.envelope.safra.safraName - b.envelope.safra.safraName);
       }
 
