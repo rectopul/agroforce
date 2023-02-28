@@ -52,6 +52,7 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import { functionsUtils } from '../../../../shared/utils/functionsUtils';
+import perm_can_do from '../../../../shared/utils/perm_can_do';
 
 export default function TipoEnsaio({
   allAssay,
@@ -335,6 +336,7 @@ export default function TipoEnsaio({
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.gli}`}
+              style={{ display: !perm_can_do('/config/tmg/ensaio', 'edit') ? 'none' : '' }}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -356,6 +358,7 @@ export default function TipoEnsaio({
           <div>
             <Button
               icon={<BsTrashFill size={14} />}
+              style={{ display: !perm_can_do('/config/tmg/ensaio', 'delete') ? 'none' : '' }}
               title="Excluir ensaio"
               onClick={() => { deleteConfirmItem(rowData); }}
               bgColor="bg-red-600"
@@ -369,6 +372,7 @@ export default function TipoEnsaio({
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.gli}`}
+              style={{ display: !perm_can_do('/config/tmg/ensaio', 'edit') ? 'none' : '' }}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -391,6 +395,7 @@ export default function TipoEnsaio({
               icon={<BsTrashFill size={14} />}
               title="Ensaio já associado a um experimento"
               disabled
+              style={{ display: !perm_can_do('/config/tmg/ensaio', 'delete') ? 'none' : '' }}
               onClick={() => {}}
               bgColor="bg-gray-600"
               textColor="white"
@@ -813,6 +818,7 @@ export default function TipoEnsaio({
                         value="Importar"
                         bgColor="bg-blue-600"
                         textColor="white"
+                        style={{ display: !perm_can_do('/config/tmg/ensaio', 'import') ? 'none' : '' }}
                         onClick={() => {
                           window.open('/listas/rd?importar=ensaio', '_blank');
                         }}

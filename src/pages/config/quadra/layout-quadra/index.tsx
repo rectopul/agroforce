@@ -45,6 +45,7 @@ import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
+import perm_can_do from '../../../../shared/utils/perm_can_do';
 
 interface ILayoultProps {
   id: number | any;
@@ -389,6 +390,7 @@ export default function Listagem({
                   icon={<BiEdit size={14} />}
                   bgColor="bg-blue-600"
                   textColor="white"
+                  style={{ display: !perm_can_do('/config/tmg/layout-quadra', 'edit') ? 'none' : '' }}
                   onClick={() => {
                     setCookies('pageBeforeEdit', currentPage?.toString());
                     setCookies('filterBeforeEdit', filter);
@@ -411,6 +413,7 @@ export default function Listagem({
                   icon={<BiEdit size={14} />}
                   bgColor="bg-blue-600"
                   textColor="white"
+                  style={{ display: !perm_can_do('/config/tmg/layout-quadra', 'edit') ? 'none' : '' }}
                   onClick={() => {
                     setCookies('pageBeforeEdit', currentPage?.toString());
                     setCookies('filterBeforeEdit', filter);
@@ -431,6 +434,7 @@ export default function Listagem({
             data={rowData}
             text="a quadra"
             keyName="name"
+            style={{ display: !perm_can_do('/config/tmg/layout-quadra', 'disable') ? 'none' : '' }}
             onPress={handleStatus}
           />
         </div>
@@ -981,6 +985,7 @@ export default function Listagem({
                         value="Importar"
                         bgColor="bg-blue-600"
                         textColor="white"
+                        style={{ display: !perm_can_do('/config/tmg/layout-quadra', 'import') ? 'none' : '' }}
                         onClick={() => {
                           window.open(
                             '/listas/rd?importar=layout_quadra',

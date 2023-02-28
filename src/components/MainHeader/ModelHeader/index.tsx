@@ -1,11 +1,11 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Menu, Transition } from "@headlessui/react";
-import Link from "next/link";
-import { Fragment, useEffect, useState } from "react";
-import { FaRegUserCircle } from "react-icons/fa";
-import { MdOutlineExitToApp } from "react-icons/md";
-import { RiLockPasswordLine } from "react-icons/ri";
-import { userService } from "../../../services";
+import { Menu, Transition } from '@headlessui/react';
+import Link from 'next/link';
+import { Fragment, useEffect, useState } from 'react';
+import { FaRegUserCircle } from 'react-icons/fa';
+import { MdOutlineExitToApp } from 'react-icons/md';
+import { RiLockPasswordLine } from 'react-icons/ri';
+import { userService } from '../../../services';
 
 interface IModelProps {
   name: string;
@@ -13,17 +13,15 @@ interface IModelProps {
 }
 
 export function ModelHeader({ name, avatar }: IModelProps) {
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
   function classNames(...classes: any) {
-    return classes.filter(Boolean).join(" ");
+    return classes.filter(Boolean).join(' ');
   }
   const [user, setUser] = useState();
 
   useEffect(() => {
-    const subscription = userService.user.subscribe((x: any | undefined) =>
-      setUser(x)
-    );
+    const subscription = userService.user.subscribe((x: any | undefined) => setUser(x));
     return () => subscription.unsubscribe();
   }, []);
 
@@ -46,7 +44,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
         aria-expanded="true"
         aria-haspopup="true"
       >
-        {!avatar || avatar === "" ? (
+        {!avatar || avatar === '' ? (
           <div
             className="h-10 w-10
                   flex items-center justify-center
@@ -118,8 +116,8 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                 <Link href={`/perfil?id=${userLogado.id}`}>
                   <a
                     className={classNames(
-                      active ? "bg-gray-100 text-blue-600" : "text-gray-700",
-                      "px-4 py-2 text-base flex flex-row items-center gap-1"
+                      active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',
+                      'px-4 py-2 text-base flex flex-row items-center gap-1',
                     )}
                   >
                     <FaRegUserCircle />
@@ -133,8 +131,8 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                 <Link href="/perfil/alterar-senha">
                   <a
                     className={classNames(
-                      active ? "bg-gray-100 text-blue-600" : "text-gray-700",
-                      "px-4 py-2 text-base flex items-center gap-1"
+                      active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',
+                      'px-4 py-2 text-base flex items-center gap-1',
                     )}
                   >
                     <RiLockPasswordLine />
@@ -143,6 +141,21 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                 </Link>
               )}
             </Menu.Item>
+            {/* <Menu.Item>
+              {({ active }) => (
+                <Link href="/perfil/perfis">
+                  <a
+                    className={classNames(
+                      active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',
+                      'px-4 py-2 text-base flex items-center gap-1',
+                    )}
+                  >
+                    <RiLockPasswordLine />
+                    Permissões
+                  </a>
+                </Link>
+              )}
+            </Menu.Item> */}
             <form
               method="POST"
               action="#"
@@ -153,8 +166,8 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                   <button
                     type="submit"
                     className={classNames(
-                      active ? "bg-gray-100 text-red-600" : "text-red-800",
-                      "w-full text-left px-4 py-2 text-base flex items-center gap-1"
+                      active ? 'bg-gray-100 text-red-600' : 'text-red-800',
+                      'w-full text-left px-4 py-2 text-base flex items-center gap-1',
                     )}
                     onClick={logout}
                   >

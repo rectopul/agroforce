@@ -46,6 +46,7 @@ import { tableGlobalFunctions } from '../../../helpers';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../components/Loading';
 import { functionsUtils } from '../../../shared/utils/functionsUtils';
+import perm_can_do from '../../../shared/utils/perm_can_do';
 
 interface IDelineamentoProps {
   id: number | any;
@@ -322,6 +323,7 @@ export default function Listagem({
         <div className="h-7 flex">
           <div className="ml-1" />
           <ButtonToogleConfirmation
+            style={{ display: !perm_can_do('/config/tmg/delineamento', 'disable') ? 'none' : '' }}
             data={rowData}
             text="o delineamento"
             keyName="name"
@@ -396,6 +398,7 @@ export default function Listagem({
                 >
                   <Button
                     icon={<AiOutlineTable size={14} />}
+                    style={{ display: !perm_can_do('/config/delineamento/delineamento/sequencia-delineamento', 'view') ? 'none' : '' }}
                     onClick={() => {
                       setCookies('pageBeforeEdit', currentPage?.toString());
                       setCookies('filterBeforeEdit', filter);
@@ -857,6 +860,7 @@ export default function Listagem({
                         title="Importar"
                         value="Importar"
                         bgColor="bg-blue-600"
+                        style={{ display: !perm_can_do('/config/tmg/delineamento', 'import') ? 'none' : '' }}
                         textColor="white"
                         onClick={() => {
                           window.open(

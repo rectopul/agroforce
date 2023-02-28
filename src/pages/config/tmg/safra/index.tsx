@@ -43,6 +43,7 @@ import ITabs from '../../../../shared/utils/dropdown';
 import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
+import perm_can_do from '../../../../shared/utils/perm_can_do';
 
 interface IFilter {
   filterStatus: object | any;
@@ -85,16 +86,16 @@ interface IData {
 }
 
 export default function Listagem({
-          allSafras,
-          totalItems,
-          itensPerPage,
-          filterApplication,
-          cultureId,
-          pageBeforeEdit,
-          filterBeforeEdit,
-          typeOrderServer, // RR
-          orderByserver, // RR
-        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  allSafras,
+  totalItems,
+  itensPerPage,
+  filterApplication,
+  cultureId,
+  pageBeforeEdit,
+  filterBeforeEdit,
+  typeOrderServer, // RR
+  orderByserver, // RR
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs;
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -423,6 +424,7 @@ export default function Listagem({
                   `/config/tmg/safra/atualizar?id=${rowData.id}&currentPage=${currentPage}&${filtersParams}`,
                 );
               }}
+              style={{ display: !perm_can_do('/config/tmg/safra', 'edit') ? 'none' : '' }}
               bgColor="bg-blue-600"
               textColor="white"
             />
@@ -433,6 +435,8 @@ export default function Listagem({
               data={rowData}
               text="a safra"
               keyName="safraName"
+              style={{ display: !perm_can_do('/config/tmg/safra', 'disable') ? 'none' : '' }}
+              bgColor="bg-red-600"
               onPress={handleStatusSafra}
             />
           </div>
@@ -588,7 +592,6 @@ export default function Listagem({
 
     await safraService.getAll(filterParam).then(({ status, response }) => {
       if (status === 200) {
-          
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, response, 'safras');
 
@@ -831,6 +834,7 @@ export default function Listagem({
                       <Button
                         title="Cadastrar safra"
                         value="Cadastrar safra"
+                        style={{ display: !perm_can_do('/config/tmg/safra', 'create') ? 'none' : '' }}
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {

@@ -42,6 +42,7 @@ import ITabs from '../../../../shared/utils/dropdown';
 import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
+import perm_can_do from '../../../../shared/utils/perm_can_do';
 
 interface IFilter {
   filterYearFrom: string | number;
@@ -922,6 +923,7 @@ export default function Listagem({
                         value="Importar"
                         bgColor="bg-blue-600"
                         textColor="white"
+                        style={{ display: !perm_can_do('/config/tmg/genotipo', 'import') ? 'none' : '' }}
                         onClick={() => {
                           window.open('/listas/rd?importar=rd', '_blank');
                         }}
