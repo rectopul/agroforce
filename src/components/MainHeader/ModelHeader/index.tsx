@@ -141,7 +141,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                 </Link>
               )}
             </Menu.Item>
-            <Menu.Item>
+            {/* <Menu.Item>
               {({ active }) => (
                 <Link href="/perfil/perfis">
                   <a
@@ -155,7 +155,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                   </a>
                 </Link>
               )}
-            </Menu.Item>
+            </Menu.Item> */}
             <form
               method="POST"
               action="#"

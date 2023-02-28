@@ -115,6 +115,19 @@ model users_cultures {
   user       user     @relation(fields: [userId], references: [id], map: "Users_Cultures_userId_fkey")
 }
 
+model profile {
+  id               Int      @id @default(autoincrement())
+  name             String
+  acess_permission String
+  permissions      String?  @db.LongText
+  createdAt        DateTime @default(now())
+  createdBy        Int?
+
+  profile_permissions profile_permissions[]
+  user_profile        user_profile[]
+  users_permissions   users_permissions[]
+}
+
 model users_permissions {
   id                 Int      @id @default(autoincrement())
   userId             Int
@@ -688,19 +701,6 @@ model profile_permissions {
 
   profile     profile     @relation(fields: [profileId], references: [id])
   permissions permissions @relation(fields: [permissionId], references: [id])
-}
-
-model profile {
-  id               Int      @id @default(autoincrement())
-  name             String
-  acess_permission String
-  permissions      String?  @db.LongText
-  createdAt        DateTime @default(now())
-  createdBy        Int?
-
-  profile_permissions profile_permissions[]
-  user_profile        user_profile[]
-  users_permissions   users_permissions[]
 }
 
 model user_profile {
