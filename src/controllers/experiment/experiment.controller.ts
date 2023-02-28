@@ -389,8 +389,11 @@ export class ExperimentController {
          * limpa os experimentos
          * caso seja exclusão de experimentos de um grupo, o método relationGroup irá limpar a coluna experimentGroupId de experiments
          * caso seja atualização de status fará o fluxo normal
+         * SELECT * FROM `experiment` WHERE `experimentName` LIKE '%BA408BR02%' ORDER BY `id` ASC
          */
-        await this.experimentRepository.relationGroup(data);
+        const teste = await this.experimentRepository.relationGroup(data);
+
+        console.log('responseRelation', teste);
 
         if (data.experimentGroupId) {
           const { response: group } = await experimentGroupController.getOne(Number(data.experimentGroupId));
@@ -446,6 +449,7 @@ export class ExperimentController {
         const transactionConfig = new TransactionConfig();
         const experimentRepositoryTransaction = new ExperimentRepository();
         experimentRepositoryTransaction.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+        console.log('transactionConfig.transactionScope.run');
         try {
           await transactionConfig.transactionScope.run(async () => {
             for (const row in data) {

@@ -705,19 +705,35 @@ export class ExperimentGenotipeController {
 
   async setStatus({ idList: idExperiment, status }: any) {
     try {
-      await this.ExperimentGenotipeRepository.updateStatus(
-        idExperiment,
-        status,
-      );
-      idExperiment.map(async (id: number) => {
-        const { response }: any = await this.experimentController.getOne(id);
-        await this.experimentGroupController.countEtiqueta(
-          response.experimentGroupId,
-          idExperiment,
-        );
-      });
+      const experimentsGroupIds:number[] = [];
+      await this.ExperimentGenotipeRepository.updateStatus(idExperiment,status);
+      for (const id of idExperiment) {
+        console.log('const id of idExperiment', id, idExperiment);
+        const { response }: any = await this.experimentController.getOne(Number(id));
+        // verifica se experimentGroupId já foi adicionado
+        if (response?.experimentGroupId && !experimentsGroupIds.includes(response.experimentGroupId)) {
+          experimentsGroupIds.push(response.experimentGroupId);
+        }
+        // await this.experimentGroupController.countEtiqueta(
+        //   response.experimentGroupId,
+        //   idExperiment,
+        // );
+      }
+      
+      for(const id of experimentsGroupIds){
+        await this.experimentGroupController.countEtiqueta(id,idExperiment, (status === 'EM ETIQUETAGEM'));
+      }
+      
+      // idExperiment.map(async (id: number) => {
+      //   const { response }: any = await this.experimentController.getOne(id);
+      //   await this.experimentGroupController.countEtiqueta(
+      //     response.experimentGroupId,
+      //     idExperiment,
+      //   );
+      // });
+      
     } catch (error: any) {
-      handleError('Parcelas controller', 'setStatus', error.message);
+      handleError('Parcelas controller', 'setStatus', error.message + ' :: '+ JSON.stringify(error));
       throw new Error('[Controller] - setStatus Parcelas erro');
     }
   }

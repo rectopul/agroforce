@@ -44,7 +44,7 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
   if (tagType === 1) {
     const listTags = data.map((item: any) => (
       <div className="etiquetaModelo1">
-        <div className="flexRow" style={{ fontSize: 16 }}>
+        <div className="flexRow" style={{ fontSize: 14 }}>
           <div className="flex1">
             {Number(item?.npe)?.toLocaleString("pt-BR")}
           </div>
@@ -72,7 +72,7 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
           style={{
             fontSize: 7,
             justifyContent: "flex-end",
-            marginTop: -7,
+            marginTop: -5,
             marginBottom: -4,
           }}
         >
