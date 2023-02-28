@@ -58,6 +58,7 @@ import { IReturnObject } from '../../../interfaces/shared/Import.interface';
 import { tableGlobalFunctions } from '../../../helpers';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../components/Loading';
+import perm_can_do from '../../../shared/utils/perm_can_do';
 
 export default function Listagem({
   allExperimentGroup,
@@ -376,6 +377,7 @@ export default function Listagem({
             <Button
               title={`Editar ${rowData.name}`}
               type="button"
+              style={{ display: !perm_can_do('/config/tmg/etiquetagem', 'edit') ? 'none' : '' }}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -397,6 +399,7 @@ export default function Listagem({
             <Button
               title=""
               type="button"
+              style={{ display: !perm_can_do('/config/tmg/etiquetagem', 'print') ? 'none' : '' }}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -422,6 +425,7 @@ export default function Listagem({
               }
               title={`Excluir ${rowData.name}`}
               type="button"
+              style={{ display: !perm_can_do('/config/tmg/etiquetagem', 'delete') ? 'none' : '' }}
               onClick={() => {
                 deleteConfirmItem(rowData);
               }}
@@ -1099,6 +1103,7 @@ export default function Listagem({
                         title="Criar novo grupo"
                         value="Criar novo grupo"
                         textColor="white"
+                        style={{ display: !perm_can_do('/config/tmg/etiquetagem', 'create') ? 'none' : '' }}
                         onClick={() => {
                           setIsOpenModal(!isOpenModal);
                         }}

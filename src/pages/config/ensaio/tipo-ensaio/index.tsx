@@ -51,6 +51,7 @@ import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import { functionsUtils } from '../../../../shared/utils/functionsUtils';
+import perm_can_do from '../../../../shared/utils/perm_can_do';
 
 interface ITypeAssayProps {
   id: number;
@@ -323,6 +324,7 @@ export default function TipoEnsaio({
                 <Button
                   icon={<BiEdit size={14} />}
                   title={`Atualizar ${rowData.name}`}
+                  style={{ display: !perm_can_do('/config/tmg/tipo-ensaio', 'edit') ? 'none' : '' }}
                   onClick={() => {
                     setCookies('pageBeforeEdit', currentPage?.toString());
                     setCookies('filterBeforeEdit', filter);
@@ -347,6 +349,7 @@ export default function TipoEnsaio({
                   title={`Atualizar ${rowData.name}`}
                   icon={<BiEdit size={14} />}
                   onClick={() => {}}
+                  style={{ display: !perm_can_do('/config/tmg/tipo-ensaio', 'edit') ? 'none' : '' }}
                   bgColor="bg-blue-600"
                   textColor="white"
                   href={`/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`}
@@ -357,6 +360,7 @@ export default function TipoEnsaio({
           <div className="ml-1" />
           <ButtonToogleConfirmation
             data={rowData}
+            style={{ display: !perm_can_do('/config/tmg/tipo-ensaio', 'disable') ? 'none' : '' }}
             text="o tipo ensaio"
             keyName="name"
             onPress={handleStatus}
@@ -708,6 +712,7 @@ export default function TipoEnsaio({
                         title="Cadastrar Tipo Ensaio"
                         value="Cadastrar Tipo Ensaio"
                         bgColor="bg-blue-600"
+                        style={{ display: !perm_can_do('/config/tmg/tipo-ensaio', 'create') ? 'none' : '' }}
                         textColor="white"
                         onClick={() => {
                           setCookies('pageBeforeEdit', currentPage?.toString());

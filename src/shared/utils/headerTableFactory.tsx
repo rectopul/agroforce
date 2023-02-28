@@ -18,7 +18,6 @@ export default function headerTableFactoryGlobal({
   handleOrder,
   ...rest
 }: IHeaderTableFactory) {
-  console.log('🚀 ~ file: headerTableFactory.tsx:21 ~ orderList:', orderList);
   return {
     title: (
       <div className="flex items-center">

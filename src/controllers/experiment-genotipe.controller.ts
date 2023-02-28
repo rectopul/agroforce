@@ -548,7 +548,6 @@ export class ExperimentGenotipeController {
   }
 
   async getOne(id: number) {
-    console.log('🚀 ~ file: experiment-genotipe.controller.ts:535 ~ ExperimentGenotipeController ~ getOne ~ id:', id);
     try {
       const response = await this.ExperimentGenotipeRepository.findById(id);
 

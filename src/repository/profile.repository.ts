@@ -1,37 +1,47 @@
 import { prisma } from '../pages/api/db/db';
+import { BaseRepository } from './base-repository';
 
-export class ProfileRepository {
+export class ProfileRepository extends BaseRepository {
+  createProfilePermission(data: any) {
+    throw new Error('Method not implemented.');
+  }
   async findOne(id: number) {
-    const Result = await prisma.profile.findUnique({
-      where: {
-        id,
-      },
+    const result = await prisma.profile.findUnique({
+      where: { id },
     });
-    return Result;
+    return result;
   }
 
-  async findAll() {
-    const Result = await prisma.profile.findMany();
-    return Result;
+  async findAll(where: any) {
+    const count = await prisma.profile.count({ where });
+
+    const result: object | any = await prisma.profile.findMany({
+
+      where,
+    });
+
+    result.total = count;
+    return result;
   }
 
-  async create(Profile: object | any) {
-    const Result = await prisma.profile.create({ data: Profile });
-    return Result;
+  async create(data: any) {
+    const result = await prisma.profile.create({ data });
+    return result;
   }
 
-  async update(id: number, Profile: Object) {
-    const profile = await this.findOne(id);
-    if (profile !== null) {
-      const Result = await prisma.profile.update({
-        where: {
-          id,
-        },
-        data: Profile,
-      });
+  async findByName(name: string) {
+    const result = await prisma.profile.findFirst({
+      where: { name },
+    });
 
-      return Result;
-    }
-    return false;
+    return result;
+  }
+
+  async update(id: number, data: any) {
+    const result = await prisma.profile.update({
+      where: { id },
+      data,
+    });
+    return result;
   }
 }

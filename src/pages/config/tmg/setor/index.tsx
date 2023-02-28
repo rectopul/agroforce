@@ -45,6 +45,7 @@ import { tableGlobalFunctions } from 'src/helpers';
 import ITabs from '../../../../shared/utils/dropdown';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
+import perm_can_do from '../../../../shared/utils/perm_can_do';
 
 interface IFilter {
   filterStatus: object | any;
@@ -310,6 +311,7 @@ export default function Listagem({
               title={`Atualizar ${rowData.name}`}
               icon={<BiEdit size={14} />}
               bgColor="bg-blue-600"
+              style={{ display: !perm_can_do('/config/tmg/setor', 'edit') ? 'none' : '' }}
               textColor="white"
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
@@ -327,6 +329,7 @@ export default function Listagem({
           <div style={{ width: 5 }} />
           <div className="h-7">
             <ButtonToogleConfirmation
+              style={{ display: !perm_can_do('/config/tmg/setor', 'disable') ? 'none' : '' }}
               data={rowData}
               text="o setor"
               keyName="name"
@@ -661,6 +664,7 @@ export default function Listagem({
                       <Button
                         title="Cadastrar setor"
                         value="Cadastrar setor"
+                        style={{ display: !perm_can_do('/config/tmg/setor', 'create') ? 'none' : '' }}
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {

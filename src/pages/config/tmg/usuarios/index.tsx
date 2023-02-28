@@ -46,6 +46,7 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import ComponentLoading from '../../../../components/Loading';
+import perm_can_do from '../../../../shared/utils/perm_can_do';
 
 interface IUsers {
   id: number;
@@ -400,6 +401,7 @@ export default function Listagem({
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
+              style={{ display: !perm_can_do('/config/tmg/usuarios', 'edit') ? 'none' : '' }}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -420,6 +422,7 @@ export default function Listagem({
             <ButtonToogleConfirmation
               data={rowData}
               text="o usuário"
+              style={{ display: !perm_can_do('/config/tmg/usuarios', 'disable') ? 'none' : '' }}
               keyName="name"
               onPress={handleStatus}
             />
@@ -824,8 +827,9 @@ export default function Listagem({
                       <Button
                         title="Cadastrar usuário"
                         value="Cadastrar usuário"
-                        bgColor="bg-blue-600"
                         textColor="white"
+                        bgColor="bg-blue-600"
+                        style={{ display: !perm_can_do('/config/tmg/usuarios', 'create') ? 'none' : '' }}
                         onClick={() => {
                           setCookies('pageBeforeEdit', currentPage?.toString());
                           setCookies('filterBeforeEdit', filter);

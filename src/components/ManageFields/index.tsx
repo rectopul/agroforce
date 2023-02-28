@@ -1,12 +1,14 @@
-import {DragDropContext, Draggable, Droppable, DropResult} from "react-beautiful-dnd";
-import {AccordionFilter} from "../AccordionFilter";
-import {Button} from "../Button";
-import {IoReloadSharp, IoTrash} from "react-icons/io5";
-import {CheckBox} from "../CheckBox";
-import {userPreferencesService} from "../../services";
-import {useEffect, useState} from "react";
-import Swal from "sweetalert2";
-import {useRouter} from "next/router";
+import {
+  DragDropContext, Draggable, Droppable, DropResult,
+} from 'react-beautiful-dnd';
+import { IoReloadSharp, IoTrash } from 'react-icons/io5';
+import { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
+import { useRouter } from 'next/router';
+import { AccordionFilter } from '../AccordionFilter';
+import { Button } from '../Button';
+import { CheckBox } from '../CheckBox';
+import { userPreferencesService } from '../../services';
 
 interface IPreferences {
   id: number;
@@ -42,48 +44,47 @@ interface IGenerateProps {
 }
 
 export function ManageFields(props: ManageFieldsProps) {
-
   const router = useRouter();
-  
-  const preferencesDefault = props.preferencesDefault;
-  
+
+  const { preferencesDefault } = props;
+
   // const [statusAccordion, setStatusAccordion] = useState<boolean>(props.statusAccordionExpanded);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(props.statusAccordionExpanded);
-  
+
   const [camposGerenciados, setCamposGerenciados] = useState<any>(props.preferences.table_preferences);
 
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(props.generatesPropsDefault);
 
   const [userLogado, setUserLogado] = useState<any>(props.userLogado);
-  
+
   const [preferences, setPreferences] = useState<any>(props.preferences);
 
   useEffect(() => {
     reorderGeneratedProps();
     props.OnSetGeneratesProps(generatesProps);
   }, []);
-  
+
   useEffect(() => {
     props.OnSetPreferences(preferences);
   }, [preferences]);
-  
+
   // useEffect(() => {
   //   console.log('useEffect', 'statusAccordion', statusAccordion);
   // }, [statusAccordion]);
-  
+
   // useEffect(() => {
   //   console.log('ManageFields', 'camposGerenciados', camposGerenciados);
   //   props.OnColumnsOrder(camposGerenciados);
   // }, [camposGerenciados]);
-  
-  function reorderGeneratedProps(){
+
+  function reorderGeneratedProps() {
     const campos_arr = camposGerenciados.split(',');
     const items = Array.from(generatesProps);
     // const [reorderedItem] = items.splice(result.source.index, 1);
     // const index: number = Number(result.destination?.index);
-    //items.splice(index, 0, reorderedItem);
-    
-    let items_restantes = items;
+    // items.splice(index, 0, reorderedItem);
+
+    const items_restantes = items;
     const newItems = [];
     // iterate campos_arr
     for (let i = 0; i < campos_arr.length; i += 1) {
@@ -95,8 +96,8 @@ export function ManageFields(props: ManageFieldsProps) {
         }
       }
     }
-    
-    for(let i = 0; i < items_restantes.length; i += 1){
+
+    for (let i = 0; i < items_restantes.length; i += 1) {
       newItems.push(items_restantes[i]);
     }
     console.log('items_restantes', items_restantes);
@@ -104,9 +105,9 @@ export function ManageFields(props: ManageFieldsProps) {
     setGeneratesProps(newItems);
     console.log('reordererGeneretesPros', items, newItems);
   }
-  
+
   // props.OnColumnsOrder(props.camposGerenciadosDefault);
-  
+
   function handleOnDragEnd(result: DropResult): void {
     console.log('====>handleOnDragEnd', 'result', result);
     setStatusAccordion(true);
@@ -118,56 +119,54 @@ export function ManageFields(props: ManageFieldsProps) {
     items.splice(index, 0, reorderedItem);
     console.log('====>handleOnDragEnd', 'items', items);
     setGeneratesProps(items);
-    //props.OnSetGeneratesProps(items);
+    // props.OnSetGeneratesProps(items);
     setStatusAccordion(true);
   }
-  
+
   async function clearPreferencesByUserAndModule(): Promise<void> {
-    
-    if(preferences.id === 0) return;
-    
+    if (preferences.id === 0) return;
+
     await userPreferencesService
       .deleted(preferences.id)
       .then(({ status, response }) => {
         console.log('response', response);
-        
+
         if (status === 200) {
           preferencesDefault.userId = userLogado.id;
 
           delete userLogado.preferences[props.identifier_preference];
           userLogado.preferences[props.identifier_preference] = preferencesDefault;
-          
-          console.log(`====> ${props.identifier_preference}::`,preferencesDefault);
-          
-          let preferences1 = userLogado.preferences[props.identifier_preference];
+
+          console.log(`====> ${props.identifier_preference}::`, preferencesDefault);
+
+          const preferences1 = userLogado.preferences[props.identifier_preference];
 
           setUserLogado(userLogado);
           setPreferences(preferencesDefault);
           props.OnSetUserLogado(userLogado);
           props.OnSetPreferences(preferencesDefault);
 
-          localStorage.setItem("user", JSON.stringify(userLogado));
-          
+          localStorage.setItem('user', JSON.stringify(userLogado));
+
           console.log('====>preferences antes de chamar getValuesColumns:', preferences);
           console.log('====>preferences antes de chamar getValuesColumns:', preferences1);
-          
+
           getValuesColumns();
-          
         }
       })
       .catch((error) => {
         console.log('error', error);
         Swal.fire({
-          title: "Falha ao excluir preferências",
-          html: "Ocorreu um erro ao excluir as preferências do usuário. Tente novamente mais tarde.\r\n" + JSON.stringify(error),
-          width: "800",
+          title: 'Falha ao excluir preferências',
+          html: `Ocorreu um erro ao excluir as preferências do usuário. Tente novamente mais tarde.\r\n${JSON.stringify(error)}`,
+          width: '800',
         });
       });
   }
 
   async function getValuesColumns(): Promise<void> {
-    const els: any = document.querySelectorAll("ul[data-rbd-droppable-id='tbl_"+props.table+"'] input[type='checkbox']");
-    let selecionados = "";
+    const els: any = document.querySelectorAll(`ul[data-rbd-droppable-id='tbl_${props.table}'] input[type='checkbox']`);
+    let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -184,18 +183,16 @@ export function ManageFields(props: ManageFieldsProps) {
           module_id: props.module_id,
         })
         .then((response) => {
-          
           userLogado.preferences[props.identifier_preference] = {
             id: response.response.id,
             route_usage: router.route,
             userId: userLogado.id,
             table_preferences: campos,
           };
-          
+
           setPreferences(userLogado.preferences[props.identifier_preference]);
-          
         });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     } else {
       userLogado.preferences[props.identifier_preference] = {
         id: preferences.id,
@@ -203,9 +200,9 @@ export function ManageFields(props: ManageFieldsProps) {
         table_preferences: campos,
       };
       console.log('atualização de preferências: ', userLogado.preferences[props.identifier_preference]);
-      
+
       // verifica se existe alguma preferência salva no banco
-      await userPreferencesService.getAll({id: preferences.id})
+      await userPreferencesService.getAll({ id: preferences.id })
         .then((response) => {
           console.log('response', response);
         })
@@ -218,26 +215,25 @@ export function ManageFields(props: ManageFieldsProps) {
         id: preferences.id,
       })
         .then((response) => {
-          console.log('===> UPDATE:','response:', response);
-          
+          console.log('===> UPDATE:', 'response:', response);
         })
         .catch((error) => {
           console.log('error', error);
           Swal.fire({
-            title: "Falha ao atualizar preferências",
-            html: "Ocorreu um erro ao atualizar as preferências do usuário. Tente novamente mais tarde.\r\n" + JSON.stringify(error),
-            width: "800",
+            title: 'Falha ao atualizar preferências',
+            html: `Ocorreu um erro ao atualizar as preferências do usuário. Tente novamente mais tarde.\r\n${JSON.stringify(error)}`,
+            width: '800',
           });
         });
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
-    let preferences1 = userLogado.preferences[props.identifier_preference];
-    
+    const preferences1 = userLogado.preferences[props.identifier_preference];
+
     setUserLogado(userLogado);
     setPreferences(preferences1);
     setCamposGerenciados(campos);
-    
+
     console.log('ManageFields', 'getValuesColumns', campos);
 
     props.OnSetUserLogado(userLogado);
@@ -245,8 +241,8 @@ export function ManageFields(props: ManageFieldsProps) {
     props.OnSetCamposGerenciados(campos);
     // manda para o pai os generetesProps ao clicar em atualizar, pois finalizamos nossa ordenação;
     props.OnSetGeneratesProps(generatesProps);
-    
-     setStatusAccordion(false);
+
+    setStatusAccordion(false);
   }
 
   return (
@@ -257,7 +253,7 @@ export function ManageFields(props: ManageFieldsProps) {
           grid={statusAccordion}
         >
           <DragDropContext onDragEnd={handleOnDragEnd}>
-            <Droppable droppableId={'tbl_'+props.table}>
+            <Droppable droppableId={`tbl_${props.table}`}>
               {(provided) => (
                 <ul
                   className="w-full h-full characters"
@@ -270,20 +266,20 @@ export function ManageFields(props: ManageFieldsProps) {
                       bgColor="bg-blue-600"
                       textColor="white"
                       onClick={getValuesColumns}
-                      icon={<IoReloadSharp size={20}/>}
+                      icon={<IoReloadSharp size={20} />}
                     />
                   </div>
-                  
-                  {/*<div className="h-8 mb-3">*/}
-                  {/*  <Button*/}
-                  {/*    value="Limpar Preferências"*/}
-                  {/*    bgColor="bg-red-600"*/}
-                  {/*    textColor="white"*/}
-                  {/*    onClick={clearPreferencesByUserAndModule}*/}
-                  {/*    icon={<IoTrash size={20}/>}*/}
-                  {/*  />*/}
-                  {/*</div>*/}
-                  
+
+                  {/* <div className="h-8 mb-3"> */}
+                  {/*  <Button */}
+                  {/*    value="Limpar Preferências" */}
+                  {/*    bgColor="bg-red-600" */}
+                  {/*    textColor="white" */}
+                  {/*    onClick={clearPreferencesByUserAndModule} */}
+                  {/*    icon={<IoTrash size={20}/>} */}
+                  {/*  /> */}
+                  {/* </div> */}
+
                   {generatesProps.map((generate, index) => (
                     <Draggable
                       key={String(generate.value)}
@@ -296,8 +292,8 @@ export function ManageFields(props: ManageFieldsProps) {
                           {...provider.draggableProps}
                           {...provider.dragHandleProps}
                         >
-                          {/*{generate.value}::{camposGerenciados}*/}
-                          
+                          {/* {generate.value}::{camposGerenciados} */}
+
                           <CheckBox
                             name={generate.name}
                             title={generate.title?.toString()}
@@ -315,11 +311,11 @@ export function ManageFields(props: ManageFieldsProps) {
           </DragDropContext>
         </AccordionFilter>
 
-        {/*<span style={{fontSize:9}} className="w-30">*/}
-        {/*  Preferences COMP: {JSON.stringify(props.preferences.table_preferences,null, 2)}<br/>*/}
-        {/*  Status Acordion COMP: {statusAccordion}*/}
-        {/*</span>*/}
-        
+        {/* <span style={{fontSize:9}} className="w-30"> */}
+        {/*  Preferences COMP: {JSON.stringify(props.preferences.table_preferences,null, 2)}<br/> */}
+        {/*  Status Acordion COMP: {statusAccordion} */}
+        {/* </span> */}
+
       </div>
     </div>
   );

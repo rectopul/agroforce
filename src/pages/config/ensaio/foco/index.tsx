@@ -52,6 +52,7 @@ import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
+import perm_can_do from '../../../../shared/utils/perm_can_do';
 
 interface IFilter {
   filterStatus: object | any;
@@ -402,6 +403,7 @@ export default function Listagem({
               <Button
                 icon={<BiEdit size={14} />}
                 title={`Atualizar ${rowData.name}`}
+                style={{ display: !perm_can_do('/config/tmg/foco', 'edit') ? 'none' : '' }}
                 onClick={() => {
                   setCookies('pageBeforeEdit', currentPage?.toString());
                   setCookies('filterBeforeEdit', filter);
@@ -421,6 +423,7 @@ export default function Listagem({
               <Button
                 icon={<BiEdit size={14} />}
                 title={`Atualizar ${rowData.name}`}
+                style={{ display: !perm_can_do('/config/tmg/foco', 'edit') ? 'none' : '' }}
                 onClick={() => {
                   setCookies('pageBeforeEdit', currentPage?.toString());
                   setCookies('filterBeforeEdit', filtersParams);
@@ -434,6 +437,7 @@ export default function Listagem({
           <div className="ml-1" />
           <ButtonToogleConfirmation
             data={rowData}
+            style={{ display: !perm_can_do('/config/tmg/foco', 'disable') ? 'none' : '' }}
             text="o foco"
             keyName="name"
             onPress={handleStatus}
