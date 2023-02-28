@@ -2,6 +2,13 @@ import { prisma } from '../pages/api/db/db';
 import { BaseRepository } from './base-repository';
 
 export class ProfilePermissionsRepository extends BaseRepository {
+  async deleteAll(data: any) {
+    const result = await prisma.profile_permissions.deleteMany({
+      where: data,
+    });
+    return result;
+  }
+
   async findOne(id: number) {
     const result = await prisma.profile_permissions.findUnique({
       where: { id },

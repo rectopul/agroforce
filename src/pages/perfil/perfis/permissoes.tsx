@@ -2,19 +2,22 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { Fragment, useState } from 'react';
 import { RiFileExcel2Line } from 'react-icons/ri';
+import Swal from 'sweetalert2';
 import { Button, CheckBox } from '../../../components';
 import { Content } from '../../../components/Content';
 import { profileService } from '../../../services';
 import stylesCommon from '../../../shared/styles/common.module.css';
+import LoadingComponent from '../../../components/Loading';
 
 export default function Permissoes({
   allRoutes,
   profileId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const [routes, setRoutes] = useState<any>(allRoutes);
+  const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   function Route({ key, route }: any) {
     return (
@@ -25,6 +28,7 @@ export default function Permissoes({
   }
 
   async function save() {
+    setLoading(true);
     const els: any = document.querySelectorAll("input[type='checkbox']");
     const selecionados: any = {};
 
@@ -34,7 +38,14 @@ export default function Permissoes({
       }
     }
 
-    await profileService.update({ selecionados, profileId });
+    const { status, message } = await profileService.update({ selecionados, profileId });
+    if (status === 200) {
+      Swal.fire(message);
+      router.back();
+    } else {
+      Swal.fire(message);
+      setLoading(false);
+    }
   }
 
   return (
@@ -42,16 +53,19 @@ export default function Permissoes({
       <Head>
         <title>Permissões</title>
       </Head>
+
+      {loading && <LoadingComponent text="" />}
+
       <Content
         contentHeader={[]}
         moduloActive="config"
       >
         <div className={stylesCommon.container}>
           <ul>
-            {routes.map((route: any) => (
+            {allRoutes.map((route: any) => (
               <>
                 <Route key={route.id} route={route.screenRoute} />
-                {route.permission[0]?.map((element: any) => (
+                {route.permission[0]?.permissions?.map((element: any) => (
                   <CheckBox
                     name={element.title}
                     id={route.screenRoute}

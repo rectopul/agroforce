@@ -55,6 +55,7 @@ import { functionsUtils } from '../../../shared/utils/functionsUtils';
 import { tableGlobalFunctions } from '../../../helpers';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../components/Loading';
+import perm_can_do from '../../../shared/utils/perm_can_do';
 
 interface IFilter {
   filterStatus: object | any;
@@ -431,6 +432,7 @@ export default function Listagem({
               bgColor="bg-blue-600"
               textColor="white"
               title={`Editar ${rowData.cod_quadra}`}
+              style={{ display: !perm_can_do('/config/tmg/quadra', 'edit') ? 'none' : '' }}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -447,6 +449,7 @@ export default function Listagem({
             data={rowData}
             text="a quadra"
             keyName="name"
+            style={{ display: !perm_can_do('/config/tmg/quadra', 'disable') ? 'none' : '' }}
             onPress={handleStatus}
           />
         </div>
@@ -1000,6 +1003,7 @@ export default function Listagem({
                         value="Importar"
                         bgColor="bg-blue-600"
                         textColor="white"
+                        style={{ display: !perm_can_do('/config/tmg/quadra', 'import') ? 'none' : '' }}
                         onClick={() => {
                           setModalImport(true);
                         }}

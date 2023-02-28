@@ -61,6 +61,7 @@ import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
 import { functionsUtils } from '../../../../shared/utils/functionsUtils';
+import perm_can_do from '../../../../shared/utils/perm_can_do';
 
 export default function Listagem({
   // assaySelect,
@@ -86,7 +87,7 @@ export default function Listagem({
     : (tab.statusTab = false)));
 
   const router = useRouter();
-  
+
   // const userLogado = JSON.parse(localStorage.getItem('user') as string);
   // const preferences = userLogado.preferences.parcelas || {
   //   id: 0,
@@ -94,7 +95,7 @@ export default function Listagem({
   //     'id,foco,type_assay,tecnologia,gli,experiment,culture,status_t,rep,status,nt,npe,genotipo,nca',
   // };
 
-  const [userLogado, setUserLogado] = useState<any>(JSON.parse(localStorage.getItem("user") as string));
+  const [userLogado, setUserLogado] = useState<any>(JSON.parse(localStorage.getItem('user') as string));
   const table = 'experiment_genotipe';
   const module_name = 'parcelas';
   const module_id = 30;
@@ -1471,6 +1472,7 @@ export default function Listagem({
                         title="Substituir"
                         value="Substituir"
                         textColor="white"
+                        style={{ display: !perm_can_do('/listas/parcelas-experimento', 'change') ? 'none' : '' }}
                         onClick={() => {
                           setRadioStatus();
                           setIsOpenModal(!isOpenModal);
@@ -1492,7 +1494,6 @@ export default function Listagem({
 
                     <div className="h-full flex items-center gap-2">
 
-
                       <ManageFields
                         statusAccordionExpanded={false}
                         generatesPropsDefault={generatesProps}
@@ -1505,70 +1506,70 @@ export default function Listagem({
                         module_name={module_name}
                         module_id={module_id}
                         identifier_preference={identifier_preference}
-                        OnSetStatusAccordion={(e: any) => { console.log('callback','setStatusAccordion', e); setStatusAccordion(e); }}
-                        OnSetGeneratesProps={(e: any) => { console.log('callback','setGeneratesProps', e); setGeneratesProps(e); }}
-                        OnSetCamposGerenciados={(e: any) => { console.log('callback','setCamposGerenciados', e); setCamposGerenciados(e); }}
-                        OnColumnsOrder={(e: any) => { console.log('callback','columnsOrder', e); orderColumns(e); }}
-                        OnSetUserLogado={(e: any) => { console.log('callback','setUserLogado', e); setUserLogado(e); }}
-                        OnSetPreferences={(e: any) => { console.log('callback','setPreferences', e); setPreferences(e); }}
-                      ></ManageFields>
-                      
-                      {/*<div className="border-solid border-2 border-blue-600 rounded">*/}
-                      {/*  <div className="w-64">*/}
-                      {/*    <AccordionFilter*/}
-                      {/*      title="Gerenciar Campos"*/}
-                      {/*      grid={statusAccordion}*/}
-                      {/*    >*/}
-                      {/*      <DragDropContext onDragEnd={handleOnDragEnd}>*/}
-                      {/*        <Droppable droppableId="characters">*/}
-                      {/*          {(provided) => (*/}
-                      {/*            <ul*/}
-                      {/*              className="w-full h-full characters"*/}
-                      {/*              {...provided.droppableProps}*/}
-                      {/*              ref={provided.innerRef}*/}
-                      {/*            >*/}
-                      {/*              <div className="h-8 mb-3">*/}
-                      {/*                <Button*/}
-                      {/*                  value="Atualizar"*/}
-                      {/*                  bgColor="bg-blue-600"*/}
-                      {/*                  textColor="white"*/}
-                      {/*                  onClick={getValuesColumns}*/}
-                      {/*                  icon={<IoReloadSharp size={20} />}*/}
-                      {/*                />*/}
-                      {/*              </div>*/}
-                      {/*              {generatesProps.map((generate, index) => (*/}
-                      {/*                <Draggable*/}
-                      {/*                  key={index}*/}
-                      {/*                  draggableId={String(generate.title)}*/}
-                      {/*                  index={index}*/}
-                      {/*                >*/}
-                      {/*                  {(providers) => (*/}
-                      {/*                    <li*/}
-                      {/*                      ref={providers.innerRef}*/}
-                      {/*                      {...providers.draggableProps}*/}
-                      {/*                      {...providers.dragHandleProps}*/}
-                      {/*                    >*/}
-                      {/*                      <CheckBox*/}
-                      {/*                        name={generate.name}*/}
-                      {/*                        title={generate.title?.toString()}*/}
-                      {/*                        value={generate.value}*/}
-                      {/*                        defaultChecked={camposGerenciados.includes(*/}
-                      {/*                          generate.value,*/}
-                      {/*                        )}*/}
-                      {/*                      />*/}
-                      {/*                    </li>*/}
-                      {/*                  )}*/}
-                      {/*                </Draggable>*/}
-                      {/*              ))}*/}
-                      {/*              {provided.placeholder}*/}
-                      {/*            </ul>*/}
-                      {/*          )}*/}
-                      {/*        </Droppable>*/}
-                      {/*      </DragDropContext>*/}
-                      {/*    </AccordionFilter>*/}
-                      {/*  </div>*/}
-                      {/*</div>*/}
-                      
+                        OnSetStatusAccordion={(e: any) => { console.log('callback', 'setStatusAccordion', e); setStatusAccordion(e); }}
+                        OnSetGeneratesProps={(e: any) => { console.log('callback', 'setGeneratesProps', e); setGeneratesProps(e); }}
+                        OnSetCamposGerenciados={(e: any) => { console.log('callback', 'setCamposGerenciados', e); setCamposGerenciados(e); }}
+                        OnColumnsOrder={(e: any) => { console.log('callback', 'columnsOrder', e); orderColumns(e); }}
+                        OnSetUserLogado={(e: any) => { console.log('callback', 'setUserLogado', e); setUserLogado(e); }}
+                        OnSetPreferences={(e: any) => { console.log('callback', 'setPreferences', e); setPreferences(e); }}
+                      />
+
+                      {/* <div className="border-solid border-2 border-blue-600 rounded"> */}
+                      {/*  <div className="w-64"> */}
+                      {/*    <AccordionFilter */}
+                      {/*      title="Gerenciar Campos" */}
+                      {/*      grid={statusAccordion} */}
+                      {/*    > */}
+                      {/*      <DragDropContext onDragEnd={handleOnDragEnd}> */}
+                      {/*        <Droppable droppableId="characters"> */}
+                      {/*          {(provided) => ( */}
+                      {/*            <ul */}
+                      {/*              className="w-full h-full characters" */}
+                      {/*              {...provided.droppableProps} */}
+                      {/*              ref={provided.innerRef} */}
+                      {/*            > */}
+                      {/*              <div className="h-8 mb-3"> */}
+                      {/*                <Button */}
+                      {/*                  value="Atualizar" */}
+                      {/*                  bgColor="bg-blue-600" */}
+                      {/*                  textColor="white" */}
+                      {/*                  onClick={getValuesColumns} */}
+                      {/*                  icon={<IoReloadSharp size={20} />} */}
+                      {/*                /> */}
+                      {/*              </div> */}
+                      {/*              {generatesProps.map((generate, index) => ( */}
+                      {/*                <Draggable */}
+                      {/*                  key={index} */}
+                      {/*                  draggableId={String(generate.title)} */}
+                      {/*                  index={index} */}
+                      {/*                > */}
+                      {/*                  {(providers) => ( */}
+                      {/*                    <li */}
+                      {/*                      ref={providers.innerRef} */}
+                      {/*                      {...providers.draggableProps} */}
+                      {/*                      {...providers.dragHandleProps} */}
+                      {/*                    > */}
+                      {/*                      <CheckBox */}
+                      {/*                        name={generate.name} */}
+                      {/*                        title={generate.title?.toString()} */}
+                      {/*                        value={generate.value} */}
+                      {/*                        defaultChecked={camposGerenciados.includes( */}
+                      {/*                          generate.value, */}
+                      {/*                        )} */}
+                      {/*                      /> */}
+                      {/*                    </li> */}
+                      {/*                  )} */}
+                      {/*                </Draggable> */}
+                      {/*              ))} */}
+                      {/*              {provided.placeholder} */}
+                      {/*            </ul> */}
+                      {/*          )} */}
+                      {/*        </Droppable> */}
+                      {/*      </DragDropContext> */}
+                      {/*    </AccordionFilter> */}
+                      {/*  </div> */}
+                      {/* </div> */}
+
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
                           title="Exportar planilha para substituição"

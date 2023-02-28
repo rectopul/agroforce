@@ -61,8 +61,6 @@ async function post(url: any, body: any) {
 }
 
 async function put(url: any, body: any) {
-  console.log('🚀 ~ file: fetch-wrapper.ts:64 ~ put ~ body:', body);
-  console.log('🚀 ~ file: fetch-wrapper.ts:64 ~ put ~ url:', url);
   const requestOptions: object | any = {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...authHeader(url) },

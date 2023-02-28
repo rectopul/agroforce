@@ -14,7 +14,6 @@ export class TypeAssayController {
   reporteController = new ReporteController();
 
   async getAll(options: object | any) {
-    console.log('🚀 ~ file: tipo-ensaio.controller.ts:17 ~ TypeAssayController ~ getAll ~ options:', options);
     const parameters: object | any = {};
     let orderBy: object | any;
     const equalsOrContains = options.importValidate ? 'equals' : 'contains';

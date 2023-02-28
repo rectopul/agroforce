@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { PermissionRepository } from '../../repository/permission.repository';
 import handleError from '../../shared/utils/handleError';
@@ -22,22 +23,30 @@ export class PermissionsController {
       );
 
       const helper: any = {};
+      for (const item of response) {
+        if (profilesIdList.includes(item.id)) {
+          helper[item.screenRoute] += `${item.action};`;
+        } else {
+          helper[item.screenRoute] += '';
+        }
+      }
+      const aux: any = {};
       const result = response.reduce((r: any, o: any) => {
         const key = `${o.screenRoute}`;
 
-        if (!helper[key]) {
-          helper[key] = { ...o }; // create a copy of o
-          r.push(helper[key]);
-        } else if (profilesIdList.includes(helper[key].id)) {
-          helper[key].action += `;${o.action}`;
+        if (!aux[key]) {
+          aux[key] = { ...o };
+          r.push(aux[key]);
+        } else if (profilesIdList.includes(aux[key].id)) {
+          aux[key].action += `;${o.action}`;
         }
 
         return r;
       }, []);
 
-      permissions.forEach((permission: any, index: number) => {
-        permission.forEach((element: any) => {
-          if (String(result[index].action).includes(element.value)) {
+      permissions.forEach((permission: any) => {
+        permission.permissions.forEach((element: any) => {
+          if (String(helper[permission.route]).includes(element.value)) {
             element.checked = true;
           } else {
             element.checked = false;
@@ -45,9 +54,9 @@ export class PermissionsController {
         });
       });
 
-      const newResult = result.map((element: any, index: number) => ({
+      const newResult = result.map((element: any) => ({
         ...element,
-        permission: permissions.filter((e, ind) => index === ind),
+        permission: permissions.filter((e: any) => element.screenRoute === e.route),
       }));
 
       if (!result) {

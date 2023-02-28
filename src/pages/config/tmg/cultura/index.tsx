@@ -278,8 +278,8 @@ export default function Listagem({
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
-              disabled={!perm_can_do('/config/tmg/cultura', 'edit')}
-              bgColor={!perm_can_do('/config/tmg/cultura', 'edit') ? 'bg-gray-300' : 'bg-blue-600'}
+              style={{ display: !perm_can_do('/config/tmg/cultura', 'edit') ? 'none' : '' }}
+              bgColor="bg-blue-600"
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -299,8 +299,8 @@ export default function Listagem({
           <div className="h-7">
             <ButtonToogleConfirmation
               data={rowData}
-              disabled={!perm_can_do('/config/tmg/cultura', 'disable')}
-              bgColor={!perm_can_do('/config/tmg/cultura', 'disable') ? 'bg-gray-300' : 'bg-red-600'}
+              style={{ display: !perm_can_do('/config/tmg/cultura', 'disable') ? 'none' : '' }}
+              bgColor="bg-red-600"
               text="a cultura"
               keyName="name"
               onPress={handleStatusCulture}
@@ -616,8 +616,8 @@ export default function Listagem({
                       <Button
                         title="Cadastrar cultura"
                         value="Cadastrar cultura"
-                        disabled={!perm_can_do('/config/tmg/cultura', 'create')}
-                        bgColor={!perm_can_do('/config/tmg/cultura', 'create') ? 'bg-gray-300' : 'bg-blue-600'}
+                        style={{ display: !perm_can_do('/config/tmg/cultura', 'create') ? 'none' : '' }}
+                        bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {
                           setCookies('pageBeforeEdit', currentPage?.toString());

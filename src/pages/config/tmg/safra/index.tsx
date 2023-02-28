@@ -424,8 +424,8 @@ export default function Listagem({
                   `/config/tmg/safra/atualizar?id=${rowData.id}&currentPage=${currentPage}&${filtersParams}`,
                 );
               }}
-              disabled={!perm_can_do('/config/tmg/safra', 'edit')}
-              bgColor={!perm_can_do('/config/tmg/safra', 'edit') ? 'bg-gray-300' : 'bg-blue-600'}
+              style={{ display: !perm_can_do('/config/tmg/safra', 'edit') ? 'none' : '' }}
+              bgColor="bg-blue-600"
               textColor="white"
             />
           </div>
@@ -435,8 +435,8 @@ export default function Listagem({
               data={rowData}
               text="a safra"
               keyName="safraName"
-              disabled={!perm_can_do('/config/tmg/safra', 'disable')}
-              bgColor={!perm_can_do('/config/tmg/safra', 'disable') ? 'bg-gray-300' : 'bg-red-600'}
+              style={{ display: !perm_can_do('/config/tmg/safra', 'disable') ? 'none' : '' }}
+              bgColor="bg-red-600"
               onPress={handleStatusSafra}
             />
           </div>
@@ -834,8 +834,8 @@ export default function Listagem({
                       <Button
                         title="Cadastrar safra"
                         value="Cadastrar safra"
-                        disabled={!perm_can_do('/config/tmg/safra', 'create')}
-                        bgColor={!perm_can_do('/config/tmg/safra', 'create') ? 'bg-gray-300' : 'bg-blue-600'}
+                        style={{ display: !perm_can_do('/config/tmg/safra', 'create') ? 'none' : '' }}
+                        bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {
                           setCookies('pageBeforeEdit', currentPage?.toString());

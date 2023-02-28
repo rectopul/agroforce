@@ -44,6 +44,7 @@ import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
 import { functionsUtils } from '../../../../shared/utils/functionsUtils';
+import perm_can_do from '../../../../shared/utils/perm_can_do';
 
 interface IFilter {
   filterFoco: string;
@@ -386,6 +387,7 @@ export default function Listagem({
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.experimentName}`}
+              style={{ display: !perm_can_do('/config/tmg/experimento', 'edit') ? 'none' : '' }}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -409,6 +411,7 @@ export default function Listagem({
             <Button
               title={`Deletar ${rowData.experimentName}`}
               icon={<BsTrashFill size={14} />}
+              style={{ display: !perm_can_do('/config/tmg/experimento', 'delete') ? 'none' : '' }}
               onClick={() => deleteConfirmItem(rowData)}
               disabled={
                 rowData.status != 'IMPORTADO' && rowData.status != 'SORTEADO'
@@ -873,6 +876,7 @@ export default function Listagem({
                         value="Importar"
                         bgColor="bg-blue-600"
                         textColor="white"
+                        style={{ display: !perm_can_do('/config/tmg/experimento', 'import') ? 'none' : '' }}
                         onClick={() => {
                           window.open(
                             '/listas/rd?importar=experimento',

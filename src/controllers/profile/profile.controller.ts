@@ -65,7 +65,8 @@ export class ProfileController {
   async generatePermissions(data: any) {
     try {
       let permissions: any = '';
-      Object.keys(data.selecionados).map(async (key: any) => {
+      const selecionados = Object.keys(data.selecionados);
+      for (const key of selecionados) {
         data.selecionados[key] = data.selecionados[key].replaceAll(/undefined/g, '').split(',').filter((n: any) => n);
 
         for (const item of data.selecionados[key]) {
@@ -78,9 +79,8 @@ export class ProfileController {
             permissionId: Number(permission[0]?.id),
           });
           permissions += `${key} --${item};`;
-          console.log('🚀 ~ file: profile.controller.ts:80 ~ ProfileController ~ data.selecionados[key].forEach ~ permissions:', permissions);
         }
-      });
+      }
       return permissions;
     } catch (error: any) {
       handleError('Perfil  controller', 'Generate Permissions', error.message);
@@ -90,6 +90,9 @@ export class ProfileController {
 
   async update(data: any) {
     try {
+      await this.profilePermissionsRepository.deleteAll({
+        profileId: Number(data.profileId),
+      });
       const permissions = await this.generatePermissions(data);
 
       const { status } = await this.getOne(Number(data.profileId));
@@ -107,13 +110,6 @@ export class ProfileController {
 
   async createProfilePermission(data: any) {
     try {
-      const response = await this.profilePermissionsRepository.findAll({
-        profileId: Number(data.profileId),
-        permissionId: Number(data.permissionId),
-      });
-      if (response.length > 0) {
-        return { status: 200, message: 'Permissão cadastrado' };
-      }
       await this.profilePermissionsRepository.create(data);
       return { status: 200, message: 'Permissão cadastrado' };
     } catch (error: any) {

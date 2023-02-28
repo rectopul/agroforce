@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import React, { useState } from 'react';
+import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 
-import { Button, ModalConfirmation } from "../index";
+import { Button, ModalConfirmation } from '../index';
 
 interface IButtonToogleConfirmation {
   data: any;
@@ -25,14 +25,14 @@ export function ButtonToogleConfirmation({
       <ModalConfirmation
         isOpen={isOpenModal}
         text={`Você tem certeza que deseja ${
-          data?.status == 1 ? "inativar" : "ativar"
+          data?.status == 1 ? 'inativar' : 'ativar'
         } ${text} ${data[keyName]}?`}
         onCancel={() => setIsOpenModal(false)}
         onPress={() => onPress(data)}
       />
       <div className="h-7 w-10">
         <Button
-          title={data?.status == 1 ? "Ativo" : "Inativo"}
+          title={data?.status == 1 ? 'Ativo' : 'Inativo'}
           icon={
             data?.status ? (
               <FaRegThumbsUp size={14} />
@@ -41,7 +41,7 @@ export function ButtonToogleConfirmation({
             )
           }
           onClick={() => setIsOpenModal(true)}
-          bgColor={data?.status == 1 ? "bg-green-600" : "bg-red-800"}
+          bgColor={data?.status == 1 ? 'bg-green-600' : 'bg-red-800'}
           textColor="white"
           {...rest}
         />
