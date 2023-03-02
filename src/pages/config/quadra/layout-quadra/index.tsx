@@ -390,7 +390,7 @@ export default function Listagem({
                   icon={<BiEdit size={14} />}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  style={{ display: !perm_can_do('/config/tmg/layout-quadra', 'edit') ? 'none' : '' }}
+                  style={{ display: !perm_can_do('/config/quadra/layout-quadra', 'edit') ? 'none' : '' }}
                   onClick={() => {
                     setCookies('pageBeforeEdit', currentPage?.toString());
                     setCookies('filterBeforeEdit', filter);
@@ -413,7 +413,7 @@ export default function Listagem({
                   icon={<BiEdit size={14} />}
                   bgColor="bg-blue-600"
                   textColor="white"
-                  style={{ display: !perm_can_do('/config/tmg/layout-quadra', 'edit') ? 'none' : '' }}
+                  style={{ display: !perm_can_do('/config/quadra/layout-quadra', 'edit') ? 'none' : '' }}
                   onClick={() => {
                     setCookies('pageBeforeEdit', currentPage?.toString());
                     setCookies('filterBeforeEdit', filter);
@@ -434,7 +434,7 @@ export default function Listagem({
             data={rowData}
             text="a quadra"
             keyName="name"
-            style={{ display: !perm_can_do('/config/tmg/layout-quadra', 'disable') ? 'none' : '' }}
+            style={{ display: !perm_can_do('/config/quadra/layout-quadra', 'disable') ? 'none' : '' }}
             onPress={handleStatus}
           />
         </div>
@@ -985,7 +985,7 @@ export default function Listagem({
                         value="Importar"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        style={{ display: !perm_can_do('/config/tmg/layout-quadra', 'import') ? 'none' : '' }}
+                        style={{ display: !perm_can_do('/config/quadra/layout-quadra', 'import') ? 'none' : '' }}
                         onClick={() => {
                           window.open(
                             '/listas/rd?importar=layout_quadra',

@@ -134,6 +134,7 @@ export default function NovoLocal({
                     npef: npe.status == 3 ? npe.npef : values.prox_npe,
                     npei_i: values.prox_npe,
                     edited: 1,
+                    userId: userLogado.id,
                   })
                   .then((response) => {
                     if (response.status === 200) {

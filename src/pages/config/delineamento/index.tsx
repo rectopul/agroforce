@@ -280,6 +280,7 @@ export default function Listagem({
         if (response.status === 200 || response.status === 400) {
           setDelineamento(response.response);
           setTotalItems(response.total);
+          setLoading(false);
           tableRef.current.dataManager.changePageSize(
             response.total >= take ? take : response.total,
           );
@@ -323,7 +324,7 @@ export default function Listagem({
         <div className="h-7 flex">
           <div className="ml-1" />
           <ButtonToogleConfirmation
-            style={{ display: !perm_can_do('/config/tmg/delineamento', 'disable') ? 'none' : '' }}
+            style={{ display: !perm_can_do('/config/delineamento/delineamento', 'disable') ? 'none' : '' }}
             data={rowData}
             text="o delineamento"
             keyName="name"
@@ -534,6 +535,7 @@ export default function Listagem({
   }
 
   async function handleStatus(data: IDelineamentoProps): Promise<void> {
+    setLoading(true);
     const parametersFilter = `filterStatus=${1}&id_culture=${cultureId}&name=${
       data?.name
     }`;
@@ -860,7 +862,7 @@ export default function Listagem({
                         title="Importar"
                         value="Importar"
                         bgColor="bg-blue-600"
-                        style={{ display: !perm_can_do('/config/tmg/delineamento', 'import') ? 'none' : '' }}
+                        style={{ display: !perm_can_do('/config/delineamento/delineamento', 'import') ? 'none' : '' }}
                         textColor="white"
                         onClick={() => {
                           window.open(

@@ -387,7 +387,7 @@ export default function Listagem({
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.experimentName}`}
-              style={{ display: !perm_can_do('/config/tmg/experimento', 'edit') ? 'none' : '' }}
+              style={{ display: !perm_can_do('/listas/experimento', 'edit') ? 'none' : '' }}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -411,7 +411,7 @@ export default function Listagem({
             <Button
               title={`Deletar ${rowData.experimentName}`}
               icon={<BsTrashFill size={14} />}
-              style={{ display: !perm_can_do('/config/tmg/experimento', 'delete') ? 'none' : '' }}
+              style={{ display: !perm_can_do('/listas/experimento', 'delete') ? 'none' : '' }}
               onClick={() => deleteConfirmItem(rowData)}
               disabled={
                 rowData.status != 'IMPORTADO' && rowData.status != 'SORTEADO'
@@ -610,7 +610,7 @@ export default function Listagem({
 
     await experimentService
       .getAll(`${filterParam}&excel=${true}`)
-      .then(({ status, response, message }: any) => {
+      .then(({ status, response }: any) => {
         if (status === 200) {
           const workBook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(workBook, response, 'experimentos');
@@ -876,7 +876,7 @@ export default function Listagem({
                         value="Importar"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        style={{ display: !perm_can_do('/config/tmg/experimento', 'import') ? 'none' : '' }}
+                        style={{ display: !perm_can_do('/listas/experimento', 'import') ? 'none' : '' }}
                         onClick={() => {
                           window.open(
                             '/listas/rd?importar=experimento',

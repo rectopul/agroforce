@@ -368,6 +368,7 @@ export default function Listagem({
       id,
       checkedTreatments,
       value,
+      userId: userLogado.id,
     });
     Swal.fire({
       html: message,
@@ -408,32 +409,6 @@ export default function Listagem({
       ),
     };
   }
-
-  // function tecnologiaHeaderFactory(name: string, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: "tecnologia",
-  //     width: 0,
-  //     sorting: true,
-  //     render: (rowData: any) => (
-  //       <div className="h-10 flex">
-  //         <div>
-  //           {`${rowData.genotipo.tecnologia.cod_tec} ${rowData.genotipo.tecnologia.name}`}
-  //         </div>
-  //       </div>
-  //     ),
-  //   };
-  // }
 
   function columnsOrder(columnsCampos: string) {
     const columnCampos: string[] = columnsCampos.split(',');

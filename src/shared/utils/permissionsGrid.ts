@@ -164,6 +164,7 @@ const permissions = [
     route: '/listas/ensaios/genotipos-ensaio',
     permissions: [
       { value: 'view', title: 'Ver', checked: false },
+      { value: 'change', title: 'Substituir', checked: false },
     ],
   },
   {
@@ -179,6 +180,7 @@ const permissions = [
     route: '/listas/parcelas-experimento',
     permissions: [
       { value: 'view', title: 'Ver', checked: false },
+      { value: 'change', title: 'Substituir', checked: false },
     ],
   },
   {
@@ -188,12 +190,14 @@ const permissions = [
       { value: 'edit', title: 'Editar', checked: false },
       { value: 'import', title: 'Importar', checked: false },
       { value: 'delete', title: 'Excluir', checked: false },
+      { value: 'sort', title: 'Sortear', checked: false },
     ],
   },
   {
     route: '/operacao/etiquetagem',
     permissions: [
       { value: 'view', title: 'Ver', checked: false },
+      { value: 'create', title: 'Criar', checked: false },
       { value: 'edit', title: 'Editar', checked: false },
       { value: 'print', title: 'Imprimir', checked: false },
       { value: 'delete', title: 'Excluir', checked: false },
@@ -203,6 +207,12 @@ const permissions = [
     route: '/relatorios/logs',
     permissions: [
       { value: 'view', title: 'Ver', checked: false },
+    ],
+  },
+  {
+    route: 'config/tmg/quadra/alocacao',
+    permissions: [
+      { value: 'import', title: 'Importar', checked: false },
     ],
   },
 ];
