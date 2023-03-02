@@ -200,18 +200,21 @@ export default function AtualizarLocal({
       comments: experimento.comments,
     },
     onSubmit: async (values) => {
+      setLoading(true);
       await experimentService
         .update({
           id: Number(values.id),
           nlp: Number(values.nlp),
           clp: values.clp,
           comments: values.comments,
+          userId: userLogado.id,
         })
         .then((response) => {
           if (response.status === 200) {
             Swal.fire('Experimento atualizado com sucesso!');
             router.back();
           } else {
+            setLoading(false);
             Swal.fire(response.message);
           }
         });
@@ -667,10 +670,11 @@ export default function AtualizarLocal({
 
   return (
     <>
-      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Dados do experimento</title>
       </Head>
+
+      {loading && <ComponentLoading text="" />}
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <AccordionFilter

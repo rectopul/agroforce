@@ -228,6 +228,7 @@ export class ExperimentGroupController {
 
       if (!experimentGroup) return { status: 404, message: 'Grupo de experimento não existente' };
 
+      delete data.userId;
       const response = await this.experimentGroupRepository.update(Number(data.id), data);
 
       return { status: 200, response, message: 'Grupo de experimento atualizado' };

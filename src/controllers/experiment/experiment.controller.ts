@@ -435,6 +435,7 @@ export class ExperimentController {
         await this.reporteController.create({
           userId: data.userId, module: 'EXPERIMENTO', operation: 'EDIÇÃO', oldValue: `${data.nlp}_${data.clp}_${data.comments}`, ip: String(ip),
         });
+        delete data.userId;
         const response = await this.experimentRepository.update(experimento.id, data);
         if (experimento.experimentGroupId) {
           await this.countExperimentGroupChildren(experimento.experimentGroupId);
