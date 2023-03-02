@@ -393,8 +393,6 @@ export class ExperimentController {
          */
         const teste = await this.experimentRepository.relationGroup(data);
 
-        console.log('responseRelation', teste);
-
         if (data.experimentGroupId) {
           const { response: group } = await experimentGroupController.getOne(Number(data.experimentGroupId));
 
@@ -404,7 +402,7 @@ export class ExperimentController {
           await this.reporteController.create({
             userId: data.userId,
             module: 'GRUPO DE ETIQUETAGEM',
-            operation: 'EDIÇÃO',
+            operation: 'ADIÇÃO DE EXPERIMENTO',
             oldValue: group.name,
             ip: String(ip),
           });
@@ -433,6 +431,10 @@ export class ExperimentController {
             delete data.userId;
           }
         }
+        const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+        await this.reporteController.create({
+          userId: data.userId, module: 'EXPERIMENTO', operation: 'EDIÇÃO', oldValue: `${data.nlp}_${data.clp}_${data.comments}`, ip: String(ip),
+        });
         const response = await this.experimentRepository.update(experimento.id, data);
         if (experimento.experimentGroupId) {
           await this.countExperimentGroupChildren(experimento.experimentGroupId);
@@ -449,7 +451,6 @@ export class ExperimentController {
         const transactionConfig = new TransactionConfig();
         const experimentRepositoryTransaction = new ExperimentRepository();
         experimentRepositoryTransaction.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
-        console.log('transactionConfig.transactionScope.run');
         try {
           await transactionConfig.transactionScope.run(async () => {
             for (const row in data) {

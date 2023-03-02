@@ -216,10 +216,11 @@ export default function NovoUsuario({
 
   return (
     <>
-      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Novo usuário</title>
       </Head>
+
+      {loading && <ComponentLoading text="" />}
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form

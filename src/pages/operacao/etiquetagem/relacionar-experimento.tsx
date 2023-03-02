@@ -466,64 +466,17 @@ export default function Listagem({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    await experimentService
-      .getAll(`${filter}&excel=${true}`)
-      .then(({ status, response }: IReturnObject) => {
-        if (status === 200) {
-          const newData = response.map((item: any) => {
-            const newItem = item;
-            newItem.CULTURA = item.assay_list?.safra?.culture?.name;
-            newItem.SAFRA = item.assay_list?.safra?.safraName;
-            newItem.FOCO = item.assay_list?.foco.name;
-            newItem.TIPO_DE_ENSAIO = item.assay_list?.type_assay.name;
-            newItem.TECNOLOGIA = `${item.assay_list?.tecnologia.cod_tec} ${item.assay_list?.tecnologia.name}`;
-            newItem.GLI = item.assay_list?.gli;
-            newItem.NOME_DO_EXPERIMENTO = item?.experimentName;
-            newItem.BGM = item.assay_list?.bgm;
-            newItem.STATUS_ENSAIO = item.assay_list?.status;
-            newItem.PLANTIO = newItem.local?.name_local_culture;
-            newItem.DELINEAMENTO = item.delineamento?.name;
-            newItem.DENSIDADE = item?.density;
-            newItem.REP = item.repetitionsNumber;
-            newItem.ÉPOCA = item?.period;
-            newItem.ORDEM_SORTEIO = item?.orderDraw;
-            newItem.NLP = item?.nlp;
-            newItem.CLP = item?.clp;
-            newItem.OBSERVAÇÕES = item?.comments;
-            newItem.COUNT_NT = newItem.countNT;
-            newItem.NPE_QT = newItem.npeQT;
+    const skip = 0;
+    const take = 10;
 
-            delete newItem.id;
-            delete newItem.safra;
-            delete newItem.experiment_genotipe;
-            delete newItem.seq_delineamento;
-            delete newItem.experimentGroupId;
-            delete newItem.countNT;
-            delete newItem.npeQT;
-            delete newItem.local;
-            delete newItem.delineamento;
-            delete newItem.eel;
-            delete newItem.clp;
-            delete newItem.nlp;
-            delete newItem.orderDraw;
-            delete newItem.comments;
-            delete newItem.period;
-            delete newItem.repetitionsNumber;
-            delete newItem.density;
-            delete newItem.status;
-            delete newItem.experimentName;
-            delete newItem.type_assay;
-            delete newItem.idSafra;
-            delete newItem.assay_list;
-            return newItem;
-          });
-          const workSheet = XLSX.utils.json_to_sheet(newData);
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+
+    await experimentService
+      .getAll(`${filterParam}&excel=${true}`)
+      .then(({ status, response }: any) => {
+        if (status === 200) {
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(
-            workBook,
-            workSheet,
-            'seleção-expe.-para-etiquetagem',
-          );
+          XLSX.utils.book_append_sheet(workBook, response, 'experimentos');
 
           // Buffer
           XLSX.write(workBook, {
@@ -536,7 +489,7 @@ export default function Listagem({
             type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, 'Seleção expe. para etiquetagem.xlsx');
+          XLSX.writeFile(workBook, 'Experimentos.xlsx');
         } else {
           setLoading(false);
           Swal.fire(
@@ -573,7 +526,7 @@ export default function Listagem({
       </div>
     );
   }
-  
+
   async function handleSubmit() {
     setLoading(true);
     const experimentsSelected = rowsSelected.map(
@@ -585,37 +538,31 @@ export default function Listagem({
       idList: experimentsSelected,
       experimentGroupId: Number(experimentGroupId),
       userId: userLogado.id,
-      status: 'ETIQ. NÃO INICIADA'
+      status: 'ETIQ. NÃO INICIADA',
     })
       .then((response) => {
         if (response.status === 200) {
-
           Swal.fire({
-            title: "Experimentos associados com sucesso.",
+            title: 'Experimentos associados com sucesso.',
             showDenyButton: false,
             showCancelButton: false,
-            confirmButtonText: "Ok",
+            confirmButtonText: 'Ok',
           }).then(() => {
             router.back();
-            //router.push("/operacao/ambiente");
+            // router.push("/operacao/ambiente");
           });
-
         } else {
-
           Swal.fire('Erro ao associar experimentos');
-
         }
         setLoading(false);
       })
       .catch((error) => {
-
         setLoading(false);
 
         Swal.fire({
-          title: "Houve ao associar os experimentos ao grupo. ",
+          title: 'Houve ao associar os experimentos ao grupo. ',
           html: error,
         });
-
       });
 
     // const { status }: IReturnObject = await experimentService.update({

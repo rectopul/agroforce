@@ -262,6 +262,7 @@ export default function TipoEnsaio({
         if (response.status === 200 || response.status === 400) {
           setTypeAssay(response.response);
           setTotalItems(response.total);
+          setLoading(false);
           tableRef.current.dataManager.changePageSize(
             response.total >= take ? take : response.total,
           );
@@ -300,6 +301,7 @@ export default function TipoEnsaio({
   }
 
   async function handleStatus(data: any): Promise<void> {
+    setLoading(true);
     await typeAssayService.update({
       id: data?.id,
       status: data?.status === 1 ? 0 : 1,
@@ -324,7 +326,7 @@ export default function TipoEnsaio({
                 <Button
                   icon={<BiEdit size={14} />}
                   title={`Atualizar ${rowData.name}`}
-                  style={{ display: !perm_can_do('/config/tmg/tipo-ensaio', 'edit') ? 'none' : '' }}
+                  style={{ display: !perm_can_do('/config/ensaio/tipo-ensaio', 'edit') ? 'none' : '' }}
                   onClick={() => {
                     setCookies('pageBeforeEdit', currentPage?.toString());
                     setCookies('filterBeforeEdit', filter);
@@ -349,7 +351,7 @@ export default function TipoEnsaio({
                   title={`Atualizar ${rowData.name}`}
                   icon={<BiEdit size={14} />}
                   onClick={() => {}}
-                  style={{ display: !perm_can_do('/config/tmg/tipo-ensaio', 'edit') ? 'none' : '' }}
+                  style={{ display: !perm_can_do('/config/ensaio/tipo-ensaio', 'edit') ? 'none' : '' }}
                   bgColor="bg-blue-600"
                   textColor="white"
                   href={`/config/ensaio/tipo-ensaio/atualizar?id=${rowData.id}`}
@@ -360,7 +362,7 @@ export default function TipoEnsaio({
           <div className="ml-1" />
           <ButtonToogleConfirmation
             data={rowData}
-            style={{ display: !perm_can_do('/config/tmg/tipo-ensaio', 'disable') ? 'none' : '' }}
+            style={{ display: !perm_can_do('/config/ensaio/tipo-ensaio', 'disable') ? 'none' : '' }}
             text="o tipo ensaio"
             keyName="name"
             onPress={handleStatus}
@@ -712,7 +714,7 @@ export default function TipoEnsaio({
                         title="Cadastrar Tipo Ensaio"
                         value="Cadastrar Tipo Ensaio"
                         bgColor="bg-blue-600"
-                        style={{ display: !perm_can_do('/config/tmg/tipo-ensaio', 'create') ? 'none' : '' }}
+                        style={{ display: !perm_can_do('/config/ensaio/tipo-ensaio', 'create') ? 'none' : '' }}
                         textColor="white"
                         onClick={() => {
                           setCookies('pageBeforeEdit', currentPage?.toString());

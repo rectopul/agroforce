@@ -218,6 +218,7 @@ export default function Listagem({
         if (response.status === 200 || response.status === 400) {
           setCultures(response.response);
           setTotalItems(response.total);
+          setLoading(false);
           tableRef.current.dataManager.changePageSize(
             response.total >= take ? take : response.total,
           );
@@ -234,6 +235,7 @@ export default function Listagem({
   }, [typeOrder, filter]);
 
   async function handleStatusCulture(data: any): Promise<void> {
+    setLoading(true);
     await cultureService.updateCulture({
       id: data?.id,
       name: data?.name,
@@ -300,7 +302,6 @@ export default function Listagem({
             <ButtonToogleConfirmation
               data={rowData}
               style={{ display: !perm_can_do('/config/tmg/cultura', 'disable') ? 'none' : '' }}
-              bgColor="bg-red-600"
               text="a cultura"
               keyName="name"
               onPress={handleStatusCulture}

@@ -202,6 +202,7 @@ export default function Listagem({
         if (response.status === 200 || response.status === 400) {
           setItems(response.response);
           setTotalItems(response.total);
+          setLoading(false);
           tableRef.current.dataManager.changePageSize(
             response.total >= take ? take : response.total,
           );
@@ -218,26 +219,7 @@ export default function Listagem({
   }, [typeOrder]);
 
   async function handleStatusItem(data: IDepartment): Promise<void> {
-    // if (data.status === 1) {
-    //   data.status = 0;
-    // } else {
-    //   data.status = 1;
-    // }
-
-    // const index = items.findIndex((item) => item.id === data?.id);
-
-    // if (index === -1) {
-    //   return;
-    // }
-
-    // setItems((oldItem) => {
-    //   const copy = [...oldItem];
-    //   copy[index].status = data.status;
-    //   return copy;
-    // });
-
-    // const { id, status, name } = items[index];
-
+    setLoading(true);
     await departmentService.update({
       id: data?.id,
       name: data?.name,

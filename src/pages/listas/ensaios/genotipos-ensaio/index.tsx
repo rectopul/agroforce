@@ -1524,7 +1524,7 @@ export default function Listagem({
                         title="Substituir"
                         value="Substituir"
                         textColor="white"
-                        style={{ display: !perm_can_do('/config/tmg/genotipos-ensaio', 'change') ? 'none' : '' }}
+                        style={{ display: !perm_can_do('/listas/ensaios/genotipos-ensaio', 'change') ? 'none' : '' }}
                         onClick={() => {
                           setRadioStatus();
                           setIsOpenModal(!isOpenModal);

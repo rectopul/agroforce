@@ -268,6 +268,9 @@ export default function AtualizarUsuario({
       <Head>
         <title>Atualizar Usuário</title>
       </Head>
+
+      {loading && <ComponentLoading text="" />}
+
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded p-8"
