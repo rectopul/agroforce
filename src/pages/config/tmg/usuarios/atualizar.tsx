@@ -82,6 +82,7 @@ export default function AtualizarUsuario({
 
   const userCultures: any = [];
   const userPermissions: any = [];
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
   if (data.users_permissions) {
     Object.keys(data.users_permissions).forEach((_, item) => {
@@ -165,10 +166,11 @@ export default function AtualizarUsuario({
       registration: data.registration,
       departmentId: data.departmentId,
       status: data.status,
-      created_by: data.created_by,
+      created_by: userLogado.id,
       cultures: [],
     },
     onSubmit: async (values) => {
+      setLoading(true);
       validateInputs(values);
       if (
         !values.name
@@ -201,6 +203,7 @@ export default function AtualizarUsuario({
       let input: any;
       const auxObject: any = [];
       let auxObject2: any = [];
+      let auxValidate: boolean = false;
 
       Object.keys(values.cultures).forEach((item: any) => {
         input = document.querySelector(
@@ -212,12 +215,22 @@ export default function AtualizarUsuario({
             auxObject2.push(input.options[i].value);
           }
         }
+        if (values.cultures[item] && auxObject2.length === 0) {
+          auxValidate = true;
+          return;
+        }
         ObjProfiles = {
           cultureId: values.cultures[item],
           profiles: auxObject2,
         };
+
         auxObject.push(ObjProfiles);
       });
+
+      if (auxValidate) {
+        Swal.fire('E preciso escolher um perfil para as culturas selecionadas');
+        return;
+      }
 
       await userService
         .update({
@@ -235,7 +248,7 @@ export default function AtualizarUsuario({
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire('Usuário atualizado com sucesso!');
+            Swal.fire('Usuário atualizado com sucesso. (Caso tenha mudado as permissões de cultura, sera necessário sair e entrar novamente)');
             setLoading(false);
             router.back();
           } else {
@@ -255,6 +268,9 @@ export default function AtualizarUsuario({
       <Head>
         <title>Atualizar Usuário</title>
       </Head>
+
+      {loading && <ComponentLoading text="" />}
+
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
           className="w-full bg-white shadow-md rounded p-8"

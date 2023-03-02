@@ -1,13 +1,14 @@
 import { GroupRepository } from '../repository/group.repository';
 import { ReporteRepository } from '../repository/reporte.repository';
 import handleError from '../shared/utils/handleError';
+import { ReporteController } from './reportes/reporte.controller';
 
 export class GroupController {
   public readonly required = 'Campo obrigatório';
 
   groupRepository = new GroupRepository();
 
-  reporteRepository = new ReporteRepository();
+  reporteController = new ReporteController();
 
   async getOne({ id }: any) {
     try {
@@ -29,10 +30,10 @@ export class GroupController {
       const groupAlreadyExists = await this.groupRepository.findByData(data);
       if (groupAlreadyExists) return { status: 400, message: 'Dados já cadastrados' };
 
+      await this.reporteController.create({
+        userId: data.created_by, module: 'GRUPO DE FOCO', operation: 'CRIAÇÃO', oldValue: data.group, ip: String(ip),
+      });
       const grupo = await this.groupRepository.create(data);
-      // await this.reporteRepository.create({
-      //   madeBy: grupo.created_by, module: 'Foco-Grupo', operation: 'Cadastro', name: JSON.stringify(grupo.id_foco), ip: JSON.stringify(ip), idOperation: grupo.id,
-      // });
 
       return { status: 200, message: 'grupo cadastrado' };
     } catch (error: any) {
@@ -48,11 +49,11 @@ export class GroupController {
       const group: any = await this.groupRepository.findById(data.id);
 
       if (!group) return { status: 400, message: 'grupo não existente' };
-
+      await this.reporteController.create({
+        userId: data.created_by, module: 'GRUPO DE FOCO', operation: 'EDIÇÃO', oldValue: data.group, ip: String(ip),
+      });
       const grupo = await this.groupRepository.update(data.id, data);
-      // await this.reporteRepository.create({
-      //   madeBy: grupo.created_by, module: 'Foco-Grupo', operation: 'Edição', name: JSON.stringify(grupo.id_foco), ip: JSON.stringify(ip), idOperation: grupo.id,
-      // });
+
       return { status: 200, message: 'grupo atualizado' };
     } catch (error: any) {
       handleError('Grupo controller', 'Update', error.message);

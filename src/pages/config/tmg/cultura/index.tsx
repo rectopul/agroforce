@@ -49,6 +49,7 @@ import { cultureService, userPreferencesService } from '../../../../services';
 import ITabs from '../../../../shared/utils/dropdown';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
+import perm_can_do from '../../../../shared/utils/perm_can_do';
 
 interface IFilter {
   filterStatus: object | any;
@@ -217,6 +218,7 @@ export default function Listagem({
         if (response.status === 200 || response.status === 400) {
           setCultures(response.response);
           setTotalItems(response.total);
+          setLoading(false);
           tableRef.current.dataManager.changePageSize(
             response.total >= take ? take : response.total,
           );
@@ -233,24 +235,7 @@ export default function Listagem({
   }, [typeOrder, filter]);
 
   async function handleStatusCulture(data: any): Promise<void> {
-    // if (data.status === 0) {
-    //   data.status = 1;
-    // } else {
-    //   data.status = 0;
-    // }
-
-    // const index = cultures.findIndex((culture) => culture.id === data?.id);
-
-    // if (index === -1) return;
-
-    // setCultures((oldCulture) => {
-    //   const copy = [...oldCulture];
-    //   copy[index].status = data.status;
-    //   return copy;
-    // });
-
-    // const { id, name, desc, status } = cultures[index];
-
+    setLoading(true);
     await cultureService.updateCulture({
       id: data?.id,
       name: data?.name,
@@ -267,33 +252,6 @@ export default function Listagem({
     order: string | any,
     name: string | any,
   ): Promise<void> {
-    // // Manage orders of colunms
-    // const parametersFilter = await tableGlobalFunctions.handleOrderGlobal(column, order, filter, 'safra');
-
-    // const value = await tableGlobalFunctions.skip(currentPage, parametersFilter);
-
-    // await cultureService
-    //   .getAll(value)
-    //   .then((response) => {
-    //     if (response.status === 200) {
-    //       setCultures(response.response);
-    //       setFiltersParams(parametersFilter);
-    //     }
-    //   });
-
-    // if (orderList === 2) {
-    //   setOrder(0);
-    //   setArrowOrder(<AiOutlineArrowDown />);
-    // } else {
-    //   setOrder(orderList + 1);
-    //   if (orderList === 1) {
-    //     setArrowOrder(<AiOutlineArrowUp />);
-    //   } else {
-    //     setArrowOrder('');
-    //   }
-    // }
-
-    // Gobal manage orders
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
@@ -309,76 +267,6 @@ export default function Listagem({
     }, 100);
   }
 
-  // useEffect(()=>{
-  //   removeCookies("filtersParams");
-
-  //   setFilter('filterStatus=1')
-  //   // removeCookies("filterBeforeEdit");
-  // });
-
-  // function headerTableFactory(name: any, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList, name)}
-  //         >
-  //           {name}
-  //         </button>
-  //         {fieldOrder === name && (
-  //           <div className="pl-2">
-  //             {orderList !== 0 ? (
-  //               orderList === 1 ? (
-  //                 <AiOutlineArrowDown size={15} />
-  //               ) : (
-  //                 <AiOutlineArrowUp size={15} />
-  //               )
-  //             ) : null}
-  //           </div>
-  //         )}
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: false,
-  //   };
-  // }
-
-  function idHeaderFactory() {
-    return {
-      title: <div className="flex items-center">{arrowOrder}</div>,
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-9 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="h-9 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
-          </div>
-        </div>
-      )),
-    };
-  }
-
   function statusHeaderFactory() {
     return {
       title: 'Ação',
@@ -392,6 +280,8 @@ export default function Listagem({
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
+              style={{ display: !perm_can_do('/config/tmg/cultura', 'edit') ? 'none' : '' }}
+              bgColor="bg-blue-600"
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -404,7 +294,6 @@ export default function Listagem({
                 localStorage.setItem('pageBeforeEdit', currentPage?.toString());
                 router.push(`/config/tmg/cultura/atualizar?id=${rowData.id}`);
               }}
-              bgColor="bg-blue-600"
               textColor="white"
             />
           </div>
@@ -412,6 +301,7 @@ export default function Listagem({
           <div className="h-7">
             <ButtonToogleConfirmation
               data={rowData}
+              style={{ display: !perm_can_do('/config/tmg/cultura', 'disable') ? 'none' : '' }}
               text="a cultura"
               keyName="name"
               onPress={handleStatusCulture}
@@ -518,13 +408,12 @@ export default function Listagem({
   }
 
   const downloadExcel = async (): Promise<void> => {
-    
     setLoading(true);
 
     const skip = 0;
     const take = 10;
     const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
-    
+
     await cultureService.getAll(filterParam).then(({ status, response }) => {
       if (status === 200) {
         // const newData = response.map((row: any) => {
@@ -545,7 +434,7 @@ export default function Listagem({
         // });
 
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, response, "cultures");
+        XLSX.utils.book_append_sheet(workBook, response, 'cultures');
 
         // Buffer
         XLSX.write(workBook, {
@@ -728,6 +617,7 @@ export default function Listagem({
                       <Button
                         title="Cadastrar cultura"
                         value="Cadastrar cultura"
+                        style={{ display: !perm_can_do('/config/tmg/cultura', 'create') ? 'none' : '' }}
                         bgColor="bg-blue-600"
                         textColor="white"
                         onClick={() => {

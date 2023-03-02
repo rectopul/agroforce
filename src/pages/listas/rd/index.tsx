@@ -57,6 +57,7 @@ import * as ITabs from '../../../shared/utils/dropdown';
 import ComponentLoading from '../../../components/Loading';
 import { functionsUtils } from '../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
+import perm_can_do from '../../../shared/utils/perm_can_do';
 // import { importblob } from '../../../services/azure_services/import_blob_azure';
 // import { ImputtoBase64 } from '../../../components/helpers/funções_helpers';
 
@@ -587,36 +588,6 @@ export default function Import({
     setGeneratesProps(items);
   }
 
-  // async function lastUpdate(tableName: string) {
-  //   switch (tableName) {
-  //     case 'ensaio':
-  //       return (
-  //         <p>00-00-000 00:00:00</p>
-  //       );
-  //     case 'experimento': {
-  //       const { status, response } = await experimentService.getAll({ idSafra });
-  //       let lastExperiment: any = 0;
-  //       if (status === 200) {
-  //         const lastExperimentUpdate = response.map((item: any) => {
-  //           if (lastExperiment < item.created_at) {
-  //             lastExperiment = item.created_at;
-  //           }
-  //         });
-  //         return (
-  //           <p>{lastExperimentUpdate}</p>
-  //         );
-  //       }
-  //       return (
-  //         <p>00-00-000 00:00:00</p>
-  //       );
-  //     }
-  //     default:
-  //       return (
-  //         <p>00-00-000 00:00:00</p>
-  //       );
-  //   }
-  // }
-
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
 
@@ -744,10 +715,13 @@ export default function Import({
   }
 
   function ComponentImport({
-    title, table, moduleId, disabled = false,
+    title, table, moduleId, disabled = false, style,
   }: any) {
     return (
-      <div className="m-4 grid grid-cols-3 gap-4 h-20 items-center">
+      <div
+        style={style}
+        className="m-4 grid grid-cols-3 gap-4 h-20 items-center"
+      >
         <div className="h-16 w-16 flex items-center mr-1">
           <Button
             textColor="white"
@@ -818,7 +792,16 @@ export default function Import({
 
               <TabPanel value={value} index={0}>
                 {(Router?.importar == 'rd' || !Router.importar) && (
-                  <ComponentImport title="Cadastros RD" table="" moduleId={0} />
+                  <ComponentImport
+                    title="Cadastros RD"
+                    table=""
+                    moduleId={0}
+                    style={{
+                      display: (!perm_can_do('/config/tmg/genotipo', 'import')
+                    || !perm_can_do('/config/ensaio/tecnologia', 'import')
+                    || !perm_can_do('/config/local/lugar-local', 'import')) ? 'none' : '',
+                    }}
+                  />
                 )}
 
                 {(Router?.importar == 'ensaio' || !Router?.importar) && (
@@ -826,6 +809,9 @@ export default function Import({
                     title="Importar Lista de Ensaio"
                     table="ASSAY_LIST"
                     moduleId={26}
+                    style={{
+                      display: !perm_can_do('/listas/ensaios/ensaio', 'import') ? 'none' : '',
+                    }}
                   />
                 )}
 
@@ -834,6 +820,9 @@ export default function Import({
                     title="Importar Subs. de genótipo/nca Ensaio"
                     table="GENOTYPE_TREATMENT"
                     moduleId={27}
+                    style={{
+                      display: !perm_can_do('/listas/ensaios/genotipos-ensaio', 'change') ? 'none' : '',
+                    }}
                   />
                 )}
 
@@ -842,6 +831,9 @@ export default function Import({
                     title="Importar Lista de Experimento"
                     table="EXPERIMENT"
                     moduleId={22}
+                    style={{
+                      display: !perm_can_do('/listas/experimento', 'import') ? 'none' : '',
+                    }}
                   />
                 )}
 
@@ -851,6 +843,9 @@ export default function Import({
                     title="Importar Subs. de genótipo/nca Experimento"
                     table="PARCELS"
                     moduleId={30}
+                    style={{
+                      display: !perm_can_do('/listas/parcelas-experimento', 'change') ? 'none' : '',
+                    }}
                   />
                 )}
 
@@ -863,6 +858,9 @@ export default function Import({
                     title="Importar Delineamento"
                     table="DELIMITATION"
                     moduleId={7}
+                    style={{
+                      display: !perm_can_do('/config/delineamento/delineamento', 'change') ? 'none' : '',
+                    }}
                   />
                 )}
 
@@ -871,6 +869,9 @@ export default function Import({
                     title="Importar Ambiente"
                     table="NPE"
                     moduleId={14}
+                    style={{
+                      display: !perm_can_do('/operacao/ambiente', 'change') ? 'none' : '',
+                    }}
                   />
                 )}
 
@@ -879,6 +880,9 @@ export default function Import({
                     title="Importar Layout de quadra"
                     table="BLOCK_LAYOUT"
                     moduleId={5}
+                    style={{
+                      display: !perm_can_do('/config/quadra/layout-quadra', 'change') ? 'none' : '',
+                    }}
                   />
                 )}
 
@@ -887,6 +891,9 @@ export default function Import({
                     title="Importar Quadra"
                     table="BLOCK"
                     moduleId={17}
+                    style={{
+                      display: !perm_can_do('/config/quadra', 'change') ? 'none' : '',
+                    }}
                   />
                 )}
 
@@ -896,6 +903,9 @@ export default function Import({
                     title="Importar Alocação de quadra"
                     table="ALLOCATION"
                     moduleId={31}
+                    style={{
+                      display: !perm_can_do('config/tmg/quadra/alocacao', 'import') ? 'none' : '',
+                    }}
                   />
                 )}
                 {(Router?.importar == 'etiquetas_impressas'
@@ -905,6 +915,9 @@ export default function Import({
                     title="Importar Etiquetas Impressas"
                     table="TAG_PRINTED" // AINDA NÃO SEI NOME CORRETO
                     moduleId={0} // AINDA NÃO SEI CODIGO CORRETO
+                    style={{
+                      display: !perm_can_do('/operacao/etiquetagem', 'print') ? 'none' : '',
+                    }}
                   />
                 )}
               </TabPanel>

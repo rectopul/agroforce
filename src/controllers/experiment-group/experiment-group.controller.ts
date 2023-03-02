@@ -210,10 +210,13 @@ export class ExperimentGroupController {
 
   async update(data: any) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
       const experimentGroup: any = await this.experimentGroupRepository.findById(data.id);
 
-      // if origin data from edit experimentGroup [operacao/etiquetagem/atualizar?id=]
       if (data.safraId && data.name) {
+        await this.reporteController.create({
+          userId: data.userId, module: 'GRUPO DE ETIQUETAGEM', operation: 'EDIÇÃO', oldValue: data.name, ip: String(ip),
+        });
         const { response: validate }: any = await this.getAll({
           safraId: data.safraId,
           filterExperimentGroup: data.name,
@@ -271,7 +274,7 @@ export class ExperimentGroupController {
           tagsPrinted += 1;
         }
       });
-    });/**/
+    });/* */
 
     for (const experiment of response.experiment) {
       for (const parcelas of experiment.experiment_genotipe) {
@@ -291,7 +294,7 @@ export class ExperimentGroupController {
       tagsPrinted,
     });
 
-    if(createGroup !== true) {
+    if (createGroup !== true) {
       if (typeof idExperiment === 'number') {
         await this.experimentController.handleExperimentStatus(idExperiment);
       } else {
@@ -299,11 +302,9 @@ export class ExperimentGroupController {
           await this.experimentController.handleExperimentStatus(<number>experimentId);
         }
       }
-      
     }
 
     await this.handleGroupStatus(id);
-    
   }
 
   async handleGroupStatus(id: number) {
@@ -332,7 +333,7 @@ export class ExperimentGroupController {
     } else {
       status = 'ETIQ. EM ANDAMENTO';
     }
-    
+
     await this.update({ id, status });
   }
 }

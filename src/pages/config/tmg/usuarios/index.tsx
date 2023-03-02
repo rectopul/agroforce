@@ -46,6 +46,7 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
 import ComponentLoading from '../../../../components/Loading';
+import perm_can_do from '../../../../shared/utils/perm_can_do';
 
 interface IUsers {
   id: number;
@@ -242,6 +243,7 @@ export default function Listagem({
         if (response.status === 200 || response.status === 400) {
           setUsers(response.response);
           setTotalItems(response.total); // Set new total records
+          setLoading(false);
           tableRef.current.dataManager.changePageSize(
             response.total >= take ? take : response.total,
           );
@@ -257,98 +259,14 @@ export default function Listagem({
     callingApi(filter);
   }, [typeOrder]);
 
-  // function headerTableFactory(name: any, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList, name)}
-  //         >
-  //           {name}
-  //         </button>
-  //         {fieldOrder === name && (
-  //           <div className="pl-2">
-  //             {orderList !== 0 ? (
-  //               orderList === 1 ? (
-  //                 <AiOutlineArrowDown size={15} />
-  //               ) : (
-  //                 <AiOutlineArrowUp size={15} />
-  //               )
-  //             ) : null}
-  //           </div>
-  //         )}
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: false,
-  //   };
-  // }
-
-  function headerTableTelFactory(name: any, title: string) {
-    return {
-      title: (
-        <div className="flex items-center">
-          <button
-            className="font-medium text-gray-900"
-            onClick={() => handleOrder(title, orderList, name)}
-          >
-            {name}
-          </button>
-          {fieldOrder === name && (
-            <div className="pl-2">
-              {orderList !== 0 ? (
-                orderList === 1 ? (
-                  <AiOutlineArrowDown size={15} />
-                ) : (
-                  <AiOutlineArrowUp size={15} />
-                )
-              ) : null}
-            </div>
-          )}
-        </div>
-      ),
-      field: title,
-      sorting: false,
-      render: (rowData: IUsers) => handleFormatTel(rowData.tel),
-    };
-  }
-
   async function handleStatus(data: any): Promise<void> {
-    // if (data.status === 1) {
-    //   data.status = 0;
-    // } else {
-    //   data.status = 1;
-    // }
-
-    // const index = users.findIndex((user) => user.id === data?.id);
-
+    setLoading(true);
     await userService.update({
       id: data?.id,
       name: data?.name,
       status: data.status == 1 ? 0 : 1,
       created_by: userLogado.id,
     });
-
-    // if (index === -1) return;
-
-    // setUsers((oldUser) => {
-    //   const copy = [...oldUser];
-    //   copy[index].status = data.status;
-    //   return copy;
-    // });
-
-    // const { id, name, login, tel, status, avatar } = users[index];
-
-    // await userService.update({
-    //   id,
-    //   name,
-    //   login,
-    //   tel,
-    //   status,
-    //   avatar,
-    //   created_by: userLogado.id,
-    // });
 
     handlePagination(currentPage);
   }
@@ -400,6 +318,7 @@ export default function Listagem({
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
+              style={{ display: !perm_can_do('/config/tmg/usuarios', 'edit') ? 'none' : '' }}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -420,6 +339,7 @@ export default function Listagem({
             <ButtonToogleConfirmation
               data={rowData}
               text="o usuário"
+              style={{ display: !perm_can_do('/config/tmg/usuarios', 'disable') ? 'none' : '' }}
               keyName="name"
               onPress={handleStatus}
             />
@@ -824,8 +744,9 @@ export default function Listagem({
                       <Button
                         title="Cadastrar usuário"
                         value="Cadastrar usuário"
-                        bgColor="bg-blue-600"
                         textColor="white"
+                        bgColor="bg-blue-600"
+                        style={{ display: !perm_can_do('/config/tmg/usuarios', 'create') ? 'none' : '' }}
                         onClick={() => {
                           setCookies('pageBeforeEdit', currentPage?.toString());
                           setCookies('filterBeforeEdit', filter);

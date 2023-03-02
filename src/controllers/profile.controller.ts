@@ -5,7 +5,7 @@ export class ProfileController {
 
   async getAllProfiles() {
     try {
-      const response = await this.profileRepository.findAll();
+      const response = await this.profileRepository.findAll({});
       return response;
     } catch (err) {
 

@@ -43,6 +43,7 @@ import { functionsUtils } from '../../../shared/utils/functionsUtils';
 import { tableGlobalFunctions } from '../../../helpers';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../components/Loading';
+import perm_can_do from '../../../shared/utils/perm_can_do';
 
 interface INpeProps {
   id: number | any;
@@ -391,6 +392,7 @@ export default function Listagem({
               bgColor={rowData.edited === 1 ? 'bg-blue-900' : 'bg-blue-600'}
               textColor="white"
               title="Editar"
+              style={{ display: !perm_can_do('/operacao/ambiente', 'edit') ? 'none' : '' }}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -408,6 +410,7 @@ export default function Listagem({
           <ButtonDeleteConfirmation
             data={rowData}
             keyName={rowData?.local?.name_local_culture}
+            style={{ display: !perm_can_do('/operacao/ambiente', 'delete') ? 'none' : '' }}
             onPress={deleteItem}
             disabled={rowData.status === 3}
           />
@@ -1046,6 +1049,7 @@ export default function Listagem({
                           value="Importar"
                           bgColor="bg-blue-600"
                           textColor="white"
+                          style={{ display: !perm_can_do('/operacao/ambiente', 'import') ? 'none' : '' }}
                           onClick={() => {
                             window.open(
                               '/listas/rd?importar=ambiente',
@@ -1066,6 +1070,7 @@ export default function Listagem({
                           }
                           textColor="white"
                           disabled={selectedNPE.length <= 0}
+                          style={{ display: !perm_can_do('/operacao/ambiente', 'sort') ? 'none' : '' }}
                           onClick={() => {
                             selectedNPE.sort((a, b) => a.prox_npe - b.prox_npe);
                             localStorage.setItem(

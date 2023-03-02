@@ -6,6 +6,7 @@ type ITypeButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   title?: string;
   type?: string;
   onClick: () => any;
+  style?: any;
   icon?: string | ReactNode;
   bgColor?: string;
   textColor?: string;
@@ -22,6 +23,7 @@ export function Button({
   type,
   icon,
   onClick,
+  style,
   textColor,
   bgColor,
   hoverBgColor,
@@ -42,6 +44,7 @@ export function Button({
       disabled={disabled}
       type={type}
       onClick={onClick}
+      style={style}
       className={`w-full h-full
         flex justify-center items-center gap-2
         px-3 

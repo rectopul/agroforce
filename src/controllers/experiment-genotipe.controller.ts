@@ -13,6 +13,7 @@ import { ReporteController } from './reportes/reporte.controller';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 import { prisma } from '../pages/api/db/db';
+import { NpeController } from './npe/npe.controller';
 
 export class ExperimentGenotipeController {
   private ExperimentGenotipeRepository = new ExperimentGenotipeRepository();
@@ -490,9 +491,11 @@ export class ExperimentGenotipeController {
   }
 
   async create({
-    experiment_genotipo, gt, experimentObj, npeToUpdate,
+    experiment_genotipo, gt, experimentObj, npeToUpdate, userId,
   }: object | any) {
+    const npeController = new NpeController();
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
       const response = await prisma?.$transaction(async (tx) => {
         await gt.map(async (gen_treatment: any) => {
           await tx.genotype_treatment.update({
@@ -517,6 +520,11 @@ export class ExperimentGenotipeController {
         });
 
         await npeToUpdate.map(async (npe: any) => {
+          const { response: newNpe }: IReturnObject = await npeController.getOne(Number(npe.id));
+          const concat = `${newNpe.local.name_local_culture}_${newNpe.safra.safraName}_${newNpe.foco.name}_${newNpe.group.group}_${newNpe.type_assay.name}_${newNpe.tecnologia.cod_tec} ${newNpe.tecnologia.name}_${newNpe.epoca}_${newNpe.npei}_${newNpe.prox_npe}`;
+          await this.reporteController.create({
+            userId, module: 'AMBIENTE', operation: 'SORTEIO', oldValue: concat, ip: String(ip),
+          });
           await tx.npe.update({
             where: {
               id: npe.id,
@@ -548,7 +556,6 @@ export class ExperimentGenotipeController {
   }
 
   async getOne(id: number) {
-    console.log('🚀 ~ file: experiment-genotipe.controller.ts:535 ~ ExperimentGenotipeController ~ getOne ~ id:', id);
     try {
       const response = await this.ExperimentGenotipeRepository.findById(id);
 
@@ -707,7 +714,7 @@ export class ExperimentGenotipeController {
   async setStatus({ idList: idExperiment, status }: any) {
     try {
       const experimentsGroupIds:number[] = [];
-      await this.ExperimentGenotipeRepository.updateStatus(idExperiment,status);
+      await this.ExperimentGenotipeRepository.updateStatus(idExperiment, status);
       for (const id of idExperiment) {
         console.log('const id of idExperiment', id, idExperiment);
         const { response }: any = await this.experimentController.getOne(Number(id));
@@ -720,11 +727,11 @@ export class ExperimentGenotipeController {
         //   idExperiment,
         // );
       }
-      
-      for(const id of experimentsGroupIds){
-        await this.experimentGroupController.countEtiqueta(id,idExperiment, (status === 'EM ETIQUETAGEM'));
+
+      for (const id of experimentsGroupIds) {
+        await this.experimentGroupController.countEtiqueta(id, idExperiment, (status === 'EM ETIQUETAGEM'));
       }
-      
+
       // idExperiment.map(async (id: number) => {
       //   const { response }: any = await this.experimentController.getOne(id);
       //   await this.experimentGroupController.countEtiqueta(
@@ -732,9 +739,8 @@ export class ExperimentGenotipeController {
       //     idExperiment,
       //   );
       // });
-      
     } catch (error: any) {
-      handleError('Parcelas controller', 'setStatus', error.message + ' :: '+ JSON.stringify(error));
+      handleError('Parcelas controller', 'setStatus', `${error.message} :: ${JSON.stringify(error)}`);
       throw new Error('[Controller] - setStatus Parcelas erro');
     }
   }

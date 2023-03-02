@@ -46,6 +46,7 @@ import { tableGlobalFunctions } from '../../../helpers';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../components/Loading';
 import { functionsUtils } from '../../../shared/utils/functionsUtils';
+import perm_can_do from '../../../shared/utils/perm_can_do';
 
 interface IDelineamentoProps {
   id: number | any;
@@ -279,6 +280,7 @@ export default function Listagem({
         if (response.status === 200 || response.status === 400) {
           setDelineamento(response.response);
           setTotalItems(response.total);
+          setLoading(false);
           tableRef.current.dataManager.changePageSize(
             response.total >= take ? take : response.total,
           );
@@ -322,6 +324,7 @@ export default function Listagem({
         <div className="h-7 flex">
           <div className="ml-1" />
           <ButtonToogleConfirmation
+            style={{ display: !perm_can_do('/config/delineamento/delineamento', 'disable') ? 'none' : '' }}
             data={rowData}
             text="o delineamento"
             keyName="name"
@@ -396,6 +399,7 @@ export default function Listagem({
                 >
                   <Button
                     icon={<AiOutlineTable size={14} />}
+                    style={{ display: !perm_can_do('/config/delineamento/delineamento/sequencia-delineamento', 'view') ? 'none' : '' }}
                     onClick={() => {
                       setCookies('pageBeforeEdit', currentPage?.toString());
                       setCookies('filterBeforeEdit', filter);
@@ -531,6 +535,7 @@ export default function Listagem({
   }
 
   async function handleStatus(data: IDelineamentoProps): Promise<void> {
+    setLoading(true);
     const parametersFilter = `filterStatus=${1}&id_culture=${cultureId}&name=${
       data?.name
     }`;
@@ -857,6 +862,7 @@ export default function Listagem({
                         title="Importar"
                         value="Importar"
                         bgColor="bg-blue-600"
+                        style={{ display: !perm_can_do('/config/delineamento/delineamento', 'import') ? 'none' : '' }}
                         textColor="white"
                         onClick={() => {
                           window.open(

@@ -1,5 +1,7 @@
-import Link from "next/link";
-import { ReactNode } from "react";
+/* eslint-disable jsx-a11y/anchor-is-valid */
+import Link from 'next/link';
+import { ReactNode } from 'react';
+import perm_can_do from '../../shared/utils/perm_can_do';
 
 interface IDropDownProps {
   label: string;
@@ -7,7 +9,9 @@ interface IDropDownProps {
   icon: string | ReactNode;
 }
 
-export function DropDown({ label, href, icon }: IDropDownProps) {
+export function DropDown({
+  label, href, icon,
+}: IDropDownProps) {
   return (
     <ul
       className="
@@ -29,7 +33,7 @@ export function DropDown({ label, href, icon }: IDropDownProps) {
             duration-300
             hover:text-blue-600
             "
-            href={href}
+            href={!perm_can_do(`${href}`, 'view') ? href : '#'}
           >
             {icon}
             {label}

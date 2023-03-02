@@ -203,7 +203,7 @@ export default function NovoUsuario({
         })
         .then((response) => {
           if (response.status === 200) {
-            Swal.fire('Usuário cadastrado com sucesso!');
+            Swal.fire('Usuário cadastrado com sucesso. (Caso tenha mudado as permissões de cultura, sera necessário sair e entrar novamente)');
             setLoading(false);
             router.back();
           } else {
@@ -216,10 +216,11 @@ export default function NovoUsuario({
 
   return (
     <>
-       {loading && <ComponentLoading text="" />}
       <Head>
         <title>Novo usuário</title>
       </Head>
+
+      {loading && <ComponentLoading text="" />}
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
         <form
@@ -490,7 +491,7 @@ export default function NovoUsuario({
                 textColor="white"
                 icon={<FiUserPlus size={18} />}
                 onClick={() => {
-                  
+
                 }}
               />
             </div>

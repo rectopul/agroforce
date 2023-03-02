@@ -62,6 +62,7 @@ import { functionsUtils } from '../../../../shared/utils/functionsUtils';
 import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
+import perm_can_do from '../../../../shared/utils/perm_can_do';
 
 export default function Listagem({
   allTreatments,
@@ -1523,6 +1524,7 @@ export default function Listagem({
                         title="Substituir"
                         value="Substituir"
                         textColor="white"
+                        style={{ display: !perm_can_do('/listas/ensaios/genotipos-ensaio', 'change') ? 'none' : '' }}
                         onClick={() => {
                           setRadioStatus();
                           setIsOpenModal(!isOpenModal);
