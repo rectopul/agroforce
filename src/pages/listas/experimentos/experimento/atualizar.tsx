@@ -537,47 +537,18 @@ export default function AtualizarLocal({
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
-    // const newResponse: any = [];
-    // let newTake = 500;
-    // while (newTake < total) {
-    //   experimentGenotipeService.getAll(`${filter}&take=${newTake}&skip=${Number(newTake - 500)}`).then(({ response }: any) => {
-    //     newResponse.push(response);
-    //   });
-    //   newTake += 500;
-    // }
+
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
+
     await experimentGenotipeService
-      .getAll(filter)
+      .getAll(filterParam)
       .then(({ status, response }) => {
         if (status === 200) {
-          const newData = response.map((item: any) => {
-            const newItem: any = {};
-            newItem.CULTURA = item.safra.culture.name;
-            newItem.SAFRA = item.safra.safraName;
-            newItem.FOCO = item.foco.name;
-            newItem.ENSAIO = item.type_assay.name;
-            newItem.TECNOLOGIA = `${item.tecnologia.cod_tec} ${item.tecnologia.name}`;
-            newItem.GLI = item.gli;
-            newItem.BGM = item.bgm;
-            newItem.EXPERIMENTO = item.experiment.experimentName;
-            newItem.LUGAR_DE_PLANTIO = item.experiment.local.name_local_culture;
-            newItem.DELINEAMENTO = item.experiment.delineamento.name;
-            newItem.REP = item.rep;
-            newItem.NT = item.nt;
-            newItem.NPE = item.npe;
-            newItem.STATUS_T = item.status_t;
-            newItem.NOME_DO_GENÓTIPO = item.genotipo.name_genotipo;
-            newItem.NCA = item.nca;
-            newItem.STATUS_EXP = item.experiment.status;
-            newItem.STATUS_PARC = item.status;
-            
-
-            delete newItem.id;
-            return newItem;
-          });
-          const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Parcela do experimento');
-
+          XLSX.utils.book_append_sheet(workBook, response, 'Parcelas');
           // Buffer
           XLSX.write(workBook, {
             bookType: 'xlsx', // xlsx
@@ -589,7 +560,7 @@ export default function AtualizarLocal({
             type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, 'Parcela do experimento.xlsx');
+          XLSX.writeFile(workBook, 'Parcelas.xlsx');
         } else {
           setLoading(false);
           Swal.fire(

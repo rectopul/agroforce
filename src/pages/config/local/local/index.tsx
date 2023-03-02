@@ -356,7 +356,7 @@ export default function Listagem({
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name_local_culture}`}
-              style={{ display: !perm_can_do('/config/tmg/local', 'edit') ? 'none' : '' }}
+              style={{ display: !perm_can_do('/config/local/lugar-local', 'edit') ? 'none' : '' }}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -791,7 +791,7 @@ export default function Listagem({
                         value="Importar"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        style={{ display: !perm_can_do('/config/tmg/local', 'import') ? 'none' : '' }}
+                        style={{ display: !perm_can_do('/config/local/lugar-local', 'import') ? 'none' : '' }}
                         onClick={() => {
                           window.open('/listas/rd?importar=rd', '_blank');
                         }}

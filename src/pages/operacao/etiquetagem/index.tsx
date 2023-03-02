@@ -195,8 +195,6 @@ export default function Listagem({
     currentPage * Number(take)
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
-  const [isLoading, setIsLoading] = useState(false);
-
   const [isOpenModalConfirm, setIsOpenModalConfirm] = useState<boolean>(false);
   const [itemSelectedDelete, setItemSelectedDelete] = useState<any>(null);
 
@@ -324,8 +322,8 @@ export default function Listagem({
   }
 
   async function deleteItem() {
+    setLoading(true);
     setIsOpenModalConfirm(false);
-    setIsLoading(true);
 
     const { status, message } = await experimentGroupService.deleted(
       {
@@ -377,7 +375,7 @@ export default function Listagem({
             <Button
               title={`Editar ${rowData.name}`}
               type="button"
-              style={{ display: !perm_can_do('/config/tmg/etiquetagem', 'edit') ? 'none' : '' }}
+              style={{ display: !perm_can_do('/operacao/etiquetagem', 'edit') ? 'none' : '' }}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -399,7 +397,7 @@ export default function Listagem({
             <Button
               title=""
               type="button"
-              style={{ display: !perm_can_do('/config/tmg/etiquetagem', 'print') ? 'none' : '' }}
+              style={{ display: !perm_can_do('/operacao/etiquetagem', 'print') ? 'none' : '' }}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -425,7 +423,7 @@ export default function Listagem({
               }
               title={`Excluir ${rowData.name}`}
               type="button"
-              style={{ display: !perm_can_do('/config/tmg/etiquetagem', 'delete') ? 'none' : '' }}
+              style={{ display: !perm_can_do('/operacao/etiquetagem', 'delete') ? 'none' : '' }}
               onClick={() => {
                 deleteConfirmItem(rowData);
               }}
@@ -731,11 +729,11 @@ export default function Listagem({
 
   return (
     <>
-      {loading && <ComponentLoading text="" />}
-
       <Head>
         <title>Listagem de Grupo de etiquetagem</title>
       </Head>
+
+      {loading && <ComponentLoading text="" />}
 
       <ModalConfirmation
         isOpen={isOpenModalConfirm}
@@ -768,68 +766,6 @@ export default function Listagem({
           </div>
         </form>
       </ModalComponent>
-
-      {/* <Modal
-        isOpen={isOpenModal}
-        shouldCloseOnOverlayClick={false}
-        shouldCloseOnEsc={false}
-        onRequestClose={() => { setIsOpenModal(!isOpenModal); }}
-        overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
-        className="flex
-          flex-col
-          w-full
-          h-64
-          max-w-xl
-          bg-gray-50
-          rounded-tl-2xl
-          rounded-tr-2xl
-          rounded-br-2xl
-          rounded-bl-2xl
-          pt-2
-          pb-4
-          px-8
-          relative
-          shadow-lg
-          shadow-gray-900/50"
-      >
-        <form className="flex flex-col">
-          <button
-            type="button"
-            className="flex absolute top-4 right-3 justify-end"
-            onClick={() => {
-              setIsOpenModal(!isOpenModal);
-            }}
-          >
-            <RiCloseCircleFill size={35} className="fill-red-600 hover:fill-red-800" />
-          </button>
-
-          <div className="flex flex-col px-4  justify-between">
-            <header className="flex flex-col mt-2">
-              <h2 className="mb-2 text-blue-600 text-xl font-medium">Cadastrar grupo</h2>
-            </header>
-            <div style={{ height: 25 }} />
-            <h2 style={{ marginBottom: 5 }}>Nome do grupo</h2>
-            <Input
-              type="text"
-              placeholder="Nome do grupo"
-              id="inputName"
-              name="inputName"
-            />
-          </div>
-          <div className="flex justify-end py-11">
-            <div className="h-10 w-40">
-              <button
-                type="submit"
-                value="Cadastrar"
-                className="w-full h-full ml-auto mt-6 bg-green-600 text-white px-8 rounded-lg text-sm hover:bg-green-800"
-                onClick={(e) => handleSubmit(e)}
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
-        </form>
-      </Modal> */}
 
       <Content contentHeader={tabsEtiquetagemMenu} moduloActive="operacao">
         <main
@@ -865,25 +801,6 @@ export default function Listagem({
                     'filterExperimentGroup',
                     'Grupo de etiquetagem',
                   )}
-                  {/* {filterFieldFactory(
-                    "filterQuantityExperiment",
-                    "Qtde. exp.",
-                    true
-                  )} */}
-                  {/* {filterFieldFactory(
-                    "filterTagsToPrint",
-                    "Total etiq. a imprimir"
-                  )} */}
-                  {/* {filterFieldFactory(
-                    "filterTagsPrinted",
-                    "Total etiq. impressas"
-                  )} */}
-                  {/* {filterFieldFactory(
-                    "filterTotalTags",
-                    "Total etiquetas",
-                    true
-                  )} */}
-                  {/* {filterFieldFactory("filterStatus", "Status", true)} */}
 
                   <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
@@ -1103,7 +1020,7 @@ export default function Listagem({
                         title="Criar novo grupo"
                         value="Criar novo grupo"
                         textColor="white"
-                        style={{ display: !perm_can_do('/config/tmg/etiquetagem', 'create') ? 'none' : '' }}
+                        style={{ display: !perm_can_do('/operacao/etiquetagem', 'create') ? 'none' : '' }}
                         onClick={() => {
                           setIsOpenModal(!isOpenModal);
                         }}

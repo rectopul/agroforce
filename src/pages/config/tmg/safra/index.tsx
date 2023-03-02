@@ -242,12 +242,12 @@ export default function Listagem({
         if (response.status === 200 || response.status === 400) {
           setSafras(response.response);
           setTotalItems(response.total);
+          setLoading(false);
           tableRef.current.dataManager.changePageSize(
             // response.total >= take ? take : response.total,
             20,
           );
         }
-        setLoading(false);
       })
       .catch((_) => {
         setLoading(false);
@@ -260,109 +260,14 @@ export default function Listagem({
   }, [typeOrder]);
 
   async function handleStatusSafra(data: ISafra): Promise<void> {
-    // if (data.status === 1) {
-    //   data.status = 0;
-    // } else {
-    //   data.status = 1;
-    // }
-
-    // const index = safras.findIndex((safra) => safra.id === data?.id);
-
-    // if (index === -1) {
-    //   return;
-    // }
-
+    setLoading(true);
     await safraService.updateSafras({
       id: data?.id,
       status: data?.status === 1 ? 0 : 1,
     });
 
-    // setSafras((oldSafra) => {
-    //   const copy = [...oldSafra];
-    //   copy[index].status = data.status;
-    //   return copy;
-    // });
-
-    // const { id, safraName, year, plantingStartTime, plantingEndTime, status } =
-    //   safras[index];
-
-    // await safraService.updateSafras({
-    //   id,
-    //   safraName,
-    //   year,
-    //   plantingStartTime,
-    //   plantingEndTime,
-    //   status,
-    // });
-
     handlePagination(currentPage);
   }
-
-  // async function handleOrder(
-  //   column: string,
-  //   order: string | any,
-  // ): Promise<void> {
-  //   let typeOrder: any;
-  //   let parametersFilter: any;
-  //   if (order === 1) {
-  //     typeOrder = 'asc';
-  //   } else if (order === 2) {
-  //     typeOrder = 'desc';
-  //   } else {
-  //     typeOrder = '';
-  //   }
-  //   setOrderBy(column);
-  //   setOrderType(typeOrder);
-  //   if (filter && typeof filter !== 'undefined') {
-  //     if (typeOrder !== '') {
-  //       parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-  //     } else {
-  //       parametersFilter = filter;
-  //     }
-  //   } else if (typeOrder !== '') {
-  //     parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-  //   } else {
-  //     parametersFilter = filter;
-  //   }
-
-  //   await safraService
-  //     .getAll(`${parametersFilter}&skip=0&take=${take}`)
-  //     .then((response) => {
-  //       if (response.status === 200) {
-  //         setSafras(response.response);
-  //       }
-  //     });
-
-  //   if (orderList === 2) {
-  //     setOrder(0);
-  //     setArrowOrder(<AiOutlineArrowDown />);
-  //   } else {
-  //     setOrder(orderList + 1);
-  //     if (orderList === 1) {
-  //       setArrowOrder(<AiOutlineArrowUp />);
-  //     } else {
-  //       setArrowOrder('');
-  //     }
-  //   }
-  // }
-
-  // function headerTableFactory(name: any, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: true,
-  //   };
-  // }
 
   function idHeaderFactory() {
     return {
@@ -436,7 +341,6 @@ export default function Listagem({
               text="a safra"
               keyName="safraName"
               style={{ display: !perm_can_do('/config/tmg/safra', 'disable') ? 'none' : '' }}
-              bgColor="bg-red-600"
               onPress={handleStatusSafra}
             />
           </div>

@@ -432,7 +432,7 @@ export default function Listagem({
               bgColor="bg-blue-600"
               textColor="white"
               title={`Editar ${rowData.cod_quadra}`}
-              style={{ display: !perm_can_do('/config/tmg/quadra', 'edit') ? 'none' : '' }}
+              style={{ display: !perm_can_do('/config/quadra', 'edit') ? 'none' : '' }}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -449,7 +449,7 @@ export default function Listagem({
             data={rowData}
             text="a quadra"
             keyName="name"
-            style={{ display: !perm_can_do('/config/tmg/quadra', 'disable') ? 'none' : '' }}
+            style={{ display: !perm_can_do('/config/quadra', 'disable') ? 'none' : '' }}
             onPress={handleStatus}
           />
         </div>
@@ -1003,7 +1003,7 @@ export default function Listagem({
                         value="Importar"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        style={{ display: !perm_can_do('/config/tmg/quadra', 'import') ? 'none' : '' }}
+                        style={{ display: !perm_can_do('/config/quadra', 'import') ? 'none' : '' }}
                         onClick={() => {
                           setModalImport(true);
                         }}

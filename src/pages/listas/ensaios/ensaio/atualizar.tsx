@@ -215,6 +215,7 @@ export default function AtualizarTipoEnsaio({
           id: values.id,
           project: values.project,
           comments: values.comments,
+          userId: userLogado.id,
         })
         .then(({ status, message }) => {
           if (status === 200) {
@@ -700,55 +701,17 @@ export default function AtualizarTipoEnsaio({
   }
 
   const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
+    const skip = 0;
+    const take = 10;
+
+    const filterParam = `${treatmentsFilterApplication}&skip=${skip}&take=${take}&createFile=true`;
     await genotypeTreatmentService
-      .getAll(treatmentsFilterApplication)
+      .getAll(`${filterParam}&excel=true`)
       .then(({ status, response }) => {
         if (status === 200) {
-          const newData = response.map((row: any) => {
-            const newRow = row;
-            newRow.CULTURA = row.safra.culture.name;
-            newRow.SAFRA = row.safra.safraName;
-            newRow.FASE = newRow.lote?.fase;
-            newRow.ENSAIO = newRow.assay_list.type_assay.name;
-            newRow.TECNOLOGIA = `${newRow.assay_list?.tecnologia.cod_tec} ${newRow.assay_list?.tecnologia.name}`;
-            newRow.GLI = newRow.assay_list.gli;
-            newRow.STATUS_ENSAIO = newRow.assay_list.status;
-            newRow.PROJETO = newRow.assay_list.project;
-            newRow.COMENTARIOS = newRow.comments;
-            newRow.FASE = newRow.lote.fase;
-            newRow.GGEN = `${newRow.genotipo?.tecnologia.cod_tec} ${newRow.genotipo?.tecnologia.name}`;
-            newRow.NT = newRow.treatments_number;
-            newRow.NOME_DO_GENOTIPO = newRow.genotipo?.name_genotipo;
-            newRow.GMR = newRow.genotipo?.gmr;
-            newRow.BGM = newRow.genotipo?.bgm;
-            newRow.STATUS_T = newRow.status;
-            newRow.NCA = newRow.lote?.ncc;
-            newRow.COD_LOTE = newRow.lote?.cod_lote;
-            newRow.STATUS_TRAT = newRow.status_experiment;
-            newRow.OBS = newRow.comments;
-            newRow.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
-
-            delete row.id_lote;
-            delete row.id_genotipo;
-            delete row.safra;
-            delete row.treatments_number;
-            delete row.status;
-            delete row.status_experiment;
-            delete row.comments;
-            delete row.genotipo;
-            delete row.lote;
-            delete row.id;
-            delete row.id_safra;
-            delete row.assay_list;
-            return newRow;
-          });
-          const workSheet = XLSX.utils.json_to_sheet(newData);
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(
-            workBook,
-            workSheet,
-            'Genotipo do ensaio',
-          );
+          XLSX.utils.book_append_sheet(workBook, response, 'Tratamentos');
 
           // Buffer
           XLSX.write(workBook, {
@@ -761,65 +724,29 @@ export default function AtualizarTipoEnsaio({
             type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, 'Genotipo do ensaio.xlsx');
+          XLSX.writeFile(workBook, 'Tratamentos-genótipo.xlsx');
         } else {
+          setLoading(false);
           Swal.fire(
             'Não existem registros para serem exportados, favor checar.',
           );
         }
       });
+    setLoading(false);
   };
 
   const downloadExcelExperiments = async (): Promise<void> => {
-    await experimentService
-      .getAll(`${experimentFilterApplication}&excel=${true}`)
-      .then(({ status, response }) => {
-        if (status === 200) {
-          const newData = response.map((item: any) => {
-            const newItem = item;
-            newItem.CULTURA = item.assay_list?.safra?.culture?.name;
-            newItem.SAFRA = item.assay_list?.safra?.safraName;
-            newItem.FOCO = item.assay_list?.foco.name;
-            newItem.ENSAIO = item.assay_list?.type_assay.name;
-            newItem.TECNOLOGIA = `${item.assay_list?.tecnologia.cod_tec} ${item.assay_list?.tecnologia.name}`;
-            newItem.GLI = item.assay_list?.gli;
-            newItem.BGM = item.assay_list?.bgm;
-            newItem.STATUS_DO_ENSAIO = item.assay_list?.status;
-            newItem.PROJETO = item?.assay_list?.project;
-            newItem.COMENTÁRIOS = item?.assay_list?.comments;
-            newItem.EXPERIMENTO_PLANEJADO = '';
-            newItem.DELINEAMENTO = item.delineamento?.name;
-            newItem.REP = item.repetitionsNumber;
-            newItem.STATUS_EXP = item.status;
-            newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
+    setLoading(true);
+    const skip = 0;
+    const take = 10;
 
-            delete newItem.id;
-            delete newItem.safra;
-            delete newItem.experiment_genotipe;
-            delete newItem.seq_delineamento;
-            delete newItem.experimentGroupId;
-            delete newItem.countNT;
-            delete newItem.npeQT;
-            delete newItem.local;
-            delete newItem.delineamento;
-            delete newItem.eel;
-            delete newItem.clp;
-            delete newItem.nlp;
-            delete newItem.orderDraw;
-            delete newItem.comments;
-            delete newItem.period;
-            delete newItem.repetitionsNumber;
-            delete newItem.density;
-            delete newItem.status;
-            delete newItem.experimentName;
-            delete newItem.type_assay;
-            delete newItem.idSafra;
-            delete newItem.assay_list;
-            return newItem;
-          });
-          const workSheet = XLSX.utils.json_to_sheet(newData);
+    const filterParam = `${experimentFilterApplication}&skip=${skip}&take=${take}&createFile=true`;
+    await experimentService
+      .getAll(`${filterParam}&excel=${true}`)
+      .then(({ status, response }: any) => {
+        if (status === 200) {
           const workBook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workBook, workSheet, 'Experimento');
+          XLSX.utils.book_append_sheet(workBook, response, 'experimentos');
 
           // Buffer
           XLSX.write(workBook, {
@@ -832,9 +759,15 @@ export default function AtualizarTipoEnsaio({
             type: 'binary',
           });
           // Download
-          XLSX.writeFile(workBook, 'Experimento.xlsx');
+          XLSX.writeFile(workBook, 'Experimentos.xlsx');
+        } else {
+          setLoading(false);
+          Swal.fire(
+            'Não existem registros para serem exportados, favor checar.',
+          );
         }
       });
+    setLoading(false);
   };
 
   function handleTotalPages(): void {

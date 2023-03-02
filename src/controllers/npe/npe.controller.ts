@@ -196,18 +196,15 @@ export class NpeController {
          * ATENÇÃO CASO O USUÁRIO ORDENE OS AMBIENTES POR QUALQUER OUTRO CAMPO QUE NÃO SEJA O PROX_NPE
          * CARREGAR O NEXT_NPE DE CADA AMBIENTE SEPARADAMENTE
          */
-        if(orderBy !== '{"prox_npe":"asc"}') {
-          
-          for(const npe of response) {
-            
-            if(typeof npe === 'object') {
-              
+        if (orderBy !== '{"prox_npe":"asc"}') {
+          for (const npe of response) {
+            if (typeof npe === 'object') {
               const orderByAux = '{"prox_npe":"asc"}';
               const parametersAux: object | any = {};
               parametersAux.AND = [];
               parametersAux.npei = JSON.parse(`{"gt": ${Number(npe.npei)} }`);
-              parametersAux.group = { "group": { "equals": Number(npe.group?.id) } };
-              
+              parametersAux.group = { group: { equals: Number(npe.group?.id) } };
+
               const responseNextNPE = await this.npeRepository.findAll(
                 parametersAux,
                 select,
@@ -215,8 +212,8 @@ export class NpeController {
                 0,
                 orderByAux,
               );
-              
-              if(responseNextNPE.length > 0) {
+
+              if (responseNextNPE.length > 0) {
                 const next = responseNextNPE[0];
                 if (!npe.npeQT) {
                   npe.npeQT = next.npei_i - npe.npef; // quantidade disponivel
@@ -228,11 +225,8 @@ export class NpeController {
                 npe.nextNPE = 0;
                 npe.npeRequisitada = 0;
               }
-              
             }
-            
           }
-          
         } else {
           const next_available_npe = response[response.length - 1].prox_npe;// proximo npe disponivel
           response.map(async (value: any, index: any, elements: any) => {
@@ -270,7 +264,6 @@ export class NpeController {
             return newItem;
           });
         }
-        
       }
 
       for (let i = 0; i < response.length; i++) {
@@ -440,18 +433,17 @@ export class NpeController {
   }
 
   async update(data: any) {
+    console.log('🚀 ~ file: npe.controller.ts:436 ~ NpeController ~ update ~ data:', data);
     try {
       if (data) {
         if (data.length === undefined) {
-          const operation = data.status === 1 ? 'ATIVAÇÃO' : 'INATIVAÇÃO';
+          const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+          await this.reporteController.create({
+            userId: data.userId, module: 'AMBIENTE', operation: 'EDIÇÃO', oldValue: data.prox_npe, ip: String(ip),
+          });
+          delete data.userId;
           const npe = await this.npeRepository.update(data.id, data);
           if (!npe) return { status: 400, message: 'Npe não encontrado' };
-          if (data.status === 0 || data.status === 1) {
-            const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-            // await this.reporteRepository.create({
-            //   madeBy: npe.created_by, module: 'Npe', operation, name: JSON.stringify(npe.safraId), ip: JSON.stringify(ip), idOperation: npe.id,
-            // });
-          }
           return { status: 200, message: 'Npe atualizada' };
         }
         const transactionConfig = new TransactionConfig();
