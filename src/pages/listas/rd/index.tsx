@@ -859,7 +859,7 @@ export default function Import({
                     table="DELIMITATION"
                     moduleId={7}
                     style={{
-                      display: !perm_can_do('/config/delineamento/delineamento', 'change') ? 'none' : '',
+                      display: !perm_can_do('/config/delineamento/delineamento', 'import') ? 'none' : '',
                     }}
                   />
                 )}
@@ -870,7 +870,7 @@ export default function Import({
                     table="NPE"
                     moduleId={14}
                     style={{
-                      display: !perm_can_do('/operacao/ambiente', 'change') ? 'none' : '',
+                      display: !perm_can_do('/operacao/ambiente', 'import') ? 'none' : '',
                     }}
                   />
                 )}
@@ -881,7 +881,7 @@ export default function Import({
                     table="BLOCK_LAYOUT"
                     moduleId={5}
                     style={{
-                      display: !perm_can_do('/config/quadra/layout-quadra', 'change') ? 'none' : '',
+                      display: !perm_can_do('/config/quadra/layout-quadra', 'import') ? 'none' : '',
                     }}
                   />
                 )}
@@ -892,7 +892,7 @@ export default function Import({
                     table="BLOCK"
                     moduleId={17}
                     style={{
-                      display: !perm_can_do('/config/quadra', 'change') ? 'none' : '',
+                      display: !perm_can_do('/config/quadra', 'import') ? 'none' : '',
                     }}
                   />
                 )}

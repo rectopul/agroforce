@@ -150,6 +150,7 @@ export class AssayListController {
   }
 
   async update(data: any) {
+    console.log('🚀 ~ file: assay-list.controller.ts:153 ~ AssayListController ~ update ~ data:', data);
     try {
       const assayList: any = await this.assayListRepository.findById(data.id);
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
@@ -157,7 +158,7 @@ export class AssayListController {
         userId: data.userId, module: 'ENSAIO', operation: 'EDIÇÃO', oldValue: `${data.project}_${data.comments}`, ip: String(ip),
       });
       if (!assayList) return { status: 404, message: 'Lista de ensaio não existente' };
-
+      delete data.userId;
       const response = await this.assayListRepository.update(Number(data.id), data);
 
       return { status: 200, response, message: 'Lista de ensaio atualizado' };
