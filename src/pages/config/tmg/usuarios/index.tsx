@@ -1,38 +1,36 @@
-import { useFormik } from 'formik';
-import MaterialTable from 'material-table';
-import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
-import getConfig from 'next/config';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useEffect, useState, useRef } from 'react';
+import { useFormik } from "formik";
+import MaterialTable from "material-table";
+import { InferGetServerSidePropsType, GetServerSideProps } from "next";
+import getConfig from "next/config";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useEffect, useState, useRef } from "react";
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DropResult,
-} from 'react-beautiful-dnd';
+} from "react-beautiful-dnd";
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiTwotoneStar,
-} from 'react-icons/ai';
-import {
-  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
-} from 'react-icons/bi';
-import * as XLSX from 'xlsx';
+} from "react-icons/ai";
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import * as XLSX from "xlsx";
 
-import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
-import { FiUserPlus } from 'react-icons/fi';
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line } from 'react-icons/ri';
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { removeCookies, setCookies } from 'cookies-next';
-import { tableGlobalFunctions } from 'src/helpers';
-import Swal from 'sweetalert2';
-import { userPreferencesService, userService } from '../../../../services';
-import { handleFormatTel } from '../../../../shared/utils/tel';
-import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
+import { FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
+import { FiUserPlus } from "react-icons/fi";
+import { IoReloadSharp } from "react-icons/io5";
+import { MdFirstPage, MdLastPage } from "react-icons/md";
+import { RiFileExcel2Line } from "react-icons/ri";
+import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import { removeCookies, setCookies } from "cookies-next";
+import { tableGlobalFunctions } from "src/helpers";
+import Swal from "sweetalert2";
+import { userPreferencesService, userService } from "../../../../services";
+import { handleFormatTel } from "../../../../shared/utils/tel";
+import headerTableFactoryGlobal from "../../../../shared/utils/headerTableFactory";
 import {
   AccordionFilter,
   Button,
@@ -42,11 +40,11 @@ import {
   Select,
   FieldItemsPerPage,
   ButtonToogleConfirmation,
-} from '../../../../components';
-import * as ITabs from '../../../../shared/utils/dropdown';
-import { UserPreferenceController } from '../../../../controllers/user-preference.controller';
-import ComponentLoading from '../../../../components/Loading';
-import perm_can_do from '../../../../shared/utils/perm_can_do';
+} from "../../../../components";
+import * as ITabs from "../../../../shared/utils/dropdown";
+import { UserPreferenceController } from "../../../../controllers/user-preference.controller";
+import ComponentLoading from "../../../../components/Loading";
+import perm_can_do from "../../../../shared/utils/perm_can_do";
 
 interface IUsers {
   id: number;
@@ -96,28 +94,30 @@ export default function Listagem({
   const tableRef = useRef<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const tabsDropDowns = TabsDropDowns('config');
+  const tabsDropDowns = TabsDropDowns("config");
 
-  tabsDropDowns.map((tab) => (tab.titleTab === 'TMG'
-    && tab.data.map((i) => i.labelDropDown === 'Usuários')
-    ? (tab.statusTab = true)
-    : (tab.statusTab = false)));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === "TMG" &&
+    tab.data.map((i) => i.labelDropDown === "Usuários")
+      ? (tab.statusTab = true)
+      : (tab.statusTab = false)
+  );
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const preferences = userLogado.preferences.usuario || {
     id: 0,
-    table_preferences: 'id,avatar,name,tel,login,status',
+    table_preferences: "id,avatar,name,tel,login,status,action",
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+    preferences.table_preferences
   );
   const router = useRouter();
   const [users, setUsers] = useState<IUsers[]>(() => allUsers);
   const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit),
+    Number(pageBeforeEdit)
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-  const [arrowOrder, setArrowOrder] = useState<any>('');
+  const [arrowOrder, setArrowOrder] = useState<any>("");
   const [filter, setFilter] = useState<any>(filterApplication);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -128,46 +128,53 @@ export default function Listagem({
     //   defaultChecked: () => camposGerenciados.includes('id'),
     // },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Avatar',
-      value: 'avatar',
-      defaultChecked: () => camposGerenciados.includes('avatar'),
+      name: "CamposGerenciados[]",
+      title: "Avatar",
+      value: "avatar",
+      defaultChecked: () => camposGerenciados.includes("avatar"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Nome',
-      value: 'name',
-      defaultChecked: () => camposGerenciados.includes('name'),
+      name: "CamposGerenciados[]",
+      title: "Nome",
+      value: "name",
+      defaultChecked: () => camposGerenciados.includes("name"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Login',
-      value: 'login',
-      defaultChecked: () => camposGerenciados.includes('login'),
+      name: "CamposGerenciados[]",
+      title: "Login",
+      value: "login",
+      defaultChecked: () => camposGerenciados.includes("login"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Telefone',
-      value: 'tel',
-      defaultChecked: () => camposGerenciados.includes('tel'),
+      name: "CamposGerenciados[]",
+      title: "Telefone",
+      value: "tel",
+      defaultChecked: () => camposGerenciados.includes("tel"),
     },
     {
-      name: 'CamposGerenciados[]',
-      title: 'Ação',
-      value: 'status',
-      defaultChecked: () => camposGerenciados.includes('status'),
+      name: "CamposGerenciados[]",
+      title: "Status",
+      value: "status",
+      defaultChecked: () => camposGerenciados.includes("status"),
+    },
+    {
+      name: "CamposGerenciados[]",
+      title: "Ação",
+      value: "action",
+      defaultChecked: () => camposGerenciados.includes("action"),
     },
   ]);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [statusAccordionFilter, setStatusAccordionFilter] = useState<boolean>(false);
-  const [colorStar, setColorStar] = useState<string>('');
+  const [statusAccordionFilter, setStatusAccordionFilter] =
+    useState<boolean>(false);
+  const [colorStar, setColorStar] = useState<string>("");
   // const [orderBy, setOrderBy] = useState<string>('');
-  const [orderType, setOrderType] = useState<string>('');
+  const [orderType, setOrderType] = useState<string>("");
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
   const [orderList, setOrder] = useState<number>(
-    typeOrderServer == 'desc' ? 1 : 2,
+    typeOrderServer == "desc" ? 1 : 2
   );
   const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer); // RR
@@ -178,21 +185,21 @@ export default function Listagem({
   }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`; // RR
 
   const filters = [
-    { id: 2, name: 'Todos' },
-    { id: 1, name: 'Ativos' },
-    { id: 0, name: 'Inativos' },
+    { id: 2, name: "Todos" },
+    { id: 1, name: "Ativos" },
+    { id: 0, name: "Inativos" },
   ];
 
-  const filterStatusBeforeEdit = filterBeforeEdit.split('');
+  const filterStatusBeforeEdit = filterBeforeEdit.split("");
   const columns = colums(camposGerenciados);
 
   const formik = useFormik<IFilter>({
     initialValues: {
       filterStatus: filterStatusBeforeEdit[13],
-      filterName: checkValue('filterName'),
-      filterLogin: checkValue('filterLogin'),
-      orderBy: '',
-      typeOrder: '',
+      filterName: checkValue("filterName"),
+      filterLogin: checkValue("filterLogin"),
+      orderBy: "",
+      typeOrder: "",
     },
     onSubmit: async ({ filterStatus, filterName, filterLogin }) => {
       // Call filter with there parameter
@@ -225,9 +232,9 @@ export default function Listagem({
   async function callingApi(parametersFilter: any, page: any = 0) {
     setCurrentPage(page);
 
-    setCookies('filterBeforeEdit', parametersFilter);
-    setCookies('filterBeforeEditTypeOrder', typeOrder);
-    setCookies('filterBeforeEditOrderBy', orderBy);
+    setCookies("filterBeforeEdit", parametersFilter);
+    setCookies("filterBeforeEditTypeOrder", typeOrder);
+    setCookies("filterBeforeEditOrderBy", orderBy);
 
     // parametersFilter = `${parametersFilter}&${pathExtra}`;
     parametersFilter = `${parametersFilter}&skip=${
@@ -235,7 +242,7 @@ export default function Listagem({
     }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
     setFiltersParams(parametersFilter);
-    setCookies('filtersParams', parametersFilter);
+    setCookies("filtersParams", parametersFilter);
 
     await userService
       .getAll(parametersFilter)
@@ -245,7 +252,7 @@ export default function Listagem({
           setTotalItems(response.total); // Set new total records
           setLoading(false);
           tableRef.current.dataManager.changePageSize(
-            response.total >= take ? take : response.total,
+            response.total >= take ? take : response.total
           );
         }
       })
@@ -274,60 +281,65 @@ export default function Listagem({
   function idHeaderFactory() {
     return {
       title: <div className="flex items-center">{arrowOrder}</div>,
-      field: 'id',
+      field: "id",
       width: 0,
       sorting: false,
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-9 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
+      render: () =>
+        colorStar === "#eba417" ? (
+          <div className="h-9 flex">
+            <div>
+              <button
+                type="button"
+                className="w-full h-full flex items-center justify-center border-0"
+                onClick={() => setColorStar("")}
+              >
+                <AiTwotoneStar size={20} color="#eba417" />
+              </button>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="h-9 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
+        ) : (
+          <div className="h-9 flex">
+            <div>
+              <button
+                type="button"
+                className="w-full h-full flex items-center justify-center border-0"
+                onClick={() => setColorStar("#eba417")}
+              >
+                <AiTwotoneStar size={20} />
+              </button>
+            </div>
           </div>
-        </div>
-      )),
+        ),
     };
   }
 
-  function statusHeaderFactory() {
+  function actionHeaderFactory() {
     return {
-      title: 'Ação',
-      field: 'status',
+      title: "Ação",
+      field: "action",
       sorting: false,
       searchable: false,
-      filterPlaceholder: 'Filtrar por status',
+      filterPlaceholder: "Filtrar por status",
       render: (rowData: IUsers) => (
         <div className="h-7 flex">
           <div className="h-7">
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
-              style={{ display: !perm_can_do('/config/tmg/usuarios', 'edit') ? 'none' : '' }}
+              style={{
+                display: !perm_can_do("/config/tmg/usuarios", "edit")
+                  ? "none"
+                  : "",
+              }}
               onClick={() => {
-                setCookies('pageBeforeEdit', currentPage?.toString());
-                setCookies('filterBeforeEdit', filter);
-                setCookies('filterBeforeEditTypeOrder', typeOrder);
-                setCookies('filterBeforeEditOrderBy', orderBy);
-                setCookies('filtersParams', filtersParams);
-                setCookies('itensPage', itensPerPage);
-                setCookies('lastPage', 'atualizar');
-                setCookies('takeBeforeEdit', take);
+                setCookies("pageBeforeEdit", currentPage?.toString());
+                setCookies("filterBeforeEdit", filter);
+                setCookies("filterBeforeEditTypeOrder", typeOrder);
+                setCookies("filterBeforeEditOrderBy", orderBy);
+                setCookies("filtersParams", filtersParams);
+                setCookies("itensPage", itensPerPage);
+                setCookies("lastPage", "atualizar");
+                setCookies("takeBeforeEdit", take);
                 router.push(`/config/tmg/usuarios/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
@@ -339,7 +351,11 @@ export default function Listagem({
             <ButtonToogleConfirmation
               data={rowData}
               text="o usuário"
-              style={{ display: !perm_can_do('/config/tmg/usuarios', 'disable') ? 'none' : '' }}
+              style={{
+                display: !perm_can_do("/config/tmg/usuarios", "disable")
+                  ? "none"
+                  : "",
+              }}
               keyName="name"
               onPress={handleStatus}
             />
@@ -350,7 +366,7 @@ export default function Listagem({
   }
 
   function colums(camposGerenciados: any): any {
-    const columnCampos: any = camposGerenciados.split(',');
+    const columnCampos: any = camposGerenciados.split(",");
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item: any) => {
@@ -358,63 +374,64 @@ export default function Listagem({
       //   tableFields.push(idHeaderFactory());
       // }
 
-      if (columnCampos[item] === 'avatar') {
+      if (columnCampos[item] === "avatar") {
         tableFields.push({
-          title: 'Avatar',
-          field: 'avatar',
+          title: "Avatar",
+          field: "avatar",
           sorting: false,
           width: 0,
           exports: false,
-          render: (rowData: IUsers) => (!rowData.avatar || rowData.avatar === '' ? (
-          // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src="https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag"
-              alt={rowData.name}
-              style={{ width: 30, height: 30, borderRadius: 99999 }}
-            />
-          ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={rowData.avatar}
-              alt={rowData.name}
-              style={{ width: 30, height: 30, borderRadius: 99999 }}
-            />
-          )),
+          render: (rowData: IUsers) =>
+            !rowData.avatar || rowData.avatar === "" ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src="https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag"
+                alt={rowData.name}
+                style={{ width: 30, height: 30, borderRadius: 99999 }}
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={rowData.avatar}
+                alt={rowData.name}
+                style={{ width: 30, height: 30, borderRadius: 99999 }}
+              />
+            ),
         });
       }
-      if (columnCampos[item] === 'name') {
+      if (columnCampos[item] === "name") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Nome',
-            title: 'name',
+            name: "Nome",
+            title: "name",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
 
-      if (columnCampos[item] === 'login') {
+      if (columnCampos[item] === "login") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Login',
-            title: 'login',
+            name: "Login",
+            title: "login",
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
-      if (columnCampos[item] === 'tel') {
+      if (columnCampos[item] === "tel") {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'Telefone',
-            title: 'tel',
+            name: "Telefone",
+            title: "tel",
             orderList,
             fieldOrder,
             handleOrder,
             render: (rowData: IUsers) => handleFormatTel(rowData.tel),
-          }),
+          })
         );
         // tableFields.push({
         //   title: "Telefone",
@@ -423,8 +440,24 @@ export default function Listagem({
         //   render: (rowData: IUsers) => handleFormatTel(rowData.tel),
         // });
       }
-      if (columnCampos[item] === 'status') {
-        tableFields.push(statusHeaderFactory());
+      if (columnCampos[item] === "status") {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Status",
+            title: "status",
+            orderList,
+            fieldOrder,
+            handleOrder,
+            render: (rowData: any) => (
+              <div className="h-7">
+                {rowData?.status == 1 ? "Ativo" : "Inativo"}
+              </div>
+            ),
+          })
+        );
+      }
+      if (columnCampos[item] === "action") {
+        tableFields.push(actionHeaderFactory());
       }
     });
     return tableFields;
@@ -433,7 +466,7 @@ export default function Listagem({
   async function handleOrder(
     column: string,
     order: string | any,
-    name: string,
+    name: string
   ): Promise<void> {
     // // Manage orders of colunms
     // const parametersFilter = await tableGlobalFunctions.handleOrderGlobal(column, order, filter, 'safra');
@@ -461,13 +494,12 @@ export default function Listagem({
     // }
 
     // Gobal manage orders
-    const {
-      typeOrderG, columnG, orderByG, arrowOrder,
-    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    const { typeOrderG, columnG, orderByG, arrowOrder } =
+      await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
-    typeOrderG !== '' ? (typeOrderG == 'desc' ? setOrder(1) : setOrder(2)) : '';
+    typeOrderG !== "" ? (typeOrderG == "desc" ? setOrder(1) : setOrder(2)) : "";
     setOrderBy(columnG);
     setArrowOrder(arrowOrder);
     setLoading(true);
@@ -478,7 +510,7 @@ export default function Listagem({
 
   async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
+    let selecionados = "";
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
         selecionados += `${els[i].value},`;
@@ -501,7 +533,7 @@ export default function Listagem({
           };
           preferences.id = response.response.id;
         });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     } else {
       userLogado.preferences.usuario = {
         id: preferences.id,
@@ -512,7 +544,7 @@ export default function Listagem({
         table_preferences: campos,
         id: preferences.id,
       });
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
     }
 
     setStatusAccordion(false);
@@ -538,7 +570,7 @@ export default function Listagem({
 
     const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
 
-    if (!filterApplication.includes('paramSelect')) {
+    if (!filterApplication.includes("paramSelect")) {
       // filterApplication += `&paramSelect=${camposGerenciados}`;
     }
 
@@ -555,22 +587,22 @@ export default function Listagem({
         }); */
 
         const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workBook, response, 'usuarios');
+        XLSX.utils.book_append_sheet(workBook, response, "usuarios");
 
         // Buffer
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx || csv
-          type: 'buffer',
+          bookType: "xlsx", // xlsx || csv
+          type: "buffer",
         });
         // Binary
         XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx || csv
-          type: 'binary',
+          bookType: "xlsx", // xlsx || csv
+          type: "binary",
         });
         // Download xlsx || csv
-        XLSX.writeFile(workBook, 'Usuários.xlsx');
+        XLSX.writeFile(workBook, "Usuários.xlsx");
       } else {
-        Swal.fire('Não existem registros para serem exportados, favor checar.');
+        Swal.fire("Não existem registros para serem exportados, favor checar.");
       }
     });
     setLoading(false);
@@ -602,7 +634,7 @@ export default function Listagem({
   function checkValue(value: any) {
     const parameter = tableGlobalFunctions.getValuesForFilter(
       value,
-      filtersParams,
+      filtersParams
     );
     return parameter;
   }
@@ -681,8 +713,8 @@ export default function Listagem({
                     />
                   </div>
 
-                  {filterFieldFactory('filterName', 'Nome')}
-                  {filterFieldFactory('filterLogin', 'Login')}
+                  {filterFieldFactory("filterName", "Nome")}
+                  {filterFieldFactory("filterLogin", "Login")}
 
                   <FieldItemsPerPage selected={take} onChange={setTake} />
 
@@ -708,7 +740,7 @@ export default function Listagem({
           <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
-              style={{ background: '#f9fafb' }}
+              style={{ background: "#f9fafb" }}
               columns={columns}
               data={users}
               options={{
@@ -720,7 +752,7 @@ export default function Listagem({
                 headerStyle: {
                   zIndex: 1,
                 },
-                rowStyle: { background: '#f9fafb', height: 35 },
+                rowStyle: { background: "#f9fafb", height: 35 },
                 search: false,
                 filtering: false,
                 pageSize: Number(take),
@@ -746,25 +778,30 @@ export default function Listagem({
                         value="Cadastrar usuário"
                         textColor="white"
                         bgColor="bg-blue-600"
-                        style={{ display: !perm_can_do('/config/tmg/usuarios', 'create') ? 'none' : '' }}
+                        style={{
+                          display: !perm_can_do(
+                            "/config/tmg/usuarios",
+                            "create"
+                          )
+                            ? "none"
+                            : "",
+                        }}
                         onClick={() => {
-                          setCookies('pageBeforeEdit', currentPage?.toString());
-                          setCookies('filterBeforeEdit', filter);
-                          setCookies('filterBeforeEditTypeOrder', typeOrder);
-                          setCookies('filterBeforeEditOrderBy', orderBy);
-                          setCookies('filtersParams', filtersParams);
-                          setCookies('takeBeforeEdit', take);
-                          setCookies('lastPage', 'cadastro');
-                          router.push('usuarios/cadastro');
+                          setCookies("pageBeforeEdit", currentPage?.toString());
+                          setCookies("filterBeforeEdit", filter);
+                          setCookies("filterBeforeEditTypeOrder", typeOrder);
+                          setCookies("filterBeforeEditOrderBy", orderBy);
+                          setCookies("filtersParams", filtersParams);
+                          setCookies("takeBeforeEdit", take);
+                          setCookies("lastPage", "cadastro");
+                          router.push("usuarios/cadastro");
                         }}
                         icon={<FiUserPlus size={20} />}
                       />
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
+                      Total registrado: {itemsTotal}
                     </strong>
 
                     <div
@@ -811,7 +848,7 @@ export default function Listagem({
                                               title={generate.title?.toString()}
                                               value={generate.value}
                                               defaultChecked={camposGerenciados.includes(
-                                                generate.value,
+                                                generate.value
                                               )}
                                             />
                                           </li>
@@ -840,58 +877,59 @@ export default function Listagem({
                     </div>
                   </div>
                 ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => handlePagination(0)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
-                    />
-                    <Button
-                      onClick={() => handlePagination(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {Array(1)
-                      .fill('')
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => handlePagination(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
-                    <Button
-                      onClick={() => handlePagination(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => handlePagination(pages - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => handlePagination(0)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage < 1}
+                      />
+                      <Button
+                        onClick={() => handlePagination(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill("")
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => handlePagination(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => handlePagination(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => handlePagination(pages - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                   ) as any,
               }}
             />
@@ -912,15 +950,15 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 0;
 
   // Last page
-  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
-  if (lastPageServer == undefined || lastPageServer == 'No') {
-    removeCookies('filterBeforeEdit', { req, res });
-    removeCookies('pageBeforeEdit', { req, res });
-    removeCookies('filterBeforeEditTypeOrder', { req, res });
-    removeCookies('filterBeforeEditOrderBy', { req, res });
-    removeCookies('lastPage', { req, res });
-    removeCookies('filtersParams', { req, res });
-    removeCookies('itensPage', { req, res });
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
+  if (lastPageServer == undefined || lastPageServer == "No") {
+    removeCookies("filterBeforeEdit", { req, res });
+    removeCookies("pageBeforeEdit", { req, res });
+    removeCookies("filterBeforeEditTypeOrder", { req, res });
+    removeCookies("filterBeforeEditOrderBy", { req, res });
+    removeCookies("lastPage", { req, res });
+    removeCookies("filtersParams", { req, res });
+    removeCookies("itensPage", { req, res });
   }
 
   const itensPerPage = req.cookies.takeBeforeEdit
@@ -929,28 +967,28 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : 'filterStatus=1';
+    : "filterStatus=1";
   const filterApplication = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : 'filterStatus=1';
+    : "filterStatus=1";
 
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : 'asc';
+    : "asc";
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : 'name';
+    : "name";
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-  removeCookies('filterBeforeEditTypeOrder', { req, res });
-  removeCookies('filterBeforeEditOrderBy', { req, res });
-  removeCookies('takeBeforeEdit', { req, res });
-  removeCookies('lastPage', { req, res });
-  removeCookies('filtersParams', { req, res });
+  removeCookies("filterBeforeEdit", { req, res });
+  removeCookies("pageBeforeEdit", { req, res });
+  removeCookies("filterBeforeEditTypeOrder", { req, res });
+  removeCookies("filterBeforeEditOrderBy", { req, res });
+  removeCookies("takeBeforeEdit", { req, res });
+  removeCookies("lastPage", { req, res });
+  removeCookies("filtersParams", { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
@@ -959,8 +997,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
