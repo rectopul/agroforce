@@ -1,14 +1,16 @@
 /* eslint-disable react/jsx-props-no-multi-spaces */
-import { setCookie } from "nookies";
-import { ReactNode, useState } from "react";
-import { BiUser } from "react-icons/bi";
-import { BsCheckLg } from "react-icons/bs";
-import { HiOutlineOfficeBuilding } from "react-icons/hi";
-import { MdDateRange } from "react-icons/md";
-import { RiPlantLine, RiSeedlingLine } from "react-icons/ri";
-import { userService } from "src/services";
-import { Aside, DropDown, MainHeader, Select, ToolTip } from "..";
-import { TabHeader } from "../MainHeader/TabHeader/index2";
+import { setCookie } from 'nookies';
+import { ReactNode, useState } from 'react';
+import { BiUser } from 'react-icons/bi';
+import { BsCheckLg } from 'react-icons/bs';
+import { HiOutlineOfficeBuilding } from 'react-icons/hi';
+import { MdDateRange } from 'react-icons/md';
+import { RiPlantLine, RiSeedlingLine } from 'react-icons/ri';
+import { userService } from 'src/services';
+import {
+  Aside, DropDown, MainHeader, Select, ToolTip,
+} from '..';
+import { TabHeader } from '../MainHeader/TabHeader/index2';
 
 interface IUsers {
   id: number;
@@ -47,21 +49,58 @@ export function Content({
   moduloActive,
 }: IContentData) {
   const userLogado: IUsers | any = JSON.parse(
-    localStorage.getItem("user") as string
+    localStorage.getItem('user') as string,
   );
   const cultures: object | any = [];
   const safras: object | any = [];
   const [culturaSelecionada, setCulturaSelecionada] = useState<any>(
-    userLogado.userCulture.cultura_selecionada
+    userLogado.userCulture.cultura_selecionada,
   );
   const [safraSelecionada, setSafraSelecionada] = useState<any>(
-    userLogado.safras.safra_selecionada
+    userLogado.safras.safra_selecionada,
   );
 
-  const avatarDefault =
-    "https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag";
+  const avatarDefault = 'https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag';
 
-  const [tabsHeader, setTabsHeader] = useState<IContentProps[]>(contentHeader);
+  const [tabsHeader, setTabsHeader] = useState<IContentProps[]>(
+    !contentHeader
+      ? [
+        {
+          titleTab: 'TMG',
+          valueTab: <BsCheckLg />,
+          statusTab: true,
+          hrefTab: '/config/tmg/usuarios',
+          data: [
+            {
+              labelDropDown: 'Cultura',
+              hrefDropDown: '/config/tmg/cultura',
+              iconDropDown: <RiSeedlingLine />,
+            },
+            {
+              labelDropDown: 'Usuários',
+              hrefDropDown: '/config/tmg/usuarios',
+              iconDropDown: <BiUser />,
+            },
+            {
+              labelDropDown: 'Setor',
+              hrefDropDown: '/config/tmg/setor',
+              iconDropDown: <HiOutlineOfficeBuilding />,
+            },
+            {
+              labelDropDown: 'Safra',
+              hrefDropDown: '/config/tmg/safra',
+              iconDropDown: <MdDateRange />,
+            },
+            {
+              labelDropDown: 'Portfólio',
+              hrefDropDown: '/config/tmg/portfolio',
+              iconDropDown: <RiPlantLine />,
+            },
+          ],
+        },
+      ]
+      : () => contentHeader,
+  );
 
   if (userLogado.userCulture.culturas[0]) {
     userLogado.userCulture.culturas.map((value: string | object | any) => {
@@ -114,26 +153,24 @@ export function Content({
 
   function validationSafras(value: any) {
     if (value !== safraSelecionada) {
-      setCookie(null, "safraId", value, {
+      setCookie(null, 'safraId', value, {
         maxAge: 86400 * 7,
-        path: "/",
+        path: '/',
       });
       setSafraSelecionada(value);
       userLogado.safras.safra_selecionada = Number(value);
-      localStorage.setItem("user", JSON.stringify(userLogado));
+      localStorage.setItem('user', JSON.stringify(userLogado));
       setTimeout(() => 2000);
       location.reload();
     }
   }
-
-  console.log({ tabsHeader });
 
   return (
     <>
       <MainHeader
         name={userLogado.name}
         avatar={!userLogado.avatar ? avatarDefault : userLogado.avatar}
-        headerSelects={
+        headerSelects={(
           <div className="mb-7 flex gap-3">
             <div className="h-7 lg:w-40 md:w-32 sm:w-26">
               <Select
@@ -150,12 +187,12 @@ export function Content({
               />
             </div>
           </div>
-        }
+        )}
       >
-        {tabsHeader?.map((item: any, index: any) => (
+        {tabsHeader.map((item: any, index: any) => (
           <ToolTip
             key={index}
-            contentMenu={item?.data?.map((dropdown: any, index: any) => (
+            contentMenu={item.data.map((dropdown: any, index: any) => (
               <DropDown
                 key={index}
                 label={dropdown.labelDropDown}
