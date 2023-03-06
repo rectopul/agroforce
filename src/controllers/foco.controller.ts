@@ -96,9 +96,9 @@ export class FocoController {
         });
       }
 
-      if (options.orderBy == 'group.group' && options.typeOrder == 'asc') {
+      if (options.orderBy == 'group.group' && options.typeOrder == 'desc') {
         response.sort((a: any, b: any) => b.group.group - a.group.group);
-      } else if (options.orderBy == 'group.group' && options.typeOrder == 'desc') {
+      } else if (options.orderBy == 'group.group' && options.typeOrder == 'asc') {
         response.sort((a: any, b: any) => a.group.group - b.group.group);
       }
 
