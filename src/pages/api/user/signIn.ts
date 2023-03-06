@@ -33,17 +33,22 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       if (validateLogin.total <= 0 || validateLogin.status === 400) throw new Error('Você não tem acesso a essa pagina, entre em contato com seu líder!');
 
       userCulture.culturas = await PermissionController.getByUserID(user.id);
+      const {
+        response: userPermissions,
+      }: any = await PermissionController.getPermissions(Number(user.id));
+
       userCulture.culturas = userCulture.culturas.response;
-      permissions = userCulture.culturas[0].profile.permissions;
 
       if (!userCulture.culturas || userCulture.culturas.status === 400 || userCulture.culturas.length === 0) throw new Error('Você está sem acesso as culturas, contate o seu lider!');
 
-      let cultureSelecionada;
+      let cultureSelecionada: any;
       Object.keys(userCulture.culturas).forEach((item: any) => {
         if (userCulture.culturas[item].status === 1) {
           cultureSelecionada = userCulture.culturas[item].cultureId;
         }
       });
+      permissions = userPermissions.filter((item: any) => item.cultureId === cultureSelecionada);
+      permissions = permissions[0].profile.permissions;
       userCulture.cultura_selecionada = cultureSelecionada || userCulture.culturas[0]?.cultureId;
 
       safras.safras = await safraController.getAll({
