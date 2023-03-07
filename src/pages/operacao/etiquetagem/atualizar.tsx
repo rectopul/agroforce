@@ -72,7 +72,7 @@ export default function Listagem({
   const preferences = userLogado.preferences.experimento || {
     id: 0,
     table_preferences:
-      'id,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status,action',
+      'id,foco,type_assay,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,status',
   };
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
@@ -111,7 +111,6 @@ export default function Listagem({
     },
     { name: 'CamposGerenciados[]', title: 'Rep', value: 'repetitionsNumber' },
     { name: 'CamposGerenciados[]', title: 'Status EXP', value: 'status' },
-    { name: 'CamposGerenciados[]', title: 'Ação', value: 'action' },
   ]);
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);

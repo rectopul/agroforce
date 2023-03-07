@@ -363,6 +363,24 @@ async function callTmgLoteXlsxDownload(options: any) {
       newItem.dt_export = moment(newItem.dt_export).format('DD-MM-YYYY hh:mm:ss');
 
       newItem.CULTURA = item?.genotipo.culture.name;
+      newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
+      newItem.NOME_PRINCIPAL = (item?.genotipo.name_main);
+      newItem.NOME_PUBLICO = (item?.genotipo.name_public);
+      newItem.NOME_EXPERIMENTAL = (item?.genotipo.name_experiment);
+      newItem.NOME_ALTERNATIVO = (item?.genotipo.name_alter);
+      newItem.ELITE_NOME = (item?.genotipo.elit_name);
+      newItem.TECNOLOGIA = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
+      newItem.N_DE_LOTES = (item?.genotipo.numberLotes);
+      newItem.TIPO = (item?.genotipo.type);
+      newItem.GMR = item?.genotipo.gmr ? String(item?.genotipo.gmr) : '';
+      newItem.BGM = item?.genotipo.bgm ? String(item?.genotipo.bgm) : '';
+      newItem.CRUZA_DE_ORIGEM = (item?.genotipo.cruza);
+      newItem.PROGENITOR_F_DIRETO = (item?.genotipo.progenitor_f_direto);
+      newItem.PROGENITOR_M_DIRETO = (item?.genotipo.progenitor_m_direto);
+      newItem.PROGENITOR_F_ORIGEM = (item?.genotipo.progenitor_f_origem);
+      newItem.PROGENITOR_M_ORIGEM = (item?.genotipo.progenitor_m_origem);
+      newItem.PROGENITORES_ORIGEM = (item?.genotipo.progenitores_origem);
+      newItem.PARENTESCO_COMPLETO = (item?.genotipo.parentesco_completo);
       newItem.ANO = item?.year;
       newItem.SAFRA = item?.safra.safraName;
       newItem.COD_LOTE = String(item?.cod_lote);
@@ -370,11 +388,6 @@ async function callTmgLoteXlsxDownload(options: any) {
       newItem.FASE = item?.fase ? String(item?.fase) : '';
       newItem.PESO = item?.peso ? String(item?.peso) : '';
       newItem.QUANT_SEMENTES = item?.quant_sementes;
-      newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
-      newItem.NOME_PRINCIPAL = String(item?.genotipo.name_main);
-      newItem.GMR = item?.genotipo.gmr ? String(item?.genotipo.gmr) : '';
-      newItem.BGM = item?.genotipo.bgm ? String(item?.genotipo.bgm) : '';
-      newItem.TECNOLOGIA = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
       newItem.DT_RD = newItem.dt_export;
       newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
