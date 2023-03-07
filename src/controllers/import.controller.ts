@@ -334,7 +334,7 @@ export class ImportController {
 
   async checkFile(req: any) {
     const filePath: any = [];
-    const res = new Promise(async (resolve, reject) => {
+    const res = await new Promise(async (resolve, reject) => {
       const dir = './public/log_import';
 
       if (!fs.existsSync(dir)) {
@@ -345,9 +345,9 @@ export class ImportController {
         });
       } else {
         await fs.readdir('./public/log_import', (err, files) => {
-          files.forEach((file) => {
+          for (const file of files) {
             filePath.push(file);
-          });
+          }
           if (filePath.length > 0) {
             resolve({
               message: 'files fetched success',
@@ -364,6 +364,7 @@ export class ImportController {
       }
     });
 
+    console.log('🚀 ~ file: import.controller.ts:338 ~ ImportController ~ res ~ res:', res);
     return res;
   }
 

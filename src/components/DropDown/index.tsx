@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import Link from "next/link";
-import { ReactNode } from "react";
-import perm_can_do from "../../shared/utils/perm_can_do";
+import Link from 'next/link';
+import { ReactNode } from 'react';
+import perm_can_do from '../../shared/utils/perm_can_do';
 
 interface IDropDownProps {
   label: string;
@@ -12,14 +12,14 @@ interface IDropDownProps {
 export function DropDown({ label, href, icon }: IDropDownProps) {
   return (
     <>
-      {perm_can_do(`${href}`, "view") ? (
+      {perm_can_do(`${href}`, 'view') ? (
         <ul
           className="
       h-7
       px-2
       bg-white mb-0.5
     "
-          style={{ maxWidth: "300px" }}
+          style={{ maxWidth: '300px' }}
         >
           <li>
             <Link href={href}>

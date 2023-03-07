@@ -349,13 +349,14 @@ export default function Import({
     const filename = `/log_import/${rowData.filePath}`;
 
     await importService.checkFile().then((res) => {
-      if (res.status == 400) {
+      if (res.files.length === 0) {
         Swal.fire('Nenhum arquivo disponível para download.');
       } else {
         const validFileName = res.files;
         let valid = false;
 
         if (validFileName.length > 0) {
+          console.log('🚀 ~ file: index.tsx:361 ~ validFileName.map ~ rowData:', rowData);
           validFileName.map((e: any) => {
             if (e == rowData.filePath) {
               valid = true;
@@ -799,7 +800,7 @@ export default function Import({
                     style={{
                       display: (!perm_can_do('/config/tmg/genotipo', 'import')
                     || !perm_can_do('/config/ensaio/tecnologia', 'import')
-                    || !perm_can_do('/config/local/lugar-local', 'import')) ? 'none' : '',
+                    || !perm_can_do('/config/local/local', 'import')) ? 'none' : '',
                     }}
                   />
                 )}
@@ -832,7 +833,7 @@ export default function Import({
                     table="EXPERIMENT"
                     moduleId={22}
                     style={{
-                      display: !perm_can_do('/listas/experimento', 'import') ? 'none' : '',
+                      display: !perm_can_do('/listas/experimentos/experimento', 'import') ? 'none' : '',
                     }}
                   />
                 )}
@@ -844,7 +845,7 @@ export default function Import({
                     table="PARCELS"
                     moduleId={30}
                     style={{
-                      display: !perm_can_do('/listas/parcelas-experimento', 'change') ? 'none' : '',
+                      display: !perm_can_do('/listas/experimentos/parcelas-experimento', 'change') ? 'none' : '',
                     }}
                   />
                 )}
@@ -859,7 +860,7 @@ export default function Import({
                     table="DELIMITATION"
                     moduleId={7}
                     style={{
-                      display: !perm_can_do('/config/delineamento/delineamento', 'import') ? 'none' : '',
+                      display: !perm_can_do('/config/delineamento', 'import') ? 'none' : '',
                     }}
                   />
                 )}

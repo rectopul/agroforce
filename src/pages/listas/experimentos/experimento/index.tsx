@@ -387,7 +387,7 @@ export default function Listagem({
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.experimentName}`}
-              style={{ display: !perm_can_do('/listas/experimento', 'edit') ? 'none' : '' }}
+              style={{ display: !perm_can_do('/listas/experimentos/experimento', 'edit') ? 'none' : '' }}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
                 setCookies('filterBeforeEdit', filter);
@@ -411,7 +411,7 @@ export default function Listagem({
             <Button
               title={`Deletar ${rowData.experimentName}`}
               icon={<BsTrashFill size={14} />}
-              style={{ display: !perm_can_do('/listas/experimento', 'delete') ? 'none' : '' }}
+              style={{ display: !perm_can_do('/listas/experimentos/experimento', 'delete') ? 'none' : '' }}
               onClick={() => deleteConfirmItem(rowData)}
               disabled={
                 rowData.status != 'IMPORTADO' && rowData.status != 'SORTEADO'
@@ -876,7 +876,7 @@ export default function Listagem({
                         value="Importar"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        style={{ display: !perm_can_do('/listas/experimento', 'import') ? 'none' : '' }}
+                        style={{ display: !perm_can_do('/listas/experimentos/experimento', 'import') ? 'none' : '' }}
                         onClick={() => {
                           window.open(
                             '/listas/rd?importar=experimento',
