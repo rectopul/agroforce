@@ -534,12 +534,13 @@ export default function Listagem({
     );
 
     // quando se usa Then força o usuário aguardar até que a execução esteja completa
-    await experimentService.update({
-      idList: experimentsSelected,
-      experimentGroupId: Number(experimentGroupId),
-      userId: userLogado.id,
-      status: 'ETIQ. NÃO INICIADA',
-    })
+    await experimentService
+      .update({
+        idList: experimentsSelected,
+        experimentGroupId: Number(experimentGroupId),
+        userId: userLogado.id,
+        status: 'ETIQ. NÃO INICIADA',
+      })
       .then((response) => {
         if (response.status === 200) {
           Swal.fire({
@@ -728,7 +729,17 @@ export default function Listagem({
                   "
                   >
                     <div className="flex">
-                      <div className="h-12 w-74 mr-2">
+                      <div className="h-12 w-28 ml-0">
+                        <Button
+                          type="button"
+                          value="Voltar"
+                          bgColor="bg-red-600"
+                          textColor="white"
+                          icon={<IoMdArrowBack size={18} />}
+                          onClick={() => router.back()}
+                        />
+                      </div>
+                      <div className="h-12 w-74 ml-2">
                         <Button
                           title="Salvar grupo de experimento"
                           value="Salvar grupo de experimento"
@@ -738,16 +749,6 @@ export default function Listagem({
                           }}
                           bgColor="bg-blue-600"
                           icon={<RiArrowUpDownLine size={20} />}
-                        />
-                      </div>
-                      <div className="h-12 w-28 ml-0">
-                        <Button
-                          type="button"
-                          value="Voltar"
-                          bgColor="bg-red-600"
-                          textColor="white"
-                          icon={<IoMdArrowBack size={18} />}
-                          onClick={() => router.back()}
                         />
                       </div>
                     </div>

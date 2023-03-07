@@ -7,6 +7,8 @@ import { HiOutlineOfficeBuilding } from 'react-icons/hi';
 import { MdDateRange } from 'react-icons/md';
 import { RiPlantLine, RiSeedlingLine } from 'react-icons/ri';
 
+import perm_can_do from './perm_can_do';
+
 interface IDropDown {
   labelDropDown: string;
   hrefDropDown: string;
@@ -29,7 +31,8 @@ export function TabsDropDowns(typeAside: any = 'config') {
         titleTab: 'TMG',
         valueTab: <BsCheckLg />,
         statusTab: true,
-        hrefTab: '/config/tmg/usuarios',
+        // hrefTab: "/config/tmg/usuarios",
+        hrefTab: '#',
         data: [
           {
             labelDropDown: 'Cultura',
@@ -67,7 +70,8 @@ export function TabsDropDowns(typeAside: any = 'config') {
         titleTab: 'ENSAIO',
         valueTab: <BsCheckLg />,
         statusTab: false,
-        hrefTab: '/config/ensaio/tipo-ensaio',
+        // hrefTab: "/config/ensaio/tipo-ensaio",
+        hrefTab: '#',
         data: [
           {
             labelDropDown: 'Tipo de ensaio',
@@ -103,7 +107,8 @@ export function TabsDropDowns(typeAside: any = 'config') {
         titleTab: 'DELINEAMENTO',
         valueTab: <BsCheckLg />,
         statusTab: false,
-        hrefTab: '/config/delineamento',
+        // hrefTab: '/config/delineamento',
+        hrefTab: '#',
         data: [
           {
             labelDropDown: 'Delineamento',
@@ -116,7 +121,8 @@ export function TabsDropDowns(typeAside: any = 'config') {
         titleTab: 'LOCAL',
         valueTab: <BsCheckLg />,
         statusTab: false,
-        hrefTab: '/config/local/local',
+        // hrefTab: "/config/local/local",
+        hrefTab: '#',
         data: [
           {
             labelDropDown: 'Lugar cultura',
@@ -134,7 +140,8 @@ export function TabsDropDowns(typeAside: any = 'config') {
         titleTab: 'QUADRAS',
         valueTab: <BsCheckLg />,
         statusTab: false,
-        hrefTab: '/config/quadra',
+        // hrefTab: "/config/quadra",
+        hrefTab: '#',
         data: [
           {
             labelDropDown: 'Layout',
@@ -154,7 +161,8 @@ export function TabsDropDowns(typeAside: any = 'config') {
         titleTab: 'RD',
         valueTab: <BsCheckLg />,
         statusTab: false,
-        hrefTab: '/listas/rd',
+        // hrefTab: "/listas/rd",
+        hrefTab: '#',
         data: [
           {
             labelDropDown: 'RD',
@@ -167,7 +175,8 @@ export function TabsDropDowns(typeAside: any = 'config') {
         titleTab: 'ENSAIO',
         valueTab: <BsCheckLg />,
         statusTab: false,
-        hrefTab: '/listas/ensaios/ensaio',
+        // hrefTab: "/listas/ensaios/ensaio",
+        hrefTab: '#',
         data: [
           {
             labelDropDown: 'Ensaio',
@@ -185,7 +194,8 @@ export function TabsDropDowns(typeAside: any = 'config') {
         titleTab: 'EXPERIMENTOS',
         valueTab: <BsCheckLg />,
         statusTab: false,
-        hrefTab: '/listas/experimentos/experimento',
+        // hrefTab: "/listas/experimentos/experimento",
+        hrefTab: '#',
         data: [
           {
             labelDropDown: 'Experimento',
