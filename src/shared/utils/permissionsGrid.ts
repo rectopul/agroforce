@@ -91,7 +91,7 @@ const permissions = [
     ],
   },
   {
-    route: '/config/delineamento/delineamento',
+    route: '/config/delineamento',
     permissions: [
       { value: 'view', title: 'Ver', checked: false },
       { value: 'import', title: 'Importar', checked: false },
@@ -99,13 +99,13 @@ const permissions = [
     ],
   },
   {
-    route: '/config/delineamento/delineamento/sequencia-delineamento',
+    route: '/config/delineamento/sequencia-delineamento',
     permissions: [
       { value: 'view', title: 'Ver', checked: false },
     ],
   },
   {
-    route: '/config/local/lugar-local',
+    route: '/config/local/local',
     permissions: [
       { value: 'view', title: 'Ver', checked: false },
       { value: 'import', title: 'Importar', checked: false },
@@ -168,7 +168,7 @@ const permissions = [
     ],
   },
   {
-    route: '/listas/experimento',
+    route: '/listas/experimentos/experimento',
     permissions: [
       { value: 'view', title: 'Ver', checked: false },
       { value: 'edit', title: 'Editar', checked: false },
@@ -177,7 +177,7 @@ const permissions = [
     ],
   },
   {
-    route: '/listas/parcelas-experimento',
+    route: '/listas/experimentos/parcelas-experimento',
     permissions: [
       { value: 'view', title: 'Ver', checked: false },
       { value: 'change', title: 'Substituir', checked: false },

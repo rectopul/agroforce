@@ -5,6 +5,7 @@ export class ProfileRepository extends BaseRepository {
   createProfilePermission(data: any) {
     throw new Error('Method not implemented.');
   }
+
   async findOne(id: number) {
     const result = await prisma.profile.findUnique({
       where: { id },
