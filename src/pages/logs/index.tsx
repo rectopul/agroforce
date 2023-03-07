@@ -183,6 +183,24 @@ export default function Listagem({
       value: 'INATIVAÇÃO',
       defaultChecked: () => camposGerenciados.includes('INATIVAÇÃO'),
     },
+    {
+      name: 'StatusCheckbox',
+      title: 'SUBSTITUIÇÃO',
+      value: 'SUBSTITUIÇÃO',
+      defaultChecked: () => camposGerenciados.includes('SUBSTITUIÇÃO'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'SORTEIO',
+      value: 'SORTEIO',
+      defaultChecked: () => camposGerenciados.includes('SORTEIO'),
+    },
+    {
+      name: 'StatusCheckbox',
+      title: 'ADIÇÃO DE EXPERIMENTO',
+      value: 'ADIÇÃO DE EXPERIMENTO',
+      defaultChecked: () => camposGerenciados.includes('ADIÇÃO DE EXPERIMENTO'),
+    },
   ]);
   // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
