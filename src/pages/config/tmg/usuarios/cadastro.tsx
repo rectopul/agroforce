@@ -440,7 +440,7 @@ export default function NovoUsuario({
 
                   <div className="w-full">
                     <h4 className="block text-gray-900 text-sm font-bold mb-1">
-                      Permissões
+                      Perfil
                     </h4>
                     <div>
                       <MultiSelectComponent
