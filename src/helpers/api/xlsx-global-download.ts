@@ -852,7 +852,7 @@ async function callEnsaioEnsaioXlsxDownload(options: any) {
       newItem.STATUS_DO_ENSAIO = newItem?.status;
       newItem.BGM = newItem?.bgm;
       newItem.PROJETO = newItem?.project;
-      newItem.OBSERVAÇÕES = newItem?.comments;
+      newItem.COMENTARIOS = newItem?.comments;
       newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete newItem.safra;
@@ -911,7 +911,7 @@ async function callEnsaioGenotipeXlsxDownload(options: any) {
       newItem.BGM = item.assay_list.bgm;
       newItem.STATUS_ENSAIO = item.assay_list.status;
       newItem.PROJETO = item.assay_list.project;
-      newItem.COMENTÁRIOS = item.assay_list.status;
+      newItem.COMENTÁRIOS = item.assay_list.comments;
       newItem.FASE = item.lote.fase;
       newItem.GGEN = `${item.genotipo.tecnologia.cod_tec} ${item.genotipo.tecnologia.name}`;
       newItem.NT = item.treatments_number;
