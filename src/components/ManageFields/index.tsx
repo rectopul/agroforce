@@ -122,36 +122,91 @@ export function ManageFields(props: ManageFieldsProps) {
     // props.OnSetGeneratesProps(items);
     setStatusAccordion(true);
   }
+  
+  async function acao1(): Promise<void> {
+    console.log('acao1');
+    setCamposGerenciados('id,foco,type_assay,tecnologia,gli');
+    props.OnSetCamposGerenciados('id,foco,type_assay,tecnologia,gli');
+    reorderGeneratedProps();
+    props.OnSetGeneratesProps(generatesProps);
+    getValuesColumns();
+  }
+
+  async function acao2(): Promise<void> {
+    console.log('acao2');
+    setCamposGerenciados('rep,status,nt,npe,genotipo,nca');
+    props.OnSetCamposGerenciados('rep,status,nt,npe,genotipo,nca');
+    reorderGeneratedProps();
+    props.OnSetGeneratesProps(generatesProps);
+    getValuesColumns();
+  }
 
   async function clearPreferencesByUserAndModule(): Promise<void> {
     if (preferences.id === 0) return;
-
+    
     await userPreferencesService
       .deleted(preferences.id)
-      .then(({ status, response }) => {
+      .then(async ({status, response}) => {
         console.log('response', response);
 
         if (status === 200) {
-          preferencesDefault.userId = userLogado.id;
 
+          // simulação de exclusão de preferências
+          preferences.id = 0;
+          preferences.table_preferences = props.camposGerenciadosDefault;
+          preferences.userId = userLogado.id;
+          preferences.route_usage = router.route;
+          userLogado.preferences[props.identifier_preference] = preferences;
+
+          setPreferences(preferences);
+          props.OnSetPreferences(preferences);
+
+          setUserLogado(userLogado);
+          props.OnSetUserLogado(userLogado);
+
+          //camposGerenciados
+          setCamposGerenciados(props.camposGerenciadosDefault);
+          props.OnSetCamposGerenciados(props.camposGerenciadosDefault);
+
+          localStorage.setItem('user', JSON.stringify(userLogado));
+
+          reorderGeneratedProps();
+          props.OnSetGeneratesProps(generatesProps);
+
+          await userPreferencesService
+            .create({
+              table_preferences: props.camposGerenciadosDefault,
+              userId: userLogado.id,
+              route_usage: router.route,
+              module_id: props.module_id,
+            })
+            .then((response) => {
+              userLogado.preferences[props.identifier_preference] = {
+                id: response.response.id,
+                route_usage: router.route,
+                userId: userLogado.id,
+                table_preferences: props.camposGerenciadosDefault,
+              };
+              setPreferences(userLogado.preferences[props.identifier_preference]);
+            });
+
+          //getValuesColumns();
+
+          /*
+          preferencesDefault.userId = userLogado.id;
           delete userLogado.preferences[props.identifier_preference];
           userLogado.preferences[props.identifier_preference] = preferencesDefault;
-
           console.log(`====> ${props.identifier_preference}::`, preferencesDefault);
-
           const preferences1 = userLogado.preferences[props.identifier_preference];
-
           setUserLogado(userLogado);
           setPreferences(preferencesDefault);
           props.OnSetUserLogado(userLogado);
           props.OnSetPreferences(preferencesDefault);
-
           localStorage.setItem('user', JSON.stringify(userLogado));
-
           console.log('====>preferences antes de chamar getValuesColumns:', preferences);
           console.log('====>preferences antes de chamar getValuesColumns:', preferences1);
+          getValuesColumns();/**/
 
-          getValuesColumns();
         }
       })
       .catch((error) => {
@@ -163,8 +218,11 @@ export function ManageFields(props: ManageFieldsProps) {
         });
       });
   }
-
+  
   async function getValuesColumns(): Promise<void> {
+
+    console.log('=======> called: getValuesColumns');
+    
     const els: any = document.querySelectorAll(`ul[data-rbd-droppable-id='tbl_${props.table}'] input[type='checkbox']`);
     let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
@@ -174,7 +232,7 @@ export function ManageFields(props: ManageFieldsProps) {
     }
     const totalString = selecionados.length;
     const campos = selecionados.substr(0, totalString - 1);
-    if (preferences.id === 0) {
+    if (preferences.id === 0 || preferences.id === null) {
       await userPreferencesService
         .create({
           table_preferences: campos,
@@ -193,7 +251,8 @@ export function ManageFields(props: ManageFieldsProps) {
           setPreferences(userLogado.preferences[props.identifier_preference]);
         });
       localStorage.setItem('user', JSON.stringify(userLogado));
-    } else {
+    } 
+    else {
       userLogado.preferences[props.identifier_preference] = {
         id: preferences.id,
         userId: preferences.userId,
@@ -270,15 +329,15 @@ export function ManageFields(props: ManageFieldsProps) {
                     />
                   </div>
 
-                  {/* <div className="h-8 mb-3"> */}
-                  {/*  <Button */}
-                  {/*    value="Limpar Preferências" */}
-                  {/*    bgColor="bg-red-600" */}
-                  {/*    textColor="white" */}
-                  {/*    onClick={clearPreferencesByUserAndModule} */}
-                  {/*    icon={<IoTrash size={20}/>} */}
-                  {/*  /> */}
-                  {/* </div> */}
+                   <div className="h-8 mb-3"> 
+                    <Button 
+                      value="Limpar Preferências" 
+                      bgColor="bg-red-600" 
+                      textColor="white" 
+                      onClick={clearPreferencesByUserAndModule} 
+                      icon={<IoTrash size={20}/>} 
+                    />
+                   </div>
 
                   {generatesProps.map((generate, index) => (
                     <Draggable

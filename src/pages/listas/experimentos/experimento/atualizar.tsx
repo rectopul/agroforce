@@ -117,20 +117,21 @@ export default function AtualizarLocal({
   const module_id = 30;
   // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
   const identifier_preference = module_name + router.route;
+  const camposGerenciadosDefault = 'repetitionExperience,genotipo,gmr,bgm,fase,tecnologia,nt,rep,status,nca,npe,sequence,block,experiment';
   const preferencesDefault = {
     id: 0,
     route_usage: router.route,
-    table_preferences:
-      'repetitionExperience,genotipo,gmr,bgm,fase,tecnologia,nt,rep,status,nca,npe,sequence,block,experiment',
+    table_preferences: camposGerenciadosDefault
   };
 
   const [preferences, setPreferences] = useState<any>(
     userLogado.preferences[identifier_preference] || preferencesDefault,
   );
+  
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
-
+  
   const [materiais, setMateriais] = useState<any>(() => allItens);
   const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -953,7 +954,7 @@ export default function AtualizarLocal({
                       <ManageFields
                         statusAccordionExpanded={false}
                         generatesPropsDefault={generatesProps}
-                        camposGerenciadosDefault={camposGerenciados}
+                        camposGerenciadosDefault={camposGerenciadosDefault}
                         preferences={preferences}
                         preferencesDefault={preferencesDefault}
                         userLogado={userLogado}
