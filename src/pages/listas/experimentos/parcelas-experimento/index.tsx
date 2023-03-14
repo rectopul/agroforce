@@ -101,18 +101,18 @@ export default function Listagem({
   const module_id = 30;
   // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
   const identifier_preference = module_name + router.route;
+  const camposGerenciadosDefault = 'id,foco,type_assay,tecnologia,gli,experiment,culture,status_t,rep,status,nt,npe,genotipo,nca';
   const preferencesDefault = {
     id: 0,
     route_usage: router.route,
-    table_preferences:
-      'id,foco,type_assay,tecnologia,gli,experiment,culture,status_t,rep,status,nt,npe,genotipo,nca',
+    table_preferences: camposGerenciadosDefault
   };
 
   const [preferences, setPreferences] = useState<any>(userLogado.preferences[identifier_preference] || preferencesDefault);
-
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
+  
   const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -532,6 +532,7 @@ export default function Listagem({
   // }
 
   function orderColumns(columnsOrder: string): Array<object> {
+    console.log('=======> called: orderColumns');
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item: any) => {
@@ -1497,7 +1498,7 @@ export default function Listagem({
                       <ManageFields
                         statusAccordionExpanded={false}
                         generatesPropsDefault={generatesProps}
-                        camposGerenciadosDefault={camposGerenciados}
+                        camposGerenciadosDefault={camposGerenciadosDefault}
                         preferences={preferences}
                         preferencesDefault={preferencesDefault}
                         userLogado={userLogado}
