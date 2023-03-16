@@ -11,6 +11,7 @@ import { Content } from '../../../components/Content';
 import { profileService } from '../../../services';
 import stylesCommon from '../../../shared/styles/common.module.css';
 import LoadingComponent from '../../../components/Loading';
+import perm_can_do from '../../../shared/utils/perm_can_do';
 
 export default function Permissoes({
   allRoutes,
@@ -21,8 +22,8 @@ export default function Permissoes({
 
   function Route({ key, route }: any) {
     return (
-      <div className="inline ">
-        <li id={key} className="mr-12">{ route }</li>
+      <div className="w-96 pb-2">
+        <li id={key}>{ route }</li>
       </div>
     );
   }
@@ -63,26 +64,29 @@ export default function Permissoes({
         <div className={stylesCommon.container}>
           <ul>
             {allRoutes.map((route: any) => (
-              <>
+              <li className="flex ">
                 <Route key={route.id} route={route.screenRoute} />
                 {route.permission[0]?.permissions?.map((element: any) => (
-                  <CheckBox
-                    name={element.title}
-                    id={route.screenRoute}
-                    title={element.title?.toString()}
-                    value={element.value}
-                    defaultChecked={element.checked}
-                  />
+                  <div className="ml-2">
+                    <CheckBox
+                      name={element.title}
+                      id={route.screenRoute}
+                      title={element.title?.toString()}
+                      value={element.value}
+                      defaultChecked={element.checked}
+                    />
+                  </div>
                 ))}
-              </>
+              </li>
             ))}
           </ul>
-          <div>
+          <div className="w-40 pt-8">
             <Button
               title="Salvar"
               value="Salvar"
               bgColor="bg-blue-600"
               textColor="white"
+              style={{ display: !perm_can_do('/perfil/perfis/permissoes', 'edit') ? 'none' : '' }}
               onClick={save}
             />
           </div>

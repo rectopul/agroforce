@@ -6,6 +6,7 @@ import { FaRegUserCircle } from 'react-icons/fa';
 import { MdOutlineExitToApp } from 'react-icons/md';
 import { RiLockPasswordLine } from 'react-icons/ri';
 import { userService } from '../../../services';
+import perm_can_do from '../../../shared/utils/perm_can_do';
 
 interface IModelProps {
   name: string;
@@ -141,21 +142,24 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                 </Link>
               )}
             </Menu.Item>
-            {/* <Menu.Item>
+            <Menu.Item>
               {({ active }) => (
-                <Link href="/perfil/perfis">
+                <Link
+                  href="/perfil/perfis"
+                >
                   <a
                     className={classNames(
                       active ? 'bg-gray-100 text-blue-600' : 'text-gray-700',
                       'px-4 py-2 text-base flex items-center gap-1',
                     )}
+                    style={{ display: !perm_can_do('/perfil/perfis', 'view') ? 'none' : '' }}
                   >
                     <RiLockPasswordLine />
                     Permissões
                   </a>
                 </Link>
               )}
-            </Menu.Item> */}
+            </Menu.Item>
             <form
               method="POST"
               action="#"

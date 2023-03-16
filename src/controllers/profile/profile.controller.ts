@@ -6,6 +6,7 @@ import { ProfileRepository } from '../../repository/profile.repository';
 import handleError from '../../shared/utils/handleError';
 import { PermissionsController } from '../permissions/permissions.controller';
 import { ProfilePermissionsRepository } from '../../repository/profile-permissions.repository';
+import { ReporteController } from '../reportes/reporte.controller';
 
 export class ProfileController {
   profileRepository = new ProfileRepository();
@@ -13,6 +14,8 @@ export class ProfileController {
   permissionsController = new PermissionsController();
 
   profilePermissionsRepository = new ProfilePermissionsRepository();
+
+  reporteController = new ReporteController();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -54,6 +57,13 @@ export class ProfileController {
 
   async create(data: any) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json')
+        .then((results) => results.json())
+        .catch(() => '0.0.0.0');
+      data.acess_permission = `"${data.name}"`;
+      await this.reporteController.create({
+        userId: data.createdBy, module: 'PERFIL', operation: 'CRIAÇÃO', oldValue: data.name, ip: String(ip),
+      });
       await this.profileRepository.create(data);
       return { status: 200, message: 'Permissão cadastrado' };
     } catch (error: any) {
@@ -90,6 +100,17 @@ export class ProfileController {
 
   async update(data: any) {
     try {
+      const { ip } = await fetch('https://api.ipify.org/?format=json')
+        .then((results) => results.json())
+        .catch(() => '0.0.0.0');
+      if (data.name) {
+        await this.reporteController.create({
+          userId: data.createdBy, module: 'PERFIL', operation: 'EDIÇÃO', oldValue: data.name, ip: String(ip),
+        });
+        await this.profileRepository.update(Number(data.id), data);
+
+        return { status: 200, message: 'Perfil atualizado' };
+      }
       await this.profilePermissionsRepository.deleteAll({
         profileId: Number(data.profileId),
       });

@@ -165,10 +165,6 @@ export class CulturaController {
 
   async updateCulture(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json')
-        .then((results) => results.json())
-        .catch(() => '0.0.0.0');
-
       const culture = await this.culturaRepository.findOne(data.id);
 
       const { created_by } = data;
@@ -190,6 +186,9 @@ export class CulturaController {
         return { status: 400, response: [], message: 'Tipo de ensaio não atualizado' };
       }
 
+      const { ip } = await fetch('https://api.ipify.org/?format=json')
+        .then((results) => results.json())
+        .catch(() => '0.0.0.0');
       if (data.status === 1) {
         await this.reporteController.create({
           userId: created_by, module: 'CULTURA', operation: 'ATIVAÇÃO', oldValue: response.desc, ip: String(ip),
