@@ -42,6 +42,7 @@ import {
   FieldItemsPerPage,
   SelectMultiple,
   ModalConfirmation,
+  ManageFields,
 } from '../../../components';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
@@ -82,13 +83,26 @@ export default function Listagem({
   const tableRef = useRef<any>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.etiquetagem || {
+  const [userLogado, setUserLogado] = useState<any>(
+    JSON.parse(localStorage.getItem('user') as string),
+  );
+  const table = 'ExperimentGroup';
+  const module_name = 'etiquetagem';
+  const module_id = 29;
+  // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
+  const identifier_preference = module_name + router.route;
+  const camposGerenciadosDefault = 'id,name,experimentAmount,tagsToPrint,tagsPrinted,totalTags,status,action';
+  const preferencesDefault = {
     id: 0,
-    table_preferences:
-      'id,name,experimentAmount,tagsToPrint,tagsPrinted,totalTags,status,action',
+    route_usage: router.route,
+    table_preferences: camposGerenciadosDefault,
   };
+
+  const [preferences, setPreferences] = useState<any>(
+    userLogado.preferences[identifier_preference] || preferencesDefault,
+  );
 
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
@@ -177,7 +191,6 @@ export default function Listagem({
   // const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
   const [arrowOrder, setArrowOrder] = useState<any>('');
-  const router = useRouter();
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [statusAccordionFilter, setStatusAccordionFilter] = useState<boolean>(false);
   // const take: number = itensPerPage;
@@ -537,7 +550,7 @@ export default function Listagem({
         .create({
           table_preferences: campos,
           userId: userLogado.id,
-          module_id: 32,
+          module_id: 29,
         })
         .then((response) => {
           userLogado.preferences.etiquetagem = {
@@ -631,7 +644,7 @@ export default function Listagem({
         XLSX.writeFile(workBook, 'Listagem grupo de etiquetagem.xlsx');
       } else {
         setLoading(false);
-        Swal.fire('Não existem registros para serem exportados, favor checar.');
+        Swal.fire('Nenhum dado para extrair');
       }
     });
     setLoading(false);
@@ -1038,61 +1051,43 @@ export default function Listagem({
                       className="h-full flex items-center gap-2
                     "
                     >
-                      <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-64">
-                          <AccordionFilter
-                            title="Gerenciar Campos"
-                            grid={statusAccordion}
-                          >
-                            <DragDropContext onDragEnd={handleOnDragEnd}>
-                              <Droppable droppableId="characters">
-                                {(provided) => (
-                                  <ul
-                                    className="w-full h-full characters"
-                                    {...provided.droppableProps}
-                                    ref={provided.innerRef}
-                                  >
-                                    <div className="h-8 mb-3">
-                                      <Button
-                                        value="Atualizar"
-                                        bgColor="bg-blue-600"
-                                        textColor="white"
-                                        onClick={getValuesColumns}
-                                        icon={<IoReloadSharp size={20} />}
-                                      />
-                                    </div>
-                                    {generatesProps.map((generate, index) => (
-                                      <Draggable
-                                        key={index}
-                                        draggableId={String(generate.title)}
-                                        index={index}
-                                      >
-                                        {(providers) => (
-                                          <li
-                                            ref={providers.innerRef}
-                                            {...providers.draggableProps}
-                                            {...providers.dragHandleProps}
-                                          >
-                                            <CheckBox
-                                              name={generate.name}
-                                              title={generate.title?.toString()}
-                                              value={generate.value}
-                                              defaultChecked={camposGerenciados.includes(
-                                                generate.value,
-                                              )}
-                                            />
-                                          </li>
-                                        )}
-                                      </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                  </ul>
-                                )}
-                              </Droppable>
-                            </DragDropContext>
-                          </AccordionFilter>
-                        </div>
-                      </div>
+                      <ManageFields
+                        statusAccordionExpanded={false}
+                        generatesPropsDefault={generatesProps}
+                        camposGerenciadosDefault={camposGerenciadosDefault}
+                        preferences={preferences}
+                        preferencesDefault={preferencesDefault}
+                        userLogado={userLogado}
+                        label="Gerenciar Campos"
+                        table={table}
+                        module_name={module_name}
+                        module_id={module_id}
+                        identifier_preference={identifier_preference}
+                        OnSetStatusAccordion={(e: any) => {
+                          console.log('callback', 'setStatusAccordion', e);
+                          setStatusAccordion(e);
+                        }}
+                        OnSetGeneratesProps={(e: any) => {
+                          console.log('callback', 'setGeneratesProps', e);
+                          setGeneratesProps(e);
+                        }}
+                        OnSetCamposGerenciados={(e: any) => {
+                          console.log('callback', 'setCamposGerenciados', e);
+                          setCamposGerenciados(e);
+                        }}
+                        OnColumnsOrder={(e: any) => {
+                          console.log('callback', 'columnsOrder', e);
+                          orderColumns(e);
+                        }}
+                        OnSetUserLogado={(e: any) => {
+                          console.log('callback', 'setUserLogado', e);
+                          setUserLogado(e);
+                        }}
+                        OnSetPreferences={(e: any) => {
+                          console.log('callback', 'setPreferences', e);
+                          setPreferences(e);
+                        }}
+                      />
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
                           title="Exportar planilha de grupos"

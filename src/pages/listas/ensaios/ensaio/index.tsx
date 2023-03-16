@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
@@ -47,6 +48,7 @@ import {
   Input,
   ModalConfirmation,
   FieldItemsPerPage,
+  ManageFields,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
@@ -74,16 +76,32 @@ export default function TipoEnsaio({
 
   const tableRef = useRef<any>(null);
 
+  const router = useRouter();
+
   const [loading, setLoading] = useState(false);
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.assayList || {
+  const [userLogado, setUserLogado] = useState<any>(
+    JSON.parse(localStorage.getItem('user') as string),
+  );
+  const table = 'assay_list';
+  const module_name = 'assayList';
+  const module_id = 26;
+  // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
+  const identifier_preference = module_name + router.route;
+  const camposGerenciadosDefault = 'id,protocol_name,foco,type_assay,gli,tecnologia,treatmentsNumber,status,action';
+  const preferencesDefault = {
     id: 0,
-    table_preferences:
-      'id,protocol_name,foco,type_assay,gli,tecnologia,treatmentsNumber,status,action',
+    route_usage: router.route,
+    table_preferences: camposGerenciadosDefault,
   };
+
+  const [preferences, setPreferences] = useState<any>(
+    userLogado.preferences[identifier_preference] || preferencesDefault,
+  );
+
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
+
   const [assayList, setAssayList] = useState<IAssayList[]>(() => allAssay);
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit),
@@ -155,7 +173,6 @@ export default function TipoEnsaio({
   const [orderType, setOrderType] = useState<string>('');
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
-  const router = useRouter();
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
@@ -346,6 +363,7 @@ export default function TipoEnsaio({
                 setCookies('itensPage', itensPerPage);
                 setCookies('lastPage', 'atualizar');
                 setCookies('takeBeforeEdit', take);
+                setCookies('urlPage', 'assayList');
                 router.push(
                   `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`,
                 );
@@ -381,6 +399,7 @@ export default function TipoEnsaio({
                 setCookies('filtersParams', filtersParams);
                 setCookies('takeBeforeEdit', take);
                 setCookies('lastPage', 'atualizar');
+                setCookies('urlPage', 'assayList');
                 router.push(
                   `/listas/ensaios/ensaio/atualizar?id=${rowData.id}`,
                 );
@@ -596,6 +615,10 @@ export default function TipoEnsaio({
     await assayListService
       .getAll(filterParam)
       .then(({ status, response }) => {
+        if (!response.A1) {
+          Swal.fire('Nenhum dado para extrair');
+          return;
+        }
         if (status === 200) {
           const workBook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(workBook, response, 'Tipo_Ensaio');
@@ -836,61 +859,43 @@ export default function TipoEnsaio({
                       className="h-full flex items-center gap-2
                     "
                     >
-                      <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-64">
-                          <AccordionFilter
-                            title="Gerenciar Campos"
-                            grid={statusAccordion}
-                          >
-                            <DragDropContext onDragEnd={handleOnDragEnd}>
-                              <Droppable droppableId="characters">
-                                {(provided) => (
-                                  <ul
-                                    className="w-full h-full characters"
-                                    {...provided.droppableProps}
-                                    ref={provided.innerRef}
-                                  >
-                                    <div className="h-8 mb-3">
-                                      <Button
-                                        value="Atualizar"
-                                        bgColor="bg-blue-600"
-                                        textColor="white"
-                                        onClick={getValuesColumns}
-                                        icon={<IoReloadSharp size={20} />}
-                                      />
-                                    </div>
-                                    {generatesProps.map((generate, index) => (
-                                      <Draggable
-                                        key={index}
-                                        draggableId={String(generate.title)}
-                                        index={index}
-                                      >
-                                        {(providers) => (
-                                          <li
-                                            ref={providers.innerRef}
-                                            {...providers.draggableProps}
-                                            {...providers.dragHandleProps}
-                                          >
-                                            <CheckBox
-                                              name={generate.name}
-                                              title={generate.title?.toString()}
-                                              value={generate.value}
-                                              defaultChecked={camposGerenciados.includes(
-                                                generate.value,
-                                              )}
-                                            />
-                                          </li>
-                                        )}
-                                      </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                  </ul>
-                                )}
-                              </Droppable>
-                            </DragDropContext>
-                          </AccordionFilter>
-                        </div>
-                      </div>
+                      <ManageFields
+                        statusAccordionExpanded={false}
+                        generatesPropsDefault={generatesProps}
+                        camposGerenciadosDefault={camposGerenciadosDefault}
+                        preferences={preferences}
+                        preferencesDefault={preferencesDefault}
+                        userLogado={userLogado}
+                        label="Gerenciar Campos"
+                        table={table}
+                        module_name={module_name}
+                        module_id={module_id}
+                        identifier_preference={identifier_preference}
+                        OnSetStatusAccordion={(e: any) => {
+                          console.log('callback', 'setStatusAccordion', e);
+                          setStatusAccordion(e);
+                        }}
+                        OnSetGeneratesProps={(e: any) => {
+                          console.log('callback', 'setGeneratesProps', e);
+                          setGeneratesProps(e);
+                        }}
+                        OnSetCamposGerenciados={(e: any) => {
+                          console.log('callback', 'setCamposGerenciados', e);
+                          setCamposGerenciados(e);
+                        }}
+                        OnColumnsOrder={(e: any) => {
+                          console.log('callback', 'columnsOrder', e);
+                          orderColumns(e);
+                        }}
+                        OnSetUserLogado={(e: any) => {
+                          console.log('callback', 'setUserLogado', e);
+                          setUserLogado(e);
+                        }}
+                        OnSetPreferences={(e: any) => {
+                          console.log('callback', 'setPreferences', e);
+                          setPreferences(e);
+                        }}
+                      />
 
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
@@ -982,7 +987,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
-  if (lastPageServer == undefined || lastPageServer == 'No') {
+  if (lastPageServer == undefined || lastPageServer == 'No' || req.cookies.urlPage !== 'assayList') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });

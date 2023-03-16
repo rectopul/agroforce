@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
@@ -46,6 +47,7 @@ import {
   Content,
   Input,
   FieldItemsPerPage,
+  ManageFields,
 } from '../../../components';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
@@ -249,11 +251,25 @@ export default function Import({
     }
   }
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.rd || {
+  const [userLogado, setUserLogado] = useState<any>(
+    JSON.parse(localStorage.getItem('user') as string),
+  );
+  const tables = 'log_import';
+  const module_name = 'RD';
+  const module_id = 25;
+  // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
+  const identifier_preference = module_name + router.route;
+  const camposGerenciadosDefault = 'id,user_id,created_at,table,state,updated_at,action';
+  const preferencesDefault = {
     id: 0,
-    table_preferences: 'id,user_id,created_at,table,state,updated_at',
+    route_usage: router.route,
+    table_preferences: camposGerenciadosDefault,
   };
+
+  const [preferences, setPreferences] = useState<any>(
+    userLogado.preferences[identifier_preference] || preferencesDefault,
+  );
+
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
@@ -356,7 +372,6 @@ export default function Import({
         let valid = false;
 
         if (validFileName.length > 0) {
-          console.log('🚀 ~ file: index.tsx:361 ~ validFileName.map ~ rowData:', rowData);
           validFileName.map((e: any) => {
             if (e == rowData.filePath) {
               valid = true;
@@ -419,7 +434,6 @@ export default function Import({
                   textColor="white"
                   onClick={() => {
                     downloadFile(rowData);
-                    // replacementExcel();
                   }}
                 />
               </div>
@@ -598,6 +612,10 @@ export default function Import({
     const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
 
     await logImportService.getAll(filterParam).then(({ status, response }) => {
+      if (!response.A1) {
+        Swal.fire('Nenhum dado para extrair');
+        return;
+      }
       if (status === 200) {
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, response, 'logs');
@@ -1081,77 +1099,43 @@ export default function Import({
                       </strong>
 
                       <div className="h-full flex items-center gap-2">
-                        <div className="border-solid border-2 border-blue-600 rounded">
-                          <div className="w-72">
-                            <AccordionFilter
-                              title="Gerenciar Campos"
-                              grid={statusAccordion}
-                            >
-                              <DragDropContext onDragEnd={handleOnDragEnd}>
-                                <Droppable droppableId="characters">
-                                  {(provided) => (
-                                    <ul
-                                      className="w-full h-full characters"
-                                      {...provided.droppableProps}
-                                      ref={provided.innerRef}
-                                    >
-                                      <div className="h-8 mb-3">
-                                        <Button
-                                          value="Atualizar"
-                                          bgColor="bg-blue-600"
-                                          textColor="white"
-                                          onClick={getValuesColumns}
-                                          icon={<IoReloadSharp size={20} />}
-                                        />
-                                      </div>
-                                      {generatesProps.map((genarate, index) => (
-                                        <Draggable
-                                          key={index}
-                                          draggableId={String(genarate.title)}
-                                          index={index}
-                                        >
-                                          {(provider) => (
-                                            <li
-                                              ref={provider.innerRef}
-                                              {...provider.draggableProps}
-                                              {...provider.dragHandleProps}
-                                            >
-                                              <CheckBox
-                                                name={genarate.name}
-                                                title={genarate.title?.toString()}
-                                                value={genarate.value}
-                                                defaultChecked={camposGerenciados.includes(
-                                                  genarate.value as string,
-                                                )}
-                                              />
-                                            </li>
-                                          )}
-                                        </Draggable>
-                                      ))}
-                                      {provided.placeholder}
-                                    </ul>
-                                  )}
-                                </Droppable>
-                              </DragDropContext>
-                            </AccordionFilter>
-                          </div>
-                        </div>
-
-                        {/* <div className="h-12 flex items-center justify-left">
-                          <Button
-                            title="Cancelar importação de planilha"
-                            icon={<AiOutlineStop size={20} />}
-                            bgColor={
-                              disabledButton ? 'bg-blue-600' : 'bg-gray-400'
-                            }
-                            textColor="white"
-                            disabled={!disabledButton}
-                            onClick={() => {
-                              cancelImport();
-                            }}
-                          />
-                        </div> */}
-
+                        <ManageFields
+                          statusAccordionExpanded={false}
+                          generatesPropsDefault={generatesProps}
+                          camposGerenciadosDefault={camposGerenciadosDefault}
+                          preferences={preferences}
+                          preferencesDefault={preferencesDefault}
+                          userLogado={userLogado}
+                          label="Gerenciar Campos"
+                          table={tables}
+                          module_name={module_name}
+                          module_id={module_id}
+                          identifier_preference={identifier_preference}
+                          OnSetStatusAccordion={(e: any) => {
+                            console.log('callback', 'setStatusAccordion', e);
+                            setStatusAccordion(e);
+                          }}
+                          OnSetGeneratesProps={(e: any) => {
+                            console.log('callback', 'setGeneratesProps', e);
+                            setGeneratesProps(e);
+                          }}
+                          OnSetCamposGerenciados={(e: any) => {
+                            console.log('callback', 'setCamposGerenciados', e);
+                            setCamposGerenciados(e);
+                          }}
+                          OnColumnsOrder={(e: any) => {
+                            console.log('callback', 'columnsOrder', e);
+                            columnsOrder(e);
+                          }}
+                          OnSetUserLogado={(e: any) => {
+                            console.log('callback', 'setUserLogado', e);
+                            setUserLogado(e);
+                          }}
+                          OnSetPreferences={(e: any) => {
+                            console.log('callback', 'setPreferences', e);
+                            setPreferences(e);
+                          }}
+                        />
                         <div className="h-12 flex items-center justify-center w-full">
                           <Button
                             title="Exportar planilha de logs"

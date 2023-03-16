@@ -709,6 +709,10 @@ export default function AtualizarTipoEnsaio({
     await genotypeTreatmentService
       .getAll(`${filterParam}&excel=true`)
       .then(({ status, response }) => {
+        if (!response.A1) {
+          Swal.fire('Nenhum dado para extrair');
+          return;
+        }
         if (status === 200) {
           const workBook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(workBook, response, 'Tratamentos');
@@ -744,6 +748,10 @@ export default function AtualizarTipoEnsaio({
     await experimentService
       .getAll(`${filterParam}&excel=${true}`)
       .then(({ status, response }: any) => {
+        if (!response.A1) {
+          Swal.fire('Nenhum dado para extrair');
+          return;
+        }
         if (status === 200) {
           const workBook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(workBook, response, 'experimentos');
@@ -1250,7 +1258,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
-  if (lastPageServer == undefined || lastPageServer == 'No') {
+  if (lastPageServer == undefined || lastPageServer == 'No' || req.cookies.urlPage !== 'assayList') {
+    console.log('🚀 ~ file: atualizar.tsx:1254 ~ req.cookies.urlPage:', req.cookies.urlPage);
     // removeCookies('filterBeforeEdit', { req, res });
     // removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });

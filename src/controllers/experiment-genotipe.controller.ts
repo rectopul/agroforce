@@ -47,6 +47,12 @@ export class ExperimentGenotipeController {
         );
       }
 
+      if (options.filterGroup) {
+        parameters.group = JSON.parse(
+          `{ "group": { "${equalsOrContains}": "${options.filterGroup}" } }`,
+        );
+      }
+
       // if (options.filterGli) {
       //   parameters.assayList = JSON.parse(
       //     `{ "name": { "${equalsOrContains}": "${options.filterGli}" } }`,
