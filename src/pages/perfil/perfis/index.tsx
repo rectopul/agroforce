@@ -7,12 +7,15 @@ import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
-import { BiEdit, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import {
+  BiEdit, BiLeftArrow, BiRightArrow, BiSlider,
+} from 'react-icons/bi';
 import { MdDateRange, MdFirstPage, MdLastPage } from 'react-icons/md';
 import { Button } from '../../../components/Button';
 import { Content } from '../../../components/Content';
 import { profileService } from '../../../services';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
+import perm_can_do from '../../../shared/utils/perm_can_do';
 
 export default function Perfis({
   allProfiles,
@@ -92,16 +95,30 @@ export default function Perfis({
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
+              style={{ display: !perm_can_do('/perfil/perfis', 'edit') ? 'none' : '' }}
               onClick={() => {
                 router.push(
-                  `/perfil/perfis/permissoes?id=${rowData.id}`,
+                  `/perfil/perfis/atualizar?id=${rowData.id}`,
                 );
               }}
               bgColor="bg-blue-600"
               textColor="white"
             />
           </div>
-
+          <div className="h-7 ml-3">
+            <Button
+              value="Permissões"
+              title={`Permissões de ${rowData.name}`}
+              style={{ display: !perm_can_do('/perfil/perfis/permissoes', 'view') ? 'none' : '' }}
+              onClick={() => {
+                router.push(
+                  `/perfil/perfis/permissoes?id=${rowData.id}`,
+                );
+              }}
+              bgColor="bg-red-600"
+              textColor="white"
+            />
+          </div>
         </div>
       ),
     };
@@ -112,9 +129,6 @@ export default function Perfis({
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      // if (columnCampos[index] === 'id') {
-      //   tableFields.push(idHeaderFactory());
-      // }
       if (columnCampos[index] === 'name') {
         tableFields.push(
           headerTableFactoryGlobal({
@@ -187,8 +201,9 @@ export default function Perfis({
                         value="Cadastrar perfil"
                         bgColor="bg-blue-600"
                         textColor="white"
+                        style={{ display: !perm_can_do('/perfil/perfis', 'create') ? 'none' : '' }}
                         onClick={() => {
-                          router.push('perfil/perfis/cadastro');
+                          router.push('/perfil/perfis/cadastro');
                         }}
                         icon={<MdDateRange size={20} />}
                       />
