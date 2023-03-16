@@ -219,6 +219,7 @@ export default function AtualizarUsuario({
           auxValidate = true;
           return;
         }
+
         ObjProfiles = {
           cultureId: values.cultures[item],
           profiles: auxObject2,
@@ -229,6 +230,7 @@ export default function AtualizarUsuario({
 
       if (auxValidate) {
         Swal.fire('E preciso escolher um perfil para as culturas selecionadas');
+        setLoading(false);
         return;
       }
 

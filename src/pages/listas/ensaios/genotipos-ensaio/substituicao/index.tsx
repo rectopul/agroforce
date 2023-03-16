@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
@@ -34,6 +35,7 @@ import {
   Input,
   ModalConfirmation,
   FieldItemsPerPage,
+  ManageFields,
 } from '../../../../../components';
 import {
   loteService,
@@ -117,7 +119,24 @@ export default function Listagem({
     ? (tab.statusTab = true)
     : (tab.statusTab = false)));
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
+  const [userLogado, setUserLogado] = useState<any>(
+    JSON.parse(localStorage.getItem('user') as string),
+  );
+  const table = 'lote';
+  const module_name = 'lote';
+  const module_id = 12;
+  // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
+  const identifier_preference = module_name + router.route;
+  const camposGerenciadosDefault = 'safra,year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia,action';
+  const preferencesDefault = {
+    id: 0,
+    route_usage: router.route,
+    table_preferences: camposGerenciadosDefault,
+  };
+
+  const [preferences, setPreferences] = useState<any>(
+    userLogado.preferences[identifier_preference] || preferencesDefault,
+  );
   const checkedTreatments = JSON.parse(
     localStorage.getItem('checkedTreatments') as string,
   );
@@ -125,11 +144,6 @@ export default function Listagem({
     localStorage.getItem('treatmentsOptionSelected') as string,
   );
 
-  const preferences = userLogado.preferences.lote || {
-    id: 0,
-    table_preferences:
-      'safra,year,cod_lote,ncc,fase,peso,quant_sementes,name_genotipo,name_main,gmr,bgm,tecnologia,action',
-  };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
@@ -967,61 +981,43 @@ export default function Listagem({
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
-                      <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-72">
-                          <AccordionFilter
-                            title="Gerenciar Campos"
-                            grid={statusAccordion}
-                          >
-                            <DragDropContext onDragEnd={handleOnDragEnd}>
-                              <Droppable droppableId="characters">
-                                {(provided) => (
-                                  <ul
-                                    className="w-full h-full characters"
-                                    {...provided.droppableProps}
-                                    ref={provided.innerRef}
-                                  >
-                                    <div className="h-8 mb-3">
-                                      <Button
-                                        value="Atualizar"
-                                        bgColor="bg-blue-600"
-                                        textColor="white"
-                                        onClick={getValuesColumns}
-                                        icon={<IoReloadSharp size={20} />}
-                                      />
-                                    </div>
-                                    {generatesProps.map((generate, index) => (
-                                      <Draggable
-                                        key={index}
-                                        draggableId={String(generate.title)}
-                                        index={index}
-                                      >
-                                        {(provider) => (
-                                          <li
-                                            ref={provider.innerRef}
-                                            {...provider.draggableProps}
-                                            {...provider.dragHandleProps}
-                                          >
-                                            <CheckBox
-                                              name={generate.name}
-                                              title={generate.title?.toString()}
-                                              value={generate.value}
-                                              defaultChecked={camposGerenciados.includes(
-                                                generate.value as string,
-                                              )}
-                                            />
-                                          </li>
-                                        )}
-                                      </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                  </ul>
-                                )}
-                              </Droppable>
-                            </DragDropContext>
-                          </AccordionFilter>
-                        </div>
-                      </div>
+                      <ManageFields
+                        statusAccordionExpanded={false}
+                        generatesPropsDefault={generatesProps}
+                        camposGerenciadosDefault={camposGerenciadosDefault}
+                        preferences={preferences}
+                        preferencesDefault={preferencesDefault}
+                        userLogado={userLogado}
+                        label="Gerenciar Campos"
+                        table={table}
+                        module_name={module_name}
+                        module_id={module_id}
+                        identifier_preference={identifier_preference}
+                        OnSetStatusAccordion={(e: any) => {
+                          console.log('callback', 'setStatusAccordion', e);
+                          setStatusAccordion(e);
+                        }}
+                        OnSetGeneratesProps={(e: any) => {
+                          console.log('callback', 'setGeneratesProps', e);
+                          setGeneratesProps(e);
+                        }}
+                        OnSetCamposGerenciados={(e: any) => {
+                          console.log('callback', 'setCamposGerenciados', e);
+                          setCamposGerenciados(e);
+                        }}
+                        OnColumnsOrder={(e: any) => {
+                          console.log('callback', 'columnsOrder', e);
+                          columnsOrder(e);
+                        }}
+                        OnSetUserLogado={(e: any) => {
+                          console.log('callback', 'setUserLogado', e);
+                          setUserLogado(e);
+                        }}
+                        OnSetPreferences={(e: any) => {
+                          console.log('callback', 'setPreferences', e);
+                          setPreferences(e);
+                        }}
+                      />
                     </div>
                   </div>
                 ),

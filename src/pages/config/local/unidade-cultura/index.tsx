@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
@@ -8,7 +9,6 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
-import router from 'next/router';
 import { useEffect, useState, useRef } from 'react';
 import {
   DragDropContext,
@@ -34,6 +34,7 @@ import * as XLSX from 'xlsx';
 import { BsTrashFill } from 'react-icons/bs';
 import Swal from 'sweetalert2';
 import moment from 'moment';
+import { useRouter } from 'next/router';
 import {
   AccordionFilter,
   Button,
@@ -42,6 +43,7 @@ import {
   Input,
   Select,
   FieldItemsPerPage,
+  ManageFields,
 } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../../helpers';
@@ -115,12 +117,26 @@ export default function Listagem({
   const tabsDropDowns = TabsDropDowns('config');
   tabsDropDowns.map((tab) => (tab.titleTab === 'LOCAL' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.unidadeCultura || {
+  const router = useRouter();
+  const [userLogado, setUserLogado] = useState<any>(
+    JSON.parse(localStorage.getItem('user') as string),
+  );
+  const table = 'cultureUnity';
+  const module_name = 'unidadeCultura';
+  const module_id = 21;
+  // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
+  const identifier_preference = module_name + router.route;
+  const camposGerenciadosDefault = 'id,name_unity_culture,year,name_local_culture,label,mloc,adress,label_country,label_region,name_locality';
+  const preferencesDefault = {
     id: 0,
-    table_preferences:
-      'id,name_unity_culture,year,name_local_culture,label,mloc,adress,label_country,label_region,name_locality',
+    route_usage: router.route,
+    table_preferences: camposGerenciadosDefault,
   };
+
+  const [preferences, setPreferences] = useState<any>(
+    userLogado.preferences[identifier_preference] || preferencesDefault,
+  );
+
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
@@ -600,6 +616,10 @@ export default function Listagem({
     const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
 
     await unidadeCulturaService.getAll(filterParam).then(({ status, response }) => {
+      if (!response.A1) {
+        Swal.fire('Nenhum dado para extrair');
+        return;
+      }
       if (status === 200) {
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, response, 'unidade-cultura');
@@ -856,61 +876,43 @@ export default function Listagem({
                       className="h-full flex items-center gap-2
                     "
                     >
-                      <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-64">
-                          <AccordionFilter
-                            title="Gerenciar Campos"
-                            grid={statusAccordion}
-                          >
-                            <DragDropContext onDragEnd={handleOnDragEnd}>
-                              <Droppable droppableId="characters">
-                                {(provided) => (
-                                  <ul
-                                    className="w-full h-full characters"
-                                    {...provided.droppableProps}
-                                    ref={provided.innerRef}
-                                  >
-                                    <div className="h-8 mb-3">
-                                      <Button
-                                        value="Atualizar"
-                                        bgColor="bg-blue-600"
-                                        textColor="white"
-                                        onClick={getValuesColumns}
-                                        icon={<IoReloadSharp size={20} />}
-                                      />
-                                    </div>
-                                    {generatesProps.map((generate, index) => (
-                                      <Draggable
-                                        key={index}
-                                        draggableId={String(generate.title)}
-                                        index={index}
-                                      >
-                                        {(provider) => (
-                                          <li
-                                            ref={provider.innerRef}
-                                            {...provider.draggableProps}
-                                            {...provider.dragHandleProps}
-                                          >
-                                            <CheckBox
-                                              name={generate.name}
-                                              title={generate.title?.toString()}
-                                              value={generate.value}
-                                              defaultChecked={camposGerenciados.includes(
-                                                generate.value,
-                                              )}
-                                            />
-                                          </li>
-                                        )}
-                                      </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                  </ul>
-                                )}
-                              </Droppable>
-                            </DragDropContext>
-                          </AccordionFilter>
-                        </div>
-                      </div>
+                      <ManageFields
+                        statusAccordionExpanded={false}
+                        generatesPropsDefault={generatesProps}
+                        camposGerenciadosDefault={camposGerenciadosDefault}
+                        preferences={preferences}
+                        preferencesDefault={preferencesDefault}
+                        userLogado={userLogado}
+                        label="Gerenciar Campos"
+                        table={table}
+                        module_name={module_name}
+                        module_id={module_id}
+                        identifier_preference={identifier_preference}
+                        OnSetStatusAccordion={(e: any) => {
+                          console.log('callback', 'setStatusAccordion', e);
+                          setStatusAccordion(e);
+                        }}
+                        OnSetGeneratesProps={(e: any) => {
+                          console.log('callback', 'setGeneratesProps', e);
+                          setGeneratesProps(e);
+                        }}
+                        OnSetCamposGerenciados={(e: any) => {
+                          console.log('callback', 'setCamposGerenciados', e);
+                          setCamposGerenciados(e);
+                        }}
+                        OnColumnsOrder={(e: any) => {
+                          console.log('callback', 'columnsOrder', e);
+                          columnsOrder(e);
+                        }}
+                        OnSetUserLogado={(e: any) => {
+                          console.log('callback', 'setUserLogado', e);
+                          setUserLogado(e);
+                        }}
+                        OnSetPreferences={(e: any) => {
+                          console.log('callback', 'setPreferences', e);
+                          setPreferences(e);
+                        }}
+                      />
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
                           title="Exportar planilha de locais"

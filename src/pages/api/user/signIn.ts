@@ -47,7 +47,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
           cultureSelecionada = userCulture.culturas[item].cultureId;
         }
       });
-      permissions = userPermissions.filter((item: any) => item.cultureId === cultureSelecionada);
+      permissions = userPermissions?.filter((item: any) => item.cultureId === cultureSelecionada);
       permissions = permissions[0]?.profile?.permissions;
       userCulture.cultura_selecionada = cultureSelecionada || userCulture.culturas[0]?.cultureId;
 
@@ -204,7 +204,6 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       });
       preferences.reportes = preferences.reportes.response[0];
     }
-
     if (!user) throw new Error('Login ou senha é invalida!');
 
     // fazer a busca de permissoes
