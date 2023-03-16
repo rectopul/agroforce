@@ -406,6 +406,8 @@ export class ImportNpeController {
                         id_safra: idSafra,
                         filterNpeFrom: Number(spreadSheet[row][column]),
                         filterNpeTo: Number(spreadSheet[row][column]),
+                        filterGrpFrom: Number(groupNumber[0]?.group),
+                        filterGrpTo: Number(groupNumber[0]?.group),
                       });
                       if (parcelas.length > 0) {
                         responseIfError[Number(column)] += responseGenericFactory(

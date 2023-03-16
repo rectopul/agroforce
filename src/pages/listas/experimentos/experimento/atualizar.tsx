@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
 /* eslint-disable react/no-array-index-key */
@@ -104,34 +105,33 @@ export default function AtualizarLocal({
     ? (tab.statusTab = true)
     : (tab.statusTab = false)));
 
-  const router = useRouter();
-
   const tableRef = useRef<any>();
   const [loading, setLoading] = useState<boolean>(false);
 
+  const router = useRouter();
   const [userLogado, setUserLogado] = useState<any>(
     JSON.parse(localStorage.getItem('user') as string),
   );
-  const table = 'experiment_genotipe';
-  const module_name = 'parcelas';
-  const module_id = 30;
+  const table = 'experiment';
+  const module_name = 'experimento';
+  const module_id = 22;
   // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
   const identifier_preference = module_name + router.route;
   const camposGerenciadosDefault = 'repetitionExperience,genotipo,gmr,bgm,fase,tecnologia,nt,rep,status,nca,npe,sequence,block,experiment';
   const preferencesDefault = {
     id: 0,
     route_usage: router.route,
-    table_preferences: camposGerenciadosDefault
+    table_preferences: camposGerenciadosDefault,
   };
 
   const [preferences, setPreferences] = useState<any>(
     userLogado.preferences[identifier_preference] || preferencesDefault,
   );
-  
+
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
-  
+
   const [materiais, setMateriais] = useState<any>(() => allItens);
   const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -550,6 +550,10 @@ export default function AtualizarLocal({
     await experimentGenotipeService
       .getAll(filterParam)
       .then(({ status, response }) => {
+        if (!response.A1) {
+          Swal.fire('Nenhum dado para extrair');
+          return;
+        }
         if (status === 200) {
           const workBook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(workBook, response, 'Parcelas');
@@ -988,62 +992,6 @@ export default function AtualizarLocal({
                           setPreferences(e);
                         }}
                       />
-
-                      {/* <div className="border-solid border-2 border-blue-600 rounded"> */}
-                      {/*  <div className="w-72"> */}
-                      {/*    <AccordionFilter */}
-                      {/*      title="Gerenciar Campos" */}
-                      {/*      grid={statusAccordion} */}
-                      {/*    > */}
-                      {/*      <DragDropContext onDragEnd={handleOnDragEnd}> */}
-                      {/*        <Droppable droppableId="characters"> */}
-                      {/*          {(provided) => ( */}
-                      {/*            <ul */}
-                      {/*              className="w-full h-full characters" */}
-                      {/*              {...provided.droppableProps} */}
-                      {/*              ref={provided.innerRef} */}
-                      {/*            > */}
-                      {/*              <div className="h-8 mb-3"> */}
-                      {/*                <Button */}
-                      {/*                  value="Atualizar" */}
-                      {/*                  bgColor="bg-blue-600" */}
-                      {/*                  textColor="white" */}
-                      {/*                  onClick={getValuesColumns} */}
-                      {/*                  icon={<IoReloadSharp size={20} />} */}
-                      {/*                /> */}
-                      {/*              </div> */}
-                      {/*              {generatesProps.map((generate, index) => ( */}
-                      {/*                <Draggable */}
-                      {/*                  key={index} */}
-                      {/*                  draggableId={String(generate.title)} */}
-                      {/*                  index={index} */}
-                      {/*                > */}
-                      {/*                  {(provider) => ( */}
-                      {/*                    <li */}
-                      {/*                      ref={provider.innerRef} */}
-                      {/*                      {...provider.draggableProps} */}
-                      {/*                      {...provider.dragHandleProps} */}
-                      {/*                    > */}
-                      {/*                      <CheckBox */}
-                      {/*                        name={generate.name} */}
-                      {/*                        title={generate.title?.toString()} */}
-                      {/*                        value={generate.value} */}
-                      {/*                        defaultChecked={camposGerenciados.includes( */}
-                      {/*                          generate.value as string */}
-                      {/*                        )} */}
-                      {/*                      /> */}
-                      {/*                    </li> */}
-                      {/*                  )} */}
-                      {/*                </Draggable> */}
-                      {/*              ))} */}
-                      {/*              {provided.placeholder} */}
-                      {/*            </ul> */}
-                      {/*          )} */}
-                      {/*        </Droppable> */}
-                      {/*      </DragDropContext> */}
-                      {/*    </AccordionFilter> */}
-                      {/*  </div> */}
-                      {/* </div> */}
 
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button

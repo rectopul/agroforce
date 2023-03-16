@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { removeCookies, setCookies } from 'cookies-next';
 import { useFormik } from 'formik';
 import Swal from 'sweetalert2';
@@ -5,7 +6,6 @@ import MaterialTable from 'material-table';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
-import router from 'next/router';
 import { useEffect, useState, useRef } from 'react';
 import {
   DragDropContext,
@@ -31,6 +31,7 @@ import { delineamentoService, userPreferencesService } from 'src/services';
 import * as XLSX from 'xlsx';
 import { number } from 'yup/lib/locale';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { useRouter } from 'next/router';
 import {
   AccordionFilter,
   Button,
@@ -40,6 +41,7 @@ import {
   Select,
   FieldItemsPerPage,
   ButtonToogleConfirmation,
+  ManageFields,
 } from '../../../components';
 import * as ITabs from '../../../shared/utils/dropdown';
 import { tableGlobalFunctions } from '../../../helpers';
@@ -109,12 +111,26 @@ export default function Listagem({
     ? (tab.statusTab = true)
     : (tab.statusTab = false)));
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.delineamento || {
+  const router = useRouter();
+  const [userLogado, setUserLogado] = useState<any>(
+    JSON.parse(localStorage.getItem('user') as string),
+  );
+  const table = 'delineamento';
+  const module_name = 'delineamento';
+  const module_id = 7;
+  // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
+  const identifier_preference = module_name + router.route;
+  const camposGerenciadosDefault = 'id,name,repeticao,trat_repeticao,sequencia,status,action';
+  const preferencesDefault = {
     id: 0,
-    table_preferences:
-      'id,name,repeticao,trat_repeticao,sequencia,status,action',
+    route_usage: router.route,
+    table_preferences: camposGerenciadosDefault,
   };
+
+  const [preferences, setPreferences] = useState<any>(
+    userLogado.preferences[identifier_preference] || preferencesDefault,
+  );
+
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
@@ -604,6 +620,10 @@ export default function Listagem({
     await delineamentoService
       .getAll(filterParam)
       .then(({ status, response }) => {
+        if (!response.A1) {
+          Swal.fire('Nenhum dado para extrair');
+          return;
+        }
         if (status === 200) {
           const workBook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(workBook, response, 'delineamento');
@@ -856,62 +876,43 @@ export default function Listagem({
                       className="h-full flex items-center gap-2
                     "
                     >
-                      <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-64">
-                          <AccordionFilter
-                            title="Gerenciar Campos"
-                            grid={statusAccordion}
-                          >
-                            <DragDropContext onDragEnd={handleOnDragEnd}>
-                              <Droppable droppableId="characters">
-                                {(provided) => (
-                                  <ul
-                                    className="w-full h-full characters"
-                                    {...provided.droppableProps}
-                                    ref={provided.innerRef}
-                                  >
-                                    <div className="h-8 mb-3">
-                                      <Button
-                                        value="Atualizar"
-                                        bgColor="bg-blue-600"
-                                        textColor="white"
-                                        onClick={getValuesColumns}
-                                        icon={<IoReloadSharp size={20} />}
-                                      />
-                                    </div>
-                                    {generatesProps.map((generate, index) => (
-                                      <Draggable
-                                        key={index}
-                                        draggableId={String(generate.title)}
-                                        index={index}
-                                      >
-                                        {(provided) => (
-                                          <li
-                                            ref={provided.innerRef}
-                                            {...provided.draggableProps}
-                                            {...provided.dragHandleProps}
-                                          >
-                                            <CheckBox
-                                              name={generate.name}
-                                              title={generate.title?.toString()}
-                                              value={generate.value}
-                                              defaultChecked={camposGerenciados.includes(
-                                                generate.value,
-                                              )}
-                                            />
-                                          </li>
-                                        )}
-                                      </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                  </ul>
-                                )}
-                              </Droppable>
-                            </DragDropContext>
-                          </AccordionFilter>
-                        </div>
-                      </div>
-
+                      <ManageFields
+                        statusAccordionExpanded={false}
+                        generatesPropsDefault={generatesProps}
+                        camposGerenciadosDefault={camposGerenciadosDefault}
+                        preferences={preferences}
+                        preferencesDefault={preferencesDefault}
+                        userLogado={userLogado}
+                        label="Gerenciar Campos"
+                        table={table}
+                        module_name={module_name}
+                        module_id={module_id}
+                        identifier_preference={identifier_preference}
+                        OnSetStatusAccordion={(e: any) => {
+                          console.log('callback', 'setStatusAccordion', e);
+                          setStatusAccordion(e);
+                        }}
+                        OnSetGeneratesProps={(e: any) => {
+                          console.log('callback', 'setGeneratesProps', e);
+                          setGeneratesProps(e);
+                        }}
+                        OnSetCamposGerenciados={(e: any) => {
+                          console.log('callback', 'setCamposGerenciados', e);
+                          setCamposGerenciados(e);
+                        }}
+                        OnColumnsOrder={(e: any) => {
+                          console.log('callback', 'columnsOrder', e);
+                          columns(e);
+                        }}
+                        OnSetUserLogado={(e: any) => {
+                          console.log('callback', 'setUserLogado', e);
+                          setUserLogado(e);
+                        }}
+                        OnSetPreferences={(e: any) => {
+                          console.log('callback', 'setPreferences', e);
+                          setPreferences(e);
+                        }}
+                      />
                       <div className="h-12 flex items-center justify-center w-full">
                         {/* <Button title="Importação de planilha" icon={<RiFileExcel2Line size={20} />} bgColor='bg-blue-600' textColor='white' onClick={() => {router.push('sequencia-delineamento/importacao')}} /> */}
                         <Button

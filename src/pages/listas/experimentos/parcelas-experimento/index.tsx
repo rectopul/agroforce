@@ -770,6 +770,10 @@ export default function Listagem({
     await experimentGenotipeService
       .getAll(filterParam)
       .then(({ status, response }) => {
+        if (!response.A1) {
+          Swal.fire('Nenhum dado para extrair');
+          return;
+        }
         if (status === 200) {
           const workBook = XLSX.utils.book_new();
           // workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });

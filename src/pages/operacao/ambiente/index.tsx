@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { useFormik } from 'formik';
 import MaterialTable from 'material-table';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -37,6 +38,7 @@ import {
   Select,
   FieldItemsPerPage,
   ButtonDeleteConfirmation,
+  ManageFields,
 } from '../../../components';
 import * as ITabs from '../../../shared/utils/dropdown';
 import { functionsUtils } from '../../../shared/utils/functionsUtils';
@@ -122,12 +124,24 @@ export default function Listagem({
 
   const router = useRouter();
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.npe || {
+  const [userLogado, setUserLogado] = useState<any>(
+    JSON.parse(localStorage.getItem('user') as string),
+  );
+  const table = 'npe';
+  const module_name = 'npe';
+  const module_id = 14;
+  // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
+  const identifier_preference = module_name + router.route;
+  const camposGerenciadosDefault = 'id,local,safra,foco,ensaio,tecnologia,epoca,npei,prox_npe,grp,status';
+  const preferencesDefault = {
     id: 0,
-    table_preferences:
-      'id,local,safra,foco,ensaio,tecnologia,epoca,npei,npef,prox_npe,grp,status',
+    route_usage: router.route,
+    table_preferences: camposGerenciadosDefault,
   };
+
+  const [preferences, setPreferences] = useState<any>(
+    userLogado.preferences[identifier_preference] || preferencesDefault,
+  );
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
@@ -187,12 +201,12 @@ export default function Listagem({
       value: 'npei_i',
       defaultChecked: () => camposGerenciados.includes('npei_i'),
     },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'NPE Final',
-      value: 'npef',
-      defaultChecked: () => camposGerenciados.includes('npef'),
-    },
+    // {
+    //   name: 'CamposGerenciados[]',
+    //   title: 'NPE Final',
+    //   value: 'npef',
+    //   defaultChecked: () => camposGerenciados.includes('npef'),
+    // },
     {
       name: 'CamposGerenciados[]',
       title: 'Prox NPE ',
@@ -727,6 +741,10 @@ export default function Listagem({
     const filterParam = `${filter}&skip=${skip}&take=${take}&createFile=true`;
 
     await npeService.getAll(filterParam).then(({ status, response }) => {
+      if (!response.A1) {
+        Swal.fire('Nenhum dado para extrair');
+        return;
+      }
       if (status === 200) {
         const workBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workBook, response, 'Ambiente');
@@ -1106,61 +1124,43 @@ export default function Listagem({
                       className="h-full flex items-center gap-2
                     "
                     >
-                      <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-64">
-                          <AccordionFilter
-                            title="Gerenciar Campos"
-                            grid={statusAccordion}
-                          >
-                            <DragDropContext onDragEnd={handleOnDragEnd}>
-                              <Droppable droppableId="characters">
-                                {(provided) => (
-                                  <ul
-                                    className="w-full h-full characters"
-                                    {...provided.droppableProps}
-                                    ref={provided.innerRef}
-                                  >
-                                    <div className="h-8 mb-3">
-                                      <Button
-                                        value="Atualizar"
-                                        bgColor="bg-blue-600"
-                                        textColor="white"
-                                        onClick={getValuesColumns}
-                                        icon={<IoReloadSharp size={20} />}
-                                      />
-                                    </div>
-                                    {generatesProps.map((generate, index) => (
-                                      <Draggable
-                                        key={index}
-                                        draggableId={String(generate.title)}
-                                        index={index}
-                                      >
-                                        {(provided) => (
-                                          <li
-                                            ref={provided.innerRef}
-                                            {...provided.draggableProps}
-                                            {...provided.dragHandleProps}
-                                          >
-                                            <CheckBox
-                                              name={generate.name}
-                                              title={generate.title?.toString()}
-                                              value={generate.value}
-                                              defaultChecked={camposGerenciados.includes(
-                                                generate.value,
-                                              )}
-                                            />
-                                          </li>
-                                        )}
-                                      </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                  </ul>
-                                )}
-                              </Droppable>
-                            </DragDropContext>
-                          </AccordionFilter>
-                        </div>
-                      </div>
+                      <ManageFields
+                        statusAccordionExpanded={false}
+                        generatesPropsDefault={generatesProps}
+                        camposGerenciadosDefault={camposGerenciadosDefault}
+                        preferences={preferences}
+                        preferencesDefault={preferencesDefault}
+                        userLogado={userLogado}
+                        label="Gerenciar Campos"
+                        table={table}
+                        module_name={module_name}
+                        module_id={module_id}
+                        identifier_preference={identifier_preference}
+                        OnSetStatusAccordion={(e: any) => {
+                          console.log('callback', 'setStatusAccordion', e);
+                          setStatusAccordion(e);
+                        }}
+                        OnSetGeneratesProps={(e: any) => {
+                          console.log('callback', 'setGeneratesProps', e);
+                          setGeneratesProps(e);
+                        }}
+                        OnSetCamposGerenciados={(e: any) => {
+                          console.log('callback', 'setCamposGerenciados', e);
+                          setCamposGerenciados(e);
+                        }}
+                        OnColumnsOrder={(e: any) => {
+                          console.log('callback', 'columnsOrder', e);
+                          columns(e);
+                        }}
+                        OnSetUserLogado={(e: any) => {
+                          console.log('callback', 'setUserLogado', e);
+                          setUserLogado(e);
+                        }}
+                        OnSetPreferences={(e: any) => {
+                          console.log('callback', 'setPreferences', e);
+                          setPreferences(e);
+                        }}
+                      />
 
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button

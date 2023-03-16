@@ -167,6 +167,7 @@ export default function NovoUsuario({
       let input: any;
       const auxObject: any = [];
       let auxObject2: any = [];
+      let auxValidate: boolean = false;
 
       Object.keys(values.cultures).forEach((item: any) => {
         input = document.querySelector(
@@ -178,12 +179,23 @@ export default function NovoUsuario({
             auxObject2.push(input.options[i].value);
           }
         }
+        if (values.cultures[item] && auxObject2.length === 0) {
+          auxValidate = true;
+          return;
+        }
+
         ObjProfiles = {
           cultureId: values.cultures[item],
           profiles: auxObject2,
         };
         auxObject.push(ObjProfiles);
       });
+
+      if (auxValidate) {
+        Swal.fire('E preciso escolher um perfil para as culturas selecionadas');
+        setLoading(false);
+        return;
+      }
 
       await userService
         .create({

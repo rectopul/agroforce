@@ -173,13 +173,17 @@ export class SafraController {
         const response = await this.safraRepository.update(data.id, data);
         if (data.status === 1) {
           await this.reporteController.create({
-            userId: response.created_by, module: 'SAFRA', operation: 'ATIVAÇÃO', oldValue: response.safraName, ip: String(ip),
+            userId: data.created_by, module: 'SAFRA', operation: 'ATIVAÇÃO', oldValue: data.safraName, ip: String(ip),
           });
         } else if (data.status === 0) {
           await this.reporteController.create({
-            userId: response.created_by, module: 'SAFRA', operation: 'INATIVAÇÃO', oldValue: response.safraName, ip: String(ip),
+            userId: data.created_by, module: 'SAFRA', operation: 'INATIVAÇÃO', oldValue: data.safraName, ip: String(ip),
           });
         }
+
+        await this.reporteController.create({
+          userId: data.created_by, module: 'SAFRA', operation: 'EDIÇÃO', oldValue: data.safraName, ip: String(ip),
+        });
 
         if (!response) {
           return { status: 400, response: [], message: 'Safra não atualizado' };

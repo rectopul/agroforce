@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 import { useFormik } from 'formik';
 import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
@@ -29,7 +30,7 @@ interface Input {
   plantingEndTime: string;
 }
 
-export default function AtualizarSafra(safra: ISafraProps) {
+export default function AtualizarSafra(safra: any) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
@@ -121,7 +122,25 @@ export default function AtualizarSafra(safra: ISafraProps) {
       inputYear.style.borderColor = '';
     }
   }
-
+  function validateUpdate() {
+    if (
+      safra.assay_list.length > 0
+      || safra.envelope.length > 0
+      || safra.experiment.length > 0
+      || safra.genotipo.length > 0
+      || safra.genotype_treatment.length > 0
+      || safra.group.length > 0
+      || safra.lote.length > 0
+      || safra.npe.length > 0
+      || safra.quadra.length > 0
+      || safra.experiment_genotipe.length > 0
+      || safra.ExperimentGroup.length > 0
+      || safra.log_import.length > 0
+    ) {
+      return true;
+    }
+    return false;
+  }
   return (
     <>
       {loading && <ComponentLoading text="" />}
@@ -144,8 +163,8 @@ export default function AtualizarSafra(safra: ISafraProps) {
               <Input
                 id="safraName"
                 name="safraName"
-                disabled
-                style={{ background: '#e5e7eb' }}
+                style={validateUpdate() ? { background: '#e5e7eb' } : {}}
+                disabled={validateUpdate()}
                 placeholder="___________"
                 maxLength={10}
                 onChange={formik.handleChange}
@@ -162,8 +181,8 @@ export default function AtualizarSafra(safra: ISafraProps) {
                 id="year"
                 name="year"
                 maxLength={4}
-                disabled
-                style={{ background: '#e5e7eb' }}
+                style={validateUpdate() ? { background: '#e5e7eb' } : {}}
+                disabled={validateUpdate()}
                 placeholder="____"
                 onChange={formik.handleChange}
                 value={formik.values.year}
@@ -177,6 +196,8 @@ export default function AtualizarSafra(safra: ISafraProps) {
               <Input
                 type="date"
                 id="plantingStartTime"
+                style={validateUpdate() ? { background: '#e5e7eb' } : {}}
+                disabled={validateUpdate()}
                 name="plantingStartTime"
                 onChange={formik.handleChange}
                 value={formik.values.plantingStartTime}
@@ -190,6 +211,8 @@ export default function AtualizarSafra(safra: ISafraProps) {
               <Input
                 type="date"
                 id="plantingEndTime"
+                style={validateUpdate() ? { background: '#e5e7eb' } : {}}
+                disabled={validateUpdate()}
                 name="plantingEndTime"
                 onChange={formik.handleChange}
                 value={formik.values.plantingEndTime}

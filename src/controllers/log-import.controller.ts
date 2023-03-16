@@ -163,7 +163,7 @@ export class LogImportController {
       return { status: 200, response, total: response.total };
     } catch (error: any) {
       handleError('Log Import controller', 'GetAll', error.message);
-      throw new Error('[Controller] - GetAll Log Import erro: ' + JSON.stringify(error));
+      throw new Error(`[Controller] - GetAll Log Import erro: ${JSON.stringify(error)}`);
     }
   }
 }

@@ -1,5 +1,5 @@
 import { prisma } from '../pages/api/db/db';
-import {BaseRepository} from './base-repository';
+import { BaseRepository } from './base-repository';
 
 export class SafraRepository extends BaseRepository {
   async create(data: any) {
@@ -18,6 +18,31 @@ export class SafraRepository extends BaseRepository {
   async findOne(id: number) {
     const result = await prisma.safra.findUnique({
       where: { id },
+      select: {
+        id: true,
+        id_culture: true,
+        year: true,
+        plantingStartTime: true,
+        plantingEndTime: true,
+        main_safra: true,
+        status: true,
+        created_by: true,
+        created_at: true,
+        safraName: true,
+        culture: true,
+        assay_list: true,
+        envelope: true,
+        experiment: true,
+        genotipo: true,
+        genotype_treatment: true,
+        group: true,
+        lote: true,
+        npe: true,
+        quadra: true,
+        experiment_genotipe: true,
+        ExperimentGroup: true,
+        log_import: true,
+      },
     });
     return result;
   }

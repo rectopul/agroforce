@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable array-callback-return */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
@@ -53,6 +54,7 @@ import {
   Content,
   Input,
   FieldItemsPerPage,
+  ManageFields,
 } from '../../../../components';
 import LoadingComponent from '../../../../components/Loading';
 import ITabs from '../../../../shared/utils/dropdown';
@@ -131,16 +133,29 @@ export default function Listagem({
   const tableRef = useRef<any>(null);
   const tabsOperationMenu = tabsOperation.map((i) => (i.titleTab === 'AMBIENTE' ? { ...i, statusTab: true } : i));
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.experimento || {
+  const router = useRouter();
+  const [userLogado, setUserLogado] = useState<any>(
+    JSON.parse(localStorage.getItem('user') as string),
+  );
+  const table = 'experiment';
+  const module_name = 'experimento';
+  const module_id = 22;
+  // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
+  const identifier_preference = module_name + router.route;
+  const camposGerenciadosDefault = 'id,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,countNT,npei,npefView,npeQT';
+  const preferencesDefault = {
     id: 0,
-    table_preferences:
-      'id,gli,experimentName,tecnologia,period,delineamento,repetitionsNumber,countNT,npei,npefView,npeQT',
+    route_usage: router.route,
+    table_preferences: camposGerenciadosDefault,
   };
+
+  const [preferences, setPreferences] = useState<any>(
+    userLogado.preferences[identifier_preference] || preferencesDefault,
+  );
+
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
-  const router = useRouter();
   const [experimentos, setExperimento] = useState<IExperimento[]>([]);
   const [experimentosNew, setExperimentoNew] = useState<IExperimento[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -1409,61 +1424,43 @@ export default function Listagem({
                       </div>
 
                       <div className="h-full flex items-center gap-2">
-                        <div className="border-solid border-2 border-blue-600 rounded">
-                          <div className="w-72">
-                            <AccordionFilter
-                              title="Gerenciar Campos"
-                              grid={statusAccordion}
-                            >
-                              <DragDropContext onDragEnd={handleOnDragEnd}>
-                                <Droppable droppableId="characters">
-                                  {(provided) => (
-                                    <ul
-                                      className="w-full h-full characters"
-                                      {...provided.droppableProps}
-                                      ref={provided.innerRef}
-                                    >
-                                      <div className="h-8 mb-3">
-                                        <Button
-                                          value="Atualizar"
-                                          bgColor="bg-blue-600"
-                                          textColor="white"
-                                          onClick={getValuesColumns}
-                                          icon={<IoReloadSharp size={20} />}
-                                        />
-                                      </div>
-                                      {generatesProps.map((generate, index) => (
-                                        <Draggable
-                                          key={index}
-                                          draggableId={String(generate.title)}
-                                          index={index}
-                                        >
-                                          {(provider) => (
-                                            <li
-                                              ref={provider.innerRef}
-                                              {...provider.draggableProps}
-                                              {...provider.dragHandleProps}
-                                            >
-                                              <CheckBox
-                                                name={generate.name}
-                                                title={generate.title?.toString()}
-                                                value={generate.value}
-                                                defaultChecked={camposGerenciados.includes(
-                                                  String(generate.value),
-                                                )}
-                                              />
-                                            </li>
-                                          )}
-                                        </Draggable>
-                                      ))}
-                                      {provided.placeholder}
-                                    </ul>
-                                  )}
-                                </Droppable>
-                              </DragDropContext>
-                            </AccordionFilter>
-                          </div>
-                        </div>
+                        <ManageFields
+                          statusAccordionExpanded={false}
+                          generatesPropsDefault={generatesProps}
+                          camposGerenciadosDefault={camposGerenciadosDefault}
+                          preferences={preferences}
+                          preferencesDefault={preferencesDefault}
+                          userLogado={userLogado}
+                          label="Gerenciar Campos"
+                          table={table}
+                          module_name={module_name}
+                          module_id={module_id}
+                          identifier_preference={identifier_preference}
+                          OnSetStatusAccordion={(e: any) => {
+                            console.log('callback', 'setStatusAccordion', e);
+                            setStatusAccordion(e);
+                          }}
+                          OnSetGeneratesProps={(e: any) => {
+                            console.log('callback', 'setGeneratesProps', e);
+                            setGeneratesProps(e);
+                          }}
+                          OnSetCamposGerenciados={(e: any) => {
+                            console.log('callback', 'setCamposGerenciados', e);
+                            setCamposGerenciados(e);
+                          }}
+                          OnColumnsOrder={(e: any) => {
+                            console.log('callback', 'columnsOrder', e);
+                            columnsOrder(e);
+                          }}
+                          OnSetUserLogado={(e: any) => {
+                            console.log('callback', 'setUserLogado', e);
+                            setUserLogado(e);
+                          }}
+                          OnSetPreferences={(e: any) => {
+                            console.log('callback', 'setPreferences', e);
+                            setPreferences(e);
+                          }}
+                        />
 
                         <div className="h-12 flex items-center justify-center w-full">
                           <Button
