@@ -9,7 +9,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
     case 'GET': {
       const result: any = await profileController.getOne(Number(id));
-      res.status(200).json(result.response);
+      res.status(200).json(result);
       break;
     }
     case 'PUT': {

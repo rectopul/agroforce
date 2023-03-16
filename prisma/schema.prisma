@@ -118,7 +118,7 @@ model users_cultures {
 model profile {
   id               Int      @id @default(autoincrement())
   name             String
-  acess_permission String
+  acess_permission String?
   permissions      String?  @db.LongText
   createdAt        DateTime @default(now())
   createdBy        Int?
