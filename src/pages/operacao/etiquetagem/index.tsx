@@ -1077,7 +1077,7 @@ export default function Listagem({
                         }}
                         OnColumnsOrder={(e: any) => {
                           console.log('callback', 'columnsOrder', e);
-                          columns(e);
+                          orderColumns(e);
                         }}
                         OnSetUserLogado={(e: any) => {
                           console.log('callback', 'setUserLogado', e);
