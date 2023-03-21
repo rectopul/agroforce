@@ -44,6 +44,7 @@ interface IGenerateProps {
 }
 
 export function ManageFields(props: ManageFieldsProps) {
+  console.log('🚀 ~ file: index.tsx:47 ~ ManageFields ~ props:', props);
   const router = useRouter();
 
   const { preferencesDefault } = props;
@@ -69,11 +70,9 @@ export function ManageFields(props: ManageFieldsProps) {
   }, [preferences]);
 
   // useEffect(() => {
-  //   console.log('useEffect', 'statusAccordion', statusAccordion);
   // }, [statusAccordion]);
 
   // useEffect(() => {
-  //   console.log('ManageFields', 'camposGerenciados', camposGerenciados);
   //   props.OnColumnsOrder(camposGerenciados);
   // }, [camposGerenciados]);
 
@@ -100,16 +99,12 @@ export function ManageFields(props: ManageFieldsProps) {
     for (let i = 0; i < items_restantes.length; i += 1) {
       newItems.push(items_restantes[i]);
     }
-    console.log('items_restantes', items_restantes);
-    console.log('result', newItems);
     setGeneratesProps(newItems);
-    console.log('reordererGeneretesPros', items, newItems);
   }
 
   // props.OnColumnsOrder(props.camposGerenciadosDefault);
 
   function handleOnDragEnd(result: DropResult): void {
-    console.log('====>handleOnDragEnd', 'result', result);
     setStatusAccordion(true);
     if (!result) return;
 
@@ -117,14 +112,12 @@ export function ManageFields(props: ManageFieldsProps) {
     const [reorderedItem] = items.splice(result.source.index, 1);
     const index: number = Number(result.destination?.index);
     items.splice(index, 0, reorderedItem);
-    console.log('====>handleOnDragEnd', 'items', items);
     setGeneratesProps(items);
     // props.OnSetGeneratesProps(items);
     setStatusAccordion(true);
   }
-  
+
   async function acao1(): Promise<void> {
-    console.log('acao1');
     setCamposGerenciados('id,foco,type_assay,tecnologia,gli');
     props.OnSetCamposGerenciados('id,foco,type_assay,tecnologia,gli');
     reorderGeneratedProps();
@@ -133,7 +126,6 @@ export function ManageFields(props: ManageFieldsProps) {
   }
 
   async function acao2(): Promise<void> {
-    console.log('acao2');
     setCamposGerenciados('rep,status,nt,npe,genotipo,nca');
     props.OnSetCamposGerenciados('rep,status,nt,npe,genotipo,nca');
     reorderGeneratedProps();
@@ -143,14 +135,11 @@ export function ManageFields(props: ManageFieldsProps) {
 
   async function clearPreferencesByUserAndModule(): Promise<void> {
     if (preferences.id === 0) return;
-    
+
     await userPreferencesService
       .deleted(preferences.id)
-      .then(async ({status, response}) => {
-        console.log('response', response);
-
+      .then(async ({ status, response }) => {
         if (status === 200) {
-
           // simulação de exclusão de preferências
           preferences.id = 0;
           preferences.table_preferences = props.camposGerenciadosDefault;
@@ -164,7 +153,7 @@ export function ManageFields(props: ManageFieldsProps) {
           setUserLogado(userLogado);
           props.OnSetUserLogado(userLogado);
 
-          //camposGerenciados
+          // camposGerenciados
           setCamposGerenciados(props.camposGerenciadosDefault);
           props.OnSetCamposGerenciados(props.camposGerenciadosDefault);
 
@@ -190,27 +179,24 @@ export function ManageFields(props: ManageFieldsProps) {
               setPreferences(userLogado.preferences[props.identifier_preference]);
             });
 
-          //getValuesColumns();
+          // getValuesColumns();
 
           /*
           preferencesDefault.userId = userLogado.id;
           delete userLogado.preferences[props.identifier_preference];
           userLogado.preferences[props.identifier_preference] = preferencesDefault;
-          console.log(`====> ${props.identifier_preference}::`, preferencesDefault);
+
           const preferences1 = userLogado.preferences[props.identifier_preference];
           setUserLogado(userLogado);
           setPreferences(preferencesDefault);
           props.OnSetUserLogado(userLogado);
           props.OnSetPreferences(preferencesDefault);
           localStorage.setItem('user', JSON.stringify(userLogado));
-          console.log('====>preferences antes de chamar getValuesColumns:', preferences);
-          console.log('====>preferences antes de chamar getValuesColumns:', preferences1);
-          getValuesColumns();/**/
 
+          getValuesColumns();/* */
         }
       })
       .catch((error) => {
-        console.log('error', error);
         Swal.fire({
           title: 'Falha ao excluir preferências',
           html: `Ocorreu um erro ao excluir as preferências do usuário. Tente novamente mais tarde.\r\n${JSON.stringify(error)}`,
@@ -218,11 +204,8 @@ export function ManageFields(props: ManageFieldsProps) {
         });
       });
   }
-  
-  async function getValuesColumns(): Promise<void> {
 
-    console.log('=======> called: getValuesColumns');
-    
+  async function getValuesColumns(): Promise<void> {
     const els: any = document.querySelectorAll(`ul[data-rbd-droppable-id='tbl_${props.table}'] input[type='checkbox']`);
     let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
@@ -251,19 +234,17 @@ export function ManageFields(props: ManageFieldsProps) {
           setPreferences(userLogado.preferences[props.identifier_preference]);
         });
       localStorage.setItem('user', JSON.stringify(userLogado));
-    } 
-    else {
+    } else {
       userLogado.preferences[props.identifier_preference] = {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
       };
-      console.log('atualização de preferências: ', userLogado.preferences[props.identifier_preference]);
 
       // verifica se existe alguma preferência salva no banco
       await userPreferencesService.getAll({ id: preferences.id })
         .then((response) => {
-          console.log('response', response);
+
         })
         .catch((error) => {
 
@@ -274,10 +255,9 @@ export function ManageFields(props: ManageFieldsProps) {
         id: preferences.id,
       })
         .then((response) => {
-          console.log('===> UPDATE:', 'response:', response);
+
         })
         .catch((error) => {
-          console.log('error', error);
           Swal.fire({
             title: 'Falha ao atualizar preferências',
             html: `Ocorreu um erro ao atualizar as preferências do usuário. Tente novamente mais tarde.\r\n${JSON.stringify(error)}`,
@@ -292,8 +272,6 @@ export function ManageFields(props: ManageFieldsProps) {
     setUserLogado(userLogado);
     setPreferences(preferences1);
     setCamposGerenciados(campos);
-
-    console.log('ManageFields', 'getValuesColumns', campos);
 
     props.OnSetUserLogado(userLogado);
     props.OnSetPreferences(preferences1);
@@ -329,15 +307,15 @@ export function ManageFields(props: ManageFieldsProps) {
                     />
                   </div>
 
-                   <div className="h-8 mb-3"> 
-                    <Button 
-                      value="Limpar Preferências" 
-                      bgColor="bg-red-600" 
-                      textColor="white" 
-                      onClick={clearPreferencesByUserAndModule} 
-                      icon={<IoTrash size={20}/>} 
+                  <div className="h-8 mb-3">
+                    <Button
+                      value="Limpar Preferências"
+                      bgColor="bg-red-600"
+                      textColor="white"
+                      onClick={clearPreferencesByUserAndModule}
+                      icon={<IoTrash size={20} />}
                     />
-                   </div>
+                  </div>
 
                   {generatesProps.map((generate, index) => (
                     <Draggable

@@ -364,7 +364,6 @@ export class ImportController {
       }
     });
 
-    console.log('🚀 ~ file: import.controller.ts:338 ~ ImportController ~ res ~ res:', res);
     return res;
   }
 

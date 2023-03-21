@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import Link from "next/link";
 import { ReactNode } from "react";
-import perm_can_do from "../../shared/utils/perm_can_do";
+import { perm_can_do } from "../../shared/utils/perm_can_do";
 
 interface IDropDownProps {
   label: string;

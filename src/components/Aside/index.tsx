@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import { HiOutlineClipboardList, HiOutlineMail } from 'react-icons/hi';
 import { RiUserSettingsFill } from 'react-icons/ri';
 import { FaBars } from 'react-icons/fa';
@@ -7,17 +8,72 @@ import { GiThreeLeaves } from 'react-icons/gi';
 import { VscGraph } from 'react-icons/vsc';
 import { BsGear } from 'react-icons/bs';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import { ButtonAside } from './ButtonAside';
+import { asidePermissions } from '../../shared/utils/perm_can_do';
 
 const versionApp = '0.0.32.1';
 
 export function Aside({ moduloActive }: any) {
   const aArray = versionApp.split('.');
-
+  const [config, setConfig] = useState<any>([
+    '/config/tmg/usuarios',
+    '/config/tmg/cultura',
+    '/config/tmg/safra',
+    '/config/tmg/genotipo',
+    '/config/tmg/lote',
+    '/config/ensaio/foco',
+    '/config/tmg/setor',
+    '/config/ensaio/tecnologia',
+    '/config/ensaio/tipo-ensaio',
+    '/config/delineamento',
+    '/config/delineamento/sequencia-delineamento',
+    '/config/local/local',
+    '/config/quadra',
+    '/config/quadra/layout-quadra',
+  ]);
+  const [list, setList] = useState<any>([
+    '/listas/rd',
+    '/listas/ensaios/ensaio',
+    '/listas/ensaios/genotipos-ensaio',
+    '/listas/experimentos/experimento',
+    '/listas/experimentos/parcelas-experimento',
+  ]);
+  const [operation, setOperation] = useState<any>([
+    '/operacao/ambiente',
+    '/operacao/etiquetagem',
+  ]);
+  const [logs, setLogs] = useState<any>([
+    '/relatorios/logs',
+  ]);
   const prev = aArray.splice(0, aArray.length - 1);
   const next = aArray.splice(-1);
 
-  // aArray.toLowerCase() === aArray[aArray.length-1].toLowerCase();
+  async function set(value: any, state: any) {
+    state(value);
+  }
+
+  useEffect(() => {
+    (async () => {
+      const newConfig = await asidePermissions(config);
+      set(newConfig, setConfig);
+    })();
+
+    (async () => {
+      const newList = await asidePermissions(list);
+      set(newList, setList);
+    })();
+
+    (async () => {
+      const newOperations = await asidePermissions(operation);
+      set(newOperations, setOperation);
+    })();
+
+    (async () => {
+      const newLogs = await asidePermissions(logs);
+      set(newLogs, setLogs);
+    })();
+  }, []);
 
   return (
     <aside
@@ -31,30 +87,38 @@ export function Aside({ moduloActive }: any) {
         pt-4
       "
       >
+        {config.length > 0 && (
         <ButtonAside
           title="Configurações"
           icon={<BsGear size={32} />}
-          href="/config/tmg/usuarios"
+          href={config.length ? config[0] : '/config/tmg/usuarios'}
           active={moduloActive === 'config'}
         />
+        )}
+        {list.length > 0 && (
         <ButtonAside
           title="Lista"
           icon={<HiOutlineClipboardList size={32} />}
-          href="/listas/rd"
+          href={list.length ? list[0] : 'listas/rd'}
           active={moduloActive === 'listas'}
         />
+        )}
+        {operation.length > 0 && (
         <ButtonAside
           title="Operação"
           icon={<RiUserSettingsFill size={32} />}
-          href="/operacao/ambiente"
+          href={operation.length ? operation[0] : '/operacao/ambiente'}
           active={moduloActive === 'operacao'}
         />
+        )}
+        {logs.length > 0 && (
         <ButtonAside
           title="Relatórios"
           icon={<FaBars size={32} />}
-          href="/logs"
+          href={logs.length ? logs[0] : '/logs'}
           active={moduloActive === 'relatorios'}
         />
+        )}
         {/*
 
         <ButtonAside
