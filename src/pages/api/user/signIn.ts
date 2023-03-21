@@ -206,7 +206,16 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
         userId: user.id, module_id: 31,
       });
       preferences.reportes = preferences.reportes.response[0];
+
+      await PreferencesControllers.getAll({
+        userId: user.id
+      }).then(({ status, response }) => {
+        console.log('signIn', response);
+      });
+      
     }
+    
+
     if (!user) throw new Error('Login ou senha é invalida!');
 
     // fazer a busca de permissoes
