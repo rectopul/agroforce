@@ -27,7 +27,6 @@ export class ExperimentController {
     let orderBy: object | any;
     parameters.AND = [];
 
-
     try {
       options = await removeEspecialAndSpace(options);
       if (options.createFile) {
@@ -430,11 +429,16 @@ export class ExperimentController {
             delete data.userId;
           }
         }
-        const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-        await this.reporteController.create({
-          userId: data.userId, module: 'EXPERIMENTO', operation: 'EDIÇÃO', oldValue: `${data.nlp}_${data.clp}_${data.comments}`, ip: String(ip),
-        });
+        console.log('🚀 ~ file: experiment.controller.ts:382 ~ ExperimentController ~ update ~ data:', data);
+
+        if (!data.import) {
+          const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+          await this.reporteController.create({
+            userId: data.userId, module: 'EXPERIMENTO', operation: 'EDIÇÃO', oldValue: `${data.nlp}_${data.clp}_${data.comments}`, ip: String(ip),
+          });
+        }
         delete data.userId;
+        delete data.import;
         const response = await this.experimentRepository.update(experimento.id, data);
         if (experimento.experimentGroupId) {
           await this.countExperimentGroupChildren(experimento.experimentGroupId);
