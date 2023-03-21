@@ -60,6 +60,8 @@ export function ManageFields(props: ManageFieldsProps) {
 
   const [preferences, setPreferences] = useState<any>(props.preferences);
 
+  const [identifier_preference, setIdentifierPreference] = useState<string>(props.identifier_preference);
+
   useEffect(() => {
     reorderGeneratedProps();
     props.OnSetGeneratesProps(generatesProps);
@@ -230,7 +232,7 @@ export function ManageFields(props: ManageFieldsProps) {
             userId: userLogado.id,
             table_preferences: campos,
           };
-
+          
           setPreferences(userLogado.preferences[props.identifier_preference]);
         });
       localStorage.setItem('user', JSON.stringify(userLogado));
@@ -255,7 +257,7 @@ export function ManageFields(props: ManageFieldsProps) {
         id: preferences.id,
       })
         .then((response) => {
-
+          
         })
         .catch((error) => {
           Swal.fire({
@@ -297,6 +299,7 @@ export function ManageFields(props: ManageFieldsProps) {
                   {...provided.droppableProps}
                   ref={provided.innerRef}
                 >
+                  {identifier_preference}
                   <div className="h-8 mb-3">
                     <Button
                       value="Atualizar"
