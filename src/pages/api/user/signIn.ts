@@ -61,6 +61,8 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
         safras.safras = safras.safras.response;
         safras.safra_selecionada = safras.safras[0]?.id || 0;
       }
+      
+      
 
       preferences.usuario = await PreferencesControllers.getAll({
         userId: user.id, module_id: 1,
@@ -208,10 +210,27 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       preferences.reportes = preferences.reportes.response[0];
 
       await PreferencesControllers.getAll({
-        userId: user.id
+        userId: user.id,
+        showModule: true,
       }).then(({ status, response }) => {
         console.log('signIn', response);
+        
+        if(status === 200) {
+          response.forEach((item:any) => {
+            
+            console.log('item', item);
+            
+            if(item.route_usage !== null && item.route_usage !== '' && !preferences[item.route_usage]) {
+              preferences[item.modules.module + item.route_usage] = item;
+            }
+            
+          });
+          
+        }
+        
       });
+      
+      console.log('preferences', preferences);
       
     }
     
