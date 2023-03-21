@@ -47,9 +47,12 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
           cultureSelecionada = userCulture.culturas[item].cultureId;
         }
       });
-      permissions = userPermissions?.filter((item: any) => item.cultureId === cultureSelecionada);
-      permissions = permissions[0]?.profile?.permissions;
+
       userCulture.cultura_selecionada = cultureSelecionada || userCulture.culturas[0]?.cultureId;
+
+      permissions = userPermissions
+        ?.filter((item: any) => item.cultureId === userCulture.cultura_selecionada);
+      permissions = permissions[0]?.profile?.permissions;
 
       safras.safras = await safraController.getAll({
         id_culture: userCulture.cultura_selecionada, filterStatus: 1, orderBy: 'safraName', typeOrder: 'desc',

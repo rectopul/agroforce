@@ -23,7 +23,7 @@ import { TypeAssayController } from '../tipo-ensaio.controller';
 import { assayListQueue } from './assay-list-queue';
 import { AssayListController } from './assay-list.controller';
 import { GenotypeTreatmentRepository } from '../../repository/genotype-treatment/genotype-treatment.repository';
-import {prisma} from "../../pages/api/db/db";
+import { prisma } from '../../pages/api/db/db';
 
 export class ImportAssayListController {
   static async validate(
@@ -455,8 +455,7 @@ export class ImportAssayListController {
       await logImportController.update({
         id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
-      console.log('error', error);
-      handleError('Date: ' + new Date().toISOString() + ' Lista de ensaio controller', 'Validate Import', error.message);
+      handleError(`Date: ${new Date().toISOString()} Lista de ensaio controller`, 'Validate Import', error.message);
       return { status: 500, message: 'Erro ao validar planilha de Lista de ensaio' };
     }
   }
@@ -498,16 +497,15 @@ export class ImportAssayListController {
     let verifyToDelete: boolean = false;
     try {
       // await prisma?.$transaction(async () => {
-      //    
+      //
       // },
       // {
       //   maxWait: 0,
       //   timeout: 0,
       // });
-      
+
       await transactionConfig.transactionScope.run(async () => {
         for (const row in spreadSheet) {
-          console.log('$transaction', 'row', row);
           if (row !== '0') {
             const { response: typeAssay }: IReturnObject = await typeAssayController.getAll({
               filterName: spreadSheet[row][3],
@@ -623,7 +621,7 @@ export class ImportAssayListController {
           }
         }
       });
-      
+
       await logImportController.update({
         id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
       });
