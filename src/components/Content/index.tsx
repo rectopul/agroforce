@@ -127,7 +127,6 @@ export function Content({
     }
   }
 
-  console.log({ tabsHeader });
 
   return (
     <>

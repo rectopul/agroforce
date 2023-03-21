@@ -265,7 +265,7 @@ export class ImportController {
       }
 
       if (data.moduleId === 22) {
-        return await ImportExperimentController.validate(responseLog?.id, data);
+        return await ImportExperimentController.validate(responseLog?.id, false, data);
       }
 
       // Validação Lista de Ensaio
@@ -364,7 +364,6 @@ export class ImportController {
       }
     });
 
-    console.log('🚀 ~ file: import.controller.ts:338 ~ ImportController ~ res ~ res:', res);
     return res;
   }
 

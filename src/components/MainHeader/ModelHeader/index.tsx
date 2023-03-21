@@ -6,7 +6,7 @@ import { FaRegUserCircle } from 'react-icons/fa';
 import { MdOutlineExitToApp } from 'react-icons/md';
 import { RiLockPasswordLine } from 'react-icons/ri';
 import { userService } from '../../../services';
-import perm_can_do from '../../../shared/utils/perm_can_do';
+import { perm_can_do } from '../../../shared/utils/perm_can_do';
 
 interface IModelProps {
   name: string;

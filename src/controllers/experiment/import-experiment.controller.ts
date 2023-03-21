@@ -20,10 +20,12 @@ import { LogImportController } from '../log-import.controller';
 import { validateInteger } from '../../shared/utils/numberValidate';
 import { CulturaController } from '../cultura.controller';
 import { validateHeaders } from '../../shared/utils/validateHeaders';
+import { experimentQueue } from './experimento-queue';
 
 export class ImportExperimentController {
   static async validate(
     idLog: number,
+    queueProcessing: boolean,
     {
       spreadSheet, idSafra, idCulture, created_by: createdBy,
     }: ImportValidate,
@@ -63,6 +65,20 @@ export class ImportExperimentController {
           id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: validate,
         });
         return { status: 400, message: validate };
+      }
+
+      if ((spreadSheet.length > Number(process.env.MAX_DIRECT_UPLOAD_ALLOWED))
+            && !queueProcessing) {
+        experimentQueue.add({
+          instance: {
+            spreadSheet, idSafra, idCulture, created_by: createdBy,
+          },
+          logId: idLog,
+        });
+        return {
+          status: 400,
+          message: 'Os dados são validados e carregados em background',
+        };
       }
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
@@ -368,93 +384,9 @@ export class ImportExperimentController {
         }
       }
       if (responseIfError.length === 0) {
-        try {
-          for (const row in spreadSheet) {
-            if (row !== '0') {
-              const { response: local } = await localController.getAll({
-                name_local_culture: spreadSheet[row][7],
-                importValidate: true,
-              });
-              const { response: assayList } = await assayListController.getAll({
-                gli: spreadSheet[row][4],
-                id_safra: idSafra,
-                importValidate: true,
-              });
-              const { response: delineamento } = await delineamentoController.getAll({
-                id_culture: idCulture,
-                name: spreadSheet[row][10],
-                filterStatus: 1,
-                importValidate: true,
-              });
-              const comments = spreadSheet[row][14]?.substr(0, 255) ? spreadSheet[row][14]?.substr(0, 255) : '';
-              let experimentName;
-              if (spreadSheet[row][9].toString().length < 2) {
-                experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_0${spreadSheet[row][9]}`;
-              } else {
-                experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_${spreadSheet[row][9]}`;
-              }
-              const { response: experiment } = await experimentController.getAll({
-                filterExperimentName: experimentName,
-                idSafra,
-                importValidate: true,
-              });
-              if (experiment.total > 0) {
-                await experimentController.update(
-                  {
-                    id: experiment[0]?.id,
-                    idAssayList: assayList[0]?.id,
-                    idLocal: local[0]?.id,
-                    idDelineamento: delineamento[0]?.id,
-                    idSafra,
-                    experimentName,
-                    density: spreadSheet[row][8],
-                    period: spreadSheet[row][9],
-                    repetitionsNumber: spreadSheet[row][11],
-                    nlp: spreadSheet[row][12],
-                    clp: spreadSheet[row][13],
-                    comments,
-                    orderDraw: spreadSheet[row][15],
-                    created_by: createdBy,
-                  },
-                );
-              } else {
-                const { status }: IReturnObject = await experimentController.create(
-                  {
-                    idAssayList: assayList[0]?.id,
-                    idLocal: local[0]?.id,
-                    idDelineamento: delineamento[0]?.id,
-                    idSafra,
-                    experimentName,
-                    density: spreadSheet[row][8],
-                    period: spreadSheet[row][9],
-                    repetitionsNumber: spreadSheet[row][11],
-                    nlp: spreadSheet[row][12],
-                    clp: spreadSheet[row][13],
-                    comments,
-                    orderDraw: spreadSheet[row][15],
-                    created_by: createdBy,
-                  },
-                );
-                if (status === 200) {
-                  await assayListController.update({
-                    id: assayList[0]?.id,
-                    status: 'EXP IMP.',
-                  });
-                }
-              }
-            }
-          }
-          await logImportController.update({
-            id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
-          });
-          return { status: 200, message: 'Experimento importado com sucesso' };
-        } catch (error: any) {
-          await logImportController.update({
-            id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
-          });
-          handleError('Experimento controller', 'Save Import', error.message);
-          return { status: 500, message: 'Erro ao salvar planilha de experimento' };
-        }
+        return this.storeRecords(idLog, {
+          spreadSheet, idSafra, idCulture, created_by: createdBy,
+        });
       }
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       await logImportController.update({
@@ -466,8 +398,106 @@ export class ImportExperimentController {
         id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
       handleError('Experimento controller', 'Validate Import', error.message);
-      console.log('import-experiment.controller.ts.error', error);
       return { status: 500, message: 'Erro ao validar planilha de experimento' };
+    }
+  }
+
+  static async storeRecords(idLog: number, {
+    spreadSheet, idSafra, idCulture, created_by: createdBy,
+  }: ImportValidate) {
+    const localController = new LocalController();
+    const assayListController = new AssayListController();
+    const logImportController = new LogImportController();
+    const experimentController = new ExperimentController();
+    const delineamentoController = new DelineamentoController();
+
+    try {
+      for (const row in spreadSheet) {
+        if (row !== '0') {
+          const { response: local } = await localController.getAll({
+            name_local_culture: spreadSheet[row][7],
+            importValidate: true,
+          });
+          const { response: assayList } = await assayListController.getAll({
+            gli: spreadSheet[row][4],
+            id_safra: idSafra,
+            importValidate: true,
+          });
+          const { response: delineamento } = await delineamentoController.getAll({
+            id_culture: idCulture,
+            name: spreadSheet[row][10],
+            filterStatus: 1,
+            importValidate: true,
+          });
+          const comments = spreadSheet[row][14]?.substr(0, 255) ? spreadSheet[row][14]?.substr(0, 255) : '';
+          let experimentName;
+          if (spreadSheet[row][9].toString().length < 2) {
+            experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_0${spreadSheet[row][9]}`;
+          } else {
+            experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_${spreadSheet[row][9]}`;
+          }
+          const { response: experiment } = await experimentController.getAll({
+            filterExperimentName: experimentName,
+            idSafra,
+            importValidate: true,
+          });
+          if (experiment.total > 0) {
+            await experimentController.update(
+              {
+                id: experiment[0]?.id,
+                idAssayList: assayList[0]?.id,
+                idLocal: local[0]?.id,
+                idDelineamento: delineamento[0]?.id,
+                idSafra,
+                experimentName,
+                density: spreadSheet[row][8],
+                period: spreadSheet[row][9],
+                repetitionsNumber: spreadSheet[row][11],
+                nlp: spreadSheet[row][12],
+                clp: spreadSheet[row][13],
+                comments,
+                orderDraw: spreadSheet[row][15],
+                created_by: createdBy,
+                import: true,
+              },
+            );
+          } else {
+            const { status }: IReturnObject = await experimentController.create(
+              {
+                idAssayList: assayList[0]?.id,
+                idLocal: local[0]?.id,
+                idDelineamento: delineamento[0]?.id,
+                idSafra,
+                experimentName,
+                density: spreadSheet[row][8],
+                period: spreadSheet[row][9],
+                repetitionsNumber: spreadSheet[row][11],
+                nlp: spreadSheet[row][12],
+                clp: spreadSheet[row][13],
+                comments,
+                orderDraw: spreadSheet[row][15],
+                created_by: createdBy,
+              },
+            );
+            if (status === 200) {
+              await assayListController.update({
+                id: assayList[0]?.id,
+                status: 'EXP IMP.',
+              });
+            }
+          }
+        }
+      }
+      await logImportController.update({
+        id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
+      });
+      return { status: 200, message: 'Experimento importado com sucesso' };
+    } catch (error: any) {
+      await logImportController.update({
+        id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
+      });
+      handleError('Experimento controller', 'Save Import', error.message);
+      return { status: 500, message: 'Erro ao salvar planilha de experimento' };
     }
   }
 }

@@ -7,7 +7,7 @@ import { HiOutlineOfficeBuilding } from 'react-icons/hi';
 import { MdDateRange } from 'react-icons/md';
 import { RiPlantLine, RiSeedlingLine } from 'react-icons/ri';
 
-import perm_can_do from './perm_can_do';
+import { perm_can_do } from './perm_can_do';
 
 interface IDropDown {
   labelDropDown: string;

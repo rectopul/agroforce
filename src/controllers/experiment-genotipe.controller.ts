@@ -595,10 +595,6 @@ export class ExperimentGenotipeController {
 
           const { idExperiment } = response;
 
-          console.log('experiment-genotipe.controller.ts', 'update', 'idExperiment', idExperiment);
-
-          console.log('parcela antes', response, 'status destino: ', status);
-
           const { response: resExp }: any = await this.experimentController.getOne(idExperiment);
           // await this.experimentGroupController.countEtiqueta(
           //   resExp.experimentGroupId,
@@ -722,7 +718,6 @@ export class ExperimentGenotipeController {
       const experimentsGroupIds:number[] = [];
       await this.ExperimentGenotipeRepository.updateStatus(idExperiment, status);
       for (const id of idExperiment) {
-        console.log('const id of idExperiment', id, idExperiment);
         const { response }: any = await this.experimentController.getOne(Number(id));
         // verifica se experimentGroupId já foi adicionado
         if (response?.experimentGroupId && !experimentsGroupIds.includes(response.experimentGroupId)) {

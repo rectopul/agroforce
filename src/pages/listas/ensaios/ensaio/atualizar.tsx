@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/no-unstable-nested-components */
@@ -55,6 +56,7 @@ import {
   Input,
   FieldItemsPerPage,
   Select,
+  ManageFields,
 } from '../../../../components';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import { tableGlobalFunctions } from '../../../../helpers';
@@ -84,24 +86,66 @@ export default function AtualizarTipoEnsaio({
 
   tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
-  const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const preferences = userLogado.preferences.genotypeTreatment || {
-    id: 0,
-    table_preferences:
-      'safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment',
-  };
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+  const router = useRouter();
+  const [userLogado, setUserLogado] = useState<any>(
+    JSON.parse(localStorage.getItem('user') as string),
   );
+  const [table, setTable] = useState<string>('genotipo');
+  const [tables, setTables] = useState<string>('genotype_treatment');
+  const [module_name, setModuloName] = useState<string>('genotypeTreatment');
+  const [module_id, setModuleId] = useState<number>(27);
+  const [identifier_preference, setIdentifierPreference] = useState<string>('');
+  const [camposGerenciadosDefault, setCamposGerenciadosDefault] = useState<string>('safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment');
+  const [preferencesDefault, setPreferencesDefault] = useState<any>({
+    id: 0,
+    route_usage: router.route,
+    table_preferences: camposGerenciadosDefault,
+  });
+  const [
+    preferences,
+    setPreferences,
+  ] = useState<any>(userLogado.preferences[identifier_preference] || preferencesDefault);
+  const [camposGerenciados, setCamposGerenciados] = useState<any>('safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment');
+  const [experimentsCamposGerenciados, setExperimentsCamposGerenciados] = useState<any>('id,gli,experimentName,local,delineamento,repetitionsNumber,nlp,clp,eel,density,status');
+
+  useEffect(() => {
+    function setPreferencesGenotype() {
+      setTables('genotype_treatment');
+      setModuloName('genotypeTreatment');
+      setModuleId(27);
+      setIdentifierPreference(module_name + router.route);
+      setCamposGerenciadosDefault('safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment');
+      setPreferencesDefault({
+        id: 0,
+        route_usage: router.route,
+        table_preferences: camposGerenciadosDefault,
+
+      });
+      setPreferences(userLogado.preferences[identifier_preference] || preferencesDefault);
+      setCamposGerenciados(preferences.table_preferences);
+    }
+    function setPreferencesExperiment() {
+      setTables('experiment');
+      setModuloName('experimento');
+      setModuleId(22);
+      setIdentifierPreference(module_name + router.route);
+      setCamposGerenciadosDefault('id,gli,experimentName,local,delineamento,repetitionsNumber,nlp,clp,eel,density,status');
+      setPreferencesDefault({
+        id: 0,
+        route_usage: router.route,
+        table_preferences: camposGerenciadosDefault,
+
+      });
+      setPreferences(userLogado.preferences[identifier_preference] || preferencesDefault);
+      setExperimentsCamposGerenciados(preferences.table_preferences);
+    }
+
+    table === 'genotipo'
+      ? setPreferencesGenotype()
+      : setPreferencesExperiment();
+  }, [table]);
 
   const tableRef = useRef<any>(null);
-
-  const preferencesExperiments = userLogado.preferences.experimento || {
-    id: 0,
-    table_preferences:
-      'id,gli,experimentName,local,delineamento,repetitionsNumber,nlp,clp,eel,density,status',
-  };
-  const [experimentsCamposGerenciados, setExperimentsCamposGerenciados] = useState<any>(preferencesExperiments.table_preferences);
 
   const [itemsTotal, setItemsTotal] = useState<any>(totalItens);
   const [experimentsTotal, setExperimentsTotal] = useState<any>(totalExperiments);
@@ -113,7 +157,6 @@ export default function AtualizarTipoEnsaio({
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
 
-  const [table, setTable] = useState<string>('genotipo');
   const [genotypeTreatments, setGenotypeTreatments] = useState<any>(
     () => allGenotypeTreatment,
   );
@@ -194,7 +237,6 @@ export default function AtualizarTipoEnsaio({
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
 
-  const router = useRouter();
   const formik = useFormik<IAssayListUpdate | any>({
     initialValues: {
       id: assayList?.id,
@@ -331,9 +373,6 @@ export default function AtualizarTipoEnsaio({
     const tableFields: any = [];
 
     Object.keys(columnOrder).forEach((item, index) => {
-      // if (columnOrder[index] === 'id') {
-      //   tableFields.push(idHeaderFactory());
-      // }
       if (columnOrder[index] === 'safra') {
         tableFields.push(
           headerTableFactoryGlobal({
@@ -590,115 +629,6 @@ export default function AtualizarTipoEnsaio({
   const experimentColumns = experimentColumnsOrder(
     experimentsCamposGerenciados,
   );
-
-  async function getValuesColumns() {
-    const els: any = document.querySelectorAll("input[type='checkbox']");
-    let selecionados = '';
-    for (let i = 0; i < els.length; i += 1) {
-      if (els[i].checked) {
-        selecionados += `${els[i].value},`;
-      }
-    }
-    const totalString = selecionados.length;
-    const campos = selecionados.substr(0, totalString - 1);
-    if (preferences.id === 0) {
-      await userPreferencesService
-        .create({
-          table_preferences: campos,
-          userId: userLogado.id,
-          module_id: 27,
-        })
-        .then((response) => {
-          userLogado.preferences.genotypeTreatment = {
-            id: response.response.id,
-            userId: preferences.userId,
-            table_preferences: campos,
-          };
-          preferences.id = response.response.id;
-        });
-      localStorage.setItem('user', JSON.stringify(userLogado));
-    } else {
-      userLogado.preferences.genotypeTreatment = {
-        id: preferences.id,
-        userId: preferences.userId,
-        table_preferences: campos,
-      };
-      await userPreferencesService.update({
-        table_preferences: campos,
-        id: preferences.id,
-      });
-      localStorage.setItem('user', JSON.stringify(userLogado));
-    }
-
-    setStatusAccordion(false);
-    setCamposGerenciados(campos);
-  }
-
-  async function getValuesColumnsExperiments(): Promise<void> {
-    const els: any = document.querySelectorAll("input[type='checkbox']");
-    let selecionados = '';
-    for (let i = 0; i < els.length; i += 1) {
-      if (els[i].checked) {
-        selecionados += `${els[i].value},`;
-      }
-    }
-    const totalString = selecionados.length;
-    const campos = selecionados.substr(0, totalString - 1);
-    if (preferences.id === 0) {
-      await userPreferencesService
-        .create({
-          table_preferences: campos,
-          userId: userLogado.id,
-          module_id: 22,
-        })
-        .then((response) => {
-          userLogado.preferences.experimento = {
-            id: response.response.id,
-            userId: preferences.userId,
-            table_preferences: campos,
-          };
-          preferences.id = response.response.id;
-        });
-      localStorage.setItem('user', JSON.stringify(userLogado));
-    } else {
-      userLogado.preferences.experimento = {
-        id: preferences.id,
-        userId: preferences.userId,
-        table_preferences: campos,
-      };
-      await userPreferencesService.update({
-        table_preferences: campos,
-        id: preferences.id,
-      });
-      localStorage.setItem('user', JSON.stringify(userLogado));
-    }
-    setStatusAccordion(false);
-    setExperimentsCamposGerenciados(campos);
-  }
-
-  function handleOnDragEnd(result: DropResult): void {
-    setStatusAccordion(true);
-    if (!result) return;
-
-    const items = Array.from(generatesProps);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    const index: number = Number(result.destination?.index);
-    items.splice(index, 0, reorderedItem);
-
-    setGeneratesProps(items);
-  }
-
-  function handleOnDragEndExperiments(result: DropResult): void {
-    setStatusAccordion(true);
-    if (!result) return;
-
-    const items = Array.from(generatesPropsExperiments);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    const index: number = Number(result.destination?.index);
-    items.splice(index, 0, reorderedItem);
-
-    setGeneratesPropsExperiments(items);
-  }
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
@@ -1049,104 +979,37 @@ export default function AtualizarTipoEnsaio({
                     </div>
 
                     <div className="h-full flex items-center gap-2">
-                      <div className="border-solid border-2 border-blue-600 rounded">
-                        <div className="w-72">
-                          <AccordionFilter
-                            title="Gerenciar Campos"
-                            grid={statusAccordion}
-                          >
-                            <DragDropContext
-                              onDragEnd={
-                                table === 'genotipo'
-                                  ? handleOnDragEnd
-                                  : handleOnDragEndExperiments
-                              }
-                            >
-                              <Droppable droppableId="characters">
-                                {(provided) => (
-                                  <ul
-                                    className="w-full h-full characters"
-                                    {...provided.droppableProps}
-                                    ref={provided.innerRef}
-                                  >
-                                    <div className="h-8 mb-3">
-                                      <Button
-                                        value="Atualizar"
-                                        bgColor="bg-blue-600"
-                                        textColor="white"
-                                        onClick={
-                                          table === 'genotipo'
-                                            ? getValuesColumns
-                                            : getValuesColumnsExperiments
-                                        }
-                                        icon={<IoReloadSharp size={20} />}
-                                      />
-                                    </div>
-                                    {table === 'genotipo'
-                                      ? generatesProps.map(
-                                        (generate, index) => (
-                                          <Draggable
-                                            key={index}
-                                            draggableId={String(
-                                              generate.title,
-                                            )}
-                                            index={index}
-                                          >
-                                            {(dragProps) => (
-                                              <li
-                                                ref={dragProps.innerRef}
-                                                {...dragProps.draggableProps}
-                                                {...dragProps.dragHandleProps}
-                                              >
-                                                <CheckBox
-                                                  name={generate.name}
-                                                  title={generate.title?.toString()}
-                                                  value={generate.value}
-                                                  defaultChecked={camposGerenciados.includes(
-                                                      generate.value as string,
-                                                  )}
-                                                />
-                                              </li>
-                                            )}
-                                          </Draggable>
-                                        ),
-                                      )
-                                      : generatesPropsExperiments.map(
-                                        (generate, index) => (
-                                          <Draggable
-                                            key={index}
-                                            draggableId={String(
-                                              generate.title,
-                                            )}
-                                            index={index}
-                                          >
-                                            {(dragProps) => (
-                                              <li
-                                                ref={dragProps.innerRef}
-                                                {...dragProps.draggableProps}
-                                                {...dragProps.dragHandleProps}
-                                              >
-                                                <CheckBox
-                                                  name={generate.name}
-                                                  title={generate.title?.toString()}
-                                                  value={generate.value}
-                                                  defaultChecked={experimentsCamposGerenciados.includes(
-                                                      generate.value as string,
-                                                  )}
-                                                />
-                                              </li>
-                                            )}
-                                          </Draggable>
-                                        ),
-                                      )}
-                                    {provided.placeholder}
-                                  </ul>
-                                )}
-                              </Droppable>
-                            </DragDropContext>
-                          </AccordionFilter>
-                        </div>
-                      </div>
+                      <ManageFields
+                        statusAccordionExpanded={false}
+                        generatesPropsDefault={generatesProps}
+                        camposGerenciadosDefault={camposGerenciadosDefault}
+                        preferences={preferences}
+                        preferencesDefault={preferencesDefault}
+                        userLogado={userLogado}
+                        label="Gerenciar Campos"
+                        table={tables}
+                        module_name={module_name}
+                        module_id={module_id}
+                        identifier_preference={identifier_preference}
+                        OnSetStatusAccordion={(e: any) => {
+                          setStatusAccordion(e);
+                        }}
+                        OnSetGeneratesProps={(e: any) => {
+                          setGeneratesProps(e);
+                        }}
+                        OnSetCamposGerenciados={(e: any) => {
+                          setCamposGerenciados(e);
+                        }}
+                        OnColumnsOrder={(e: any) => {
+                          columnsOrder(e);
+                        }}
+                        OnSetUserLogado={(e: any) => {
+                          setUserLogado(e);
+                        }}
+                        OnSetPreferences={(e: any) => {
+                          setPreferences(e);
+                        }}
+                      />
 
                       <div className="h-12 flex items-center justify-center w-full">
                         <Button
