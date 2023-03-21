@@ -15,7 +15,7 @@ import { Button } from '../../../components/Button';
 import { Content } from '../../../components/Content';
 import { profileService } from '../../../services';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
-import perm_can_do from '../../../shared/utils/perm_can_do';
+import { perm_can_do } from '../../../shared/utils/perm_can_do';
 
 export default function Perfis({
   allProfiles,

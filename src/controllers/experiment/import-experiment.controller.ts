@@ -466,7 +466,6 @@ export class ImportExperimentController {
         id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
       handleError('Experimento controller', 'Validate Import', error.message);
-      console.log('import-experiment.controller.ts.error', error);
       return { status: 500, message: 'Erro ao validar planilha de experimento' };
     }
   }

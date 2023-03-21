@@ -433,7 +433,6 @@ export class NpeController {
   }
 
   async update(data: any) {
-    console.log('🚀 ~ file: npe.controller.ts:436 ~ NpeController ~ update ~ data:', data);
     try {
       if (data) {
         if (data.length === undefined) {

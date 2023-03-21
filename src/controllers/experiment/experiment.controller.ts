@@ -27,7 +27,6 @@ export class ExperimentController {
     let orderBy: object | any;
     parameters.AND = [];
 
-    // console.log('experimentos', 'options', options);
 
     try {
       options = await removeEspecialAndSpace(options);

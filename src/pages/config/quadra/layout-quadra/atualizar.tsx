@@ -676,27 +676,21 @@ export default function Atualizarquadra({
                         module_id={module_id}
                         identifier_preference={identifier_preference}
                         OnSetStatusAccordion={(e: any) => {
-                          console.log('callback', 'setStatusAccordion', e);
                           setStatusAccordion(e);
                         }}
                         OnSetGeneratesProps={(e: any) => {
-                          console.log('callback', 'setGeneratesProps', e);
                           setGeneratesProps(e);
                         }}
                         OnSetCamposGerenciados={(e: any) => {
-                          console.log('callback', 'setCamposGerenciados', e);
                           setCamposGerenciados(e);
                         }}
                         OnColumnsOrder={(e: any) => {
-                          console.log('callback', 'columnsOrder', e);
                           columnsOrder(e);
                         }}
                         OnSetUserLogado={(e: any) => {
-                          console.log('callback', 'setUserLogado', e);
                           setUserLogado(e);
                         }}
                         OnSetPreferences={(e: any) => {
-                          console.log('callback', 'setPreferences', e);
                           setPreferences(e);
                         }}
                       />

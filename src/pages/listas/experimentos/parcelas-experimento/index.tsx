@@ -61,7 +61,7 @@ import { tableGlobalFunctions } from '../../../../helpers';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../components/Loading';
 import { functionsUtils } from '../../../../shared/utils/functionsUtils';
-import perm_can_do from '../../../../shared/utils/perm_can_do';
+import { perm_can_do } from '../../../../shared/utils/perm_can_do';
 
 export default function Listagem({
   // assaySelect,
@@ -105,14 +105,14 @@ export default function Listagem({
   const preferencesDefault = {
     id: 0,
     route_usage: router.route,
-    table_preferences: camposGerenciadosDefault
+    table_preferences: camposGerenciadosDefault,
   };
 
   const [preferences, setPreferences] = useState<any>(userLogado.preferences[identifier_preference] || preferencesDefault);
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
-  
+
   const [treatments, setTreatments] = useState<ITreatment[] | any>([]);
   const [tableMessage, setMessage] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -1477,7 +1477,7 @@ export default function Listagem({
                         title="Substituir"
                         value="Substituir"
                         textColor="white"
-                        style={{ display: !perm_can_do('/listas/parcelas-experimento', 'change') ? 'none' : '' }}
+                        style={{ display: !perm_can_do('/listas/experimentos/parcelas-experimento', 'change') ? 'none' : '' }}
                         onClick={() => {
                           setRadioStatus();
                           setIsOpenModal(!isOpenModal);
@@ -1511,12 +1511,12 @@ export default function Listagem({
                         module_name={module_name}
                         module_id={module_id}
                         identifier_preference={identifier_preference}
-                        OnSetStatusAccordion={(e: any) => { console.log('callback', 'setStatusAccordion', e); setStatusAccordion(e); }}
-                        OnSetGeneratesProps={(e: any) => { console.log('callback', 'setGeneratesProps', e); setGeneratesProps(e); }}
-                        OnSetCamposGerenciados={(e: any) => { console.log('callback', 'setCamposGerenciados', e); setCamposGerenciados(e); }}
-                        OnColumnsOrder={(e: any) => { console.log('callback', 'columnsOrder', e); orderColumns(e); }}
-                        OnSetUserLogado={(e: any) => { console.log('callback', 'setUserLogado', e); setUserLogado(e); }}
-                        OnSetPreferences={(e: any) => { console.log('callback', 'setPreferences', e); setPreferences(e); }}
+                        OnSetStatusAccordion={(e: any) => {  setStatusAccordion(e); }}
+                        OnSetGeneratesProps={(e: any) => {  setGeneratesProps(e); }}
+                        OnSetCamposGerenciados={(e: any) => {  setCamposGerenciados(e); }}
+                        OnColumnsOrder={(e: any) => {  orderColumns(e); }}
+                        OnSetUserLogado={(e: any) => {  setUserLogado(e); }}
+                        OnSetPreferences={(e: any) => {  setPreferences(e); }}
                       />
 
                       {/* <div className="border-solid border-2 border-blue-600 rounded"> */}

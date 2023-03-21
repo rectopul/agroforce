@@ -12,7 +12,7 @@ import { Content } from "../../../components/Content";
 import { profileService } from "../../../services";
 import stylesCommon from "../../../shared/styles/common.module.css";
 import LoadingComponent from "../../../components/Loading";
-import perm_can_do from "../../../shared/utils/perm_can_do";
+import { perm_can_do } from "../../../shared/utils/perm_can_do";
 
 let groupRoutes = [
   { title: "Perfil", name: "/perfil/" },

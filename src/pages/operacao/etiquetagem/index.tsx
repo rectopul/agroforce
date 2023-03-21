@@ -59,7 +59,7 @@ import { IReturnObject } from '../../../interfaces/shared/Import.interface';
 import { tableGlobalFunctions } from '../../../helpers';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../components/Loading';
-import perm_can_do from '../../../shared/utils/perm_can_do';
+import { perm_can_do } from '../../../shared/utils/perm_can_do';
 
 export default function Listagem({
   allExperimentGroup,
@@ -1064,27 +1064,27 @@ export default function Listagem({
                         module_id={module_id}
                         identifier_preference={identifier_preference}
                         OnSetStatusAccordion={(e: any) => {
-                          console.log('callback', 'setStatusAccordion', e);
+                          
                           setStatusAccordion(e);
                         }}
                         OnSetGeneratesProps={(e: any) => {
-                          console.log('callback', 'setGeneratesProps', e);
+                          
                           setGeneratesProps(e);
                         }}
                         OnSetCamposGerenciados={(e: any) => {
-                          console.log('callback', 'setCamposGerenciados', e);
+                          
                           setCamposGerenciados(e);
                         }}
                         OnColumnsOrder={(e: any) => {
-                          console.log('callback', 'columnsOrder', e);
+                          
                           orderColumns(e);
                         }}
                         OnSetUserLogado={(e: any) => {
-                          console.log('callback', 'setUserLogado', e);
+                          
                           setUserLogado(e);
                         }}
                         OnSetPreferences={(e: any) => {
-                          console.log('callback', 'setPreferences', e);
+                          
                           setPreferences(e);
                         }}
                       />
