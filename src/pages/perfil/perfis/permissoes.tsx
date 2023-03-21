@@ -5,6 +5,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
 import { RiFileExcel2Line } from "react-icons/ri";
+import { IoMdArrowBack } from "react-icons/io";
 import Swal from "sweetalert2";
 import { Button, CheckBox } from "../../../components";
 import { Content } from "../../../components/Content";
@@ -110,19 +111,31 @@ export default function Permissoes({
             </div>
           ))}
 
-          <div className="w-40 h-10 mt-10">
-            <Button
-              title="Salvar"
-              value="Salvar"
-              bgColor="bg-blue-600"
-              textColor="white"
-              style={{
-                display: !perm_can_do("/perfil/perfis/permissoes", "edit")
-                  ? "none"
-                  : "",
-              }}
-              onClick={save}
-            />
+          <div className="flex mt-10">
+            <div className="w-40 h-10 mt-10 mr-4">
+              <Button
+                title="Salvar"
+                value="Salvar"
+                bgColor="bg-blue-600"
+                textColor="white"
+                style={{
+                  display: !perm_can_do("/perfil/perfis/permissoes", "edit")
+                    ? "none"
+                    : "",
+                }}
+                onClick={save}
+              />
+            </div>
+            <div className="w-40 h-10 mt-10">
+              <Button
+                title="Voltar"
+                value="Voltar"
+                bgColor="bg-red-600"
+                textColor="white"
+                //icon={<IoMdArrowBack size={18} />}
+                onClick={() => router.back()}
+              />
+            </div>
           </div>
         </div>
       </Content>
