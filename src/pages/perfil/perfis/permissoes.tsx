@@ -3,9 +3,7 @@ import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { Fragment, useState } from 'react';
-import { RiFileExcel2Line } from 'react-icons/ri';
-import { IoMdArrowBack } from 'react-icons/io';
+import { useState } from 'react';
 import Swal from 'sweetalert2';
 import { Button, CheckBox } from '../../../components';
 import { Content } from '../../../components/Content';
@@ -31,7 +29,7 @@ export default function Permissoes({
 
   function Route({ key, route }: any) {
     return (
-      <div className="w-96 p-1 ">
+      <div className="w-96 p-1">
         {/* <li id={key}>{route}</li> */}
         {route}
       </div>
@@ -49,7 +47,10 @@ export default function Permissoes({
       }
     }
 
-    const { status, message } = await profileService.update({ selecionados, profileId });
+    const { status, message } = await profileService.update({
+      selecionados,
+      profileId,
+    });
     if (status === 200) {
       Swal.fire(message);
       router.back();
@@ -67,10 +68,7 @@ export default function Permissoes({
 
       {loading && <LoadingComponent text="" />}
 
-      <Content
-        contentHeader={[]}
-        moduloActive="config"
-      >
+      <Content contentHeader={[]} moduloActive="config">
         <div className={stylesCommon.container}>
           {groupRoutes?.map((item) => (
             <div>
@@ -84,7 +82,7 @@ export default function Permissoes({
                 .map((route: any, index: any) => (
                   <div
                     className={`flex border border-gray-200 ${
-                      index % 2 != 0 ? 'bg-gray-200' : ''
+                      index % 2 !== 0 ? 'bg-gray-200' : ''
                     }`}
                   >
                     <div
@@ -132,7 +130,6 @@ export default function Permissoes({
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
-                // icon={<IoMdArrowBack size={18} />}
                 onClick={() => router.back()}
               />
             </div>
@@ -162,9 +159,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
-  const {
-    newResult: allRoutes,
-  } = await fetch(
+  const { newResult: allRoutes } = await fetch(
     urlParameters.toString(),
     requestOptions,
   ).then((response) => response.json());

@@ -90,6 +90,7 @@ export default function AtualizarTipoEnsaio({
   const [userLogado, setUserLogado] = useState<any>(
     JSON.parse(localStorage.getItem('user') as string),
   );
+  const [table, setTable] = useState<string>('genotipo');
   const [tables, setTables] = useState<string>('genotype_treatment');
   const [module_name, setModuloName] = useState<string>('genotypeTreatment');
   const [module_id, setModuleId] = useState<number>(27);
@@ -156,7 +157,6 @@ export default function AtualizarTipoEnsaio({
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
 
-  const [table, setTable] = useState<string>('genotipo');
   const [genotypeTreatments, setGenotypeTreatments] = useState<any>(
     () => allGenotypeTreatment,
   );
