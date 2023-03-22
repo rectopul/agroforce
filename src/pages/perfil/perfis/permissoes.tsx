@@ -93,7 +93,7 @@ export default function Permissoes({
                     >
                       <Route key={route.id} route={route.screenRoute} />
                     </div>
-                    <div className="flex w-1/2 justify-center">
+                    <div className="flex w-1/2">
                       {route.permission[0]?.permissions?.map((element: any) => (
                         <div className="p-1 ml-2">
                           <CheckBox
