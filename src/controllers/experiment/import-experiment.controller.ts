@@ -102,8 +102,9 @@ export class ImportExperimentController {
               await logImportController.update({
                 id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: `Erro na linha ${Number(row) + 1}. Experimento já cadastrado e utilizado no sistema`,
               });
-              responseIfError[0]
-              += `<li style="text-align:left"> Erro na linha ${Number(row) + 1}. Experimento já cadastrado e utilizado no sistema </li> <br>`;
+              return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimento já cadastrado e utilizado no sistema` };
+              // responseIfError[0]
+              // += `<li style="text-align:left"> Erro na linha ${Number(row) + 1}. Experimento já cadastrado e utilizado no sistema </li> <br>`;
             }
           }
           if (experimentNameTemp.includes(experimentName)) {
@@ -112,8 +113,9 @@ export class ImportExperimentController {
             });
 
             experimentNameTemp[row] = experimentName;
-            responseIfError[0]
-              += `<li style="text-align:left"> Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela </li> <br>`;
+            return { status: 200, message: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela` };
+            // responseIfError[0]
+            //   += `<li style="text-align:left"> Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela </li> <br>`;
           }
           experimentNameTemp[row] = experimentName;
           let assayList: any = {};
