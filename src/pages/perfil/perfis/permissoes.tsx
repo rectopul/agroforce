@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { Fragment, useState } from 'react';
 import { RiFileExcel2Line } from 'react-icons/ri';
+import { IoMdArrowBack } from 'react-icons/io';
 import Swal from 'sweetalert2';
 import { Button, CheckBox } from '../../../components';
 import { Content } from '../../../components/Content';
@@ -12,6 +13,14 @@ import { profileService } from '../../../services';
 import stylesCommon from '../../../shared/styles/common.module.css';
 import LoadingComponent from '../../../components/Loading';
 import { perm_can_do } from '../../../shared/utils/perm_can_do';
+
+const groupRoutes = [
+  { title: 'Perfil', name: '/perfil/' },
+  { title: 'Configurações', name: '/config/' },
+  { title: 'Lista', name: '/listas/' },
+  { title: 'Operação', name: '/operacao/' },
+  { title: 'Relatórios', name: '/relatorios/' },
+];
 
 export default function Permissoes({
   allRoutes,
@@ -22,8 +31,9 @@ export default function Permissoes({
 
   function Route({ key, route }: any) {
     return (
-      <div className="w-96 pb-2">
-        <li id={key}>{ route }</li>
+      <div className="w-96 p-1 ">
+        {/* <li id={key}>{route}</li> */}
+        {route}
       </div>
     );
   }
@@ -35,7 +45,7 @@ export default function Permissoes({
 
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
-        selecionados[els[i].id] += (els[i].value ? `${els[i].value},` : '');
+        selecionados[els[i].id] += els[i].value ? `${els[i].value},` : '';
       }
     }
 
@@ -62,33 +72,70 @@ export default function Permissoes({
         moduloActive="config"
       >
         <div className={stylesCommon.container}>
-          <ul>
-            {allRoutes.map((route: any) => (
-              <li className="flex ">
-                <Route key={route.id} route={route.screenRoute} />
-                {route.permission[0]?.permissions?.map((element: any) => (
-                  <div className="ml-2">
-                    <CheckBox
-                      name={element.title}
-                      id={route.screenRoute}
-                      title={element.title?.toString()}
-                      value={element.value}
-                      defaultChecked={element.checked}
-                    />
+          {groupRoutes?.map((item) => (
+            <div>
+              <div className="bg-gray-450 mt-3">
+                <span className="ml-2 text-ml font-bold text-white">
+                  {item?.title}
+                </span>
+              </div>
+              {allRoutes
+                ?.filter((i: any) => i?.screenRoute?.includes(item?.name))
+                .map((route: any, index: any) => (
+                  <div
+                    className={`flex border border-gray-200 ${
+                      index % 2 != 0 ? 'bg-gray-200' : ''
+                    }`}
+                  >
+                    <div
+                      key={route.id}
+                      className="flex text-sm w-1/2 justify-center align-center"
+                    >
+                      <Route key={route.id} route={route.screenRoute} />
+                    </div>
+                    <div className="flex w-1/2 justify-center">
+                      {route.permission[0]?.permissions?.map((element: any) => (
+                        <div className="p-1 ml-2">
+                          <CheckBox
+                            name={element.title}
+                            id={route.screenRoute}
+                            title={element.title?.toString()}
+                            value={element.value}
+                            defaultChecked={element.checked}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
-              </li>
-            ))}
-          </ul>
-          <div className="w-40 pt-8">
-            <Button
-              title="Salvar"
-              value="Salvar"
-              bgColor="bg-blue-600"
-              textColor="white"
-              style={{ display: !perm_can_do('/perfil/perfis/permissoes', 'edit') ? 'none' : '' }}
-              onClick={save}
-            />
+            </div>
+          ))}
+
+          <div className="flex mt-10">
+            <div className="w-40 h-10 mt-10 mr-4">
+              <Button
+                title="Salvar"
+                value="Salvar"
+                bgColor="bg-blue-600"
+                textColor="white"
+                style={{
+                  display: !perm_can_do('/perfil/perfis/permissoes', 'edit')
+                    ? 'none'
+                    : '',
+                }}
+                onClick={save}
+              />
+            </div>
+            <div className="w-40 h-10 mt-10">
+              <Button
+                title="Voltar"
+                value="Voltar"
+                bgColor="bg-red-600"
+                textColor="white"
+                // icon={<IoMdArrowBack size={18} />}
+                onClick={() => router.back()}
+              />
+            </div>
           </div>
         </div>
       </Content>
@@ -106,7 +153,9 @@ export const getServerSideProps: GetServerSideProps = async ({
   const baseUrl = `${publicRuntimeConfig.apiUrl}/permissions`;
 
   const urlParameters: any = new URL(baseUrl);
-  urlParameters.search = new URLSearchParams(`profileId=${profileId}`).toString();
+  urlParameters.search = new URLSearchParams(
+    `profileId=${profileId}`,
+  ).toString();
   const requestOptions = {
     method: 'GET',
     credentials: 'include',

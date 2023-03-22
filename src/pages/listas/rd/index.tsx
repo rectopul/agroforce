@@ -1112,27 +1112,21 @@ export default function Import({
                           module_id={module_id}
                           identifier_preference={identifier_preference}
                           OnSetStatusAccordion={(e: any) => {
-                            
                             setStatusAccordion(e);
                           }}
                           OnSetGeneratesProps={(e: any) => {
-                            
                             setGeneratesProps(e);
                           }}
                           OnSetCamposGerenciados={(e: any) => {
-                            
                             setCamposGerenciados(e);
                           }}
                           OnColumnsOrder={(e: any) => {
-                            
                             columnsOrder(e);
                           }}
                           OnSetUserLogado={(e: any) => {
-                            
                             setUserLogado(e);
                           }}
                           OnSetPreferences={(e: any) => {
-                            
                             setPreferences(e);
                           }}
                         />
@@ -1229,7 +1223,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
-  if (lastPageServer == undefined || lastPageServer == 'No') {
+  if (lastPageServer == undefined || lastPageServer == 'No' || req.cookies.urlPage !== 'rd') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });
