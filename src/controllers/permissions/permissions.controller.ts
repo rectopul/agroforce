@@ -58,7 +58,6 @@ export class PermissionsController {
         ...element,
         permission: permissions.filter((e: any) => element.screenRoute === e.route),
       }));
-      console.log('🚀 ~ file: permissions.controller.ts:61 ~ PermissionsController ~ newResult ~ newResult:', newResult);
 
       if (!result) {
         return {

@@ -27,10 +27,9 @@ export default function Permissoes({
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
-  function Route({ key, route }: any) {
+  function Route({ route }: any) {
     return (
       <div className="w-96 p-1">
-        {/* <li id={key}>{route}</li> */}
         {route}
       </div>
     );
@@ -89,7 +88,7 @@ export default function Permissoes({
                       key={route.id}
                       className="flex text-sm w-1/2 justify-center align-center"
                     >
-                      <Route key={route.id} route={route.screenRoute} />
+                      <Route key={route.id} route={route.permission[0].name} />
                     </div>
                     <div className="flex w-1/2 justify-center">
                       {route.permission[0]?.permissions?.map((element: any) => (
