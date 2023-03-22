@@ -1,25 +1,23 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import getConfig from "next/config";
-import { RequestInit } from "next/dist/server/web/spec-extension/request";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { Fragment, useState } from "react";
-import { RiFileExcel2Line } from "react-icons/ri";
-import { IoMdArrowBack } from "react-icons/io";
-import Swal from "sweetalert2";
-import { Button, CheckBox } from "../../../components";
-import { Content } from "../../../components/Content";
-import { profileService } from "../../../services";
-import stylesCommon from "../../../shared/styles/common.module.css";
-import LoadingComponent from "../../../components/Loading";
-import { perm_can_do } from "../../../shared/utils/perm_can_do";
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import Swal from 'sweetalert2';
+import { Button, CheckBox } from '../../../components';
+import { Content } from '../../../components/Content';
+import { profileService } from '../../../services';
+import stylesCommon from '../../../shared/styles/common.module.css';
+import LoadingComponent from '../../../components/Loading';
+import { perm_can_do } from '../../../shared/utils/perm_can_do';
 
-let groupRoutes = [
-  { title: "Perfil", name: "/perfil/" },
-  { title: "Configurações", name: "/config/" },
-  { title: "Lista", name: "/listas/" },
-  { title: "Operação", name: "/operacao/" },
-  { title: "Relatórios", name: "/relatorios/" },
+const groupRoutes = [
+  { title: 'Perfil', name: '/perfil/' },
+  { title: 'Configurações', name: '/config/' },
+  { title: 'Lista', name: '/listas/' },
+  { title: 'Operação', name: '/operacao/' },
+  { title: 'Relatórios', name: '/relatorios/' },
 ];
 
 export default function Permissoes({
@@ -29,10 +27,9 @@ export default function Permissoes({
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
-  function Route({ key, route }: any) {
+  function Route({ route }: any) {
     return (
       <div className="w-96 p-1">
-        {/* <li id={key}>{route}</li> */}
         {route}
       </div>
     );
@@ -45,7 +42,7 @@ export default function Permissoes({
 
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
-        selecionados[els[i].id] += els[i].value ? `${els[i].value},` : "";
+        selecionados[els[i].id] += els[i].value ? `${els[i].value},` : '';
       }
     }
 
@@ -84,16 +81,16 @@ export default function Permissoes({
                 .map((route: any, index: any) => (
                   <div
                     className={`flex border border-gray-200 ${
-                      index % 2 != 0 ? "bg-gray-200" : ""
+                      index % 2 !== 0 ? 'bg-gray-200' : ''
                     }`}
                   >
                     <div
                       key={route.id}
                       className="flex text-sm w-1/2 justify-center align-center"
                     >
-                      <Route key={route.id} route={route.screenRoute} />
+                      <Route key={route.id} route={route.permission[0].name} />
                     </div>
-                    <div className="flex w-1/2 justify-center">
+                    <div className="flex w-1/2">
                       {route.permission[0]?.permissions?.map((element: any) => (
                         <div className="p-1 ml-2">
                           <CheckBox
@@ -119,9 +116,9 @@ export default function Permissoes({
                 bgColor="bg-blue-600"
                 textColor="white"
                 style={{
-                  display: !perm_can_do("/perfil/perfis/permissoes", "edit")
-                    ? "none"
-                    : "",
+                  display: !perm_can_do('/perfil/perfis/permissoes', 'edit')
+                    ? 'none'
+                    : '',
                 }}
                 onClick={save}
               />
@@ -132,7 +129,6 @@ export default function Permissoes({
                 value="Voltar"
                 bgColor="bg-red-600"
                 textColor="white"
-                //icon={<IoMdArrowBack size={18} />}
                 onClick={() => router.back()}
               />
             </div>
@@ -154,17 +150,17 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(
-    `profileId=${profileId}`
+    `profileId=${profileId}`,
   ).toString();
   const requestOptions = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
   const { newResult: allRoutes } = await fetch(
     urlParameters.toString(),
-    requestOptions
+    requestOptions,
   ).then((response) => response.json());
 
   return {

@@ -1511,12 +1511,12 @@ export default function Listagem({
                         module_name={module_name}
                         module_id={module_id}
                         identifier_preference={identifier_preference}
-                        OnSetStatusAccordion={(e: any) => {  setStatusAccordion(e); }}
-                        OnSetGeneratesProps={(e: any) => {  setGeneratesProps(e); }}
-                        OnSetCamposGerenciados={(e: any) => {  setCamposGerenciados(e); }}
-                        OnColumnsOrder={(e: any) => {  orderColumns(e); }}
-                        OnSetUserLogado={(e: any) => {  setUserLogado(e); }}
-                        OnSetPreferences={(e: any) => {  setPreferences(e); }}
+                        OnSetStatusAccordion={(e: any) => { setStatusAccordion(e); }}
+                        OnSetGeneratesProps={(e: any) => { setGeneratesProps(e); }}
+                        OnSetCamposGerenciados={(e: any) => { setCamposGerenciados(e); }}
+                        OnColumnsOrder={(e: any) => { orderColumns(e); }}
+                        OnSetUserLogado={(e: any) => { setUserLogado(e); }}
+                        OnSetPreferences={(e: any) => { setPreferences(e); }}
                       />
 
                       {/* <div className="border-solid border-2 border-blue-600 rounded"> */}
@@ -1677,7 +1677,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
-  if (lastPageServer == undefined || lastPageServer == 'No') {
+  if (lastPageServer == undefined || lastPageServer == 'No' || req.cookies.urlPage !== 'parcelas') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });
