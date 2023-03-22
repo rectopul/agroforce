@@ -265,7 +265,7 @@ export class ImportController {
       }
 
       if (data.moduleId === 22) {
-        return await ImportExperimentController.validate(responseLog?.id, data);
+        return await ImportExperimentController.validate(responseLog?.id, false, data);
       }
 
       // Validação Lista de Ensaio
