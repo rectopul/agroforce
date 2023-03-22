@@ -458,6 +458,7 @@ export default function Listagem({
                       setCookies('lastPage', 'sequencia-delineamento');
                       setCookies('itensPage', itensPerPage);
                       setCookies('takeBeforeEdit', take);
+                      setCookies('urlPage', 'delineamento');
                       router.push(
                         `delineamento/sequencia-delineamento?id_delineamento=${rowData.id}`,
                       );
@@ -1003,7 +1004,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
-  if (lastPageServer == undefined || lastPageServer == 'No') {
+  if (lastPageServer == undefined || lastPageServer == 'No' || req.cookies.urlPage !== 'delineamento') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });
