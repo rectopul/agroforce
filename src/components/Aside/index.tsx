@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 import { ButtonAside } from './ButtonAside';
 import { asidePermissions } from '../../shared/utils/perm_can_do';
 
-const versionApp = '0.0.33.1';
+const versionApp = '0.0.33.2';
 
 export function Aside({ moduloActive }: any) {
   const aArray = versionApp.split('.');
@@ -44,7 +44,7 @@ export function Aside({ moduloActive }: any) {
     '/operacao/etiquetagem',
   ]);
   const [logs, setLogs] = useState<any>([
-    '/relatorios/logs',
+    '/logs',
   ]);
   const prev = aArray.splice(0, aArray.length - 1);
   const next = aArray.splice(-1);

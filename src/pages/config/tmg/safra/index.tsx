@@ -280,43 +280,10 @@ export default function Listagem({
     await safraService.updateSafras({
       id: data?.id,
       status: data?.status === 1 ? 0 : 1,
+      created_by: userLogado?.id,
     });
 
     handlePagination(currentPage);
-  }
-
-  function idHeaderFactory() {
-    return {
-      title: <div className="flex items-center">{arrowOrder}</div>,
-      field: 'id',
-      width: 0,
-      sorting: false,
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-9 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="h-9 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
-          </div>
-        </div>
-      )),
-    };
   }
 
   function actionHeaderFactory() {

@@ -813,7 +813,7 @@ export default function Listagem({
                         value="Importar"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        style={{ display: !perm_can_do('/config/local/local', 'import') ? 'none' : '' }}
+                        style={{ display: !perm_can_do('/listas/rd', 'import') ? 'none' : '' }}
                         onClick={() => {
                           window.open('/listas/rd?importar=rd', '_blank');
                         }}

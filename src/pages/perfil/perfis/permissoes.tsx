@@ -51,7 +51,7 @@ export default function Permissoes({
       profileId,
     });
     if (status === 200) {
-      Swal.fire(message);
+      Swal.fire('Permissões atualizadas. (Caso tenha alterado, sera necessário sair e entrar novamente)');
       router.back();
     } else {
       Swal.fire(message);
