@@ -44,7 +44,8 @@ interface IGenerateProps {
 }
 
 export function ManageFields(props: ManageFieldsProps) {
-  console.log('🚀 ~ file: index.tsx:47 ~ ManageFields ~ props:', props);
+  // console.log('🚀 ~ file: index.tsx:47 ~ ManageFields ~ identifier_preference:', props.identifier_preference);
+  // console.log('🚀 ~ file: index.tsx:47 ~ ManageFields ~ props:', props);
   const router = useRouter();
 
   const { preferencesDefault } = props;
@@ -63,13 +64,22 @@ export function ManageFields(props: ManageFieldsProps) {
   const [identifier_preference, setIdentifierPreference] = useState<string>(props.identifier_preference);
 
   useEffect(() => {
-    reorderGeneratedProps();
-    props.OnSetGeneratesProps(generatesProps);
-  }, []);
-
+    //reorderGeneratedProps();
+    //props.OnSetGeneratesProps(generatesProps);
+  }, [camposGerenciados]);
+  
   useEffect(() => {
+    console.log('useEffect preferences', preferences);
     props.OnSetPreferences(preferences);
+    reorderGeneratedPropsDefault();
   }, [preferences]);
+
+  function reorderGeneratedPropsDefault() {
+    const campos_arr = props.camposGerenciadosDefault.split(',');
+    const items = Array.from(generatesProps);
+    
+    setGeneratesProps(items);
+  }
 
   // useEffect(() => {
   // }, [statusAccordion]);
@@ -104,8 +114,6 @@ export function ManageFields(props: ManageFieldsProps) {
     setGeneratesProps(newItems);
   }
 
-  // props.OnColumnsOrder(props.camposGerenciadosDefault);
-
   function handleOnDragEnd(result: DropResult): void {
     setStatusAccordion(true);
     if (!result) return;
@@ -118,30 +126,46 @@ export function ManageFields(props: ManageFieldsProps) {
     // props.OnSetGeneratesProps(items);
     setStatusAccordion(true);
   }
+  
+  async function deleteAllPreferencesByUserAndModule() : Promise<void>{
+    await userPreferencesService
+      .getAll({
+        userId: userLogado.id,
+        route_usage: router.route,
+        module_id: props.module_id,
+      })
+      .then((response) => {
+        console.log('🚀 ~ file: index.tsx:47 ~ ManageFields ~ response:', response);
+        if(response.status === 200){
 
-  async function acao1(): Promise<void> {
-    setCamposGerenciados('id,foco,type_assay,tecnologia,gli');
-    props.OnSetCamposGerenciados('id,foco,type_assay,tecnologia,gli');
-    reorderGeneratedProps();
-    props.OnSetGeneratesProps(generatesProps);
-    getValuesColumns();
-  }
-
-  async function acao2(): Promise<void> {
-    setCamposGerenciados('rep,status,nt,npe,genotipo,nca');
-    props.OnSetCamposGerenciados('rep,status,nt,npe,genotipo,nca');
-    reorderGeneratedProps();
-    props.OnSetGeneratesProps(generatesProps);
-    getValuesColumns();
+          response.response.forEach(async (item: any) => {
+            await userPreferencesService.deleted(item.id).then(({ statusD, responseD }) => {
+              console.log('deleted', item, statusD, responseD);
+            });
+          });
+          
+        }
+        
+        
+      });
   }
 
   async function clearPreferencesByUserAndModule(): Promise<void> {
-    if (preferences.id === 0) return;
+    
+    if (preferences.id === 0) {
+
+      await deleteAllPreferencesByUserAndModule();
+      return;
+      
+    }
 
     await userPreferencesService
       .deleted(preferences.id)
       .then(async ({ status, response }) => {
         if (status === 200) {
+
+          await deleteAllPreferencesByUserAndModule();
+          
           // simulação de exclusão de preferências
           preferences.id = 0;
           preferences.table_preferences = props.camposGerenciadosDefault;
@@ -170,6 +194,7 @@ export function ManageFields(props: ManageFieldsProps) {
               userId: userLogado.id,
               route_usage: router.route,
               module_id: props.module_id,
+              identifier_extra: props.identifier_preference,
             })
             .then((response) => {
               userLogado.preferences[props.identifier_preference] = {
@@ -224,6 +249,7 @@ export function ManageFields(props: ManageFieldsProps) {
           userId: userLogado.id,
           route_usage: router.route,
           module_id: props.module_id,
+          identifier_extra: props.identifier_preference,
         })
         .then((response) => {
           userLogado.preferences[props.identifier_preference] = {
@@ -231,6 +257,7 @@ export function ManageFields(props: ManageFieldsProps) {
             route_usage: router.route,
             userId: userLogado.id,
             table_preferences: campos,
+            identifier_extra: props.identifier_preference,
           };
           
           setPreferences(userLogado.preferences[props.identifier_preference]);
@@ -241,6 +268,7 @@ export function ManageFields(props: ManageFieldsProps) {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
+        identifier_extra: props.identifier_preference,
       };
 
       // verifica se existe alguma preferência salva no banco
@@ -253,10 +281,13 @@ export function ManageFields(props: ManageFieldsProps) {
         });
 
       const response = await userPreferencesService.update({
-        table_preferences: campos,
         id: preferences.id,
+        table_preferences: campos,
+        identifier_extra: props.identifier_preference,
       })
         .then((response) => {
+          
+          console.log("atualizar gerenciar campos:", response);
           
         })
         .catch((error) => {
@@ -287,6 +318,8 @@ export function ManageFields(props: ManageFieldsProps) {
   return (
     <div className="border-solid border-2 border-blue-600 rounded">
       <div className="w-72">
+        {props.identifier_preference}<br/>
+        {userLogado.preferences[props.identifier_preference]}
         <AccordionFilter
           title="Gerenciar Campos"
           grid={statusAccordion}
@@ -298,8 +331,8 @@ export function ManageFields(props: ManageFieldsProps) {
                   className="w-full h-full characters"
                   {...provided.droppableProps}
                   ref={provided.innerRef}
+                  title={identifier_preference}
                 >
-                  {identifier_preference}
                   <div className="h-8 mb-3">
                     <Button
                       value="Atualizar"

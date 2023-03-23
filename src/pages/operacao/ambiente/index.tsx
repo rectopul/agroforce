@@ -132,7 +132,7 @@ export default function Listagem({
   const module_id = 14;
   // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
   const identifier_preference = module_name + router.route;
-  const camposGerenciadosDefault = 'id,local,safra,foco,ensaio,tecnologia,epoca,npei,prox_npe,grp,status';
+  const camposGerenciadosDefault = 'id,local,safra,foco,ensaio,tecnologia,epoca,npei_i,prox_npe,grp,status';
   const preferencesDefault = {
     id: 0,
     route_usage: router.route,

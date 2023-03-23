@@ -220,8 +220,16 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
             
             console.log('item', item);
             
+            let identifier = item.modules.module;
+            
             if(item.route_usage !== null && item.route_usage !== '' && !preferences[item.route_usage]) {
-              preferences[item.modules.module + item.route_usage] = item;
+              identifier = item.modules.module + item.route_usage;
+              preferences[identifier] = item;
+            }
+            
+            if(item.identifier_extra !== null && item.identifier_extra !== '' && !preferences[item.identifier_extra]) {
+              identifier = item.identifier_extra;
+              preferences[identifier] = item;
             }
             
           });
