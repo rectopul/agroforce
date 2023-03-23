@@ -815,11 +815,7 @@ export default function Import({
                     title="Cadastros RD"
                     table=""
                     moduleId={0}
-                    style={{
-                      display: (!perm_can_do('/config/tmg/genotipo', 'import')
-                    || !perm_can_do('/config/ensaio/tecnologia', 'import')
-                    || !perm_can_do('/config/local/local', 'import')) ? 'none' : '',
-                    }}
+                    style={{ display: (!perm_can_do('/listas/rd', 'import')) ? 'none' : '' }}
                   />
                 )}
 
