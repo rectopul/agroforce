@@ -99,17 +99,17 @@ export class ImportExperimentController {
           });
           if (experiment?.length > 0) {
             if (experiment[0].status?.toUpperCase() !== 'IMPORTADO') {
-              await logImportController.update({
-                id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: `Erro na linha ${Number(row) + 1}. Experimento já cadastrado e utilizado no sistema`,
-              });
+              // await logImportController.update({
+              //   id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: `Erro na linha ${Number(row) + 1}. Experimento já cadastrado e utilizado no sistema`,
+              // });
               responseIfError[0]
               += `<li style="text-align:left"> Erro na linha ${Number(row) + 1}. Experimento já cadastrado e utilizado no sistema </li> <br>`;
             }
           }
           if (experimentNameTemp.includes(experimentName)) {
-            await logImportController.update({
-              id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela`,
-            });
+            // await logImportController.update({
+            //   id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela`,
+            // });
 
             experimentNameTemp[row] = experimentName;
             responseIfError[0]
