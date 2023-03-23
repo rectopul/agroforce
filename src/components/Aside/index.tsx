@@ -44,7 +44,7 @@ export function Aside({ moduloActive }: any) {
     '/operacao/etiquetagem',
   ]);
   const [logs, setLogs] = useState<any>([
-    '/relatorios/logs',
+    '/logs',
   ]);
   const prev = aArray.splice(0, aArray.length - 1);
   const next = aArray.splice(-1);

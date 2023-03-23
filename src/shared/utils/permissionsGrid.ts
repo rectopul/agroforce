@@ -32,7 +32,7 @@ const permissions = [
     name: 'Genótipo',
     permissions: [
       { value: 'view', title: 'Ver', checked: false },
-      { value: 'import', title: 'Importar', checked: false },
+      // { value: 'import', title: 'Importar', checked: false },
       { value: 'edit', title: 'Editar', checked: false },
     ],
   },
@@ -88,7 +88,7 @@ const permissions = [
     name: 'Tecnologia',
     permissions: [
       { value: 'view', title: 'Ver', checked: false },
-      { value: 'import', title: 'Importar', checked: false },
+      // { value: 'import', title: 'Importar', checked: false },
     ],
   },
   {
@@ -122,7 +122,7 @@ const permissions = [
     name: 'Local',
     permissions: [
       { value: 'view', title: 'Ver', checked: false },
-      { value: 'import', title: 'Importar', checked: false },
+      // { value: 'import', title: 'Importar', checked: false },
       { value: 'edit', title: 'Editar', checked: false },
     ],
   },
@@ -158,6 +158,7 @@ const permissions = [
     name: 'RD',
     permissions: [
       { value: 'view', title: 'Ver', checked: false },
+      { value: 'import', title: 'Importar', checked: false },
     ],
   },
   {
@@ -219,7 +220,7 @@ const permissions = [
     ],
   },
   {
-    route: '/relatorios/logs',
+    route: '/logs',
     name: 'Logs',
     permissions: [
       { value: 'view', title: 'Ver', checked: false },
