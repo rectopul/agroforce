@@ -91,6 +91,7 @@ export function ManageFields(props: ManageFieldsProps) {
     console.log('mudou generatesProps', generatesProps);
     //props.OnSetGeneratesProps(generatesProps); // ATENÇÃO NÃO USAR ESSE HOOK ENTRA EM LOOP;
     // props.generatesPropsDefault = generatesProps;
+    
   }, [generatesProps]);
   
   useEffect(() => {
