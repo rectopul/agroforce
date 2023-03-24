@@ -7,7 +7,6 @@ datasource db {
   provider          = "mysql"
   url               = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
-  // relationMode = "prisma" // desabilita a verificação de chaves estrangeiras
 }
 
 model config_gerais {
@@ -148,7 +147,6 @@ model users_preferences {
   userId            Int
   module_id         Int
   route_usage       String?
-  identifier_extra  String?
   table_preferences String?
   updated_at        DateTime @default(now())
   modules           modules  @relation(fields: [module_id], references: [id], map: "Users_Preferences_module_id_fkey")
