@@ -90,15 +90,14 @@ export default function TipoEnsaio({
   const camposGerenciadosDefault = 'id,protocol_name,foco,type_assay,gli,tecnologia,treatmentsNumber,status,action';
   const preferencesDefault = {
     id: 0,
-    userId: userLogado.id,
     route_usage: router.route,
     table_preferences: camposGerenciadosDefault,
   };
-  
+
   const [preferences, setPreferences] = useState<any>(
     userLogado.preferences[identifier_preference] || preferencesDefault,
   );
-  
+
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
@@ -267,7 +266,11 @@ export default function TipoEnsaio({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleOrder(column: string, order: number, name: any,): Promise<void> {
+  async function handleOrder(
+    column: string,
+    order: number,
+    name: any,
+  ): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {

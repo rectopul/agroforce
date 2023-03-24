@@ -14,12 +14,10 @@ interface IPreferences {
   id: number;
   userId?: number;
   table_preferences: string;
-  route_usage: string;
 }
 
 interface ManageFieldsProps {
   statusAccordionExpanded: boolean;
-  table_tabs?: string;
   generatesPropsDefault: IGenerateProps[];
   camposGerenciadosDefault: any;
   label?: string;
@@ -46,8 +44,7 @@ interface IGenerateProps {
 }
 
 export function ManageFields(props: ManageFieldsProps) {
-  // console.log('🚀 ~ file: index.tsx:47 ~ ManageFields ~ identifier_preference:', props.identifier_preference);
-  // console.log('🚀 ~ file: index.tsx:47 ~ ManageFields ~ props:', props);
+  console.log('🚀 ~ file: index.tsx:47 ~ ManageFields ~ props:', props);
   const router = useRouter();
 
   const { preferencesDefault } = props;
@@ -55,7 +52,7 @@ export function ManageFields(props: ManageFieldsProps) {
   // const [statusAccordion, setStatusAccordion] = useState<boolean>(props.statusAccordionExpanded);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(props.statusAccordionExpanded);
 
-  const [camposGerenciados, setCamposGerenciados] = useState<any>(props.preferences?.table_preferences ?? props.camposGerenciadosDefault);
+  const [camposGerenciados, setCamposGerenciados] = useState<any>(props.preferences.table_preferences);
 
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(props.generatesPropsDefault);
 
@@ -63,44 +60,21 @@ export function ManageFields(props: ManageFieldsProps) {
 
   const [preferences, setPreferences] = useState<any>(props.preferences);
 
-  const [identifier_preference, setIdentifierPreference] = useState<string>(props.identifier_preference);
-  
-  // table_tabs
   useEffect(() => {
-    
-    if(props.table_tabs) {
-      console.log('mudou table_tabs', props.table_tabs, generatesProps);
-      console.log('props', props);
-      console.log('** camposGerenciados: ', camposGerenciados);
-      const preferences1 = userLogado.preferences[props.identifier_preference];
-      console.log("preferences1", preferences1);
-      //props.OnSetGeneratesProps(generatesProps);
-      //props.OnSetPreferences(preferences1);
-      props.OnSetCamposGerenciados(camposGerenciados);
-    }
-    
-  }, [props.table_tabs]);
-  
-  useEffect(() => {
-    //reorderGeneratedProps();
-    //props.OnSetGeneratesProps(generatesProps);
-    console.log('mudou camposGerenciados', camposGerenciados);
-  }, [camposGerenciados]);
-  
-  useEffect(() => {
-    console.log('mudou generatesProps', generatesProps);
-    //props.OnSetGeneratesProps(generatesProps); // ATENÇÃO NÃO USAR ESSE HOOK ENTRA EM LOOP;
-    // props.generatesPropsDefault = generatesProps;
-  }, [generatesProps]);
-  
-  useEffect(() => {
-    console.log('******* useEffect ****** preferences', preferences);
-    //reorderGeneratedPropsDefault();
-  }, [preferences]);
+    reorderGeneratedProps();
+    props.OnSetGeneratesProps(generatesProps);
+  }, []);
 
   useEffect(() => {
-    props.OnColumnsOrder(camposGerenciados);
-  }, [camposGerenciados]);
+    props.OnSetPreferences(preferences);
+  }, [preferences]);
+
+  // useEffect(() => {
+  // }, [statusAccordion]);
+
+  // useEffect(() => {
+  //   props.OnColumnsOrder(camposGerenciados);
+  // }, [camposGerenciados]);
 
   function reorderGeneratedProps() {
     const campos_arr = camposGerenciados.split(',');
@@ -108,6 +82,7 @@ export function ManageFields(props: ManageFieldsProps) {
     // const [reorderedItem] = items.splice(result.source.index, 1);
     // const index: number = Number(result.destination?.index);
     // items.splice(index, 0, reorderedItem);
+
     const items_restantes = items;
     const newItems = [];
     // iterate campos_arr
@@ -127,6 +102,8 @@ export function ManageFields(props: ManageFieldsProps) {
     setGeneratesProps(newItems);
   }
 
+  // props.OnColumnsOrder(props.camposGerenciadosDefault);
+
   function handleOnDragEnd(result: DropResult): void {
     setStatusAccordion(true);
     if (!result) return;
@@ -136,73 +113,53 @@ export function ManageFields(props: ManageFieldsProps) {
     const index: number = Number(result.destination?.index);
     items.splice(index, 0, reorderedItem);
     setGeneratesProps(items);
-    //setStatusAccordion(true);
-  }
-  
-  async function deleteAllPreferencesByUserAndModule() : Promise<void>{
-    await userPreferencesService
-      .getAll({
-        userId: userLogado.id,
-        route_usage: router.route,
-        module_id: props.module_id,
-      })
-      .then((response) => {
-        console.log('🚀 ~ file: index.tsx:47 ~ ManageFields ~ response:', response);
-        if (response.status === 200) {
-          response.response.forEach(async (item: any) => {
-            
-            delete userLogado.preferences[props.identifier_preference];
-            localStorage.setItem('userLogado', JSON.stringify(userLogado));
-            props.OnSetUserLogado(userLogado);
-            
-            await userPreferencesService.deleted(item.id).then(({statusD, responseD}) => {
-              console.log('deleted', item, statusD, responseD);
-            });
-          });
-        }
-      });
+    // props.OnSetGeneratesProps(items);
+    setStatusAccordion(true);
   }
 
-  async function resetUserPreferences(): Promise<void>{
-    // simulação de exclusão de preferências
-    preferences.id = 0;
-    preferences.table_preferences = props.camposGerenciadosDefault;
-    preferences.userId = userLogado.id;
-    preferences.route_usage = router.route;
-    
-    userLogado.preferences[props.identifier_preference] = preferences;
-    
-    setUserLogado(userLogado);
-    setPreferences(preferences);
-    
-    localStorage.setItem('user', JSON.stringify(userLogado));
+  async function acao1(): Promise<void> {
+    setCamposGerenciados('id,foco,type_assay,tecnologia,gli');
+    props.OnSetCamposGerenciados('id,foco,type_assay,tecnologia,gli');
+    reorderGeneratedProps();
+    props.OnSetGeneratesProps(generatesProps);
+    getValuesColumns();
   }
-  
+
+  async function acao2(): Promise<void> {
+    setCamposGerenciados('rep,status,nt,npe,genotipo,nca');
+    props.OnSetCamposGerenciados('rep,status,nt,npe,genotipo,nca');
+    reorderGeneratedProps();
+    props.OnSetGeneratesProps(generatesProps);
+    getValuesColumns();
+  }
+
   async function clearPreferencesByUserAndModule(): Promise<void> {
-    
-    if (preferences.id === 0) {
-
-      await deleteAllPreferencesByUserAndModule();
-      return;
-      
-    }
+    if (preferences.id === 0) return;
 
     await userPreferencesService
       .deleted(preferences.id)
       .then(async ({ status, response }) => {
         if (status === 200) {
+          // simulação de exclusão de preferências
+          preferences.id = 0;
+          preferences.table_preferences = props.camposGerenciadosDefault;
+          preferences.userId = userLogado.id;
+          preferences.route_usage = router.route;
+          userLogado.preferences[props.identifier_preference] = preferences;
 
-          await deleteAllPreferencesByUserAndModule();
-          
+          setPreferences(preferences);
+          props.OnSetPreferences(preferences);
+
+          setUserLogado(userLogado);
+          props.OnSetUserLogado(userLogado);
+
+          // camposGerenciados
           setCamposGerenciados(props.camposGerenciadosDefault);
+          props.OnSetCamposGerenciados(props.camposGerenciadosDefault);
 
-          await resetUserPreferences();
+          localStorage.setItem('user', JSON.stringify(userLogado));
 
           reorderGeneratedProps();
-
-          props.OnSetUserLogado(userLogado);
-          props.OnSetCamposGerenciados(props.camposGerenciadosDefault);
-          props.OnSetPreferences(preferences);
           props.OnSetGeneratesProps(generatesProps);
 
           await userPreferencesService
@@ -211,7 +168,6 @@ export function ManageFields(props: ManageFieldsProps) {
               userId: userLogado.id,
               route_usage: router.route,
               module_id: props.module_id,
-              identifier_extra: props.identifier_preference,
             })
             .then((response) => {
               userLogado.preferences[props.identifier_preference] = {
@@ -219,7 +175,6 @@ export function ManageFields(props: ManageFieldsProps) {
                 route_usage: router.route,
                 userId: userLogado.id,
                 table_preferences: props.camposGerenciadosDefault,
-                identifier_extra: props.identifier_preference,
               };
               setPreferences(userLogado.preferences[props.identifier_preference]);
             });
@@ -240,9 +195,6 @@ export function ManageFields(props: ManageFieldsProps) {
 
           getValuesColumns();/* */
         }
-        
-        setStatusAccordion(false);
-        
       })
       .catch((error) => {
         Swal.fire({
@@ -266,11 +218,10 @@ export function ManageFields(props: ManageFieldsProps) {
     if (preferences.id === 0 || preferences.id === null) {
       await userPreferencesService
         .create({
-          route_usage: router.route,
-          userId: userLogado.id,
-          module_id: props.module_id,
           table_preferences: campos,
-          identifier_extra: props.identifier_preference,
+          userId: userLogado.id,
+          route_usage: router.route,
+          module_id: props.module_id,
         })
         .then((response) => {
           userLogado.preferences[props.identifier_preference] = {
@@ -278,9 +229,8 @@ export function ManageFields(props: ManageFieldsProps) {
             route_usage: router.route,
             userId: userLogado.id,
             table_preferences: campos,
-            identifier_extra: props.identifier_preference,
           };
-          
+
           setPreferences(userLogado.preferences[props.identifier_preference]);
         });
       localStorage.setItem('user', JSON.stringify(userLogado));
@@ -289,46 +239,31 @@ export function ManageFields(props: ManageFieldsProps) {
         id: preferences.id,
         userId: preferences.userId,
         table_preferences: campos,
-        identifier_extra: props.identifier_preference,
       };
 
       // verifica se existe alguma preferência salva no banco
-      await userPreferencesService.getAll({id: preferences.id})
-        .then(async (response) => {
-          console.log("Verificando se existe preferência salva no banco:", response);
+      await userPreferencesService.getAll({ id: preferences.id })
+        .then((response) => {
 
-          if (response.status == 400 || response.total === 0) {
-            await resetUserPreferences();
-          } else {
-            const response = await userPreferencesService.update({
-              id: preferences.id,
-              table_preferences: campos,
-              identifier_extra: props.identifier_preference,
-            })
-              .then((response) => {
-                
-                console.log("atualizar gerenciar campos:", response);
-                
-              })
-              .catch((error) => {
-                Swal.fire({
-                  title: 'Falha ao atualizar preferências',
-                  html: `Ocorreu um erro ao atualizar as preferências do usuário. Tente novamente mais tarde.\r\n${JSON.stringify(error)}`,
-                  width: '800',
-                });
-              });
-          }
+        })
+        .catch((error) => {
 
+        });
+
+      const response = await userPreferencesService.update({
+        table_preferences: campos,
+        id: preferences.id,
+      })
+        .then((response) => {
 
         })
         .catch((error) => {
           Swal.fire({
-            title: 'Falha ao carregar as preferências',
-            html: `Ocorreu um erro ao carregar as preferências do usuário. Tente novamente mais tarde.\r\n${JSON.stringify(error)}`,
+            title: 'Falha ao atualizar preferências',
+            html: `Ocorreu um erro ao atualizar as preferências do usuário. Tente novamente mais tarde.\r\n${JSON.stringify(error)}`,
             width: '800',
           });
         });
-      
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
@@ -350,7 +285,10 @@ export function ManageFields(props: ManageFieldsProps) {
   return (
     <div className="border-solid border-2 border-blue-600 rounded">
       <div className="w-72">
-        <AccordionFilter title="Gerenciar Campos" grid={statusAccordion}>
+        <AccordionFilter
+          title="Gerenciar Campos"
+          grid={statusAccordion}
+        >
           <DragDropContext onDragEnd={handleOnDragEnd}>
             <Droppable droppableId={`tbl_${props.table}`}>
               {(provided) => (
@@ -358,7 +296,6 @@ export function ManageFields(props: ManageFieldsProps) {
                   className="w-full h-full characters"
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  title={identifier_preference}
                 >
                   <div className="h-8 mb-3">
                     <Button
