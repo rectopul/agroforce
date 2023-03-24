@@ -915,11 +915,12 @@ export default function AtualizarTipoEnsaio({
         >
           <div style={{ marginTop: '1%' }} className="w-full h-auto">
             
-            <p>GENOTIPOS: {JSON.stringify(camposGerenciados)}</p>
-            <pre>{JSON.stringify(generatesProps)}</pre>
+            {/*<p>GENOTIPOS: {JSON.stringify(camposGerenciados)}</p>*/}
+            {/*<pre>{JSON.stringify(generatesProps)}</pre>*/}
             
-            <p>EXPERIMENTOS: {JSON.stringify(experimentsCamposGerenciados)}</p>
-            <pre>{JSON.stringify(generatesPropsExperiments)}</pre>
+            {/*<p>EXPERIMENTOS: {JSON.stringify(experimentsCamposGerenciados)}</p>*/}
+            {/*<pre>{JSON.stringify(generatesPropsExperiments)}</pre>*/}
+            
             <MaterialTable
               tableRef={tableRef}
               style={{ background: '#f9fafb' }}
