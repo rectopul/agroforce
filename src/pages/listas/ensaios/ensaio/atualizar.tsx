@@ -86,7 +86,7 @@ export default function AtualizarTipoEnsaio({
   tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
-  const [userLogado, setUserLogado] = useState<any>(JSON.parse(localStorage.getItem('user') as string),);
+  const [userLogado, setUserLogado] = useState<any>(JSON.parse(localStorage.getItem('user') as string));
   const [table, setTable] = useState<string>('genotipo');
   const [tables, setTables] = useState<string>('genotype_treatment');
   const [module_name, setModuloName] = useState<string>('genotypeTreatment');
@@ -94,13 +94,11 @@ export default function AtualizarTipoEnsaio({
   const [identifier_preference, setIdentifierPreference] = useState<string>('');
   
   const [camposGerenciadosDefault, setCamposGerenciadosDefault] = useState<string>('safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment');
-  
   const [preferencesDefault, setPreferencesDefault] = useState<any>({
     id: 0,
     route_usage: router.route,
     table_preferences: camposGerenciadosDefault,
   });
-  
   const [preferences, setPreferences] = useState<any>(userLogado.preferences[identifier_preference] || preferencesDefault);
 
   const [camposGerenciadosDefaultExperiment, setCamposGerenciadosDefaultExperiment] = useState<string>('safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment');
@@ -112,26 +110,20 @@ export default function AtualizarTipoEnsaio({
   const [preferencesExperiment, setPreferencesExperiment] = useState<any>(userLogado.preferences[identifier_preference] || preferencesDefault);
   
   const [camposGerenciados, setCamposGerenciados] = useState<any>('safra,genotipoName,fase,cod_tec,treatments_number,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment');
-
-  //let camposGerenciados = 'safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment';
-  
   const [experimentsCamposGerenciados, setExperimentsCamposGerenciados] = useState<any>('id,gli,experimentName,local,delineamento,repetitionsNumber,nlp,clp,eel,density,status');
   
   const tableRef = useRef<any>(null);
   const [itemsTotal, setItemsTotal] = useState<any>(totalItens);
   const [experimentsTotal, setExperimentsTotal] = useState<any>(totalExperiments);
-  const [experimentFilter, setExperimentFilter] = useState<any>(
-    experimentFilterApplication,
-  );
-  const [treatmentsFilter, setTreatmentsFilter] = useState<any>(
-    treatmentsFilterApplication,
-  );
+  const [experimentFilter, setExperimentFilter] = useState<any>(experimentFilterApplication);
+  const [treatmentsFilter, setTreatmentsFilter] = useState<any>(treatmentsFilterApplication);
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
-
-  const [genotypeTreatments, setGenotypeTreatments] = useState<any>(
-    () => allGenotypeTreatment,
-  );
+  
+  /* REGISTROS */
+  const [genotypeTreatments, setGenotypeTreatments] = useState<any>(() => allGenotypeTreatment);
   const [experiments, setExperiments] = useState<any>(() => allExperiments);
+  /* REGISTROS */
+  
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2,);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
@@ -142,30 +134,29 @@ export default function AtualizarTipoEnsaio({
   const [orderType, setOrderType] = useState<string>('');
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
   const [loading, setLoading] = useState<boolean>(false);
-  // const [columns, setColumns] = useState<any>([]);
   const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
     orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy
   }&typeOrder=${typeOrder}`;
   
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
+    {name: 'CamposGerenciados[]', title: 'Nome do genótipo', value: 'genotipoName'},
     {name: 'CamposGerenciados[]', title: 'Safra', value: 'safra'},
-    {name: 'CamposGerenciados[]', title: 'Fase', value: 'fase'},
-    {name: 'CamposGerenciados[]', title: 'GGEN', value: 'cod_tec',},
+    {name: 'CamposGerenciados[]', title: 'GGEN', value: 'cod_tec'},
     {name: 'CamposGerenciados[]', title: 'NT', value: 'treatments_number'},
-    {name: 'CamposGerenciados[]', title: 'Nome do genótipo', value: 'genotipoName',},
-    {name: 'CamposGerenciados[]', title: 'GMR', value: 'genotipoGmr',},
-    {name: 'CamposGerenciados[]', title: 'BGM', value: 'genotipoBgm',},
+    {name: 'CamposGerenciados[]', title: 'Fase', value: 'fase'},
+    {name: 'CamposGerenciados[]', title: 'GMR', value: 'genotipoGmr'},
+    {name: 'CamposGerenciados[]', title: 'BGM', value: 'genotipoBgm'},
     {name: 'CamposGerenciados[]', title: 'T', value: 'status'},
     {name: 'CamposGerenciados[]', title: 'NCA', value: 'nca'},
     {name: 'CamposGerenciados[]', title: 'Cód lote', value: 'cod_lote'},
     {name: 'CamposGerenciados[]', title: 'OBS', value: 'comments'},
-    {name: 'CamposGerenciados[]', title: 'Status Trat.', value: 'status_experiment',},
+    {name: 'CamposGerenciados[]', title: 'Status Trat.', value: 'status_experiment'},
   ]);
   
   const [generatesPropsExperiments, setGeneratesPropsExperiments] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    {name: 'CamposGerenciados[]', title: 'Experimento Planejado', value: 'experimentName',},
+    {name: 'CamposGerenciados[]', title: 'Experimento Planejado', value: 'experimentName'},
     {name: 'CamposGerenciados[]', title: 'Lugar de Cultura', value: 'local'},
     {name: 'CamposGerenciados[]', title: 'Delineamento', value: 'delineamento',},
     {name: 'CamposGerenciados[]', title: 'Rep.', value: 'repetitionsNumber'},
