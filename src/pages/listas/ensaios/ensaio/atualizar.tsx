@@ -979,6 +979,7 @@ export default function AtualizarTipoEnsaio({
                     </div>
 
                     <div className="h-full flex items-center gap-2">
+                      
                       <ManageFields
                         statusAccordionExpanded={false}
                         generatesPropsDefault={generatesProps}

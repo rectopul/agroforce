@@ -61,9 +61,32 @@ export function ManageFields(props: ManageFieldsProps) {
   const [preferences, setPreferences] = useState<any>(props.preferences);
 
   useEffect(() => {
-    reorderGeneratedProps();
-    props.OnSetGeneratesProps(generatesProps);
-  }, []);
+    
+    if(props.table_tabs) {
+      console.log('mudou table_tabs', props.table_tabs, generatesProps);
+      console.log('props', props);
+      console.log('** camposGerenciados: ', camposGerenciados);
+      const preferences1 = userLogado.preferences[props.identifier_preference];
+      console.log("preferences1", preferences1);
+      //props.OnSetGeneratesProps(generatesProps);
+      //props.OnSetPreferences(preferences1);
+      props.OnSetCamposGerenciados(camposGerenciados);
+    }
+    
+  }, [props.table_tabs]);
+  
+  useEffect(() => {
+    //reorderGeneratedProps();
+    //props.OnSetGeneratesProps(generatesProps);
+    console.log('mudou camposGerenciados', camposGerenciados);
+  }, [camposGerenciados]);
+  
+  useEffect(() => {
+    console.log('mudou generatesProps', generatesProps);
+    //props.OnSetGeneratesProps(generatesProps); // ATENÇÃO NÃO USAR ESSE HOOK ENTRA EM LOOP;
+    // props.generatesPropsDefault = generatesProps;
+    
+  }, [generatesProps]);
 
   useEffect(() => {
     props.OnSetPreferences(preferences);
