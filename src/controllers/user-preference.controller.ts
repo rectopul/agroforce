@@ -11,27 +11,8 @@ export class UserPreferenceController {
     let orderBy: object | any;
 
     try {
-      let select:any = {};
+      const select = { id: true, userId: true, table_preferences: true };
 
-      if (options.showModule) {
-        select = {
-          id: true,
-          userId: true,
-          modules: {select: {id: true, module: true}},
-          table_preferences: true,
-          route_usage: true,
-          identifier_extra: true,
-        };
-      } else {
-        select = {
-          id: true,
-          userId: true,
-          table_preferences: true,
-          route_usage: true,
-          identifier_extra: true,
-        };
-      }
-      
       if(options.id){
         parameters.id = Number(options.id);
       }
@@ -42,13 +23,6 @@ export class UserPreferenceController {
 
       if (options.module_id) {
         parameters.module_id = Number(options.module_id);
-      }
-
-      if (options.route_usage) {
-        //parameters.route_usage = JSON.parse(`{"${equalsOrContains}":"${options.filterName}"}`);
-        parameters.route_usage = {
-          "equals": options.route_usage
-        };
       }
 
       const response: object | any = await this.userPreferences.findAll(
