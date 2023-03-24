@@ -776,10 +776,7 @@ export default function Listagem({
                       {itemsTotal}
                     </strong>
 
-                    <div
-                      className="h-full flex items-center gap-2
-                    "
-                    >
+                    <div className="h-full flex items-center gap-2">
                       <ManageFields
                         statusAccordionExpanded={false}
                         generatesPropsDefault={generatesProps}
