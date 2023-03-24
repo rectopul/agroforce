@@ -74,10 +74,9 @@ export function ManageFields(props: ManageFieldsProps) {
       console.log('** camposGerenciados: ', camposGerenciados);
       const preferences1 = userLogado.preferences[props.identifier_preference];
       console.log("preferences1", preferences1);
-
       //props.OnSetGeneratesProps(generatesProps);
       //props.OnSetPreferences(preferences1);
-      //props.OnSetCamposGerenciados(camposGerenciados);
+      props.OnSetCamposGerenciados(camposGerenciados);
     }
     
   }, [props.table_tabs]);
@@ -151,6 +150,11 @@ export function ManageFields(props: ManageFieldsProps) {
         console.log('🚀 ~ file: index.tsx:47 ~ ManageFields ~ response:', response);
         if (response.status === 200) {
           response.response.forEach(async (item: any) => {
+            
+            delete userLogado.preferences[props.identifier_preference];
+            localStorage.setItem('userLogado', JSON.stringify(userLogado));
+            props.OnSetUserLogado(userLogado);
+            
             await userPreferencesService.deleted(item.id).then(({statusD, responseD}) => {
               console.log('deleted', item, statusD, responseD);
             });
@@ -159,6 +163,21 @@ export function ManageFields(props: ManageFieldsProps) {
       });
   }
 
+  async function resetUserPreferences(): Promise<void>{
+    // simulação de exclusão de preferências
+    preferences.id = 0;
+    preferences.table_preferences = props.camposGerenciadosDefault;
+    preferences.userId = userLogado.id;
+    preferences.route_usage = router.route;
+    
+    userLogado.preferences[props.identifier_preference] = preferences;
+    
+    setUserLogado(userLogado);
+    setPreferences(preferences);
+    
+    localStorage.setItem('user', JSON.stringify(userLogado));
+  }
+  
   async function clearPreferencesByUserAndModule(): Promise<void> {
     
     if (preferences.id === 0) {
@@ -175,19 +194,9 @@ export function ManageFields(props: ManageFieldsProps) {
 
           await deleteAllPreferencesByUserAndModule();
           
-          // simulação de exclusão de preferências
-          preferences.id = 0;
-          preferences.table_preferences = props.camposGerenciadosDefault;
-          preferences.userId = userLogado.id;
-          preferences.route_usage = router.route;
-          
-          userLogado.preferences[props.identifier_preference] = preferences;
-
-          setPreferences(preferences);
-          setUserLogado(userLogado);
           setCamposGerenciados(props.camposGerenciadosDefault);
-          
-          localStorage.setItem('user', JSON.stringify(userLogado));
+
+          await resetUserPreferences();
 
           reorderGeneratedProps();
 
@@ -284,31 +293,42 @@ export function ManageFields(props: ManageFieldsProps) {
       };
 
       // verifica se existe alguma preferência salva no banco
-      await userPreferencesService.getAll({ id: preferences.id })
-        .then((response) => {
+      await userPreferencesService.getAll({id: preferences.id})
+        .then(async (response) => {
+          console.log("Verificando se existe preferência salva no banco:", response);
 
-        })
-        .catch((error) => {
+          if (response.status == 400 || response.total === 0) {
+            await resetUserPreferences();
+          } else {
+            const response = await userPreferencesService.update({
+              id: preferences.id,
+              table_preferences: campos,
+              identifier_extra: props.identifier_preference,
+            })
+              .then((response) => {
+                
+                console.log("atualizar gerenciar campos:", response);
+                
+              })
+              .catch((error) => {
+                Swal.fire({
+                  title: 'Falha ao atualizar preferências',
+                  html: `Ocorreu um erro ao atualizar as preferências do usuário. Tente novamente mais tarde.\r\n${JSON.stringify(error)}`,
+                  width: '800',
+                });
+              });
+          }
 
-        });
 
-      const response = await userPreferencesService.update({
-        id: preferences.id,
-        table_preferences: campos,
-        identifier_extra: props.identifier_preference,
-      })
-        .then((response) => {
-          
-          console.log("atualizar gerenciar campos:", response);
-          
         })
         .catch((error) => {
           Swal.fire({
-            title: 'Falha ao atualizar preferências',
-            html: `Ocorreu um erro ao atualizar as preferências do usuário. Tente novamente mais tarde.\r\n${JSON.stringify(error)}`,
+            title: 'Falha ao carregar as preferências',
+            html: `Ocorreu um erro ao carregar as preferências do usuário. Tente novamente mais tarde.\r\n${JSON.stringify(error)}`,
             width: '800',
           });
         });
+      
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 

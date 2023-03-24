@@ -458,7 +458,7 @@ export default function AtualizarTipoEnsaio({
     return tableFields;
   }
 
-  function experimentColumnsOrder(columnCampos: string) {
+  function columnsOrderExperiments(columnCampos: string) {
     const columnOrder: string[] = columnCampos.split(',');
     const tableFields: any = [];
     
@@ -566,7 +566,11 @@ export default function AtualizarTipoEnsaio({
     return tableFields;
   }
 
-  let columns = table == 'genotipo' ? columnsOrder(camposGerenciados) : experimentColumnsOrder(experimentsCamposGerenciados); 
+  const columns = table === 'genotipo' ? 
+    columnsOrder(camposGerenciados) : 
+    columnsOrderExperiments(experimentsCamposGerenciados);
+  
+  console.log("===========> columns atualizado::: ", columns);
   
   function setPreferencesByTabs(table:string) {
     console.log('setPreferencesByTabs', table);
@@ -609,26 +613,24 @@ export default function AtualizarTipoEnsaio({
       userLogado.preferences[identifier_preference] = userLogado.preferences[identifier_preference] || preferencesDefault;
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
-
-    columns = table === 'genotipo' ? columnsOrder(camposGerenciados) : experimentColumnsOrder(experimentsCamposGerenciados);
-    
   }
   
   useEffect(() => {
     async function setPreferencesGenotype() {
-
-      let fieldsDefault = 'genotipoName,safra,fase,cod_tec,treatments_number,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment';
+      let module_name = 'genotypeTreatment';
+      let fieldsDefault = 'genotipoName,safra,cod_tec,treatments_number,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment';
       let identifier = module_name + router.route + '_tabs_genotipo';
       let preferencesDefault = {
         id: 0,
         route_usage: router.route,
-        table_preferences: 'genotipoName,safra,fase,cod_tec,treatments_number,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment',
-        identifier_extra: identifier_preference,
+        table_preferences: fieldsDefault,
+        identifier_extra: identifier,
       };
-      let preferences1 = userLogado.preferences[identifier_preference] || preferencesDefault;
+      let preferences1 = userLogado.preferences[identifier] || preferencesDefault;
+      let campos = preferences1.table_preferences;
       
       setTables('genotype_treatment');
-      setModuloName('genotypeTreatment');
+      setModuloName(module_name);
       setModuleId(27);
       setIdentifierPreference(identifier);
       setCamposGerenciadosDefault(fieldsDefault);
@@ -638,19 +640,20 @@ export default function AtualizarTipoEnsaio({
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
     async function setPreferencesExperiment() {
-      
+      let module_name = 'experimento';
       let fieldsDefault = 'experimentName,id,gli,local,delineamento,repetitionsNumber,nlp,clp,eel,density,status';
       let identifier = module_name + router.route + '_tabs_experimento';
       let preferencesDefault = {
         id: 0,
         route_usage: router.route,
         table_preferences: fieldsDefault,
-        identifier_extra: identifier_preference,
+        identifier_extra: identifier,
       };
-      let preferences1 = userLogado.preferences[identifier_preference] || preferencesDefault;
+      let preferences1 = userLogado.preferences[identifier] || preferencesDefault;
+      let campos = preferences1.table_preferences;
       
       setTables('experiment');
-      setModuloName('experimento');
+      setModuloName(module_name);
       setModuleId(22);
       setIdentifierPreference(identifier);
       setCamposGerenciadosDefault(fieldsDefault);
@@ -920,9 +923,12 @@ export default function AtualizarTipoEnsaio({
         "
         >
           <div style={{ marginTop: '1%' }} className="w-full h-auto">
-            <p>{JSON.stringify(generatesProps)}</p>
-            <p>{JSON.stringify(camposGerenciados)}</p>
-            <p>{JSON.stringify(experimentsCamposGerenciados)}</p>
+            
+            <p>GENOTIPOS: {JSON.stringify(camposGerenciados)}</p>
+            <pre>{JSON.stringify(generatesProps)}</pre>
+            
+            <p>EXPERIMENTOS: {JSON.stringify(experimentsCamposGerenciados)}</p>
+            <pre>{JSON.stringify(generatesPropsExperiments)}</pre>
             <MaterialTable
               tableRef={tableRef}
               style={{ background: '#f9fafb' }}
@@ -941,49 +947,20 @@ export default function AtualizarTipoEnsaio({
               }}
               components={{
                 Toolbar: () => (
-                  <div
-                    className="w-full max-h-96
-                    flex
-                    items-center
-                    justify-between
-                    gap-4
-                    bg-gray-50
-                    py-2
-                    px-5
-                    border-solid border-b
-                    border-gray-200
-                  "
-                  >
-                    <div
-                      className="flex
-                    items-center"
-                    >
+                  <div className="w-full max-h-96 flex items-center justify-between gap-4 bg-gray-50 py-2 px-5 border-solid border-b border-gray-200">
+                    <div className="flex items-center">
                       <div className="h-12">
-                        <Button
-                          title="GENÓTIPOS"
-                          value="GENÓTIPOS"
-                          bgColor={
-                            table === 'genotipo' ? 'bg-blue-600' : 'bg-gray-600'
-                          }
+                        <Button title="GENÓTIPOS" value="GENÓTIPOS"
+                          bgColor={table === 'genotipo' ? 'bg-blue-600' : 'bg-gray-600'}
                           textColor="white"
-                          onClick={() => setTable('genotipo')}
-                          // icon={<FaSortAmountUpAlt size={20} />}
-                        />
+                          onClick={() => setTable('genotipo')}/* icon={<FaSortAmountUpAlt size={20} />} *//>
                       </div>
-                      <div style={{ width: 10 }} />
+                      <div style={{width: 10}}/>
                       <div className="h-12">
-                        <Button
-                          title="EXPERIMENTOS"
-                          value="EXPERIMENTOS"
-                          bgColor={
-                            table === 'experimentos'
-                              ? 'bg-blue-600'
-                              : 'bg-gray-600'
-                          }
+                        <Button title="EXPERIMENTOS" value="EXPERIMENTOS"
+                          bgColor={table === 'experimentos' ? 'bg-blue-600' : 'bg-gray-600'}
                           textColor="white"
-                          onClick={() => setTable('experimentos')}
-                          // icon={<FaSortAmountUpAlt size={20} />}
-                        />
+                          onClick={() => setTable('experimentos')}/* icon={<FaSortAmountUpAlt size={20} />} *//>
                       </div>
                     </div>
 
@@ -1023,18 +1000,33 @@ export default function AtualizarTipoEnsaio({
                         OnColumnsOrder={(e: any) => {
                           // columnsOrder(e);
                           console.log('OnColumnsOrder', e);
+                          console.log('table', table);
+
+                          table === 'genotipo' ? 
+                            columnsOrder(e) : 
+                            columnsOrderExperiments(e);
+                          
                           // Descomentar somente quando realmente a string gerenciarCampos for a correta.
                         }}
                         OnSetStatusAccordion={(e: any) => {
                           setStatusAccordion(e);
                         }}
                         OnSetGeneratesProps={(e: any) => {
-                          setGeneratesProps(e);
+                          console.log('OnSetGeneratesProps', e);
+                          table === 'genotipo' ?
+                            setGeneratesProps(e) :
+                            setGeneratesPropsExperiments(e);
+                          
                         }}
                         OnSetCamposGerenciados={(e: any) => {
                           console.log('setCamposGerenciados.e', e);
                           // setCamposGerenciados(e);
-                          setCamposGerenciados(e);
+                          
+                          table === 'genotipo' ?
+                            setCamposGerenciados(e) :
+                            setExperimentsCamposGerenciados(e);
+                          
+                          
                         }}
                         OnSetUserLogado={(e: any) => {
                           setUserLogado(e);

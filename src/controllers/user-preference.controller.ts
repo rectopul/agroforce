@@ -20,7 +20,7 @@ export class UserPreferenceController {
           modules: {select: {id: true, module: true}},
           table_preferences: true,
           route_usage: true,
-          //identifier_extra: true,
+          identifier_extra: true,
         };
       } else {
         select = {
@@ -28,7 +28,7 @@ export class UserPreferenceController {
           userId: true,
           table_preferences: true,
           route_usage: true,
-          //identifier_extra: true,
+          identifier_extra: true,
         };
       }
       
