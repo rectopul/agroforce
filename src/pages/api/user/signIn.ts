@@ -220,16 +220,25 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
             
             console.log('item', item);
             
+            //const newItem = {};
+            const newItem: any = {};
+            newItem.id = item.id;
+            newItem.userId = item.userId;
+            newItem.table_preferences = item.table_preferences;
+            newItem.route_usage = item.route_usage;
+            newItem.identifier_extra = item.identifier_extra;
+            
+            
             let identifier = item.modules.module;
             
             if(item.route_usage !== null && item.route_usage !== '' && !preferences[item.route_usage]) {
               identifier = item.modules.module + item.route_usage;
-              preferences[identifier] = item;
+              preferences[identifier] = newItem;
             }
             
             if(item.identifier_extra !== null && item.identifier_extra !== '' && !preferences[item.identifier_extra]) {
               identifier = item.identifier_extra;
-              preferences[identifier] = item;
+              preferences[identifier] = newItem;
             }
             
           });

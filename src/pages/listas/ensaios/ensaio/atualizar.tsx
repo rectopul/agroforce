@@ -61,6 +61,7 @@ import {
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import { tableGlobalFunctions } from '../../../../helpers';
 import ComponentLoading from '../../../../components/Loading';
+import {asidePermissions} from "../../../../shared/utils/perm_can_do";
 
 type IAssayListUpdate = Omit<IAssayList, 'id_safra' | 'period'>;
 
@@ -81,31 +82,39 @@ export default function AtualizarTipoEnsaio({
   typeOrderServer,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { TabsDropDowns } = ITabs.default;
-
   const tabsDropDowns = TabsDropDowns('listas');
-
   tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
-  const [userLogado, setUserLogado] = useState<any>(
-    JSON.parse(localStorage.getItem('user') as string),
-  );
+  const [userLogado, setUserLogado] = useState<any>(JSON.parse(localStorage.getItem('user') as string),);
   const [table, setTable] = useState<string>('genotipo');
   const [tables, setTables] = useState<string>('genotype_treatment');
   const [module_name, setModuloName] = useState<string>('genotypeTreatment');
   const [module_id, setModuleId] = useState<number>(27);
   const [identifier_preference, setIdentifierPreference] = useState<string>('');
+  
   const [camposGerenciadosDefault, setCamposGerenciadosDefault] = useState<string>('safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment');
+  
   const [preferencesDefault, setPreferencesDefault] = useState<any>({
     id: 0,
     route_usage: router.route,
     table_preferences: camposGerenciadosDefault,
   });
-  const [
-    preferences,
-    setPreferences,
-  ] = useState<any>(userLogado.preferences[identifier_preference] || preferencesDefault);
-  const [camposGerenciados, setCamposGerenciados] = useState<any>('safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment');
+  
+  const [preferences, setPreferences] = useState<any>(userLogado.preferences[identifier_preference] || preferencesDefault);
+
+  const [camposGerenciadosDefaultExperiment, setCamposGerenciadosDefaultExperiment] = useState<string>('safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment');
+  const [preferencesDefaultExperiment, setPreferencesDefaultExperiment] = useState<any>({
+    id: 0,
+    route_usage: router.route,
+    table_preferences: camposGerenciadosDefaultExperiment,
+  });
+  const [preferencesExperiment, setPreferencesExperiment] = useState<any>(userLogado.preferences[identifier_preference] || preferencesDefault);
+  
+  const [camposGerenciados, setCamposGerenciados] = useState<any>('safra,genotipoName,fase,cod_tec,treatments_number,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment');
+
+  //let camposGerenciados = 'safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment';
+  
   const [experimentsCamposGerenciados, setExperimentsCamposGerenciados] = useState<any>('id,gli,experimentName,local,delineamento,repetitionsNumber,nlp,clp,eel,density,status');
   
   const tableRef = useRef<any>(null);
@@ -124,9 +133,7 @@ export default function AtualizarTipoEnsaio({
   );
   const [experiments, setExperiments] = useState<any>(() => allExperiments);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [orderList, setOrder] = useState<number>(
-    typeOrderServer == 'desc' ? 1 : 2,
-  );
+  const [orderList, setOrder] = useState<number>(typeOrderServer == 'desc' ? 1 : 2,);
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
@@ -135,7 +142,7 @@ export default function AtualizarTipoEnsaio({
   const [orderType, setOrderType] = useState<string>('');
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
   const [loading, setLoading] = useState<boolean>(false);
-  const [columns, setColumns] = useState<any>([]);
+  // const [columns, setColumns] = useState<any>([]);
   const pathExtra = `skip=${currentPage * Number(take)}&take=${take}&orderBy=${
     orderBy == 'tecnologia' ? 'tecnologia.cod_tec' : orderBy
   }&typeOrder=${typeOrder}`;
@@ -203,7 +210,7 @@ export default function AtualizarTipoEnsaio({
         });
     },
   });
-
+  
   async function callingApi(parametersFilter: any) {
     setCookies('filterBeforeEditTypeOrder', typeOrder);
     parametersFilter = `${parametersFilter}&${pathExtra}`;
@@ -296,7 +303,7 @@ export default function AtualizarTipoEnsaio({
     const columnOrder: string[] = columnCampos.split(',');
     const tableFields: any = [];
 
-    console.log("===========> columnsOrder", columnOrder);
+    console.log("===========> columnsOrder (GENÓTIPOS) ", columnOrder);
     
     Object.keys(columnOrder).forEach((item, index) => {
       if (columnOrder[index] === 'safra') {
@@ -445,6 +452,9 @@ export default function AtualizarTipoEnsaio({
         );
       }
     });
+
+    console.log("===========> columnsOrder:: tableFields", tableFields);
+    
     return tableFields;
   }
 
@@ -452,7 +462,7 @@ export default function AtualizarTipoEnsaio({
     const columnOrder: string[] = columnCampos.split(',');
     const tableFields: any = [];
     
-    console.log("===========> experimentColumnsOrder", columnOrder);
+    console.log("===========> experimentColumnsOrder (EXPERIMENTOS)", columnOrder);
 
     Object.keys(columnOrder).forEach((item, index) => {
       // if (columnOrder[index] === "id") {
@@ -550,53 +560,119 @@ export default function AtualizarTipoEnsaio({
         );
       }
     });
+
+    console.log("===========> experimentColumnsOrder:: tableFields", tableFields);
+    
     return tableFields;
   }
 
-  // const columns = columnsOrder(camposGerenciados);
-  // const experimentColumns = experimentColumnsOrder(experimentsCamposGerenciados);
-
-  useEffect(() => {
-    function setPreferencesGenotype() {
+  let columns = table == 'genotipo' ? columnsOrder(camposGerenciados) : experimentColumnsOrder(experimentsCamposGerenciados); 
+  
+  function setPreferencesByTabs(table:string) {
+    console.log('setPreferencesByTabs', table);
+    if (table === 'genotipo') {
       setTables('genotype_treatment');
       setModuloName('genotypeTreatment');
       setModuleId(27);
       setIdentifierPreference(module_name + router.route + '_tabs_genotipo');
-      setCamposGerenciadosDefault('safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment');
+      
+      let cmpDefault = 'genotipoName,safra,fase,cod_tec,treatments_number,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment';
+      
+      setCamposGerenciadosDefault(cmpDefault);
       setPreferencesDefault({
         id: 0,
         route_usage: router.route,
         table_preferences: camposGerenciadosDefault,
+        identifier_extra: identifier_preference,
       });
+      
+      console.log('preferencesDefault', preferencesDefault);
+      
       setPreferences(userLogado.preferences[identifier_preference] || preferencesDefault);
-      setCamposGerenciados(preferences.table_preferences);
-    }
-    function setPreferencesExperiment() {
+      //setCamposGerenciados(preferences.table_preferences);
+      userLogado.preferences[identifier_preference] = userLogado.preferences[identifier_preference] || preferencesDefault;
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    } else {
       setTables('experiment');
       setModuloName('experimento');
       setModuleId(22);
       setIdentifierPreference(module_name + router.route + '_tabs_experimento');
-      setCamposGerenciadosDefault('id,gli,experimentName,local,delineamento,repetitionsNumber,nlp,clp,eel,density,status');
+      setCamposGerenciadosDefault('experimentName,id,gli,local,delineamento,repetitionsNumber,nlp,clp,eel,density,status');
       setPreferencesDefault({
         id: 0,
         route_usage: router.route,
         table_preferences: camposGerenciadosDefault,
+        identifier_extra: identifier_preference,
       });
       setPreferences(userLogado.preferences[identifier_preference] || preferencesDefault);
       setExperimentsCamposGerenciados(preferences.table_preferences);
+      userLogado.preferences[identifier_preference] = userLogado.preferences[identifier_preference] || preferencesDefault;
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    }
+
+    columns = table === 'genotipo' ? columnsOrder(camposGerenciados) : experimentColumnsOrder(experimentsCamposGerenciados);
+    
+  }
+  
+  useEffect(() => {
+    async function setPreferencesGenotype() {
+
+      let fieldsDefault = 'genotipoName,safra,fase,cod_tec,treatments_number,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment';
+      let identifier = module_name + router.route + '_tabs_genotipo';
+      let preferencesDefault = {
+        id: 0,
+        route_usage: router.route,
+        table_preferences: 'genotipoName,safra,fase,cod_tec,treatments_number,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment',
+        identifier_extra: identifier_preference,
+      };
+      let preferences1 = userLogado.preferences[identifier_preference] || preferencesDefault;
+      
+      setTables('genotype_treatment');
+      setModuloName('genotypeTreatment');
+      setModuleId(27);
+      setIdentifierPreference(identifier);
+      setCamposGerenciadosDefault(fieldsDefault);
+      setPreferencesDefault(preferencesDefault);
+      setPreferences(preferences1);
+      setCamposGerenciados(preferences1.table_preferences);
+      localStorage.setItem('user', JSON.stringify(userLogado));
+    }
+    async function setPreferencesExperiment() {
+      
+      let fieldsDefault = 'experimentName,id,gli,local,delineamento,repetitionsNumber,nlp,clp,eel,density,status';
+      let identifier = module_name + router.route + '_tabs_experimento';
+      let preferencesDefault = {
+        id: 0,
+        route_usage: router.route,
+        table_preferences: fieldsDefault,
+        identifier_extra: identifier_preference,
+      };
+      let preferences1 = userLogado.preferences[identifier_preference] || preferencesDefault;
+      
+      setTables('experiment');
+      setModuloName('experimento');
+      setModuleId(22);
+      setIdentifierPreference(identifier);
+      setCamposGerenciadosDefault(fieldsDefault);
+      setPreferencesDefault(preferencesDefault);
+      setPreferences(preferences1);
+      setExperimentsCamposGerenciados(fieldsDefault);
+      localStorage.setItem('user', JSON.stringify(userLogado));
     }
 
     table === 'genotipo'
       ? setPreferencesGenotype()
       : setPreferencesExperiment();
 
-    if(table === 'genotipo'){
-      setColumns(columnsOrder(camposGerenciados));
-    } else {
-      setColumns(experimentColumnsOrder(camposGerenciados));
-    }
+    console.log('===========> useEffect:: table', table);
+    console.log('===========> useEffect:: preferences', preferences);
+    /*setPreferencesByTabs(table);*/
+    
+  }, [table]);
 
-  }, [table, camposGerenciados]);
+  async function set(value: any, state: any) {
+    state(value);
+  }
 
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
@@ -732,23 +808,12 @@ export default function AtualizarTipoEnsaio({
       {loading && <ComponentLoading text="" />}
 
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
-        <form
-          className="w-full bg-white shadow-md rounded px-4 pt-3 pb-3 mt-0"
-          onSubmit={formik.handleSubmit}
-        >
+        <form className="w-full bg-white shadow-md rounded px-4 pt-3 pb-3 mt-0" onSubmit={formik.handleSubmit}>
           <div className="w-full flex justify-between items-start">
             <h1 className="text-xl">Atualizar Lista de Ensaio</h1>
           </div>
 
-          <div
-            className="w-full
-            flex
-            justify-around
-            gap-0
-            mt-0
-            mb-0
-          "
-          >
+          <div className="w-full flex justify-around gap-0 mt-0 mb-0">
             <div className="w-full flex justify-between items-start gap-5 mt-1">
               {updateFieldFactory('Foco', 'foco')}
 
@@ -764,15 +829,7 @@ export default function AtualizarTipoEnsaio({
             </div>
           </div>
 
-          <div
-            className="w-full
-            flex
-            justify-around
-            gap-6
-            mt-4
-            mb-1
-          "
-          >
+          <div className="w-full flex justify-around gap-6 mt-4 mb-1">
             <div className="w-full flex justify-between items-start gap-5 mt-10">
               <div className="w-full h-10">
                 <label className="block text-gray-900 text-sm font-bold mb-0">
@@ -863,6 +920,9 @@ export default function AtualizarTipoEnsaio({
         "
         >
           <div style={{ marginTop: '1%' }} className="w-full h-auto">
+            <p>{JSON.stringify(generatesProps)}</p>
+            <p>{JSON.stringify(camposGerenciados)}</p>
+            <p>{JSON.stringify(experimentsCamposGerenciados)}</p>
             <MaterialTable
               tableRef={tableRef}
               style={{ background: '#f9fafb' }}
@@ -949,6 +1009,7 @@ export default function AtualizarTipoEnsaio({
                     <div className="h-full flex items-center gap-2">
                       <ManageFields
                         statusAccordionExpanded={false}
+                        table_tabs={table}
                         generatesPropsDefault={ table === 'genotipo' ? generatesProps : generatesPropsExperiments }
                         camposGerenciadosDefault={camposGerenciadosDefault}
                         preferences={preferences}
@@ -962,10 +1023,7 @@ export default function AtualizarTipoEnsaio({
                         OnColumnsOrder={(e: any) => {
                           // columnsOrder(e);
                           console.log('OnColumnsOrder', e);
-                          table === 'genotipo'
-                            ? columnsOrder(e)
-                            : experimentColumnsOrder(e);
-                          
+                          // Descomentar somente quando realmente a string gerenciarCampos for a correta.
                         }}
                         OnSetStatusAccordion={(e: any) => {
                           setStatusAccordion(e);
@@ -974,6 +1032,8 @@ export default function AtualizarTipoEnsaio({
                           setGeneratesProps(e);
                         }}
                         OnSetCamposGerenciados={(e: any) => {
+                          console.log('setCamposGerenciados.e', e);
+                          // setCamposGerenciados(e);
                           setCamposGerenciados(e);
                         }}
                         OnSetUserLogado={(e: any) => {
