@@ -424,6 +424,7 @@ export default function Listagem({
                     setCookies('filterBeforeEditOrderBy', orderBy);
                     setCookies('filtersParams', filtersParams);
                     setCookies('lastPage', 'atualizar');
+                    setCookies('urlPage', 'quadraLayout');
                     router.push(
                       `/config/quadra/layout-quadra/atualizar?id=${rowData.id}`,
                     );
@@ -454,6 +455,7 @@ export default function Listagem({
                     setCookies('filterBeforeEditOrderBy', orderBy);
                     setCookies('filtersParams', filtersParams);
                     setCookies('lastPage', 'atualizar');
+                    setCookies('urlPage', 'quadraLayout');
                     router.push(
                       `/config/quadra/layout-quadra/atualizar?id=${rowData.id}`,
                     );
@@ -1212,7 +1214,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
-  if (lastPageServer == undefined || lastPageServer == 'No') {
+  if (lastPageServer == undefined || lastPageServer == 'No' || req.cookies.urlPage !== 'quadraLayout') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });

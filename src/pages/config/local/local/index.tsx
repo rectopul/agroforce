@@ -383,6 +383,7 @@ export default function Listagem({
                 setCookies('lastPage', 'atualizar');
                 setCookies('takeBeforeEdit', take);
                 setCookies('itensPage', itensPerPage);
+                setCookies('urlPage', 'local');
                 router.push(`/config/local/local/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
@@ -812,7 +813,7 @@ export default function Listagem({
                         value="Importar"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        style={{ display: !perm_can_do('/config/local/local', 'import') ? 'none' : '' }}
+                        style={{ display: !perm_can_do('/listas/rd', 'import') ? 'none' : '' }}
                         onClick={() => {
                           window.open('/listas/rd?importar=rd', '_blank');
                         }}
@@ -843,27 +844,21 @@ export default function Listagem({
                         module_id={module_id}
                         identifier_preference={identifier_preference}
                         OnSetStatusAccordion={(e: any) => {
-                          
                           setStatusAccordion(e);
                         }}
                         OnSetGeneratesProps={(e: any) => {
-                          
                           setGeneratesProps(e);
                         }}
                         OnSetCamposGerenciados={(e: any) => {
-                          
                           setCamposGerenciados(e);
                         }}
                         OnColumnsOrder={(e: any) => {
-                          
                           columnsOrder(e);
                         }}
                         OnSetUserLogado={(e: any) => {
-                          
                           setUserLogado(e);
                         }}
                         OnSetPreferences={(e: any) => {
-                          
                           setPreferences(e);
                         }}
                       />
@@ -968,7 +963,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
-  if (lastPageServer == undefined || lastPageServer == 'No') {
+  if (lastPageServer == undefined || lastPageServer == 'No' || req.cookies.urlPage !== 'local') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });

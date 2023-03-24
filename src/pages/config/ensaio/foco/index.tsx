@@ -436,6 +436,7 @@ export default function Listagem({
                   setCookies('filtersParams', filtersParams);
                   setCookies('lastPage', 'atualizar');
                   setCookies('takeBeforeEdit', take);
+                  setCookies('urlPage', 'foco');
                   router.push(`/config/ensaio/foco/atualizar?id=${rowData.id}`);
                 }}
                 bgColor="bg-blue-600"
@@ -455,6 +456,7 @@ export default function Listagem({
                 onClick={() => {
                   setCookies('pageBeforeEdit', currentPage?.toString());
                   setCookies('filterBeforeEdit', filtersParams);
+                  setCookies('urlPage', 'foco');
                   router.push(`/config/ensaio/foco/atualizar?id=${rowData.id}`);
                 }}
                 bgColor="bg-blue-600"
@@ -860,27 +862,21 @@ export default function Listagem({
                         module_id={module_id}
                         identifier_preference={identifier_preference}
                         OnSetStatusAccordion={(e: any) => {
-                          
                           setStatusAccordion(e);
                         }}
                         OnSetGeneratesProps={(e: any) => {
-                          
                           setGeneratesProps(e);
                         }}
                         OnSetCamposGerenciados={(e: any) => {
-                          
                           setCamposGerenciados(e);
                         }}
                         OnColumnsOrder={(e: any) => {
-                          
                           columnsOrder(e);
                         }}
                         OnSetUserLogado={(e: any) => {
-                          
                           setUserLogado(e);
                         }}
                         OnSetPreferences={(e: any) => {
-                          
                           setPreferences(e);
                         }}
                       />
@@ -971,7 +967,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
-  if (lastPageServer == undefined || lastPageServer == 'No') {
+  if (lastPageServer == undefined || lastPageServer == 'No' || req.cookies.urlPage !== 'foco') {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });
