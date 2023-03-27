@@ -470,6 +470,7 @@ export default function Listagem({
             title: 'local.name_local_culture',
             orderList,
             fieldOrder,
+
             handleOrder,
           }),
         );
