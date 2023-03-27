@@ -820,7 +820,7 @@ export default function TipoEnsaio({
                           setCamposGerenciados(e);
                         }}
                         OnColumnsOrder={(e: any) => {
-                          columns(e);
+                          colums(e);
                         }}
                         OnSetUserLogado={(e: any) => {
                           setUserLogado(e);
