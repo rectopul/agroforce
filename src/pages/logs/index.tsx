@@ -716,7 +716,7 @@ export default function Listagem({
                           setCamposGerenciados(e);
                         }}
                         OnColumnsOrder={(e: any) => {
-                          columns(e);
+                          colums(e);
                         }}
                         OnSetUserLogado={(e: any) => {
                           setUserLogado(e);
