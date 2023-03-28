@@ -300,7 +300,7 @@ export default function Listagem({
       page * Number(take)
     }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
 
-    await loteService
+    await replaceTreatmentService
       .getAll(parametersFilter)
       .then((response) => {
         if (response.status === 200 || response.status === 400) {
@@ -318,7 +318,7 @@ export default function Listagem({
   }
 
   useEffect(() => {
-    callingApi(filter);
+    seperate(filter);
   }, [typeOrder]);
 
   async function handleOrder(

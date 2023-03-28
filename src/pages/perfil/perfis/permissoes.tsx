@@ -13,11 +13,11 @@ import LoadingComponent from '../../../components/Loading';
 import { perm_can_do } from '../../../shared/utils/perm_can_do';
 
 const groupRoutes = [
-  { title: 'Perfil', name: '/perfil/' },
-  { title: 'Configurações', name: '/config/' },
-  { title: 'Lista', name: '/listas/' },
-  { title: 'Operação', name: '/operacao/' },
-  { title: 'Relatórios', name: '/relatorios/' },
+  { title: 'Perfil', name: '/perfil' },
+  { title: 'Configurações', name: '/config' },
+  { title: 'Lista', name: '/listas' },
+  { title: 'Operação', name: '/operacao' },
+  { title: 'Relatórios', name: '/logs' },
 ];
 
 export default function Permissoes({
