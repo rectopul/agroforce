@@ -21,7 +21,7 @@ import { validateInteger } from '../../shared/utils/numberValidate';
 import { CulturaController } from '../cultura.controller';
 import { validateHeaders } from '../../shared/utils/validateHeaders';
 import { experimentQueue } from './experimento-queue';
-import {culture, local, safra} from "@prisma/client";
+import {culture, delineamento, local, safra, assay_list, experiment} from "@prisma/client";
 
 export class ImportExperimentController {
   static async validate(
@@ -89,6 +89,8 @@ export class ImportExperimentController {
       // array de locais para evitar fazer varias requisições
       const locals: Array<local> = [];
       
+      let contagem = 0;
+      
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
           let experimentName;
@@ -138,8 +140,7 @@ export class ImportExperimentController {
             assayList = response.length > 0 ? response[0] : [];
           }
           
-          
-          
+          console.log('importando experimento: linha:', contagem);
           for (const column in spreadSheet[row]) {
             // CULTURA
             if (column === '0') { // CULTURA
@@ -148,21 +149,19 @@ export class ImportExperimentController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
               
-              let response = null;
+              let responseCulture = null;
               
               // se a cultura não estiver no array de culturas, faz a requisição
               if (!cultures.find((culture) => culture.id === idCulture)) {
-                let { response }: any = await culturaController.getOneCulture(Number(idCulture));
-                
-                cultures.push(response);
+                let { response:responseCultureX }: any = await culturaController.getOneCulture(Number(idCulture));
+                responseCulture = responseCultureX;
+                cultures.push(responseCulture);
               } else {
-                
                 // find culture bu idCulture
-                response = cultures.find((culture) => culture.id === idCulture);
-                
+                responseCulture = cultures.find((culture) => culture.id === idCulture);
               }
               
-              if (response?.name?.toUpperCase() !== spreadSheet[row][column]?.toUpperCase()) {
+              if (responseCulture?.name?.toUpperCase() !== spreadSheet[row][column]?.toUpperCase()) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
                   row,
@@ -338,6 +337,7 @@ export class ImportExperimentController {
                 }
               }
             }
+            // DENSIDADE
             if (column === '8') { // DENSIDADE
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -353,6 +353,7 @@ export class ImportExperimentController {
                   );
               }
             }
+            // EPOCA
             if (column === '9') { // EPOCA
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -368,6 +369,7 @@ export class ImportExperimentController {
                   );
               }
             }
+            // DELINEAMENTO
             if (column === '10') { // DELINEAMENTO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -407,6 +409,7 @@ export class ImportExperimentController {
                 }
               }
             }
+            // NREP
             if (column === '11') { // NREP
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -420,6 +423,7 @@ export class ImportExperimentController {
                 );
               }
             }
+            // NPL
             if (column === '12') { // NPL
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -433,6 +437,7 @@ export class ImportExperimentController {
                 );
               }
             }
+            // CLP
             if (column === '13') { // CLP
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -447,6 +452,7 @@ export class ImportExperimentController {
                 );
               }
             }
+            // ORDEM SORTEIO
             if (column === '15') { // ORDEM SORTEIO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -461,8 +467,12 @@ export class ImportExperimentController {
               }
             }
           }
+
+          contagem++;
         }
       }
+      
+      
       if (responseIfError.length === 0) {
         return this.storeRecords(idLog, {
           spreadSheet, idSafra, idCulture, created_by: createdBy,
@@ -491,24 +501,100 @@ export class ImportExperimentController {
     const experimentController = new ExperimentController();
     const delineamentoController = new DelineamentoController();
 
+    // array de culturas para evitar fazer varias requisições
+    const cultures: Array<culture> = [];
+    // array de safras para evitar fazer varias requisições
+    const safras: Array<safra> = [];
+    // array de locais para evitar fazer varias requisições
+    const locals: Array<local> = [];
+    // array de delineamentos para evitar fazer varias requisições
+    const delineamentos: Array<delineamento> = [];
+    // array de listas de ensaios para evitar fazer varias requisições
+    const assayLists: Array<assay_list> = [];
+    // array de experimentos para evitar fazer varias requisições
+    const experiments: Array<experiment> = [];
+    
+    const otimizar = true;
+    
+    let linha = 1;
+    
     try {
       for (const row in spreadSheet) {
         if (row !== '0') {
-          const { response: local } = await localController.getAll({
-            name_local_culture: spreadSheet[row][7],
-            importValidate: true,
-          });
-          const { response: assayList } = await assayListController.getAll({
-            gli: spreadSheet[row][4],
-            id_safra: idSafra,
-            importValidate: true,
-          });
-          const { response: delineamento } = await delineamentoController.getAll({
-            id_culture: idCulture,
-            name: spreadSheet[row][10],
-            filterStatus: 1,
-            importValidate: true,
-          });
+
+          let local = null;
+          let assayList = null;
+          let delineamento = null;
+          
+          console.log('processando planilha de experimento: linha:', linha);
+          
+          if (otimizar) {
+
+            if (!locals.find((local) => local.name_local_culture === spreadSheet[row][7])) {
+              const {response: localX} = await localController.getAll({
+                name_local_culture: spreadSheet[row][7],
+                importValidate: true,
+              });
+              local = localX;
+              locals.push(local);
+            } else {
+              local = locals.find((local) => local.name_local_culture === spreadSheet[row][7]);
+            }
+
+            if (!assayLists.find((assayList) => assayList.gli === spreadSheet[row][4] && assayList.id_safra === idSafra)) {
+              const {response: assayListX} = await assayListController.getAll({
+                gli: spreadSheet[row][4],
+                id_safra: idSafra,
+                importValidate: true,
+              });
+              assayList = assayListX;
+              assayLists.push(assayList);
+            } else {
+              assayList = assayLists.find((assayList) => assayList.gli === spreadSheet[row][4] && assayList.id_safra === idSafra);
+            }
+
+            if (!delineamentos.find((delineamento) => delineamento.id_culture === idCulture && delineamento.name === spreadSheet[row][10])) {
+              const {response: delineamentox} = await delineamentoController.getAll({
+                id_culture: idCulture,
+                name: spreadSheet[row][10],
+                filterStatus: 1,
+                importValidate: true,
+              });
+              delineamento = delineamentox;
+              delineamentos.push(delineamento);
+            } else {
+              delineamento = delineamentos.find((delineamento) => delineamento.id_culture === idCulture && delineamento.name === spreadSheet[row][10]);
+            }
+
+          } 
+          else {
+
+            const {response: localx} = await localController.getAll({
+              name_local_culture: spreadSheet[row][7],
+              importValidate: true,
+            });
+            
+            local = localx;
+
+            const {response: assayListx} = await assayListController.getAll({
+              gli: spreadSheet[row][4],
+              id_safra: idSafra,
+              importValidate: true,
+            });
+            
+            assayList = assayListx;
+
+            const {response: delineamentox} = await delineamentoController.getAll({
+              id_culture: idCulture,
+              name: spreadSheet[row][10],
+              filterStatus: 1,
+              importValidate: true,
+            });
+            
+            delineamento = delineamentox;
+
+          }
+          
           const comments = spreadSheet[row][14]?.substr(0, 255) ? spreadSheet[row][14]?.substr(0, 255) : '';
           let experimentName;
           if (spreadSheet[row][9].toString().length < 2) {
@@ -516,6 +602,8 @@ export class ImportExperimentController {
           } else {
             experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_${spreadSheet[row][9]}`;
           }
+          
+          
           const { response: experiment } = await experimentController.getAll({
             filterExperimentName: experimentName,
             idSafra,
@@ -566,6 +654,9 @@ export class ImportExperimentController {
               });
             }
           }
+
+          linha++;
+          
         }
       }
       await logImportController.update({

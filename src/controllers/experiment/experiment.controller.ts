@@ -464,13 +464,13 @@ export class ExperimentController {
           return { status: 200, message: 'Experimento atualizado' };
         } catch (error: any) {
           handleError('Experimento controller', 'Update', error.message);
-          throw new Error('[Controller] - Update Experimento erro update many');
+          throw new Error('[Controller] - Update Experimento erro update many' + error.message);
         }
       }
       return { status: 400, message: 'Experimento não atualizado' };
     } catch (error: any) {
       handleError('Experimento controller', 'Update', error.message);
-      throw new Error('[Controller] - Update Experimento erro');
+      throw new Error('[Controller] - Update Experimento erro: ' + error.message);
     }
   }
 
