@@ -969,6 +969,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('urlPage', { req, res });
     removeCookies('itensPage', { req, res });
   }
 
@@ -1005,6 +1006,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('takeBeforeEdit', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });
   removeCookies('lastPage', { req, res });
+  removeCookies('urlPage', { req, res });
 
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(param).toString();

@@ -90,9 +90,7 @@ export default function AtualizarUsuario({
       if (userPermissions[data.users_permissions[item].id_cultures]) {
         userPermissions[data.users_permissions[item].id_cultures] = [
           data.users_permissions[item].id_profiles,
-          Number(
-            userPermissions[data.users_permissions[item].id_cultures].join(),
-          ),
+          ...userPermissions[data.users_permissions[item].id_cultures],
         ];
       } else {
         userPermissions[data.users_permissions[item].id_cultures] = [
@@ -204,6 +202,7 @@ export default function AtualizarUsuario({
       const auxObject: any = [];
       let auxObject2: any = [];
       let auxValidate: boolean = false;
+      let validateQuantity: boolean = false;
 
       Object.keys(values.cultures).forEach((item: any) => {
         input = document.querySelector(
@@ -220,6 +219,10 @@ export default function AtualizarUsuario({
           return;
         }
 
+        if (auxObject2.length > 5) {
+          validateQuantity = true;
+        }
+
         ObjProfiles = {
           cultureId: values.cultures[item],
           profiles: auxObject2,
@@ -230,6 +233,12 @@ export default function AtualizarUsuario({
 
       if (auxValidate) {
         Swal.fire('E preciso escolher um perfil para as culturas selecionadas');
+        setLoading(false);
+        return;
+      }
+
+      if (validateQuantity) {
+        Swal.fire('O máximo de perfis por cultura é 5');
         setLoading(false);
         return;
       }

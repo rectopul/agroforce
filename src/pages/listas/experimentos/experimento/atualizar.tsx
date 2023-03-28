@@ -474,11 +474,6 @@ export default function AtualizarLocal({
       }
     });
 
-    console.log(
-      '======> PARENT: Ordenação das colunas: ',
-      `'${columnsCampos}'`,
-      tableFields,
-    );
 
     return tableFields;
   }

@@ -1230,6 +1230,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('urlPage', { req, res });
   }
 
   const filterBeforeEdit = req.cookies.filterBeforeEdit
