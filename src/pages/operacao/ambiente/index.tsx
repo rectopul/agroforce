@@ -1045,6 +1045,7 @@ export default function Listagem({
                             setCookies('lastPage', 'atualizar');
                             setCookies('takeBeforeEdit', take);
                             setCookies('itensPage', itensPerPage);
+                            setCookies('urlPage', 'ambiente');
                             router.push({
                               pathname: '/operacao/ambiente/experimento',
                             });

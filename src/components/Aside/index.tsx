@@ -56,22 +56,22 @@ export function Aside({ moduloActive }: any) {
   useEffect(() => {
     (async () => {
       const newConfig = await asidePermissions(config);
-      set(newConfig, setConfig);
+      await set(newConfig, setConfig);
     })();
 
     (async () => {
       const newList = await asidePermissions(list);
-      set(newList, setList);
+      await set(newList, setList);
     })();
 
     (async () => {
       const newOperations = await asidePermissions(operation);
-      set(newOperations, setOperation);
+      await set(newOperations, setOperation);
     })();
 
     (async () => {
       const newLogs = await asidePermissions(logs);
-      set(newLogs, setLogs);
+      await set(newLogs, setLogs);
     })();
   }, []);
 
