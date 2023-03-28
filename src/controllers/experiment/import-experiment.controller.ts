@@ -21,6 +21,7 @@ import { validateInteger } from '../../shared/utils/numberValidate';
 import { CulturaController } from '../cultura.controller';
 import { validateHeaders } from '../../shared/utils/validateHeaders';
 import { experimentQueue } from './experimento-queue';
+import {culture, local, safra} from "@prisma/client";
 
 export class ImportExperimentController {
   static async validate(
@@ -80,6 +81,14 @@ export class ImportExperimentController {
           message: 'Os dados são validados e carregados em background',
         };
       }
+
+      // array de culturas para evitar fazer varias requisições
+      const cultures: Array<culture> = [];
+      // array de safras para evitar fazer varias requisições
+      const safras: Array<safra> = [];
+      // array de locais para evitar fazer varias requisições
+      const locals: Array<local> = [];
+      
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
           let experimentName;
@@ -110,7 +119,6 @@ export class ImportExperimentController {
             // await logImportController.update({
             //   id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela`,
             // });
-
             experimentNameTemp[row] = experimentName;
             responseIfError[0]
               += `<li style="text-align:left"> Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela </li> <br>`;
@@ -129,15 +137,31 @@ export class ImportExperimentController {
 
             assayList = response.length > 0 ? response[0] : [];
           }
+          
+          
+          
           for (const column in spreadSheet[row]) {
+            // CULTURA
             if (column === '0') { // CULTURA
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
-              const {
-                response,
-              }: any = await culturaController.getOneCulture(Number(idCulture));
+              
+              let response = null;
+              
+              // se a cultura não estiver no array de culturas, faz a requisição
+              if (!cultures.find((culture) => culture.id === idCulture)) {
+                let { response }: any = await culturaController.getOneCulture(Number(idCulture));
+                
+                cultures.push(response);
+              } else {
+                
+                // find culture bu idCulture
+                response = cultures.find((culture) => culture.id === idCulture);
+                
+              }
+              
               if (response?.name?.toUpperCase() !== spreadSheet[row][column]?.toUpperCase()) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
@@ -147,12 +171,31 @@ export class ImportExperimentController {
                 );
               }
             }
+            // SAFRA
             if (column === '1') { // SAFRA
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                const { status, response }: IReturnObject = await safraController.getOne(idSafra);
+                
+                let status = 0;
+                let response = null;
+                
+                // se a safra não estiver no array de culturas, faz a requisição
+                if (!safras.find((safra) => safra.id === idSafra)) {
+                  
+                  let {status, response}: IReturnObject = await safraController.getOne(idSafra);
+                  
+                  safras.push(response);
+                  
+                } else {
+                  
+                  status = 200;
+                  // find safra bu idSafra
+                  response = safras.find((safra) => safra.id === idSafra);
+                  
+                }
+                
                 if (status === 200) {
                   if (response?.safraName?.toUpperCase()
                       !== spreadSheet[row][column]?.toUpperCase()) {
@@ -171,6 +214,7 @@ export class ImportExperimentController {
                 }
               }
             }
+            // ENSAIO
             if (column === '2') { // ENSAIO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -181,6 +225,7 @@ export class ImportExperimentController {
                   += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
             }
+            // FOCO
             if (column === '3') { // FOCO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -191,6 +236,7 @@ export class ImportExperimentController {
                   += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
             }
+            // GGEN // TECNOLOGIA
             if (column === '5') { // GGEN // TECNOLOGIA
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -215,6 +261,7 @@ export class ImportExperimentController {
                 }
               }
             }
+            // GGM // BGM
             if (column === '6') { // GGM // BGM
               if (spreadSheet[row][column] !== null) {
                 if (isNaN(spreadSheet[row][column])) {
@@ -229,26 +276,57 @@ export class ImportExperimentController {
                 }
               }
             }
+            // LOCAL
             if (column === '7') { // LOCAL
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                const { response } = await localController.getAll({
-                  name_local_culture: spreadSheet[row][column],
-                  importValidate: true,
-                });
-                if (response.total === 0) {
+                // locals
+                
+                let responseLocal = null;
+                
+                // se o lcal não estiver no array de locais, faz a requisição
+                if (!locals.find((local) => local.name_local_culture === spreadSheet[row][column])) {
+
+                  const { response: responseLocalx } = await localController.getAll({
+                    name_local_culture: spreadSheet[row][column],
+                    importValidate: true,
+                  });
+
+                  responseLocal = responseLocalx;
+                  
+                  locals.push(responseLocalx);
+
+                } else {
+                  // find local by name
+                  responseLocal = locals.find((local) => local.name_local_culture === spreadSheet[row][column]);
+                }
+                
+                if (responseLocal.total === 0) {
                   responseIfError[Number(column)]
                     += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
                 }
-                const {
-                  response: responseSafra,
-                }: IReturnObject = await safraController.getOne(idSafra);
-                const cultureUnityValidate = response[0]?.cultureUnity.map((item: any) => {
+                
+                let responseSafra: any = null;
+                
+                // se a safra não estiver no array de safras, faz a requisição
+                if (!safras.find((safra) => safra.id === idSafra)) {
+                  const { response: responseSafrax } = await safraController.getOne(idSafra);
+                  responseSafra = responseSafrax;
+                  safras.push(responseSafra);
+                } else {
+                  // find safra by id
+                  responseSafra = safras.find((safra) => safra.id === idSafra);
+                }
+                
+                // const {response: responseSafra,}: IReturnObject = await safraController.getOne(idSafra);
+                
+                const cultureUnityValidate = responseLocal[0]?.cultureUnity.map((item: any) => {
                   if (item?.year === responseSafra?.year) return true;
                   return false;
                 });
+                
                 if (!cultureUnityValidate?.includes(true)) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
