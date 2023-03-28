@@ -186,10 +186,6 @@ export default function Listagem({
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
 
-  const pathExtra = `skip=${
-    currentPage * Number(take)
-  }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
-
   const [rowsSelected, setRowsSelected] = useState([]);
 
   const formik = useFormik<IFilter>({
@@ -582,24 +578,7 @@ export default function Listagem({
           html: error,
         });
       });
-
-    // const { status }: IReturnObject = await experimentService.update({
-    //   idList: experimentsSelected,
-    //   experimentGroupId: Number(experimentGroupId),
-    //   userId: userLogado.id,
-    // });
-    // if (status !== 200) {
-    //   Swal.fire('Erro ao associar experimentos');
-    //   setLoading(false);
-    // } else {
-    //   router.back();
-    // }
   }
-
-  // useEffect(() => {
-  //   handlePagination();
-  //   handleTotalPages();
-  // }, [currentPage]);
 
   return (
     <>
@@ -790,27 +769,21 @@ export default function Listagem({
                         module_id={module_id}
                         identifier_preference={identifier_preference}
                         OnSetStatusAccordion={(e: any) => {
-                          
                           setStatusAccordion(e);
                         }}
                         OnSetGeneratesProps={(e: any) => {
-                          
                           setGeneratesProps(e);
                         }}
                         OnSetCamposGerenciados={(e: any) => {
-                          
                           setCamposGerenciados(e);
                         }}
                         OnColumnsOrder={(e: any) => {
-                          
                           orderColumns(e);
                         }}
                         OnSetUserLogado={(e: any) => {
-                          
                           setUserLogado(e);
                         }}
                         OnSetPreferences={(e: any) => {
-                          
                           setPreferences(e);
                         }}
                       />
@@ -900,11 +873,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     await PreferencesControllers.getConfigGerais()
   )?.response[0]?.itens_per_page) ?? 10;
 
-  // (await (
-  //   await PreferencesControllers.getConfigGerais()
-  // )?.response[0]?.itens_per_page) ?? 5;
-
-  // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
   if (lastPageServer == undefined || lastPageServer == 'No') {
@@ -913,6 +881,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('urlPage', { req, res });
   }
 
   const pageBeforeEdit = req.cookies.pageBeforeEdit
@@ -940,18 +909,14 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { publicRuntimeConfig } = getConfig();
   const baseUrlExperimento = `${publicRuntimeConfig.apiUrl}/experiment`;
 
-  // const filterApplication =
-  //   req.cookies.filterBeforeEdit ||
-  //   `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}&filterExperimentStatus=SORTEADO`;
-
   // experimentGroupId=21&safraId=32&grid=true
   // Não pode trazer o filtro anterior, pois queremos todos os experimentos para incluir neste grupo e não só os experimentos do grupo 'experimentGroupId'.
-  const filterApplication = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}&filterExperimentStatus=SORTEADO`;
+  const filterApplication = `id_culture=${idCulture}&id_safra=${idSafra}&filterExperimentStatus=SORTEADO`;
 
   removeCookies('filterBeforeEdit', { req, res });
   removeCookies('pageBeforeEdit', { req, res });
 
-  const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}&filterExperimentStatus=SORTEADO`;
+  const param = `id_culture=${idCulture}&id_safra=${idSafra}&filterExperimentStatus=SORTEADO`;
 
   const urlParametersExperiment: any = new URL(baseUrlExperimento);
   urlParametersExperiment.search = new URLSearchParams(param).toString();

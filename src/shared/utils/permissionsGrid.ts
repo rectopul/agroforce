@@ -6,15 +6,7 @@ const permissions = [
       { value: 'view', title: 'Ver', checked: false },
       { value: 'create', title: 'Criar', checked: false },
       { value: 'edit', title: 'Editar', checked: false },
-      { value: 'delete', title: 'Excluir', checked: false },
-    ],
-  },
-  {
-    route: '/perfil/perfis/permissoes',
-    name: 'Permissões',
-    permissions: [
-      { value: 'view', title: 'Ver', checked: false },
-      { value: 'edit', title: 'Editar', checked: false },
+      { value: 'permissions', title: 'Permissões', checked: false },
     ],
   },
   {

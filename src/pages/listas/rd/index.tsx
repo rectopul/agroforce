@@ -1225,6 +1225,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('urlPage', { req, res });
     removeCookies('itensPage', { req, res });
     removeCookies('filterSelectStatusExp', { req, res });
   }
@@ -1255,6 +1256,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   removeCookies('takeBeforeEdit', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });
   removeCookies('lastPage', { req, res });
+  removeCookies('urlPage', { req, res });
   removeCookies('filterSelectStatusExp', { req, res });
 
   const param = `skip=0&take=${itensPerPage}&idSafra=${idSafra}`;

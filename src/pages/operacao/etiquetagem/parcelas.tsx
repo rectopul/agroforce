@@ -370,7 +370,6 @@ export default function Listagem({
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
-      console.log(parcelas);
       reloadExperimentGroup();
       setLoading(false);
     },

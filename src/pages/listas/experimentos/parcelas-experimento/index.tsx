@@ -409,6 +409,7 @@ export default function Listagem({
           tableRef.current.dataManager.changePageSize(
             response.total >= take ? take : response.total,
           );
+          setLoading(false);
         }
         setLoading(false);
       })
@@ -429,44 +430,7 @@ export default function Listagem({
     order: number,
     name: any,
   ): Promise<void> {
-    // let typeOrder: any;
-    // let parametersFilter: any;
-    // if (order === 1) {
-    //   typeOrder = 'asc';
-    // } else if (order === 2) {
-    //   typeOrder = 'desc';
-    // } else {
-    //   typeOrder = '';
-    // }
-    // setOrderBy(column);
-    // setOrderType(typeOrder);
-    // if (filter && typeof filter !== 'undefined') {
-    //   if (typeOrder !== '') {
-    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-    //   } else {
-    //     parametersFilter = filter;
-    //   }
-    // } else if (typeOrder !== '') {
-    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    // } else {
-    //   parametersFilter = filter;
-    // }
-
-    // await genotypeTreatmentService
-    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
-    //   .then(({ status, response }) => {
-    //     if (status === 200) {
-    //       setTreatments(response);
-    //     }
-    //   });
-
-    // if (orderList === 2) {
-    //   setOrder(0);
-    // } else {
-    //   setOrder(orderList + 1);
-    // }
-
-    // Gobal manage orders
+    setLoading(true);
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
@@ -476,63 +440,9 @@ export default function Listagem({
     setOrderBy(columnG);
     typeOrderG !== '' ? (typeOrderG == 'desc' ? setOrder(1) : setOrder(2)) : '';
     setArrowOrder(arrowOrder);
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 3000);
   }
 
-  // function headerTableFactory(
-  //   name: string,
-  //   title: string,
-  //   style: boolean = false
-  // ) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: true,
-  //     cellStyle: style ? { color: "#039be5", fontWeight: "bold" } : {},
-  //   };
-  // }
-
-  // function tecnologiaHeaderFactory(name: string, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: "tecnologia",
-  //     width: 0,
-  //     sorting: true,
-  //     render: (rowData: any) => (
-  //       <div className="h-10 flex">
-  //         <div>
-  //           {`${rowData.experiment.assay_list.tecnologia.cod_tec} ${rowData.experiment.assay_list.tecnologia.name}`}
-  //         </div>
-  //       </div>
-  //     ),
-  //   };
-  // }
-
   function orderColumns(columnsOrder: string): Array<object> {
-    console.log('=======> called: orderColumns');
     const columnOrder: any = columnsOrder.split(',');
     const tableFields: any = [];
     Object.keys(columnOrder).forEach((item: any) => {
@@ -1485,6 +1395,10 @@ export default function Listagem({
                             'filterSelectStatusParcel',
                             statusFilterSelected,
                           );
+                          setCookies(
+                            'urlPage',
+                            'parcelas',
+                          );
                         }}
                         bgColor="bg-blue-600"
                         icon={<RiArrowUpDownLine size={20} />}
@@ -1683,6 +1597,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('urlPage', { req, res });
     removeCookies('filterSelectStatusParcel', { req, res });
   }
 
@@ -1723,26 +1638,6 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}`;
 
-  // test code
-
-  // // [optional] Define some header
-  // const columns = ['A Number Column', 'A Text Column', 'A Date Column', 'A Boolean Column', 'Another Boolean Column', 'Another Text Column'];
-
-  // // Initialize the writer
-  // const xlsxWriter = new XLSXWriteStream({ header: true, columns });
-
-  // // Pipe the writer into a Stream.Writable output stream in order to retrieve XLSX file data,
-  // // write it into file or send it as HTTP response.
-  // const writeStream = fs.createWriteStream('file.xlsx');
-  // xlsxWriter.pipe(writeStream);
-
-  // // Write rows one by one with
-  // const row = [1, '02', new Date('2015-10-21T16:29:00.000Z'), true, false, '🦄'];
-  // xlsxWriter.write(row);
-  // xlsxWriter.end(); // Do not forget to end the stream!
-
-  // test code end
-
   const urlParametersAssay: any = new URL(baseUrlAssay);
   const urlParametersTreatment: any = new URL(baseUrlTreatment);
   urlParametersTreatment.search = new URLSearchParams(param).toString();
@@ -1755,23 +1650,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { response: allExpTreatments = [], total: totalItems = 0 } = await fetch(urlParametersTreatment.toString(), requestOptions).then(
     (response) => response.json(),
   );
-
-  // const { response: allAssay } = await fetch(
-  //   urlParametersAssay.toString(),
-  //   requestOptions
-  // ).then((response) => response.json());
-
-  // const assaySelect = allAssay.map((item: any) => {
-  //   const newItem: any = {};
-  //   newItem.id = item.gli;
-  //   newItem.name = item.gli;
-  //   return newItem;
-  // });
-
-  // const teste: any = {};
-  // teste.id = '';
-  // teste.name = 'Selecione';
-  // assaySelect.unshift(teste);
 
   const genotypeSelect = allExpTreatments?.map((item: any) => {
     const newItem: any = {};

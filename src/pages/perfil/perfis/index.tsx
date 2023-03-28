@@ -109,7 +109,7 @@ export default function Perfis({
             <Button
               value="Permissões"
               title={`Permissões de ${rowData.name}`}
-              style={{ display: !perm_can_do('/perfil/perfis/permissoes', 'view') ? 'none' : '' }}
+              style={{ display: !perm_can_do('/perfil/perfis', 'permissions') ? 'none' : '' }}
               onClick={() => {
                 router.push(
                   `/perfil/perfis/permissoes?id=${rowData.id}`,
@@ -293,6 +293,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('urlPage', { req, res });
     removeCookies('itensPage', { req, res });
   }
 

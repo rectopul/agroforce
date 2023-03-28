@@ -368,7 +368,6 @@ export default function Listagem({
 
   // Call that function when change type order value.
   useEffect(() => {
-    // console.log('typeOrder', typeOrder);
     callingApi(filter);
   }, [typeOrder]);
 
@@ -429,31 +428,6 @@ export default function Listagem({
             onPress={deleteItem}
             disabled={rowData.status === 3}
           />
-          {/* {rowData.status === 1 || rowData.status === 3 ? (
-            <div>
-              <Button
-                title={rowData.status === 3 ? '' : 'Ativo'}
-                icon={<BsTrashFill size={14} />}
-                onClick={() => deleteItem(rowData.id)}
-                bgColor={rowData.status === 3 ? 'bg-gray-400' : 'bg-red-600'}
-                textColor="white"
-                disabled={rowData.status === 3}
-              />
-            </div>
-          ) : (
-            <div className="h-7 flex">
-              <div className="h-7" />
-              <div>
-                <Button
-                  title="Inativo"
-                  icon={<BsTrashFill size={14} />}
-                  onClick={async () => deleteItem(rowData.id)}
-                  bgColor="bg-red-800"
-                  textColor="white"
-                />
-              </div>
-            </div>
-          )} */}
         </div>
       ),
     };
@@ -470,7 +444,6 @@ export default function Listagem({
             title: 'local.name_local_culture',
             orderList,
             fieldOrder,
-
             handleOrder,
           }),
         );
@@ -547,18 +520,7 @@ export default function Listagem({
           }),
         );
       }
-      // if (columnCampos[item] === 'npef') {
-      //   tableFields.push(
-      //     headerTableFactoryGlobal({
-      //       type: 'int',
-      //       name: 'NPE Final',
-      //       title: 'npef',
-      //       orderList,
-      //       fieldOrder,
-      //       handleOrder,
-      //     }),
-      //   );
-      // }
+
       if (columnCampos[item] === 'prox_npe') {
         tableFields.push(
           headerTableFactoryGlobal({
@@ -927,31 +889,6 @@ export default function Listagem({
 
                   <div className="h-6 w-1/3 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      NPE Final
-                    </label>
-                    <div className="flex">
-                      <Input
-                        type="number"
-                        placeholder="De"
-                        id="filterNpeFinalFrom"
-                        name="filterNpeFinalFrom"
-                        defaultValue={checkValue('filterNpeFinalFrom')}
-                        onChange={formik.handleChange}
-                      />
-                      <Input
-                        type="number"
-                        style={{ marginLeft: 8 }}
-                        placeholder="Até"
-                        id="filterNpeFinalTo"
-                        name="filterNpeFinalTo"
-                        defaultValue={checkValue('filterNpeFinalTo')}
-                        onChange={formik.handleChange}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="h-6 w-1/3 ml-2">
-                    <label className="block text-gray-900 text-sm font-bold mb-1">
                       Prox NPE
                     </label>
                     <div className="flex">
@@ -1258,6 +1195,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('urlPage', { req, res });
   }
 
   const itensPerPage = req.cookies.takeBeforeEdit
@@ -1286,6 +1224,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('takeBeforeEdit', { req, res });
   removeCookies('filterBeforeEditOrderBy', { req, res });
   removeCookies('lastPage', { req, res });
+  removeCookies('urlPage', { req, res });
 
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/npe`;

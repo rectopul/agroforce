@@ -47,6 +47,7 @@ import ITabs from '../../../../../shared/utils/dropdown';
 import { functionsUtils } from '../../../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../../components/Loading';
+import { tableGlobalFunctions } from '../../../../../helpers';
 
 interface IFilter {
   filterYear: string;
@@ -193,6 +194,7 @@ export default function Listagem({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');
+  const [typeOrder, setTypeOrder] = useState<string>('');
   const [fieldOrder, setFieldOrder] = useState<any>('');
 
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -290,80 +292,52 @@ export default function Listagem({
     },
   });
 
+  async function callingApi(parametersFilter: any, page: any = 0) {
+    setCurrentPage(page);
+
+    // parametersFilter = `${parametersFilter}&${pathExtra}`;
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+
+    await loteService
+      .getAll(parametersFilter)
+      .then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          setLotes(response.response);
+          setTotalItems(response.total);
+          tableRef?.current?.dataManager?.changePageSize(
+            response.total >= take ? take : response.total,
+          );
+        }
+        setLoading(false);
+      })
+      .catch((_) => {
+        setLoading(false);
+      });
+  }
+
+  useEffect(() => {
+    callingApi(filter);
+  }, [typeOrder]);
+
   async function handleOrder(
     column: string,
     order: string | any,
     name: any,
   ): Promise<void> {
-    let typeOrder: any;
-    let parametersFilter: any;
-    if (order === 1) {
-      typeOrder = 'asc';
-    } else if (order === 2) {
-      typeOrder = 'desc';
-    } else {
-      typeOrder = '';
-    }
-    setOrderBy(column);
-    setOrderType(typeOrder);
-    if (filter && typeof filter !== 'undefined') {
-      if (typeOrder !== '') {
-        parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-      } else {
-        parametersFilter = filter;
-      }
-    } else if (typeOrder !== '') {
-      parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    } else {
-      parametersFilter = filter;
-    }
-
-    await seperate(parametersFilter);
-
-    // await loteService
-    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
-    //   .then((response) => {
-    //     if (response.status === 200) {
-    //       setLotes(response.response);
-    //     }
-    //   });
-
-    if (orderList === 2) {
-      setOrder(0);
-      setArrowOrder(<AiOutlineArrowDown />);
-    } else {
-      setOrder(orderList + 1);
-      if (orderList === 1) {
-        setArrowOrder(<AiOutlineArrowUp />);
-      } else {
-        setArrowOrder('');
-      }
-    }
-
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 100);
-    // setFieldOrder(columnG);
-  }
+    // Gobal manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
-  // function headerTableFactory(name: string, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: false,
-  //   };
-  // }
+    setFieldOrder(columnG);
+    setTypeOrder(typeOrderG);
+    setOrderBy(columnG);
+    typeOrderG !== '' ? (typeOrderG == 'desc' ? setOrder(1) : setOrder(2)) : '';
+    setArrowOrder(arrowOrder);
+  }
 
   const { value } = router.query;
 
@@ -575,59 +549,6 @@ export default function Listagem({
   }
 
   const columns = columnsOrder(camposGerenciados);
-
-  async function getValuesColumns(): Promise<void> {
-    const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
-    for (let i = 0; i < els.length; i += 1) {
-      if (els[i].checked) {
-        selecionados += `${els[i].value},`;
-      }
-    }
-    const totalString = selecionados.length;
-    const campos = selecionados.substr(0, totalString - 1);
-    if (preferences.id === 0) {
-      await userPreferencesService
-        .create({
-          table_preferences: campos,
-          userId: userLogado.id,
-          module_id: 12,
-        })
-        .then((response) => {
-          userLogado.preferences.lote = {
-            id: response.response.id,
-            userId: preferences.userId,
-            table_preferences: campos,
-          };
-          preferences.id = response.response.id;
-        });
-      localStorage.setItem('user', JSON.stringify(userLogado));
-    } else {
-      userLogado.preferences.lote = {
-        id: preferences.id,
-        userId: preferences.userId,
-        table_preferences: campos,
-      };
-      await userPreferencesService.update({
-        table_preferences: campos,
-        id: preferences.id,
-      });
-      localStorage.setItem('user', JSON.stringify(userLogado));
-    }
-    setStatusAccordion(false);
-    setCamposGerenciados(campos);
-  }
-
-  function handleOnDragEnd(result: DropResult): void {
-    setStatusAccordion(true);
-    if (!result) return;
-
-    const items = Array.from(generatesProps);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    const index = Number(result.destination?.index);
-    items.splice(index, 0, reorderedItem);
-    setGeneratesProps(items);
-  }
 
   function handleTotalPages(): void {
     if (currentPage < 0) {
@@ -994,27 +915,21 @@ export default function Listagem({
                         module_id={module_id}
                         identifier_preference={identifier_preference}
                         OnSetStatusAccordion={(e: any) => {
-                          
                           setStatusAccordion(e);
                         }}
                         OnSetGeneratesProps={(e: any) => {
-                          
                           setGeneratesProps(e);
                         }}
                         OnSetCamposGerenciados={(e: any) => {
-                          
                           setCamposGerenciados(e);
                         }}
                         OnColumnsOrder={(e: any) => {
-                          
                           columnsOrder(e);
                         }}
                         OnSetUserLogado={(e: any) => {
-                          
                           setUserLogado(e);
                         }}
                         OnSetPreferences={(e: any) => {
-                          
                           setPreferences(e);
                         }}
                       />

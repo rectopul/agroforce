@@ -116,7 +116,7 @@ export default function Permissoes({
                 bgColor="bg-blue-600"
                 textColor="white"
                 style={{
-                  display: !perm_can_do('/perfil/perfis/permissoes', 'edit')
+                  display: !perm_can_do('/perfil/perfis', 'permissions')
                     ? 'none'
                     : '',
                 }}
