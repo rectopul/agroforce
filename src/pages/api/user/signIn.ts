@@ -211,44 +211,31 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
         userId: user.id,
         showModule: true,
       }).then(({ status, response }) => {
-        console.log('signIn', response);
-        
-        if(status === 200) {
+        if (status === 200) {
           response.forEach((item:any) => {
-            
-            console.log('item', item);
-            
-            //const newItem = {};
+            // const newItem = {};
             const newItem: any = {};
             newItem.id = item.id;
             newItem.userId = item.userId;
             newItem.table_preferences = item.table_preferences;
             newItem.route_usage = item.route_usage;
             newItem.identifier_extra = item.identifier_extra;
-            
-            
+
             let identifier = item.modules.module;
-            
-            if(item.route_usage !== null && item.route_usage !== '' && !preferences[item.route_usage]) {
+
+            if (item.route_usage !== null && item.route_usage !== '' && !preferences[item.route_usage]) {
               identifier = item.modules.module + item.route_usage;
               preferences[identifier] = newItem;
             }
-            
-            if(item.identifier_extra !== null && item.identifier_extra !== '' && !preferences[item.identifier_extra]) {
+
+            if (item.identifier_extra !== null && item.identifier_extra !== '' && !preferences[item.identifier_extra]) {
               identifier = item.identifier_extra;
               preferences[identifier] = newItem;
             }
-            
           });
-          
         }
-        
       });
-      
-      console.log('preferences', preferences);
-      
     }
-    
 
     if (!user) throw new Error('Login ou senha é invalida!');
 

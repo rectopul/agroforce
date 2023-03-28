@@ -382,6 +382,7 @@ export default function Listagem({
           tableRef.current.dataManager.changePageSize(
             response.total >= take ? take : response.total,
           );
+          setLoading(false);
         }
       })
       .catch((_) => {
@@ -401,44 +402,7 @@ export default function Listagem({
     order: number,
     name: any,
   ): Promise<void> {
-    // let typeOrder: any;
-    // let parametersFilter: any;
-    // if (order === 1) {
-    //   typeOrder = 'asc';
-    // } else if (order === 2) {
-    //   typeOrder = 'desc';
-    // } else {
-    //   typeOrder = '';
-    // }
-    // setOrderBy(column);
-    // setOrderType(typeOrder);
-    // if (filter && typeof filter !== 'undefined') {
-    //   if (typeOrder !== '') {
-    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-    //   } else {
-    //     parametersFilter = filter;
-    //   }
-    // } else if (typeOrder !== '') {
-    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    // } else {
-    //   parametersFilter = filter;
-    // }
-
-    // await genotypeTreatmentService
-    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
-    //   .then(({ status, response }) => {
-    //     if (status === 200) {
-    //       setTreatments(response);
-    //     }
-    //   });
-
-    // if (orderList === 2) {
-    //   setOrder(0);
-    // } else {
-    //   setOrder(orderList + 1);
-    // }
-
-    // Gobal manage orders
+    setLoading(true);
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
@@ -448,10 +412,6 @@ export default function Listagem({
     setOrderBy(columnG);
     typeOrderG !== '' ? (typeOrderG == 'desc' ? setOrder(1) : setOrder(2)) : '';
     setArrowOrder(arrowOrder);
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 100);
   }
 
   // function headerTableFactory(
@@ -1550,6 +1510,10 @@ export default function Listagem({
                             'filterSelectStatusEssay',
                             statusFilterSelected,
                           );
+                          setCookies(
+                            'urlPage',
+                            'genotypeTreatment',
+                          );
                         }}
                         bgColor="bg-blue-600"
                         icon={<RiArrowUpDownLine size={20} />}
@@ -1702,6 +1666,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('urlPage', { req, res });
     removeCookies('filterSelectStatusEssay', { req, res });
   }
 
@@ -1753,6 +1718,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('lastPage', { req, res });
   removeCookies('filterSelectStatusEssay', { req, res });
   removeCookies('ncaEmpty', { req, res });
+  removeCookies('urlPage', { req, res });
 
   const param = `&id_culture=${idCulture}&id_safra=${idSafra}`;
 

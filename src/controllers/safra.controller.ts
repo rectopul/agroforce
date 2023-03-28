@@ -162,7 +162,6 @@ export class SafraController {
   }
 
   async update(data: UpdateSafra) {
-    console.log('🚀 ~ file: safra.controller.ts:165 ~ SafraController ~ update ~ data:', data);
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 

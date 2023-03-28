@@ -899,7 +899,7 @@ export default function Listagem({
                           setCamposGerenciados(e);
                         }}
                         OnColumnsOrder={(e: any) => {
-                          columns(e);
+                          colums(e);
                         }}
                         OnSetUserLogado={(e: any) => {
                           setUserLogado(e);
@@ -1010,6 +1010,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('urlPage', { req, res });
     removeCookies('itensPage', { req, res });
   }
 

@@ -46,8 +46,6 @@ interface IGenerateProps {
 }
 
 export function ManageFields(props: ManageFieldsProps) {
-  // console.log('🚀 ~ file: index.tsx:47 ~ ManageFields ~ identifier_preference:', props.identifier_preference);
-  // console.log('🚀 ~ file: index.tsx:47 ~ ManageFields ~ props:', props);
   const router = useRouter();
 
   const { preferencesDefault } = props;
@@ -64,41 +62,36 @@ export function ManageFields(props: ManageFieldsProps) {
   const [preferences, setPreferences] = useState<any>(props.preferences);
 
   const [identifier_preference, setIdentifierPreference] = useState<string>(props.identifier_preference);
-  
+
   // table_tabs
   useEffect(() => {
-
-    if(props.table_tabs) {
-      console.log('mudou table_tabs', props.table_tabs, generatesProps);
-      console.log('props', props);
-      console.log('** camposGerenciados: ', camposGerenciados);
+    if (props.table_tabs) {
       const preferences1 = userLogado.preferences[props.identifier_preference];
-      console.log("preferences1", preferences1);
-      //props.OnSetGeneratesProps(generatesProps);
-      //props.OnSetPreferences(preferences1);
+
+      // props.OnSetGeneratesProps(generatesProps);
+      // props.OnSetPreferences(preferences1);
       props.OnSetCamposGerenciados(camposGerenciados);
     }
-
   }, [props.table_tabs]);
 
   useEffect(() => {
-    //reorderGeneratedProps();
-    //props.OnSetGeneratesProps(generatesProps);
-    console.log('mudou camposGerenciados', camposGerenciados);
+    // reorderGeneratedProps();
+    // props.OnSetGeneratesProps(generatesProps);
+
     // reorderGeneratedProps();
     // props.OnSetGeneratesProps(generatesProps);
   }, [camposGerenciados]);
 
   useEffect(() => {
-    console.log('mudou generatesProps', generatesProps);
-    //props.OnSetGeneratesProps(generatesProps); // ATENÇÃO NÃO USAR ESSE HOOK ENTRA EM LOOP;
+
+    // props.OnSetGeneratesProps(generatesProps); // ATENÇÃO NÃO USAR ESSE HOOK ENTRA EM LOOP;
     // props.generatesPropsDefault = generatesProps;
 
   }, [generatesProps]);
-  
+
   useEffect(() => {
-    console.log('******* useEffect ****** preferences', preferences);
-    //reorderGeneratedPropsDefault();
+
+    // reorderGeneratedPropsDefault();
   }, [preferences]);
 
   useEffect(() => {
@@ -142,10 +135,10 @@ export function ManageFields(props: ManageFieldsProps) {
     const index: number = Number(result.destination?.index);
     items.splice(index, 0, reorderedItem);
     setGeneratesProps(items);
-    //setStatusAccordion(true);
+    // setStatusAccordion(true);
   }
 
-  async function deleteAllPreferencesByUserAndModule() : Promise<void>{
+  async function deleteAllPreferencesByUserAndModule() : Promise<void> {
     await userPreferencesService
       .getAll({
         userId: userLogado.id,
@@ -153,23 +146,21 @@ export function ManageFields(props: ManageFieldsProps) {
         module_id: props.module_id,
       })
       .then((response) => {
-        console.log('🚀 ~ file: index.tsx:47 ~ ManageFields ~ response:', response);
         if (response.status === 200) {
           response.response.forEach(async (item: any) => {
-
             delete userLogado.preferences[props.identifier_preference];
             localStorage.setItem('userLogado', JSON.stringify(userLogado));
             props.OnSetUserLogado(userLogado);
 
-            await userPreferencesService.deleted(item.id).then(({statusD, responseD}) => {
-              console.log('deleted', item, statusD, responseD);
+            await userPreferencesService.deleted(item.id).then(({ statusD, responseD }) => {
+
             });
           });
         }
       });
   }
 
-  async function resetUserPreferences(): Promise<void>{
+  async function resetUserPreferences(): Promise<void> {
     // simulação de exclusão de preferências
     preferences.id = 0;
     preferences.table_preferences = props.camposGerenciadosDefault;
@@ -185,19 +176,15 @@ export function ManageFields(props: ManageFieldsProps) {
   }
 
   async function clearPreferencesByUserAndModule(): Promise<void> {
-
     if (preferences.id === 0) {
-
       await deleteAllPreferencesByUserAndModule();
       return;
-
     }
 
     await userPreferencesService
       .deleted(preferences.id)
       .then(async ({ status, response }) => {
         if (status === 200) {
-
           await deleteAllPreferencesByUserAndModule();
 
           setCamposGerenciados(props.camposGerenciadosDefault);
@@ -248,7 +235,6 @@ export function ManageFields(props: ManageFieldsProps) {
         }
 
         setStatusAccordion(false);
-
       })
       .catch((error) => {
         Swal.fire({
@@ -286,7 +272,7 @@ export function ManageFields(props: ManageFieldsProps) {
             table_preferences: campos,
             identifier_extra: props.identifier_preference,
           };
-          
+
           setPreferences(userLogado.preferences[props.identifier_preference]);
         });
       localStorage.setItem('user', JSON.stringify(userLogado));
@@ -298,10 +284,8 @@ export function ManageFields(props: ManageFieldsProps) {
       };
 
       // verifica se existe alguma preferência salva no banco
-      await userPreferencesService.getAll({id: preferences.id})
+      await userPreferencesService.getAll({ id: preferences.id })
         .then(async (response) => {
-          console.log("Verificando se existe preferência salva no banco:", response);
-
           if (response.status == 400 || response.total === 0) {
             await resetUserPreferences();
           } else {
@@ -312,8 +296,6 @@ export function ManageFields(props: ManageFieldsProps) {
             })
               .then((response) => {
 
-                console.log("atualizar gerenciar campos:", response);
-
               })
               .catch((error) => {
                 Swal.fire({
@@ -323,8 +305,6 @@ export function ManageFields(props: ManageFieldsProps) {
                 });
               });
           }
-
-
         })
         .catch((error) => {
           Swal.fire({
@@ -334,7 +314,6 @@ export function ManageFields(props: ManageFieldsProps) {
           });
         });
 
-      
       localStorage.setItem('user', JSON.stringify(userLogado));
     }
 

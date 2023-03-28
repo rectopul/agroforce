@@ -1,17 +1,17 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { capitalize } from "@mui/material";
-import { useFormik } from "formik";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { AiOutlineFileSearch } from "react-icons/ai";
-import { IoMdArrowBack } from "react-icons/io";
-import Swal from "sweetalert2";
-import { useState } from "react";
-import { focoService } from "../../../../services/foco.service";
-import { Button, Content, Input } from "../../../../components";
-import * as ITabs from "../../../../shared/utils/dropdown";
-import ComponentLoading from "../../../../components/Loading";
+import { capitalize } from '@mui/material';
+import { useFormik } from 'formik';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { AiOutlineFileSearch } from 'react-icons/ai';
+import { IoMdArrowBack } from 'react-icons/io';
+import Swal from 'sweetalert2';
+import { useState } from 'react';
+import { focoService } from '../../../../services/foco.service';
+import { Button, Content, Input } from '../../../../components';
+import * as ITabs from '../../../../shared/utils/dropdown';
+import ComponentLoading from '../../../../components/Loading';
 
 interface ICreateFoco {
   name: string;
@@ -24,38 +24,36 @@ export default function Cadastro() {
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "ENSAIO" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const culture = userLogado.userCulture.cultura_selecionada as string;
 
   function validateInputs(values: any) {
     if (!values.name || values.group === 0) {
-      const inputName: any = document.getElementById("name");
-      inputName.style.borderColor = "red";
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = 'red';
     } else {
-      const inputName: any = document.getElementById("name");
-      inputName.style.borderColor = "";
+      const inputName: any = document.getElementById('name');
+      inputName.style.borderColor = '';
     }
   }
 
   const formik = useFormik<ICreateFoco>({
     initialValues: {
       id_culture: Number(culture),
-      name: "",
+      name: '',
       created_by: userLogado.id,
     },
     onSubmit: async (values) => {
       validateInputs(values);
       if (!values.name) {
         Swal.fire(
-          "Preencha todos os campos obrigatórios destacados em vermelho."
+          'Preencha todos os campos obrigatórios destacados em vermelho.',
         );
         setLoading(false);
         return;
@@ -69,7 +67,7 @@ export default function Cadastro() {
         })
         .then(({ status, message }) => {
           if (status === 200) {
-            Swal.fire("Foco cadastrado com sucesso!");
+            Swal.fire('Foco cadastrado com sucesso!');
             setLoading(false);
             router.back();
           } else {

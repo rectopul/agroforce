@@ -267,16 +267,7 @@ export default function Listagem({
       filterNameLocality,
     }) => {
       const parametersFilter = `&filterNameUnityCulture=${filterNameUnityCulture}&filterNameLocalCulture=${filterNameLocalCulture}&filterLabel=${filterLabel}&filterMloc=${filterMloc}&filterAdress=${filterAdress}&filterLabelCountry=${filterLabelCountry}&filterLabelRegion=${filterLabelRegion}&filterNameLocality=${filterNameLocality}&filterYearTo=${filterYearTo}&filterYearFrom=${filterYearFrom}&id_safra=${idSafra}`;
-      // setFiltersParams(parametersFilter);
-      // setCookies('filterBeforeEdit', filtersParams);
-      //   await unidadeCulturaService
-      //     .getAll(`${parametersFilter}&skip=0&take=${itensPerPage}&id_safra=${idSafra}`)
-      //     .then((response) => {
-      //       setFilter(parametersFilter);
-      //       setTotalItems(response.total);
-      //       setUnidadeCultura(response.response);
-      //       setCurrentPage(0);
-      //     });
+
       setFilter(parametersFilter);
       setCurrentPage(0);
       await callingApi(parametersFilter);
@@ -284,7 +275,6 @@ export default function Listagem({
     },
   });
 
-  // Calling common API
   async function callingApi(parametersFilter: any, page: any = 0) {
     setCurrentPage(page);
 
@@ -308,6 +298,7 @@ export default function Listagem({
           tableRef.current.dataManager.changePageSize(
             response.total >= take ? take : response.total,
           );
+          setLoading(false);
         }
       })
       .catch((_) => {
@@ -325,50 +316,7 @@ export default function Listagem({
     order: string | any,
     name: any,
   ): Promise<void> {
-    // let typeOrder: any;
-    // let parametersFilter: any;
-    // if (order === 1) {
-    //   typeOrder = 'asc';
-    // } else if (order === 2) {
-    //   typeOrder = 'desc';
-    // } else {
-    //   typeOrder = '';
-    // }
-    // setOrderBy(column);
-    // setOrderType(typeOrder);
-    // if (filter && typeof (filter) !== 'undefined') {
-    //   if (typeOrder !== '') {
-    //     parametersFilter = `${filter}&orderBy=${column}&typeOrder=${typeOrder}`;
-    //   } else {
-    //     parametersFilter = filter;
-    //   }
-    // } else if (typeOrder !== '') {
-    //   parametersFilter = `orderBy=${column}&typeOrder=${typeOrder}`;
-    // } else {
-    //   parametersFilter = filter;
-    // }
-
-    // await unidadeCulturaService
-    //   .getAll(`${parametersFilter}&skip=0&take=${take}`)
-    //   .then((response) => {
-    //     if (response.status === 200) {
-    //       setUnidadeCultura(response.response);
-    //     }
-    //   });
-
-    // if (orderList === 2) {
-    //   setOrder(0);
-    //   setArrowOrder(<AiOutlineArrowDown />);
-    // } else {
-    //   setOrder(orderList + 1);
-    //   if (orderList === 1) {
-    //     setArrowOrder(<AiOutlineArrowUp />);
-    //   } else {
-    //     setArrowOrder('');
-    //   }
-    // }
-
-    // Gobal manage orders
+    setLoading(true);
     const {
       typeOrderG, columnG, orderByG, arrowOrder,
     } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
@@ -378,65 +326,6 @@ export default function Listagem({
     setOrderBy(columnG);
     typeOrderG !== '' ? (typeOrderG == 'desc' ? setOrder(1) : setOrder(2)) : '';
     setArrowOrder(arrowOrder);
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 100);
-  }
-
-  async function deleteItem(id: number) {
-    const { status, message } = await unidadeCulturaService.deleted({
-      id,
-      userId: userLogado.id,
-    });
-    if (status === 200) {
-      router.reload();
-    } else {
-      Swal.fire({
-        html: message,
-        width: '800',
-      });
-    }
-  }
-
-  // function headerTableFactory(name: any, title: string) {
-  //   return {
-  //     title: (
-  //       <div className="flex items-center">
-  //         <button
-  //           type="button"
-  //           className="font-medium text-gray-900"
-  //           onClick={() => handleOrder(title, orderList)}
-  //         >
-  //           {name}
-  //         </button>
-  //       </div>
-  //     ),
-  //     field: title,
-  //     sorting: true,
-  //   };
-  // }
-
-  function statusHeaderFactory() {
-    return {
-      title: 'Ações',
-      field: 'action',
-      sorting: false,
-      searchable: false,
-      render: (rowData: any) => (
-        <div className="h-7 flex">
-          <div>
-            <Button
-              icon={<BsTrashFill size={14} />}
-              title="Deletar unidade de cultura"
-              onClick={() => deleteItem(rowData.id)}
-              bgColor="bg-red-600"
-              textColor="white"
-            />
-          </div>
-        </div>
-      ),
-    };
   }
 
   function columnsOrder(columnOrder: any): any {
@@ -552,62 +441,6 @@ export default function Listagem({
 
   const columns = columnsOrder(camposGerenciados);
 
-  async function getValuesColumns(): Promise<void> {
-    const els: any = document.querySelectorAll("input[type='checkbox'");
-    let selecionados = '';
-    for (let i = 0; i < els.length; i += 1) {
-      if (els[i].checked) {
-        selecionados += `${els[i].value},`;
-      }
-    }
-    const totalString = selecionados.length;
-    const campos = selecionados.substr(0, totalString - 1);
-    if (preferences.id === 0) {
-      await userPreferencesService
-        .create({
-          table_preferences: campos,
-          userId: userLogado.id,
-          module_id: 21,
-        })
-        .then((response) => {
-          userLogado.preferences.unidadeCultura = {
-            id: response.response.id,
-            userId: preferences.userId,
-            table_preferences: campos,
-          };
-          preferences.id = response.response.id;
-        });
-      localStorage.setItem('user', JSON.stringify(userLogado));
-    } else {
-      userLogado.preferences.unidadeCultura = {
-        id: preferences.id,
-        userId: preferences.userId,
-        table_preferences: campos,
-      };
-      await userPreferencesService.update({
-        table_preferences: campos,
-        id: preferences.id,
-      });
-      localStorage.setItem('user', JSON.stringify(userLogado));
-    }
-
-    setStatusAccordion(false);
-    setCamposGerenciados(campos);
-  }
-
-  function handleOnDragEnd(result: DropResult) {
-    setStatusAccordion(true);
-
-    if (!result) return;
-
-    const items = Array.from(generatesProps);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    const index: number = Number(result.destination?.index);
-    items.splice(index, 0, reorderedItem);
-
-    setGeneratesProps(items);
-  }
-
   const downloadExcel = async (): Promise<void> => {
     setLoading(true);
     const skip = 0;
@@ -643,33 +476,7 @@ export default function Listagem({
     setLoading(false);
   };
 
-  // manage total pages
-  async function handleTotalPages() {
-    if (currentPage < 0) {
-      setCurrentPage(0);
-    }
-  }
-
   async function handlePagination(page: any): Promise<void> {
-    // const skip = currentPage * Number(take);
-    // let parametersFilter;
-    // if (orderType) {
-    //   parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}&orderBy=${orderBy}&typeOrder=${orderType}`;
-    // } else {
-    //   parametersFilter = `skip=${skip}&take=${take}&id_safra=${idSafra}`;
-    // }
-
-    // if (filter) {
-    //   parametersFilter = `${parametersFilter}&${filter}`;
-    // }
-    // await unidadeCulturaService
-    //   .getAll(parametersFilter)
-    //   .then(({ status, response }) => {
-    //     if (status === 200) {
-    //       setUnidadeCultura(response);
-    //     }
-    //   });
-
     await callingApi(filter, page); // handle pagination globly
   }
 
@@ -699,11 +506,6 @@ export default function Listagem({
     );
     return parameter;
   }
-
-  // useEffect(() => {
-  //   handlePagination();
-  //   handleTotalPages();
-  // }, [currentPage]);
 
   return (
     <>
@@ -1013,6 +815,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     removeCookies('filterBeforeEditTypeOrder', { req, res });
     removeCookies('filterBeforeEditOrderBy', { req, res });
     removeCookies('lastPage', { req, res });
+    removeCookies('urlPage', { req, res });
   }
 
   // RR

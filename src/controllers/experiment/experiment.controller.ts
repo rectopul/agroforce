@@ -429,7 +429,6 @@ export class ExperimentController {
             delete data.userId;
           }
         }
-        console.log('🚀 ~ file: experiment.controller.ts:382 ~ ExperimentController ~ update ~ data:', data);
 
         if (!data.import) {
           const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
