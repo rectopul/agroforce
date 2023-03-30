@@ -66,12 +66,7 @@ export class ImportExperimentController {
       'ORDEM_SORTEIO',
     ];
     try {
-      function replaceSpecialChars(str: String) {
-        return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-      }
-
       const validate: any = await validateHeaders(spreadSheet, headers);
-      console.log('🚀 ~ file: import-experiment.controller.ts:78 ~ ImportExperimentController ~ validate:', validate);
       if (validate.length > 0) {
         await logImportController.update({
           id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: validate,
@@ -219,8 +214,8 @@ export class ImportExperimentController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                assayList.type_assay.name = replaceSpecialChars(assayList?.type_assay?.name);
-                spreadSheet[row][column] = replaceSpecialChars(spreadSheet[row][column]);
+                assayList.type_assay.name = this.replaceSpecialChars(assayList?.type_assay?.name);
+                spreadSheet[row][column] = this.replaceSpecialChars(spreadSheet[row][column]);
                 if (assayList?.type_assay?.name?.toUpperCase()
                           !== spreadSheet[row][column]?.toUpperCase()) {
                   responseIfError[Number(column)]
@@ -234,8 +229,8 @@ export class ImportExperimentController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                assayList.foco.name = replaceSpecialChars(assayList?.foco?.name);
-                spreadSheet[row][column] = replaceSpecialChars(spreadSheet[row][column]);
+                assayList.foco.name = this.replaceSpecialChars(assayList?.foco?.name);
+                spreadSheet[row][column] = this.replaceSpecialChars(spreadSheet[row][column]);
                 if (assayList?.foco?.name?.toUpperCase()
                     !== spreadSheet[row][column]?.toUpperCase()
                 ) {
@@ -666,5 +661,9 @@ export class ImportExperimentController {
       handleError('Experimento controller', 'Save Import', error.message);
       return { status: 500, message: 'Erro ao salvar planilha de experimento' };
     }
+  }
+
+  static replaceSpecialChars(str: String) {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   }
 }
