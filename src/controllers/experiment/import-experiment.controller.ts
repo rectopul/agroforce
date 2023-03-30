@@ -62,6 +62,8 @@ export class ImportExperimentController {
       'ORDEM_SORTEIO',
     ];
     try {
+      console.log('🚀 ~ file: import-experiment.controller.ts:66 ~ ImportExperimentController ~ spreadSheet.length:', spreadSheet.length);
+
       const validate: any = await validateHeaders(spreadSheet, headers);
       console.log('🚀 ~ file: import-experiment.controller.ts:66 ~ ImportExperimentController ~ validate:', validate);
       if (validate.length > 0) {
@@ -92,7 +94,7 @@ export class ImportExperimentController {
       // array de locais para evitar fazer varias requisições
       const locals: Array<local> = [];
 
-      let contagem = 0;
+      const contagem = 0;
 
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
@@ -143,7 +145,6 @@ export class ImportExperimentController {
             assayList = response.length > 0 ? response[0] : [];
           }
 
-          console.log('importando experimento: linha:', contagem);
           for (const column in spreadSheet[row]) {
             // CULTURA
             if (column === '0') { // CULTURA
@@ -463,8 +464,6 @@ export class ImportExperimentController {
               }
             }
           }
-
-          contagem++;
         }
       }
 
