@@ -122,7 +122,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                     )}
                   >
                     <FaRegUserCircle />
-                    <span>Perfil</span>
+                    <span>Dados Pessoais</span>
                   </a>
                 </Link>
               )}
@@ -155,7 +155,7 @@ export function ModelHeader({ name, avatar }: IModelProps) {
                     style={{ display: !perm_can_do('/perfil/perfis', 'view') ? 'none' : '' }}
                   >
                     <RiLockPasswordLine />
-                    Permissões
+                    Perfil / Permissões
                   </a>
                 </Link>
               )}

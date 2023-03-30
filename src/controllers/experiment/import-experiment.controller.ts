@@ -1,3 +1,7 @@
+/* eslint-disable camelcase */
+/* eslint-disable max-len */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-inner-declarations */
 /* eslint-disable no-unreachable-loop */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable guard-for-in */
@@ -62,8 +66,12 @@ export class ImportExperimentController {
       'ORDEM_SORTEIO',
     ];
     try {
+      function replaceSpecialChars(str: String) {
+        return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      }
+
       const validate: any = await validateHeaders(spreadSheet, headers);
-      console.log('🚀 ~ file: import-experiment.controller.ts:66 ~ ImportExperimentController ~ validate:', validate);
+      console.log('🚀 ~ file: import-experiment.controller.ts:78 ~ ImportExperimentController ~ validate:', validate);
       if (validate.length > 0) {
         await logImportController.update({
           id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: validate,
@@ -92,8 +100,6 @@ export class ImportExperimentController {
       // array de locais para evitar fazer varias requisições
       const locals: Array<local> = [];
 
-      let contagem = 0;
-
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
           let experimentName;
@@ -113,20 +119,14 @@ export class ImportExperimentController {
           });
           if (experiment?.length > 0) {
             if (experiment[0].status?.toUpperCase() !== 'IMPORTADO') {
-              // await logImportController.update({
-              //   id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: `Erro na linha ${Number(row) + 1}. Experimento já cadastrado e utilizado no sistema`,
-              // });
               responseIfError[0]
-              += `<li style="text-align:left"> Erro na linha ${Number(row) + 1}. Experimento já cadastrado e utilizado no sistema </li> <br>`;
+              += `<li style="text-align:left"> Erro na linha ${Number(row)}. Já existe um experimento cadastrado e utilizado com este nome de experimento </li> <br>`;
             }
           }
           if (experimentNameTemp.includes(experimentName)) {
-            // await logImportController.update({
-            //   id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: `Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela`,
-            // });
             experimentNameTemp[row] = experimentName;
             responseIfError[0]
-              += `<li style="text-align:left"> Erro na linha ${Number(row) + 1}. Experimentos duplicados na tabela </li> <br>`;
+              += `<li style="text-align:left"> Erro na linha ${Number(row)}. Experimentos duplicados na tabela </li> <br>`;
           }
           experimentNameTemp[row] = experimentName;
           let assayList: any = {};
@@ -143,7 +143,6 @@ export class ImportExperimentController {
             assayList = response.length > 0 ? response[0] : [];
           }
 
-          console.log('importando experimento: linha:', contagem);
           for (const column in spreadSheet[row]) {
             // CULTURA
             if (column === '0') { // CULTURA
@@ -152,19 +151,22 @@ export class ImportExperimentController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
 
-              let responseCulture = null;
+              let responseCulture: any = null;
 
               // se a cultura não estiver no array de culturas, faz a requisição
               if (!cultures.find((culture) => culture.id === idCulture)) {
-                const { response: responseCultureX }: any = await culturaController.getOneCulture(Number(idCulture));
+                const {
+                  response: responseCultureX,
+                }: any = await culturaController.getOneCulture(Number(idCulture));
                 responseCulture = responseCultureX;
                 cultures.push(responseCulture);
               } else {
                 // find culture bu idCulture
                 responseCulture = cultures.find((culture) => culture.id === idCulture);
               }
-
-              if (responseCulture?.name?.toUpperCase() !== spreadSheet[row][column]?.toUpperCase()) {
+              if (
+                responseCulture?.name?.toUpperCase() !== spreadSheet[row][column]?.toUpperCase()
+              ) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
                   row,
@@ -180,11 +182,11 @@ export class ImportExperimentController {
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
                 let status = 0;
-                let response = null;
+                let response: any = null;
 
                 // se a safra não estiver no array de culturas, faz a requisição
                 if (!safras.find((safra) => safra.id === idSafra)) {
-                  const { status, response }: IReturnObject = await safraController.getOne(idSafra);
+                  const { response }: IReturnObject = await safraController.getOne(idSafra);
 
                   safras.push(response);
                 } else {
@@ -216,10 +218,14 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (assayList?.type_assay?.name?.toUpperCase()
-                        !== spreadSheet[row][column]?.toUpperCase()) {
-                responseIfError[Number(column)]
-                  += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              } else {
+                assayList.type_assay.name = replaceSpecialChars(assayList?.type_assay?.name);
+                spreadSheet[row][column] = replaceSpecialChars(spreadSheet[row][column]);
+                if (assayList?.type_assay?.name?.toUpperCase()
+                          !== spreadSheet[row][column]?.toUpperCase()) {
+                  responseIfError[Number(column)]
+                    += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                }
               }
             }
             // FOCO
@@ -227,10 +233,15 @@ export class ImportExperimentController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              } else if (assayList?.foco?.name?.toUpperCase()
-                         !== spreadSheet[row][column]?.toUpperCase()) {
-                responseIfError[Number(column)]
-                  += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
+              } else {
+                assayList.foco.name = replaceSpecialChars(assayList?.foco?.name);
+                spreadSheet[row][column] = replaceSpecialChars(spreadSheet[row][column]);
+                if (assayList?.foco?.name?.toUpperCase()
+                    !== spreadSheet[row][column]?.toUpperCase()
+                ) {
+                  responseIfError[Number(column)]
+                    += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                }
               }
             }
             // GGEN // TECNOLOGIA
@@ -463,8 +474,6 @@ export class ImportExperimentController {
               }
             }
           }
-
-          contagem++;
         }
       }
 

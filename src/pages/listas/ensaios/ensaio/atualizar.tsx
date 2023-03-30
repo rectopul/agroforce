@@ -187,8 +187,8 @@ export default function AtualizarTipoEnsaio({
       await assayListService
         .update({
           id: values.id,
-          project: values.project,
-          comments: values.comments,
+          project: values.project?.trim(),
+          comments: values.comments?.trim(),
           userId: userLogado.id,
         })
         .then(({ status, message }) => {

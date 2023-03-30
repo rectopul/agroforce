@@ -53,7 +53,7 @@ export default function Cultura(culture: IUpdateCulture) {
         .updateCulture({
           id: culture.id,
           name: capitalize(formik.values.name),
-          desc: capitalize(formik.values.desc),
+          desc: capitalize(formik.values.desc?.trim()),
           created_by: Number(userLogado.id),
         })
         .then((response) => {

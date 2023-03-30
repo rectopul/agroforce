@@ -45,7 +45,7 @@ export default function Safra() {
 
       await departmentService
         .create({
-          name: capitalize(formik.values.name),
+          name: capitalize(formik.values.name?.trim()),
           created_by: formik.values.created_by,
         })
         .then((response) => {
@@ -74,7 +74,7 @@ export default function Safra() {
 
   return (
     <>
-    {loading && <ComponentLoading text="" />}
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Cadastro de setor</title>
       </Head>
@@ -139,7 +139,7 @@ export default function Safra() {
                 bgColor="bg-blue-600"
                 textColor="white"
                 icon={<HiOutlineOfficeBuilding size={18} />}
-                onClick={() => {setLoading(true);}}
+                onClick={() => { setLoading(true); }}
               />
             </div>
           </div>
