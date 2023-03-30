@@ -23,6 +23,7 @@ export class UserPreferenceRepository {
   }
 
   async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
+    console.log('🚀 ~ file: user-preference.repository.ts:26 ~ UserPreferenceRepository ~ findAll ~ where:', where);
     let order: object | any;
     if (orderBy) {
       order = JSON.parse(orderBy);
@@ -50,5 +51,4 @@ export class UserPreferenceRepository {
     const result = await prisma.users_preferences.delete({ where: { id } });
     return result;
   }
-  
 }
