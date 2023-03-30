@@ -201,7 +201,7 @@ export default function NovoUsuario({
         .create({
           avatar:
             'https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag',
-          name: capitalize(values.name),
+          name: capitalize(values.name?.trim()),
           login: values.login,
           cpf: values.cpf,
           email: values.email,

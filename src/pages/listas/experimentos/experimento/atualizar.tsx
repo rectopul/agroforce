@@ -207,7 +207,7 @@ export default function AtualizarLocal({
           id: Number(values.id),
           nlp: Number(values.nlp),
           clp: values.clp,
-          comments: values.comments,
+          comments: values.comments?.trim(),
           userId: userLogado.id,
         })
         .then((response) => {
@@ -473,7 +473,6 @@ export default function AtualizarLocal({
         );
       }
     });
-
 
     return tableFields;
   }
@@ -963,27 +962,21 @@ export default function AtualizarLocal({
                         module_id={module_id}
                         identifier_preference={identifier_preference}
                         OnSetStatusAccordion={(e: any) => {
-                          
                           setStatusAccordion(e);
                         }}
                         OnSetGeneratesProps={(e: any) => {
-                          
                           setGeneratesProps(e);
                         }}
                         OnSetCamposGerenciados={(e: any) => {
-                          
                           setCamposGerenciados(e);
                         }}
                         OnColumnsOrder={(e: any) => {
-                          
                           columnsOrder(e);
                         }}
                         OnSetUserLogado={(e: any) => {
-                          
                           setUserLogado(e);
                         }}
                         OnSetPreferences={(e: any) => {
-                          
                           setPreferences(e);
                         }}
                       />

@@ -7,10 +7,10 @@ import { IoMdArrowBack } from 'react-icons/io';
 import { RiPlantLine } from 'react-icons/ri';
 import { cultureService } from 'src/services';
 import Swal from 'sweetalert2';
+import { setCookies } from 'cookies-next';
 import { Button, Content, Input } from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import ComponentLoading from '../../../../components/Loading';
-import { setCookies } from 'cookies-next';
 
 interface ICreateCulture {
   name: string;
@@ -29,7 +29,6 @@ export default function Cadastro() {
   const router = useRouter();
 
   const [loading, setLoading] = useState<boolean>(false);
-
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const formik = useFormik<ICreateCulture>({
@@ -50,7 +49,7 @@ export default function Cadastro() {
       await cultureService
         .createCulture({
           name: formik.values.name.toUpperCase(),
-          desc: capitalize(formik.values.desc),
+          desc: capitalize(formik.values.desc?.trim()),
           status: formik.values.status,
           created_by: formik.values.created_by,
         })

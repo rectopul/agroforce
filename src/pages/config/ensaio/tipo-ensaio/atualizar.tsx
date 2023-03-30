@@ -31,6 +31,7 @@ import { MdFirstPage, MdLastPage } from 'react-icons/md';
 import { RiFileExcel2Line, RiOrganizationChart } from 'react-icons/ri';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
+import { capitalize } from '@mui/material';
 import {
   envelopeService,
   userPreferencesService,
@@ -181,7 +182,7 @@ export default function AtualizarTipoEnsaio({
       await typeAssayService
         .update({
           id: values.id,
-          name: values.name,
+          name: capitalize(values.name?.trim()),
           id_culture: values.id_culture,
           created_by: Number(userLogado.id),
         })
@@ -643,27 +644,21 @@ export default function AtualizarTipoEnsaio({
                         module_id={module_id}
                         identifier_preference={identifier_preference}
                         OnSetStatusAccordion={(e: any) => {
-                          
                           setStatusAccordion(e);
                         }}
                         OnSetGeneratesProps={(e: any) => {
-                          
                           setGeneratesProps(e);
                         }}
                         OnSetCamposGerenciados={(e: any) => {
-                          
                           setCamposGerenciados(e);
                         }}
                         OnColumnsOrder={(e: any) => {
-                          
                           columnsOrder(e);
                         }}
                         OnSetUserLogado={(e: any) => {
-                          
                           setUserLogado(e);
                         }}
                         OnSetPreferences={(e: any) => {
-                          
                           setPreferences(e);
                         }}
                       />

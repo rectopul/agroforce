@@ -10,6 +10,7 @@ import { MdDateRange } from 'react-icons/md';
 import { Button, Content, Input } from 'src/components';
 import { safraService } from 'src/services';
 import Swal from 'sweetalert2';
+import { capitalize } from '@mui/material';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import ComponentLoading from '../../../../components/Loading';
 
@@ -90,7 +91,7 @@ export default function AtualizarSafra(safra: any) {
         .updateSafras({
           id: safra.id,
           // id_culture: safra.id_culture,
-          safraName: formik.values.safraName,
+          safraName: capitalize(formik.values.safraName?.trim()),
           year: Number(formik.values.year),
           plantingStartTime,
           plantingEndTime,

@@ -142,7 +142,7 @@ export default function Atualizar({
       await focoService
         .update({
           id: foco.id,
-          name: capitalize(formik.values.name),
+          name: capitalize(formik.values.name?.trim()),
           id_culture: Number(culture),
           created_by: userLogado.id,
         })
@@ -664,27 +664,21 @@ export default function Atualizar({
                         module_id={module_id}
                         identifier_preference={identifier_preference}
                         OnSetStatusAccordion={(e: any) => {
-                          
                           setStatusAccordion(e);
                         }}
                         OnSetGeneratesProps={(e: any) => {
-                          
                           setGeneratesProps(e);
                         }}
                         OnSetCamposGerenciados={(e: any) => {
-                          
                           setCamposGerenciados(e);
                         }}
                         OnColumnsOrder={(e: any) => {
-                          
                           columnsOrder(e);
                         }}
                         OnSetUserLogado={(e: any) => {
-                          
                           setUserLogado(e);
                         }}
                         OnSetPreferences={(e: any) => {
-                          
                           setPreferences(e);
                         }}
                       />

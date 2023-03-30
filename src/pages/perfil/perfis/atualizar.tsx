@@ -43,7 +43,7 @@ export default function Cultura(profile: any) {
       await profileService
         .update({
           id: profile.id,
-          name: capitalize(formik.values.name),
+          name: capitalize(formik.values.name?.trim()),
           createdBy: Number(userLogado.id),
         })
         .then((response) => {

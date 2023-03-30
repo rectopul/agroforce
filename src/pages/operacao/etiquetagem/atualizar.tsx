@@ -28,6 +28,7 @@ import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import { IoMdArrowBack } from 'react-icons/io';
 import moment from 'moment';
+import { capitalize } from '@mui/material';
 import { ITreatmentGrid } from '../../../interfaces/listas/ensaio/genotype-treatment.interface';
 import { IGenerateProps } from '../../../interfaces/shared/generate-props.interface';
 
@@ -155,7 +156,7 @@ export default function Listagem({
       await experimentGroupService
         .update({
           id: values.id,
-          name: values.name,
+          name: capitalize(values.name?.trim()),
           safraId,
           userId: userLogado.id,
         })
@@ -814,27 +815,21 @@ export default function Listagem({
                         module_id={module_id}
                         identifier_preference={identifier_preference}
                         OnSetStatusAccordion={(e: any) => {
-                          
                           setStatusAccordion(e);
                         }}
                         OnSetGeneratesProps={(e: any) => {
-                          
                           setGeneratesProps(e);
                         }}
                         OnSetCamposGerenciados={(e: any) => {
-                          
                           setCamposGerenciados(e);
                         }}
                         OnColumnsOrder={(e: any) => {
-                          
                           orderColumns(e);
                         }}
                         OnSetUserLogado={(e: any) => {
-                          
                           setUserLogado(e);
                         }}
                         OnSetPreferences={(e: any) => {
-                          
                           setPreferences(e);
                         }}
                       />
