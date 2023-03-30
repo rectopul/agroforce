@@ -664,6 +664,6 @@ export class ImportExperimentController {
   }
 
   static replaceSpecialChars(str: String) {
-    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return str?.normalize('NFD')?.replace(/[\u0300-\u036f]/g, '');
   }
 }
