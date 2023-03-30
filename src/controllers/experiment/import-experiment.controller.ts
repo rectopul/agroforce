@@ -214,7 +214,9 @@ export class ImportExperimentController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                assayList.type_assay.name = this.replaceSpecialChars(assayList?.type_assay?.name);
+                if (assayList?.type_assay?.name) {
+                  assayList.type_assay.name = this.replaceSpecialChars(assayList?.type_assay?.name);
+                }
                 spreadSheet[row][column] = this.replaceSpecialChars(spreadSheet[row][column]);
                 if (assayList?.type_assay?.name?.toUpperCase()
                           !== spreadSheet[row][column]?.toUpperCase()) {
@@ -229,7 +231,9 @@ export class ImportExperimentController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               } else {
-                assayList.foco.name = this.replaceSpecialChars(assayList?.foco?.name);
+                if (assayList?.foco?.name) {
+                  assayList.foco.name = this.replaceSpecialChars(assayList?.foco?.name);
+                }
                 spreadSheet[row][column] = this.replaceSpecialChars(spreadSheet[row][column]);
                 if (assayList?.foco?.name?.toUpperCase()
                     !== spreadSheet[row][column]?.toUpperCase()
@@ -664,6 +668,7 @@ export class ImportExperimentController {
   }
 
   static replaceSpecialChars(str: String) {
+    console.log('🚀 ~ file: import-experiment.controller.ts:667 ~ ImportExperimentController ~ replaceSpecialChars ~ str:', str);
     return str?.normalize('NFD')?.replace(/[\u0300-\u036f]/g, '');
   }
 }

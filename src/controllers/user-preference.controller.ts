@@ -17,7 +17,7 @@ export class UserPreferenceController {
         select = {
           id: true,
           userId: true,
-          modules: {select: {id: true, module: true}},
+          modules: { select: { id: true, module: true } },
           table_preferences: true,
           route_usage: true,
           identifier_extra: true,
@@ -31,11 +31,11 @@ export class UserPreferenceController {
           identifier_extra: true,
         };
       }
-      
-      if(options.id){
+
+      if (options.id) {
         parameters.id = Number(options.id);
       }
-      
+
       if (options.userId) {
         parameters.userId = Number(options.userId);
       }
@@ -45,9 +45,9 @@ export class UserPreferenceController {
       }
 
       if (options.route_usage) {
-        //parameters.route_usage = JSON.parse(`{"${equalsOrContains}":"${options.filterName}"}`);
+        // parameters.route_usage = JSON.parse(`{"${equalsOrContains}":"${options.filterName}"}`);
         parameters.route_usage = {
-          "equals": options.route_usage
+          equals: options.route_usage,
         };
       }
 
@@ -121,7 +121,7 @@ export class UserPreferenceController {
       return { status: 400, message: 'houve um erro, tente novamente' };
     } catch (error: any) {
       handleError('User Preferences controller', 'create', error.message);
-      throw new Error('[Controller] - create User Preferences erro: ' + error.message);
+      throw new Error(`[Controller] - create User Preferences erro: ${error.message}`);
     }
   }
 
@@ -136,5 +136,4 @@ export class UserPreferenceController {
       return { status: 400, message: err };
     }
   }
-  
 }
