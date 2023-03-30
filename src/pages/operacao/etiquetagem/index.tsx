@@ -724,8 +724,11 @@ export default function Listagem({
     if (response?.length > 0) {
       Swal.fire('Grupo já cadastrado');
     } else {
-      const { status: createStatus, response: newGroup }: IReturnObject = await experimentGroupService.create({
-        name: inputValue,
+      const {
+        status: createStatus,
+        response: newGroup,
+      }: IReturnObject = await experimentGroupService.create({
+        name: inputValue?.trim(),
         safraId: Number(safraId),
         createdBy: userLogado.id,
       });
