@@ -3,7 +3,7 @@ import handleError from '../../shared/utils/handleError';
 import { ImportExperimentController } from './import-experiment.controller';
 
 export const experimentQueue = new Bull(
-  'assayList_queue',
+  'experiment_queue',
   process.env.REDIS_URL as string,
   {
     defaultJobOptions: {
