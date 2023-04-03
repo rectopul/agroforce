@@ -2,7 +2,7 @@ import {
   DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
 import { IoReloadSharp, IoTrash } from 'react-icons/io5';
-import { useEffect, useState } from 'react';
+import {useEffect, useLayoutEffect, useState} from 'react';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/router';
 import { AccordionFilter } from '../AccordionFilter';
@@ -97,6 +97,14 @@ export function ManageFields(props: ManageFieldsProps) {
   useEffect(() => {
     props.OnColumnsOrder(camposGerenciados);
   }, [camposGerenciados]);
+  
+  useLayoutEffect(() => {
+    // mesma coisa que construct de uma classe, é executado apenas uma vez
+    // useLayoutEffect é executado antes do useEffect;
+    console.log('useLayoutEffect', 'camposGerenciados', camposGerenciados);
+    // ordena os campos do gerenciar campos ao carregar a tela
+    reorderGeneratedProps();
+  }, [camposGerenciados]);
 
   function reorderGeneratedProps() {
     const campos_arr = camposGerenciados.split(',');
@@ -121,6 +129,9 @@ export function ManageFields(props: ManageFieldsProps) {
     for (let i = 0; i < items_restantes.length; i += 1) {
       newItems.push(items_restantes[i]);
     }
+    
+    console.log('reorderGeneratedProps', 'newItems', newItems);
+    
     setGeneratesProps(newItems);
   }
 
