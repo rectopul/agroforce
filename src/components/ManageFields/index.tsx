@@ -102,6 +102,7 @@ export function ManageFields(props: ManageFieldsProps) {
     // mesma coisa que construct de uma classe, é executado apenas uma vez
     // useLayoutEffect é executado antes do useEffect;
     console.log('useLayoutEffect', 'camposGerenciados', camposGerenciados);
+    // ordena os campos do gerenciar campos ao carregar a tela
     reorderGeneratedProps();
   }, [camposGerenciados]);
 
