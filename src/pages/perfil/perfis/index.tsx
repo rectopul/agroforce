@@ -11,6 +11,7 @@ import {
   BiEdit, BiLeftArrow, BiRightArrow, BiSlider,
 } from 'react-icons/bi';
 import { MdDateRange, MdFirstPage, MdLastPage } from 'react-icons/md';
+import Swal from 'sweetalert2';
 import { Button } from '../../../components/Button';
 import { Content } from '../../../components/Content';
 import { profileService } from '../../../services';
@@ -56,18 +57,26 @@ export default function Perfis({
   async function callingApi(page: any = 0) {
     setCurrentPage(page);
     const params = '';
-    await profileService
-      .getAll(params)
-      .then((response) => {
-        if (response.status === 200 || response.status === 400) {
-          setProfiles(response.response);
-          setTotalItems(response.total);
-          tableRef.current.dataManager.changePageSize(
+    try {
+      await profileService
+        .getAll(params)
+        .then((response) => {
+          if (response.status === 200 || response.status === 400) {
+            setProfiles(response.response);
+            setTotalItems(response.total);
+            tableRef.current.dataManager.changePageSize(
             // response.total >= take ? take : response.total,
-            20,
-          );
-        }
+              20,
+            );
+          }
+        });
+    } catch (error) {
+      Swal.fire({
+        title: 'Falha ao buscar perfis',
+        html: `Ocorreu um erro ao buscar perfis. Tente novamente mais tarde.`,
+        width: '800',
       });
+    }
   }
 
   useEffect(() => {

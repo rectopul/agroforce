@@ -284,20 +284,26 @@ export default function Listagem({
 
     setCookies('filtersParamsOperation', parametersFilter);
 
-    await experimentGroupService
-      .getAll(parametersFilter)
-      .then((response) => {
-        if (response.status === 200 || response.status === 400) {
-          setExperimentGroup(response.response);
-          setTotalItems(response.total);
-          tableRef?.current?.dataManager?.changePageSize(
-            response.total >= take ? take : response.total,
-          );
-        }
-      })
-      .catch((_) => {
-        setLoading(false);
+    try {
+      await experimentGroupService
+        .getAll(parametersFilter)
+        .then((response) => {
+          if (response.status === 200 || response.status === 400) {
+            setExperimentGroup(response.response);
+            setTotalItems(response.total);
+            tableRef?.current?.dataManager?.changePageSize(
+              response.total >= take ? take : response.total,
+            );
+          }
+        });
+    } catch (error) {
+      setLoading(false);
+      Swal.fire({
+        title: 'Falha ao buscar grupo de experimento',
+        html: `Ocorreu um erro ao buscar grupo de experimento. Tente novamente mais tarde.`,
+        width: '800',
       });
+    }
   }
 
   // Call that function when change type order value.
@@ -724,18 +730,22 @@ export default function Listagem({
     if (response?.length > 0) {
       Swal.fire('Grupo já cadastrado');
     } else {
-      const {
-        status: createStatus,
-        response: newGroup,
-      }: IReturnObject = await experimentGroupService.create({
-        name: inputValue?.trim(),
-        safraId: Number(safraId),
-        createdBy: userLogado.id,
-      });
-      if (createStatus !== 200) {
-        Swal.fire('Erro ao cadastrar grupo');
-      } else {
+      try {
+        const {
+          response: newGroup,
+        }: IReturnObject = await experimentGroupService.create({
+          name: inputValue?.trim(),
+          safraId: Number(safraId),
+          createdBy: userLogado.id,
+        });
         router.push(`/operacao/etiquetagem/atualizar?id=${newGroup.id}`);
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao criar grupo de experimento',
+          html: `Ocorreu um erro ao criar grupo de experimento. Tente novamente mais tarde.`,
+          width: '800',
+        });
       }
     }
   }

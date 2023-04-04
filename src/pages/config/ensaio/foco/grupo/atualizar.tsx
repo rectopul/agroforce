@@ -68,24 +68,33 @@ export default function Cadastro({ grupo, safra }: any) {
         return;
       }
 
-      await groupService.update({
-        id: Number(grupo.id),
-        id_safra: Number(grupo.safra.id),
-        id_foco: Number(grupo.foco.id),
-        group: Number(values.group),
-        created_by: Number(formik.values.created_by),
-      }).then((response) => {
-        if (response.status === 200) {
-          Swal.fire('Grupo atualizado com sucesso!');
-          router.back();
-        } else {
-          setCheckInput('text-red-600');
-          setLoading(false);
-          Swal.fire(response.message);
-        }
-      }).finally(() => {
-        formik.values.safra = '';
-      });
+      try {
+        await groupService.update({
+          id: Number(grupo.id),
+          id_safra: Number(grupo.safra.id),
+          id_foco: Number(grupo.foco.id),
+          group: Number(values.group),
+          created_by: Number(formik.values.created_by),
+        }).then((response) => {
+          if (response.status === 200) {
+            Swal.fire('Grupo atualizado com sucesso!');
+            router.back();
+          } else {
+            setCheckInput('text-red-600');
+            setLoading(false);
+            Swal.fire(response.message);
+          }
+        }).finally(() => {
+          formik.values.safra = '';
+        });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao atualizar grupo',
+          html: `Ocorreu um erro ao atualizar grupo. Tente novamente mais tarde.`,
+          width: '800',
+        });
+      }
     },
   });
 

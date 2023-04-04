@@ -153,22 +153,31 @@ export default function Listagem({
       name: experimentGroup?.name,
     },
     onSubmit: async (values) => {
-      await experimentGroupService
-        .update({
-          id: values.id,
-          name: capitalize(values.name?.trim()),
-          safraId,
-          userId: userLogado.id,
-        })
-        .then(({ status, message }) => {
-          if (status === 200) {
-            Swal.fire('Grupo de experimento atualizado com sucesso!');
-            router.back();
-          } else {
-            setLoading(false);
-            Swal.fire(message);
-          }
+      try {
+        await experimentGroupService
+          .update({
+            id: values.id,
+            name: capitalize(values.name?.trim()),
+            safraId,
+            userId: userLogado.id,
+          })
+          .then(({ status, message }) => {
+            if (status === 200) {
+              Swal.fire('Grupo de experimento atualizado com sucesso!');
+              router.back();
+            } else {
+              setLoading(false);
+              Swal.fire(message);
+            }
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao atualizar grupo',
+          html: `Ocorreu um erro ao atualizar grupo. Tente novamente mais tarde.`,
+          width: '800',
         });
+      }
     },
   });
 
@@ -189,21 +198,27 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     // setCookies('filtersParams', parametersFilter);
 
-    await experimentService
-      .getAll(parametersFilter)
-      .then((response: any) => {
-        if (response.status === 200 || response.status === 400) {
-          setExperiments(response.response);
-          setTotalItems(response.total);
-          tableRef.current.dataManager.changePageSize(
-            response.total >= take ? take : response.total,
-          );
-        }
-        setLoading(false);
-      })
-      .catch((_) => {
-        setLoading(false);
+    try {
+      await experimentService
+        .getAll(parametersFilter)
+        .then((response: any) => {
+          if (response.status === 200 || response.status === 400) {
+            setExperiments(response.response);
+            setTotalItems(response.total);
+            tableRef.current.dataManager.changePageSize(
+              response.total >= take ? take : response.total,
+            );
+          }
+          setLoading(false);
+        });
+    } catch (error) {
+      setLoading(false);
+      Swal.fire({
+        title: 'Falha ao buscar experimentos',
+        html: `Ocorreu um erro ao buscar experimentos. Tente novamente mais tarde.`,
+        width: '800',
       });
+    }
   }
 
   async function handleOrder(

@@ -318,24 +318,30 @@ export default function Listagem({
 
     setLoading(true);
 
-    await experimentService
-      .getAll(parametersFilter)
-      .then((response) => {
-        if (
-          response.status === 200
+    try {
+      await experimentService
+        .getAll(parametersFilter)
+        .then((response) => {
+          if (
+            response.status === 200
           || (response.status === 400 && response.total == 0)
-        ) {
-          setExperimento(response.response);
-          setTotalItems(response.total);
-          tableRef.current?.dataManager.changePageSize(
-            response.total >= take ? take : response.total,
-          );
-        }
-        setLoading(false);
-      })
-      .catch((_) => {
-        setLoading(false);
+          ) {
+            setExperimento(response.response);
+            setTotalItems(response.total);
+            tableRef.current?.dataManager.changePageSize(
+              response.total >= take ? take : response.total,
+            );
+          }
+          setLoading(false);
+        });
+    } catch (error) {
+      setLoading(false);
+      Swal.fire({
+        title: 'Falha ao buscar experimentos',
+        html: `Ocorreu um erro ao buscar experimentos. Tente novamente mais tarde.`,
+        width: '800',
       });
+    }
 
     setLoading(false);
   }

@@ -72,8 +72,6 @@ export function ImportPlanilha({ data, configSalva, moduleId }: IImportPlanilhaP
         if (input.options[v].selected) {
           if (!auxObject.includes(input.options[v].selected)) {
             auxObject.push(input.options[v].value);
-          } else {
-
           }
         }
       }

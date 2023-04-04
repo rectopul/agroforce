@@ -243,30 +243,39 @@ export default function AtualizarUsuario({
         return;
       }
 
-      await userService
-        .update({
-          id: values.id,
-          name: capitalize(values.name?.trim()),
-          login: values.login,
-          cpf: values.cpf,
-          email: values.email,
-          tel: values.tel,
-          password: values.password,
-          registration: values.registration,
-          departmentId: values.departmentId,
-          cultures: auxObject,
-          created_by: values.created_by,
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            Swal.fire('Usuário atualizado com sucesso. (Caso tenha mudado as permissões de cultura, sera necessário sair e entrar novamente)');
-            setLoading(false);
-            router.back();
-          } else {
-            setLoading(false);
-            Swal.fire(response.message);
-          }
+      try {
+        await userService
+          .update({
+            id: values.id,
+            name: capitalize(values.name?.trim()),
+            login: values.login,
+            cpf: values.cpf,
+            email: values.email,
+            tel: values.tel,
+            password: values.password,
+            registration: values.registration,
+            departmentId: values.departmentId,
+            cultures: auxObject,
+            created_by: values.created_by,
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              Swal.fire('Usuário atualizado com sucesso. (Caso tenha mudado as permissões de cultura, sera necessário sair e entrar novamente)');
+              setLoading(false);
+              router.back();
+            } else {
+              setLoading(false);
+              Swal.fire(response.message);
+            }
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao atualizar usuário',
+          html: `Ocorreu um erro ao atualizar usuário. Tente novamente mais tarde.`,
+          width: '800',
         });
+      }
     },
   });
 

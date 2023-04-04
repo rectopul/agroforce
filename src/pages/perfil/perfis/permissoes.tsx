@@ -46,16 +46,22 @@ export default function Permissoes({
       }
     }
 
-    const { status, message } = await profileService.update({
-      selecionados,
-      profileId,
-    });
-    if (status === 200) {
-      Swal.fire('Permissões atualizadas. (Caso tenha alterado, sera necessário sair e entrar novamente)');
-      router.back();
-    } else {
-      Swal.fire(message);
+    try {
+      const { status } = await profileService.update({
+        selecionados,
+        profileId,
+      });
+      if (status === 200) {
+        Swal.fire('Permissões atualizadas. (Caso tenha alterado, sera necessário sair e entrar novamente)');
+        router.back();
+      }
+    } catch (error) {
       setLoading(false);
+      Swal.fire({
+        title: 'Falha ao salvar permissões',
+        html: `Ocorreu um erro ao salvar permissões. Tente novamente mais tarde.`,
+        width: '800',
+      });
     }
   }
 

@@ -49,26 +49,36 @@ export default function Cultura(culture: IUpdateCulture) {
         setLoading(false);
         return;
       }
-      await cultureService
-        .updateCulture({
-          id: culture.id,
-          name: capitalize(formik.values.name),
-          desc: capitalize(formik.values.desc?.trim()),
-          created_by: Number(userLogado.id),
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            Swal.fire('Cultura atualizada com sucesso');
-            setLoading(false);
-            router.back();
-          } else {
-            setLoading(false);
-            Swal.fire(response.message);
-          }
-        })
-        .finally(() => {
-          formik.values.name = culture.name;
+
+      try {
+        await cultureService
+          .updateCulture({
+            id: culture.id,
+            name: capitalize(formik.values.name),
+            desc: capitalize(formik.values.desc?.trim()),
+            created_by: Number(userLogado.id),
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              Swal.fire('Cultura atualizada com sucesso');
+              setLoading(false);
+              router.back();
+            } else {
+              setLoading(false);
+              Swal.fire(response.message);
+            }
+          })
+          .finally(() => {
+            formik.values.name = culture.name;
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao atualizar cultura',
+          html: `Ocorreu um erro ao atualizar cultura. Tente novamente mais tarde.`,
+          width: '800',
         });
+      }
     },
   });
 

@@ -175,29 +175,37 @@ export default function AtualizarQuadra({
       q: quadra.q,
     },
     onSubmit: async (values) => {
-      await quadraService
-        .update({
-          id: values.id,
-          cod_quadra: values.cod_quadra,
-          id_culture: values.id_culture,
-          id_safra: values.id_safra,
-          local: values.local.name_local_culture,
-          local_plantio: values.local_plantio,
-          larg_q: values.larg_q,
-          comp_p: values.comp_p,
-          linha_p: values.linha_p,
-          comp_c: values.comp_c,
-          esquema: values.esquema,
-          q: values.q,
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            Swal.fire('Quadra atualizado com sucesso!');
-            router.back();
-          } else {
-            Swal.fire(response.message);
-          }
+      try {
+        await quadraService
+          .update({
+            id: values.id,
+            cod_quadra: values.cod_quadra,
+            id_culture: values.id_culture,
+            id_safra: values.id_safra,
+            local: values.local.name_local_culture,
+            local_plantio: values.local_plantio,
+            larg_q: values.larg_q,
+            comp_p: values.comp_p,
+            linha_p: values.linha_p,
+            comp_c: values.comp_c,
+            esquema: values.esquema,
+            q: values.q,
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              Swal.fire('Quadra atualizado com sucesso!');
+              router.back();
+            } else {
+              Swal.fire(response.message);
+            }
+          });
+      } catch (error) {
+        Swal.fire({
+          title: 'Falha ao atualizar quadra',
+          html: `Ocorreu um erro ao atualizar quadra. Tente novamente mais tarde.`,
+          width: '800',
         });
+      }
     },
   });
 

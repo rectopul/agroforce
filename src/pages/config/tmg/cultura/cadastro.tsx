@@ -46,23 +46,32 @@ export default function Cadastro() {
         return;
       }
 
-      await cultureService
-        .createCulture({
-          name: formik.values.name.toUpperCase(),
-          desc: capitalize(formik.values.desc?.trim()),
-          status: formik.values.status,
-          created_by: formik.values.created_by,
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            Swal.fire('Cultura cadastrada com sucesso!');
-            setLoading(false);
-            router.back();
-          } else {
-            setLoading(false);
-            Swal.fire(response.message);
-          }
+      try {
+        await cultureService
+          .createCulture({
+            name: formik.values.name.toUpperCase(),
+            desc: capitalize(formik.values.desc?.trim()),
+            status: formik.values.status,
+            created_by: formik.values.created_by,
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              Swal.fire('Cultura cadastrada com sucesso!');
+              setLoading(false);
+              router.back();
+            } else {
+              setLoading(false);
+              Swal.fire(response.message);
+            }
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao cadastrar cultura',
+          html: `Ocorreu um erro ao cadastrar cultura. Tente novamente mais tarde.`,
+          width: '800',
         });
+      }
     },
   });
 

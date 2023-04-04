@@ -371,23 +371,29 @@ export default function Listagem({
 
     setLoading(true);
 
-    await genotypeTreatmentService
-      .getAll(parametersFilter)
-      .then((response) => {
-        if (response.status === 200 || response.status === 400) {
-          setTreatments(response.response);
-          setTotalItems(response.total);
-          // setAfterFilter(true);
-          setMessage(true);
-          tableRef.current.dataManager.changePageSize(
-            response.total >= take ? take : response.total,
-          );
-          setLoading(false);
-        }
-      })
-      .catch((_) => {
-        setLoading(false);
+    try {
+      await genotypeTreatmentService
+        .getAll(parametersFilter)
+        .then((response) => {
+          if (response.status === 200 || response.status === 400) {
+            setTreatments(response.response);
+            setTotalItems(response.total);
+            // setAfterFilter(true);
+            setMessage(true);
+            tableRef.current.dataManager.changePageSize(
+              response.total >= take ? take : response.total,
+            );
+            setLoading(false);
+          }
+        });
+    } catch (error) {
+      setLoading(false);
+      Swal.fire({
+        title: 'Falha ao buscar genotipos do ensaio',
+        html: `Ocorreu um erro ao buscar genotipos do ensaio. Tente novamente mais tarde.`,
+        width: '800',
       });
+    }
 
     setLoading(false);
   }

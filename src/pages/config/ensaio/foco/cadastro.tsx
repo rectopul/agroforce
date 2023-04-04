@@ -59,22 +59,31 @@ export default function Cadastro() {
         return;
       }
 
-      await focoService
-        .create({
-          name: capitalize(formik.values.name?.trim()),
-          id_culture: Number(culture),
-          created_by: formik.values.created_by,
-        })
-        .then(({ status, message }) => {
-          if (status === 200) {
-            Swal.fire('Foco cadastrado com sucesso!');
-            setLoading(false);
-            router.back();
-          } else {
-            setLoading(false);
-            Swal.fire(message);
-          }
+      try {
+        await focoService
+          .create({
+            name: capitalize(formik.values.name?.trim()),
+            id_culture: Number(culture),
+            created_by: formik.values.created_by,
+          })
+          .then(({ status, message }) => {
+            if (status === 200) {
+              Swal.fire('Foco cadastrado com sucesso!');
+              setLoading(false);
+              router.back();
+            } else {
+              setLoading(false);
+              Swal.fire(message);
+            }
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao cadastrar foco',
+          html: `Ocorreu um erro ao cadastrar foco. Tente novamente mais tarde.`,
+          width: '800',
         });
+      }
     },
   });
 

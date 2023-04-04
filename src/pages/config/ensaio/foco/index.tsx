@@ -243,23 +243,24 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    const response = await focoService.getAll(parametersFilter).catch((_) => {
+    try {
+      const response = await focoService.getAll(parametersFilter);
+      if (response) {
+        setFocos(response?.response);
+        setTotalItems(response?.total);
+        setLoading(false);
+        tableRef?.current?.dataManager?.changePageSize(
+          response?.total >= take ? take : response?.total,
+        );
+      }
+    } catch (error) {
       setLoading(false);
-    });
-    if (response) {
-      setFocos(response?.response);
-      setTotalItems(response?.total);
-      setLoading(false);
-      tableRef?.current?.dataManager?.changePageSize(
-        response?.total >= take ? take : response?.total,
-      );
+      Swal.fire({
+        title: 'Falha ao buscar foco',
+        html: `Ocorreu um erro ao buscar foco. Tente novamente mais tarde.`,
+        width: '800',
+      });
     }
-    // await focoService.getAll(parametersFilter).then((response) => {
-    //   if (response.status === 200 || response.status === 400) {
-    //     setFocos(response.response);
-    //     setTotalItems(response.total);
-    //   }
-    // });
   }
 
   // Call that function when change type order value.

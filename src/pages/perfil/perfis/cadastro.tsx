@@ -35,22 +35,30 @@ export default function Cadastro() {
         setLoading(false);
         return;
       }
-
-      await profileService
-        .create({
-          name: capitalize(formik.values.name?.trim()),
-          createdBy: formik.values.createdBy,
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            Swal.fire('Perfil cadastrado com sucesso!');
-            setLoading(false);
-            router.back();
-          } else {
-            setLoading(false);
-            Swal.fire(response.message);
-          }
+      try {
+        await profileService
+          .create({
+            name: capitalize(formik.values.name?.trim()),
+            createdBy: formik.values.createdBy,
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              Swal.fire('Perfil cadastrado com sucesso!');
+              setLoading(false);
+              router.back();
+            } else {
+              setLoading(false);
+              Swal.fire(response.message);
+            }
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao criar perfil',
+          html: `Ocorreu um erro ao criar perfil. Tente novamente mais tarde.`,
+          width: '800',
         });
+      }
     },
   });
 

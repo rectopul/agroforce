@@ -2,7 +2,7 @@ import {
   DragDropContext, Draggable, Droppable, DropResult,
 } from 'react-beautiful-dnd';
 import { IoReloadSharp, IoTrash } from 'react-icons/io5';
-import {useEffect, useLayoutEffect, useState} from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/router';
 import { AccordionFilter } from '../AccordionFilter';
@@ -97,7 +97,7 @@ export function ManageFields(props: ManageFieldsProps) {
   useEffect(() => {
     props.OnColumnsOrder(camposGerenciados);
   }, [camposGerenciados]);
-  
+
   useLayoutEffect(() => {
     // mesma coisa que construct de uma classe, é executado apenas uma vez
     // useLayoutEffect é executado antes do useEffect;
@@ -129,9 +129,9 @@ export function ManageFields(props: ManageFieldsProps) {
     for (let i = 0; i < items_restantes.length; i += 1) {
       newItems.push(items_restantes[i]);
     }
-    
+
     console.log('reorderGeneratedProps', 'newItems', newItems);
-    
+
     setGeneratesProps(newItems);
   }
 
@@ -250,7 +250,7 @@ export function ManageFields(props: ManageFieldsProps) {
       .catch((error) => {
         Swal.fire({
           title: 'Falha ao excluir preferências',
-          html: `Ocorreu um erro ao excluir as preferências do usuário. Tente novamente mais tarde.\r\n${JSON.stringify(error)}`,
+          html: 'Ocorreu um erro ao excluir as preferências do usuário. Tente novamente mais tarde.',
           width: '800',
         });
       });
@@ -311,7 +311,7 @@ export function ManageFields(props: ManageFieldsProps) {
               .catch((error) => {
                 Swal.fire({
                   title: 'Falha ao atualizar preferências',
-                  html: `Ocorreu um erro ao atualizar as preferências do usuário. Tente novamente mais tarde.\r\n${JSON.stringify(error)}`,
+                  html: 'Ocorreu um erro ao atualizar as preferências do usuário. Tente novamente mais tarde.',
                   width: '800',
                 });
               });
@@ -320,7 +320,7 @@ export function ManageFields(props: ManageFieldsProps) {
         .catch((error) => {
           Swal.fire({
             title: 'Falha ao carregar as preferências',
-            html: `Ocorreu um erro ao carregar as preferências do usuário. Tente novamente mais tarde.\r\n${JSON.stringify(error)}`,
+            html: 'Ocorreu um erro ao carregar as preferências do usuário. Tente novamente mais tarde.',
             width: '800',
           });
         });

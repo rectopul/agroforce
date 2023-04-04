@@ -245,8 +245,13 @@ export default function Listagem({
           );
         }
       })
-      .catch((_) => {
+      .catch((error) => {
         setLoading(false);
+        Swal.fire({
+          title: 'Falha ao buscar culturas',
+          html: `Ocorreu um erro ao buscar culturas. Tente novamente mais tarde.`,
+          width: '800',
+        });
       });
   }
 

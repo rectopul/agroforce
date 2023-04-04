@@ -279,8 +279,13 @@ export default function Listagem({
         }
         setLoading(false);
       })
-      .catch((_) => {
+      .catch((error) => {
         setLoading(false);
+        Swal.fire({
+          title: 'Falha ao buscar quadra',
+          html: `Ocorreu um erro ao buscar quadra. Tente novamente mais tarde.`,
+          width: '800',
+        });
       });
   }
 

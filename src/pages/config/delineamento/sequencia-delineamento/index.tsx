@@ -276,22 +276,28 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await sequenciaDelineamentoService
-      .getAll(parametersFilter)
-      .then((response) => {
-        if (response.status === 200 || response.status === 400) {
-          setSeqDelineamento(response.response);
-          setTotalItems(response.total);
-          tableRef.current.dataManager.changePageSize(
+    try {
+      await sequenciaDelineamentoService
+        .getAll(parametersFilter)
+        .then((response) => {
+          if (response.status === 200 || response.status === 400) {
+            setSeqDelineamento(response.response);
+            setTotalItems(response.total);
+            tableRef.current.dataManager.changePageSize(
             // response.total >= take ? take : response.total
-            20,
-          );
-        }
-        setLoading(false);
-      })
-      .catch((_) => {
-        setLoading(false);
+              20,
+            );
+          }
+          setLoading(false);
+        });
+    } catch (error) {
+      setLoading(false);
+      Swal.fire({
+        title: 'Falha ao buscar sequencia de delineamento',
+        html: 'Ocorreu um erro ao buscar sequencia de delineamento. Tente novamente mais tarde.',
+        width: '800',
       });
+    }
   }
 
   // Call that function when change type order value.

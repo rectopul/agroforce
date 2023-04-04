@@ -87,26 +87,35 @@ export default function AtualizarSafra(safra: any) {
         );
       }
 
-      await safraService
-        .updateSafras({
-          id: safra.id,
-          // id_culture: safra.id_culture,
-          safraName: capitalize(formik.values.safraName?.trim()),
-          year: Number(formik.values.year),
-          plantingStartTime,
-          plantingEndTime,
-          created_by: userLogado?.id,
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            Swal.fire('Safra atualizada com sucesso!');
-            setLoading(false);
-            router.back();
-          } else {
-            setLoading(false);
-            Swal.fire(response.message);
-          }
+      try {
+        await safraService
+          .updateSafras({
+            id: safra.id,
+            // id_culture: safra.id_culture,
+            safraName: capitalize(formik.values.safraName?.trim()),
+            year: Number(formik.values.year),
+            plantingStartTime,
+            plantingEndTime,
+            created_by: userLogado?.id,
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              Swal.fire('Safra atualizada com sucesso!');
+              setLoading(false);
+              router.back();
+            } else {
+              setLoading(false);
+              Swal.fire(response.message);
+            }
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao atualizar safra',
+          html: `Ocorreu um erro ao atualizar safra. Tente novamente mais tarde.`,
+          width: '800',
         });
+      }
     },
   });
 

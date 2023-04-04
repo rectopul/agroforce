@@ -184,21 +184,30 @@ export default function AtualizarTipoEnsaio({
       comments: assayList?.comments,
     },
     onSubmit: async (values) => {
-      await assayListService
-        .update({
-          id: values.id,
-          project: values.project?.trim(),
-          comments: values.comments?.trim(),
-          userId: userLogado.id,
-        })
-        .then(({ status, message }) => {
-          if (status === 200) {
-            Swal.fire('Ensaio atualizado com sucesso!');
-            router.back();
-          } else {
-            Swal.fire(message);
-          }
+      try {
+        await assayListService
+          .update({
+            id: values.id,
+            project: values.project?.trim(),
+            comments: values.comments?.trim(),
+            userId: userLogado.id,
+          })
+          .then(({ status, message }) => {
+            if (status === 200) {
+              Swal.fire('Ensaio atualizado com sucesso!');
+              router.back();
+            } else {
+              Swal.fire(message);
+            }
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao atualizar ensaio',
+          html: `Ocorreu um erro ao atualizar ensaio. Tente novamente mais tarde.`,
+          width: '800',
         });
+      }
     },
   });
 
@@ -207,21 +216,26 @@ export default function AtualizarTipoEnsaio({
     parametersFilter = `${parametersFilter}&${pathExtra}`;
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
-
-    await genotypeTreatmentService
-      .getAll(parametersFilter)
-      .then((response) => {
-        if (response.status === 200 || response.status === 400) {
-          setGenotypeTreatments(response.response);
-          setItemsTotal(response.total);
-          tableRef.current.dataManager.changePageSize(
-            response.total >= take ? take : response.total,
-          );
-        }
-      })
-      .catch((_) => {
-        setLoading(false);
+    try {
+      await genotypeTreatmentService
+        .getAll(parametersFilter)
+        .then((response) => {
+          if (response.status === 200 || response.status === 400) {
+            setGenotypeTreatments(response.response);
+            setItemsTotal(response.total);
+            tableRef.current.dataManager.changePageSize(
+              response.total >= take ? take : response.total,
+            );
+          }
+        });
+    } catch (error) {
+      setLoading(false);
+      Swal.fire({
+        title: 'Falha ao buscar genotipos do ensaio',
+        html: `Ocorreu um erro ao buscar genotipos do ensaio. Tente novamente mais tarde.`,
+        width: '800',
       });
+    }
   }
 
   async function callingApiExperiment(parametersFilter: any) {

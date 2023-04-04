@@ -391,23 +391,29 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     // setCookies('filtersParams', parametersFilter);
 
-    await experimentGenotipeService
-      .getAll(parametersFilter)
-      .then((response: any) => {
-        if (response.status === 200 || response.status === 400) {
-          setParcelas(response.response);
-          setTotalItems(response.total);
-          setTagsToPrint(response.tagsToPrint);
-          setTagsPrinted(response.tagsPrinted);
-          tableRef.current.dataManager.changePageSize(
-            response.total >= take ? take : response.total,
-          );
-        }
-        setLoading(false);
-      })
-      .catch((_) => {
-        setLoading(false);
+    try {
+      await experimentGenotipeService
+        .getAll(parametersFilter)
+        .then((response: any) => {
+          if (response.status === 200 || response.status === 400) {
+            setParcelas(response.response);
+            setTotalItems(response.total);
+            setTagsToPrint(response.tagsToPrint);
+            setTagsPrinted(response.tagsPrinted);
+            tableRef.current.dataManager.changePageSize(
+              response.total >= take ? take : response.total,
+            );
+          }
+          setLoading(false);
+        });
+    } catch (error) {
+      setLoading(false);
+      Swal.fire({
+        title: 'Falha ao buscar parcelas',
+        html: `Ocorreu um erro ao buscar parcelas. Tente novamente mais tarde.`,
+        width: '800',
       });
+    }
   }
 
   async function handleOrder(
@@ -758,100 +764,180 @@ export default function Listagem({
   }
 
   async function handleSubmit(inputCode: any) {
-    let countNca = 0;
-    let validatePrint = 0;
-    let validateNca = 0;
-    const { response: parcels } = await experimentGenotipeService.getAll({
-      nca: inputCode,
-      idSafra,
-      experimentGroupId,
-    });
-    parcels.map((item: any) => {
-      if (item.nca == inputCode) {
-        validateNca += 1;
-        if (item.status === 'EM ETIQUETAGEM') {
-          setParcelasToPrint((current: any) => [...current, item.id]);
-          countNca += 1;
-          setGenotypeNameOne(item?.genotipo?.name_genotipo);
-          setNcaOne(item.nca);
-        } else {
-          validatePrint += 1;
+    try {
+      let countNca = 0;
+      let validatePrint = 0;
+      let validateNca = 0;
+      const { response: parcels } = await experimentGenotipeService.getAll({
+        nca: inputCode,
+        idSafra,
+        experimentGroupId,
+      });
+      parcels.map((item: any) => {
+        if (item.nca == inputCode) {
+          validateNca += 1;
+          if (item.status === 'EM ETIQUETAGEM') {
+            setParcelasToPrint((current: any) => [...current, item.id]);
+            countNca += 1;
+            setGenotypeNameOne(item?.genotipo?.name_genotipo);
+            setNcaOne(item.nca);
+          } else {
+            validatePrint += 1;
+          }
         }
+      });
+      const { response } = await experimentGroupService.getAll({
+        id: experimentGroupId,
+      });
+      let colorVerify = '';
+      if (validateNca == validatePrint) {
+        setValidateNcaOne('bg-red-600');
+        setErroMessage('Todos os NCA já foram impressos');
+      } else if (countNca > 0) {
+        colorVerify = 'bg-green-600';
+        setGroupNameOne(response[0]?.name);
+        setValidateNcaOne('bg-green-600');
+        setErroMessage('');
+      } else {
+        colorVerify = 'bg-red-600';
+        setValidateNcaOne('bg-red-600');
+        setErroMessage(
+          'O NCA não existe dentro do grupo, favor clicar em limpar e tentar novamente',
+        );
       }
-    });
-    const { response } = await experimentGroupService.getAll({
-      id: experimentGroupId,
-    });
-    let colorVerify = '';
-    if (validateNca == validatePrint) {
-      setValidateNcaOne('bg-red-600');
-      setErroMessage('Todos os NCA já foram impressos');
-    } else if (countNca > 0) {
-      colorVerify = 'bg-green-600';
-      setGroupNameOne(response[0]?.name);
-      setValidateNcaOne('bg-green-600');
-      setErroMessage('');
-    } else {
-      colorVerify = 'bg-red-600';
-      setValidateNcaOne('bg-red-600');
-      setErroMessage(
-        'O NCA não existe dentro do grupo, favor clicar em limpar e tentar novamente',
-      );
-    }
-    setTotalMatch(countNca);
-    if (colorVerify === 'bg-green-600') {
-      (document.getElementById('inputCode') as HTMLInputElement).value = '';
-      setDoubleVerify(true);
-    } else {
-      setDoubleVerify(false);
+      setTotalMatch(countNca);
+      if (colorVerify === 'bg-green-600') {
+        (document.getElementById('inputCode') as HTMLInputElement).value = '';
+        setDoubleVerify(true);
+      } else {
+        setDoubleVerify(false);
+      }
+    } catch (error) {
+      setLoading(false);
+      Swal.fire({
+        title: 'Falha ao verificar NCA',
+        html: `Ocorreu um erro ao verificar NCA. Tente novamente mais tarde.`,
+        width: '800',
+      });
     }
   }
 
   async function verifyAgain(inputCode: any) {
-    let countNca = 0;
-    let secondNca = '';
+    try {
+      let countNca = 0;
+      let secondNca = '';
 
-    const { response: parcelsAgain } = await experimentGenotipeService.getAll({
-      nca: inputCode,
-      idSafra,
-      experimentGroupId,
-    });
-    parcelsAgain.map((item: any) => {
-      if (item.nca == inputCode) {
-        setGenotypeNameTwo(item?.genotipo?.name_genotipo);
-        secondNca = item.nca;
-        setNcaTwo(item.nca);
-        countNca += 1;
+      const { response: parcelsAgain } = await experimentGenotipeService.getAll({
+        nca: inputCode,
+        idSafra,
+        experimentGroupId,
+      });
+      parcelsAgain.map((item: any) => {
+        if (item.nca == inputCode) {
+          setGenotypeNameTwo(item?.genotipo?.name_genotipo);
+          secondNca = item.nca;
+          setNcaTwo(item.nca);
+          countNca += 1;
+        }
+      });
+
+      const { response } = await experimentGroupService.getAll({
+        id: experimentGroupId,
+      });
+
+      let colorVerify = '';
+
+      if (countNca > 0 && secondNca === ncaOne) {
+        colorVerify = 'bg-green-600';
+        setGroupNameTwo(response[0]?.name);
+        setValidateNcaTwo('bg-green-600');
+        setErroMessage('');
+      } else {
+        colorVerify = 'bg-red-600';
+        setValidateNcaTwo('bg-red-600');
+        setErroMessage(
+          'O NCA não existe dentro do grupo, favor clicar em limpar e tentar novamente',
+        );
       }
-    });
+      setTotalMatch(countNca);
 
-    const { response } = await experimentGroupService.getAll({
-      id: experimentGroupId,
-    });
+      if (colorVerify === 'bg-green-600') {
+        setIsLoading(true);
 
-    let colorVerify = '';
+        const parcelsToPrint = parcelsAgain.filter((parcela: any) => parcelasToPrint.includes(parcela.id));
+        const validateSeeds: any = [];
 
-    if (countNca > 0 && secondNca === ncaOne) {
-      colorVerify = 'bg-green-600';
-      setGroupNameTwo(response[0]?.name);
-      setValidateNcaTwo('bg-green-600');
-      setErroMessage('');
-    } else {
-      colorVerify = 'bg-red-600';
-      setValidateNcaTwo('bg-red-600');
-      setErroMessage(
-        'O NCA não existe dentro do grupo, favor clicar em limpar e tentar novamente',
-      );
+        const parcels = parcelsToPrint.map((item: any) => {
+          item.type_assay.envelope?.filter(
+            (seed: any) => seed.id_safra === idSafra,
+          );
+          if (item.type_assay.envelope?.length === 0) {
+            validateSeeds.push(true);
+          } else {
+            return item;
+          }
+        });
+        if (validateSeeds.includes(true)) {
+          Swal.fire(
+            'Quantidade de sementes por envelope não cadastrada no tipo de ensaio',
+          );
+          setValidateNcaOne('bg-red-600');
+          setValidateNcaTwo('bg-red-600');
+          setLoading(false);
+          setIsLoading(false);
+          return;
+        }
+
+        await experimentGenotipeService.update({
+          idList: parcelasToPrint,
+          status: 'IMPRESSO',
+          userId: userLogado.id,
+          count: 'print',
+        });
+
+        parcels.map((parcela: any) => {
+          parcela.counter += 1;
+          return parcela;
+        });
+        cleanState();
+
+        if (parcels) {
+          localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
+
+          // setStateIframe(stateIframe + 1);
+
+          resetIframe();
+
+          // -- AQUI
+          setIsOpenModalPrint(true);
+          setUrlPrint('imprimir');
+          cleanState();
+          (document.getElementById('inputCode') as HTMLInputElement).value = '';
+          setTimeout(() => (inputRef?.current as any)?.focus(), 2000);
+          handlePagination(currentPage);
+          reloadExperimentGroup();
+        // router.push("imprimir");
+        }
+      }
+
+      setIsLoading(false);
+    } catch (error) {
+      setLoading(false);
+      Swal.fire({
+        title: 'Falha ao verificar NCA',
+        html: `Ocorreu um erro ao verificar NCA. Tente novamente mais tarde.`,
+        width: '800',
+      });
     }
-    setTotalMatch(countNca);
+  }
 
-    if (colorVerify === 'bg-green-600') {
-      setIsLoading(true);
+  async function reprint() {
+    setIsLoading(true);
+    try {
+      const idList = rowsSelected.map((item: any) => item.id);
 
-      const parcelsToPrint = parcelsAgain.filter((parcela: any) => parcelasToPrint.includes(parcela.id));
       const validateSeeds: any = [];
-
-      const parcels = parcelsToPrint.map((item: any) => {
+      const parcels = rowsSelected.map((item: any) => {
         item.type_assay.envelope?.filter(
           (seed: any) => seed.id_safra === idSafra,
         );
@@ -862,21 +948,16 @@ export default function Listagem({
         }
       });
       if (validateSeeds.includes(true)) {
-        Swal.fire(
-          'Quantidade de sementes por envelope não cadastrada no tipo de ensaio',
-        );
-        setValidateNcaOne('bg-red-600');
-        setValidateNcaTwo('bg-red-600');
+        Swal.fire('Sementes não cadastradas no tipo de ensaio');
         setLoading(false);
         setIsLoading(false);
         return;
       }
-
       await experimentGenotipeService.update({
-        idList: parcelasToPrint,
+        idList,
         status: 'IMPRESSO',
         userId: userLogado.id,
-        count: 'print',
+        count: 'reprint',
       });
 
       parcels.map((parcela: any) => {
@@ -896,69 +977,21 @@ export default function Listagem({
         setIsOpenModalPrint(true);
         setUrlPrint('imprimir');
         cleanState();
-        (document.getElementById('inputCode') as HTMLInputElement).value = '';
         setTimeout(() => (inputRef?.current as any)?.focus(), 2000);
         handlePagination(currentPage);
         reloadExperimentGroup();
-        // router.push("imprimir");
-      }
-    }
-
-    setIsLoading(false);
-  }
-
-  async function reprint() {
-    setIsLoading(true);
-    const idList = rowsSelected.map((item: any) => item.id);
-
-    const validateSeeds: any = [];
-    const parcels = rowsSelected.map((item: any) => {
-      item.type_assay.envelope?.filter(
-        (seed: any) => seed.id_safra === idSafra,
-      );
-      if (item.type_assay.envelope?.length === 0) {
-        validateSeeds.push(true);
-      } else {
-        return item;
-      }
-    });
-    if (validateSeeds.includes(true)) {
-      Swal.fire('Sementes não cadastradas no tipo de ensaio');
-      setLoading(false);
-      setIsLoading(false);
-      return;
-    }
-    await experimentGenotipeService.update({
-      idList,
-      status: 'IMPRESSO',
-      userId: userLogado.id,
-      count: 'reprint',
-    });
-
-    parcels.map((parcela: any) => {
-      parcela.counter += 1;
-      return parcela;
-    });
-    cleanState();
-
-    if (parcels) {
-      localStorage.setItem('parcelasToPrint', JSON.stringify(parcels));
-
-      // setStateIframe(stateIframe + 1);
-
-      resetIframe();
-
-      // -- AQUI
-      setIsOpenModalPrint(true);
-      setUrlPrint('imprimir');
-      cleanState();
-      setTimeout(() => (inputRef?.current as any)?.focus(), 2000);
-      handlePagination(currentPage);
-      reloadExperimentGroup();
       // router.push("imprimir");
-    }
+      }
 
-    setIsLoading(false);
+      setIsLoading(false);
+    } catch (error) {
+      setLoading(false);
+      Swal.fire({
+        title: 'Falha ao reimprimir',
+        html: `Ocorreu um erro ao reimprimir. Tente novamente mais tarde.`,
+        width: '800',
+      });
+    }
   }
 
   async function writeOff(inputCode: any) {
@@ -1008,7 +1041,12 @@ export default function Listagem({
         setIsOpenModal(false);
       } catch (error) {
         cleanState();
-        Swal.fire('Erro ao tentar dar baixa na parcela.');
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao dar baixa na parcela',
+          html: `Ocorreu um erro ao dar baixa na parcela. Tente novamente mais tarde.`,
+          width: '800',
+        });
       }
     }
   }
@@ -1661,27 +1699,21 @@ export default function Listagem({
                         module_id={module_id}
                         identifier_preference={identifier_preference}
                         OnSetStatusAccordion={(e: any) => {
-                          
                           setStatusAccordion(e);
                         }}
                         OnSetGeneratesProps={(e: any) => {
-                          
                           setGeneratesProps(e);
                         }}
                         OnSetCamposGerenciados={(e: any) => {
-                          
                           setCamposGerenciados(e);
                         }}
                         OnColumnsOrder={(e: any) => {
-                          
                           orderColumns(e);
                         }}
                         OnSetUserLogado={(e: any) => {
-                          
                           setUserLogado(e);
                         }}
                         OnSetPreferences={(e: any) => {
-                          
                           setPreferences(e);
                         }}
                       />
