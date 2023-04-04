@@ -117,7 +117,7 @@ export default function AtualizarLocal({
   const module_id = 22;
   // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
   const identifier_preference = module_name + router.route;
-  const camposGerenciadosDefault = 'repetitionExperience,genotipo,gmr,bgm,fase,tecnologia,nt,rep,status,nca,npe,sequence,block,experiment';
+  const camposGerenciadosDefault = 'repetitionExperience,genotipo,gmr,bgm,fase,tecnologia,nt,rep,status,status_t,nca,npe,sequence,block,experiment';
   const preferencesDefault = {
     id: 0,
     route_usage: router.route,
