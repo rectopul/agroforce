@@ -179,24 +179,32 @@ export default function AtualizarTipoEnsaio({
 
       setLoading(true);
 
-      await typeAssayService
-        .update({
-          id: values.id,
-          name: capitalize(values.name?.trim()),
-          id_culture: values.id_culture,
-          created_by: Number(userLogado.id),
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            Swal.fire('Tipo de Ensaio atualizado com sucesso!');
-            setLoading(false);
-            router.push('/config/ensaio/tipo-ensaio');
-          } else {
-            setLoading(false);
-            Swal.fire(response.message);
-          }
-        })
-        .catch((e) => setLoading(false));
+      try {
+        await typeAssayService
+          .update({
+            id: values.id,
+            name: capitalize(values.name?.trim()),
+            id_culture: values.id_culture,
+            created_by: Number(userLogado.id),
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              Swal.fire('Tipo de Ensaio atualizado com sucesso!');
+              setLoading(false);
+              router.push('/config/ensaio/tipo-ensaio');
+            } else {
+              setLoading(false);
+              Swal.fire(response.message);
+            }
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao atualizar tipo de ensaio',
+          html: `Ocorreu um erro ao atualizar tipo de ensaio. Tente novamente mais tarde.`,
+          width: '800',
+        });
+      }
     },
   });
 

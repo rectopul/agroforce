@@ -226,7 +226,7 @@ export function ManageFields(props: ManageFieldsProps) {
       .catch((error) => {
         Swal.fire({
           title: 'Falha ao excluir preferências',
-          html: `Ocorreu um erro ao excluir as preferências do usuário. Tente novamente mais tarde.\r\n${JSON.stringify(error)}`,
+          html: `Ocorreu um erro ao excluir as preferências do usuário. Tente novamente mais tarde.`,
           width: '800',
         });
       });
@@ -293,7 +293,7 @@ export function ManageFields(props: ManageFieldsProps) {
         .catch((error) => {
           Swal.fire({
             title: 'Falha ao atualizar preferências',
-            html: `Ocorreu um erro ao atualizar as preferências do usuário. Tente novamente mais tarde.\r\n${JSON.stringify(error)}`,
+            html: `Ocorreu um erro ao atualizar as preferências do usuário. Tente novamente mais tarde.`,
             width: '800',
           });
         });

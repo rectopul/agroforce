@@ -139,23 +139,32 @@ export default function Atualizar({
         return;
       }
 
-      await focoService
-        .update({
-          id: foco.id,
-          name: capitalize(formik.values.name?.trim()),
-          id_culture: Number(culture),
-          created_by: userLogado.id,
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            Swal.fire('Foco atualizado com sucesso!');
-            setLoading(false);
-            router.back();
-          } else {
-            setLoading(false);
-            Swal.fire(response.message);
-          }
+      try {
+        await focoService
+          .update({
+            id: foco.id,
+            name: capitalize(formik.values.name?.trim()),
+            id_culture: Number(culture),
+            created_by: userLogado.id,
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              Swal.fire('Foco atualizado com sucesso!');
+              setLoading(false);
+              router.back();
+            } else {
+              setLoading(false);
+              Swal.fire(response.message);
+            }
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao atualizar foco',
+          html: `Ocorreu um erro ao atualizar foco. Tente novamente mais tarde.`,
+          width: '800',
         });
+      }
     },
   });
 

@@ -225,8 +225,13 @@ export default function Listagem({
           );
         }
       })
-      .catch((_) => {
+      .catch((error) => {
         setLoading(false);
+        Swal.fire({
+          title: 'Falha ao buscar setores',
+          html: `Ocorreu um erro ao buscar setores. Tente novamente mais tarde.`,
+          width: '800',
+        });
       });
   }
 

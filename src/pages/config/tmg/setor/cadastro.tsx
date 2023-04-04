@@ -43,22 +43,31 @@ export default function Safra() {
         return;
       }
 
-      await departmentService
-        .create({
-          name: capitalize(formik.values.name?.trim()),
-          created_by: formik.values.created_by,
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            Swal.fire('Setor cadastrado com sucesso!');
-            setLoading(false);
-            router.back();
-          } else {
-            setCheckInput('text-red-600');
-            setLoading(false);
-            Swal.fire(response.message);
-          }
+      try {
+        await departmentService
+          .create({
+            name: capitalize(formik.values.name?.trim()),
+            created_by: formik.values.created_by,
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              Swal.fire('Setor cadastrado com sucesso!');
+              setLoading(false);
+              router.back();
+            } else {
+              setCheckInput('text-red-600');
+              setLoading(false);
+              Swal.fire(response.message);
+            }
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao criar setor',
+          html: `Ocorreu um erro ao criar setor. Tente novamente mais tarde.`,
+          width: '800',
         });
+      }
     },
   });
 

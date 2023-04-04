@@ -256,24 +256,30 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await experimentService
-      .getAll(parametersFilter)
-      .then((response) => {
-        if (
-          response.status === 200
+    try {
+      await experimentService
+        .getAll(parametersFilter)
+        .then((response) => {
+          if (
+            response.status === 200
           || (response.status === 400 && response.total === 0)
-        ) {
-          setExperiments(response.response);
-          setTotalItems(response.total);
-          tableRef.current.dataManager.changePageSize(
-            response.total >= take ? take : response.total,
-          );
-        }
-        setLoading(false);
-      })
-      .catch((_) => {
-        setLoading(false);
+          ) {
+            setExperiments(response.response);
+            setTotalItems(response.total);
+            tableRef.current.dataManager.changePageSize(
+              response.total >= take ? take : response.total,
+            );
+          }
+          setLoading(false);
+        });
+    } catch (error) {
+      setLoading(false);
+      Swal.fire({
+        title: 'Falha ao buscar experimentos',
+        html: `Ocorreu um erro ao buscar experimentos. Tente novamente mais tarde.`,
+        width: '800',
       });
+    }
   }
 
   // Call that function when change type order value.
@@ -572,10 +578,10 @@ export default function Listagem({
       })
       .catch((error) => {
         setLoading(false);
-
         Swal.fire({
-          title: 'Houve ao associar os experimentos ao grupo. ',
-          html: error,
+          title: 'Falha ao associar experimentos',
+          html: `Ocorreu um erro ao associar experimentos. Tente novamente mais tarde.`,
+          width: '800',
         });
       });
   }

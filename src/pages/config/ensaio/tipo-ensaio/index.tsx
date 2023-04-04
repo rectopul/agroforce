@@ -289,8 +289,13 @@ export default function TipoEnsaio({
           setLoading(false);
         }
       })
-      .catch((_) => {
+      .catch((error) => {
         setLoading(false);
+        Swal.fire({
+          title: 'Falha ao buscar tipo de ensaio',
+          html: `Ocorreu um erro ao buscar tipo de ensaio. Tente novamente mais tarde.`,
+          width: '800',
+        });
       });
   }
 

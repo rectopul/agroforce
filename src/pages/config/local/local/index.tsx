@@ -297,8 +297,13 @@ export default function Listagem({
           );
         }
       })
-      .catch((_) => {
+      .catch((error) => {
         setLoading(false);
+        Swal.fire({
+          title: 'Falha ao buscar local',
+          html: 'Ocorreu um erro ao buscar local. Tente novamente mais tarde.',
+          width: '800',
+        });
       });
   }
 

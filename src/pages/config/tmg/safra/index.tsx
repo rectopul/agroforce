@@ -265,8 +265,13 @@ export default function Listagem({
           );
         }
       })
-      .catch((_) => {
+      .catch((error) => {
         setLoading(false);
+        Swal.fire({
+          title: 'Falha ao buscar safra',
+          html: `Ocorreu um erro ao buscar safra. Tente novamente mais tarde.`,
+          width: '800',
+        });
       });
   }
 

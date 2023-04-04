@@ -301,8 +301,13 @@ export default function Listagem({
           setLoading(false);
         }
       })
-      .catch((_) => {
+      .catch((error) => {
         setLoading(false);
+        Swal.fire({
+          title: 'Falha ao buscar unidade de cultura',
+          html: 'Ocorreu um erro ao buscar unidade de cultura. Tente novamente mais tarde.',
+          width: '800',
+        });
       });
   }
 

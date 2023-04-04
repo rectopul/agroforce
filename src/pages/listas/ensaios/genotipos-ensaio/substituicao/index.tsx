@@ -271,24 +271,30 @@ export default function Listagem({
 
       setLoading(true);
 
-      await replaceTreatmentService
-        .getAll(
-          `${parametersFilter}&skip=0&take=${take}&checkedTreatments=${tempParams}`,
-        )
-        .then(({ response, total: allTotal }) => {
-          setFilter(parametersFilter);
-          setLotes(response);
-          setTotalItems(allTotal);
-          setCurrentPage(0);
-          setLoading(false);
-          tableRef?.current?.dataManager?.changePageSize(
-            allTotal >= take ? take : allTotal,
-          );
-          setLoading(false);
-        })
-        .catch((_) => {
-          setLoading(false);
+      try {
+        await replaceTreatmentService
+          .getAll(
+            `${parametersFilter}&skip=0&take=${take}&checkedTreatments=${tempParams}`,
+          )
+          .then(({ response, total: allTotal }) => {
+            setFilter(parametersFilter);
+            setLotes(response);
+            setTotalItems(allTotal);
+            setCurrentPage(0);
+            setLoading(false);
+            tableRef?.current?.dataManager?.changePageSize(
+              allTotal >= take ? take : allTotal,
+            );
+            setLoading(false);
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao buscar lotes',
+          html: `Ocorreu um erro ao buscar lotes. Tente novamente mais tarde.`,
+          width: '800',
         });
+      }
     },
   });
 
@@ -352,16 +358,25 @@ export default function Listagem({
   }
 
   async function replaceTreatmentButton(id: number) {
-    const { message } = await replaceTreatmentService.replace({
-      id,
-      checkedTreatments,
-      value,
-      userId: userLogado.id,
-    });
-    Swal.fire({
-      html: message,
-      width: '800',
-    });
+    try {
+      const { message } = await replaceTreatmentService.replace({
+        id,
+        checkedTreatments,
+        value,
+        userId: userLogado.id,
+      });
+      Swal.fire({
+        html: message,
+        width: '800',
+      });
+    } catch (error) {
+      setLoading(false);
+      Swal.fire({
+        title: 'Falha ao substituir',
+        html: `Ocorreu um erro ao substituir. Tente novamente mais tarde.`,
+        width: '800',
+      });
+    }
 
     if (value == 'ensaios') {
       router.back();

@@ -43,23 +43,32 @@ export default function AtualizarSafra(item: IDepartmentProps) {
         return;
       }
 
-      await departmentService
-        .update({
-          id: item.id,
-          name: capitalize(formik.values.name?.trim()),
-          created_by: userLogado?.id,
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            Swal.fire('Setor atualizado com sucesso!');
-            setLoading(false);
-            router.back();
-          } else {
-            setCheckInput('text-red-600');
-            setLoading(false);
-            Swal.fire(response.message);
-          }
+      try {
+        await departmentService
+          .update({
+            id: item.id,
+            name: capitalize(formik.values.name?.trim()),
+            created_by: userLogado?.id,
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              Swal.fire('Setor atualizado com sucesso!');
+              setLoading(false);
+              router.back();
+            } else {
+              setCheckInput('text-red-600');
+              setLoading(false);
+              Swal.fire(response.message);
+            }
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao atualizar o setor',
+          html: `Ocorreu um erro ao atualizar o setor. Tente novamente mais tarde.`,
+          width: '800',
         });
+      }
     },
   });
 

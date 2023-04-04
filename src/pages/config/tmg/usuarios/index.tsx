@@ -271,8 +271,14 @@ export default function Listagem({
           );
         }
       })
-      .catch((_) => {
+      .catch((error) => {
         setLoading(false);
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao buscar usuários',
+          html: `Ocorreu um erro ao buscar usuários. Tente novamente mais tarde.`,
+          width: '800',
+        });
       });
   }
 

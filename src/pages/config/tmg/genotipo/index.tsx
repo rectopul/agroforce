@@ -312,8 +312,13 @@ export default function Listagem({
           setLoading(false);
         }
       })
-      .catch((_) => {
+      .catch((error) => {
         setLoading(false);
+        Swal.fire({
+          title: 'Falha ao buscar genótipo',
+          html: `Ocorreu um erro ao buscar genótipo. Tente novamente mais tarde.`,
+          width: '800',
+        });
       });
   }
 

@@ -164,9 +164,11 @@ export default function Import({
             setExecuteUpload(0);
           }
         })
-        .catch((e: any) => {
+        .catch((error: any) => {
+          setLoading(false);
           Swal.fire({
-            html: 'Erro ao ler planilha',
+            title: 'Erro ao ler planilha',
+            html: `Ocorreu um erro ao ler a planilha. Tente novamente mais tarde.`,
             width: '800',
             didClose: () => {
               router.reload();
@@ -240,9 +242,11 @@ export default function Import({
       }
 
       (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
-    } catch (e: any) {
+    } catch (error: any) {
+      setLoading(false);
       Swal.fire({
-        html: 'Erro ao ler planilha',
+        title: 'Erro ao ler planilha',
+        html: `Ocorreu um erro ao ler a planilha. Tente novamente mais tarde.`,
         width: '800',
         didClose: () => {
           router.reload();
@@ -346,14 +350,23 @@ export default function Import({
     parametersFilter = `${parametersFilter}&skip=${
       newPage * Number(take)
     }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
-    await logImportService.getAll(parametersFilter)
-      .then(({ response, total: allTotal }) => {
-        setLogs(response);
-        setTotalItems(allTotal);
-        tableRef.current.dataManager.changePageSize(
-          allTotal >= take ? take : allTotal,
-        );
+    try {
+      await logImportService.getAll(parametersFilter)
+        .then(({ response, total: allTotal }) => {
+          setLogs(response);
+          setTotalItems(allTotal);
+          tableRef.current.dataManager.changePageSize(
+            allTotal >= take ? take : allTotal,
+          );
+        });
+    } catch (error) {
+      setLoading(false);
+      Swal.fire({
+        title: 'Falha ao buscar log de importação',
+        html: `Ocorreu um erro ao buscar log de importação. Tente novamente mais tarde.`,
+        width: '800',
       });
+    }
   }
 
   // Call that function when change type order value.

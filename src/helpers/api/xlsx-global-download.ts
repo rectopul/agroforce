@@ -264,7 +264,7 @@ async function callTmgGenotipeXlsxDownload(options: any) {
   options.take = 1000;
 
   do {
-    const { response, status } = await Controller.getAll(options);
+    const { response } = await Controller.getAll(options);
     const newData = response.map((row: any) => {
       row.CULTURA = row.culture.name;
       row.NOME_GENÓTIPO = row.name_genotipo;
@@ -285,12 +285,6 @@ async function callTmgGenotipeXlsxDownload(options: any) {
       row.PROGENITOR_M_ORIGEM = row.progenitor_m_origem;
       row.PROGENITORES_ORIGEM = row.progenitores_origem;
       row.PARENTESCO_COMPLETO = row.parentesco_completo;
-      row.ANO = String(row.lote[0]?.year);
-      row.COD_LOTE = String(row.lote[0]?.cod_lote);
-      row.NCC = String(row.lote[0]?.ncc);
-      row.PESO = row.lote[0]?.peso ? String(row.lote[0]?.peso) : '';
-      row.FASE = row.lote[0]?.fase ? String(row.lote[0]?.fase) : '';
-      row.QUANT_SEMENTES = row.lote[0]?.quant_sementes ? String(row.lote[0]?.quant_sementes) : '';
       row.dt_export = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
       row.DT_RD = row.dt_export;
       row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
@@ -370,7 +364,6 @@ async function callTmgLoteXlsxDownload(options: any) {
       newItem.NOME_ALTERNATIVO = (item?.genotipo.name_alter);
       newItem.ELITE_NOME = (item?.genotipo.elit_name);
       newItem.TECNOLOGIA = `${item?.genotipo.tecnologia.cod_tec} ${item?.genotipo.tecnologia.name}`;
-      newItem.N_DE_LOTES = (item?.genotipo.numberLotes);
       newItem.TIPO = (item?.genotipo.type);
       newItem.GMR = item?.genotipo.gmr ? String(item?.genotipo.gmr) : '';
       newItem.BGM = item?.genotipo.bgm ? String(item?.genotipo.bgm) : '';

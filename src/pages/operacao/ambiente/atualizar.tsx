@@ -119,53 +119,62 @@ export default function NovoLocal({
       }
 
       const parametersFilter = `filterStatus=1&npei=${values.prox_npe}`;
-      await npeService.getAll(parametersFilter).then(async (response) => {
-        if (response.total <= 0 || npe[0]?.id === response[0]?.id) {
-          const { groupId } = values;
-          const paramFilter = `id_culture=${idCulture}&id_safra=${idSafra}&npe=${values.prox_npe}&groupId=${groupId}`;
-          await experimentGenotipeService
-            .getAll(paramFilter)
-            .then(async (response) => {
-              if (response.total <= 0) {
-                await npeService
-                  .update({
-                    id: values.id,
-                    prox_npe: values.prox_npe,
-                    npef: npe.status == 3 ? npe.npef : values.prox_npe,
-                    npei_i: values.prox_npe,
-                    edited: 1,
-                    userId: userLogado.id,
-                  })
-                  .then((response) => {
-                    if (response.status === 200) {
-                      Swal.fire('NPE atualizado com sucesso!');
-                      setLoading(false);
-                      router.back();
-                    } else {
-                      setLoading(false);
-                      Swal.fire(response.message);
-                    }
-                  });
-              } else {
-                setLoading(false);
-                Swal.fire({
-                  title: 'NPE Já usado !!!',
-                  html:
+      try {
+        await npeService.getAll(parametersFilter).then(async (response) => {
+          if (response.total <= 0 || npe[0]?.id === response[0]?.id) {
+            const { groupId } = values;
+            const paramFilter = `id_culture=${idCulture}&id_safra=${idSafra}&npe=${values.prox_npe}&groupId=${groupId}`;
+            await experimentGenotipeService
+              .getAll(paramFilter)
+              .then(async (response) => {
+                if (response.total <= 0) {
+                  await npeService
+                    .update({
+                      id: values.id,
+                      prox_npe: values.prox_npe,
+                      npef: npe.status == 3 ? npe.npef : values.prox_npe,
+                      npei_i: values.prox_npe,
+                      edited: 1,
+                      userId: userLogado.id,
+                    })
+                    .then((response) => {
+                      if (response.status === 200) {
+                        Swal.fire('NPE atualizado com sucesso!');
+                        setLoading(false);
+                        router.back();
+                      } else {
+                        setLoading(false);
+                        Swal.fire(response.message);
+                      }
+                    });
+                } else {
+                  setLoading(false);
+                  Swal.fire({
+                    title: 'NPE Já usado !!!',
+                    html:
                     'Não foi possível atualizar o prox npe, o prox npe inserido já foi usado pela parcela.<br/>'
                     // `Cultura: ${idCulture}<br>` +
                     // `Safra: ${idSafra}<br>` +
                     // `GroupId: ${groupId}<br>` +
                     + `Próx NPE: ${values.prox_npe}<br>`,
-                });
-              }
-            });
-        } else {
-          setLoading(false);
-          Swal.fire(
-            'Não é possível atualizar o prox npe, o prox npe inserido já é consumido por outro npe.',
-          );
-        }
-      });
+                  });
+                }
+              });
+          } else {
+            setLoading(false);
+            Swal.fire(
+              'Não é possível atualizar o prox npe, o prox npe inserido já é consumido por outro npe.',
+            );
+          }
+        });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao atualizar ambiente',
+          html: `Ocorreu um erro ao atualizar ambiente. Tente novamente mais tarde.`,
+          width: '800',
+        });
+      }
     },
   });
 
