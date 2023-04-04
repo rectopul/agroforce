@@ -40,25 +40,34 @@ export default function Cultura(profile: any) {
         setLoading(false);
         return;
       }
-      await profileService
-        .update({
-          id: profile.id,
-          name: capitalize(formik.values.name?.trim()),
-          createdBy: Number(userLogado.id),
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            Swal.fire('Perfil atualizada com sucesso');
-            setLoading(false);
-            router.back();
-          } else {
-            setLoading(false);
-            Swal.fire(response.message);
-          }
-        })
-        .finally(() => {
-          formik.values.name = profile.name;
+      try {
+        await profileService
+          .update({
+            id: profile.id,
+            name: capitalize(formik.values.name?.trim()),
+            createdBy: Number(userLogado.id),
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              Swal.fire('Perfil atualizada com sucesso');
+              setLoading(false);
+              router.back();
+            } else {
+              setLoading(false);
+              Swal.fire(response.message);
+            }
+          })
+          .finally(() => {
+            formik.values.name = profile.name;
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao atualizar perfil',
+          html: `Ocorreu um erro ao atualizar perfil. Tente novamente mais tarde.}`,
+          width: '800',
         });
+      }
     },
   });
 

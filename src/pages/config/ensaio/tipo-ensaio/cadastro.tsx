@@ -67,25 +67,33 @@ export default function NovoTipoEnsaio() {
       }
       setLoading(true);
 
-      await typeAssayService
-        .create({
-          id_culture: Number(culture),
-          name: capitalize(values.name?.trim()),
-          protocol_name: values.protocolName,
-          created_by: Number(userLogado.id),
-          status: 1,
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            Swal.fire('Tipo de Ensaio cadastrado com sucesso!');
-            setLoading(false);
-            router.back();
-          } else {
-            setLoading(false);
-            Swal.fire(response.message);
-          }
-        })
-        .catch((e) => setLoading(false));
+      try {
+        await typeAssayService
+          .create({
+            id_culture: Number(culture),
+            name: capitalize(values.name?.trim()),
+            protocol_name: values.protocolName,
+            created_by: Number(userLogado.id),
+            status: 1,
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              Swal.fire('Tipo de Ensaio cadastrado com sucesso!');
+              setLoading(false);
+              router.back();
+            } else {
+              setLoading(false);
+              Swal.fire(response.message);
+            }
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao cadastrar tipo de ensaio',
+          html: `Ocorreu um erro ao cadastrar tipo de ensaio. Tente novamente mais tarde.`,
+          width: '800',
+        });
+      }
     },
   });
 

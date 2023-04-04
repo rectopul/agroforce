@@ -725,139 +725,149 @@ export default function Listagem({
     setCountAsync(0);
 
     // object.values selectedNPE
-    for (const env of Object.values(selectedNPE)) {
+    try {
+      for (const env of Object.values(selectedNPE)) {
       // selectedNPE.map(async (env: any) => {
-      let tempFilter = `idSafra=${env?.safraId}&idLocal=${env?.localId}&Foco=${env?.foco.id}&Epoca=${env?.epoca}&Tecnologia=${env?.tecnologia.cod_tec}&TypeAssay=${env?.type_assay.id}&Status=IMPORTADO&excel=true`;
-      if (filter) {
-        tempFilter = `${tempFilter}&${filter}`;
-      }
+        let tempFilter = `idSafra=${env?.safraId}&idLocal=${env?.localId}&Foco=${env?.foco.id}&Epoca=${env?.epoca}&Tecnologia=${env?.tecnologia.cod_tec}&TypeAssay=${env?.type_assay.id}&Status=IMPORTADO&excel=true`;
+        if (filter) {
+          tempFilter = `${tempFilter}&${filter}`;
+        }
 
-      const orderBy1 = 'orderDraw';
-      const typeOrder1 = 'asc';
+        const orderBy1 = 'orderDraw';
+        const typeOrder1 = 'asc';
 
-      const orderBy2 = 'assay_list.gli';
-      const typeOrder2 = 'asc';
+        const orderBy2 = 'assay_list.gli';
+        const typeOrder2 = 'asc';
 
-      const orderBy = [orderBy1, orderBy2];
-      const typeOrder = [typeOrder1, typeOrder2];
+        const orderBy = [orderBy1, orderBy2];
+        const typeOrder = [typeOrder1, typeOrder2];
 
-      tempFilter = `${tempFilter}&orderBy=${orderBy1}&typeOrder=${typeOrder1}&orderBy=${orderBy2}&typeOrder=${typeOrder2}`;
-      tempFilter = `${tempFilter}&orderBy=&typeOrder=`;
+        tempFilter = `${tempFilter}&orderBy=${orderBy1}&typeOrder=${typeOrder1}&orderBy=${orderBy2}&typeOrder=${typeOrder2}`;
+        tempFilter = `${tempFilter}&orderBy=&typeOrder=`;
 
-      let count1 = 0;
+        let count1 = 0;
 
-      setCountAsync(countAsync + 1);
+        setCountAsync(countAsync + 1);
 
-      await experimentService
-        .getAll(tempFilter)
-        .then(({ status, response, total }) => {
-          let i = 0;
+        await experimentService
+          .getAll(tempFilter)
+          .then(({ status, response, total }) => {
+            let i = 0;
 
-          response.length > 0 ? (i = env.prox_npe) : (i = env.npef);
-          let count = 0;
-          response.map((p: any) => {
-            p.npei = i;
+            response.length > 0 ? (i = env.prox_npe) : (i = env.npef);
+            let count = 0;
+            response.map((p: any) => {
+              p.npei = i;
 
-            p.seq_delineamento?.map((sd: any) => {
-              p.npef = i;
-              i = p.npef + 1;
-              // npeRequisitada
-              env.npeRequisitada++;
+              p.seq_delineamento?.map((sd: any) => {
+                p.npef = i;
+                i = p.npef + 1;
+                // npeRequisitada
+                env.npeRequisitada++;
 
-              i >= env.nextNPE.npei_i && npeUsedFrom == 0
-                ? setNpeUsedFrom(env.nextNPE.npei_i)
-                : '';
-            });
+                i >= env.nextNPE.npei_i && npeUsedFrom == 0
+                  ? setNpeUsedFrom(env.nextNPE.npei_i)
+                  : '';
+              });
 
-            p.npeQT = p.npef - p.npei + 1;
-            env.npef = i - 1;
-            env.npefView = i - 1;
+              p.npeQT = p.npef - p.npei + 1;
+              env.npef = i - 1;
+              env.npefView = i - 1;
 
-            p.npefView = p.npef;
+              p.npefView = p.npef;
 
-            // enable disable button && isNCCAvailable
-            p.assay_list?.genotype_treatment?.map((exp: any) => {
-              if (
-                exp.lote == null
+              // enable disable button && isNCCAvailable
+              p.assay_list?.genotype_treatment?.map((exp: any) => {
+                if (
+                  exp.lote == null
                 || exp.lote?.ncc == ''
                 || exp.lote?.ncc == null
                 || exp.lote?.ncc == undefined
-              ) {
+                ) {
                 // setSortearDisable(true);
-                ++count;
-              }
+                  ++count;
+                }
+              });
             });
-          });
 
-          /**
+            /**
            * No caso temos o ENV1 com NPEI = 101 e NPEF = 101 e NPEI_I = 101 e PROX_NPE = 101
            * Quando calculamos os experimentos + seq_delineamento
            * No caso temos o ENV2 com NPEI = 151 e NPEF = 151 e NPEI_I = 151 e PROX_NPE = 151
            * EDITA o ENV2 para PROX_NPE: 190
            * No caso temos o ENV2 com NPEI = 151 e NPEF = 190 e NPEI_I = 190 e PROX_NPE = 190
            * */
-          if (env.npef >= env.nextNPE.npei_i) {
-            ++count1; // conta o número de sobreposições
-          }
+            if (env.npef >= env.nextNPE.npei_i) {
+              ++count1; // conta o número de sobreposições
+            }
 
-          // se tiver zero experimentos o npef é igual ao npei
-          // IMPORTANTE: essa mudança no npef só é feita após a verificação de sobreposição;
-          if (response.length === 0) {
-            env.npef = env.prox_npe;
-            env.npefView = env.prox_npe;
-          }
+            // se tiver zero experimentos o npef é igual ao npei
+            // IMPORTANTE: essa mudança no npef só é feita após a verificação de sobreposição;
+            if (response.length === 0) {
+              env.npef = env.prox_npe;
+              env.npefView = env.prox_npe;
+            }
 
-          const temp = {
-            env,
-            data: response,
-            isNccAvailable: true,
-            isOverLap: false,
-          };
-          temp.env = env;
-          temp.data = response;
-          temp.isOverLap = false;
-
-          if (count1 > 0) {
-            temp.isOverLap = true; // indica se houve sobreposição no env atual com o proximo env
-          } else {
+            const temp = {
+              env,
+              data: response,
+              isNccAvailable: true,
+              isOverLap: false,
+            };
+            temp.env = env;
+            temp.data = response;
             temp.isOverLap = false;
-          }
 
-          if (count > 0) {
-            temp.isNccAvailable = false;
-          } else {
-            temp.isNccAvailable = true;
-          }
+            if (count1 > 0) {
+              temp.isOverLap = true; // indica se houve sobreposição no env atual com o proximo env
+            } else {
+              temp.isOverLap = false;
+            }
 
-          // // if name_local_culture == 'MT406SZ01' && epoca == '2'
-          // if(temp.env.local.name_local_culture == 'MT406SZ01' && temp.env.epoca == '2') {
-          //   // simulando NCC indisponível
-          //   temp.isNccAvailable = false;
-          // }
+            if (count > 0) {
+              temp.isNccAvailable = false;
+            } else {
+              temp.isNccAvailable = true;
+            }
 
-          //   "contagem de lotes sem NCC dos tratamentos de genótipos (count)",
-          //   count,
-          //   "<<genotype_treatment>>"
-          // );
+            // // if name_local_culture == 'MT406SZ01' && epoca == '2'
+            // if(temp.env.local.name_local_culture == 'MT406SZ01' && temp.env.epoca == '2') {
+            //   // simulando NCC indisponível
+            //   temp.isNccAvailable = false;
+            // }
 
-          setAllNPERecords((prev) => [...prev, temp]);
-          count = 0;
+            //   "contagem de lotes sem NCC dos tratamentos de genótipos (count)",
+            //   count,
+            //   "<<genotype_treatment>>"
+            // );
 
-          // setLoading(false);
-          setCountAsync(countAsync - 1);
-        })
-        .catch((error) => {
-          setCountAsync(countAsync - 1);
-          Swal.fire({
-            title: `Houve um problema para listar o ambiente: ${env?.local?.name_local_culture}`,
-            html: `DETALHES: ${error}`,
+            setAllNPERecords((prev) => [...prev, temp]);
+            count = 0;
+
+            // setLoading(false);
+            setCountAsync(countAsync - 1);
+          })
+          .catch((error) => {
+            setCountAsync(countAsync - 1);
+            Swal.fire({
+              title: `Houve um problema para listar o ambiente: ${env?.local?.name_local_culture}`,
+              html: `DETALHES: ${error}`,
+            });
+          })
+          .finally(() => {
+            setCountAsync(0);
           });
-        })
-        .finally(() => {
-          setCountAsync(0);
-        });
       // });
+      }
+    } catch (error) {
+      setLoading(false);
+      Swal.fire({
+        title: 'Falha ao buscar experimento',
+        html: `Ocorreu um erro ao buscar experimento. Tente novamente mais tarde.`,
+        width: '800',
+      });
     }
+
     // end for
   }
 
@@ -1437,27 +1447,21 @@ export default function Listagem({
                           module_id={module_id}
                           identifier_preference={identifier_preference}
                           OnSetStatusAccordion={(e: any) => {
-                            
                             setStatusAccordion(e);
                           }}
                           OnSetGeneratesProps={(e: any) => {
-                            
                             setGeneratesProps(e);
                           }}
                           OnSetCamposGerenciados={(e: any) => {
-                            
                             setCamposGerenciados(e);
                           }}
                           OnColumnsOrder={(e: any) => {
-                            
                             columnsOrder(e);
                           }}
                           OnSetUserLogado={(e: any) => {
-                            
                             setUserLogado(e);
                           }}
                           OnSetPreferences={(e: any) => {
-                            
                             setPreferences(e);
                           }}
                         />

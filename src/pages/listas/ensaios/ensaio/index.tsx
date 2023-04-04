@@ -94,11 +94,11 @@ export default function TipoEnsaio({
     route_usage: router.route,
     table_preferences: camposGerenciadosDefault,
   };
-  
+
   const [preferences, setPreferences] = useState<any>(
     userLogado.preferences[identifier_preference] || preferencesDefault,
   );
-  
+
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences,
   );
@@ -245,21 +245,27 @@ export default function TipoEnsaio({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await assayListService
-      .getAll(parametersFilter)
-      .then((response) => {
-        if (response.status === 200 || response.status === 400) {
-          setAssayList(response.response);
-          setTotalItems(response.total);
-          tableRef.current.dataManager.changePageSize(
-            response.total >= take ? take : response.total,
-          );
-        }
-        setLoading(false);
-      })
-      .catch((_) => {
-        setLoading(false);
+    try {
+      await assayListService
+        .getAll(parametersFilter)
+        .then((response) => {
+          if (response.status === 200 || response.status === 400) {
+            setAssayList(response.response);
+            setTotalItems(response.total);
+            tableRef.current.dataManager.changePageSize(
+              response.total >= take ? take : response.total,
+            );
+          }
+          setLoading(false);
+        });
+    } catch (error) {
+      setLoading(false);
+      Swal.fire({
+        title: 'Falha ao buscar ensaio',
+        html: `Ocorreu um erro ao buscar ensaio. Tente novamente mais tarde.`,
+        width: '800',
       });
+    }
   }
 
   // Call that function when change type order value.
@@ -267,7 +273,7 @@ export default function TipoEnsaio({
     callingApi(filter);
   }, [typeOrder]);
 
-  async function handleOrder(column: string, order: number, name: any,): Promise<void> {
+  async function handleOrder(column: string, order: number, name: any): Promise<void> {
     let typeOrder: any;
     let parametersFilter: any;
     if (order === 1) {

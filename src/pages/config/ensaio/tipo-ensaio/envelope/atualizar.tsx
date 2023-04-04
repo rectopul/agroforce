@@ -1,42 +1,40 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { useFormik } from "formik";
-import { useState } from "react";
-import { GetServerSideProps } from "next";
-import getConfig from "next/config";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { AiOutlineFileSearch } from "react-icons/ai";
-import { IoMdArrowBack } from "react-icons/io";
-import Swal from "sweetalert2";
-import { RequestInit } from "next/dist/server/web/spec-extension/request";
-import { envelopeService } from "../../../../../services";
-import { Button, Content, Input } from "../../../../../components";
-import ComponentLoading from "../../../../../components/Loading";
-import * as ITabs from "../../../../../shared/utils/dropdown";
+import { useFormik } from 'formik';
+import { useState } from 'react';
+import { GetServerSideProps } from 'next';
+import getConfig from 'next/config';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { AiOutlineFileSearch } from 'react-icons/ai';
+import { IoMdArrowBack } from 'react-icons/io';
+import Swal from 'sweetalert2';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import { envelopeService } from '../../../../../services';
+import { Button, Content, Input } from '../../../../../components';
+import ComponentLoading from '../../../../../components/Loading';
+import * as ITabs from '../../../../../shared/utils/dropdown';
 
 export default function Cadastro({ envelope }: any) {
   const { TabsDropDowns } = ITabs.default;
 
   const tabsDropDowns = TabsDropDowns();
 
-  tabsDropDowns.map((tab) =>
-    tab.titleTab === "ENSAIO" ? (tab.statusTab = true) : (tab.statusTab = false)
-  );
+  tabsDropDowns.map((tab) => (tab.titleTab === 'ENSAIO' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
   const router = useRouter();
 
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
 
   const [loading, setLoading] = useState<boolean>(false);
 
   function validateInputs(values: any) {
     if (!values.seeds) {
-      const inputSeeds: any = document.getElementById("seeds");
-      inputSeeds.style.borderColor = "red";
+      const inputSeeds: any = document.getElementById('seeds');
+      inputSeeds.style.borderColor = 'red';
     } else {
-      const inputSeeds: any = document.getElementById("seeds");
-      inputSeeds.style.borderColor = "";
+      const inputSeeds: any = document.getElementById('seeds');
+      inputSeeds.style.borderColor = '';
     }
   }
   const formik = useFormik<any>({
@@ -50,32 +48,40 @@ export default function Cadastro({ envelope }: any) {
       validateInputs(values);
       if (!values.seeds) {
         Swal.fire(
-          "Preencha todos os campos obrigatórios destacados em vermelho."
+          'Preencha todos os campos obrigatórios destacados em vermelho.',
         );
         return;
       }
 
       setLoading(true);
 
-      await envelopeService
-        .update({
-          id: Number(envelope.id),
-          id_safra: Number(envelope.safra.id),
-          id_type_assay: Number(envelope.type_assay.id),
-          seeds: Number(values.seeds),
-          created_by: Number(formik.values.created_by),
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            Swal.fire("Envelope atualizado com sucesso!");
-            setLoading(false);
-            router.back();
-          } else {
-            setLoading(false);
-            Swal.fire(response.message);
-          }
-        })
-        .catch((e) => setLoading(false));
+      try {
+        await envelopeService
+          .update({
+            id: Number(envelope.id),
+            id_safra: Number(envelope.safra.id),
+            id_type_assay: Number(envelope.type_assay.id),
+            seeds: Number(values.seeds),
+            created_by: Number(formik.values.created_by),
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              Swal.fire('Envelope atualizado com sucesso!');
+              setLoading(false);
+              router.back();
+            } else {
+              setLoading(false);
+              Swal.fire(response.message);
+            }
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao atualizar envelope',
+          html: `Ocorreu um erro ao atualizar envelope. Tente novamente mais tarde.`,
+          width: '800',
+        });
+      }
     },
   });
 
@@ -109,7 +115,7 @@ export default function Cadastro({ envelope }: any) {
               </label>
               <Input
                 id="safra"
-                style={{ background: "#e5e7eb" }}
+                style={{ background: '#e5e7eb' }}
                 name="safra"
                 type="text"
                 disabled
@@ -172,14 +178,14 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
   const { token } = context.req.cookies;
   const idEnvelope = context.query.id;
   const requestOptions: RequestInit | undefined = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   };
 
   const apiEnvelope = await fetch(
     `${baseUrlShow}/${idEnvelope}`,
-    requestOptions
+    requestOptions,
   );
 
   const envelope = await apiEnvelope.json();

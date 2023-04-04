@@ -88,26 +88,35 @@ export default function Safra() {
         );
       }
 
-      await safraService
-        .create({
-          id_culture: Number(culture),
-          safraName: formik.values.safraName?.trim(),
-          year: Number(formik.values.year),
-          plantingStartTime,
-          plantingEndTime,
-          status: formik.values.status,
-          created_by: Number(userLogado.id),
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            Swal.fire('Safra cadastrada com sucesso!');
-            setLoading(false);
-            router.back();
-          } else {
-            setLoading(false);
-            Swal.fire(response.message);
-          }
+      try {
+        await safraService
+          .create({
+            id_culture: Number(culture),
+            safraName: formik.values.safraName?.trim(),
+            year: Number(formik.values.year),
+            plantingStartTime,
+            plantingEndTime,
+            status: formik.values.status,
+            created_by: Number(userLogado.id),
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              Swal.fire('Safra cadastrada com sucesso!');
+              setLoading(false);
+              router.back();
+            } else {
+              setLoading(false);
+              Swal.fire(response.message);
+            }
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao criar safra',
+          html: `Ocorreu um erro ao criar safra. Tente novamente mais tarde.`,
+          width: '800',
         });
+      }
     },
   });
 

@@ -197,32 +197,41 @@ export default function NovoUsuario({
         return;
       }
 
-      await userService
-        .create({
-          avatar:
+      try {
+        await userService
+          .create({
+            avatar:
             'https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag',
-          name: capitalize(values.name?.trim()),
-          login: values.login,
-          cpf: values.cpf,
-          email: values.email,
-          tel: values.tel,
-          password: values.password,
-          registration: values.registration,
-          departmentId: values.departmentId,
-          status: values.status,
-          created_by: values.created_by,
-          cultures: auxObject,
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            Swal.fire('Usuário cadastrado com sucesso. (Caso tenha mudado as permissões de cultura, sera necessário sair e entrar novamente)');
-            setLoading(false);
-            router.back();
-          } else {
-            setLoading(false);
-            Swal.fire(response.message);
-          }
+            name: capitalize(values.name?.trim()),
+            login: values.login,
+            cpf: values.cpf,
+            email: values.email,
+            tel: values.tel,
+            password: values.password,
+            registration: values.registration,
+            departmentId: values.departmentId,
+            status: values.status,
+            created_by: values.created_by,
+            cultures: auxObject,
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              Swal.fire('Usuário cadastrado com sucesso. (Caso tenha mudado as permissões de cultura, sera necessário sair e entrar novamente)');
+              setLoading(false);
+              router.back();
+            } else {
+              setLoading(false);
+              Swal.fire(response.message);
+            }
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao criar usuário',
+          html: `Ocorreu um erro ao criar usuário. Tente novamente mais tarde.`,
+          width: '800',
         });
+      }
     },
   });
 

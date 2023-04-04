@@ -270,8 +270,13 @@ export default function Atualizargenotipo({
         }
         setLoading(false);
       })
-      .catch((_) => {
+      .catch((error) => {
         setLoading(false);
+        Swal.fire({
+          title: 'Falha ao buscar lotes',
+          html: `Ocorreu um erro ao buscar lotes. Tente novamente mais tarde.`,
+          width: '800',
+        });
       });
 
     setLoading(false);
@@ -882,27 +887,21 @@ export default function Atualizargenotipo({
                         module_id={module_id}
                         identifier_preference={identifier_preference}
                         OnSetStatusAccordion={(e: any) => {
-                          
                           setStatusAccordion(e);
                         }}
                         OnSetGeneratesProps={(e: any) => {
-                          
                           setGeneratesProps(e);
                         }}
                         OnSetCamposGerenciados={(e: any) => {
-                          
                           setCamposGerenciados(e);
                         }}
                         OnColumnsOrder={(e: any) => {
-                          
                           columnsOrder(e);
                         }}
                         OnSetUserLogado={(e: any) => {
-                          
                           setUserLogado(e);
                         }}
                         OnSetPreferences={(e: any) => {
-                          
                           setPreferences(e);
                         }}
                       />

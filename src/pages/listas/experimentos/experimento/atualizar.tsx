@@ -202,23 +202,32 @@ export default function AtualizarLocal({
     },
     onSubmit: async (values) => {
       setLoading(true);
-      await experimentService
-        .update({
-          id: Number(values.id),
-          nlp: Number(values.nlp),
-          clp: values.clp,
-          comments: values.comments?.trim(),
-          userId: userLogado.id,
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            Swal.fire('Experimento atualizado com sucesso!');
-            router.back();
-          } else {
-            setLoading(false);
-            Swal.fire(response.message);
-          }
+      try {
+        await experimentService
+          .update({
+            id: Number(values.id),
+            nlp: Number(values.nlp),
+            clp: values.clp,
+            comments: values.comments?.trim(),
+            userId: userLogado.id,
+          })
+          .then((response) => {
+            if (response.status === 200) {
+              Swal.fire('Experimento atualizado com sucesso!');
+              router.back();
+            } else {
+              setLoading(false);
+              Swal.fire(response.message);
+            }
+          });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao atualizar experimentos',
+          html: `Ocorreu um erro ao atualizar experimentos. Tente novamente mais tarde.`,
+          width: '800',
         });
+      }
     },
   });
 

@@ -238,8 +238,13 @@ export default function Listagem({
           );
         }
       })
-      .catch((_) => {
+      .catch((error) => {
         setLoading(false);
+        Swal.fire({
+          title: 'Falha ao buscar tecnologia',
+          html: `Ocorreu um erro ao buscar tecnologia. Tente novamente mais tarde.`,
+          width: '800',
+        });
       });
   }
 

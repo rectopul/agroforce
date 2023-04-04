@@ -62,23 +62,32 @@ export default function Cadastro({ safra, id_foco }: any) {
         return;
       }
 
-      await groupService.create({
-        id_safra: Number(safra.id),
-        id_foco: Number(id_foco),
-        group: Number(values.group),
-        created_by: formik.values.created_by,
-      }).then((response) => {
-        if (response.status === 200) {
-          Swal.fire('Grupo cadastrado com sucesso!');
-          router.back();
-        } else {
-          setCheckInput('text-red-600');
-          setLoading(false);
-          Swal.fire(response.message);
-        }
-      }).finally(() => {
-        formik.values.safra = '';
-      });
+      try {
+        await groupService.create({
+          id_safra: Number(safra.id),
+          id_foco: Number(id_foco),
+          group: Number(values.group),
+          created_by: formik.values.created_by,
+        }).then((response) => {
+          if (response.status === 200) {
+            Swal.fire('Grupo cadastrado com sucesso!');
+            router.back();
+          } else {
+            setCheckInput('text-red-600');
+            setLoading(false);
+            Swal.fire(response.message);
+          }
+        }).finally(() => {
+          formik.values.safra = '';
+        });
+      } catch (error) {
+        setLoading(false);
+        Swal.fire({
+          title: 'Falha ao cadastrar grupo',
+          html: `Ocorreu um erro ao cadastrar grupo. Tente novamente mais tarde.`,
+          width: '800',
+        });
+      }
     },
   });
 

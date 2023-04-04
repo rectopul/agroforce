@@ -278,20 +278,26 @@ export default function Listagem({
     setFiltersParams(parametersFilter);
     setCookies('filtersParams', parametersFilter);
 
-    await reporteService
-      .getAll(parametersFilter)
-      .then((response) => {
-        if (response.status === 200 || response.status === 400) {
-          setNPE(response.response);
-          setTotalItems(response.total);
-          tableRef.current.dataManager.changePageSize(
-            response.total >= take ? take : response.total,
-          );
-        }
-      })
-      .catch((_) => {
-        setLoading(false);
+    try {
+      await reporteService
+        .getAll(parametersFilter)
+        .then((response) => {
+          if (response.status === 200 || response.status === 400) {
+            setNPE(response.response);
+            setTotalItems(response.total);
+            tableRef.current.dataManager.changePageSize(
+              response.total >= take ? take : response.total,
+            );
+          }
+        });
+    } catch (error) {
+      setLoading(false);
+      Swal.fire({
+        title: 'Falha ao buscar logs',
+        html: `Ocorreu um erro ao buscar logs. Tente novamente mais tarde.`,
+        width: '800',
       });
+    }
   }
 
   // Call that function when change type order value.
