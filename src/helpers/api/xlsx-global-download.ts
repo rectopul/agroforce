@@ -901,7 +901,7 @@ async function callEnsaioGenotipeXlsxDownload(options: any) {
       newItem.ENSAIO = item.assay_list.type_assay.name;
       newItem.TECNOLOGIA = `${item.assay_list.tecnologia.cod_tec} ${item.assay_list.tecnologia.name}`;
       newItem.GLI = item.assay_list.gli;
-      newItem.BGM = item.assay_list.bgm;
+      newItem.BGM_ENS = item.assay_list.bgm;
       newItem.STATUS_ENSAIO = item.assay_list.status;
       newItem.PROJETO = item.assay_list.project;
       newItem.COMENTÁRIOS = item.assay_list.comments;
@@ -909,8 +909,8 @@ async function callEnsaioGenotipeXlsxDownload(options: any) {
       newItem.GGEN = `${item.genotipo.tecnologia.cod_tec} ${item.genotipo.tecnologia.name}`;
       newItem.NT = item.treatments_number;
       newItem.NOME_DO_GENOTIPO = item.genotipo.name_genotipo;
-      newItem.GMR = item.genotipo.gmr;
-      newItem.BGM = item.genotipo.bgm;
+      newItem.GMR_GEN = item.genotipo.gmr;
+      newItem.BGM_GEN = item.genotipo.bgm;
       newItem.STATUS_T = item.status;
       newItem.NCA = String(item.lote.ncc);
       newItem.COD_LOTE = String(item.lote.cod_lote);
