@@ -501,9 +501,19 @@ export class ExperimentGenotipeController {
   }: object | any) {
     const npeController = new NpeController();
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+      const { ip } = await fetch('https://api.ipify.org/?format=json')
+        .then((results) => results.json())
+        .catch(() => '0.0.0.0');
+      
+      let maxWait = 60000; // 60000 milisegundos = 60 segundos
+      let timeout = 120000; // 120000 milisegundos = 120 segundos
+      timeout = 600000; // 600000 milisegundos = 600 segundos = 10 minutos (capacidade 100 mil linhas) no createMany de experiment_genotipe
+      
       const response = await prisma?.$transaction(async (tx) => {
         await gt.map(async (gen_treatment: any) => {
+          
+          console.log('gen_treatment', gen_treatment);
+          
           await tx.genotype_treatment.update({
             where: {
               id: gen_treatment.id,
@@ -515,6 +525,9 @@ export class ExperimentGenotipeController {
         });
 
         await experimentObj.map(async (exp: any) => {
+          
+          console.log('exp', exp);
+          
           await tx.experiment.update({
             where: {
               id: exp.id,
@@ -528,6 +541,9 @@ export class ExperimentGenotipeController {
         await npeToUpdate.map(async (npe: any) => {
           const { response: newNpe }: IReturnObject = await npeController.getOne(Number(npe.id));
           const concat = `${newNpe.local.name_local_culture}_${newNpe.safra.safraName}_${newNpe.foco.name}_${newNpe.group.group}_${newNpe.type_assay.name}_${newNpe.tecnologia.cod_tec} ${newNpe.tecnologia.name}_${newNpe.epoca}_${newNpe.npei}_${newNpe.prox_npe}`;
+          
+          console.log('npe', npe);
+          
           await this.reporteController.create({
             userId, module: 'AMBIENTE', operation: 'SORTEIO', oldValue: concat, ip: String(ip),
           });
@@ -542,13 +558,16 @@ export class ExperimentGenotipeController {
             },
           });
         });
-
+        
+        console.log('pre.createMany:experiment_genotipo', experiment_genotipo);
+        
         const exp_gen = await tx.experiment_genotipe.createMany({ data: experiment_genotipo });
 
         return exp_gen;
-      }, {
-        maxWait: 60000,
-        timeout: 120000,
+      }, 
+        {
+        maxWait: maxWait, // 60000 milisegundos = 60 segundos
+        timeout: timeout, // 120000 milisegundos = 120 segundos
       });
 
       if (response) {
@@ -858,14 +877,17 @@ export class ExperimentGenotipeController {
           workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
           // logic
           res = response;
-
+          console.log("createXls registros incluidos na planilha:", options.skip);
+          
           options.skip += 1000;
         });
       }
 
       return workSheet;
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
+      handleError('Parcelas controller', 'GetAll', error.message);
+      throw new Error('[Controller] - GetAll Parcelas erro');
     }
   }
 }
