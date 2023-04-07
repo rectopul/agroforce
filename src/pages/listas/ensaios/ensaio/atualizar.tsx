@@ -93,7 +93,8 @@ export default function AtualizarTipoEnsaio({
   const [module_id, setModuleId] = useState<number>(27);
   const [identifier_preference, setIdentifierPreference] = useState<string>('');
 
-  const [camposGerenciadosDefault, setCamposGerenciadosDefault] = useState<string>('safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment');
+  const [camposGerenciadosDefault, setCamposGerenciadosDefault] = useState<string>(
+    'safra,fase,cod_tec,treatments_number,genotipoName,genotipoGmr,genotipoBgm,ensaioBgm,status,nca,cod_lote,comments,status_experiment');
   const [preferencesDefault, setPreferencesDefault] = useState<any>({
     id: 0,
     route_usage: router.route,
@@ -109,7 +110,7 @@ export default function AtualizarTipoEnsaio({
   });
   const [preferencesExperiment, setPreferencesExperiment] = useState<any>(userLogado.preferences[identifier_preference] || preferencesDefault);
 
-  const [camposGerenciados, setCamposGerenciados] = useState<any>('safra,genotipoName,fase,cod_tec,treatments_number,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment');
+  const [camposGerenciados, setCamposGerenciados] = useState<any>('safra,genotipoName,fase,cod_tec,treatments_number,genotipoGmr,genotipoBgm,ensaioBgm,status,nca,cod_lote,comments,status_experiment');
   const [experimentsCamposGerenciados, setExperimentsCamposGerenciados] = useState<any>('id,gli,experimentName,local,delineamento,repetitionsNumber,nlp,clp,eel,density,status');
 
   const tableRef = useRef<any>(null);
@@ -146,7 +147,8 @@ export default function AtualizarTipoEnsaio({
     { name: 'CamposGerenciados[]', title: 'NT', value: 'treatments_number' },
     { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
     { name: 'CamposGerenciados[]', title: 'GMR', value: 'genotipoGmr' },
-    { name: 'CamposGerenciados[]', title: 'BGM', value: 'genotipoBgm' },
+    { name: 'CamposGerenciados[]', title: 'BGM_Gen', value: 'genotipoBgm' },
+    { name: 'CamposGerenciados[]', title: 'BGM_Ens', value: 'ensaioBgm' },
     { name: 'CamposGerenciados[]', title: 'T', value: 'status' },
     { name: 'CamposGerenciados[]', title: 'NCA', value: 'nca' },
     { name: 'CamposGerenciados[]', title: 'Cód lote', value: 'cod_lote' },
@@ -384,8 +386,19 @@ export default function AtualizarTipoEnsaio({
       if (columnOrder[index] === 'genotipoBgm') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'BGM',
+            name: 'BGM_Gen',
             title: 'genotipo.bgm',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
+      }
+      if (columnOrder[index] === 'ensaioBgm') {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'BGM_Ens',
+            title: 'assay_list.bgm',
             orderList,
             fieldOrder,
             handleOrder,
@@ -566,51 +579,11 @@ export default function AtualizarTipoEnsaio({
   const columns = table === 'genotipo'
     ? columnsOrder(camposGerenciados)
     : columnsOrderExperiments(experimentsCamposGerenciados);
-
-  function setPreferencesByTabs(table:string) {
-    if (table === 'genotipo') {
-      setTables('genotype_treatment');
-      setModuloName('genotypeTreatment');
-      setModuleId(27);
-      setIdentifierPreference(`${module_name + router.route}_tabs_genotipo`);
-
-      const cmpDefault = 'genotipoName,safra,fase,cod_tec,treatments_number,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment';
-
-      setCamposGerenciadosDefault(cmpDefault);
-      setPreferencesDefault({
-        id: 0,
-        route_usage: router.route,
-        table_preferences: camposGerenciadosDefault,
-        identifier_extra: identifier_preference,
-      });
-
-      setPreferences(userLogado.preferences[identifier_preference] || preferencesDefault);
-      // setCamposGerenciados(preferences.table_preferences);
-      userLogado.preferences[identifier_preference] = userLogado.preferences[identifier_preference] || preferencesDefault;
-      localStorage.setItem('user', JSON.stringify(userLogado));
-    } else {
-      setTables('experiment');
-      setModuloName('experimento');
-      setModuleId(22);
-      setIdentifierPreference(`${module_name + router.route}_tabs_experimento`);
-      setCamposGerenciadosDefault('experimentName,id,gli,local,delineamento,repetitionsNumber,nlp,clp,eel,density,status');
-      setPreferencesDefault({
-        id: 0,
-        route_usage: router.route,
-        table_preferences: camposGerenciadosDefault,
-        identifier_extra: identifier_preference,
-      });
-      setPreferences(userLogado.preferences[identifier_preference] || preferencesDefault);
-      setExperimentsCamposGerenciados(preferences.table_preferences);
-      userLogado.preferences[identifier_preference] = userLogado.preferences[identifier_preference] || preferencesDefault;
-      localStorage.setItem('user', JSON.stringify(userLogado));
-    }
-  }
-
+  
   useEffect(() => {
     async function setPreferencesGenotype() {
       const module_name = 'genotypeTreatment';
-      const fieldsDefault = 'genotipoName,safra,cod_tec,treatments_number,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment';
+      const fieldsDefault = 'genotipoName,safra,cod_tec,treatments_number,genotipoGmr,genotipoBgm,ensaioBgm,status,nca,cod_lote,comments,status_experiment';
       const identifier = `${module_name + router.route}_tabs_genotipo`;
       const preferencesDefault = {
         id: 0,
@@ -659,7 +632,6 @@ export default function AtualizarTipoEnsaio({
       ? setPreferencesGenotype()
       : setPreferencesExperiment();
 
-    /* setPreferencesByTabs(table); */
   }, [table]);
 
   async function set(value: any, state: any) {
