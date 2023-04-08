@@ -781,19 +781,19 @@ export default function Listagem({
         if (status === 200) {
           const newData = response.map((item: any) => {
             const newItem: any = {};
-            newItem.safra = item.safra.safraName;
-            newItem.foco = item.assay_list?.foco.name;
-            newItem.ensaio = item.assay_list?.type_assay.name;
-            newItem.tecnologia = item.assay_list?.tecnologia.cod_tec;
-            newItem.gli = item.assay_list?.gli;
-            newItem.bgm = item.assay_list?.bgm === null ? '' : Number(item.assay_list?.bgm);
-            newItem.nt = item.treatments_number;
-            newItem.status_t = item.status;
-            newItem.genotipo = item.genotipo.name_genotipo;
-            newItem.nca = item.lote?.ncc;
-            newItem.novo_genotipo = '';
-            newItem.novo_status = '';
-            newItem.novo_nca = '';
+            newItem.SAFRA = item.safra.safraName;
+            newItem.FOCO = item.assay_list?.foco.name;
+            newItem.ENSAIO = item.assay_list?.type_assay.name;
+            newItem.TECNOLOGIA = item.assay_list?.tecnologia.cod_tec;
+            newItem.GLI = item.assay_list?.gli;
+            newItem.BGM_ENS = item.assay_list?.bgm === null ? '' : Number(item.assay_list?.bgm);
+            newItem.NT = item.treatments_number;
+            newItem.STATUS_T = item.status;
+            newItem.GENOTIPO = item.genotipo.name_genotipo;
+            newItem.NCA = item.lote?.ncc;
+            newItem.NOVO_GENOTIPO = '';
+            newItem.NOVO_STATUS = '';
+            newItem.NOVO_NCA = '';
             return newItem;
           });
           const workSheet = XLSX.utils.json_to_sheet(newData);
