@@ -814,7 +814,7 @@ export class ExperimentGenotipeController {
         newItem.GLI = item.gli;
         newItem.EXPERIMENTO = item.experiment.experimentName;
         newItem.BGM = item.genotipo.bgm;
-        newItem.STATUS_ENSAIO = item.experiment.assay_list.status;
+        // newItem.STATUS_ENSAIO = item.experiment.assay_list.status;
         newItem.LUGAR_PLANTIO = item.experiment.local.name_local_culture;
         newItem.DELINEAMENTO = item.experiment.delineamento.name;
         newItem.REPETIÇÕES = item.rep;
@@ -853,7 +853,7 @@ export class ExperimentGenotipeController {
             newItem.GLI = item.gli;
             newItem.EXPERIMENTO = item.experiment.experimentName;
             newItem.BGM = item.genotipo.bgm;
-            newItem.STATUS_ENSAIO = item.experiment.assay_list.status;
+            // newItem.STATUS_ENSAIO = item.experiment.assay_list.status;
             newItem.LUGAR_PLANTIO = item.experiment.local.name_local_culture;
             newItem.DELINEAMENTO = item.experiment.delineamento.name;
             newItem.REPETIÇÕES = item.rep;

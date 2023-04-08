@@ -117,7 +117,7 @@ export default function AtualizarLocal({
   const module_id = 22;
   // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
   const identifier_preference = module_name + router.route;
-  const camposGerenciadosDefault = 'repetitionExperience,genotipo,gmr,bgm,fase,tecnologia,nt,rep,status,status_t,nca,npe,sequence,block,experiment';
+  const camposGerenciadosDefault = 'repetitionExperience,genotipo,gmr_gen,bgm_gen,fase,tecnologia,nt,rep,status,status_t,nca,npe,sequence,block,experiment';
   const preferencesDefault = {
     id: 0,
     route_usage: router.route,
@@ -157,8 +157,8 @@ export default function AtualizarLocal({
       title: 'Nome do genotipo',
       value: 'genotipo',
     },
-    { name: 'CamposGerenciados[]', title: 'GMR_ens', value: 'gmr' },
-    { name: 'CamposGerenciados[]', title: 'BGM_ens', value: 'bgm' },
+    { name: 'CamposGerenciados[]', title: 'GMR_gen', value: 'gmr_gen' },
+    { name: 'CamposGerenciados[]', title: 'BGM_gen', value: 'bgm_gen' },
     { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
     { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
     { name: 'CamposGerenciados[]', title: 'NT', value: 'nt' },
@@ -351,10 +351,10 @@ export default function AtualizarLocal({
           }),
         );
       }
-      if (columnCampos[index] === 'gmr') {
+      if (columnCampos[index] === 'gmr_gen') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'GMR_ens',
+            name: 'GMR_gen',
             title: 'genotipo.gmr',
             orderList,
             fieldOrder,
@@ -363,10 +363,10 @@ export default function AtualizarLocal({
           }),
         );
       }
-      if (columnCampos[index] === 'bgm') {
+      if (columnCampos[index] === 'bgm_gen') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'BGM_ens',
+            name: 'BGM_gen',
             title: 'genotipo.bgm',
             orderList,
             fieldOrder,
