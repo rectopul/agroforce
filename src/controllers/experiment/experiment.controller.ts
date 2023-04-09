@@ -543,8 +543,8 @@ export class ExperimentController {
       }
       return { status: 404, message: 'Experimento não excluído' };
     } catch (error: any) {
-      handleError('Experimento controller', 'Delete', error.message);
-      throw new Error('[Controller] - Delete Experimento erro');
+      handleError('Experimento controller', 'Delete', error.message, error);
+      throw new Error('[Controller] - Delete Experimento erro: '+ error.message);
     }
   }
 
