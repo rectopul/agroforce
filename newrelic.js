@@ -12,7 +12,6 @@ if(process.env.COPYMOD === 'douglas') {
   appKey='19471e81c068a309688e8ed0ec1641e0FFFFNRAL';
 }
 
-
 if (process.env.NODE_ENV === 'development') {
   appName = 'development';
 } else if (process.env.COPYMOD === 'tmg') {
