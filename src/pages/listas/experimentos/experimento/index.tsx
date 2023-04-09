@@ -237,6 +237,9 @@ export default function Listagem({
     filterSelectStatusExp,
   );
 
+  /*const newrelic = require('newrelic');
+  newrelic.setPageViewName(router.route);*/
+  
   const formik = useFormik<IFilter>({
     initialValues: {
       filterFoco: checkValue('filterFoco'),
@@ -383,19 +386,30 @@ export default function Listagem({
     setLoading(true);
 
     // eslint-disable-next-line max-len
-    const { status, message } = await experimentService.deleted({
+    await experimentService.deleted({
       id: itemSelectedDelete?.id,
       userId: userLogado.id,
-    });
-    if (status === 200) {
-      await handlePagination(currentPage);
-      setLoading(false);
-    } else {
+    }).then(async ({ status, message }) => {
+      if (status === 200) {
+        await handlePagination(currentPage);
+        setLoading(false);
+      } else {
+        await Swal.fire({
+          html: message,
+          width: '800',
+        });
+        setLoading(false);
+      }
+    }).catch((error) => {
+      console.log(error);
       Swal.fire({
-        html: message,
+        html: (typeof error === 'string') ? error : error.message,
         width: '800',
       });
-    }
+      setLoading(false);
+    });
+    
+    
   }
 
   function statusHeaderFactory() {
