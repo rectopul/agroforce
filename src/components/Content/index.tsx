@@ -1,16 +1,15 @@
 /* eslint-disable react/jsx-props-no-multi-spaces */
-import { setCookie } from 'nookies';
-import { ReactNode, useState } from 'react';
-import { BiUser } from 'react-icons/bi';
-import { BsCheckLg } from 'react-icons/bs';
-import { HiOutlineOfficeBuilding } from 'react-icons/hi';
-import { MdDateRange } from 'react-icons/md';
-import { RiPlantLine, RiSeedlingLine } from 'react-icons/ri';
-import { userService } from 'src/services';
-import {
-  Aside, DropDown, MainHeader, Select, ToolTip,
-} from '..';
-import { TabHeader } from '../MainHeader/TabHeader/index2';
+import { setCookie } from "nookies";
+import { ReactNode, useEffect, useState } from "react";
+import { BiUser } from "react-icons/bi";
+import { BsCheckLg } from "react-icons/bs";
+import { HiOutlineOfficeBuilding } from "react-icons/hi";
+import { MdDateRange } from "react-icons/md";
+import { RiPlantLine, RiSeedlingLine } from "react-icons/ri";
+import { userService } from "src/services";
+import { Aside, DropDown, MainHeader, Select, ToolTip } from "..";
+import { TabHeader } from "../MainHeader/TabHeader/index2";
+import { perm_can_do } from "../../shared/utils/perm_can_do";
 
 interface IUsers {
   id: number;
@@ -49,18 +48,19 @@ export function Content({
   moduloActive,
 }: IContentData) {
   const userLogado: IUsers | any = JSON.parse(
-    localStorage.getItem('user') as string,
+    localStorage.getItem("user") as string
   );
   const cultures: object | any = [];
   const safras: object | any = [];
   const [culturaSelecionada, setCulturaSelecionada] = useState<any>(
-    userLogado.userCulture.cultura_selecionada,
+    userLogado.userCulture.cultura_selecionada
   );
   const [safraSelecionada, setSafraSelecionada] = useState<any>(
-    userLogado.safras.safra_selecionada,
+    userLogado.safras.safra_selecionada
   );
 
-  const avatarDefault = 'https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag';
+  const avatarDefault =
+    "https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag";
 
   const [tabsHeader, setTabsHeader] = useState<IContentProps[]>(contentHeader);
 
@@ -115,25 +115,40 @@ export function Content({
 
   function validationSafras(value: any) {
     if (value !== safraSelecionada) {
-      setCookie(null, 'safraId', value, {
+      setCookie(null, "safraId", value, {
         maxAge: 86400 * 7,
-        path: '/',
+        path: "/",
       });
       setSafraSelecionada(value);
       userLogado.safras.safra_selecionada = Number(value);
-      localStorage.setItem('user', JSON.stringify(userLogado));
+      localStorage.setItem("user", JSON.stringify(userLogado));
       setTimeout(() => 2000);
       location.reload();
     }
   }
 
+  useEffect(() => {
+    let newHeader: any = [];
+
+    contentHeader?.map((item) => {
+      const itemsMenu = item?.data?.filter((i) =>
+        perm_can_do(`${i.hrefDropDown}`, "view")
+      );
+
+      if (itemsMenu?.length > 0) newHeader.push(item);
+    });
+
+    setTabsHeader(newHeader);
+    // console.log({ contentHeader });
+    // console.log({ newHeader });
+  }, [contentHeader]);
 
   return (
     <>
       <MainHeader
         name={userLogado.name}
         avatar={!userLogado.avatar ? avatarDefault : userLogado.avatar}
-        headerSelects={(
+        headerSelects={
           <div className="mb-7 flex gap-3">
             <div className="h-7 lg:w-40 md:w-32 sm:w-26">
               <Select
@@ -150,7 +165,7 @@ export function Content({
               />
             </div>
           </div>
-        )}
+        }
       >
         {tabsHeader?.map((item: any, index: any) => (
           <ToolTip
