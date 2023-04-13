@@ -117,7 +117,7 @@ export default function AtualizarLocal({
   const module_id = 22;
   // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
   const identifier_preference = module_name + router.route;
-  const camposGerenciadosDefault = 'repetitionExperience,genotipo,gmr_gen,bgm_gen,fase,tecnologia,nt,rep,status,status_t,nca,npe,sequence,block,experiment';
+  const camposGerenciadosDefault = 'repetitionExperience,genotipo,gmr_gen,bgm_gen,bgm_ens,fase,tecnologia,nt,rep,status,status_t,nca,npe,sequence,block,experiment';
   const preferencesDefault = {
     id: 0,
     route_usage: router.route,
@@ -147,28 +147,21 @@ export default function AtualizarLocal({
   const [filtersParams, setFiltersParams] = useState<any>(''); // Set filter Parameter
   // const [colorStar, setColorStar] = useState<string>('');
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Rep Exp',
-      value: 'repetitionExperience',
-    },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Nome do genotipo',
-      value: 'genotipo',
-    },
-    { name: 'CamposGerenciados[]', title: 'GMR_gen', value: 'gmr_gen' },
-    { name: 'CamposGerenciados[]', title: 'BGM_gen', value: 'bgm_gen' },
-    { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
-    { name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia' },
-    { name: 'CamposGerenciados[]', title: 'NT', value: 'nt' },
-    { name: 'CamposGerenciados[]', title: 'Rep. trat.', value: 'rep' },
-    { name: 'CamposGerenciados[]', title: 'T', value: 'status_t' },
-    { name: 'CamposGerenciados[]', title: 'NCA', value: 'nca' },
-    { name: 'CamposGerenciados[]', title: 'NPE', value: 'npe' },
+    {name: 'CamposGerenciados[]', title: 'Rep Exp', value: 'repetitionExperience',},
+    {name: 'CamposGerenciados[]', title: 'Nome do genotipo', value: 'genotipo',},
+    {name: 'CamposGerenciados[]', title: 'GMR_GEN', value: 'gmr_gen'},
+    {name: 'CamposGerenciados[]', title: 'BGM_GEN', value: 'bgm_gen'},
+    {name: 'CamposGerenciados[]', title: 'BGM_ENS', value: 'bgm_ens'},
+    {name: 'CamposGerenciados[]', title: 'Fase', value: 'fase'},
+    {name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia'},
+    {name: 'CamposGerenciados[]', title: 'NT', value: 'nt'},
+    {name: 'CamposGerenciados[]', title: 'Rep. trat.', value: 'rep'},
+    {name: 'CamposGerenciados[]', title: 'T', value: 'status_t'},
+    {name: 'CamposGerenciados[]', title: 'NCA', value: 'nca'},
+    {name: 'CamposGerenciados[]', title: 'NPE', value: 'npe'},
     // { name: "CamposGerenciados[]", title: "Seq.", value: "sorteio" },
-    { name: 'CamposGerenciados[]', title: 'Bloco', value: 'block' },
-    { name: 'CamposGerenciados[]', title: 'Status parc', value: 'status' },
+    {name: 'CamposGerenciados[]', title: 'Bloco', value: 'block'},
+    {name: 'CamposGerenciados[]', title: 'Status parc', value: 'status'},
   ]);
 
   const [take, setTake] = useState<any>(itensPerPage);
@@ -354,7 +347,7 @@ export default function AtualizarLocal({
       if (columnCampos[index] === 'gmr_gen') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'GMR_gen',
+            name: 'GMR_GEN',
             title: 'genotipo.gmr',
             orderList,
             fieldOrder,
@@ -366,8 +359,19 @@ export default function AtualizarLocal({
       if (columnCampos[index] === 'bgm_gen') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'BGM_gen',
+            name: 'BGM_GEN',
             title: 'genotipo.bgm',
+            orderList,
+            fieldOrder,
+            handleOrder,
+          }),
+        );
+      }
+      if (columnCampos[index] === 'bgm_ens') {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: 'BGM_ENS',
+            title: 'experiment.assay_list.bgm',
             orderList,
             fieldOrder,
             handleOrder,
