@@ -110,7 +110,7 @@ export default function AtualizarTipoEnsaio({
   });
   const [preferencesExperiment, setPreferencesExperiment] = useState<any>(userLogado.preferences[identifier_preference] || preferencesDefault);
 
-  const [camposGerenciados, setCamposGerenciados] = useState<any>('safra,genotipoName,fase,cod_tec,treatments_number,genotipoGmr,genotipoBgm,ensaioBgm,status,nca,cod_lote,comments,status_experiment');
+  const [camposGerenciados, setCamposGerenciados] = useState<any>('safra,genotipoName,cod_tec,treatments_number,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment,fase');
   const [experimentsCamposGerenciados, setExperimentsCamposGerenciados] = useState<any>('id,gli,experimentName,local,delineamento,repetitionsNumber,nlp,clp,eel,density,status');
 
   const tableRef = useRef<any>(null);
@@ -140,7 +140,7 @@ export default function AtualizarTipoEnsaio({
   }&typeOrder=${typeOrder}`;
 
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    // { name: "CamposGerenciados[]", title: "Favorito", value: "id" },
+    /*{ name: "CamposGerenciados[]", title: "Favorito", value: "id" },*/
     { name: 'CamposGerenciados[]', title: 'Nome do genótipo', value: 'genotipoName' },
     { name: 'CamposGerenciados[]', title: 'Safra', value: 'safra' },
     { name: 'CamposGerenciados[]', title: 'GGEN', value: 'cod_tec' },
@@ -148,7 +148,6 @@ export default function AtualizarTipoEnsaio({
     { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
     { name: 'CamposGerenciados[]', title: 'GMR_GEN', value: 'genotipoGmr' },
     { name: 'CamposGerenciados[]', title: 'BGM_GEN', value: 'genotipoBgm' },
-    { name: 'CamposGerenciados[]', title: 'BGM_ESN', value: 'ensaioBgm' },
     { name: 'CamposGerenciados[]', title: 'T', value: 'status' },
     { name: 'CamposGerenciados[]', title: 'NCA', value: 'nca' },
     { name: 'CamposGerenciados[]', title: 'Cód lote', value: 'cod_lote' },
@@ -394,17 +393,6 @@ export default function AtualizarTipoEnsaio({
           }),
         );
       }
-      if (columnOrder[index] === 'ensaioBgm') {
-        tableFields.push(
-          headerTableFactoryGlobal({
-            name: 'BGM_ENS',
-            title: 'assay_list.bgm',
-            orderList,
-            fieldOrder,
-            handleOrder,
-          }),
-        );
-      }
       if (columnOrder[index] === 'status') {
         tableFields.push(
           headerTableFactoryGlobal({
@@ -583,7 +571,7 @@ export default function AtualizarTipoEnsaio({
   useEffect(() => {
     async function setPreferencesGenotype() {
       const module_name = 'genotypeTreatment';
-      const fieldsDefault = 'genotipoName,safra,cod_tec,treatments_number,genotipoGmr,genotipoBgm,ensaioBgm,status,nca,cod_lote,comments,status_experiment';
+      const fieldsDefault = 'genotipoName,safra,cod_tec,treatments_number,genotipoGmr,genotipoBgm,status,nca,cod_lote,comments,status_experiment,fase';
       const identifier = `${module_name + router.route}_tabs_genotipo`;
       const preferencesDefault = {
         id: 0,
