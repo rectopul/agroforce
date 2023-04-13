@@ -156,19 +156,19 @@ export default function Listagem({
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'BGM_Ens',
+      title: 'BGM_ENS',
       value: 'bgm',
       defaultChecked: () => camposGerenciados.includes('bgm'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'BGM_Gen',
+      title: 'BGM_GEN',
       value: 'bgmGenotype',
       defaultChecked: () => camposGerenciados.includes('bgmGenotype'),
     },
     {
       name: 'CamposGerenciados[]',
-      title: 'GMR_Gen',
+      title: 'GMR_GEN',
       value: 'gmr',
       defaultChecked: () => camposGerenciados.includes('gmr'),
     },
@@ -304,10 +304,10 @@ export default function Listagem({
       filterCodTec,
     }) => {
       if (!functionsUtils?.isNumeric(filterBgmFrom)) {
-        return Swal.fire('O campo BGM_Ens não pode ter ponto ou vírgula.');
+        return Swal.fire('O campo BGM_ENS não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterBgmTo)) {
-        return Swal.fire('O campo BGM_Ens não pode ter ponto ou vírgula.');
+        return Swal.fire('O campo BGM_ENS não pode ter ponto ou vírgula.');
       }
       if (!functionsUtils?.isNumeric(filterNtFrom)) {
         return Swal.fire('O campo NT não pode ter ponto ou vírgula.');
@@ -571,7 +571,7 @@ export default function Listagem({
       if (columnOrder[item] === 'bgm') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'BGM_ens',
+            name: 'BGM_ENS',
             title: 'assay_list.bgm',
             orderList,
             fieldOrder,
@@ -582,7 +582,7 @@ export default function Listagem({
       if (columnOrder[item] === 'bgmGenotype') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'BGM_Gen',
+            name: 'BGM_GEN',
             title: 'genotipo.bgm',
             orderList,
             fieldOrder,
@@ -593,7 +593,7 @@ export default function Listagem({
       if (columnOrder[item] === 'gmr') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'GMR_Gen',
+            name: 'GMR_GEN',
             title: 'genotipo.gmr',
             orderList,
             fieldOrder,
@@ -743,10 +743,12 @@ export default function Listagem({
     await genotypeTreatmentService
       .getAll(`${filterParam}&excel=true`)
       .then(({ status, response }) => {
+        
         if (!response.A1) {
           Swal.fire('Nenhum dado para extrair');
           return;
         }
+        
         if (status === 200) {
           const workBook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(workBook, response, 'Tratamentos');
@@ -1252,7 +1254,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      BGM_Ens
+                      BGM_ENS
                     </label>
                     <div className="flex">
                       <Input
@@ -1277,7 +1279,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      BGM_Gen
+                      BGM_GEN
                     </label>
                     <div className="flex">
                       <Input
@@ -1302,7 +1304,7 @@ export default function Listagem({
 
                   <div className="h-6 w-1/2 ml-2">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
-                      GMR_Gen
+                      GMR_GEN
                     </label>
                     <div className="flex">
                       <Input
