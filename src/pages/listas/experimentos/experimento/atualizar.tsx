@@ -117,7 +117,7 @@ export default function AtualizarLocal({
   const module_id = 22;
   // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
   const identifier_preference = module_name + router.route;
-  const camposGerenciadosDefault = 'repetitionExperience,genotipo,gmr_gen,bgm_gen,bgm_ens,fase,tecnologia,nt,rep,status,status_t,nca,npe,sequence,block,experiment';
+  const camposGerenciadosDefault = 'repetitionExperience,genotipo,gmr_gen,bgm_gen,fase,tecnologia,nt,rep,status,status_t,nca,npe,sequence,block,experiment';
   const preferencesDefault = {
     id: 0,
     route_usage: router.route,
@@ -151,7 +151,7 @@ export default function AtualizarLocal({
     {name: 'CamposGerenciados[]', title: 'Nome do genotipo', value: 'genotipo',},
     {name: 'CamposGerenciados[]', title: 'GMR_GEN', value: 'gmr_gen'},
     {name: 'CamposGerenciados[]', title: 'BGM_GEN', value: 'bgm_gen'},
-    {name: 'CamposGerenciados[]', title: 'BGM_ENS', value: 'bgm_ens'},
+    /*{name: 'CamposGerenciados[]', title: 'BGM_ENS', value: 'bgm_ens'},*/
     {name: 'CamposGerenciados[]', title: 'Fase', value: 'fase'},
     {name: 'CamposGerenciados[]', title: 'Tecnologia', value: 'tecnologia'},
     {name: 'CamposGerenciados[]', title: 'NT', value: 'nt'},
@@ -367,7 +367,7 @@ export default function AtualizarLocal({
           }),
         );
       }
-      if (columnCampos[index] === 'bgm_ens') {
+      /*if (columnCampos[index] === 'bgm_ens') {
         tableFields.push(
           headerTableFactoryGlobal({
             name: 'BGM_ENS',
@@ -377,7 +377,7 @@ export default function AtualizarLocal({
             handleOrder,
           }),
         );
-      }
+      }*/
       if (columnCampos[index] === 'fase') {
         tableFields.push(
           headerTableFactoryGlobal({
