@@ -151,6 +151,13 @@ export default function AtualizarTipoEnsaio({
   const pages = Math.ceil(total / take);
 
   function validateInputs(values: any) {
+
+    // for of values and trim fields typeof string
+    for (const key in values) {
+      if (typeof values[key] === 'string') {
+        values[key] = values[key].trim();
+      }
+    }
     if (!values.name) {
       const inputName: any = document.getElementById('name');
       inputName.style.borderColor = 'red';

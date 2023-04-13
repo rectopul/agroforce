@@ -65,7 +65,10 @@ export default function Safra() {
         created_by, id_culture, status, ...inputs
       } = data;
 
-      validateInputs(inputs);
+      validateInputs(values);
+      
+      console.log('values', values);
+      
       if (!values.safraName || !values.year) {
         Swal.fire(
           'Preencha todos os campos obrigatórios destacados em vermelho.',
@@ -120,7 +123,13 @@ export default function Safra() {
     },
   });
 
-  function validateInputs(values: Input) {
+  function validateInputs(values: any) {
+    // for of values and trim fields typeof string
+    for (const key in values) {
+      if (typeof values[key] === 'string') {
+        values[key] = values[key].trim();
+      }
+    }
     if (!values.safraName || !values.year) {
       const inputSafraName: any = document.getElementById('safraName');
       const inputYear: any = document.getElementById('year');

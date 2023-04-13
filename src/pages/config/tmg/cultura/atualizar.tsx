@@ -5,7 +5,7 @@ import getConfig from 'next/config';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { IoMdArrowBack } from 'react-icons/io';
 import { RiPlantLine } from 'react-icons/ri';
 import { cultureService } from 'src/services';
@@ -35,16 +35,28 @@ export default function Cultura(culture: IUpdateCulture) {
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const formik = useFormik<IUpdateCulture>({
+  const [value, setValue] = React.useState(0);
+  
+  const formik 
+    = useFormik<IUpdateCulture>({
     initialValues: {
       id: culture.id,
       name: culture.name,
       desc: culture.desc,
       created_by: 0,
     },
-    onSubmit: async (values) => {
+
+    onSubmit: async (values:any) => {
+
+      // for of values and trim fields typeof string
+      for (const key in values) {
+        if (typeof values[key] === 'string') {
+          values[key] = values[key].trim();
+        }
+      }
+      
       validateInputs(values);
-      if (!values.name || !values.desc) {
+      if (!values.name.trim() || !values.desc) {
         Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
         setLoading(false);
         return;
@@ -81,7 +93,7 @@ export default function Cultura(culture: IUpdateCulture) {
       }
     },
   });
-
+  
   function validateInputs(values: any) {
     if (!values.name || !values.desc) {
       const inputName: any = document.getElementById('name');

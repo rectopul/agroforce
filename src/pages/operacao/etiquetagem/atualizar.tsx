@@ -153,6 +153,13 @@ export default function Listagem({
       name: experimentGroup?.name,
     },
     onSubmit: async (values) => {
+      
+      if(!values.name?.trim()){
+        Swal.fire('Informe o nome do grupo de experimento');
+        setLoading(false);
+        return;
+      }
+      
       try {
         await experimentGroupService
           .update({
