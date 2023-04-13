@@ -146,9 +146,9 @@ export default function AtualizarTipoEnsaio({
     { name: 'CamposGerenciados[]', title: 'GGEN', value: 'cod_tec' },
     { name: 'CamposGerenciados[]', title: 'NT', value: 'treatments_number' },
     { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
-    { name: 'CamposGerenciados[]', title: 'GMR', value: 'genotipoGmr' },
-    { name: 'CamposGerenciados[]', title: 'BGM_Gen', value: 'genotipoBgm' },
-    { name: 'CamposGerenciados[]', title: 'BGM_Ens', value: 'ensaioBgm' },
+    { name: 'CamposGerenciados[]', title: 'GMR_GEN', value: 'genotipoGmr' },
+    { name: 'CamposGerenciados[]', title: 'BGM_GEN', value: 'genotipoBgm' },
+    { name: 'CamposGerenciados[]', title: 'BGM_ESN', value: 'ensaioBgm' },
     { name: 'CamposGerenciados[]', title: 'T', value: 'status' },
     { name: 'CamposGerenciados[]', title: 'NCA', value: 'nca' },
     { name: 'CamposGerenciados[]', title: 'Cód lote', value: 'cod_lote' },
@@ -374,7 +374,7 @@ export default function AtualizarTipoEnsaio({
       if (columnOrder[index] === 'genotipoGmr') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'GMR',
+            name: 'GMR_GEN',
             title: 'genotipo.gmr',
             orderList,
             fieldOrder,
@@ -386,7 +386,7 @@ export default function AtualizarTipoEnsaio({
       if (columnOrder[index] === 'genotipoBgm') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'BGM_Gen',
+            name: 'BGM_GEN',
             title: 'genotipo.bgm',
             orderList,
             fieldOrder,
@@ -397,7 +397,7 @@ export default function AtualizarTipoEnsaio({
       if (columnOrder[index] === 'ensaioBgm') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: 'BGM_Ens',
+            name: 'BGM_ENS',
             title: 'assay_list.bgm',
             orderList,
             fieldOrder,
