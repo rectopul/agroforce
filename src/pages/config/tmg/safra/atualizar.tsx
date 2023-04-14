@@ -119,7 +119,16 @@ export default function AtualizarSafra(safra: any) {
     },
   });
 
-  function validateInputs(values: Input) {
+  function validateInputs(values:any) {
+    // for of values and trim fields typeof string
+    for (const key in values) {
+      if (typeof values[key] === 'string') {
+        values[key] = values[key].trim();
+      }
+    }
+    
+    console.log('values', values);
+    
     if (!values.safraName || !values.year) {
       const inputSafraName: any = document.getElementById('safraName');
       const inputYear: any = document.getElementById('year');

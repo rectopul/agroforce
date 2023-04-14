@@ -720,13 +720,22 @@ export default function Listagem({
 
   async function handleSubmit(event: any) {
     event.preventDefault();
-    const inputValue: any = (
+    let inputValue: any = (
       document.getElementById('inputName') as HTMLInputElement
     )?.value;
+
+    inputValue = inputValue?.trim();
+
+    if(inputValue === '' || inputValue === undefined || inputValue === null) {
+      Swal.fire('Campo nome é obrigatório');
+      return;
+    }
+    
     const { response }: IReturnObject = await experimentGroupService.getAll({
       filterExperimentGroup: inputValue,
       safraId,
     });
+    
     if (response?.length > 0) {
       Swal.fire('Grupo já cadastrado');
     } else {

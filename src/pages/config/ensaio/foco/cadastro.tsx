@@ -34,6 +34,12 @@ export default function Cadastro() {
   const culture = userLogado.userCulture.cultura_selecionada as string;
 
   function validateInputs(values: any) {
+    // for of values and trim fields typeof string
+    for (const key in values) {
+      if (typeof values[key] === 'string') {
+        values[key] = values[key].trim();
+      }
+    }
     if (!values.name || values.group === 0) {
       const inputName: any = document.getElementById('name');
       inputName.style.borderColor = 'red';
