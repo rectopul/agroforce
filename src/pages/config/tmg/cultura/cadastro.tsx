@@ -31,14 +31,24 @@ export default function Cadastro() {
   const [loading, setLoading] = useState<boolean>(false);
 
   const userLogado = JSON.parse(localStorage.getItem('user') as string);
-  const formik = useFormik<ICreateCulture>({
+  const formik
+    = useFormik<ICreateCulture>({
     initialValues: {
       name: '',
       desc: '',
       status: 1,
       created_by: Number(userLogado.id),
     },
-    onSubmit: async (values) => {
+    onSubmit: async (values:any) => {
+      
+      // for of values and trim fields typeof string
+      for (const key in values) {
+        if (typeof values[key] === 'string') {
+          values[key] = values[key].trim();
+        }
+      }
+      
+      
       validateInputs(values);
       if (!values.name || !values.desc) {
         Swal.fire('Preencha todos os campos obrigatórios destacados em vermelho.');
