@@ -1038,9 +1038,10 @@ export default function Listagem({
             });
           } else {
             Swal.fire({
-              title: 'algo deu errado',
-              showCancelButton: true,
+              title: 'Erro ao sortear',
+              html: response.message,
             });
+            setLoading(false);
           }
           setLoading(false);
         })

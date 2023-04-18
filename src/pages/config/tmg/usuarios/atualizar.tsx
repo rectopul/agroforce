@@ -210,6 +210,7 @@ export default function AtualizarUsuario({
       let auxObject2: any = [];
       let auxValidate: boolean = false;
       let validateQuantity: boolean = false;
+      let quantityRoles: number = 20;
 
       Object.keys(values.cultures).forEach((item: any) => {
         input = document.querySelector(
@@ -226,7 +227,7 @@ export default function AtualizarUsuario({
           return;
         }
 
-        if (auxObject2.length > 5) {
+        if (auxObject2.length > quantityRoles) {
           validateQuantity = true;
         }
 
@@ -592,7 +593,6 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
         },
         select: {
           id: true,
-
           profile: {
             select: {
               id: true,
@@ -606,6 +606,7 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
             },
           },
         },
+        // distinct: ['cultureId'],
       },
       department: {
         select: {
@@ -614,7 +615,7 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
       },
     },
   });
-
+  
   const responseDepartment = await prisma.department.findMany({
     where: {
       status: 1,
