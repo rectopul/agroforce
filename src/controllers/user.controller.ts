@@ -200,21 +200,23 @@ export class UserController {
         
         if (response) {
           if (data.cultures) {
-            
+
             // deleta todos as permissoes antes de inserir novas;
             await this.userPermissionsController.delete(response.id);
-            
-            Object.keys(data.cultures).forEach((item: any) => {
-              data.cultures[item].profiles.forEach((profile: any) => {
-                this.userPermissionsController.post({
+
+            for (const item of Object.keys(data.cultures)) {
+              for (const profile of data.cultures[item].profiles) {
+                const res = await this.userPermissionsController.post({
                   userId: response.id,
                   profileId: Number(profile),
                   cultureId: Number(data.cultures[item].cultureId),
                   created_by: Number(data.created_by),
                 });
-              });
-            });
+              }
+            }
+            
           }
+          
           if (data.cultureId) {
             this.userCultureController.save(
               { cultureId: data.cultureId, userId: response.id, created_by: data.created_by },
