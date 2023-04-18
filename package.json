@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "next",
-    "debug": "cross-env NODE_OPTIONS='--inspect' next dev",
+    "debug": "cross-env NODE_OPTIONS='--inspect --max_old_space_size=8192' next dev",
     "debug_limitado": "cross-env NODE_OPTIONS='--inspect --max_old_space_size=4096' next dev",
     "debug_limitado_2mb": "cross-env NODE_OPTIONS='--inspect --max_old_space_size=2048' next dev",
     "debug_limitado_4mb": "cross-env NODE_OPTIONS='--inspect --max_old_space_size=4096' next dev",

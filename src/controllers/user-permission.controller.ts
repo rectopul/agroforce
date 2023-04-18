@@ -81,7 +81,8 @@ export class UserPermissionController {
   async post(data: object | any) {
     try {
       if (data !== null && data !== undefined) {
-        await this.delete(Number(data.userId));
+        // esta linha está errada neste local, está excluindo todas as permissões do usuário e inserindo apenas a ultima;
+        // await this.delete(Number(data.userId));
         data.status = 0;
         const response = await this.userPermission.create(data);
         if (response.count > 0) {
