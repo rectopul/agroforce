@@ -509,6 +509,10 @@ export class ExperimentGenotipeController {
       let timeout = 120000; // 120000 milisegundos = 120 segundos
       timeout = 600000; // 600000 milisegundos = 600 segundos = 10 minutos (capacidade 100 mil linhas) no createMany de experiment_genotipe
       
+      if(experiment_genotipo.length > 100000){
+        return { status: 400, message: 'Você está tentando gerar muitos registros, favor procurar o admnistrador;' };
+      }
+      
       const response = await prisma?.$transaction(async (tx) => {
         await gt.map(async (gen_treatment: any) => {
           
