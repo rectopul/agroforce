@@ -195,8 +195,15 @@ export class UserController {
 
         const response = await this.userRepository.create(parameters);
 
+
+        console.log('data.cultures', data.cultures);
+        
         if (response) {
           if (data.cultures) {
+            
+            // deleta todos as permissoes antes de inserir novas;
+            await this.userPermissionsController.delete(response.id);
+            
             Object.keys(data.cultures).forEach((item: any) => {
               data.cultures[item].profiles.forEach((profile: any) => {
                 this.userPermissionsController.post({
@@ -339,20 +346,28 @@ export class UserController {
           parameters.created_by = data.created_by;
         }
 
+        console.log('data.cultures', data.cultures);
+        
         const response: object | any = await this.userRepository.update(data.id, parameters);
 
         if (response.count > 0) {
           if (data.cultures) {
-            Object.keys(data.cultures).forEach((item: any) => {
-              data.cultures[item].profiles.forEach((profile: any) => {
-                this.userPermissionsController.post({
+
+            await this.userPermissionsController.delete(data.id);
+            
+            for (const item of Object.keys(data.cultures)) {
+              for (const profile of data.cultures[item].profiles) {
+                const res = await this.userPermissionsController.post({
                   userId: data.id,
                   profileId: Number(profile),
                   cultureId: Number(data.cultures[item].cultureId),
                   created_by: Number(data.created_by),
                 });
-              });
-            });
+                
+                console.log('responsePerm', res);
+                
+              }
+            }
           }
 
           if (data.status === 1) {

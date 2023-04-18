@@ -25,6 +25,7 @@ import {
 import IDepartment from '../../../../../props/departmentDTO';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import ComponentLoading from '../../../../components/Loading';
+import {prisma} from "../../../api/db/db";
 
 interface ICulture {
   id: number;
@@ -177,25 +178,29 @@ export default function NovoUsuario({
       let auxValidate: boolean = false;
 
       Object.keys(values.cultures).forEach((item: any) => {
-        input = document.querySelector(
-          `select[name="profiles_${values.cultures[item]}"]`,
-        );
-        auxObject2 = [];
+
+        let rolesIds = [];
+        
+        input = document.querySelector(`select[name="profiles_${values.cultures[item]}"]`);
+        
         for (let i = 0; i < input.options.length; i += 1) {
           if (input.options[i].selected) {
-            auxObject2.push(input.options[i].value);
+            rolesIds.push(input.options[i].value);
           }
         }
-        if (values.cultures[item] && auxObject2.length === 0) {
+        
+        if (values.cultures[item] && rolesIds.length === 0) {
           auxValidate = true;
           return;
         }
 
-        ObjProfiles = {
+        let user_permission = {
           cultureId: values.cultures[item],
-          profiles: auxObject2,
+          profiles: rolesIds,
         };
-        auxObject.push(ObjProfiles);
+        
+        auxObject.push(user_permission);
+        
       });
 
       if (auxValidate) {
@@ -205,22 +210,25 @@ export default function NovoUsuario({
       }
 
       try {
-        await userService
-          .create({
-            avatar:
+        
+        const data = {
+          avatar:
             'https://media-exp1.licdn.com/dms/image/C4E0BAQGtzqdAyfyQxw/company-logo_200_200/0/1609955662718?e=2147483647&v=beta&t=sfA6x4MWOhWda5si7bHHFbOuhpz4ZCTdeCPtgyWlAag',
-            name: capitalize(values.name?.trim()),
-            login: values.login,
-            cpf: values.cpf,
-            email: values.email,
-            tel: values.tel,
-            password: values.password,
-            registration: values.registration,
-            departmentId: values.departmentId,
-            status: values.status,
-            created_by: values.created_by,
-            cultures: auxObject,
-          })
+          name: capitalize(values.name?.trim()),
+          login: values.login,
+          cpf: values.cpf,
+          email: values.email,
+          tel: values.tel,
+          password: values.password,
+          registration: values.registration,
+          departmentId: values.departmentId,
+          status: values.status,
+          created_by: values.created_by,
+          cultures: auxObject,
+        };
+        
+        await userService
+          .create(data)
           .then((response) => {
             if (response.status === 200) {
               Swal.fire('Usuário cadastrado com sucesso. (Caso tenha mudado as permissões de cultura, sera necessário sair e entrar novamente)');
@@ -532,8 +540,11 @@ export default function NovoUsuario({
 
 export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
   const { publicRuntimeConfig } = getConfig();
+  
   const baseUrl = `${publicRuntimeConfig.apiUrl}/user`;
+  
   const { token } = req.cookies;
+  
   const requestOptions: RequestInit | undefined = {
     method: 'GET',
     credentials: 'include',
@@ -542,8 +553,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
 
   const apiDepartment = await fetch(`${baseUrl}/departament`, requestOptions);
   const apiProfile = await fetch(`${baseUrl}/profile`, requestOptions);
+
+  const param = `&filterStatus=1`;
+
+  const urlParameters: any = new URL(`${publicRuntimeConfig.apiUrl}/culture`);
+  urlParameters.search = new URLSearchParams(param).toString();
+
   const apiCulture = await fetch(
-    `${publicRuntimeConfig.apiUrl}/culture`,
+    urlParameters.toString(),
     requestOptions,
   );
 
@@ -551,5 +568,20 @@ export const getServerSideProps: GetServerSideProps = async ({ req }: any) => {
   const profiles = await apiProfile.json();
   const Cultures = (await apiCulture.json()).response;
 
-  return { props: { departments, profiles, Cultures } };
+  /*const responseCulture = await prisma.culture.findMany({
+    where: {
+      status: 1,
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
+  const Cultures = responseCulture.map((culture: any) => ({
+    id: culture.id,
+    name: culture.name,
+  }));*/
+
+  return {props: {departments, profiles, Cultures}};
 };
