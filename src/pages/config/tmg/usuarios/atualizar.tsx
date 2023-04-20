@@ -210,7 +210,7 @@ export default function AtualizarUsuario({
       let auxObject2: any = [];
       let auxValidate: boolean = false;
       let validateQuantity: boolean = false;
-      let quantityRoles: number = 20;
+      let maxRoles: number = 20;
 
       Object.keys(values.cultures).forEach((item: any) => {
         input = document.querySelector(
@@ -227,7 +227,7 @@ export default function AtualizarUsuario({
           return;
         }
 
-        if (auxObject2.length > quantityRoles) {
+        if (auxObject2.length > maxRoles) {
           validateQuantity = true;
         }
 
@@ -246,7 +246,7 @@ export default function AtualizarUsuario({
       }
 
       if (validateQuantity) {
-        Swal.fire('O máximo de perfis por cultura é 5');
+        Swal.fire(`O máximo de perfis por cultura é ${maxRoles}`);
         setLoading(false);
         return;
       }
