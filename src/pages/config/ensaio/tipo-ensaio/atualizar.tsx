@@ -190,7 +190,7 @@ export default function AtualizarTipoEnsaio({
         await typeAssayService
           .update({
             id: values.id,
-            name: capitalize(values.name?.trim()),
+            name: (values.name?.trim()),
             id_culture: values.id_culture,
             created_by: Number(userLogado.id),
           })

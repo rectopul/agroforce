@@ -43,7 +43,7 @@ export default function NovoLocal({ delineamentoEdit }: IData) {
   const formik = useFormik<IDelineamentoProps>({
     initialValues: {
       id: delineamentoEdit.id,
-      name: capitalize(delineamentoEdit.name),
+      name: (delineamentoEdit.name),
       repeticao: delineamentoEdit.repeticao,
       trat_repeticao: delineamentoEdit.trat_repeticao,
       created_by: userLogado.id,

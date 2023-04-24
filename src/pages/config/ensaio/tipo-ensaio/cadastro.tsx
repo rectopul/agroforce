@@ -77,7 +77,7 @@ export default function NovoTipoEnsaio() {
         await typeAssayService
           .create({
             id_culture: Number(culture),
-            name: capitalize(values.name?.trim()),
+            name: (values.name?.trim()),
             protocol_name: values.protocolName,
             created_by: Number(userLogado.id),
             status: 1,

@@ -68,7 +68,7 @@ export default function Cadastro() {
       try {
         await focoService
           .create({
-            name: capitalize(formik.values.name?.trim()),
+            name: (formik.values.name?.trim()),
             id_culture: Number(culture),
             created_by: formik.values.created_by,
           })

@@ -46,7 +46,7 @@ export default function Safra() {
       try {
         await departmentService
           .create({
-            name: capitalize(formik.values.name?.trim()),
+            name: (formik.values.name?.trim()),
             created_by: formik.values.created_by,
           })
           .then((response) => {

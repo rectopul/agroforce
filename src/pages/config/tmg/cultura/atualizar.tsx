@@ -66,8 +66,8 @@ export default function Cultura(culture: IUpdateCulture) {
         await cultureService
           .updateCulture({
             id: culture.id,
-            name: capitalize(formik.values.name),
-            desc: capitalize(formik.values.desc?.trim()),
+            name: (formik.values.name?.toUpperCase()),
+            desc: (formik.values.desc?.trim()),
             created_by: Number(userLogado.id),
           })
           .then((response) => {

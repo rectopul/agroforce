@@ -255,7 +255,7 @@ export default function AtualizarUsuario({
         await userService
           .update({
             id: values.id,
-            name: capitalize(values.name?.trim()),
+            name: (values.name?.trim()),
             login: values.login,
             cpf: values.cpf,
             email: values.email,

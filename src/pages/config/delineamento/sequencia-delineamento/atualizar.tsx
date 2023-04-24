@@ -54,7 +54,7 @@ export default function Cultura(item: IUpdateSequenciaDelineamento) {
 
       await sequenciaDelineamentoService.update({
         id: item.id,
-        name: capitalize(formik.values.name),
+        name: (formik.values.name),
         repeticao: formik.values.repeticao,
         sorteio: formik.values.sorteio,
         nt: formik.values.nt,
