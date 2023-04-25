@@ -164,7 +164,7 @@ export default function Listagem({
         await experimentGroupService
           .update({
             id: values.id,
-            name: capitalize(values.name?.trim()),
+            name: (values.name?.trim()),
             safraId,
             userId: userLogado.id,
           })

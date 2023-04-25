@@ -60,7 +60,7 @@ export default function Cadastro() {
         await cultureService
           .createCulture({
             name: formik.values.name.toUpperCase(),
-            desc: capitalize(formik.values.desc?.trim()),
+            desc: formik.values.desc?.trim(),
             status: formik.values.status,
             created_by: formik.values.created_by,
           })

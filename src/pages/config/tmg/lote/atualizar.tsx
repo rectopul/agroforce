@@ -51,7 +51,7 @@ export default function Atualizar(lote: IUpdateLote) {
 
       await loteService.update({
         id: lote.id,
-        name: capitalize(values.name),
+        name: (values.name),
         volume: values.volume,
       }).then((response) => {
         if (response.status === 200) {

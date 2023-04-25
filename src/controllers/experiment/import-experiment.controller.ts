@@ -97,35 +97,17 @@ export class ImportExperimentController {
 
       for (const row in spreadSheet) {
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
-          let experimentName;
-          // se o experimento tiver menos que 2 digitos, adiciona um 0 na frente
-          // ATENÇÃO O EP PODE VIR NO FORMATO NUMBER OU STRING INCLUSIVE NULO
-          if ((typeof spreadSheet[row][9] !== 'number' && typeof spreadSheet[row][9] !== 'string') || spreadSheet[row][9] === null) {
-            experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_00`;
-          } else if (String(spreadSheet[row][9]).toString().length < 2) {
-            experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_0${spreadSheet[row][9]}`;
-          } else {
-            experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_${spreadSheet[row][9]}`;
-          }
-          const { response: experiment } = await experimentController.getAll({
-            filterExperimentName: experimentName,
-            idSafra,
-            importValidate: true,
-          });
-          if (experiment?.length > 0) {
-            if (experiment[0].status?.toUpperCase() !== 'IMPORTADO') {
-              responseIfError[0]
-              += `<li style="text-align:left"> Erro na linha ${Number(row)}. Já existe um experimento cadastrado e utilizado com este nome de experimento </li> <br>`;
-            }
-          }
-          if (experimentNameTemp.includes(experimentName)) {
-            experimentNameTemp[row] = experimentName;
-            responseIfError[0]
-              += `<li style="text-align:left"> Erro na linha ${Number(row)}. Experimentos duplicados na tabela </li> <br>`;
-          }
-          experimentNameTemp[row] = experimentName;
+
+          // armazena qual linha e coluna está com erro
+          let dataIfErrorPerRow: Array<{
+            column: number;
+            row: number;
+          }> = [];
+          
+          // ENSAIO / GLI
           let assayList: any = {};
           if (spreadSheet[row][4] === null) { // GLI
+            dataIfErrorPerRow.push({ column: 4, row: Number(row) });
             responseIfError[Number(3)]
               += responseNullFactory(Number(3 + 1), row, spreadSheet[0][4]);
           } else {
@@ -137,9 +119,322 @@ export class ImportExperimentController {
 
             assayList = response.length > 0 ? response[0] : [];
           }
+          
+          // ERRO: Não foi encontrado o GLI + SAFRA na lista de ensaios;
+          // A 4º coluna da 5º linha está incorreta, Não foi encontrado o GLI informado na lista de ensaios;
+
+          // CULTURA
+          let columnCultura: string = '0';
+          if (columnCultura === '0') { // CULTURA
+            if (spreadSheet[row][columnCultura] === null) {
+              dataIfErrorPerRow.push({ column: Number(columnCultura), row: Number(row) });
+              responseIfError[Number(columnCultura)]
+                += responseNullFactory((Number(columnCultura) + 1), row, spreadSheet[0][columnCultura]);
+            }
+
+            let responseCulture: any = null;
+
+            // se a cultura não estiver no array de culturas, faz a requisição
+            if (!cultures.find((culture) => culture.id === idCulture)) {
+              const {
+                response: responseCultureX,
+              }: any = await culturaController.getOneCulture(Number(idCulture));
+              responseCulture = responseCultureX;
+              cultures.push(responseCulture);
+            } else {
+              // find culture bu idCulture
+              responseCulture = cultures.find((culture) => culture.id === idCulture);
+            }
+            if (
+              responseCulture?.name?.toUpperCase() !== spreadSheet[row][columnCultura]?.toUpperCase()
+            ) {
+              dataIfErrorPerRow.push({ column: Number(columnCultura), row: Number(row) });
+              responseIfError[Number(columnCultura)] += responseGenericFactory(
+                Number(columnCultura) + 1,
+                row,
+                spreadSheet[0][columnCultura],
+                'a cultura e diferente da selecionada',
+              );
+            }
+          }
+
+          // SAFRA
+          let columnSafra: string = '1';
+          if (columnSafra === '1') { // SAFRA
+            if (spreadSheet[row][columnSafra] === null) {
+              dataIfErrorPerRow.push({ column: Number(columnSafra), row: Number(row) });
+              responseIfError[Number(columnSafra)]
+                += responseNullFactory((Number(columnSafra) + 1), row, spreadSheet[0][columnSafra]);
+            } else {
+              let statusSafra: number = 0;
+              let responseSafra: any = null;
+
+              // se a safra não estiver no array de culturas, faz a requisição
+              if (!safras.find((safra) => safra.id === idSafra)) {
+                const { status:statusX, response: responseX }: IReturnObject = await safraController.getOne(idSafra);
+                
+                statusSafra = statusX;
+                responseSafra = responseX;
+
+                safras.push(responseSafra);
+              } else {
+                statusSafra = 200;
+                // find safra bu idSafra
+                responseSafra = safras.find((safra) => safra.id === idSafra);
+              }
+
+              if (statusSafra === 200) {
+                if (responseSafra?.safraName?.toUpperCase() !== spreadSheet[row][columnSafra]?.toUpperCase()) {
+                  dataIfErrorPerRow.push({ column: Number(columnSafra), row: Number(row) });
+                  responseIfError[Number(columnSafra)]
+                    += responseGenericFactory(
+                    (Number(columnSafra) + 1),
+                    row,
+                    spreadSheet[0][columnSafra],
+                    'safra informada e diferente da selecionada',
+                  );
+                }
+              }
+              if (idSafra !== assayList?.id_safra) {
+                dataIfErrorPerRow.push({ column: Number(columnSafra), row: Number(row) });
+                responseIfError[Number(columnSafra)]
+                  += responseDiffFactory((Number(columnSafra) + 1), row, spreadSheet[0][columnSafra]);
+              }
+            }
+          }
+
+          
+          // ENSAIO
+          let columnEnsaio: string = '2';
+          if(columnEnsaio === '2'){
+            if (spreadSheet[row][columnEnsaio] === null) {
+              dataIfErrorPerRow.push({ column: Number(columnEnsaio), row: Number(row) });
+              responseIfError[Number(columnEnsaio)] += responseNullFactory((Number(columnEnsaio) + 1), row, spreadSheet[0][columnEnsaio]);
+            } else {
+              if (assayList?.type_assay?.name) {
+                assayList.type_assay.name = this.replaceSpecialChars(assayList?.type_assay?.name);
+              }
+              spreadSheet[row][columnEnsaio] = this.replaceSpecialChars(spreadSheet[row][columnEnsaio]);
+              if (assayList?.type_assay?.name?.toUpperCase() !== spreadSheet[row][columnEnsaio]?.toUpperCase()) {
+                dataIfErrorPerRow.push({ column: Number(columnEnsaio), row: Number(row) });
+                responseIfError[Number(columnEnsaio)] += responseDiffFactory((Number(columnEnsaio) + 1), row, spreadSheet[0][columnEnsaio]);
+              }
+            }
+          }
+
+
+          // FOCO
+          let columnFoco: string = '3';
+          if(columnFoco === '3'){
+            if (spreadSheet[row][columnFoco] === null) {
+              dataIfErrorPerRow.push({ column: Number(columnFoco), row: Number(row) });
+              responseIfError[Number(columnFoco)]
+                += responseNullFactory((Number(columnFoco) + 1), row, spreadSheet[0][columnFoco]);
+            } else {
+              if (assayList?.foco?.name) {
+                assayList.foco.name = this.replaceSpecialChars(assayList?.foco?.name);
+              }
+              spreadSheet[row][columnFoco] = this.replaceSpecialChars(spreadSheet[row][columnFoco]);
+              if (assayList?.foco?.name?.toUpperCase()
+                !== spreadSheet[row][columnFoco]?.toUpperCase()
+              ) {
+                dataIfErrorPerRow.push({ column: Number(columnFoco), row: Number(row) });
+                responseIfError[Number(columnFoco)]
+                  += responseDiffFactory((Number(columnFoco) + 1), row, spreadSheet[0][columnFoco]);
+              }
+            }
+          }
+          
+          
+          // GGEN // TECNOLOGIA
+          let columnTecnologia: string = '5';
+          if (columnTecnologia === '5') { // GGEN // TECNOLOGIA
+            if (spreadSheet[row][columnTecnologia] === null) {
+              dataIfErrorPerRow.push({ column: Number(columnTecnologia), row: Number(row) });
+              responseIfError[Number(columnTecnologia)]
+                += responseNullFactory((Number(columnTecnologia) + 1), row, spreadSheet[0][columnTecnologia]);
+            } else if ((spreadSheet[row][columnTecnologia]).toString().length > 2) {
+              dataIfErrorPerRow.push({ column: Number(columnTecnologia), row: Number(row) });
+              responseIfError[Number(columnTecnologia)]
+                += responseGenericFactory(
+                (Number(columnTecnologia) + 1),
+                row,
+                spreadSheet[0][columnTecnologia],
+                'o limite de caracteres e 2',
+              );
+            } else {
+              if (spreadSheet[row][columnTecnologia].toString().length < 2) {
+                // eslint-disable-next-line no-param-reassign
+                spreadSheet[row][columnTecnologia] = `0${spreadSheet[row][columnTecnologia].toString()}`;
+              }
+              if (assayList?.tecnologia?.cod_tec?.toUpperCase()
+                !== (spreadSheet[row][columnTecnologia]?.toString()?.toUpperCase())) {
+                dataIfErrorPerRow.push({ column: Number(columnTecnologia), row: Number(row) });
+                responseIfError[Number(columnTecnologia)]
+                  += responseDiffFactory((Number(columnTecnologia) + 1), row, spreadSheet[0][columnTecnologia]);
+              }
+            }
+          }
+
+          
+          // GGM // BGM
+          let columnBGM: string = '6';
+          if (columnBGM === '6') { // GGM // BGM
+            if (spreadSheet[row][columnBGM] !== null) {
+              if (isNaN(spreadSheet[row][columnBGM])) {
+                dataIfErrorPerRow.push({ column: Number(columnBGM), row: Number(row) });
+                responseIfError[Number(columnBGM)] 
+                  += responsePositiveNumericFactory(Number(columnBGM) + 1, row, spreadSheet[0][columnBGM]);
+              } else if (Number(assayList?.bgm) !== Number(spreadSheet[row][columnBGM])) {
+                dataIfErrorPerRow.push({ column: Number(columnBGM), row: Number(row) });
+                responseIfError[Number(columnBGM)]
+                    += responseDiffFactory((Number(columnBGM) + 1), row, spreadSheet[0][columnBGM]);
+              }
+            }
+          }
+
+          
+          // LOCAL
+          let columnLocal:string = '7';
+          if (columnLocal === '7') { // LOCAL
+            if (spreadSheet[row][columnLocal] === null) {
+              dataIfErrorPerRow.push({ column: Number(columnLocal), row: Number(row) });
+              responseIfError[Number(columnLocal)]
+                += responseNullFactory((Number(columnLocal) + 1), row, spreadSheet[0][columnLocal]);
+            } else {
+              // locals
+
+              let responseLocal = null;
+
+              // se o lcal não estiver no array de locais, faz a requisição
+              if (!locals.find((local) => local.name_local_culture === spreadSheet[row][columnLocal])) {
+                const { response: responseLocalx } = await localController.getAll({
+                  name_local_culture: spreadSheet[row][columnLocal],
+                  importValidate: true,
+                });
+
+                responseLocal = responseLocalx;
+
+                locals.push(responseLocalx);
+              } else {
+                // find local by name
+                responseLocal = locals.find((local) => local.name_local_culture === spreadSheet[row][columnLocal]);
+              }
+
+              if (responseLocal.total === 0) {
+                dataIfErrorPerRow.push({ column: Number(columnLocal), row: Number(row) });
+                responseIfError[Number(columnLocal)]
+                  += responseDoesNotExist((Number(columnLocal) + 1), row, spreadSheet[0][columnLocal]);
+              }
+
+              let responseSafra: any = null;
+
+              // se a safra não estiver no array de safras, faz a requisição
+              if (!safras.find((safra) => safra.id === idSafra)) {
+                const { response: responseSafrax } = await safraController.getOne(idSafra);
+                responseSafra = responseSafrax;
+                safras.push(responseSafra);
+              } else {
+                // find safra by id
+                responseSafra = safras.find((safra) => safra.id === idSafra);
+              }
+
+              // const {response: responseSafra,}: IReturnObject = await safraController.getOne(idSafra);
+
+              const cultureUnityValidate = responseLocal[0]?.cultureUnity.map((item: any) => {
+                if (item?.year === responseSafra?.year) return true;
+                return false;
+              });
+
+              if (!cultureUnityValidate?.includes(true)) {
+                dataIfErrorPerRow.push({ column: Number(columnLocal), row: Number(row) });
+                responseIfError[Number(columnLocal)]
+                  += responseGenericFactory(
+                  (Number(columnLocal) + 1),
+                  row,
+                  spreadSheet[0][columnLocal],
+                  'não tem unidade de cultura cadastrada no local informado',
+                );
+              }
+            }
+          }
+
+          
+          // EPOCA
+          let columnEpoca:string = '9';
+          if (columnEpoca === '9') { // EPOCA
+            // verifica se a epoca é nula
+            if (spreadSheet[row][columnEpoca] === null) {
+              dataIfErrorPerRow.push({ column: Number(columnEpoca), row: Number(row) });
+              responseIfError[Number(columnEpoca)]
+                += responseNullFactory((Number(columnEpoca) + 1), row, spreadSheet[0][columnEpoca]);
+            } else if ((spreadSheet[row][columnEpoca]).toString().length > 2 || !validateInteger(spreadSheet[row][columnEpoca])) {
+              dataIfErrorPerRow.push({ column: Number(columnEpoca), row: Number(row) });
+              responseIfError[Number(columnEpoca)]
+                += responseGenericFactory(
+                (Number(columnEpoca) + 1),
+                row,
+                spreadSheet[0][columnEpoca],
+                'precisa ser um numero inteiro e positivo e de ate 2 dígitos',
+              );
+            }
+          }
+          
+          
+          if(dataIfErrorPerRow.length > 0) {
+            continue;
+          }
+          
+          let experimentName;
+          // se o experimento tiver menos que 2 digitos, adiciona um 0 na frente
+          // ATENÇÃO O EP PODE VIR NO FORMATO NUMBER OU STRING INCLUSIVE NULO
+          if ((typeof spreadSheet[row][9] !== 'number' && typeof spreadSheet[row][9] !== 'string') || spreadSheet[row][9] === null) {
+            experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_00`;
+          } else if (String(spreadSheet[row][9]).toString().length < 2) {
+            experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_0${spreadSheet[row][9]}`;
+          } else {
+            experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_${spreadSheet[row][9]}`;
+          }
+          
+          const { response: experiment } = await experimentController.getAll({
+            filterExperimentName: experimentName,
+            idSafra,
+            importValidate: true,
+          });
+          
+          if (experiment?.length > 0) {
+            if (experiment[0].status?.toUpperCase() !== 'IMPORTADO') {
+              // Atenção responseIfError[0] onde 0 é a ordem em que a mensagem irá aparecer;
+              responseIfError[0]
+              += `<li style="text-align:left"> Erro na linha ${Number(row)}. Já existe um experimento cadastrado e utilizado com este nome de experimento </li> <br>`;
+            }
+          }
+          
+          if (experimentNameTemp.includes(experimentName)) {
+            experimentNameTemp[row] = experimentName;
+            responseIfError[0]
+              += `<li style="text-align:left"> Erro na linha ${Number(row)}. Experimentos duplicados na tabela </li> <br>`;
+          }
+          
+          experimentNameTemp[row] = experimentName;
+          
+          /*let assayList: any = {};
+          if (spreadSheet[row][4] === null) { // GLI
+            responseIfError[Number(3)]
+              += responseNullFactory(Number(3 + 1), row, spreadSheet[0][4]);
+          } else {
+            const { response } = await assayListController.getAll({
+              gli: spreadSheet[row][4],
+              id_safra: idSafra,
+              importValidate: true,
+            });
+
+            assayList = response.length > 0 ? response[0] : [];
+          }*/
 
           for (const column in spreadSheet[row]) {
-            // CULTURA
+            
+            /*// CULTURA
             if (column === '0') { // CULTURA
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -169,8 +464,10 @@ export class ImportExperimentController {
                   'a cultura e diferente da selecionada',
                 );
               }
-            }
-            // SAFRA
+            }*/
+            
+            
+            /*// SAFRA
             if (column === '1') { // SAFRA
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -207,8 +504,10 @@ export class ImportExperimentController {
                     += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
                 }
               }
-            }
-            // ENSAIO
+            }*/
+            
+            
+            /*// ENSAIO
             if (column === '2') { // ENSAIO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -224,8 +523,10 @@ export class ImportExperimentController {
                     += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
                 }
               }
-            }
-            // FOCO
+            }*/
+            
+            
+            /*// FOCO
             if (column === '3') { // FOCO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -242,8 +543,10 @@ export class ImportExperimentController {
                     += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
                 }
               }
-            }
-            // GGEN // TECNOLOGIA
+            }*/
+            
+            
+            /*// GGEN // TECNOLOGIA
             if (column === '5') { // GGEN // TECNOLOGIA
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -267,8 +570,10 @@ export class ImportExperimentController {
                   += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
                 }
               }
-            }
-            // GGM // BGM
+            }*/
+            
+            
+            /*// GGM // BGM
             if (column === '6') { // GGM // BGM
               if (spreadSheet[row][column] !== null) {
                 if (isNaN(spreadSheet[row][column])) {
@@ -282,8 +587,10 @@ export class ImportExperimentController {
                       += responseDiffFactory((Number(column) + 1), row, spreadSheet[0][column]);
                 }
               }
-            }
-            // LOCAL
+            }*/
+            
+            
+            /*// LOCAL
             if (column === '7') { // LOCAL
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -342,7 +649,9 @@ export class ImportExperimentController {
                     );
                 }
               }
-            }
+            }*/
+            
+            
             // DENSIDADE
             if (column === '8') { // DENSIDADE
               if (spreadSheet[row][column] === null) {
@@ -359,7 +668,9 @@ export class ImportExperimentController {
                   );
               }
             }
-            // EPOCA
+            
+            
+            /*// EPOCA
             if (column === '9') { // EPOCA
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -374,7 +685,9 @@ export class ImportExperimentController {
                     'precisa ser um numero inteiro e positivo e de ate 2 dígitos',
                   );
               }
-            }
+            }*/
+            
+            
             // DELINEAMENTO
             if (column === '10') { // DELINEAMENTO
               if (spreadSheet[row][column] === null) {
@@ -415,6 +728,8 @@ export class ImportExperimentController {
                 }
               }
             }
+            
+            
             // NREP
             if (column === '11') { // NREP
               if (spreadSheet[row][column] === null) {
@@ -429,6 +744,8 @@ export class ImportExperimentController {
                 );
               }
             }
+            
+            
             // NPL
             if (column === '12') { // NPL
               if (spreadSheet[row][column] === null) {
@@ -443,6 +760,7 @@ export class ImportExperimentController {
                 );
               }
             }
+            
             // CLP
             if (column === '13') { // CLP
               if (spreadSheet[row][column] === null) {
@@ -458,6 +776,7 @@ export class ImportExperimentController {
                 );
               }
             }
+            
             // ORDEM SORTEIO
             if (column === '15') { // ORDEM SORTEIO
               if (spreadSheet[row][column] === null) {

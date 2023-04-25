@@ -50,7 +50,7 @@ export default function Cadastro({ id_genotipo }: IIdGenotipo) {
 
       await loteService.create({
         id_genotipo,
-        name: capitalize(formik.values.name),
+        name: (formik.values.name),
         volume: formik.values.volume,
         created_by: formik.values.created_by,
       }).then((response) => {

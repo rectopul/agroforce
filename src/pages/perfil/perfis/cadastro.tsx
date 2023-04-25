@@ -38,7 +38,7 @@ export default function Cadastro() {
       try {
         await profileService
           .create({
-            name: capitalize(formik.values.name?.trim()),
+            name: (formik.values.name?.trim()),
             createdBy: formik.values.createdBy,
           })
           .then((response) => {

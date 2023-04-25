@@ -51,7 +51,7 @@ export default function Cadastro() {
     onSubmit: async (values) => {
       await genotipoService.create({
         id_culture: formik.values.id_culture,
-        genealogy: capitalize(formik.values.genealogy),
+        genealogy: (formik.values.genealogy),
         cruza: formik.values.cruza,
         status: formik.values.status,
         created_by: formik.values.created_by,

@@ -90,8 +90,8 @@ export default function NovoLocal({ uf }: IData) {
       if (!values.cod_local || !values.pais || !values.uf || !values.city || !values.name_farm) { return; }
 
       await localService.create({
-        cod_local: capitalize(values.cod_local),
-        cod_red_local: capitalize(values.cod_red_local),
+        cod_local: (values.cod_local),
+        cod_red_local: (values.cod_red_local),
         pais: values.pais,
         uf: values.uf,
         city: values.city,

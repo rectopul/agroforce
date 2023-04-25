@@ -63,7 +63,7 @@ export default function Cadastro({ id_delineamento }: IIdDelineamento) {
 
       await sequenciaDelineamentoService.create({
         id_delineamento,
-        name: capitalize(values.name),
+        name: (values.name),
         repeticao: values.repeticao,
         sorteio: values.sorteio,
         nt: values.nt,

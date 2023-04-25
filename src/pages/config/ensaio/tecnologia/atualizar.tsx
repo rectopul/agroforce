@@ -45,8 +45,8 @@ export default function NovoLocal({ tecnologia }: IData) {
     initialValues: {
       id: tecnologia.id,
       cod_tec: tecnologia.cod_tec,
-      name: capitalize(tecnologia.name),
-      desc: capitalize(tecnologia.desc),
+      name: (tecnologia.name),
+      desc: (tecnologia.desc),
       created_by: userLogado.id,
       status: 1,
     },
