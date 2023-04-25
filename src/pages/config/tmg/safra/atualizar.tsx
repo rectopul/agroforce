@@ -92,7 +92,7 @@ export default function AtualizarSafra(safra: any) {
           .updateSafras({
             id: safra.id,
             // id_culture: safra.id_culture,
-            safraName: capitalize(formik.values.safraName?.trim()),
+            safraName: (formik.values.safraName?.trim()),
             year: Number(formik.values.year),
             plantingStartTime,
             plantingEndTime,

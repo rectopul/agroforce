@@ -149,7 +149,7 @@ export default function Atualizar({
         await focoService
           .update({
             id: foco.id,
-            name: capitalize(formik.values.name?.trim()),
+            name: (formik.values.name?.trim()),
             id_culture: Number(culture),
             created_by: userLogado.id,
           })

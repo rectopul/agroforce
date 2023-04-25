@@ -47,7 +47,7 @@ export default function AtualizarSafra(item: IDepartmentProps) {
         await departmentService
           .update({
             id: item.id,
-            name: capitalize(formik.values.name?.trim()),
+            name: (formik.values.name?.trim()),
             created_by: userLogado?.id,
           })
           .then((response) => {

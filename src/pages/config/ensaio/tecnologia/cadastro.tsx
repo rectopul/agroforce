@@ -62,9 +62,9 @@ export default function NovoLocal() {
 
       await tecnologiaService.create({
         id_culture: Number(culture),
-        name: capitalize(values.name),
-        cod_tec: capitalize(values.cod_tec),
-        desc: capitalize(values.desc),
+        name: (values.name),
+        cod_tec: (values.cod_tec),
+        desc: (values.desc),
         created_by: Number(userLogado.id),
         status: 1,
       }).then((response) => {
