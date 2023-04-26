@@ -276,8 +276,8 @@ async function callTmgGenotipeXlsxDownload(options: any) {
       row.TECNOLOGIA = `${row.tecnologia.cod_tec} ${row.tecnologia.name}`;
       row.N_DE_LOTES = row.numberLotes;
       row.TIPO = row.type;
-      row.GMR = row.gmr;
-      row.BGM = row.bgm;
+      row.GMR = row.gmr?String(row.gmr):'';
+      row.BGM = row.bgm?String(row.bgm):'';
       row.CRUZA_DE_ORIGEM = row.cruza;
       row.PROGENITOR_F_DIRETO = row.progenitor_f_direto;
       row.PROGENITOR_M_DIRETO = row.progenitor_m_direto;
