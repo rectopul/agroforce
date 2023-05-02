@@ -21,8 +21,9 @@ const groupRoutes = [
 ];
 
 export default function Permissoes({
-  allRoutes,
-  profileId,
+                                     allRoutes,
+                                     profileId,
+                                     profileX,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
@@ -74,6 +75,9 @@ export default function Permissoes({
       {loading && <LoadingComponent text="" />}
 
       <Content contentHeader={[]} moduloActive="config">
+
+        <h1 className="text-2xl">Perfil - {profileX.name}</h1>
+        
         <div className={stylesCommon.container}>
           {groupRoutes?.map((item) => (
             <div>
@@ -85,16 +89,10 @@ export default function Permissoes({
               {allRoutes
                 ?.filter((i: any) => i?.screenRoute?.includes(item?.name))
                 .map((route: any, index: any) => (
-                  <div
-                    className={`flex border border-gray-200 ${
-                      index % 2 !== 0 ? 'bg-gray-200' : ''
-                    }`}
-                  >
-                    <div
-                      key={route.id}
-                      className="flex text-sm w-1/2 justify-center align-center"
-                    >
-                      <Route key={route.id} route={route.permission[0].name} />
+                  <div className={`flex border border-gray-200 ${index % 2 !== 0 ? 'bg-gray-200' : ''}`}>
+
+                    <div key={route.id} className="flex text-sm w-1/2 justify-center align-center">
+                      <Route key={route.id} route={route.permission.length ? route.permission[0].name:'Desconhecido'} />
                     </div>
                     <div className="flex w-1/2">
                       {route.permission[0]?.permissions?.map((element: any) => (
@@ -154,6 +152,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { publicRuntimeConfig } = getConfig();
   const baseUrl = `${publicRuntimeConfig.apiUrl}/permissions`;
 
+  const baseUrlProfile = `${publicRuntimeConfig.apiUrl}/profile`;
+  
   const urlParameters: any = new URL(baseUrl);
   urlParameters.search = new URLSearchParams(
     `profileId=${profileId}`,
@@ -169,10 +169,28 @@ export const getServerSideProps: GetServerSideProps = async ({
     requestOptions,
   ).then((response) => response.json());
 
+  /*const { newResult: profile } = await fetch(
+    `${baseUrl}/profile/${profileId}`, 
+    requestOptions
+  ).then((response) => response.json());*/
+
+  /*const {response:profileX} = await fetch(
+    `${baseUrlProfile}/${profileId}`,
+    requestOptions,
+  ).then((response) => response.json());*/
+
+  const { response: profileX } = await fetch(
+    `${baseUrlProfile}/${profileId}`,
+    requestOptions,
+  ).then((data) => data.json());
+
+  console.log('profile', profileX);
+
   return {
     props: {
       allRoutes,
       profileId,
+      profileX
     },
   };
 };

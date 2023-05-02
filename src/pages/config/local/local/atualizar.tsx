@@ -45,6 +45,7 @@ import {
 import * as ITabs from '../../../../shared/utils/dropdown';
 import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactory';
 import { tableGlobalFunctions } from '../../../../helpers';
+import {removeCookies} from "cookies-next";
 
 export interface IData {
   allCultureUnity: any;
@@ -93,6 +94,9 @@ export default function AtualizarLocal({
   const tabsDropDowns = TabsDropDowns('config');
   tabsDropDowns.map((tab) => (tab.titleTab === 'LOCAL' ? (tab.statusTab = true) : (tab.statusTab = false)));
 
+  console.log('typeOrderServer', typeOrderServer);
+  console.log('orderByserver', orderByserver);
+  
   const tableRef = useRef<any>(null);
 
   const router = useRouter();
@@ -135,18 +139,13 @@ export default function AtualizarLocal({
   const [filter, setFilter] = useState<any>(filterApplication);
   const [colorStar, setColorStar] = useState<string>('');
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
-    // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Nome de Unidade de Cultura',
-      value: 'name_unity_culture',
-    },
-    { name: 'CamposGerenciados[]', title: 'Ano', value: 'year' },
+    {name: 'CamposGerenciados[]', title: 'Nome de Unidade de Cultura', value: 'name_unity_culture',},
+    {name: 'CamposGerenciados[]', title: 'Ano', value: 'year'},
   ]);
-  const [orderBy, setOrderBy] = useState<string>(orderByserver); // RR
+  const [orderBy, setOrderBy] = useState<string>(orderByserver?? ''); // RR
   const [orderType, setOrderType] = useState<string>('');
-  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
-  const [typeOrder, setTypeOrder] = useState<string>('');
+  const [fieldOrder, setFieldOrder] = useState<any>(orderByserver?? '');
+  const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer ?? '');
 
   const take: number = itensPerPage;
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
@@ -714,7 +713,29 @@ export const getServerSideProps: GetServerSideProps = async ({
     requestOptions,
   );
 
-  const filterApplication = `filterStatus=1&&id_local=${id_local}&orderBy=year&typeOrder=desc`;
+  // Last page
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
+
+  if (lastPageServer == undefined ||
+    lastPageServer == 'No' ||
+    req.cookies.urlPage !== 'local' ||
+    lastPageServer == 'atualizar') {
+    // removeCookies('filterBeforeEdit', { req, res });
+    // removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    // removeCookies('lastPage', { req, res });
+  }
+
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
+    ? req.cookies.filterBeforeEditTypeOrder
+    : 'desc';
+
+  const orderByserver = req.cookies.filterBeforeEditOrderBy
+    ? req.cookies.filterBeforeEditOrderBy
+    : 'year';
+
+  const filterApplication = `filterStatus=1&&id_local=${id_local}`;
 
   const { response: allCultureUnity, total: totalItems }: any = await responseUnidadeCultura.json();
 
@@ -729,6 +750,8 @@ export const getServerSideProps: GetServerSideProps = async ({
       id_local,
       local,
       pageBeforeEdit,
+      typeOrderServer,
+      orderByserver,
     },
   };
 };

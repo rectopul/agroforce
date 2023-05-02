@@ -828,6 +828,9 @@ export default function Listagem({
                         value="Cadastrar Foco"
                         bgColor="bg-blue-600"
                         textColor="white"
+                        style={{
+                          display: !perm_can_do('/config/ensaio/foco', 'create',) ? 'none' : ''
+                        }}
                         onClick={() => {
                           setCookies('pageBeforeEdit', currentPage?.toString());
                           setCookies('filterBeforeEdit', filter);
