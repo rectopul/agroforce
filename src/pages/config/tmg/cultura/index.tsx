@@ -273,14 +273,8 @@ export default function Listagem({
     handlePagination(currentPage);
   }
 
-  async function handleOrder(
-    column: string,
-    order: string | any,
-    name: string | any,
-  ): Promise<void> {
-    const {
-      typeOrderG, columnG, orderByG, arrowOrder,
-    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+  async function handleOrder(column: string, order: string | any, name: string | any,): Promise<void> {
+    const {typeOrderG, columnG, orderByG, arrowOrder} = await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
@@ -404,7 +398,7 @@ export default function Listagem({
   const columns = columnsOrder(camposGerenciados);
 
   async function getValuesColumns(): Promise<void> {
-    const els: any = document.querySelectorAll("input[type='checkbox'");
+    const els: any = document.querySelectorAll("input[type='checkbox']");
     let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
@@ -541,14 +535,7 @@ export default function Listagem({
       </Head>
 
       <Content contentHeader={tabsDropDowns} moduloActive="config">
-        <main
-          className="h-full w-full
-          flex flex-col
-          items-start
-          gap-4
-          overflow-y-hidden
-        "
-        >
+        <main className="h-full w-full flex flex-col items-start gap-4 overflow-y-hidden">
           <AccordionFilter
             title="Filtrar culturas"
             onChange={(_, e) => setStatusAccordionFilter(e)}
