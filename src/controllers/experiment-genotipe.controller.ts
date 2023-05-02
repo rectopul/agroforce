@@ -524,8 +524,6 @@ export class ExperimentGenotipeController {
         
       }
 
-      return { status: 400, message: '' };
-      
       const response = await prisma?.$transaction(async (tx) => {
         await gt.map(async (gen_treatment: any) => {
           
