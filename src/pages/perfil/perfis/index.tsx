@@ -1,20 +1,22 @@
-import { profile } from "console";
-import { removeCookies, setCookies } from "cookies-next";
-import MaterialTable from "material-table";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import getConfig from "next/config";
-import { RequestInit } from "next/dist/server/web/spec-extension/request";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
-import { BiEdit, BiLeftArrow, BiRightArrow, BiSlider } from "react-icons/bi";
-import { MdDateRange, MdFirstPage, MdLastPage } from "react-icons/md";
-import Swal from "sweetalert2";
-import { Button } from "../../../components/Button";
-import { Content } from "../../../components/Content";
-import { profileService } from "../../../services";
-import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
-import { perm_can_do } from "../../../shared/utils/perm_can_do";
+import { profile } from 'console';
+import { removeCookies, setCookies } from 'cookies-next';
+import MaterialTable from 'material-table';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import getConfig from 'next/config';
+import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect, useRef, useState } from 'react';
+import {
+  BiEdit, BiLeftArrow, BiRightArrow, BiSlider,
+} from 'react-icons/bi';
+import { MdDateRange, MdFirstPage, MdLastPage } from 'react-icons/md';
+import Swal from 'sweetalert2';
+import { Button } from '../../../components/Button';
+import { Content } from '../../../components/Content';
+import { profileService } from '../../../services';
+import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
+import { perm_can_do } from '../../../shared/utils/perm_can_do';
 
 export default function Perfis({
   allProfiles,
@@ -24,19 +26,19 @@ export default function Perfis({
   typeOrderServer, // RR
   orderByserver, // RR
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const userLogado = JSON.parse(localStorage.getItem("user") as string);
+  const userLogado = JSON.parse(localStorage.getItem('user') as string);
   const tableRef = useRef<any>(null);
   const router = useRouter();
 
   const [profiles, setProfiles] = useState<any>(() => allProfiles);
   const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit)
+    Number(pageBeforeEdit),
   );
   const [itemsTotal, setTotalItems] = useState<number>(totalItems);
   const [orderList, setOrder] = useState<number>(
-    typeOrderServer == "desc" ? 1 : 2
+    typeOrderServer == 'desc' ? 1 : 2,
   );
-  const [arrowOrder, setArrowOrder] = useState<any>("");
+  const [arrowOrder, setArrowOrder] = useState<any>('');
   const [take, setTake] = useState<number>(itensPerPage);
   const total: number = itemsTotal <= 0 ? 1 : itemsTotal;
   const pages = Math.ceil(total / take);
@@ -45,31 +47,34 @@ export default function Perfis({
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver);
   const preferences = userLogado.preferences.profiles || {
     id: 0,
-    table_preferences: "id,name,status",
+    table_preferences:
+      'id,name,status',
   };
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences
+    preferences.table_preferences,
   );
 
   async function callingApi(page: any = 0) {
     setCurrentPage(page);
-    const params = "";
+    const params = '';
     try {
-      await profileService.getAll(params).then((response) => {
-        if (response.status === 200 || response.status === 400) {
-          setProfiles(response.response);
-          setTotalItems(response.total);
-          tableRef.current.dataManager.changePageSize(
+      await profileService
+        .getAll(params)
+        .then((response) => {
+          if (response.status === 200 || response.status === 400) {
+            setProfiles(response.response);
+            setTotalItems(response.total);
+            tableRef.current.dataManager.changePageSize(
             // response.total >= take ? take : response.total,
-            20
-          );
-        }
-      });
+              20,
+            );
+          }
+        });
     } catch (error) {
       Swal.fire({
-        title: "Falha ao buscar perfis",
+        title: 'Falha ao buscar perfis',
         html: `Ocorreu um erro ao buscar perfis. Tente novamente mais tarde.`,
-        width: "800",
+        width: '800',
       });
     }
   }
@@ -88,22 +93,22 @@ export default function Perfis({
 
   function statusHeaderFactory() {
     return {
-      title: "Ação",
-      field: "status",
+      title: 'Ação',
+      field: 'status',
       sorting: false,
       searchable: false,
-      filterPlaceholder: "Filtrar por status",
+      filterPlaceholder: 'Filtrar por status',
       render: (rowData: any) => (
         <div className="h-8 flex">
           <div className="h-7">
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
-              style={{
-                display: !perm_can_do("/perfil/perfis", "edit") ? "none" : "",
-              }}
+              style={{ display: !perm_can_do('/perfil/perfis', 'edit') ? 'none' : '' }}
               onClick={() => {
-                router.push(`/perfil/perfis/atualizar?id=${rowData.id}`);
+                router.push(
+                  `/perfil/perfis/atualizar?id=${rowData.id}`,
+                );
               }}
               bgColor="bg-blue-600"
               textColor="white"
@@ -113,13 +118,11 @@ export default function Perfis({
             <Button
               value="Permissões"
               title={`Permissões de ${rowData.name}`}
-              style={{
-                display: !perm_can_do("/perfil/perfis", "permissions")
-                  ? "none"
-                  : "",
-              }}
+              style={{ display: !perm_can_do('/perfil/perfis', 'permissions') ? 'none' : '' }}
               onClick={() => {
-                router.push(`/perfil/perfis/permissoes?id=${rowData.id}`);
+                router.push(
+                  `/perfil/perfis/permissoes?id=${rowData.id}`,
+                );
               }}
               bgColor="bg-red-600"
               textColor="white"
@@ -131,22 +134,22 @@ export default function Perfis({
   }
 
   function columnsOrder(camposGerenciados: string) {
-    const columnCampos: string[] = camposGerenciados.split(",");
+    const columnCampos: string[] = camposGerenciados.split(',');
     const tableFields: any = [];
 
     Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === "name") {
+      if (columnCampos[index] === 'name') {
         tableFields.push(
           headerTableFactoryGlobal({
-            name: "Nome",
-            title: "name",
+            name: 'Nome',
+            title: 'name',
             orderList,
             fieldOrder,
             handleOrder,
-          })
+          }),
         );
       }
-      if (columnCampos[index] === "status") {
+      if (columnCampos[index] === 'status') {
         tableFields.push(statusHeaderFactory());
       }
     });
@@ -169,14 +172,14 @@ export default function Perfis({
           overflow-y-hidden
         "
         >
+
           <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
-              style={{ background: "#f9fafb" }}
+              style={{ background: '#f9fafb' }}
               columns={columns}
               data={profiles}
               options={{
-                maxBodyHeight: `calc(100vh - 250px)`,
                 sorting: true,
                 showTitle: false,
                 headerStyle: {
@@ -207,78 +210,75 @@ export default function Perfis({
                         value="Cadastrar perfil"
                         bgColor="bg-blue-600"
                         textColor="white"
-                        style={{
-                          display: !perm_can_do("/perfil/perfis", "create")
-                            ? "none"
-                            : "",
-                        }}
+                        style={{ display: !perm_can_do('/perfil/perfis', 'create') ? 'none' : '' }}
                         onClick={() => {
-                          router.push("/perfil/perfis/cadastro");
+                          router.push('/perfil/perfis/cadastro');
                         }}
                         icon={<MdDateRange size={20} />}
                       />
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado: {itemsTotal}
+                      Total registrado:
+                      {' '}
+                      {itemsTotal}
                     </strong>
                   </div>
                 ),
-                Pagination: (props) =>
-                  (
-                    <div
-                      className="flex
+                Pagination: (props) => (
+                  <div
+                    className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => handlePagination(0)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage < 1}
-                      />
-                      <Button
-                        onClick={() => {
-                          handlePagination(currentPage - 1);
-                        }}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill("")
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => handlePagination(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => handlePagination(currentPage + 1)}
-                        bgColor="bg-blue-600 RR"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => handlePagination(pages - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                    {...props}
+                  >
+                    <Button
+                      onClick={() => handlePagination(0)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdFirstPage size={18} />}
+                      disabled={currentPage < 1}
+                    />
+                    <Button
+                      onClick={() => {
+                        handlePagination(currentPage - 1);
+                      }}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiLeftArrow size={15} />}
+                      disabled={currentPage <= 0}
+                    />
+                    {Array(1)
+                      .fill('')
+                      .map((value, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => handlePagination(index)}
+                          value={`${currentPage + 1}`}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          disabled
+                        />
+                      ))}
+                    <Button
+                      onClick={() => handlePagination(currentPage + 1)}
+                      bgColor="bg-blue-600 RR"
+                      textColor="white"
+                      icon={<BiRightArrow size={15} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                    <Button
+                      onClick={() => handlePagination(pages - 1)}
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<MdLastPage size={18} />}
+                      disabled={currentPage + 1 >= pages}
+                    />
+                  </div>
                   ) as any,
               }}
             />
@@ -294,16 +294,16 @@ export const getServerSideProps: GetServerSideProps = async ({
   res,
 }: any) => {
   // Last page
-  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : "No";
+  const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
-  if (lastPageServer == undefined || lastPageServer == "No") {
-    removeCookies("filterBeforeEdit", { req, res });
-    removeCookies("pageBeforeEdit", { req, res });
-    removeCookies("filterBeforeEditTypeOrder", { req, res });
-    removeCookies("filterBeforeEditOrderBy", { req, res });
-    removeCookies("lastPage", { req, res });
-    removeCookies("urlPage", { req, res });
-    removeCookies("itensPage", { req, res });
+  if (lastPageServer == undefined || lastPageServer == 'No') {
+    removeCookies('filterBeforeEdit', { req, res });
+    removeCookies('pageBeforeEdit', { req, res });
+    removeCookies('filterBeforeEditTypeOrder', { req, res });
+    removeCookies('filterBeforeEditOrderBy', { req, res });
+    removeCookies('lastPage', { req, res });
+    removeCookies('urlPage', { req, res });
+    removeCookies('itensPage', { req, res });
   }
 
   const itensPerPage = req.cookies.takeBeforeEdit
@@ -315,17 +315,17 @@ export const getServerSideProps: GetServerSideProps = async ({
     : 0;
   const filterBeforeEdit = req.cookies.filterBeforeEdit
     ? req.cookies.filterBeforeEdit
-    : "";
+    : '';
 
   // RR
   const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
     ? req.cookies.filterBeforeEditTypeOrder
-    : "asc";
+    : 'asc';
 
   // RR
   const orderByserver = req.cookies.filterBeforeEditOrderBy
     ? req.cookies.filterBeforeEditOrderBy
-    : "";
+    : '';
 
   const { token } = req.cookies;
   // const { cultureId } = req.cookies;
@@ -334,26 +334,26 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}`
-    : "";
+    : '';
 
-  removeCookies("filterBeforeEdit", { req, res });
-  removeCookies("pageBeforeEdit", { req, res });
-  removeCookies("takeBeforeEdit", { req, res });
-  removeCookies("filterBeforeEditTypeOrder", { req, res });
-  removeCookies("filterBeforeEditOrderBy", { req, res });
-  removeCookies("lastPage", { req, res });
+  removeCookies('filterBeforeEdit', { req, res });
+  removeCookies('pageBeforeEdit', { req, res });
+  removeCookies('takeBeforeEdit', { req, res });
+  removeCookies('filterBeforeEditTypeOrder', { req, res });
+  removeCookies('filterBeforeEditOrderBy', { req, res });
+  removeCookies('lastPage', { req, res });
 
   const urlParameters: any = new URL(baseUrl);
-  urlParameters.search = new URLSearchParams("").toString();
+  urlParameters.search = new URLSearchParams('').toString();
   const requestOptions = {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
 
   const { response: allProfiles, total: totalItems } = await fetch(
     urlParameters.toString(),
-    requestOptions
+    requestOptions,
   ).then((response) => response.json());
 
   return {

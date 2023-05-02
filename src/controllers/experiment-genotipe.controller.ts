@@ -509,21 +509,10 @@ export class ExperimentGenotipeController {
       let timeout = 120000; // 120000 milisegundos = 120 segundos
       timeout = 600000; // 600000 milisegundos = 600 segundos = 10 minutos (capacidade 100 mil linhas) no createMany de experiment_genotipe
       
-      let limitQuantity = 100000; // 100000 linhas
-      
-      // formatar o numero limitQuantity para 100.000
-      let limitQuantityStr = limitQuantity.toLocaleString('pt-BR');
-      
-      let messageLimitExceeded = `A quantidade de NPE's a gerar no sorteio foi de xxxxxx, o limite máximo é de ${limitQuantityStr} NPE's. Favor procurar o administrador.`;
-      
-      if(experiment_genotipo.length > limitQuantity){
-
-        messageLimitExceeded = messageLimitExceeded.replace('xxxxxx', experiment_genotipo.length.toLocaleString());
-        
-        return { status: 400, message: messageLimitExceeded };
-        
+      if(experiment_genotipo.length > 100000){
+        return { status: 400, message: 'Você atingiu o limite de processamento, favor procurar o administrador;' };
       }
-
+      
       const response = await prisma?.$transaction(async (tx) => {
         await gt.map(async (gen_treatment: any) => {
           
