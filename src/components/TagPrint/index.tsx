@@ -41,52 +41,64 @@ function TagPrint({ tagType = 1, data = [] }: TagPrintProps) {
     return ean8;
   }
 
+  const datas =
+    data?.length === 1 ? [...data, { ...data[0], duplicated: true }] : data;
+
   if (tagType === 1) {
-    const listTags = data.map((item: any) => (
+    const listTags = datas.map((item: any) => (
       <div className="etiquetaModelo1">
-        <div className="flexRow" style={{ fontSize: 14 }}>
-          <div className="flex1">
-            {Number(item?.npe)?.toLocaleString("pt-BR")}
-          </div>
-          <div className="flex1">
-            {item?.npe && <BarCode valor={generateEAN8(item?.npe)} />}
-          </div>
-          {/* INICIO CONTAGEM IMPRESSAO ETIQUETAS */}
-          <div>
+        {!item?.duplicated && (
+          <>
+            <div className="flexRow" style={{ fontSize: 14 }}>
+              <div className="flex1">
+                {Number(item?.npe)?.toLocaleString("pt-BR")}
+              </div>
+              <div className="flex1">
+                {item?.npe && <BarCode valor={generateEAN8(item?.npe)} />}
+              </div>
+              {/* INICIO CONTAGEM IMPRESSAO ETIQUETAS */}
+              <div>
+                <div
+                  style={{
+                    fontSize: 7,
+                    borderWidth: 1,
+                    borderRadius: 2,
+                    padding: 1,
+                    marginBottom: -2,
+                  }}
+                >
+                  {item?.counter}
+                </div>
+              </div>
+              {/* FIM CONTAGEM IMPRESSAO ETIQUETAS */}
+            </div>
             <div
+              className="flexRow"
               style={{
                 fontSize: 7,
-                borderWidth: 1,
-                borderRadius: 2,
-                padding: 1,
-                marginBottom: -2,
+                justifyContent: "flex-end",
+                marginTop: -5,
+                marginBottom: -4,
               }}
             >
-              {item?.counter}
+              <div>{generateEAN8(item?.npe)}</div>
             </div>
-          </div>
-          {/* FIM CONTAGEM IMPRESSAO ETIQUETAS */}
-        </div>
-        <div
-          className="flexRow"
-          style={{
-            fontSize: 7,
-            justifyContent: "flex-end",
-            marginTop: -5,
-            marginBottom: -4,
-          }}
-        >
-          <div>{generateEAN8(item?.npe)}</div>
-        </div>
-        <div className="flexRow" style={{ fontSize: 9 }}>
-          <div className="flex1">{item?.genotipo?.name_genotipo}</div>
-          <div>{Number(item?.nca)?.toLocaleString("pt-BR")}</div>
-        </div>
-        <div style={{ fontSize: 7.5 }}>
-          {item?.experiment?.local?.name_local_culture}-{item?.gli}-
-          {item?.type_assay?.envelope[0]?.seeds}
-          SMT
-        </div>
+            <div className="flexRow" style={{ fontSize: 9 }}>
+              <div className="flex1">{item?.genotipo?.name_genotipo}</div>
+              <div>{Number(item?.nca)?.toLocaleString("pt-BR")}</div>
+            </div>
+            <div
+              style={{
+                fontSize: 7.5,
+                color: item.duplicated ? "#fff" : "#000",
+              }}
+            >
+              {item?.experiment?.local?.name_local_culture}-{item?.gli}-
+              {item?.type_assay?.envelope[0]?.seeds}
+              SMT
+            </div>
+          </>
+        )}
       </div>
     ));
 
