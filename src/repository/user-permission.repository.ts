@@ -39,7 +39,7 @@ export class UsersPermissionsRepository {
         culture: { select: { name: true, desc: true } },
         profile: true,
       },
-      distinct: ['cultureId'],
+      distinct: ['id'],
     });
     return result;
   }

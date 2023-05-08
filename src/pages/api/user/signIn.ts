@@ -33,9 +33,8 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       if (validateLogin.total <= 0 || validateLogin.status === 400) throw new Error('Você não tem acesso a essa pagina, entre em contato com seu líder!');
 
       userCulture.culturas = await PermissionController.getByUserID(user.id);
-      const {
-        response: userPermissions,
-      }: any = await PermissionController.getPermissions(Number(user.id));
+      
+      const {response: userPermissions}: any = await PermissionController.getPermissions(Number(user.id));
 
       userCulture.culturas = userCulture.culturas.response;
 
@@ -50,8 +49,8 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
 
       userCulture.cultura_selecionada = cultureSelecionada || userCulture.culturas[0]?.cultureId;
 
-      permissions = userPermissions
-        ?.filter((item: any) => item.cultureId === userCulture.cultura_selecionada);
+      permissions = userPermissions?.filter((item: any) => item.cultureId === userCulture.cultura_selecionada);
+      
       permissions = permissions[0]?.profile?.permissions;
 
       safras.safras = await safraController.getAll({
