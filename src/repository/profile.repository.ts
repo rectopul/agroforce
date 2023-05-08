@@ -13,12 +13,21 @@ export class ProfileRepository extends BaseRepository {
     return result;
   }
 
-  async findAll(where: any) {
+  async findAll(where: any, select: any, take: any, skip: any, orderBy: string | any) {
+    let order: object | any;
+
+    if (orderBy) {
+      order = JSON.parse(orderBy);
+    }
+    
     const count = await prisma.profile.count({ where });
-
+    
     const result: object | any = await prisma.profile.findMany({
-
+      select,
+      skip,
+      take,
       where,
+      orderBy: order,
     });
 
     result.total = count;

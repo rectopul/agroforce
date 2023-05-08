@@ -7,6 +7,7 @@ import handleError from '../../shared/utils/handleError';
 import { PermissionsController } from '../permissions/permissions.controller';
 import { ProfilePermissionsRepository } from '../../repository/profile-permissions.repository';
 import { ReporteController } from '../reportes/reporte.controller';
+import {removeEspecialAndSpace} from "../../shared/utils/removeEspecialAndSpace";
 
 export class ProfileController {
   profileRepository = new ProfileRepository();
@@ -18,11 +19,61 @@ export class ProfileController {
   reporteController = new ReporteController();
 
   async getAll(options: any) {
+    
+    options = await removeEspecialAndSpace(options);
+    
     const parameters: object | any = {};
+    
     try {
+
+      let take;
+      let skip;
+      let orderBy: object | any;
+      let select: any = [];
+
+      if (options.take) {
+        if (typeof options.take === 'string') {
+          take = Number(options.take);
+        } else {
+          take = options.take;
+        }
+      }
+
+      if (options.skip) {
+        if (typeof options.skip === 'string') {
+          skip = Number(options.skip);
+        } else {
+          skip = options.skip;
+        }
+      }
+
+      select = {
+        id: true,
+        name: true,
+        permissions: true,
+        createdAt: true,
+        createdBy: true,
+      };
+      
+      /*
+      acess_permission String?
+  permissions      String?  @db.LongText
+  createdAt        DateTime @default(now())
+  createdBy        Int?
+
+  profile_permissions profile_permissions[]
+  user_profile        user_profile[]
+  users_permissions   users_permissions[]
+       */
+      // v2
       const response: object | any = await this.profileRepository.findAll(
         parameters,
+        select,
+        take,
+        skip,
+        '',
       );
+      
 
       if (!response && response.total <= 0) {
         return {
@@ -57,9 +108,14 @@ export class ProfileController {
 
   async create(data: any) {
     try {
+      // verifica se o perfil já existe
+      const profileAlreadyExists = await this.profileRepository.findByName(data.name);
+      if (profileAlreadyExists) return { status: 400, message: 'Perfil já existente' };
+
       const { ip } = await fetch('https://api.ipify.org/?format=json')
         .then((results) => results.json())
         .catch(() => '0.0.0.0');
+      
       data.acess_permission = `"${data.name}"`;
       await this.reporteController.create({
         userId: data.createdBy, module: 'PERFIL', operation: 'CRIAÇÃO', oldValue: data.name, ip: String(ip),
@@ -100,13 +156,27 @@ export class ProfileController {
 
   async update(data: any) {
     try {
-      const { ip } = await fetch('https://api.ipify.org/?format=json')
-        .then((results) => results.json())
-        .catch(() => '0.0.0.0');
+      
       if (data.name) {
+        
+        const profile = await this.profileRepository.findOne(data.id);
+
+        if (!profile) 
+          return {status: 400, message: 'Perfil não encontrado'};
+        
+        const profileAlreadyExists = await this.profileRepository.findByName(data.name);
+
+        if (profileAlreadyExists && profileAlreadyExists.id !== profile.id) 
+          return {status: 400, message: 'Época já existente'};
+
+        const { ip } = await fetch('https://api.ipify.org/?format=json')
+          .then((results) => results.json())
+          .catch(() => '0.0.0.0');
+        
         await this.reporteController.create({
           userId: data.createdBy, module: 'PERFIL', operation: 'EDIÇÃO', oldValue: data.name, ip: String(ip),
         });
+        
         await this.profileRepository.update(Number(data.id), data);
 
         return { status: 200, message: 'Perfil atualizado' };

@@ -20,6 +20,7 @@ export default function Perfis({
   allProfiles,
   totalItems,
   itensPerPage,
+  filterApplication,
   pageBeforeEdit,
   typeOrderServer, // RR
   orderByserver, // RR
@@ -29,6 +30,8 @@ export default function Perfis({
   const router = useRouter();
 
   const [profiles, setProfiles] = useState<any>(() => allProfiles);
+  
+  const [filter, setFilter] = useState<any>(filterApplication);
   const [currentPage, setCurrentPage] = useState<number>(
     Number(pageBeforeEdit)
   );
@@ -51,18 +54,25 @@ export default function Perfis({
     preferences.table_preferences
   );
 
-  async function callingApi(page: any = 0) {
+  async function callingApi(parametersFilter: any, page: any = 0) {
     setCurrentPage(page);
+
+    setCookies('filterBeforeEdit', parametersFilter);
+    setCookies('filterBeforeEditTypeOrder', typeOrder);
+    setCookies('filterBeforeEditOrderBy', orderBy);
+
+    // parametersFilter = `${parametersFilter}`;
+    parametersFilter = `${parametersFilter}&skip=${
+      page * Number(take)
+    }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
+    
     const params = "";
     try {
-      await profileService.getAll(params).then((response) => {
+      await profileService.getAll(parametersFilter).then((response) => {
         if (response.status === 200 || response.status === 400) {
           setProfiles(response.response);
           setTotalItems(response.total);
-          tableRef.current.dataManager.changePageSize(
-            // response.total >= take ? take : response.total,
-            20
-          );
+          tableRef.current.dataManager.changePageSize(response.total >= take ? take : response.total);
         }
       });
     } catch (error) {
@@ -74,16 +84,21 @@ export default function Perfis({
     }
   }
 
+  // useEffect(() => {
+  //   callingApi(currentPage);
+  // }, [typeOrder, filter]);
+
+  // Call that function when change type order value.
   useEffect(() => {
-    callingApi(currentPage);
-  }, [typeOrder]);
+    callingApi(filter);
+  }, [typeOrder, filter]);
 
   async function handleOrder(): Promise<void> {
     // teste
   }
 
   async function handlePagination(page: any): Promise<void> {
-    await callingApi(page); // handle pagination globly
+    await callingApi(filter, page); // handle pagination globly
   }
 
   function statusHeaderFactory() {
@@ -178,7 +193,7 @@ export default function Perfis({
               options={{
                 sorting: true,
                 showTitle: false,
-                maxBodyHeight: `calc(100vh - 250px)`,
+                maxBodyHeight: `calc(100vh - 320px)`,
                 headerStyle: {
                   zIndex: 1,
                 },
@@ -271,6 +286,7 @@ export default function Perfis({
                         icon={<BiRightArrow size={15} />}
                         disabled={currentPage + 1 >= pages}
                       />
+                      
                       <Button
                         onClick={() => handlePagination(pages - 1)}
                         bgColor="bg-blue-600"
@@ -334,7 +350,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const filterApplication = req.cookies.filterBeforeEdit
     ? `${req.cookies.filterBeforeEdit}`
-    : "";
+    : `filterStatus=1`;
 
   removeCookies("filterBeforeEdit", { req, res });
   removeCookies("pageBeforeEdit", { req, res });
@@ -343,14 +359,19 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies("filterBeforeEditOrderBy", { req, res });
   removeCookies("lastPage", { req, res });
 
+  const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
+  // v2
   const urlParameters: any = new URL(baseUrl);
-  urlParameters.search = new URLSearchParams("").toString();
+  //urlParameters.search = new URLSearchParams("").toString();
+  urlParameters.search = new URLSearchParams(param).toString();
   const requestOptions = {
     method: "GET",
     credentials: "include",
     headers: { Authorization: `Bearer ${token}` },
   } as RequestInit | undefined;
-
+  
+  console.log('urlParameters.toString()', urlParameters.toString());
+  
   const { response: allProfiles, total: totalItems } = await fetch(
     urlParameters.toString(),
     requestOptions

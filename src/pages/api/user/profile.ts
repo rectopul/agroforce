@@ -15,7 +15,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const Controller = new ProfileController();
   switch (req.method) {
     case 'GET':
-      const response = await Controller.getAllProfiles();
+      const response = await Controller.getAllProfiles(req.query);
       res.status(200).json(response);
       break;
     default:
