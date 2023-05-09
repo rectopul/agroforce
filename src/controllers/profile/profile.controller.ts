@@ -132,6 +132,9 @@ export class ProfileController {
     try {
       let permissions: any = '';
       const selecionados = Object.keys(data.selecionados);
+      
+      console.log('profileId:', data.profileId, Number(data.profileId));
+      
       for (const key of selecionados) {
         data.selecionados[key] = data.selecionados[key].replaceAll(/undefined/g, '').split(',').filter((n: any) => n);
 
@@ -140,17 +143,24 @@ export class ProfileController {
             screenRoute: key,
             action: item,
           });
-          await this.createProfilePermission({
+          
+          if(permission.length == 0) 
+            continue;
+          
+          let dataProfilePermission = {
             profileId: Number(data.profileId),
             permissionId: Number(permission[0]?.id),
-          });
+          };
+          
+          await this.createProfilePermission(dataProfilePermission);
+          
           permissions += `${key} --${item};`;
         }
       }
       return permissions;
     } catch (error: any) {
       handleError('Perfil  controller', 'Generate Permissions', error.message);
-      throw new Error('[Controller] - Generate Permissions Perfil  erro');
+      throw new Error('[Controller] - Generate Permissions Perfil  erro'+error.message);
     }
   }
 
@@ -184,6 +194,9 @@ export class ProfileController {
       await this.profilePermissionsRepository.deleteAll({
         profileId: Number(data.profileId),
       });
+      
+      console.log('data', data);
+      
       const permissions = await this.generatePermissions(data);
 
       const { status } = await this.getOne(Number(data.profileId));
