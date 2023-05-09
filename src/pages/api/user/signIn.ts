@@ -35,9 +35,9 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       userCulture.culturas = await PermissionController.getByUserID(user.id);
       
       const {response: userPermissions}: any = await PermissionController.getPermissions(Number(user.id));
-
+      
       userCulture.culturas = userCulture.culturas.response;
-
+      
       if (!userCulture.culturas || userCulture.culturas.status === 400 || userCulture.culturas.length === 0) throw new Error('Você está sem acesso as culturas, contate o seu lider!');
 
       let cultureSelecionada: any;
@@ -56,6 +56,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       safras.safras = await safraController.getAll({
         id_culture: userCulture.cultura_selecionada, filterStatus: 1, orderBy: 'safraName', typeOrder: 'desc',
       });
+      
       if (safras.safras.total > 0) {
         safras.safras = safras.safras.response;
         safras.safra_selecionada = safras.safras[0]?.id || 0;

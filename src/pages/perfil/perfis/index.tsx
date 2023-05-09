@@ -123,7 +123,6 @@ export default function Perfis({
               bgColor="bg-blue-600"
               textColor="white"
             />
-            {perm_can_do("/perfil/perfis", "edit")?'sim':'nao'}
           </div>
           <div className="h-7 ml-3">
             <Button
