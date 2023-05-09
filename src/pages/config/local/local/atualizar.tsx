@@ -142,7 +142,8 @@ export default function AtualizarLocal({
     {name: 'CamposGerenciados[]', title: 'Nome de Unidade de Cultura', value: 'name_unity_culture',},
     {name: 'CamposGerenciados[]', title: 'Ano', value: 'year'},
   ]);
-  const [orderBy, setOrderBy] = useState<string>(orderByserver?? ''); // RR
+  //const [orderBy, setOrderBy] = useState<string>(orderByserver?? ''); // RR
+  const [orderBy, setOrderBy] = useState<string>('year'); // RR
   const [orderType, setOrderType] = useState<string>('');
   const [fieldOrder, setFieldOrder] = useState<any>(orderByserver?? '');
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer ?? '');
@@ -722,18 +723,16 @@ export const getServerSideProps: GetServerSideProps = async ({
     lastPageServer == 'atualizar') {
     // removeCookies('filterBeforeEdit', { req, res });
     // removeCookies('pageBeforeEdit', { req, res });
-    removeCookies('filterBeforeEditTypeOrder', { req, res });
-    removeCookies('filterBeforeEditOrderBy', { req, res });
+    
+    //removeCookies('filterBeforeEditTypeOrder', { req, res });
+    //removeCookies('filterBeforeEditOrderBy', { req, res });
+    
     // removeCookies('lastPage', { req, res });
   }
 
-  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
-    ? req.cookies.filterBeforeEditTypeOrder
-    : 'desc';
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder ? req.cookies.filterBeforeEditTypeOrder : 'desc';
 
-  const orderByserver = req.cookies.filterBeforeEditOrderBy
-    ? req.cookies.filterBeforeEditOrderBy
-    : 'year';
+  const orderByserver = req.cookies.filterBeforeEditOrderBy ? req.cookies.filterBeforeEditOrderBy : 'year';
 
   const filterApplication = `filterStatus=1&&id_local=${id_local}`;
 

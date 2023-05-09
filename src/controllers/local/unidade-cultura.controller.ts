@@ -18,6 +18,9 @@ export class UnidadeCulturaController {
     parameters.AND = [];
     let orderBy: object | any;
     try {
+      
+      console.log('22::START',Date().toString());
+      
       options = await removeEspecialAndSpace(options);
       if (options.createFile) {
         const sheet = await createXls(options, 'LOCAL-UNIDADE-CULTURA');
@@ -80,11 +83,16 @@ export class UnidadeCulturaController {
         dt_export: true,
       };
 
+      console.log('86::',Date().toString());
       if (options.id_safra) {
-        const { response }: any = await this.safraController.getOne(Number(options.id_safra));
+        const { response }: any = await this.safraController.getOne(Number(options.id_safra), {
+          id: true,
+          year: true,
+        });
         parameters.year = response.year;
       }
 
+      console.log('92::',Date().toString());
       if (options.id_unity_culture) {
         parameters.id_unity_culture = options.id_unity_culture;
       }
@@ -116,7 +124,7 @@ export class UnidadeCulturaController {
           }
         }
       }
-
+      console.log('124::',Date().toString());
       const response: object | any = await this.unidadeCulturaRepository.findAll(
         parameters,
         select,
@@ -124,7 +132,7 @@ export class UnidadeCulturaController {
         skip,
         orderBy,
       );
-
+      console.log('132::',Date().toString());
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }

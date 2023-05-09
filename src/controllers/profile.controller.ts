@@ -1,11 +1,51 @@
 import { ProfileRepository } from '../repository/profile.repository';
+import {removeEspecialAndSpace} from "../shared/utils/removeEspecialAndSpace";
 
 export class ProfileController {
   profileRepository = new ProfileRepository();
 
-  async getAllProfiles() {
+  async getAllProfiles(options: any) {
+
+    options = await removeEspecialAndSpace(options);
+    const parameters: object | any = {};
+    let take;
+    let skip;
+    let orderBy: object | any;
+    let select: any = [];
+    
     try {
-      const response = await this.profileRepository.findAll({});
+
+      if (options.take) {
+        if (typeof options.take === 'string') {
+          take = Number(options.take);
+        } else {
+          take = options.take;
+        }
+      }
+
+      if (options.skip) {
+        if (typeof options.skip === 'string') {
+          skip = Number(options.skip);
+        } else {
+          skip = options.skip;
+        }
+      }
+
+      select = {
+        id: true,
+        name: true,
+        permissions: true,
+        createdAt: true,
+        createdBy: true,
+      };
+      
+      const response = await this.profileRepository.findAll(
+        parameters,
+        select,
+        take,
+        skip,
+        orderBy
+      );
       return response;
     } catch (err) {
 

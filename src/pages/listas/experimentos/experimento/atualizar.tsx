@@ -1110,14 +1110,10 @@ export const getServerSideProps: GetServerSideProps = async ({
   // const filterApplication = `id_experimento=${idExperiment}`;
 
   // RR
-  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder
-    ? req.cookies.filterBeforeEditTypeOrder
-    : "desc";
+  const typeOrderServer = req.cookies.filterBeforeEditTypeOrder ? req.cookies.filterBeforeEditTypeOrder : "desc";
 
   // RR
-  const orderByserver = req.cookies.filterBeforeEditOrderBy
-    ? req.cookies.filterBeforeEditOrderBy
-    : "";
+  const orderByserver = req.cookies.filterBeforeEditOrderBy ? req.cookies.filterBeforeEditOrderBy : "";
 
   // removeCookies('filterBeforeEdit', { req, res });
   // removeCookies('pageBeforeEdit', { req, res });

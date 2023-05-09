@@ -28,6 +28,7 @@ export class ReporteController {
   async create({
     userId, operation, module, oldValue, ip,
   }: any) {
+    
     try {
       oldValue = String(oldValue);
       const data = {

@@ -40,6 +40,7 @@ export class UsersPermissionsRepository {
         profile: true,
       },
       distinct: ['cultureId'],
+      //distinct: ['id'],
     });
     return result;
   }

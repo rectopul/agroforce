@@ -294,6 +294,6 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
   );
 
   const safra = await apiSafra.json();
-
+  console.log('safra', safra);
   return { props: safra };
 };
