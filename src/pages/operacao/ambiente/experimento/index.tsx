@@ -1355,7 +1355,7 @@ export default function Listagem({
                 options={{
                   showTitle: false,
                   // maxBodyHeight: `calc(100vh - 400px)`,
-                  maxBodyHeight: "calc(100vh - 320px)",
+                  maxBodyHeight: "43vh",
                   headerStyle: {
                     zIndex: 1,
                   },
@@ -1370,12 +1370,12 @@ export default function Listagem({
                   }),
                   search: false,
                   filtering: false,
-                  // pageSize: Number(take),
-                  paging: true,
-                  pageSizeOptions: [10, 50, 100, 200],
-                  emptyRowsWhenPaging: false,
-                  pageSize: 10,
-                  paginationType: "normal",
+                  pageSize: Number(take),
+                  //paging: true,
+                  //pageSizeOptions: [10, 50, 100, 200],
+                  //emptyRowsWhenPaging: false,
+                  //pageSize: 10,
+                  //paginationType: "normal",
                   // paging: true,
                   // paging: false, //PAGINACAO DESATIVADA TEMPORARIAMENTE
                 }}

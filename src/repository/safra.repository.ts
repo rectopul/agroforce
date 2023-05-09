@@ -15,38 +15,80 @@ export class SafraRepository extends BaseRepository {
     return result;
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, selectReplace: any=null) {
+    
+    let select = {
+      id: true,
+      id_culture: true,
+      year: true,
+      plantingStartTime: true,
+      plantingEndTime: true,
+      main_safra: true,
+      status: true,
+      created_by: true,
+      created_at: true,
+      safraName: true,
+      culture: true,
+      // assay_list: true,
+      // envelope: true,
+      // experiment: true,
+      // genotipo: true,
+      // genotype_treatment: true,
+      // group: true,
+      // lote: true,
+      // npe: true,
+      // quadra: true,
+      // experiment_genotipe: true,
+      // ExperimentGroup: true,
+      // log_import: true,
+    };
+    
+    if(selectReplace !== null){
+      select = selectReplace;
+    }
+    
     const result = await prisma.safra.findUnique({
       where: { id },
-      select: {
-        id: true,
-        id_culture: true,
-        year: true,
-        plantingStartTime: true,
-        plantingEndTime: true,
-        main_safra: true,
-        status: true,
-        created_by: true,
-        created_at: true,
-        safraName: true,
-        culture: true,
-        assay_list: true,
-        envelope: true,
-        experiment: true,
-        genotipo: true,
-        genotype_treatment: true,
-        group: true,
-        lote: true,
-        npe: true,
-        quadra: true,
-        experiment_genotipe: true,
-        ExperimentGroup: true,
-        log_import: true,
-      },
+      select: select,
     });
     return result;
   }
 
+  async findOneFull(id: number) {
+
+    let select = {
+      id: true,
+      id_culture: true,
+      year: true,
+      plantingStartTime: true,
+      plantingEndTime: true,
+      main_safra: true,
+      status: true,
+      created_by: true,
+      created_at: true,
+      safraName: true,
+      culture: true,
+      assay_list: true,
+      envelope: true,
+      experiment: true,
+      genotipo: true,
+      genotype_treatment: true,
+      group: true,
+      lote: true,
+      npe: true,
+      quadra: true,
+      experiment_genotipe: true,
+      ExperimentGroup: true,
+      log_import: true,
+    };
+
+    const result = await prisma.safra.findUnique({
+      where: { id },
+      select: select,
+    });
+    return result;
+  }
+  
   async findBySafraName(data: any) {
     const result = await prisma.safra.findFirst({
       where: {

@@ -132,7 +132,10 @@ export class ImportAllocationController {
                     spreadSheet[0][column],
                   );
               } else {
-                const { response }: IReturnObject = await safraController.getOne(Number(idSafra));
+                
+                const { response }: IReturnObject = await safraController
+                  .getOne(Number(idSafra), {id: true, safraName: true});
+                
                 if (response.safraName !== spreadSheet[row][column]) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(

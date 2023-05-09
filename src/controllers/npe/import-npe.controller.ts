@@ -175,9 +175,7 @@ export class ImportNpeController {
             if (configModule.response[0]?.fields[column] === 'Safra') {
               if (spreadSheet[row][column] !== null) {
                 if (typeof spreadSheet[row][column] === 'string') {
-                  const validateSafra: any = await safraController.getOne(
-                    Number(idSafra),
-                  );
+                  const validateSafra: any = await safraController.getOne(Number(idSafra), {id: true, safraName: true});
                   if (
                     spreadSheet[row][column]
                     !== validateSafra.response.safraName

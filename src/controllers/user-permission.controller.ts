@@ -37,26 +37,33 @@ export class UserPermissionController {
     }
   }
 
-  async getPermissions(userId: number) {
+  async getPermissions(userId: number, distinct: boolean = false) {
     try {
       const response = await this.userPermission.findPermissions(Number(userId));
       const aux: any = {};
-      const result = response.reduce((r: any, o: any) => {
-        const key = `${o.cultureId}`;
+      
+      if(!distinct){
+        const result = response.reduce((r: any, o: any) => {
+          const key = `${o.cultureId}`;
 
-        if (!aux[key]) {
-          aux[key] = { ...o };
-          r.push(aux[key]);
-        } else {
-          aux[key].profile.permissions += `${o.profile.permissions}`;
-        }
+          if (!aux[key]) {
+            aux[key] = { ...o };
+            r.push(aux[key]);
+          } else {
+            aux[key].profile.permissions += `${o.profile.permissions}`;
+          }
 
-        return r;
-      }, []);
+          return r;
+        }, []);
+        return { status: 200, response: result };
+      } else {
+        return { status: 200, response: response };
+      }
+      
       if (!response || response.length === 0) {
         return { status: 400, response: [], message: 'usuario não tem cultura' };
       }
-      return { status: 200, response: result };
+      
     } catch (error) {
       return { status: 400, message: error };
     }
