@@ -136,6 +136,21 @@ export class SafraController {
     }
   }
 
+  async getOneFull(id: number) {
+    try {
+      if (!id) return { status: 409, response: [], message: 'ID invalido' };
+
+      const response = await this.safraRepository.findOneFull(Number(id));
+
+      if (!response) return { status: 400, response };
+
+      return { status: 200, response };
+    } catch (error: any) {
+      handleError('Safra controller', 'GetOne', error.message);
+      throw new Error('[Controller] - GetOne Safra erro');
+    }
+  }
+
   async create(data: CreateSafra) {
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');

@@ -9,7 +9,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (req.method) {
     case 'GET': {
-      const Result = await Controller.getOne(Number(id));
+      const Result = await Controller.getOneFull(Number(id));
       res.status(200).json(Result.response);
       break;
     }
