@@ -121,11 +121,11 @@ export class SafraController {
     }
   }
 
-  async getOne(id: number) {
+  async getOne(id: number, selectReplace:any=null) {
     try {
       if (!id) return { status: 409, response: [], message: 'ID invalido' };
-
-      const response = await this.safraRepository.findOne(Number(id));
+      
+      const response = await this.safraRepository.findOne(Number(id), selectReplace);
 
       if (!response) return { status: 400, response };
 
@@ -166,7 +166,20 @@ export class SafraController {
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       if (data.status === 0 || data.status === 1) {
-        const safraAlreadyExists = await this.getOne(data.id);
+        const safraAlreadyExists = await this.getOne(data.id,{
+          id: true,
+          id_culture: true,
+          year: true,
+          plantingStartTime: true,
+          plantingEndTime: true,
+          main_safra: true,
+          status: true,
+          created_by: true,
+          created_at: true,
+          safraName: true,
+          culture: true,
+        });
+        
         if (safraAlreadyExists.status !== 200) {
           return { status: 400, message: 'Safra não encontrado' };
         }

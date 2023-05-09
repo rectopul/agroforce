@@ -370,11 +370,7 @@ export default function Listagem({
       filterPlaceholder: 'Filtrar por status',
       render: (rowData: ILocalProps) => (
         <div className="h-7 flex">
-          <div
-            className="
-							h-7
-						"
-          >
+          <div className="h-7">
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name_local_culture}`}
@@ -832,10 +828,7 @@ export default function Listagem({
                       {itemsTotal}
                     </strong>
 
-                    <div
-                      className="h-full flex items-center gap-2
-                    "
-                    >
+                    <div className="h-full flex items-center gap-2">
                       <ManageFields
                         statusAccordionExpanded={false}
                         generatesPropsDefault={generatesProps}
@@ -969,6 +962,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
   if (lastPageServer == undefined || lastPageServer == 'No' || req.cookies.urlPage !== 'local') {
+    console.log('removeCookies');
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });
@@ -1005,16 +999,18 @@ export const getServerSideProps: GetServerSideProps = async ({
   const baseUrl = `${publicRuntimeConfig.apiUrl}/local`;
   const param = `skip=0&take=${itensPerPage}&filterStatus=1&id_culture=${cultureId}`;
 
-  removeCookies('filterBeforeEdit', { req, res });
-  removeCookies('pageBeforeEdit', { req, res });
-  removeCookies('filterBeforeEditTypeOrder', { req, res });
-  removeCookies('takeBeforeEdit', { req, res });
-  removeCookies('filterBeforeEditOrderBy', { req, res });
-  removeCookies('lastPage', { req, res });
-  removeCookies('urlPage', { req, res });
+  // removeCookies('filterBeforeEdit', { req, res });
+  // removeCookies('pageBeforeEdit', { req, res });
+  // removeCookies('filterBeforeEditTypeOrder', { req, res });
+  // removeCookies('takeBeforeEdit', { req, res });
+  // removeCookies('filterBeforeEditOrderBy', { req, res });
+  // removeCookies('lastPage', { req, res });
+  // removeCookies('urlPage', { req, res });
 
   const urlParameters: any = new URL(baseUrl);
+  
   urlParameters.search = new URLSearchParams(param).toString();
+  
   const requestOptions = {
     method: 'GET',
     credentials: 'include',
@@ -1022,6 +1018,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   } as RequestInit | undefined;
 
   const local = await fetch(urlParameters.toString(), requestOptions);
+  
   const { response: locais, total: totalItems } = await local.json();
 
   return {

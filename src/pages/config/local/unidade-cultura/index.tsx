@@ -276,6 +276,7 @@ export default function Listagem({
   });
 
   async function callingApi(parametersFilter: any, page: any = 0) {
+    console.log('callingApi', parametersFilter, page);
     setCurrentPage(page);
 
     setCookies('filterBeforeEdit', parametersFilter);

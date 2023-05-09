@@ -7,7 +7,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (req.method) {
     case 'GET': {
+      console.log('START HANDLER>>>>', Date().toString());
       const result = await unidadeCulturaController.getAll(req.query);
+      console.log('FINISH HANDLER>>>>', Date().toString());
       res.status(200).json(result);
       break;
     }
