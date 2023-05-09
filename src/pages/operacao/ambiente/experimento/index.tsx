@@ -1376,11 +1376,10 @@ export default function Listagem({
                   search: false,
                   filtering: false,
                   pageSize: Number(take),
-                  //paging: true,
-                  //pageSizeOptions: [10, 50, 100, 200],
-                  //emptyRowsWhenPaging: false,
-                  //pageSize: 10,
-                  //paginationType: "normal",
+                  paging: true,
+                  pageSizeOptions: [10, 50, 100, 200],
+                  emptyRowsWhenPaging: false,
+                  paginationType: "normal",
                   // paging: true,
                   // paging: false, //PAGINACAO DESATIVADA TEMPORARIAMENTE
                 }}
