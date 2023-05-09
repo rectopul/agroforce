@@ -5,7 +5,7 @@
 /* eslint-disable react/no-array-index-key */
 import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from "formik";
-import MaterialTable from "material-table";
+import MaterialTable, {Column, MaterialTableProps} from "material-table";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
@@ -700,7 +700,7 @@ export default function Listagem({
     );
   }
 
-  const columnNPE = [
+  const columnNPE: Column<any>[] = [
     { title: "Local", field: "local.name_local_culture" },
     { title: "Safra", field: "safra.safraName" },
     { title: "Foco", field: "foco.name" },
@@ -709,8 +709,8 @@ export default function Listagem({
     { title: "Época", field: "epoca" },
     { title: "NPE Inicial", field: "prox_npe" },
     { title: "NPE Final", field: "npefView" },
-    { title: "NPE Requisitada", field: "npeRequisitada" },
-    { title: "NPE Disponível", field: "npeQT" },
+    { title: "NPE Requisitada", field: "npeRequisitada" , headerStyle : { textAlign: 'center', whiteSpace: 'nowrap'}},
+    { title: "NPE Disponível", field: "npeQT", headerStyle : { textAlign: 'center', whiteSpace: 'nowrap'}},
   ];
 
   const handleNPERowSelection = (rowData: any) => {
@@ -789,6 +789,9 @@ export default function Listagem({
                 }
               });
             });
+
+            response.push(response[0]);
+            response.push(response[1]);
 
             /**
              * No caso temos o ENV1 com NPEI = 101 e NPEF = 101 e NPEI_I = 101 e PROX_NPE = 101
@@ -1310,7 +1313,9 @@ export default function Listagem({
               }}
               options={{
                 showTitle: false,
-                maxBodyHeight: "170px",
+                //maxBodyHeight: "170px",
+                maxBodyHeight: "calc(20vh)",
+                minBodyHeight: "170px",
                 headerStyle: {
                   zIndex: 20,
                   height: 40,
@@ -1355,7 +1360,10 @@ export default function Listagem({
                 options={{
                   showTitle: false,
                   // maxBodyHeight: `calc(100vh - 400px)`,
-                  maxBodyHeight: "43vh",
+                  // maxBodyHeight: "calc(100vh - 60vh)",
+                  // maxBodyHeight: "43vh",
+                  minBodyHeight: "calc(20vh)",
+                  maxBodyHeight: "calc(100vh - 435px)",
                   headerStyle: {
                     zIndex: 1,
                   },
