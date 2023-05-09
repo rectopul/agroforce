@@ -134,7 +134,7 @@ export class ImportAllocationController {
               } else {
                 
                 const { response }: IReturnObject = await safraController
-                  .getOne(Number(idSafra), {id: true, safraName: true,});
+                  .getOne(Number(idSafra), {id: true, safraName: true});
                 
                 if (response.safraName !== spreadSheet[row][column]) {
                   responseIfError[Number(column)]
