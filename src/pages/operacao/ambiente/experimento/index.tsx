@@ -5,7 +5,7 @@
 /* eslint-disable react/no-array-index-key */
 import { removeCookies, setCookies } from "cookies-next";
 import { useFormik } from "formik";
-import MaterialTable, {Column, MaterialTableProps} from "material-table";
+import MaterialTable, {Column} from "material-table";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import getConfig from "next/config";
 import Head from "next/head";
@@ -789,9 +789,6 @@ export default function Listagem({
                 }
               });
             });
-
-            response.push(response[0]);
-            response.push(response[1]);
 
             /**
              * No caso temos o ENV1 com NPEI = 101 e NPEF = 101 e NPEI_I = 101 e PROX_NPE = 101
