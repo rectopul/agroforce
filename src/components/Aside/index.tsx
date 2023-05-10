@@ -12,10 +12,12 @@ import { useEffect, useState } from 'react';
 import { ButtonAside } from './ButtonAside';
 import { asidePermissions } from '../../shared/utils/perm_can_do';
 
-const versionApp = '0.0.43.3';
+const versionApp = '0.0.43.4';
 
 export function Aside({ moduloActive }: any) {
+  
   const aArray = versionApp.split('.');
+  
   const [config, setConfig] = useState<any>([
     '/config/tmg/usuarios',
     '/config/tmg/cultura',
@@ -32,6 +34,7 @@ export function Aside({ moduloActive }: any) {
     '/config/quadra',
     '/config/quadra/layout-quadra',
   ]);
+  
   const [list, setList] = useState<any>([
     '/listas/rd',
     '/listas/ensaios/ensaio',
@@ -39,14 +42,18 @@ export function Aside({ moduloActive }: any) {
     '/listas/experimentos/experimento',
     '/listas/experimentos/parcelas-experimento',
   ]);
+  
   const [operation, setOperation] = useState<any>([
     '/operacao/ambiente',
     '/operacao/etiquetagem',
   ]);
+  
   const [logs, setLogs] = useState<any>([
     '/logs',
   ]);
+  
   const prev = aArray.splice(0, aArray.length - 1);
+  
   const next = aArray.splice(-1);
 
   async function set(value: any, state: any) {
