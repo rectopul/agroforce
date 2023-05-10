@@ -1508,7 +1508,7 @@ export default function Listagem({
                           bgColor="bg-blue-600"
                           textColor="white"
                           icon={<MdFirstPage size={18} />}
-                          disabled={currentPage <= 1}
+                          disabled={currentPage < 1}
                         />
                         <Button
                           onClick={() => handlePagination(currentPage - 1)}
