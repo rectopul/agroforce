@@ -1172,9 +1172,7 @@ export default function Import({
                         disabled={currentPage < 1}
                       />
                       <Button
-                        onClick={() => {
-                          handlePagination(currentPage - 1);
-                        }}
+                        onClick={() => handlePagination(currentPage - 1)}
                         bgColor="bg-blue-600"
                         textColor="white"
                         icon={<BiLeftArrow size={15} />}
