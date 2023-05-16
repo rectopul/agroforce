@@ -54,4 +54,10 @@ export class ProfileRepository extends BaseRepository {
     });
     return result;
   }
+
+  async delete(id: number) {
+    const result = await prisma.profile.delete({ where: { id } });
+    return result;
+  }
+  
 }
