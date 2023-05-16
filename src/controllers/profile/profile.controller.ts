@@ -64,7 +64,30 @@ export class ProfileController {
         permissions: true,
         createdAt: true,
         createdBy: true,
+        
       };
+      
+      if(options.showUsersPermissions == true || options.showUsersPermissions == 'true'){
+        let users_permissions = {
+          select: {
+            id: true,
+              cultureId: true,
+              profileId: true,
+              userId: true,
+              status: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  status: true,
+                }
+              },
+          }
+        };
+        
+        // add users_permissions to select
+        select.users_permissions = users_permissions;
+      }
 
       if (options.orderBy) {
         orderBy = `{"${options.orderBy}":"${options.typeOrder}"}`;
@@ -83,6 +106,21 @@ export class ProfileController {
           status: 400, response: [], total: 0, message: 'nenhum resultado encontrado',
         };
       }
+
+      if(options.showUsersPermissions == true || options.showUsersPermissions == 'true') {
+        response.forEach((rowData: any, index: number): any => {
+          // find users_permissions with user with status == 1
+          const users_permissions_actives = rowData.users_permissions.filter((user_permission: {
+            cultureId: number;
+            profileId: number;
+            userId: number;
+            status: number;
+            user: { id: number; name: string; status: number };
+          }) => user_permission.user.status == 1);
+          rowData.users_permissions_actives = users_permissions_actives.length;
+        });
+      }
+      
       return { status: 200, response, total: response.total };
     } catch (error: any) {
       handleError('Perfil  controller', 'GetAll', error.message);
@@ -245,6 +283,7 @@ export class ProfileController {
 
       if (responseUP.length > 0) {
         responseUP.forEach((item: any) => {
+          
           // verifica se o usuário já foi adicionado
           if (item.user.name && userNames.findIndex((name) => name == item.user.name) == -1) {
             userNames.push(item.user.name);
@@ -254,13 +293,6 @@ export class ProfileController {
             }
           }
         });
-
-        // se não houver usuários ativos remove todas as permissões
-        // if (usersActive.length == 0) {
-        //   await this.usersPermissionsRepository.delete({
-        //     profileId: Number(data.id),
-        //   });
-        // }
       }
       
       // se deleteDependeces == true ou não houver usuários ativos remove todas as permissões;
@@ -275,7 +307,7 @@ export class ProfileController {
           let userString = (userNames.length)?'- ' + userNames.join('<br/>- '):'';
           return {
             status: 400,
-            message: `Existe usuários utilizando esse perfil:<br/>${userString}`
+            message: `Este perfil não pode ser excluído, pois está sendo utilizado pelos usuários:<br/>${userString}`
           };
         }
       }
