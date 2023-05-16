@@ -550,13 +550,7 @@ export default function Listagem({
                 "
                 onSubmit={formik.handleSubmit}
               >
-                <div
-                  className="w-full h-full
-                  flex
-                  justify-center
-                  pb-0
-                "
-                >
+                <div className="w-full h-full flex justify-center pb-0">
                   <div className="h-6 w-1/2 ml-4">
                     <label className="block text-gray-900 text-sm font-bold mb-1">
                       Status

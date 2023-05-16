@@ -7,25 +7,35 @@ import { RequestInit } from "next/dist/server/web/spec-extension/request";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import { BiEdit, BiLeftArrow, BiRightArrow, BiSlider } from "react-icons/bi";
+import {BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow, BiSlider} from "react-icons/bi";
 import { MdDateRange, MdFirstPage, MdLastPage } from "react-icons/md";
 import Swal from "sweetalert2";
 import { Button } from "../../../components/Button";
 import { Content } from "../../../components/Content";
 import {assayListService, profileService} from "../../../services";
+import ComponentLoading from '../../../components/Loading';
 import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
 import { perm_can_do } from "../../../shared/utils/perm_can_do";
 import {BsTrashFill} from "react-icons/bs";
-import {ModalConfirmation} from "../../../components";
+import {AccordionFilter, FieldItemsPerPage, Input, ModalConfirmation, Select} from "../../../components";
+import { useFormik } from 'formik';
+import {tableGlobalFunctions} from "../../../helpers";
+
+interface IFilter {
+  filterSearch: string | any;
+  orderBy: object | any;
+  typeOrder: object | any;
+}
 
 export default function Perfis({
-  allProfiles,
-  totalItems,
-  itensPerPage,
-  filterApplication,
-  pageBeforeEdit,
-  typeOrderServer, // RR
-  orderByserver, // RR
+   allProfiles,
+   totalItems,
+   itensPerPage,
+   filterApplication,
+   pageBeforeEdit,
+   filterBeforeEdit,
+   typeOrderServer, // RR
+   orderByserver, // RR
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const userLogado = JSON.parse(localStorage.getItem("user") as string);
   const tableRef = useRef<any>(null);
@@ -192,36 +202,87 @@ export default function Perfis({
   }
 
   async function deleteItem() {
+    
     setIsOpenModalConfirm(false);
-    //setLoading(true);
+    
+    setLoading(true);
 
     try {
       const {status, message} = await profileService.deleted({
         id: itemSelectedDelete?.id,
         userId: userLogado.id,
       });
+      
       console.log('status', status, 'message', message);
+
+      setLoading(false);
+      
       if (status === 200) {
+        
         handlePagination(currentPage);
-        //setLoading(false);
-      } else {
+
         Swal.fire({
           html: message,
           width: '800',
         });
+        
+      } else {
+        
+        Swal.fire({
+          html: message,
+          width: '800',
+        });
+        
       }
     } catch (error) {
+      
+      setLoading(false);
+      
       console.log('error', error);
+      
       Swal.fire({
         title: "Falha ao buscar perfis",
         html: `Ocorreu um erro ao excluir este perfil. Tente novamente mais tarde. DETALHE: ${error}`,
         width: "800",
       });
+      
     }
   }
 
+  const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
+
+  // Checking defualt values
+  function checkValue(value: any) {
+    const parameter = tableGlobalFunctions.getValuesForFilter(
+      value,
+      filtersParams,
+    );
+    return parameter;
+  }
+
+  const [statusAccordionFilter, setStatusAccordionFilter] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  
+  const formik = useFormik<IFilter>({
+    initialValues: {
+      filterSearch: checkValue('filterSearch'),
+      orderBy: '',
+      typeOrder: '',
+    },
+    onSubmit: async ({ filterSearch }) => {
+      const parametersFilter = `filterSearch=${filterSearch}`;
+
+      setFilter(parametersFilter);
+      setCurrentPage(0);
+
+      await callingApi(parametersFilter);
+      setLoading(false);
+    },
+  });
+
   return (
     <>
+      {loading && <ComponentLoading text="" />}
       <Head>
         <title>Perfis</title>
       </Head>
@@ -234,14 +295,56 @@ export default function Perfis({
       />
       
       <Content contentHeader={[]} moduloActive="config">
-        <main
-          className="h-full w-full
-          flex flex-col
-          items-start
-          gap-4
-          overflow-y-hidden
-        "
-        >
+        <main className="h-full w-full flex flex-col items-start gap-4 overflow-y-hidden">
+
+          <AccordionFilter title="Filtrar perfis" onChange={(_, e) => setStatusAccordionFilter(e)}>
+            <div className="w-full flex gap-2">
+              <form className="flex flex-col w-full items-center px-4 bg-white" onSubmit={formik.handleSubmit}>
+                <div className="w-full h-full flex justify-center pb-0">
+                  {/*<div className="h-6 w-1/2 ml-4">*/}
+                  {/*  <label className="block text-gray-900 text-sm font-bold mb-1">Status</label>*/}
+                  {/*  <Select*/}
+                  {/*    name="filterStatus"*/}
+                  {/*    onChange={formik.handleChange}*/}
+                  {/*    // defaultValue={checkValue('filterStatus')}*/}
+                  {/*    defaultValue={filterStatusBeforeEdit[13]}*/}
+                  {/*    values={filtersStatusItem.map((id) => id)}*/}
+                  {/*    selected="1"*/}
+                  {/*  />*/}
+                  {/*</div>*/}
+                  <div className="h-6 w-1/2 ml-4">
+                    <label className="block text-gray-900 text-sm font-bold mb-1">
+                      Nome
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Perfil"
+                      defaultValue={checkValue('filterSearch')}
+                      id="filterSearch"
+                      name="filterSearch"
+                      onChange={formik.handleChange}
+                    />
+                  </div>
+
+                  <FieldItemsPerPage selected={take} onChange={setTake} />
+
+                  <div className="h-7 w-32 mt-6" style={{ marginLeft: 10 }}>
+                    <Button
+                      type="submit"
+                      onClick={() => {
+                        setLoading(true);
+                      }}
+                      value="Filtrar"
+                      bgColor="bg-blue-600"
+                      textColor="white"
+                      icon={<BiFilterAlt size={20} />}
+                    />
+                  </div>
+                </div>
+              </form>
+            </div>
+          </AccordionFilter>
+          
           <div className="w-full h-full">
             <MaterialTable
               tableRef={tableRef}
@@ -251,10 +354,8 @@ export default function Perfis({
               options={{
                 sorting: true,
                 showTitle: false,
-                maxBodyHeight: `calc(100vh - 320px)`,
-                headerStyle: {
-                  zIndex: 1,
-                },
+                maxBodyHeight: `calc(100vh - ${statusAccordionFilter ? 410 : 320}px)`,
+                headerStyle: {zIndex: 1},
                 search: false,
                 filtering: false,
                 pageSize: Number(take),

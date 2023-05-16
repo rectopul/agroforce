@@ -54,6 +54,10 @@ export class ProfileController {
         }
       }
 
+      if (options.filterSearch) {
+        parameters.name = JSON.parse(`{"contains":"${options.filterSearch}"}`);
+      }
+
       select = {
         id: true,
         name: true,
@@ -244,43 +248,44 @@ export class ProfileController {
       console.log('statusPermissions', statusPermissions, 'responsePermissions', responsePermissions);
       console.log('responseUP', responseUP);
       
-      /*let userNames = '';
-      responseUP.forEach((item:any) => {
-        userNames += item.user.name + ', ';
-      });*/
-      
-      if (deleteDependences) {
+      let userNames:string[] = [];
+      let usersActive:string[] = [];
 
+      if (responseUP.length > 0) {
+        responseUP.forEach((item: any) => {
+          // verifica se o usuário já foi adicionado
+          if (item.user.name && userNames.findIndex((name) => name == item.user.name) == -1) {
+            userNames.push(item.user.name);
+            // armaena os usuários ativos
+            if (item.user.status === 1) {
+              usersActive.push(item.user.id);
+            }
+          }
+        });
+
+        // se não houver usuários ativos remove todas as permissões
+        // if (usersActive.length == 0) {
+        //   await this.usersPermissionsRepository.delete({
+        //     profileId: Number(data.id),
+        //   });
+        // }
+      }
+      
+      // se deleteDependeces == true ou não houver usuários ativos remove todas as permissões;
+      if (deleteDependences || usersActive.length == 0) {
+        // remove todas as permissões relacionadas ao perfil
         await this.usersPermissionsRepository.delete({
           profileId: Number(data.id),
         });
-
       } else {
-
-        let userNames:string[] = [];
-        
-        if (responseUP.length > 0) {
-          responseUP.forEach((item: any) => {
-            console.log(
-              'findIndex', 
-              'name', 
-              item.user.name, 
-              userNames.findIndex((name) => name == item.user.name) == -1);
-            
-            if (item.user.name && userNames.findIndex((name) => name == item.user.name) == -1) {
-              userNames.push(item.user.name);
-            }
-            
-          });
+        // se houver usuários ativos retorna o erro mostrando quais usuários estão utilizando o perfil
+        if (usersActive.length > 0) {
+          let userString = (userNames.length)?'- ' + userNames.join('<br/>- '):'';
+          return {
+            status: 400,
+            message: `Existe usuários utilizando esse perfil:<br/>${userString}`
+          };
         }
-        
-        let userString = (userNames.length)?'- ' + userNames.join('<br/>- '):'';
-        
-        return {
-          status: 400,
-          message: `Existe usuários utilizando esse perfil:<br/>${userString}`
-        };
-        
       }
       
       await this.reporteController.create({
