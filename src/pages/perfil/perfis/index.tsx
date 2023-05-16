@@ -12,9 +12,11 @@ import { MdDateRange, MdFirstPage, MdLastPage } from "react-icons/md";
 import Swal from "sweetalert2";
 import { Button } from "../../../components/Button";
 import { Content } from "../../../components/Content";
-import { profileService } from "../../../services";
+import {assayListService, profileService} from "../../../services";
 import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
 import { perm_can_do } from "../../../shared/utils/perm_can_do";
+import {BsTrashFill} from "react-icons/bs";
+import {ModalConfirmation} from "../../../components";
 
 export default function Perfis({
   allProfiles,
@@ -53,6 +55,8 @@ export default function Perfis({
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
     preferences.table_preferences
   );
+
+  const [itemSelectedDelete, setItemSelectedDelete] = useState<any>(null);
 
   async function callingApi(parametersFilter: any, page: any = 0) {
     setCurrentPage(page);
@@ -96,6 +100,31 @@ export default function Perfis({
   async function handleOrder(): Promise<void> {
     // teste
   }
+  
+  function columnsOrder(camposGerenciados: string) {
+    const columnCampos: string[] = camposGerenciados.split(",");
+    const tableFields: any = [];
+
+    Object.keys(columnCampos).forEach((item, index) => {
+      if (columnCampos[index] === "name") {
+        tableFields.push(
+          headerTableFactoryGlobal({
+            name: "Nome",
+            title: "name",
+            orderList,
+            fieldOrder,
+            handleOrder,
+          })
+        );
+      }
+      if (columnCampos[index] === "status") {
+        tableFields.push(statusHeaderFactory());
+      }
+    });
+    return tableFields;
+  }
+
+  const columns = columnsOrder(camposGerenciados);
 
   async function handlePagination(page: any): Promise<void> {
     await callingApi(filter, page); // handle pagination globly
@@ -110,6 +139,16 @@ export default function Perfis({
       filterPlaceholder: "Filtrar por status",
       render: (rowData: any) => (
         <div className="h-8 flex">
+          <div className="h-7 mr-3">
+            <Button
+              icon={<BsTrashFill size={14} />}
+              style={{ display: (!perm_can_do('/perfil/perfis', 'delete') && false) ? 'none' : '' }}
+              title="Excluir perfil"
+              onClick={() => { deleteConfirmItem(rowData); }}
+              bgColor="bg-red-600"
+              textColor="white"
+            />
+          </div>
           <div className="h-7">
             <Button
               icon={<BiEdit size={14} />}
@@ -136,7 +175,7 @@ export default function Perfis({
               onClick={() => {
                 router.push(`/perfil/perfis/permissoes?id=${rowData.id}`);
               }}
-              bgColor="bg-red-600"
+              bgColor="bg-blue-600"
               textColor="white"
             />
           </div>
@@ -144,37 +183,56 @@ export default function Perfis({
       ),
     };
   }
+  
+  const [isOpenModalConfirm, setIsOpenModalConfirm] = useState<boolean>(false);
 
-  function columnsOrder(camposGerenciados: string) {
-    const columnCampos: string[] = camposGerenciados.split(",");
-    const tableFields: any = [];
-
-    Object.keys(columnCampos).forEach((item, index) => {
-      if (columnCampos[index] === "name") {
-        tableFields.push(
-          headerTableFactoryGlobal({
-            name: "Nome",
-            title: "name",
-            orderList,
-            fieldOrder,
-            handleOrder,
-          })
-        );
-      }
-      if (columnCampos[index] === "status") {
-        tableFields.push(statusHeaderFactory());
-      }
-    });
-    return tableFields;
+  async function deleteConfirmItem(item: any) {
+    setItemSelectedDelete(item);
+    setIsOpenModalConfirm(true);
   }
 
-  const columns = columnsOrder(camposGerenciados);
+  async function deleteItem() {
+    setIsOpenModalConfirm(false);
+    //setLoading(true);
+
+    try {
+      const {status, message} = await profileService.deleted({
+        id: itemSelectedDelete?.id,
+        userId: userLogado.id,
+      });
+      console.log('status', status, 'message', message);
+      if (status === 200) {
+        handlePagination(currentPage);
+        //setLoading(false);
+      } else {
+        Swal.fire({
+          html: message,
+          width: '800',
+        });
+      }
+    } catch (error) {
+      console.log('error', error);
+      Swal.fire({
+        title: "Falha ao buscar perfis",
+        html: `Ocorreu um erro ao excluir este perfil. Tente novamente mais tarde. DETALHE: ${error}`,
+        width: "800",
+      });
+    }
+  }
 
   return (
     <>
       <Head>
         <title>Perfis</title>
       </Head>
+
+      <ModalConfirmation
+        isOpen={isOpenModalConfirm}
+        text={`Tem certeza que deseja deletar o perfil ${itemSelectedDelete?.name}?`}
+        onPress={deleteItem}
+        onCancel={() => setIsOpenModalConfirm(false)}
+      />
+      
       <Content contentHeader={[]} moduloActive="config">
         <main
           className="h-full w-full

@@ -7,7 +7,10 @@ import handleError from '../../shared/utils/handleError';
 import { PermissionsController } from '../permissions/permissions.controller';
 import { ProfilePermissionsRepository } from '../../repository/profile-permissions.repository';
 import { ReporteController } from '../reportes/reporte.controller';
+
 import {removeEspecialAndSpace} from "../../shared/utils/removeEspecialAndSpace";
+import {UserPermissionController} from "../user-permission.controller";
+import {UsersPermissionsRepository} from "../../repository/user-permission.repository";
 
 export class ProfileController {
   profileRepository = new ProfileRepository();
@@ -17,6 +20,10 @@ export class ProfileController {
   profilePermissionsRepository = new ProfilePermissionsRepository();
 
   reporteController = new ReporteController();
+
+  userPermissionController = new UserPermissionController();
+
+  usersPermissionsRepository = new UsersPermissionsRepository();
 
   async getAll(options: any) {
     
@@ -209,6 +216,88 @@ export class ProfileController {
     } catch (error: any) {
       handleError('Perfil  controller', 'Update', error.message);
       throw new Error('[Controller] - Update Perfil  erro');
+    }
+  }
+  
+  async deleted(data: any) {
+    // flag para excluir dependencias
+    const deleteDependences = false;
+    
+    try {
+      if (!data.id) 
+        throw new Error('Dados inválidos');
+
+      const { status: status, response:response } = await this.getOne(Number(data.id));
+
+      const { ip } = await fetch('https://api.ipify.org/?format=json')
+        .then((results) => results.json())
+        .catch(() => '0.0.0.0');
+
+      const {status:statusPermissions, response: responsePermissions} = await this.profilePermissionsRepository.findAll({
+        profileId: Number(data.id),
+      });
+      
+      const responseUP = await this.usersPermissionsRepository.findAll({
+        profileId: Number(data.id),
+      });
+
+      console.log('statusPermissions', statusPermissions, 'responsePermissions', responsePermissions);
+      console.log('responseUP', responseUP);
+      
+      /*let userNames = '';
+      responseUP.forEach((item:any) => {
+        userNames += item.user.name + ', ';
+      });*/
+      
+      if (deleteDependences) {
+
+        await this.usersPermissionsRepository.delete({
+          profileId: Number(data.id),
+        });
+
+      } else {
+
+        let userNames:string[] = [];
+        
+        if (responseUP.length > 0) {
+          responseUP.forEach((item: any) => {
+            console.log(
+              'findIndex', 
+              'name', 
+              item.user.name, 
+              userNames.findIndex((name) => name == item.user.name) == -1);
+            
+            if (item.user.name && userNames.findIndex((name) => name == item.user.name) == -1) {
+              userNames.push(item.user.name);
+            }
+            
+          });
+        }
+        
+        let userString = (userNames.length)?'- ' + userNames.join('<br/>- '):'';
+        
+        return {
+          status: 400,
+          message: `Existe usuários utilizando esse perfil:<br/>${userString}`
+        };
+        
+      }
+      
+      await this.reporteController.create({
+        userId: data.userId, module: 'PERFIL', operation: 'EXCLUSÃO', oldValue: data.id, ip: String(ip),
+      });
+      
+      await this.profileRepository.delete(Number(data.id));
+      
+      return { status: 200, message: 'Perfil excluido com sucesso!' };
+      
+      /*const { ip } = await fetch('https://api.ipify.org/?format=json')
+        .then((results) => results.json())
+        .catch(() => '*/
+    } catch (error: any) {
+      
+      handleError('Lista de ensaio controller', 'Delete', error.message);
+      throw new Error('[Controller] - Delete perfil erro: '+ error.message);
     }
   }
 
