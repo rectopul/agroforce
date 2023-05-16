@@ -107,8 +107,26 @@ export default function Perfis({
     callingApi(filter);
   }, [typeOrder, filter]);
 
-  async function handleOrder(): Promise<void> {
-    // teste
+  async function handleOrder(
+    column: string,
+    order: string | any,
+    name: string): Promise<void> {
+
+    // Global manage orders
+    const {
+      typeOrderG, columnG, orderByG, arrowOrder,
+    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+
+    setFieldOrder(columnG);
+    setTypeOrder(typeOrderG);
+    typeOrderG !== '' ? (typeOrderG == 'desc' ? setOrder(1) : setOrder(2)) : '';
+    setOrderBy(columnG);
+    setArrowOrder(arrowOrder);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 100);
+    
   }
   
   function columnsOrder(camposGerenciados: string) {

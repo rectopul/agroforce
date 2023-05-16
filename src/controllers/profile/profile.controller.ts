@@ -65,27 +65,19 @@ export class ProfileController {
         createdAt: true,
         createdBy: true,
       };
-      
-      /*
-      acess_permission String?
-  permissions      String?  @db.LongText
-  createdAt        DateTime @default(now())
-  createdBy        Int?
 
-  profile_permissions profile_permissions[]
-  user_profile        user_profile[]
-  users_permissions   users_permissions[]
-       */
-      // v2
+      if (options.orderBy) {
+        orderBy = `{"${options.orderBy}":"${options.typeOrder}"}`;
+      }
+      
       const response: object | any = await this.profileRepository.findAll(
         parameters,
         select,
         take,
         skip,
-        '',
+        orderBy
       );
       
-
       if (!response && response.total <= 0) {
         return {
           status: 400, response: [], total: 0, message: 'nenhum resultado encontrado',
