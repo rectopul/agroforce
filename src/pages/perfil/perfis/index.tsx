@@ -495,6 +495,17 @@ export default function Perfis({
                             : "",
                         }}
                         onClick={() => {
+
+                          setCookies('pageBeforeEdit', currentPage?.toString());
+                          setCookies('filterBeforeEdit', filter);
+                          setCookies('filterBeforeEditTypeOrder', typeOrder);
+                          setCookies('filterBeforeEditOrderBy', orderBy);
+                          setCookies('filtersParams', filtersParams);
+                          setCookies('lastPage', 'atualizar');
+                          setCookies('itensPage', itensPerPage);
+                          setCookies('takeBeforeEdit', take);
+                          setCookies('urlPage', 'perfis');
+                          
                           router.push("/perfil/perfis/cadastro");
                         }}
                         icon={<MdDateRange size={20} />}
