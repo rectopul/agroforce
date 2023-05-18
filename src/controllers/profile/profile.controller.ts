@@ -282,6 +282,9 @@ export class ProfileController {
       
       let userNames:string[] = [];
       let usersActive:string[] = [];
+      let usersInactive:string[] = [];
+      // variavel que guarda o status de cada userNames
+      let usersStatus: any = {};
 
       if (responseUP.length > 0) {
         responseUP.forEach((item: any) => {
@@ -289,6 +292,7 @@ export class ProfileController {
           // verifica se o usuário já foi adicionado
           if (item.user.name && userNames.findIndex((name) => name == item.user.name) == -1) {
             userNames.push(item.user.name);
+            usersStatus[item.user.name] = item.user.status;
             // armaena os usuários ativos
             if (item.user.status === 1) {
               usersActive.push(item.user.id);
@@ -298,15 +302,18 @@ export class ProfileController {
       }
       
       // se deleteDependeces == true ou não houver usuários ativos remove todas as permissões;
-      if (deleteDependences || (usersActive.length == 0 && deleteProfileOnlyInactiveUsers)) {
+      if (deleteDependences) {
         // remove todas as permissões relacionadas ao perfil
         await this.usersPermissionsRepository.delete({
           profileId: Number(data.id),
         });
       } else {
-        // se houver usuários ativos retorna o erro mostrando quais usuários estão utilizando o perfil
-        if (usersActive.length > 0 || !deleteProfileOnlyInactiveUsers) {
-          let userString = (userNames.length)?'- ' + userNames.join('<br/>- '):'';
+        // se houver usuários dependentes
+        if (userNames.length > 0) {
+          
+          // formata a string com os nomes dos usuários e seus status na frente
+          let userString = (userNames.length)?'- ' + userNames.map((name) => `${name} (${usersStatus[name]?'Ativo':'Inativo'})`).join('<br/>- '):'';
+          //let userString = (userNames.length)?'- ' + userNames.join('<br/>- '):'';
           return {
             status: 400,
             message: `Este perfil não pode ser excluído, pois está sendo utilizado pelos usuários:<br/>${userString}`

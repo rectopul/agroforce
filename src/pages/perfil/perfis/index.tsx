@@ -233,13 +233,7 @@ export default function Perfis({
               style={{display: (!perm_can_do('/perfil/perfis', 'delete') && false) ? 'none' : ''}}
               title="Excluir perfil"
               onClick={() => {
-                if (rowData?.users_permissions?.filter((user_permission: {
-                  cultureId: number;
-                  profileId: number;
-                  userId: number;
-                  status: number;
-                  user: { id: number; name: string; status: number };
-                }) => user_permission.user.status == 1).length > 0) {
+                if (rowData?.users_permissions?.length > 0) {
                   deleteItem(rowData);
                 } else {
                   deleteConfirmItem(rowData);
@@ -247,13 +241,7 @@ export default function Perfis({
               }
               }
               // bgColor="bg-red-600"
-              bgColor={rowData?.users_permissions?.filter((user_permission: {
-                cultureId: number;
-                profileId: number;
-                userId: number;
-                status: number;
-                user: { id: number; name: string; status: number };
-              }) => user_permission.user.status == 1).length > 0 ? 'bg-gray-600' : 'bg-red-600'}
+              bgColor={rowData?.users_permissions?.length > 0 ? 'bg-gray-600' : 'bg-red-600'}
               textColor="white"
             />
           </div>
