@@ -325,6 +325,11 @@ export class ProfileController {
         userId: data.userId, module: 'PERFIL', operation: 'EXCLUSÃO', oldValue: data.id, ip: String(ip),
       });
       
+      
+      await this.profilePermissionsRepository.deleteAll({
+        profileId: Number(data.id),
+      });
+      
       await this.profileRepository.delete(Number(data.id));
       
       return { status: 200, message: 'Perfil excluido com sucesso!' };
