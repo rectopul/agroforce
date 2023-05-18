@@ -83,11 +83,11 @@ export default function Perfis({
     const showUsersPermissions: number = 1;
     
     if(showUsersPermissions) {
-      
       parametersFilter = `${parametersFilter}&showUsersPermissions=${showUsersPermissions}`;
-      
     }
-    
+
+    setFiltersParams(parametersFilter);
+    setCookies('filtersParams', parametersFilter);
     
     const params = "";
     try {
@@ -107,6 +107,57 @@ export default function Perfis({
     }
   }
 
+  /*useEffect(() => {
+    // independente da rota acessada, armazena os dados em cookies
+    const handleRouteChange = (url: any) => {
+      console.log('App is changing to: ', url);
+      
+      setCookies('pageBeforeEdit', currentPage?.toString());
+      setCookies('filterBeforeEdit', filter);
+      setCookies('filterBeforeEditTypeOrder', typeOrder);
+      setCookies('filterBeforeEditOrderBy', orderBy);
+      setCookies('filtersParams', filtersParams);
+      setCookies('lastPage', 'atualizar');
+      setCookies('itensPage', itensPerPage);
+      setCookies('takeBeforeEdit', take);
+      setCookies('urlPage', 'perfis');
+
+      console.log('App is changing to: ', url);
+      console.log('filter','filterBeforeEdit', filter);
+      console.log('route', router.route);
+      console.log('asPath', router.asPath);
+      
+    };
+    
+    const hashChangeComplete = (url:any, { shallow }:any) => {
+      // Obtenha o valor atual de 'filter'
+      const currentFilter = filter;
+
+      // Faça o que for necessário com o valor atual de 'filter'
+      console.log('Valor atual de filter:', currentFilter);
+      
+      console.log('App is changing to: ', url);
+      console.log('filter','filterBeforeEdit', filter);
+      
+    };
+
+    router.events.on('routeChangeStart', hashChangeComplete);
+    
+    // create trigger for hashChangeComplete
+    router.events.on('hashChangeComplete', handleRouteChange);
+    
+    
+    // routeChangeComplete
+    // routeChangeError
+    
+
+    // If the component is unmounted, unsubscribe
+    // from the event with the `off` method:
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChange);
+    };
+  }, [router]);*/
+
   // useEffect(() => {
   //   callingApi(currentPage);
   // }, [typeOrder, filter]);
@@ -114,7 +165,7 @@ export default function Perfis({
   // Call that function when change type order value.
   useEffect(() => {
     callingApi(filter);
-  }, [typeOrder, filter]);
+  }, [typeOrder]);
 
   async function handleOrder(
     column: string,
@@ -178,10 +229,23 @@ export default function Perfis({
         <div className="h-8 flex">
           <div className="h-7 mr-3">
             <Button
-              icon={<BsTrashFill size={14} />}
-              style={{ display: (!perm_can_do('/perfil/perfis', 'delete') && false) ? 'none' : '' }}
+              icon={<BsTrashFill size={14}/>}
+              style={{display: (!perm_can_do('/perfil/perfis', 'delete') && false) ? 'none' : ''}}
               title="Excluir perfil"
-              onClick={() => { deleteConfirmItem(rowData); }}
+              onClick={() => {
+                if (rowData?.users_permissions?.filter((user_permission: {
+                  cultureId: number;
+                  profileId: number;
+                  userId: number;
+                  status: number;
+                  user: { id: number; name: string; status: number };
+                }) => user_permission.user.status == 1).length > 0) {
+                  deleteItem(rowData);
+                } else {
+                  deleteConfirmItem(rowData);
+                }
+              }
+              }
               // bgColor="bg-red-600"
               bgColor={rowData?.users_permissions?.filter((user_permission: {
                 cultureId: number;
@@ -201,6 +265,16 @@ export default function Perfis({
                 display: !perm_can_do("/perfil/perfis", "edit") ? "none" : "",
               }}
               onClick={() => {
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('lastPage', 'atualizar');
+                setCookies('itensPage', itensPerPage);
+                setCookies('takeBeforeEdit', take);
+                setCookies('urlPage', 'perfis');
+                
                 router.push(`/perfil/perfis/atualizar?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
@@ -217,6 +291,16 @@ export default function Perfis({
                   : "",
               }}
               onClick={() => {
+                setCookies('pageBeforeEdit', currentPage?.toString());
+                setCookies('filterBeforeEdit', filter);
+                setCookies('filterBeforeEditTypeOrder', typeOrder);
+                setCookies('filterBeforeEditOrderBy', orderBy);
+                setCookies('filtersParams', filtersParams);
+                setCookies('lastPage', 'atualizar');
+                setCookies('itensPage', itensPerPage);
+                setCookies('takeBeforeEdit', take);
+                setCookies('urlPage', 'perfis');
+                
                 router.push(`/perfil/perfis/permissoes?id=${rowData.id}`);
               }}
               bgColor="bg-blue-600"
@@ -235,7 +319,11 @@ export default function Perfis({
     setIsOpenModalConfirm(true);
   }
 
-  async function deleteItem() {
+  async function deleteItem(rowData?: any) {
+    
+    if(rowData != null){
+      setItemSelectedDelete(rowData);
+    }
     
     setIsOpenModalConfirm(false);
     
@@ -243,12 +331,10 @@ export default function Perfis({
 
     try {
       const {status, message} = await profileService.deleted({
-        id: itemSelectedDelete?.id,
+        id: (rowData != null) ? rowData?.id : itemSelectedDelete?.id,
         userId: userLogado.id,
       });
       
-      console.log('status', status, 'message', message);
-
       setLoading(false);
       
       if (status === 200) {
@@ -304,12 +390,12 @@ export default function Perfis({
       typeOrder: '',
     },
     onSubmit: async ({ filterSearch }) => {
-      const parametersFilter = `filterSearch=${filterSearch}`;
+      const parametersFilterForm = `filterSearch=${filterSearch}`;
 
-      setFilter(parametersFilter);
+      setFilter(parametersFilterForm);
       setCurrentPage(0);
 
-      await callingApi(parametersFilter);
+      await callingApi(parametersFilterForm);
       setLoading(false);
     },
   });
@@ -547,10 +633,11 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   removeCookies("filterBeforeEdit", { req, res });
   removeCookies("pageBeforeEdit", { req, res });
-  removeCookies("takeBeforeEdit", { req, res });
   removeCookies("filterBeforeEditTypeOrder", { req, res });
+  removeCookies("takeBeforeEdit", { req, res });
   removeCookies("filterBeforeEditOrderBy", { req, res });
   removeCookies("lastPage", { req, res });
+  removeCookies('urlPage', { req, res });
 
   const param = `skip=0&take=${itensPerPage}&filterStatus=1`;
   // v2
