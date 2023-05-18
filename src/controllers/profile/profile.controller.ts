@@ -256,6 +256,8 @@ export class ProfileController {
   async deleted(data: any) {
     // flag para excluir dependencias
     const deleteDependences = false;
+    // flag para excluir perfis sem usuários ativos
+    const deleteProfileOnlyInactiveUsers: boolean = false;
     
     try {
       if (!data.id) 
@@ -296,14 +298,14 @@ export class ProfileController {
       }
       
       // se deleteDependeces == true ou não houver usuários ativos remove todas as permissões;
-      if (deleteDependences || usersActive.length == 0) {
+      if (deleteDependences || (usersActive.length == 0 && deleteProfileOnlyInactiveUsers)) {
         // remove todas as permissões relacionadas ao perfil
         await this.usersPermissionsRepository.delete({
           profileId: Number(data.id),
         });
       } else {
         // se houver usuários ativos retorna o erro mostrando quais usuários estão utilizando o perfil
-        if (usersActive.length > 0) {
+        if (usersActive.length > 0 || !deleteProfileOnlyInactiveUsers) {
           let userString = (userNames.length)?'- ' + userNames.join('<br/>- '):'';
           return {
             status: 400,
