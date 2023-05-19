@@ -7,6 +7,7 @@ const permissions = [
       { value: 'create', title: 'Criar', checked: false },
       { value: 'edit', title: 'Editar', checked: false },
       { value: 'permissions', title: 'Permissões', checked: false },
+      { value: 'delete', title: 'Excluir', checked: false },
     ],
   },
   {

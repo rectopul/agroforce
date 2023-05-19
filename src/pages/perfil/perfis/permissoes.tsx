@@ -95,6 +95,7 @@ export default function Permissoes({
                       <Route key={route.id} route={route.permission.length ? route.permission[0].name:'Desconhecido'} />
                     </div>
                     <div className="flex w-1/2">
+                      {/*{JSON.stringify(route.permission[0]?.permissions)}*/}
                       {route.permission[0]?.permissions?.map((element: any) => (
                         <div className="p-1 ml-2">
                           <CheckBox
