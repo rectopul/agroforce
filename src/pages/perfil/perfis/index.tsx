@@ -230,7 +230,7 @@ export default function Perfis({
           <div className="h-7 mr-3">
             <Button
               icon={<BsTrashFill size={14}/>}
-              style={{display: (!perm_can_do('/perfil/perfis', 'delete') && false) ? 'none' : ''}}
+              style={{display: (!perm_can_do('/perfil/perfis', 'delete')) ? 'none' : ''}}
               title="Excluir perfil"
               onClick={() => {
                 if (rowData?.users_permissions?.length > 0) {
