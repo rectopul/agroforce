@@ -25,11 +25,72 @@ export class PermissionsController {
       const helper: any = {};
       for (const item of response) {
         if (profilesIdList.includes(item.id)) {
-          helper[item.screenRoute] += `${item.action};`;
+          let action_helper = item.action;
+          helper[item.screenRoute] += `${action_helper};`;
         } else {
           helper[item.screenRoute] += '';
         }
       }
+      
+      // comparar response com permissions e extrair o que não tem
+      // no response e adicionar no response
+      const newResponse = permissions.filter((permission: any) => {
+        return !response.some((element: any) => {
+          return element.screenRoute === permission.route;
+        });
+      });
+
+      permissions.forEach((permissionF: any) => {
+
+        let routeF = permissionF.route;
+        let permissionsNotFound = permissionF.permissions.filter((elementF: any) => {
+          let encontrou = false;
+          for (const item of response) {
+            let screenRoute = item.screenRoute;
+            let action = item.action;
+            
+            if (routeF === screenRoute) {
+              if (action.includes(elementF.value)) {
+                encontrou = true;
+              }
+            }
+          }
+          return !encontrou;
+        });
+        
+        if (permissionsNotFound.length > 0) {
+          permissionsNotFound.forEach(async (element: any) => {
+            const data = {
+              screenRoute: routeF,
+              action: element.value,
+            };
+            
+            // cria permissão em permissionsRepository
+            await this.permissionsRepository.create(data);
+          });
+        }
+        
+        
+        
+        /*permissionF.permissions.forEach((elementF: any) => {
+          let encontrou = false;
+          for (const item of response) {
+            let screenRoute = item.screenRoute;
+            let action = item.action;
+            
+            if (routeF === screenRoute) {
+              if (action.includes(elementF.value)) {
+                encontrou = true;
+              }
+            }
+          }
+        });*/
+        
+      });
+      
+      
+      console.log('newResponse', newResponse);
+      
       const aux: any = {};
       const result = response.reduce((r: any, o: any) => {
         const key = `${o.screenRoute}`;
@@ -43,6 +104,8 @@ export class PermissionsController {
 
         return r;
       }, []);
+      
+      
 
       permissions.forEach((permission: any) => {
         permission.permissions.forEach((element: any) => {
