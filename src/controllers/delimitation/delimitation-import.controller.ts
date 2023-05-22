@@ -122,7 +122,7 @@ export class ImportDelimitationController {
                     Number(column) + 1,
                     row,
                     spreadSheet[0][column],
-                    'nome do delineamento já cadastrado, porém está inativo;',
+                    ` ${valorDELI} nome do delineamento já cadastrado, porém está inativo`,
                   );
                 }
                 
