@@ -39,4 +39,14 @@ const nextConfig = {
 
 };
 
+
+if (process.env.NODE_ENV === 'development') {
+
+  nextConfig.experimental = {
+    reactRoot: true,
+    pageEnv: false
+  };
+
+}
+
 module.exports = nextConfig;
