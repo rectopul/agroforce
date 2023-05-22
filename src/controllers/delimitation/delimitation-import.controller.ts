@@ -95,21 +95,37 @@ export class ImportDelimitationController {
                 responseIfError[Number(column)]
                   += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
               }
+              
+              let valorDELI = spreadSheet[row][column];
+              
+              // delineamento ativo ou inativo
               const delineamento: any = await delineamentoController.getAll(
                 {
                   name: spreadSheet[row][column],
                   id_culture: idCulture,
-                  status: 1,
+                  //status: 1,
                   importValidate: true,
                 },
               );
+              
               if (delineamento.total > 0) {
-                responseIfError[Number(column)] += responseGenericFactory(
-                  Number(column) + 1,
-                  row,
-                  spreadSheet[0][column],
-                  'nome do delineamento ja cadastrado',
-                );
+                // o tipo de erro muda de acordo com o status do delineamento
+                if (delineamento.response[0]?.status === 1) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                    ` ${valorDELI} nome do delineamento já cadastrado`,
+                  );
+                } else if(delineamento.response[0]?.status === 0) {
+                  responseIfError[Number(column)] += responseGenericFactory(
+                    Number(column) + 1,
+                    row,
+                    spreadSheet[0][column],
+                    'nome do delineamento já cadastrado, porém está inativo;',
+                  );
+                }
+                
               }
             }
 
