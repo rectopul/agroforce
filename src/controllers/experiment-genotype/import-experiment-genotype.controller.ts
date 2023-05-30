@@ -2,28 +2,28 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
-import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
-import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
+import {TransactionConfig} from 'src/shared/prisma/transactionConfig';
+import {ImportValidate, IReturnObject} from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
 import {
   responseNullFactory,
   responseGenericFactory,
   responseDoesNotExist,
 } from '../../shared/utils/responseErrorFactory';
-import { AssayListController } from '../assay-list/assay-list.controller';
-import { ExperimentController } from '../experiment/experiment.controller';
-import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
-import { GenotipoController } from '../genotype/genotipo.controller';
-import { LogImportController } from '../log-import.controller';
-import { LoteController } from '../lote.controller';
+import {AssayListController} from '../assay-list/assay-list.controller';
+import {ExperimentController} from '../experiment/experiment.controller';
+import {ExperimentGenotipeController} from '../experiment-genotipe.controller';
+import {GenotipoController} from '../genotype/genotipo.controller';
+import {LogImportController} from '../log-import.controller';
+import {LoteController} from '../lote.controller';
 
-import { ExperimentGenotipeRepository } from '../../repository/experiment-genotipe.repository';
-import { SafraController } from '../safra.controller';
+import {ExperimentGenotipeRepository} from '../../repository/experiment-genotipe.repository';
+import {SafraController} from '../safra.controller';
 
 export class ImportExperimentGenotypeController {
   static async validate(
     idLog: number,
-    { spreadSheet, idSafra, created_by: createdBy }: ImportValidate,
+    {spreadSheet, idSafra, created_by: createdBy}: ImportValidate,
   ): Promise<IReturnObject> {
     const safraController = new SafraController();
     const loteController = new LoteController();
@@ -50,19 +50,19 @@ export class ImportExperimentGenotypeController {
       }
 
       for (const row in spreadSheet) {
+
+        let linhaStr = String(Number(row) + 1);
+        
         if (row !== '0') {
           // experiments
           // if (spreadSheet[row][5] != null) {
           //   const experiments: any = await experimentController.getFromExpName(spreadSheet[row][5]);
-
           //   if (experiments.status == 200 && experiments.response.length > 0) {
           //     value_hold.idExperiment = experiments.response[0]?.id;
-
           //     if (experiments.response[0]?.local.name_local_culture != spreadSheet[row][6]) {
           //       responseIfError[0]
           //         += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a Lugar de plantio e diferente da cadastrada no experimento. </li> <br>`;
           //     }
-
           //     if (experiments.response[0]?.delineamento.name != spreadSheet[row][7]) {
           //       responseIfError[0]
           //         += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a delineamento e diferente da cadastrada no experimento. </li> <br>`;
@@ -103,106 +103,81 @@ export class ImportExperimentGenotypeController {
 
           if (parcels.length === 0) {
             responseIfError[0]
-            += `<li style="text-align:left"> A ${row}ª linha esta incorreta, parcela do experimento não encontrada, as chaves para encontra-lo são (
+              += `<li style="text-align:left"> A ${linhaStr}ª linha esta incorreta, parcela do experimento não encontrada, as chaves para encontra-lo são (
               FOCO, TIPO DE ENSAIO, TECNOLOGIA, GLI, NOME DO EXPERIMENTO, LOCAL, DELINEAMENTO, REP, NT, NPE, STATUS_T, GENÓTIPO E NCA
               ) </li> <br>`;
           } else if (parcels[0].status === 'IMPRESSO') {
             responseIfError[0]
-            += `<li style="text-align:left"> A ${row}ª linha esta incorreta, a parcela já foi impressa e não pode ser substituída
+              += `<li style="text-align:left"> A ${linhaStr}ª linha esta incorreta, a parcela já foi impressa e não pode ser substituída
               ) </li> <br>`;
           }
 
           for (const column in spreadSheet[row]) {
+            
             if (column === '0') { // SAFRA
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]);
               }
-              const { status, response }: IReturnObject = await safraController.getOne(idSafra);
+              const {status, response}: IReturnObject = await safraController.getOne(idSafra);
               if (status === 200) {
                 if (response?.safraName?.toUpperCase()
-                    !== spreadSheet[row][column]?.toUpperCase()) {
+                  !== spreadSheet[row][column]?.toUpperCase()) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'safra informada e diferente da selecionada',
-                    );
+                    (Number(column) + 1),
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'safra informada e diferente da selecionada',
+                  );
                 }
               }
 
-              // const { response: treatment } = await experimentGenotipeController.getAll({
-              //   safraName: spreadSheet[row][0],
-              //   idExperiment: value_hold.idExperiment,
-              //   take: 1,
-              // });
-
-              // if (treatment.length == 0) {
-              //   responseIfError[Number(column)] += responseGenericFactory(
-              //     Number(column) + 1,
-              //     row,
-              //     spreadSheet[0][column],
-              //     'está incorreta, o Safra é diferente do registrado no experimento',
-              //   );
-              // }
             }
             if (column === '1') { // FOCO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               }
 
-              // const { response: treatment } = await experimentGenotipeController.getAll({
-              //   filterFoco: spreadSheet[row][1],
-              //   idExperiment: value_hold.idExperiment,
-              //   take: 1,
-              // });
-
-              // if (treatment.length == 0) {
-              //   responseIfError[Number(column)] += responseGenericFactory(
-              //     Number(column) + 1,
-              //     row,
-              //     spreadSheet[0][column],
-              //     'está incorreta, o foco é diferente do registrado no experimento',
-              //   );
-              // }
             }
             if (column === '2') { // ENSAIO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               }
 
-              // const { response: treatment } = await experimentGenotipeController.getAll({
-              //   ensaio: spreadSheet[row][2],
-              //   idExperiment: value_hold.idExperiment,
-              //   take: 1,
-              // });
-
-              // if (treatment.length == 0) {
-              //   responseIfError[Number(column)] += responseGenericFactory(
-              //     Number(column) + 1,
-              //     row,
-              //     spreadSheet[0][column],
-              //     'está incorreta, o ensaio é diferente do registrado no experimento',
-              //   );
-              // }
             }
             if (column === '3') { // TECNOLOGIA
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else {
                 // const { response: treatment } = await experimentGenotipeController.getAll({
                 //   filterCodTec: spreadSheet[row][column],
                 //   idExperiment: value_hold.idExperiment,
                 //   take: 1,
                 // });
+                
                 // if (treatment.length == 0) {
                 //   responseIfError[Number(column)] += responseGenericFactory(
                 //     Number(column) + 1,
-                //     row,
+                //     linhaStr,
                 //     spreadSheet[0][column],
                 //     ' está incorreta, o Cód Tecnologia é diferente do registrado no experimento ',
                 //   );
@@ -212,7 +187,11 @@ export class ImportExperimentGenotypeController {
             if (column === '4') { // GLI
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               }
               // const { response: treatment } = await experimentGenotipeController.getAll({
               //   gli: spreadSheet[row][4],
@@ -223,7 +202,7 @@ export class ImportExperimentGenotypeController {
               // if (treatment.length == 0) {
               //   responseIfError[Number(column)] += responseGenericFactory(
               //     Number(column) + 1,
-              //     row,
+              //     linhaStr,
               //     spreadSheet[0][column],
               //     'está incorreta, o GLI é diferente do registrado no experimento ',
               //   );
@@ -232,7 +211,11 @@ export class ImportExperimentGenotypeController {
             if (column === '9') { // NT
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else {
                 // const { response: treatment } = await experimentGenotipeController.getAll({
                 //   nt: Number(spreadSheet[row][9]),
@@ -243,7 +226,7 @@ export class ImportExperimentGenotypeController {
                 // if (treatment.length == 0) {
                 //   responseIfError[Number(column)] += responseGenericFactory(
                 //     Number(column) + 1,
-                //     row,
+                //     linhaStr,
                 //     spreadSheet[0][column],
                 //     ' está incorreta, o NT é diferente do registrado no experimento',
                 //   );
@@ -255,7 +238,11 @@ export class ImportExperimentGenotypeController {
             if (column === '10') { // NPE
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else {
                 // const { response: treatment } = await experimentGenotipeController.getAll({
                 //   npe: spreadSheet[row][column],
@@ -266,7 +253,7 @@ export class ImportExperimentGenotypeController {
                 // if (treatment.length == 0) {
                 //   responseIfError[Number(column)] += responseGenericFactory(
                 //     Number(column) + 1,
-                //     row,
+                //     linhaStr,
                 //     spreadSheet[0][column],
                 //     ' está incorreta, o NPE é diferente do registrado no experimento',
                 //   );
@@ -275,43 +262,26 @@ export class ImportExperimentGenotypeController {
                 value_hold.npe = spreadSheet[row][column];
               }
             }
-            if (column === '11') { // STATUS_T
-              // if (spreadSheet[row][column] === null) {
-              //   responseIfError[Number(column)]
-              //     += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
-              // } else {
-              //   const { response: treatment } = await experimentGenotipeController.getAll({
-              //     status: spreadSheet[row][column],
-              //     idExperiment: value_hold.idExperiment,
-              //     take: 1,
-              //   });
 
-              //   if (treatment.length == 0) {
-              //     responseIfError[Number(column)] += responseGenericFactory(
-              //       Number(column) + 1,
-              //       row,
-              //       spreadSheet[0][column],
-              //       ' está incorreta, o NPE é diferente do registrado no experimento',
-              //     );
-              //   }
-              // }
-            }
             if (column === '12') { // GENOTIPO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else {
                 // const { status }: any = await genotipoController.getOneByName(spreadSheet[row][12]);
-
                 // if (status === 400) {
                 //   responseIfError[Number(column)]
-                //     += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
+                //     += responseDoesNotExist((Number(column) + 1), linhaStr, spreadSheet[0][column]);
                 // }
               }
             }
             if (column === '13') { // NCA
               if (spreadSheet[row][column] != null) {
-                const { status, response } = await loteController.getAll({
+                const {status, response} = await loteController.getAll({
                   ncc: String(spreadSheet[row][column]),
                   filterGenotipo: String(spreadSheet[row][12]),
                   idExperiment: value_hold.idExperiment,
@@ -320,7 +290,7 @@ export class ImportExperimentGenotypeController {
                 // if (status === 400) {
                 //   responseIfError[Number(column)] += responseGenericFactory(
                 //     Number(column) + 1,
-                //     row,
+                //     linhaStr,
                 //     spreadSheet[0][column],
                 //     ' não pertence ao nome genérico',
                 //   );
@@ -332,36 +302,51 @@ export class ImportExperimentGenotypeController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'o campo é obrigatório, caso queira substituir apenas nca apenas replique os genotipos',
                 );
               } else {
-                const { status } = await genotipoController.getAll({
+                const {status} = await genotipoController.getAll({
                   name_genotipo: spreadSheet[row][column],
                   importValidate: true,
                 });
                 if (status === 400) {
                   responseIfError[Number(column)]
-                    += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
+                    += responseDoesNotExist(
+                    (Number(column) + 1),
+                    linhaStr,
+                    spreadSheet[0][column]);
                 }
               }
             }
             if (column === '15') { // STATUS T NOVO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else if (spreadSheet[row][column] !== 'L' && spreadSheet[row][column] !== 'T') {
                 responseIfError[Number(column)]
-                  += responseGenericFactory((Number(column) + 1), row, spreadSheet[0][column], 'Valor só pode ser  "T" ou "L"');
+                  += responseGenericFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                  'Valor só pode ser  "T" ou "L"');
               }
             }
             if (column === '16') { // NCA NOVO
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else {
-                const { response: lote } = await loteController.getAll({
+                const {response: lote} = await loteController.getAll({
                   ncc: spreadSheet[row][16], // NEW NCA
                   filterGenotipo: spreadSheet[row][14], // new geneticName
                 });
@@ -369,7 +354,7 @@ export class ImportExperimentGenotypeController {
                 if (lote.length == 0) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                     'não está correto para este novo nome genético',
                   );
@@ -385,7 +370,7 @@ export class ImportExperimentGenotypeController {
           await transactionConfig.transactionScope.run(async () => {
             for (const row in spreadSheet) {
               if (row !== '0') {
-                const { response: treatment } = await experimentGenotipeController.getAll({
+                const {response: treatment} = await experimentGenotipeController.getAll({
                   filterFoco: spreadSheet[row][1],
                   filterTypeAssay: spreadSheet[row][2],
                   filterCodTec: spreadSheet[row][3],
@@ -403,12 +388,12 @@ export class ImportExperimentGenotypeController {
                   importValidate: true,
                 });
 
-                const { response: genotipo } = await genotipoController.getAll({
+                const {response: genotipo} = await genotipoController.getAll({
                   name_genotipo: spreadSheet[row][14], // New genetic Name
                   importValidate: true,
                 });
 
-                const { response: lote } = await loteController.getAll({
+                const {response: lote} = await loteController.getAll({
                   ncc: spreadSheet[row][16], // NEW NCA
                   filterGenotipo: spreadSheet[row][14], // new geneticName
                 });
@@ -441,26 +426,29 @@ export class ImportExperimentGenotypeController {
           await logImportController.update({
             id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
           });
-          return { status: 200, message: 'Sub. de parcelas importado com sucesso' };
+          return {status: 200, message: 'Sub. de parcelas importado com sucesso'};
         } catch (error: any) {
           await logImportController.update({
-            id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
+            id: idLog, 
+            status: 1, 
+            state: 'FALHA', 
+            updated_at: new Date(Date.now()),
           });
           handleError('Sub. de parcelas controller', 'Save Import', error.message);
-          return { status: 500, message: 'Erro ao salvar planilha de Sub. de parcelas' };
+          return {status: 500, message: 'Erro ao salvar planilha de Sub. de parcelas'};
         }
       }
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       await logImportController.update({
         id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: responseStringError,
       });
-      return { status: 400, message: responseStringError };
+      return {status: 400, message: responseStringError};
     } catch (error: any) {
       await logImportController.update({
         id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
       handleError('Sub. de parcelas controller', 'Validate Import', error.message);
-      return { status: 500, message: 'Erro ao validar planilha de Sub. de parcelas' };
+      return {status: 500, message: 'Erro ao validar planilha de Sub. de parcelas'};
     }
   }
 }

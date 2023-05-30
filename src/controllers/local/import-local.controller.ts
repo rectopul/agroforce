@@ -2,26 +2,30 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
-import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
-import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
+import {TransactionConfig} from 'src/shared/prisma/transactionConfig';
+import {ImportValidate, IReturnObject} from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
-import { responseGenericFactory, responseNullFactory, responsePositiveNumericFactory } from '../../shared/utils/responseErrorFactory';
-import { validateHeaders } from '../../shared/utils/validateHeaders';
+import {
+  responseGenericFactory,
+  responseNullFactory,
+  responsePositiveNumericFactory
+} from '../../shared/utils/responseErrorFactory';
+import {validateHeaders} from '../../shared/utils/validateHeaders';
 // eslint-disable-next-line import/no-cycle
-import { ImportController } from '../import.controller';
-import { LogImportController } from '../log-import.controller';
-import { SafraController } from '../safra.controller';
-import { LocalController } from './local.controller';
-import { UnidadeCulturaController } from './unidade-cultura.controller';
-import { LocalRepository } from '../../repository/local.repository';
-import { UnidadeCulturaRepository } from '../../repository/unidade-cultura.repository';
+import {ImportController} from '../import.controller';
+import {LogImportController} from '../log-import.controller';
+import {SafraController} from '../safra.controller';
+import {LocalController} from './local.controller';
+import {UnidadeCulturaController} from './unidade-cultura.controller';
+import {LocalRepository} from '../../repository/local.repository';
+import {UnidadeCulturaRepository} from '../../repository/unidade-cultura.repository';
 
 export class ImportLocalController {
   static aux: any = {};
 
   static async validate(
     idLog: number,
-    { spreadSheet, idSafra, created_by: createdBy }: ImportValidate,
+    {spreadSheet, idSafra, created_by: createdBy}: ImportValidate,
   ): Promise<IReturnObject> {
     const safraController = new SafraController();
     const localController = new LocalController();
@@ -74,33 +78,44 @@ export class ImportLocalController {
         await logImportController.update({
           id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: validate,
         });
-        return { status: 400, message: validate };
+        return {status: 400, message: validate};
       }
       const configModule: object | any = await importController.getAll(4);
       configModule.response[0]?.fields.push('DT');
       for (const row in spreadSheet) {
+
+        let linhaStr = String(Number(row) + 1);
+
         if (row !== '0') {
           if (uniqueLocalName?.includes(spreadSheet[row][4])) {
             await logImportController.update({
-              id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: `Erro na linha ${Number(row) + 1}. Nome do local de cultura duplicados na planilha`,
+              id: idLog,
+              status: 1,
+              state: 'INVALIDA',
+              updated_at: new Date(Date.now()),
+              invalid_data: `Erro na linha ${Number(row) + 1}. Nome do local de cultura duplicados na planilha`,
             });
             uniqueLocalName[row] = spreadSheet[row][4];
-            return { status: 200, message: `Erro na linha ${Number(row) + 1}. Nome do local de cultura duplicados na planilha` };
+            return {status: 200, message: `Erro na linha ${linhaStr}. Nome do local de cultura duplicados na planilha`};
           }
           if (localTemp?.includes(spreadSheet[row][2])) {
             await logImportController.update({
-              id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: `Erro na linha ${Number(row) + 1}. Unidades de cultura duplicadas na planilha`,
+              id: idLog,
+              status: 1,
+              state: 'INVALIDA',
+              updated_at: new Date(Date.now()),
+              invalid_data: `Erro na linha ${Number(row) + 1}. Unidades de cultura duplicadas na planilha`,
             });
             localTemp[row] = spreadSheet[row][2];
-            return { status: 200, message: `Erro na linha ${Number(row) + 1}. Unidades de cultura duplicados na tabela` };
+            return {status: 200, message: `Erro na linha ${linhaStr}. Unidades de cultura duplicados na tabela`};
           }
           localTemp[row] = spreadSheet[row][2];
           uniqueLocalName[row] = spreadSheet[row][4];
           if (spreadSheet.length > 2) {
             if (spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]
-            || (spreadSheet.length - 1) === Number(row)) {
+              || (spreadSheet.length - 1) === Number(row)) {
               if ((spreadSheet.length - 1) === Number(row)
-              && spreadSheet[row][4] === spreadSheet[Number(row) - 1][4]) {
+                && spreadSheet[row][4] === spreadSheet[Number(row) - 1][4]) {
                 validateAll.ROTULO.push(spreadSheet[row][5]);
                 validateAll.MLOC.push(spreadSheet[row][6]);
                 validateAll.ENDERECO.push(spreadSheet[row][7]);
@@ -112,7 +127,7 @@ export class ImportLocalController {
                 const result = allEqual(validateAll[property]);
                 if (!result) {
                   responseIfError[Number(0)]
-                  += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo Nome do Lugar de Cultura(${spreadSheet[Number(row) - 1][4]}) devem ser iguais. </li> <br>`;
+                    += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo Nome do Lugar de Cultura(${spreadSheet[Number(row) - 1][4]}) devem ser iguais. </li> <br>`;
                 }
               }
               validateAll = {
@@ -147,7 +162,7 @@ export class ImportLocalController {
             //   responseIfError[Number(column)]
             //     += responseGenericFactory(
             //       (Number(column) + 1),
-            //       row,
+            //       linhaStr,
             //       spreadSheet[0][column],
             //       'a sequencia de colunas da planilha esta incorreta',
             //     );
@@ -156,46 +171,57 @@ export class ImportLocalController {
           } else if (spreadSheet[0][column]?.includes('ID da unidade de cultura')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                += responseNullFactory(
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[0][column]
+              );
             } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
               responseIfError[Number(column)]
                 += responsePositiveNumericFactory(
-                  (Number(column) + 1),
-                  row,
-                  spreadSheet[row][column],
-                );
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[row][column],
+              );
             }
           } else if (spreadSheet[0][column]?.includes('Ano')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                += responseNullFactory(
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[0][column]
+              );
             } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
               responseIfError[Number(column)]
                 += responsePositiveNumericFactory(
-                  (Number(column) + 1),
-                  row,
-                  spreadSheet[row][column],
-                );
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[row][column],
+              );
             } else {
-              const { status, response }: IReturnObject = await safraController.getOne(idSafra);
+              const {status, response}: IReturnObject = await safraController.getOne(idSafra);
               if (status === 200) {
                 if (Number(response?.year) !== Number(spreadSheet[row][column])) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'o campo Ano não corresponde ao ano da safra selecionada',
-                    );
+                    (Number(column) + 1),
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'o campo Ano não corresponde ao ano da safra selecionada',
+                  );
                 }
               }
             }
           } else if (spreadSheet[0][column]?.includes('Nome da unidade de cultura')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                += responseNullFactory(
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[0][column]);
             } else {
-              const { response } = await localController.getAll(
+              const {response} = await localController.getAll(
                 {
                   id_local_culture: Number(spreadSheet[row][3]),
                   importValidate: true,
@@ -210,7 +236,7 @@ export class ImportLocalController {
                 if (unityExist[0]?.id_local !== response[0]?.id) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                     'não e possível atualizar a unidade de cultura pois a mesma não pertence a esse lugar de cultura',
                   );
@@ -220,24 +246,35 @@ export class ImportLocalController {
           } else if (spreadSheet[0][column]?.includes('ID do lugar de cultura')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                += responseNullFactory(
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[0][column]);
             } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
               responseIfError[Number(column)]
                 += responsePositiveNumericFactory(
-                  (Number(column) + 1),
-                  row,
-                  spreadSheet[row][column],
-                );
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[row][column],
+              );
             }
           } else if (spreadSheet[0][column]?.includes('Nome do lugar de cultura')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                += responseNullFactory(
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[0][column]
+              );
             }
           } else if (spreadSheet[0][column]?.includes('Rótulo')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                += responseNullFactory(
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[0][column]
+              );
             }
           } else if (spreadSheet[0][column]?.includes('MLOC')) {
             // vazio
@@ -246,75 +283,106 @@ export class ImportLocalController {
           } else if (spreadSheet[0][column]?.includes('Identificador de localidade')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                += responseNullFactory(
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[0][column]
+              );
             } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
               responseIfError[Number(column)]
                 += responsePositiveNumericFactory(
-                  (Number(column) + 1),
-                  row,
-                  spreadSheet[row][column],
-                );
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[row][column],
+              );
             }
           } else if (spreadSheet[0][column]?.includes('Nome da localidade')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                += responseNullFactory(
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[0][column]
+              );
             }
           } else if (spreadSheet[0][column]?.includes('Identificador de região')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                += responseNullFactory(
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[0][column]
+              );
             } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
               responseIfError[Number(column)]
                 += responsePositiveNumericFactory(
-                  (Number(column) + 1),
-                  row,
-                  spreadSheet[row][column],
-                );
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[row][column],
+              );
             }
           } else if (spreadSheet[0][column]?.includes('Nome da região')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                += responseNullFactory(
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[0][column]
+              );
             }
           } else if (spreadSheet[0][column]?.includes('REG_LIBELLE')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                += responseNullFactory(
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[0][column]
+              );
             }
           } else if (spreadSheet[0][column]?.includes('ID do País')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                += responseNullFactory(
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[0][column]
+              );
             } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
               responseIfError[Number(column)]
                 += responsePositiveNumericFactory(
-                  (Number(column) + 1),
-                  row,
-                  spreadSheet[row][column],
-                );
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[row][column],
+              );
             }
           } else if (spreadSheet[0][column]?.includes('Nome do país')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                += responseNullFactory(
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[0][column]
+              );
             }
           } else if (spreadSheet[0][column]?.includes('CNTR_LIBELLE')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
-                += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                += responseNullFactory(
+                (Number(column) + 1),
+                linhaStr,
+                spreadSheet[0][column]);
             }
           } else if (spreadSheet[0][column]?.includes('DT')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += responseNullFactory(
                 Number(column) + 1,
-                row,
+                linhaStr,
                 spreadSheet[0][column],
               );
             } else if (typeof spreadSheet[row][column] === 'number') {
               responseIfError[Number(column)] += responseGenericFactory(
                 Number(column) + 1,
-                row,
+                linhaStr,
                 spreadSheet[0][column],
                 'o campo DT precisa ser no formato data',
               );
@@ -323,7 +391,7 @@ export class ImportLocalController {
               spreadSheet[row][column] = spreadSheet[row][column].replace(/\.\d+/, '');
               // eslint-disable-next-line no-param-reassign
               spreadSheet[row][column] = new Date(spreadSheet[row][column]);
-              const { status, response }: IReturnObject = await unidadeCulturaController.getAll({
+              const {status, response}: IReturnObject = await unidadeCulturaController.getAll({
                 filterNameUnityCulture: spreadSheet[row][2],
                 filterYear: spreadSheet[row][1],
               });
@@ -331,7 +399,7 @@ export class ImportLocalController {
               if (dateNow.getTime() < spreadSheet[row][column].getTime()) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'a data e maior que a data atual',
                 );
@@ -339,20 +407,17 @@ export class ImportLocalController {
               if (spreadSheet[row][column].getTime() < 100000) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'o campo DT precisa ser no formato data',
                 );
               }
               if (status === 200) {
                 const lastDtImport = response[0]?.dt_export?.getTime();
-                if (
-                  lastDtImport
-                      > spreadSheet[row][column].getTime()
-                ) {
+                if (lastDtImport > spreadSheet[row][column].getTime()) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                     'essa informação é mais antiga do que a informação do software',
                   );
@@ -411,7 +476,7 @@ export class ImportLocalController {
                 }
                 localCultureDTO.created_by = Number(createdBy);
                 unityCultureDTO.created_by = Number(createdBy);
-                const { response } = await localController.getAll(
+                const {response} = await localController.getAll(
                   {
                     name_local_culture: localCultureDTO.name_local_culture,
                     importValidate: true,
@@ -467,26 +532,26 @@ export class ImportLocalController {
           await logImportController.update({
             id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
           });
-          return { status: 200, message: 'Local importado com sucesso' };
+          return {status: 200, message: 'Local importado com sucesso'};
         } catch (error: any) {
           await logImportController.update({
             id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
           });
           handleError('Local controller', 'Save Import', error.message);
-          return { status: 500, message: 'Erro ao salvar planilha de Local' };
+          return {status: 500, message: 'Erro ao salvar planilha de Local'};
         }
       }
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       await logImportController.update({
         id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: responseStringError,
       });
-      return { status: 400, message: responseStringError };
+      return {status: 400, message: responseStringError};
     } catch (error: any) {
       await logImportController.update({
         id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
       handleError('Local controller', 'Validate Import', error.message);
-      return { status: 500, message: 'Erro ao validar planilha de Local' };
+      return {status: 500, message: 'Erro ao validar planilha de Local'};
     }
   }
 }

@@ -3,24 +3,24 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
-import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
-import { DelineamentoRepository } from 'src/repository/delineamento.repository';
-import { SequenciaDelineamentoRepository } from 'src/repository/sequencia-delineamento.repository';
-import { skip } from 'rxjs';
+import {TransactionConfig} from 'src/shared/prisma/transactionConfig';
+import {DelineamentoRepository} from 'src/repository/delineamento.repository';
+import {SequenciaDelineamentoRepository} from 'src/repository/sequencia-delineamento.repository';
+import {skip} from 'rxjs';
 import handleError from '../../shared/utils/handleError';
 import {
   responseNullFactory,
   responseGenericFactory,
   responsePositiveNumericFactory,
 } from '../../shared/utils/responseErrorFactory';
-import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
-import { DelineamentoController } from './delineamento.controller';
-import { LogImportController } from '../log-import.controller';
-import { SequenciaDelineamentoController } from '../sequencia-delineamento.controller';
-import { ImportController } from '../import.controller';
-import { CulturaController } from '../cultura.controller';
-import { validateHeaders } from '../../shared/utils/validateHeaders';
-import { delimitationQueue } from './delimitation-queue';
+import {ImportValidate, IReturnObject} from '../../interfaces/shared/Import.interface';
+import {DelineamentoController} from './delineamento.controller';
+import {LogImportController} from '../log-import.controller';
+import {SequenciaDelineamentoController} from '../sequencia-delineamento.controller';
+import {ImportController} from '../import.controller';
+import {CulturaController} from '../cultura.controller';
+import {validateHeaders} from '../../shared/utils/validateHeaders';
+import {delimitationQueue} from './delimitation-queue';
 
 export class ImportDelimitationController {
   static async validate(
@@ -45,10 +45,10 @@ export class ImportDelimitationController {
         id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: validate,
       });
 
-      return { status: 400, message: validate };
+      return {status: 400, message: validate};
     }
     if ((spreadSheet.length > Number(process.env.MAX_DIRECT_UPLOAD_ALLOWED))
-    && !queueProcessing) {
+      && !queueProcessing) {
       delimitationQueue.add({
         instance: {
           spreadSheet, idSafra, idCulture, created_by: createdBy,
@@ -69,6 +69,9 @@ export class ImportDelimitationController {
     try {
       const configModule: object | any = await importController.getAll(7);
       for (const row in spreadSheet) {
+
+        let linhaStr = String(Number(row) + 1);
+
         if (row !== '0') {
           for (const column in spreadSheet[row]) {
             if (configModule.response[0]?.fields[column] === 'Cultura') {
@@ -78,26 +81,34 @@ export class ImportDelimitationController {
                 }: any = await culturaController.getOneCulture(Number(idCulture));
                 if (response?.name?.toUpperCase() !== spreadSheet[row][column]?.toUpperCase()) {
                   responseIfError[Number(column)] += responseGenericFactory(
-                    Number(column) + 1,
-                    row,
+                    (Number(column) + 1),
+                    linhaStr,
                     spreadSheet[0][column],
                     'a cultura e diferente da selecionada',
                   );
                 }
               } else {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               }
             }
 
             if (configModule.response[0]?.fields[column] === 'Nome') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               }
-              
+
               let valorDELI = spreadSheet[row][column];
-              
+
               // delineamento ativo ou inativo
               const delineamento: any = await delineamentoController.getAll(
                 {
@@ -107,54 +118,54 @@ export class ImportDelimitationController {
                   importValidate: true,
                 },
               );
-              
+
               if (delineamento.total > 0) {
                 // o tipo de erro muda de acordo com o status do delineamento
                 if (delineamento.response[0]?.status === 1) {
                   responseIfError[Number(column)] += responseGenericFactory(
-                    Number(column) + 1,
-                    row,
+                    (Number(column) + 1),
+                    linhaStr,
                     spreadSheet[0][column],
                     ` ${valorDELI} nome do delineamento já cadastrado`,
                   );
-                } else if(delineamento.response[0]?.status === 0) {
+                } else if (delineamento.response[0]?.status === 0) {
                   responseIfError[Number(column)] += responseGenericFactory(
-                    Number(column) + 1,
-                    row,
+                    (Number(column) + 1),
+                    linhaStr,
                     spreadSheet[0][column],
                     ` ${valorDELI} nome do delineamento já cadastrado, porém está inativo`,
                   );
                 }
-                
+
               }
             }
 
             if (configModule.response[0]?.fields[column] === 'Repeticao') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
-                  Number(column) + 1,
-                  row,
+                  (Number(column) + 1),
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else if (typeof (spreadSheet[row][column]) !== 'number'
-               || Number(spreadSheet[row][column]) < 0) {
+                || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                );
               } else if (spreadSheet[Number(row) - 1][1]
                 !== spreadSheet[row][1]
                 || row === '1') {
                 if (spreadSheet[row][column] !== 1) {
                   responseIfError[Number(column)]
-                  += responseGenericFactory(
-                      Number(column) + 1,
-                      row,
-                      spreadSheet[0][column],
-                      'repetição deve iniciar com valor igual a 1',
-                    );
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'repetição deve iniciar com valor igual a 1',
+                  );
                 }
               }
             }
@@ -162,26 +173,30 @@ export class ImportDelimitationController {
             if (configModule.response[0]?.fields[column] === 'Tratamento') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else if (typeof (spreadSheet[row][column]) !== 'number'
-               || Number(spreadSheet[row][column]) < 0) {
+                || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                );
               } else if (spreadSheet[Number(row) - 1][1]
                 !== spreadSheet[row][1]
                 || row === '1') {
                 if (spreadSheet[row][column] !== 1) {
                   responseIfError[Number(column)]
-                  += responseGenericFactory(
-                      Number(column) + 1,
-                      row,
-                      spreadSheet[0][column],
-                      'o sorteio deve começar em 1',
-                    );
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'o sorteio deve começar em 1',
+                  );
                 }
               }
             }
@@ -189,52 +204,60 @@ export class ImportDelimitationController {
             if (configModule.response[0]?.fields[column] === 'Sorteio') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else if (typeof (spreadSheet[row][column]) !== 'number'
-               || Number(spreadSheet[row][column]) < 0) {
+                || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                );
               } else if (spreadSheet[Number(row) - 1][1]
                 !== spreadSheet[row][1]
                 || row === '1') {
                 if (spreadSheet[row][column] !== 1) {
                   responseIfError[Number(column)]
-                  += responseGenericFactory(
-                      Number(column) + 1,
-                      row,
-                      spreadSheet[0][column],
-                      'o sorteio deve começar em 1',
-                    );
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'o sorteio deve começar em 1',
+                  );
                 }
               } else if (spreadSheet[Number(row) - 1][column]
-              !== (spreadSheet[row][column] - 1)) {
+                !== (spreadSheet[row][column] - 1)) {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
-                    Number(column) + 1,
-                    row,
-                    spreadSheet[0][column],
-                    'o sorteio deve ser sequencial',
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                  'o sorteio deve ser sequencial',
+                );
               }
             }
 
             if (configModule.response[0]?.fields[column] === 'Bloco') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               }
               if (typeof (spreadSheet[row][column]) !== 'number'
-              || Number(spreadSheet[row][column]) < 0) {
+                || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                );
               }
             }
           }
@@ -254,13 +277,13 @@ export class ImportDelimitationController {
         invalid_data: responseStringError,
         updated_at: new Date(Date.now()),
       });
-      return { status: 400, message: responseStringError };
+      return {status: 400, message: responseStringError};
     } catch (error: any) {
       await logImportController.update({
         id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
       handleError('Delineamento controller', 'Validate Import', error.message);
-      return { status: 500, message: 'Erro ao validar planilha de Delineamento' };
+      return {status: 500, message: 'Erro ao validar planilha de Delineamento'};
     }
   }
 
@@ -356,13 +379,13 @@ export class ImportDelimitationController {
       await logImportController.update({
         id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
       });
-      return { status: 200, message: 'Delineamento importado com sucesso' };
+      return {status: 200, message: 'Delineamento importado com sucesso'};
     } catch (error: any) {
       await logImportController.update({
         id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
       handleError('Delineamento controller', 'Save Import', error.message);
-      return { status: 500, message: 'Erro ao salvar planilha de Delineamento' };
+      return {status: 500, message: 'Erro ao salvar planilha de Delineamento'};
     }
   }
 }
