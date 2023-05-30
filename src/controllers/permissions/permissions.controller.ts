@@ -4,6 +4,7 @@ import { PermissionRepository } from '../../repository/permission.repository';
 import handleError from '../../shared/utils/handleError';
 import { ProfilePermissionsRepository } from '../../repository/profile-permissions.repository';
 import permissions from '../../shared/utils/permissionsGrid';
+import initializePermissions from "../../shared/utils/initializePermissions";
 
 export class PermissionsController {
   permissionsRepository = new PermissionRepository();
@@ -40,7 +41,9 @@ export class PermissionsController {
         });
       });
 
-      permissions.forEach((permissionF: any) => {
+      initializePermissions(response);
+
+      /*permissions.forEach((permissionF: any) => {
 
         let routeF = permissionF.route;
         let permissionsNotFound = permissionF.permissions.filter((elementF: any) => {
@@ -58,6 +61,7 @@ export class PermissionsController {
           return !encontrou;
         });
         
+        // cadastrar novas permissions;
         if (permissionsNotFound.length > 0) {
           permissionsNotFound.forEach(async (element: any) => {
             const data = {
@@ -70,26 +74,9 @@ export class PermissionsController {
           });
         }
         
-        
-        
-        /*permissionF.permissions.forEach((elementF: any) => {
-          let encontrou = false;
-          for (const item of response) {
-            let screenRoute = item.screenRoute;
-            let action = item.action;
-            
-            if (routeF === screenRoute) {
-              if (action.includes(elementF.value)) {
-                encontrou = true;
-              }
-            }
-          }
-        });*/
-        
-      });
+      });*/
       
-      
-      console.log('newResponse', newResponse);
+      // console.log('newResponse', newResponse);
       
       const aux: any = {};
       const result = response.reduce((r: any, o: any) => {
@@ -104,8 +91,6 @@ export class PermissionsController {
 
         return r;
       }, []);
-      
-      
 
       permissions.forEach((permission: any) => {
         permission.permissions.forEach((element: any) => {
@@ -127,9 +112,11 @@ export class PermissionsController {
           status: 400, result: [], message: 'nenhum resultado encontrado',
         };
       }
+      
       return {
         status: 200, newResult, total: result.total,
       };
+      
     } catch (error: any) {
       handleError('Permissions controller', 'GetAll', error.message);
       throw new Error('[Controller] - GetAll Permissions erro');
