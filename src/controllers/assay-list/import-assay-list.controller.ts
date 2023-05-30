@@ -3,27 +3,31 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
-import { v4 as uuidv4 } from 'uuid';
-import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
-import { AssayListRepository } from 'src/repository/assay-list.repository';
-import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
-import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
+import {v4 as uuidv4} from 'uuid';
+import {BlobServiceClient, ContainerClient} from '@azure/storage-blob';
+import {AssayListRepository} from 'src/repository/assay-list.repository';
+import {TransactionConfig} from 'src/shared/prisma/transactionConfig';
+import {ImportValidate, IReturnObject} from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
-import { responseGenericFactory, responseNullFactory, responsePositiveNumericFactory } from '../../shared/utils/responseErrorFactory';
-import { validateHeaders } from '../../shared/utils/validateHeaders';
-import { CulturaController } from '../cultura.controller';
-import { FocoController } from '../foco.controller';
-import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';
-import { GenotipoController } from '../genotype/genotipo.controller';
-import { LogImportController } from '../log-import.controller';
-import { LoteController } from '../lote.controller';
-import { SafraController } from '../safra.controller';
-import { TecnologiaController } from '../technology/tecnologia.controller';
-import { TypeAssayController } from '../tipo-ensaio.controller';
-import { assayListQueue } from './assay-list-queue';
-import { AssayListController } from './assay-list.controller';
-import { GenotypeTreatmentRepository } from '../../repository/genotype-treatment/genotype-treatment.repository';
-import { prisma } from '../../pages/api/db/db';
+import {
+  responseGenericFactory,
+  responseNullFactory,
+  responsePositiveNumericFactory
+} from '../../shared/utils/responseErrorFactory';
+import {validateHeaders} from '../../shared/utils/validateHeaders';
+import {CulturaController} from '../cultura.controller';
+import {FocoController} from '../foco.controller';
+import {GenotypeTreatmentController} from '../genotype-treatment/genotype-treatment.controller';
+import {GenotipoController} from '../genotype/genotipo.controller';
+import {LogImportController} from '../log-import.controller';
+import {LoteController} from '../lote.controller';
+import {SafraController} from '../safra.controller';
+import {TecnologiaController} from '../technology/tecnologia.controller';
+import {TypeAssayController} from '../tipo-ensaio.controller';
+import {assayListQueue} from './assay-list-queue';
+import {AssayListController} from './assay-list.controller';
+import {GenotypeTreatmentRepository} from '../../repository/genotype-treatment/genotype-treatment.repository';
+import {prisma} from '../../pages/api/db/db';
 
 export class ImportAssayListController {
   static async validate(
@@ -72,11 +76,11 @@ export class ImportAssayListController {
           state: 'INVALIDA',
           invalid_data: validate,
         });
-        return { status: 400, message: validate };
+        return {status: 400, message: validate};
       }
 
       if ((spreadSheet.length > Number(process.env.MAX_DIRECT_UPLOAD_ALLOWED))
-            && !queueProcessing) {
+        && !queueProcessing) {
         assayListQueue.add({
           instance: {
             spreadSheet, idSafra, idCulture, created_by: createdBy,
@@ -97,12 +101,13 @@ export class ImportAssayListController {
 
       spreadSheet.unshift(header);
       for (const row in spreadSheet) {
+        let linhaStr = String(Number(row) + 1);
         if (row !== '0') {
           if (spreadSheet.length > 2) {
             if (spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]
-            || (spreadSheet.length - 1) === Number(row)) {
+              || (spreadSheet.length - 1) === Number(row)) {
               if ((spreadSheet.length - 1) === Number(row)
-              && spreadSheet[row][4] === spreadSheet[Number(row) - 1][4]) {
+                && spreadSheet[row][4] === spreadSheet[Number(row) - 1][4]) {
                 validateAll.FOCO.push(spreadSheet[row][2]);
                 validateAll.ENSAIO.push(spreadSheet[row][3]);
                 validateAll.TECNOLOGIA.push(spreadSheet[row][5]);
@@ -113,7 +118,7 @@ export class ImportAssayListController {
                 const result = allEqual(validateAll[property]);
                 if (!result) {
                   responseIfError[Number(0)]
-                  += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo GLI(${spreadSheet[Number(row) - 1][4]}) devem ser iguais. </li> <br>`;
+                    += `<li style="text-align:left"> A coluna ${property} está incorreta, todos os itens do mesmo GLI(${spreadSheet[Number(row) - 1][4]}) devem ser iguais. </li> <br>`;
                 }
               }
               validateAll = {
@@ -142,10 +147,10 @@ export class ImportAssayListController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][spreadSheet[row].length - 1],
-                    spreadSheet[0][column],
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                );
               }
               const {
                 response,
@@ -153,7 +158,7 @@ export class ImportAssayListController {
               if (response?.name?.toUpperCase() !== spreadSheet[row][column]?.toUpperCase()) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
-                  spreadSheet[row][spreadSheet[row].length - 1],
+                  linhaStr,
                   spreadSheet[0][column],
                   'a cultura e diferente da selecionada',
                 );
@@ -164,20 +169,20 @@ export class ImportAssayListController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][spreadSheet[row].length - 1],
-                    spreadSheet[0][column],
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                );
               }
-              const { response }: IReturnObject = await safraController.getOne(idSafra);
+              const {response}: IReturnObject = await safraController.getOne(idSafra);
               if (response?.safraName !== String(spreadSheet[row][column])) {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][spreadSheet[row].length - 1],
-                    spreadSheet[0][column],
-                    'a safra informada e diferente da selecionada',
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                  'a safra informada e diferente da selecionada',
+                );
               }
             }
             // Validação do campo Foco
@@ -185,12 +190,12 @@ export class ImportAssayListController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][spreadSheet[row].length - 1],
-                    spreadSheet[0][column],
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                );
               }
-              const { response }: IReturnObject = await focoController.getAll({
+              const {response}: IReturnObject = await focoController.getAll({
                 filterSearch: spreadSheet[row][column],
                 id_culture: idCulture,
                 filterStatus: 1,
@@ -199,11 +204,12 @@ export class ImportAssayListController {
               if (response?.length === 0) {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][spreadSheet[row].length - 1],
-                    spreadSheet[0][column],
-                    'informado não existe no sistema ou está inativo',
-                  );
+                  (Number(column) + 1),
+                  //spreadSheet[row][spreadSheet[row].length - 1],
+                  linhaStr,
+                  spreadSheet[0][column],
+                  'informado não existe no sistema ou está inativo',
+                );
               }
             }
             // Validação do campo Tipo de Ensaio
@@ -211,12 +217,13 @@ export class ImportAssayListController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][spreadSheet[row].length - 1],
-                    spreadSheet[0][column],
-                  );
+                  (Number(column) + 1),
+                  //spreadSheet[row][spreadSheet[row].length - 1],
+                  linhaStr,
+                  spreadSheet[0][column],
+                );
               }
-              const { response }: IReturnObject = await typeAssayController.getAll({
+              const {response}: IReturnObject = await typeAssayController.getAll({
                 filterName: spreadSheet[row][column],
                 id_culture: idCulture,
                 filterStatus: 1,
@@ -225,11 +232,12 @@ export class ImportAssayListController {
               if (response?.length === 0) {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][spreadSheet[row].length - 1],
-                    spreadSheet[0][column],
-                    'o tipo de ensaio informado não existe no sistema',
-                  );
+                  (Number(column) + 1),
+                  //spreadSheet[row][spreadSheet[row].length - 1],
+                  linhaStr,
+                  spreadSheet[0][column],
+                  'o tipo de ensaio informado não existe no sistema',
+                );
               }
             }
             // Validação GLI
@@ -237,12 +245,12 @@ export class ImportAssayListController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][spreadSheet[row].length - 1],
-                    spreadSheet[0][column],
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                );
               }
-              const { response }: IReturnObject = await assayListController.getAll({
+              const {response}: IReturnObject = await assayListController.getAll({
                 filterGli: spreadSheet[row][4],
                 id_safra: idSafra,
                 importValidate: true,
@@ -250,56 +258,47 @@ export class ImportAssayListController {
               if (response?.length > 0) {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][spreadSheet[row].length - 1],
-                    spreadSheet[0][column],
-                    'o ensaio já foi cadastrado, e preciso excluir para inserir de novo',
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                  'o ensaio já foi cadastrado, e preciso excluir para inserir de novo',
+                );
               }
-              // if (response[0]?.status === 'EXP IMP.') {
-              //   responseIfError[Number(column)]
-              //     += responseGenericFactory(
-              //       (Number(column) + 1),
-              //       spreadSheet[row][spreadSheet[row].length - 1],
-              //       spreadSheet[0][column],
-              //       'o ensaio já foi utilizado, não e possível alterar',
-              //     );
-              // }
             }
             // Validação do campo código da tecnologia
             if (column === '5') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][spreadSheet[row].length - 1],
-                    spreadSheet[0][column],
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                );
               } else if ((spreadSheet[row][column]).toString().length > 2) {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][spreadSheet[row].length - 1],
-                    'o limite de caracteres e 2',
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][spreadSheet[row].length - 1],
+                  'o limite de caracteres e 2',
+                );
               } else {
                 if (spreadSheet[row][column].toString().length < 2) {
                   // eslint-disable-next-line no-param-reassign
                   spreadSheet[row][column] = `0${spreadSheet[row][column].toString()}`;
                 }
-                const { response }: IReturnObject = await tecnologiaController.getAll({
+                const {response}: IReturnObject = await tecnologiaController.getAll({
                   cod_tec: String(spreadSheet[row][column]),
                   id_culture: idCulture,
                 });
                 if (response?.length === 0) {
                   responseIfError[Number(column)]
-                  += responseGenericFactory(
-                      (Number(column) + 1),
-                      spreadSheet[row][spreadSheet[row].length - 1],
-                      spreadSheet[0][column],
-                      'a tecnologia informado não existe no sistema',
-                    );
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'a tecnologia informado não existe no sistema',
+                  );
                 }
               }
             }
@@ -309,7 +308,7 @@ export class ImportAssayListController {
                 if (isNaN(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responsePositiveNumericFactory(
                     Number(column) + 1,
-                    spreadSheet[row][spreadSheet[row].length - 1],
+                    linhaStr,
                     spreadSheet[0][column],
                   );
                 }
@@ -320,10 +319,10 @@ export class ImportAssayListController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][spreadSheet[row].length - 1],
-                    spreadSheet[0][column],
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                );
               }
             }
             // Validação do campo número de tratamento
@@ -331,41 +330,41 @@ export class ImportAssayListController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][spreadSheet[row].length - 1],
-                    spreadSheet[0][column],
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                );
               }
               if (row === '1') {
                 if (Number(spreadSheet[row][column]) !== 1) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
-                      (Number(column) + 1),
-                      spreadSheet[row][spreadSheet[row].length - 1],
-                      spreadSheet[0][column],
-                      'o numero de tratamentos precisa começar em 1',
-                    );
+                    (Number(column) + 1),
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'o numero de tratamentos precisa começar em 1',
+                  );
                 }
               } else if (
                 (Number(spreadSheet[row][column] - 1) !== spreadSheet[Number(row) - 1][column]
-                && spreadSheet[Number(row) - 1][4] === spreadSheet[row][4])
+                  && spreadSheet[Number(row) - 1][4] === spreadSheet[row][4])
               ) {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][spreadSheet[row].length - 1],
-                    spreadSheet[0][column],
-                    'o número de tratamento não está sequencial',
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                  'o número de tratamento não está sequencial',
+                );
               } else if (spreadSheet[Number(row) - 1][4] !== spreadSheet[row][4]
-               && Number(spreadSheet[row][column]) !== 1) {
+                && Number(spreadSheet[row][column]) !== 1) {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][spreadSheet[row].length - 1],
-                    spreadSheet[0][column],
-                    'cada ensaio deve ter tratamentos sequenciais começados em 1',
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                  'cada ensaio deve ter tratamentos sequenciais começados em 1',
+                );
               }
             }
             // Validação do campo status
@@ -373,28 +372,31 @@ export class ImportAssayListController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][spreadSheet[row].length - 1],
-                    spreadSheet[0][column],
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                );
               }
               if ((spreadSheet[row][column] !== 'T' && spreadSheet[row][column] !== 'L')) {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
-                    (Number(column) + 1),
-                    spreadSheet[row][spreadSheet[row].length - 1],
-                    spreadSheet[0][column],
-                    'o valor de status deve ser igual a T ou L',
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                  'o valor de status deve ser igual a T ou L',
+                );
               }
             }
             // Validação do campo nome do genótipo
             if (column === '10') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]);
               }
-              const { response }: IReturnObject = await genotipoController.getAll({
+              const {response}: IReturnObject = await genotipoController.getAll({
                 filterGenotipo: spreadSheet[row][column],
                 id_culture: idCulture,
                 importValidate: true,
@@ -402,33 +404,33 @@ export class ImportAssayListController {
               if (response?.length === 0) {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                    'o genótipo informado não existe no sistema',
-                  );
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                  'o genótipo informado não existe no sistema',
+                );
               }
             }
             // Validação do campo NCA
             if (column === '11') {
               if (spreadSheet[row][column] !== null) {
-                const { response: genotype }: IReturnObject = await genotipoController.getAll({
+                const {response: genotype}: IReturnObject = await genotipoController.getAll({
                   filterGenotipo: spreadSheet[row][10],
                   id_culture: idCulture,
                   importValidate: true,
                 });
-                const { response }: IReturnObject = await loteController.getAll({
+                const {response}: IReturnObject = await loteController.getAll({
                   filterNcc: spreadSheet[row][column],
                   id_genotipo: genotype[0]?.id,
                 });
                 if (response?.length === 0) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
-                      (Number(column) + 1),
-                      spreadSheet[row][spreadSheet[row].length - 1],
-                      spreadSheet[0][column],
-                      'o valor de NCA não foi encontrado no cadastro de lotes relacionado ao genótipo',
-                    );
+                    (Number(column) + 1),
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'o valor de NCA não foi encontrado no cadastro de lotes relacionado ao genótipo',
+                  );
                 }
               }
             }
@@ -450,13 +452,13 @@ export class ImportAssayListController {
         state: 'INVALIDA',
         invalid_data: responseStringError,
       });
-      return { status: 400, message: responseStringError };
+      return {status: 400, message: responseStringError};
     } catch (error: any) {
       await logImportController.update({
         id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
       handleError(`Date: ${new Date().toISOString()} Lista de ensaio controller`, 'Validate Import', error.message);
-      return { status: 500, message: 'Erro ao validar planilha de Lista de ensaio' };
+      return {status: 500, message: 'Erro ao validar planilha de Lista de ensaio'};
     }
   }
 
@@ -507,29 +509,29 @@ export class ImportAssayListController {
       await transactionConfig.transactionScope.run(async () => {
         for (const row in spreadSheet) {
           if (row !== '0') {
-            const { response: typeAssay }: IReturnObject = await typeAssayController.getAll({
+            const {response: typeAssay}: IReturnObject = await typeAssayController.getAll({
               filterName: spreadSheet[row][3],
               id_culture: idCulture,
               importValidate: true,
             });
-            const { response: foco }: IReturnObject = await focoController.getAll(
+            const {response: foco}: IReturnObject = await focoController.getAll(
               {
                 filterSearch: spreadSheet[row][2],
                 id_culture: idCulture,
                 importValidate: true,
               },
             );
-            const { response: technology }: IReturnObject = await tecnologiaController.getAll({
+            const {response: technology}: IReturnObject = await tecnologiaController.getAll({
               cod_tec: String(spreadSheet[row][5]),
               id_culture: idCulture,
             });
-            const { response: genotype }: IReturnObject = await genotipoController.getAll({
+            const {response: genotype}: IReturnObject = await genotipoController.getAll({
               filterGenotipo: spreadSheet[row][10],
               id_culture: idCulture,
               importValidate: true,
             });
 
-            const { response: lote }: IReturnObject = await loteController.getAll({
+            const {response: lote}: IReturnObject = await loteController.getAll({
               filterNcc: spreadSheet[row][11] || '0',
             });
 
@@ -625,14 +627,17 @@ export class ImportAssayListController {
       await logImportController.update({
         id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
       });
-      return { status: 200, message: `Ensaios importados (${String(register)}). Produtividade x Avanço (${String(productivity)} x ${String(advance)}) ` };
+      return {
+        status: 200,
+        message: `Ensaios importados (${String(register)}). Produtividade x Avanço (${String(productivity)} x ${String(advance)}) `
+      };
     } catch (error: any) {
       await logImportController.update({
         id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
       console.warn(error);
       handleError('Lista de ensaio controller', 'Save Import', error.message);
-      return { status: 500, message: 'Erro ao salvar planilha de Lista de ensaio' };
+      return {status: 500, message: 'Erro ao salvar planilha de Lista de ensaio'};
     }
   }
 

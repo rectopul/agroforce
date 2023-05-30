@@ -108,11 +108,14 @@ export class ImportGenotypeController {
       const configModule: object | any = await importController.getAll(10);
 
       for (const row in spreadSheet) {
+        
+        let linhaStr = String(Number(row) + 1);
+        
         if (row !== '0') {
           if (nccValidate.includes(spreadSheet[row][25])) {
             responseIfError[Number(25)] += responseGenericFactory(
               Number(25) + 1,
-              row,
+              linhaStr,
               spreadSheet[0][25],
               'esta repetido na planilha',
             );
@@ -208,7 +211,7 @@ export class ImportGenotypeController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               }
@@ -218,7 +221,7 @@ export class ImportGenotypeController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               }
@@ -228,7 +231,7 @@ export class ImportGenotypeController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else {
@@ -239,7 +242,7 @@ export class ImportGenotypeController {
                   if (idCulture !== cultura.response[0]?.id) {
                     responseIfError[Number(column)] += responseGenericFactory(
                       Number(column) + 1,
-                      row,
+                      linhaStr,
                       spreadSheet[0][column],
                       'o campo cultura tem que ser igual a cultura selecionada',
                     );
@@ -247,7 +250,7 @@ export class ImportGenotypeController {
                 } else {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                     'cultura não existe',
                   );
@@ -261,7 +264,7 @@ export class ImportGenotypeController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               }
@@ -274,14 +277,14 @@ export class ImportGenotypeController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else if ((spreadSheet[row][column]).toString().length > 2) {
                 responseIfError[Number(column)]
                   += responseGenericFactory(
                     (Number(column) + 1),
-                    row,
+                  linhaStr,
                     spreadSheet[0][column],
                     'o limite de caracteres e 2',
                   );
@@ -298,7 +301,7 @@ export class ImportGenotypeController {
                 if (tec.total === 0) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                     'a tecnologia informado não existe no sistema',
                   );
@@ -311,7 +314,7 @@ export class ImportGenotypeController {
                 if (isNaN(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     (Number(column) + 1),
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                     'precisa ser um numero positivo',
                   );
@@ -324,7 +327,7 @@ export class ImportGenotypeController {
                 if (isNaN(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responsePositiveNumericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                   );
                 }
@@ -336,7 +339,7 @@ export class ImportGenotypeController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else {
@@ -348,7 +351,7 @@ export class ImportGenotypeController {
                   if (lote.length > 0) {
                     responseIfError[Number(column)] += responseGenericFactory(
                       Number(column) + 1,
-                      row,
+                      linhaStr,
                       spreadSheet[0][column],
                       'o lote já foi cadastrado em outra safra',
                     );
@@ -361,7 +364,7 @@ export class ImportGenotypeController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               }
@@ -373,7 +376,7 @@ export class ImportGenotypeController {
               if (Number(response[0]?.year) !== Number(spreadSheet[row][column])) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'ano não é igual ao da safra',
                 );
@@ -384,7 +387,7 @@ export class ImportGenotypeController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else {
@@ -398,7 +401,7 @@ export class ImportGenotypeController {
                           !== spreadSheet[row][column]?.toUpperCase()) {
                     responseIfError[Number(column)] += responseGenericFactory(
                       Number(column) + 1,
-                      row,
+                      linhaStr,
                       spreadSheet[0][column],
                       'safra não cadastrada ou inativa nessa cultura',
                     );
@@ -409,7 +412,7 @@ export class ImportGenotypeController {
                            !== spreadSheet[row][column]?.toUpperCase()) {
                     responseIfError[Number(column)] += responseGenericFactory(
                       Number(column) + 1,
-                      row,
+                      linhaStr,
                       spreadSheet[0][column],
                       'safra e diferente da selecionada',
                     );
@@ -422,14 +425,14 @@ export class ImportGenotypeController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else {
                 if (isNaN(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responsePositiveNumericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                   );
                 }
@@ -440,7 +443,7 @@ export class ImportGenotypeController {
                 if (lote.total > 0) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                     'código do lote deve ser um campo único no GOM',
                   );
@@ -459,7 +462,7 @@ export class ImportGenotypeController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               }
@@ -469,14 +472,14 @@ export class ImportGenotypeController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else if (!validateInteger(spreadSheet[row][column])
                   || spreadSheet[row][column].toString().length > 12) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   (Number(column) + 1),
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'precisa ser um numero inteiro e positivo e ter 12 dígitos',
                 );
@@ -489,7 +492,7 @@ export class ImportGenotypeController {
                   if (response.length > 0) {
                     responseIfError[Number(column)] += responseGenericFactory(
                       (Number(column) + 1),
-                      row,
+                      linhaStr,
                       spreadSheet[0][column],
                       'é chave única na cultura, e já foi cadastrado',
                     );
@@ -502,7 +505,7 @@ export class ImportGenotypeController {
               if (isNaN(spreadSheet[row][column])) {
                 responseIfError[Number(column)] += responsePositiveNumericFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               }
@@ -512,13 +515,13 @@ export class ImportGenotypeController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else if (typeof spreadSheet[row][column] === 'number') {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'o campo DT precisa ser no formato data',
                 );
@@ -535,7 +538,7 @@ export class ImportGenotypeController {
                 if (dateNow.getTime() < spreadSheet[row][column].getTime()) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                     'a data e maior que a data atual',
                   );
@@ -543,7 +546,7 @@ export class ImportGenotypeController {
                 if (spreadSheet[row][column].getTime() < 100000) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                     'o campo DT precisa ser no formato data',
                   );
@@ -551,13 +554,10 @@ export class ImportGenotypeController {
                 if (status === 200) {
                   const lastDtImport = response[0]?.dt_export?.getTime();
 
-                  if (
-                    lastDtImport
-                      > spreadSheet[row][column].getTime()
-                  ) {
+                  if (lastDtImport > spreadSheet[row][column].getTime()) {
                     responseIfError[Number(column)] += responseGenericFactory(
                       Number(column) + 1,
-                      row,
+                      linhaStr,
                       spreadSheet[0][column],
                       'essa informação é mais antiga do que a informação do software',
                     );

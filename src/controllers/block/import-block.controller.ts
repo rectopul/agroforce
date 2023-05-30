@@ -4,22 +4,22 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 
-import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
+import {ImportValidate, IReturnObject} from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
 import {
   responseDoesNotExist, responseGenericFactory, responseNullFactory, responsePositiveNumericFactory,
 } from '../../shared/utils/responseErrorFactory';
-import { CulturaController } from '../cultura.controller';
-import { DividersController } from '../dividers.controller';
+import {CulturaController} from '../cultura.controller';
+import {DividersController} from '../dividers.controller';
 // eslint-disable-next-line import/no-cycle
-import { ImportController } from '../import.controller';
-import { LayoutQuadraController } from '../block-layout/layout-quadra.controller';
-import { LocalController } from '../local/local.controller';
-import { LogImportController } from '../log-import.controller';
-import { SafraController } from '../safra.controller';
-import { QuadraController } from './quadra.controller';
-import { validateInteger } from '../../shared/utils/numberValidate';
-import { validateHeaders } from '../../shared/utils/validateHeaders';
+import {ImportController} from '../import.controller';
+import {LayoutQuadraController} from '../block-layout/layout-quadra.controller';
+import {LocalController} from '../local/local.controller';
+import {LogImportController} from '../log-import.controller';
+import {SafraController} from '../safra.controller';
+import {QuadraController} from './quadra.controller';
+import {validateInteger} from '../../shared/utils/numberValidate';
+import {validateHeaders} from '../../shared/utils/validateHeaders';
 
 export class ImportBlockController {
   static async validate(
@@ -63,7 +63,7 @@ export class ImportBlockController {
           id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: validate,
         });
 
-        return { status: 400, message: validate };
+        return {status: 400, message: validate};
       }
       const configModule: object | any = await importController.getAll(17);
 
@@ -76,25 +76,34 @@ export class ImportBlockController {
       let t4_f: any = 0;
       let divisor_anterior: any = 0;
       for (const row in spreadSheet) {
+
+        let linhaStr = String(Number(row) + 1);
+
         if (row !== '0') {
           for (const column in spreadSheet[row]) {
             if (configModule.response[0]?.fields[column] === 'Safra') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  //row,
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else {
-                const { status, response }: IReturnObject = await safraController.getOne(
+                const {status, response}: IReturnObject = await safraController.getOne(
                   Number(idSafra),
                 );
                 if (status === 200) {
                   if (String(spreadSheet[row][column]) !== response?.safraName) {
                     responseIfError[Number(column)]
                       += responseGenericFactory(
-                        (Number(column) + 1),
-                        row,
-                        spreadSheet[0][column],
-                        'a safra importada precisa ser igual a safra selecionada',
-                      );
+                      (Number(column) + 1),
+                      //row,
+                      linhaStr,
+                      spreadSheet[0][column],
+                      'a safra importada precisa ser igual a safra selecionada',
+                    );
                   }
                 }
               }
@@ -103,20 +112,25 @@ export class ImportBlockController {
             if (configModule.response[0]?.fields[column] === 'Cultura') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else {
-                const { status, response }: IReturnObject = await culturaController.getOneCulture(
+                const {status, response}: IReturnObject = await culturaController.getOneCulture(
                   Number(idCulture),
                 );
                 if (status === 200) {
                   if (spreadSheet[row][column].toUpperCase() !== response.name.toUpperCase()) {
                     responseIfError[Number(column)]
                       += responseGenericFactory(
-                        (Number(column) + 1),
-                        row,
-                        spreadSheet[0][column],
-                        'a cultura importada precisa ser igual a cultura selecionada',
-                      );
+                      (Number(column) + 1),
+                      //row,
+                      linhaStr,
+                      spreadSheet[0][column],
+                      'a cultura importada precisa ser igual a cultura selecionada',
+                    );
                   }
                 }
               }
@@ -125,15 +139,23 @@ export class ImportBlockController {
             if (configModule.response[0]?.fields[column] === 'LocalPrep') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else {
-                const { response } = await localController.getAll({
+                const {response} = await localController.getAll({
                   name_local_culture: spreadSheet[row][column],
                   importValidate: true,
                 });
                 if (response.total === 0) {
                   responseIfError[Number(column)]
-                    += responseDoesNotExist((Number(column) + 1), row, spreadSheet[0][column]);
+                    += responseDoesNotExist(
+                    (Number(column) + 1),
+                    linhaStr,
+                    spreadSheet[0][column]
+                  );
                 }
                 const {
                   response: responseSafra,
@@ -145,11 +167,11 @@ export class ImportBlockController {
                 if (!cultureUnityValidate?.includes(true)) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'não tem unidade de cultura cadastrada no local informado',
-                    );
+                    (Number(column) + 1),
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'não tem unidade de cultura cadastrada no local informado',
+                  );
                 } else {
                   aux.local_preparo = response[0]?.id;
                 }
@@ -159,9 +181,13 @@ export class ImportBlockController {
             if (configModule.response[0]?.fields[column] === 'CodigoQuadra') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else {
-                const { status }: IReturnObject = await quadraController.getAll(
+                const {status}: IReturnObject = await quadraController.getAll(
                   {
                     cod_quadra: spreadSheet[row][column],
                     local: spreadSheet[row][2],
@@ -172,12 +198,13 @@ export class ImportBlockController {
                 );
                 if (status === 200) {
                   responseIfError[Number(column)]
-                      += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'código quadra já existe neste local, para poder atualiza-lo você precisa inativar o existente',
-                    );
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    //row,
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'código quadra já existe neste local, para poder atualiza-lo você precisa inativar o existente',
+                  );
                 }
                 cod_quadra_anterior = cod_quadra;
                 cod_quadra = spreadSheet[row][column];
@@ -187,28 +214,33 @@ export class ImportBlockController {
             if (configModule.response[0]?.fields[column] === 'LargQ') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]);
               } else {
                 if (typeof spreadSheet[row][column] !== 'number'
-                || Number(spreadSheet[row][column]) <= 0) {
+                  || Number(spreadSheet[row][column]) <= 0) {
                   responseIfError[Number(column)]
-                        += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'precisa ser um numero e positivo',
-                    );
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    //row,
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'precisa ser um numero e positivo',
+                  );
                 }
                 if (larg_q !== '') {
                   if (cod_quadra === cod_quadra_anterior) {
                     if (spreadSheet[row][column] !== larg_q && row !== '1') {
                       responseIfError[Number(column)]
                         += responseGenericFactory(
-                          (Number(column) + 1),
-                          row,
-                          spreadSheet[0][column],
-                          'a largQ precisa ser igual na planilha inteira',
-                        );
+                        (Number(column) + 1),
+                        //row,
+                        linhaStr,
+                        spreadSheet[0][column],
+                        'a largQ precisa ser igual na planilha inteira',
+                      );
                       larg_q = spreadSheet[row][column];
                     } else {
                       larg_q = spreadSheet[row][column];
@@ -223,27 +255,30 @@ export class ImportBlockController {
             if (configModule.response[0]?.fields[column] === 'CompP') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]);
               } else {
                 if (typeof spreadSheet[row][column] !== 'number'
-                || Number(spreadSheet[row][column]) <= 0) {
+                  || Number(spreadSheet[row][column]) <= 0) {
                   responseIfError[Number(column)]
-                        += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'precisa ser um numero e positivo',
-                    );
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'precisa ser um numero e positivo',
+                  );
                 }
                 if (cod_quadra === cod_quadra_anterior) {
                   if (spreadSheet[row][column] !== comp_p && row !== '1') {
                     responseIfError[Number(column)]
-                        += responseGenericFactory(
-                        (Number(column) + 1),
-                        row,
-                        spreadSheet[0][column],
-                        'o compP precisa ser igual na planilha inteira',
-                      );
+                      += responseGenericFactory(
+                      (Number(column) + 1),
+                      linhaStr,
+                      spreadSheet[0][column],
+                      'o compP precisa ser igual na planilha inteira',
+                    );
                     comp_p = spreadSheet[row][column];
                   } else {
                     comp_p = spreadSheet[row][column];
@@ -257,11 +292,15 @@ export class ImportBlockController {
             if (configModule.response[0]?.fields[column] === 'LinhaP') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else if (!validateInteger(spreadSheet[row][column])) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   (Number(column) + 1),
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'precisa ser um numero inteiro e positivo',
                 );
@@ -271,12 +310,16 @@ export class ImportBlockController {
             if (configModule.response[0]?.fields[column] === 'CompC') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else if (typeof spreadSheet[row][column] !== 'number'
                 || Number(spreadSheet[row][column]) <= 0) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   (Number(column) + 1),
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'precisa ser um numero e positivo',
                 );
@@ -286,37 +329,41 @@ export class ImportBlockController {
             if (configModule.response[0]?.fields[column] === 'Esquema') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else {
-                const { response, total }: any = await layoutQuadraController.getAll(
-                  { esquema: spreadSheet[row][column], idCulture, status: 1 },
+                const {response, total}: any = await layoutQuadraController.getAll(
+                  {esquema: spreadSheet[row][column], idCulture, status: 1},
                 );
                 if (total === 0) {
                   responseIfError[Number(column)]
-                      += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'o esquema do layout ainda não foi cadastrado',
-                    );
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'o esquema do layout ainda não foi cadastrado',
+                  );
                 } else if (spreadSheet[row][3] !== spreadSheet[Number(row) - 1][3]) {
                   if (spreadSheet[Number(row) - 1][12] < response[0]?.tiros) {
                     responseIfError[Number(column)]
                       += responseGenericFactory(
-                        (Number(column) + 1),
-                        row,
-                        'T4F',
-                        'os tiros da quadra devem ser maiores ou iguais ao da esquema',
-                      );
+                      (Number(column) + 1),
+                      linhaStr,
+                      'T4F',
+                      'os tiros da quadra devem ser maiores ou iguais ao da esquema',
+                    );
                   }
                   if (spreadSheet[row][14] < response[0]?.disparos) {
                     responseIfError[Number(column)]
-                    += responseGenericFactory(
-                        (Number(column) + 1),
-                        row,
-                        'DF',
-                        'os disparos da quadra devem ser maiores ou iguais ao da esquema',
-                      );
+                      += responseGenericFactory(
+                      (Number(column) + 1),
+                      linhaStr,
+                      'DF',
+                      'os disparos da quadra devem ser maiores ou iguais ao da esquema',
+                    );
                   }
                 }
               }
@@ -325,19 +372,23 @@ export class ImportBlockController {
             if (configModule.response[0]?.fields[column] === 'Divisor') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else if (cod_quadra === cod_quadra_anterior) {
                 if (divisor_anterior === 0) {
                   if (typeof spreadSheet[row][column] !== 'number'
-                || Number(spreadSheet[row][column]) <= 0
-                || !Number.isInteger(Number(spreadSheet[row][column]))) {
+                    || Number(spreadSheet[row][column]) <= 0
+                    || !Number.isInteger(Number(spreadSheet[row][column]))) {
                     responseIfError[Number(column)]
-                        += responseGenericFactory(
-                        (Number(column) + 1),
-                        row,
-                        spreadSheet[0][column],
-                        'precisa ser um numero inteiro e positivo',
-                      );
+                      += responseGenericFactory(
+                      (Number(column) + 1),
+                      linhaStr,
+                      spreadSheet[0][column],
+                      'precisa ser um numero inteiro e positivo',
+                    );
                   } else {
                     divisor_anterior = spreadSheet[row][column];
                   }
@@ -345,32 +396,35 @@ export class ImportBlockController {
                   if ((divisor_anterior + 1) !== spreadSheet[row][column]) {
                     responseIfError[Number(column)]
                       += responseGenericFactory(
-                        (Number(column) + 1),
-                        row,
-                        spreadSheet[0][column],
-                        'não pode ter intersecção de parcelas',
-                      );
+                      (Number(column) + 1),
+                      //row,
+                      linhaStr,
+                      spreadSheet[0][column],
+                      'não pode ter intersecção de parcelas',
+                    );
                   }
                   divisor_anterior = spreadSheet[row][column];
                 } else {
                   divisor_anterior = spreadSheet[row][column];
                   responseIfError[Number(column)]
-                      += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'a coluna dos divisores precisa está em sequencia',
-                    );
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    //row,
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'a coluna dos divisores precisa está em sequencia',
+                  );
                 }
               } else if (divisor_anterior === 0) {
                 if (spreadSheet[row][column] <= 0) {
                   responseIfError[Number(column)]
-                      += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'o divisor precisa começar com 1 e ser positivo',
-                    );
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    //row,
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'o divisor precisa começar com 1 e ser positivo',
+                  );
                 }
                 divisor_anterior = spreadSheet[row][column];
               } else {
@@ -381,11 +435,15 @@ export class ImportBlockController {
             if (configModule.response[0]?.fields[column] === 'SemMetro') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else if (!validateInteger(spreadSheet[row][column])) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   (Number(column) + 1),
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'precisa ser um numero inteiro e positivo',
                 );
@@ -395,11 +453,15 @@ export class ImportBlockController {
             if (configModule.response[0]?.fields[column] === 'T4I') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else if (!validateInteger(spreadSheet[row][column])) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   (Number(column) + 1),
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'precisa ser um numero inteiro e positivo',
                 );
@@ -409,34 +471,36 @@ export class ImportBlockController {
                   if (spreadSheet[row][column] !== 1) {
                     responseIfError[Number(column)]
                       += responseGenericFactory(
-                        (Number(column) + 1),
-                        row,
-                        spreadSheet[0][column],
-                        'o t4i precisa começar com 1',
-                      );
+                      (Number(column) + 1),
+                      linhaStr,
+                      spreadSheet[0][column],
+                      'o t4i precisa começar com 1',
+                    );
                   }
                   t4_i = spreadSheet[row][column];
                 } else {
                   if (spreadSheet[row][column] <= t4_f) {
                     responseIfError[Number(column)]
                       += responseGenericFactory(
-                        (Number(column) + 1),
-                        row,
-                        spreadSheet[0][column],
-                        'o t4i precisa ser maior que a t4f anterior',
-                      );
+                      (Number(column) + 1),
+                      //row,
+                      linhaStr,
+                      spreadSheet[0][column],
+                      'o t4i precisa ser maior que a t4f anterior',
+                    );
                   }
                   t4_i = spreadSheet[row][column];
                 }
               } else {
                 if (spreadSheet[row][column] !== 1) {
                   responseIfError[Number(column)]
-                      += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'o t4i precisa começar com 1',
-                    );
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    //row,
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'o t4i precisa começar com 1',
+                  );
                 }
                 t4_i = spreadSheet[row][column];
               }
@@ -445,11 +509,15 @@ export class ImportBlockController {
             if (configModule.response[0]?.fields[column] === 'T4F') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column]
+                );
               } else if (!validateInteger(spreadSheet[row][column])) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   (Number(column) + 1),
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'precisa ser um numero inteiro e positivo',
                 );
@@ -457,42 +525,44 @@ export class ImportBlockController {
               if (cod_quadra === cod_quadra_anterior) {
                 if (t4_i === 0) {
                   responseIfError[Number(column)]
-                      += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'A coluna t4f precisa está depois da coluna t4i',
-                    );
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'A coluna t4f precisa está depois da coluna t4i',
+                  );
                 }
                 if (t4_i > spreadSheet[row][column]) {
                   responseIfError[Number(column)]
-                      += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'o t4i e o t4f precisam estar em ordem crescente',
-                    );
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'o t4i e o t4f precisam estar em ordem crescente',
+                  );
                 } else {
                   t4_f = spreadSheet[row][column];
                 }
               } else {
                 if (t4_i === 0) {
                   responseIfError[Number(column)]
-                      += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'A coluna t4f precisa está depois da coluna t4i',
-                    );
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    //row,
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'A coluna t4f precisa está depois da coluna t4i',
+                  );
                 }
                 if (t4_i > spreadSheet[row][column]) {
                   responseIfError[Number(column)]
-                      += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'o t4i e o t4f precisam estar em ordem crescente',
-                    );
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    //row,
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'o t4i e o t4f precisam estar em ordem crescente',
+                  );
                 } else {
                   t4_f = spreadSheet[row][column];
                 }
@@ -502,63 +572,75 @@ export class ImportBlockController {
             if (configModule.response[0]?.fields[column] === 'DI') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                    (Number(column) + 1),
+                  linhaStr, 
+                  spreadSheet[0][column]
+                );
               } else if (!validateInteger(spreadSheet[row][column])) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   (Number(column) + 1),
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'precisa ser um numero inteiro e positivo',
                 );
               }
               if (spreadSheet[row][column] !== 1) {
                 responseIfError[Number(column)]
-                      += responseGenericFactory(
-                    (Number(column) + 1),
-                    row,
-                    spreadSheet[0][column],
-                    'o di precisa ser 1',
-                  );
+                  += responseGenericFactory(
+                  (Number(column) + 1),
+                  //row,
+                  linhaStr,
+                  spreadSheet[0][column],
+                  'o di precisa ser 1',
+                );
               }
             }
 
             if (configModule.response[0]?.fields[column] === 'DF') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
-                  += responseNullFactory((Number(column) + 1), row, spreadSheet[0][column]);
+                  += responseNullFactory(
+                    (Number(column) + 1), 
+                  linhaStr, 
+                  spreadSheet[0][column]
+                );
               } else if (df === 0) {
                 df = spreadSheet[row][column];
               } else {
                 if (typeof spreadSheet[row][column] !== 'number'
-                || Number(spreadSheet[row][column]) <= 0
-                || !Number.isInteger(Number(spreadSheet[row][column]))) {
+                  || Number(spreadSheet[row][column]) <= 0
+                  || !Number.isInteger(Number(spreadSheet[row][column]))) {
                   responseIfError[Number(column)]
-                        += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'precisa ser um numero inteiro e positivo',
-                    );
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    //row,
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'precisa ser um numero inteiro e positivo',
+                  );
                 }
                 if (Number(spreadSheet[row][column]) <= Number(spreadSheet[row][13])) {
                   responseIfError[Number(column)]
-                      += responseGenericFactory(
-                      (Number(column) + 1),
-                      row,
-                      spreadSheet[0][column],
-                      'deve ser menor que o DI',
-                    );
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    //row,
+                    linhaStr,
+                    spreadSheet[0][column],
+                    'deve ser menor que o DI',
+                  );
                 }
                 df = spreadSheet[row][column];
                 if (cod_quadra === cod_quadra_anterior) {
                   if (df !== spreadSheet[row][column]) {
                     responseIfError[Number(column)]
                       += responseGenericFactory(
-                        (Number(column) + 1),
-                        row,
-                        spreadSheet[0][column],
-                        'a coluna df deve ser igual para este pai',
-                      );
+                      (Number(column) + 1),
+                      //row,
+                      linhaStr,
+                      spreadSheet[0][column],
+                      'a coluna df deve ser igual para este pai',
+                    );
                   }
                 }
               }
@@ -580,12 +662,11 @@ export class ImportBlockController {
               for (const column in spreadSheet[row]) {
                 if (configModule.response[0]?.fields[column] === 'LocalPrep') {
                   if (spreadSheet[row][column] !== '') {
-                    const { response }: IReturnObject = await localController.getAll(
+                    const {response}: IReturnObject = await localController.getAll(
                       {
                         name_local_culture: spreadSheet[row][column],
                         importValidate: true,
                       },
-
                     );
                     aux.local_preparo = response[0]?.id;
                   }
@@ -712,26 +793,26 @@ export class ImportBlockController {
           await logImportController.update({
             id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
           });
-          return { status: 200, message: 'Quadra importada com sucesso' };
+          return {status: 200, message: 'Quadra importada com sucesso'};
         } catch (error: any) {
           await logImportController.update({
             id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
           });
           handleError('Quadra controller', 'Save Import', error.message);
-          return { status: 500, message: 'Erro ao salvar planilha de Quadra' };
+          return {status: 500, message: 'Erro ao salvar planilha de Quadra'};
         }
       }
       await logImportController.update({
         id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
-      return { status: 400, message: responseStringError };
+      return {status: 400, message: responseStringError};
     } catch (error: any) {
       await logImportController.update({
         id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
       handleError('Quadra controller', 'Validate Import', error.message);
-      return { status: 500, message: 'Erro ao validar planilha de Quadra' };
+      return {status: 500, message: 'Erro ao validar planilha de Quadra'};
     }
   }
 }
