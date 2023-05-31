@@ -8,14 +8,14 @@ import {
   responseGenericFactory,
   responsePositiveNumericFactory,
 } from '../../shared/utils/responseErrorFactory';
-import { ImportValidate, IReturnObject } from '../../interfaces/shared/Import.interface';
-import { LogImportController } from '../log-import.controller';
+import {ImportValidate, IReturnObject} from '../../interfaces/shared/Import.interface';
+import {LogImportController} from '../log-import.controller';
 // eslint-disable-next-line import/no-cycle
-import { ImportController } from '../import.controller';
-import { LayoutQuadraController } from './layout-quadra.controller';
-import { LayoutChildrenController } from '../layout-children.controller';
-import { CulturaController } from '../cultura.controller';
-import { validateHeaders } from '../../shared/utils/validateHeaders';
+import {ImportController} from '../import.controller';
+import {LayoutQuadraController} from './layout-quadra.controller';
+import {LayoutChildrenController} from '../layout-children.controller';
+import {CulturaController} from '../cultura.controller';
+import {validateHeaders} from '../../shared/utils/validateHeaders';
 
 export class ImportLayoutBlockController {
   static aux: any = {};
@@ -56,7 +56,7 @@ export class ImportLayoutBlockController {
         await logImportController.update({
           id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: validate,
         });
-        return { status: 400, message: validate };
+        return {status: 400, message: validate};
       }
       const sColheita: any = {};
       const sl: any = {};
@@ -67,6 +67,9 @@ export class ImportLayoutBlockController {
       const parcelas: any = {};
       let combinacao: any = '';
       for (const row in spreadSheet) {
+
+        let linhaStr = String(Number(row) + 1);
+
         if (row !== '0') { // LINHA COM TITULO DAS COLUNAS
           for (const column in spreadSheet[row]) {
             if (configModule.response[0]?.fields[column] === 'Cultura') {
@@ -77,7 +80,7 @@ export class ImportLayoutBlockController {
                 if (response?.name?.toUpperCase() !== spreadSheet[row][column]?.toUpperCase()) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                     'a cultura e diferente da selecionada',
                   );
@@ -89,17 +92,17 @@ export class ImportLayoutBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else {
-                const { status }: IReturnObject = await layoutQuadraController.getAll(
-                  { id_culture: idCulture, esquema: spreadSheet[row][column], status: 1 },
+                const {status}: IReturnObject = await layoutQuadraController.getAll(
+                  {id_culture: idCulture, esquema: spreadSheet[row][column], status: 1},
                 );
                 if (status === 200) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                     'ja existe um esquema ativo com esse código',
                   );
@@ -111,23 +114,23 @@ export class ImportLayoutBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else if (Number(spreadSheet[row][column]) !== 4
-               && Number(spreadSheet[row][column]) !== 8
-               && Number(spreadSheet[row][column] !== 12)) {
+                && Number(spreadSheet[row][column]) !== 8
+                && Number(spreadSheet[row][column] !== 12)) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'a plantadeira deve ser 4,8 ou 12',
                 );
               } else if (spreadSheet[Number(row) - 1][1] === spreadSheet[row][1]
-              && spreadSheet[Number(row) - 1][column] !== spreadSheet[row][column]) {
+                && spreadSheet[Number(row) - 1][column] !== spreadSheet[row][column]) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'a plantadeira precisa ser igual para todo o esquema',
                 );
@@ -138,14 +141,14 @@ export class ImportLayoutBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else if (tiro === 0) {
                 if (spreadSheet[row][column] !== 1) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                     'o tiro precisa começar com 1',
                   );
@@ -160,14 +163,14 @@ export class ImportLayoutBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else {
                 if (tiro === 0) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                     'o campo tiro precisa vir antes que a campo disparo',
                   );
@@ -179,7 +182,7 @@ export class ImportLayoutBlockController {
                 if (tiroXdisparo[spreadSheet[row][1]]?.includes(combinacao)) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                     'a combinacao de tiros e disparos deve ser unica dentro do esquema',
                   );
@@ -192,21 +195,21 @@ export class ImportLayoutBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
-                    Number(column) + 1,
-                    row,
-                    spreadSheet[0][column],
-                  );
+                  Number(column) + 1,
+                  linhaStr,
+                  spreadSheet[0][column],
+                );
               } else if (spreadSheet[row][1] === spreadSheet[Number(row) - 1][1]) {
                 if (sl[spreadSheet[row][1]]?.includes(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                     'o sl não pode se repetir no mesmo esquema',
                   );
@@ -222,21 +225,21 @@ export class ImportLayoutBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
-                    Number(column) + 1,
-                    row,
-                    spreadSheet[0][column],
-                  );
+                  Number(column) + 1,
+                  linhaStr,
+                  spreadSheet[0][column],
+                );
               } else if (spreadSheet[row][1] === spreadSheet[Number(row) - 1][1]) {
                 if (sc[spreadSheet[row][1]]?.includes(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                     'o sc não pode se repetir no mesmo esquema',
                   );
@@ -252,21 +255,21 @@ export class ImportLayoutBlockController {
               if (spreadSheet[row][column] === null || spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else if (typeof (spreadSheet[row][column]) !== 'number' || Number(spreadSheet[row][column]) < 0) {
                 responseIfError[Number(column)]
                   += responsePositiveNumericFactory(
-                    Number(column) + 1,
-                    row,
-                    spreadSheet[0][column],
-                  );
+                  Number(column) + 1,
+                  linhaStr,
+                  spreadSheet[0][column],
+                );
               } else if (spreadSheet[row][1] === spreadSheet[Number(row) - 1][1]) {
                 if (sAloc[spreadSheet[row][1]]?.includes(spreadSheet[row][column])) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
-                    row,
+                    linhaStr,
                     spreadSheet[0][column],
                     'o sAloc não pode se repetir no mesmo esquema',
                   );
@@ -282,16 +285,16 @@ export class ImportLayoutBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else if (spreadSheet[row][column] !== 'A'
-              && spreadSheet[row][column] !== 'B'
-              && spreadSheet[row][column] !== 'C'
-              && spreadSheet[row][column] !== 'D') {
+                && spreadSheet[row][column] !== 'B'
+                && spreadSheet[row][column] !== 'C'
+                && spreadSheet[row][column] !== 'D') {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'o cj precisa ser A, B, C ou D',
                 );
@@ -302,7 +305,7 @@ export class ImportLayoutBlockController {
               if (spreadSheet[row][column] === null || spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else if (typeof spreadSheet[row][column] !== 'number'
@@ -310,7 +313,7 @@ export class ImportLayoutBlockController {
                 && spreadSheet[row][column] < 1) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'o Dist precisa ser um numero de 1 a 9',
                 );
@@ -321,14 +324,14 @@ export class ImportLayoutBlockController {
               if (spreadSheet[row][column] === null || spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else if (spreadSheet[row][column] !== 'A'
-              && spreadSheet[row][column] !== 'V') {
+                && spreadSheet[row][column] !== 'V') {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'o ST precisa ser A ou V',
                 );
@@ -339,7 +342,7 @@ export class ImportLayoutBlockController {
               if (spreadSheet[row][column] === null || spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               }
@@ -349,7 +352,7 @@ export class ImportLayoutBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'a scolheita é obrigatorio',
                 );
@@ -358,7 +361,7 @@ export class ImportLayoutBlockController {
                   if (sColheita[spreadSheet[row][1]]?.includes(spreadSheet[row][column])) {
                     responseIfError[Number(column)] += responseGenericFactory(
                       Number(column) + 1,
-                      row,
+                      linhaStr,
                       spreadSheet[0][column],
                       'o scolheita não pode se repetir no mesmo esquema',
                     );
@@ -375,14 +378,14 @@ export class ImportLayoutBlockController {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                 );
               } else if (spreadSheet[row][column] !== 'P'
-               && spreadSheet[row][column] !== 'V') {
+                && spreadSheet[row][column] !== 'V') {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
-                  row,
+                  linhaStr,
                   spreadSheet[0][column],
                   'no tipo de parcela só é aceitado P ou V',
                 );
@@ -405,9 +408,9 @@ export class ImportLayoutBlockController {
                 if (configModule.response[0]?.fields[column] === 'Esquema') {
                   if (spreadSheet[row][column] !== null) {
                     if ((this.aux.esquema) && this.aux.esquema?.toUpperCase()
-                            !== spreadSheet[row][column]?.toUpperCase()) {
+                      !== spreadSheet[row][column]?.toUpperCase()) {
                       const layoutQuadra: any = await layoutQuadraController.getAll(
-                        { status: 1, idCulture, esquema: spreadSheet[row][column] },
+                        {status: 1, idCulture, esquema: spreadSheet[row][column]},
                       );
                       if (layoutQuadra.total > 0) {
                         this.aux.id_layout_bd = layoutQuadra.response[0]?.id;
@@ -548,27 +551,27 @@ export class ImportLayoutBlockController {
           await logImportController.update({
             id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
           });
-          return { status: 200, message: 'Layout de quadra importado com sucesso' };
+          return {status: 200, message: 'Layout de quadra importado com sucesso'};
         } catch (error: any) {
           await logImportController.update({
             id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
           });
           handleError('Layout de quadra controller', 'Save Import', error.message);
-          return { status: 500, message: 'Erro ao salvar planilha de Layout de quadra' };
+          return {status: 500, message: 'Erro ao salvar planilha de Layout de quadra'};
         }
       }
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
       await logImportController.update({
         id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: responseStringError,
       });
-      return { status: 400, message: responseStringError };
+      return {status: 400, message: responseStringError};
     } catch (error: any) {
       await logImportController.update({
         id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
 
       handleError('Layout de quadra controller', 'Validate Import', error.message);
-      return { status: 500, message: 'Erro ao validar planilha de Layout de quadra' };
+      return {status: 500, message: 'Erro ao validar planilha de Layout de quadra'};
     }
   }
 }

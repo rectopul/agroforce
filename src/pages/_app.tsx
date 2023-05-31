@@ -69,6 +69,19 @@ function App({
     };
   }, [router]);
 
+  useEffect(() => {
+    // Chamar a função initializePermissions aqui
+    //initializePermissions();
+    
+    // se autorizado, chamar a função initializePermissions
+    if (authorized)
+      userService.initializePermissionsCall().then(r => {});
+
+    // Resto do código do useEffect
+
+  }, []); // Usar um array vazio para que a função seja chamada apenas uma vez no início
+
+
   return (
     <PermissionGate
       permissions={['canEdit', 'canDelete', 'canSave']}

@@ -15,7 +15,7 @@ import { Content } from "../../../components/Content";
 import {assayListService, profileService} from "../../../services";
 import ComponentLoading from '../../../components/Loading';
 import headerTableFactoryGlobal from "../../../shared/utils/headerTableFactory";
-import { perm_can_do } from "../../../shared/utils/perm_can_do";
+import {perm_can_do} from "../../../shared/utils/perm_can_do";
 import {BsTrashFill} from "react-icons/bs";
 import {AccordionFilter, FieldItemsPerPage, Input, ModalConfirmation, Select} from "../../../components";
 import { useFormik } from 'formik';
@@ -227,10 +227,12 @@ export default function Perfis({
       filterPlaceholder: "Filtrar por status",
       render: (rowData: any) => (
         <div className="h-8 flex">
-          <div className="h-7 mr-3">
+          <div className="h-7 mr-3" 
+               style={{ display: (rowData.id == 1)? 'none' : '' }}>
             <Button
               icon={<BsTrashFill size={14}/>}
-              style={{display: (!perm_can_do('/perfil/perfis', 'delete')) ? 'none' : ''}}
+              style={{
+                display: (!perm_can_do('/perfil/perfis', 'delete')) ? 'none' : ''}}
               title="Excluir perfil"
               onClick={() => {
                 if (rowData?.users_permissions?.length > 0) {
@@ -245,12 +247,13 @@ export default function Perfis({
               textColor="white"
             />
           </div>
-          <div className="h-7">
+          <div className="h-7"
+               style={{ display: (rowData.id == 1)? 'none' : '' }}>
             <Button
               icon={<BiEdit size={14} />}
               title={`Atualizar ${rowData.name}`}
               style={{
-                display: !perm_can_do("/perfil/perfis", "edit") ? "none" : "",
+                display: (!perm_can_do("/perfil/perfis", "edit") || rowData.id == 1) ? "none" : "",
               }}
               onClick={() => {
                 setCookies('pageBeforeEdit', currentPage?.toString());
@@ -269,7 +272,7 @@ export default function Perfis({
               textColor="white"
             />
           </div>
-          <div className="h-7 ml-3">
+          <div className="h-7 ml-3" style={{ marginLeft: (rowData.id == 1)? '99px !important' : '' }}>
             <Button
               value="Permissões"
               title={`Permissões de ${rowData.name}`}
