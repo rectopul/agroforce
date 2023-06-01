@@ -101,7 +101,10 @@ export class ImportAssayListController {
 
       spreadSheet.unshift(header);
       for (const row in spreadSheet) {
-        let linhaStr = String(Number(row) + 1);
+        //const linhaStr = String(Number(row) + 1);
+        const linhaStr = spreadSheet[row][spreadSheet[row].length - 1] + 1;
+        
+        console.log('linhaStr', linhaStr);
         if (row !== '0') {
           if (spreadSheet.length > 2) {
             if (spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]
