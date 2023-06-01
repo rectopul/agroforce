@@ -277,7 +277,7 @@ export default function Perfis({
               value="Permissões"
               title={`Permissões de ${rowData.name}`}
               style={{
-                display: !perm_can_do("/perfil/perfis", "permissions")
+                display: (!perm_can_do("/perfil/perfis", "permissions") || rowData.id == 1)
                   ? "none"
                   : "",
               }}
