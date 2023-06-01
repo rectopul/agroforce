@@ -14,7 +14,7 @@ export function validateProtocolLevel(data: any) {
   const protocolLevel = data[1][0];
   const message: Array<String> = newData.map((item: any, index: number) => {
     if (item[0] !== protocolLevel && index !== 0) {
-      return `<li style="text-align:left"> A ${index}ª linha esta incorreta, o protocol level tem que ser igual em toda planilha. </li> <br>`;
+      return `<li style="text-align:left"> A ${index + 1}ª linha esta incorreta, o protocol level tem que ser igual em toda planilha. </li> <br>`;
     }
   });
   const responseStringError = message.join('').replace(/undefined/g, '');
