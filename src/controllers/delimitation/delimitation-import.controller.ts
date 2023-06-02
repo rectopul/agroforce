@@ -66,6 +66,10 @@ export class ImportDelimitationController {
     const delineamentoController = new DelineamentoController();
 
     const responseIfError: Array<string> = [];
+
+    // armazena num array os valores de DELI e ORDEM como chave composta, para verificar se já existe na spreadsheet
+    const arrayChaveComposta: Array<string> = [];
+    
     try {
       const configModule: object | any = await importController.getAll(7);
       for (const row in spreadSheet) {
@@ -119,6 +123,16 @@ export class ImportDelimitationController {
                 },
               );
 
+              // if (delineamento?.length === 0) {
+              //   responseIfError[Number(column)]
+              //     += responseGenericFactory(
+              //     (Number(column) + 1),
+              //     linhaStr,
+              //     spreadSheet[0][column],
+              //     'informado não existe no sistema.',
+              //   );
+              // }
+              
               if (delineamento.total > 0) {
                 // o tipo de erro muda de acordo com o status do delineamento
                 if (delineamento.response[0]?.status === 1) {
@@ -136,10 +150,9 @@ export class ImportDelimitationController {
                     ` ${valorDELI} nome do delineamento já cadastrado, porém está inativo`,
                   );
                 }
-
               }
             }
-
+            
             if (configModule.response[0]?.fields[column] === 'Repeticao') {
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)] += responseNullFactory(
@@ -200,6 +213,9 @@ export class ImportDelimitationController {
                 }
               }
             }
+            
+            // A 4º coluna da 4º linha está incorreta, o campo ORDEM tem chave composta de DELI e ORDEM e não pode se repetir;
+            // A 4º coluna da 4º linha está incorreta, o campo ORDEM, os campos DELI e ORDEM e não podem se repetir, pois são chave composta da tabela;
 
             if (configModule.response[0]?.fields[column] === 'Sorteio') {
               if (spreadSheet[row][column] === null) {
@@ -217,8 +233,28 @@ export class ImportDelimitationController {
                   linhaStr,
                   spreadSheet[0][column],
                 );
-              } else if (spreadSheet[Number(row) - 1][1]
-                !== spreadSheet[row][1]
+              } 
+              
+              let valorDELI = spreadSheet[row][1];
+              let valorSorteio = spreadSheet[row][column];
+              
+              if (arrayChaveComposta.length > 0) {
+                // verifica se existe valores repetidos no array
+                if (arrayChaveComposta.includes(`${valorDELI}__${valorSorteio}`)) {
+                  responseIfError[Number(column)]
+                    += responseGenericFactory(
+                    (Number(column) + 1),
+                    linhaStr,
+                    spreadSheet[0][column],
+                    //'o sorteio não pode se repetir',
+                    'não pode repetir no mesmo DELI, pois são chave composta da tabela'
+                  );
+                }
+              }
+
+              arrayChaveComposta.push(`${valorDELI}__${valorSorteio}`);
+              
+              if (spreadSheet[Number(row) - 1][1] !== spreadSheet[row][1]
                 || row === '1') {
                 if (spreadSheet[row][column] !== 1) {
                   responseIfError[Number(column)]
