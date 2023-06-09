@@ -208,7 +208,7 @@ export class ImportDelimitationController {
                     (Number(column) + 1),
                     linhaStr,
                     spreadSheet[0][column],
-                    'o sorteio deve começar em 1',
+                    'o sorteio deve começar em 1. Favor conferir ordenação dos dados',
                   );
                 }
               }
@@ -262,7 +262,7 @@ export class ImportDelimitationController {
                     (Number(column) + 1),
                     linhaStr,
                     spreadSheet[0][column],
-                    'o sorteio deve começar em 1',
+                    'o sorteio deve começar em 1. Favor conferir ordenação dos dados',
                   );
                 }
               } else if (spreadSheet[Number(row) - 1][column]
