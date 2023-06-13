@@ -320,7 +320,7 @@ export class ImportDelimitationController {
         }
       }
 
-      if (responseIfError.length === 0 && false) {
+      if (responseIfError.length === 0) {
         return this.storeRecords(idLog, {
           spreadSheet, idSafra, idCulture, created_by: createdBy,
         });
