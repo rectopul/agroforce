@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 import { ButtonAside } from './ButtonAside';
 import { asidePermissions } from '../../shared/utils/perm_can_do';
 
-const versionApp = '0.0.48.0';
+const versionApp = '0.0.49.0';
 
 export function Aside({ moduloActive }: any) {
   

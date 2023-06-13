@@ -78,6 +78,7 @@ export class ImportDelimitationController {
 
         if (row !== '0') {
           for (const column in spreadSheet[row]) {
+            
             if (configModule.response[0]?.fields[column] === 'Cultura') {
               if (spreadSheet[row][column] !== null) {
                 const {
@@ -184,6 +185,13 @@ export class ImportDelimitationController {
             }
 
             if (configModule.response[0]?.fields[column] === 'Tratamento') {
+              
+              let v1 = spreadSheet[Number(row) - 1][column]; // valor da linha anterior: 1
+              let v2 = (spreadSheet[Number(row)][column]); // valor da linha atual: 5
+              
+              // se o valor da anterior é igual a atual - 1 ou igual a atual
+              let condicao = !(v1 === v2 - 1 || v1 === v2);
+              
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory(
@@ -199,7 +207,8 @@ export class ImportDelimitationController {
                   linhaStr,
                   spreadSheet[0][column],
                 );
-              } else if (spreadSheet[Number(row) - 1][1]
+              } 
+              else if (spreadSheet[Number(row) - 1][1]
                 !== spreadSheet[row][1]
                 || row === '1') {
                 if (spreadSheet[row][column] !== 1) {
@@ -211,7 +220,18 @@ export class ImportDelimitationController {
                     'o sorteio deve começar em 1. Favor conferir ordenação dos dados',
                   );
                 }
+              } else 
+                if (condicao) {
+                //if (spreadSheet[Number(row) - 1][column] !== (spreadSheet[row][column] - 1)) {
+                responseIfError[Number(column)]
+                  += responseGenericFactory(
+                  (Number(column) + 1),
+                  linhaStr,
+                  spreadSheet[0][column],
+                  'o Tratamento (NT) deve ser sequencial',
+                );
               }
+              console.log('v1:', v1, 'v2:', v2, 'condicao', condicao);
             }
             
             // A 4º coluna da 4º linha está incorreta, o campo ORDEM tem chave composta de DELI e ORDEM e não pode se repetir;
@@ -300,7 +320,7 @@ export class ImportDelimitationController {
         }
       }
 
-      if (responseIfError.length === 0) {
+      if (responseIfError.length === 0 && false) {
         return this.storeRecords(idLog, {
           spreadSheet, idSafra, idCulture, created_by: createdBy,
         });
