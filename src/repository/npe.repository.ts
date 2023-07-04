@@ -1,5 +1,6 @@
 import { prisma } from '../pages/api/db/db';
 import { BaseRepository } from './base-repository';
+import handleError from "../shared/utils/handleError";
 
 export class NpeRepository extends BaseRepository {
   async findOne(id: number) {
@@ -46,14 +47,22 @@ export class NpeRepository extends BaseRepository {
   }
 
   async update(id: number, data: Object) {
-    const result = await prisma.npe.update({
-      where: {
-        id,
-      },
-      data,
-    });
+    
+    try{
+      const result = await prisma.npe.update({
+        where: {
+          id,
+        },
+        data,
+      });
+      return result;
+    }catch (e:any){
+      handleError('NPE Repository', 'update', e.message);
+      //throw new Error('[Repository][NPE] - update erro: ' + JSON.stringify(error));
+      throw e;
+    }
 
-    return result;
+    
   }
 
   async queryRaw(query: any) {
