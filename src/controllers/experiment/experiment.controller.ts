@@ -477,10 +477,36 @@ export class ExperimentController {
     const npeController = new NpeController();
     const genotypeTreatment = new GenotypeTreatmentController();
     try {
-      const experimentGenotipeController = new ExperimentGenotipeController();
+
       const { response: experimentExist }: any = await this.getOne(Number(data.id));
-      if (!experimentExist) return { status: 404, message: 'Experimento não encontrado' };
-      if (experimentExist?.status === 'PARCIALMENTE ALOCADO' || experimentExist?.status === 'TOTALMENTE  ALOCADO') return { status: 400, message: 'Não é possível deletar.' };
+
+      /*const { response: ambiente2 } = await npeController.getAll({
+        safraId: experimentExist?.idSafra,
+        localId: experimentExist?.idLocal,
+        focoId: experimentExist?.assay_list?.foco?.id,
+        epoca: experimentExist?.period,
+        filterCodTecnologia: experimentExist?.assay_list?.tecnologia?.cod_tec,
+        typeAssayId: experimentExist?.assay_list?.type_assay?.id,
+      });
+
+      await npeController.update({
+        id: ambiente2[0]?.id,
+        status: 1,
+        edited: 0,
+      });
+      
+      console.log('ambiente2', ambiente2);
+      
+      return { status: 404, message: 'Experimento não encontrado' };*/
+      
+      const experimentGenotipeController = new ExperimentGenotipeController();
+      
+      if (!experimentExist)
+        return { status: 404, message: 'Experimento não encontrado' };
+
+      if (experimentExist?.status === 'PARCIALMENTE ALOCADO' || experimentExist?.status === 'TOTALMENTE  ALOCADO')
+        return { status: 400, message: 'Não é possível deletar.' };
+      
       const { status } = await experimentGenotipeController.deleteAll(data.id);
 
       if (status === 200) {
@@ -532,6 +558,7 @@ export class ExperimentController {
         if (ambiente.length > 0 && experiment.length === 0) {
           await npeController.update({
             id: ambiente[0]?.id,
+            userId: data.userId,
             status: 1,
             edited: 0,
           });

@@ -1,4 +1,7 @@
 import { prisma } from '../pages/api/db/db';
+import handleError from "../shared/utils/handleError";
+import {instanceOf} from "prop-types";
+import {Prisma} from "@prisma/client";
 
 export class ReporteRepository {
   async findOne(id: number) {
@@ -31,8 +34,14 @@ export class ReporteRepository {
   }
 
   async create(data: any) {
-    const reporte = await prisma.reportes.create({ data });
-    return reporte;
+    try {
+      const reporte = await prisma.reportes.create({data});
+      return reporte;
+    } catch (e:any) {
+      e.data = data;
+      handleError('[Histórico de impressão Repository][report] Create error', 'create', e.message, e);
+      throw e;
+    }
   }
 
   async update(id: number, data: any) {

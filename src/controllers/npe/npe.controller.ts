@@ -457,7 +457,7 @@ export class NpeController {
           return { status: 200, message: 'Npe atualizada' };
         } catch (error: any) {
           handleError('NPE Controller', 'Update', error.message);
-          throw new Error('[Controller] - Update NPE erro');
+          throw new Error('[Controller] - Update NPE erro: ' + JSON.stringify(data));
         }
       }
       const npeExist = await this.getOne(data.id);
@@ -469,7 +469,7 @@ export class NpeController {
       return { status: 400, response: [], message: { message: 'NPE não foi atualizada' } };
     } catch (error: any) {
       handleError('NPE Controller', 'Update', error.message);
-      throw new Error('[Controller] - Update NPE erro');
+      throw new Error('[Controller] - Update NPE erro: '+ error.message);
     }
   }
 

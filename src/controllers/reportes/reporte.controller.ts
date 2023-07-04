@@ -41,7 +41,7 @@ export class ReporteController {
       await this.reporteRepository.create(data);
     } catch (error: any) {
       handleError('Histórico de impressão Controller', 'Create', error.message);
-      throw new Error('[Controller] - Create Histórico de impressão erro');
+      throw new Error('[Controller] - Create Histórico de impressão - error: '+error.message);
     }
   }
 
