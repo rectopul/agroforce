@@ -43,16 +43,6 @@ export class ExperimentGenotipeRepository extends BaseRepository {
     return result;
   }
   
-  async deleteAllDeprecated(idExperiment: number) {
-    
-    const result = await this.getPrisma().experiment_genotipe.deleteMany({
-      where: {
-        idExperiment,
-      },
-    });
-    return result;
-  }
-
   async countTags(parameters: any) {
     parameters.status = 'EM ETIQUETAGEM';
     const tagsToPrint = await prisma.experiment_genotipe.count({ where: parameters });

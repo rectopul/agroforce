@@ -484,47 +484,44 @@ export class ExperimentController {
 
     const npeController = new NpeController();
     const genotypeTreatment = new GenotypeTreatmentController();
-    
+
     const experimentGenotipeRepository = new ExperimentGenotipeRepository();
 
     const transactionConfig = new TransactionConfig();
 
     const experimentGenotipeController = new ExperimentGenotipeController();
-    
+
     this.experimentRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
 
     experimentGenotipeRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
-    
+
     experimentGenotipeController.setTransactionController(transactionConfig.clientManager, transactionConfig.transactionScope);
 
     try {
 
-      //const returnTransaction: any = await prisma.$transaction(async (prisma) => {
-      const returnTransaction: any = await transactionConfig.transactionScope.run(async () => {
+      const returnTransaction: any = await new Promise(async (resolve, reject) => {
+        try {
+          await transactionConfig.transactionScope.run(async () => {
+            const { response: experimentExist }: any = await this.getOne(Number(data.id));
 
-        return new Promise(async (resolve, reject) => {
+            if (!experimentExist) {
+              return resolve({ status: 404, message: 'Experimento não encontrado' });
+            }
 
-          try {
-            const {response: experimentExist}: any = await this.getOne(Number(data.id));
+            if (experimentExist?.status === 'PARCIALMENTE ALOCADO' || experimentExist?.status === 'TOTALMENTE  ALOCADO') {
+              return resolve({ status: 400, message: 'Não é possível deletar.' });
+            }
 
-            if (!experimentExist)
-              return {status: 404, message: 'Experimento não encontrado'};
-
-            if (experimentExist?.status === 'PARCIALMENTE ALOCADO' || experimentExist?.status === 'TOTALMENTE  ALOCADO')
-              return {status: 400, message: 'Não é possível deletar.'};
-
-            const {status} = await experimentGenotipeController.deleteAllTransaction(Number(data.id));
-
-            //const responseEG = await experimentGenotipeRepository.deleteAllTransaction(Number(data.id));
-            //console.log('responseEG', responseEG);
+            const { status } = await experimentGenotipeController.deleteAllTransaction(Number(data.id));
 
             if (status === 200) {
-
-              //const response = await this.experimentRepository.delete(Number(data.id));
               const response = await this.experimentRepository.deleteTransaction(Number(data.id));
 
               if (response) {
-                const {ip} = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+                const { ip } = await fetch('https://api.ipify.org/?format=json')
+                  .then((results) => results.json())
+                  .catch(() => '0.0.0.0');
+
                 await this.reporteController.create({
                   userId: data.userId,
                   module: 'EXPERIMENTO',
@@ -533,17 +530,17 @@ export class ExperimentController {
                   ip: String(ip),
                 });
               }
-              const {response: assayList} = await this.assayListController.getOne(Number(experimentExist?.idAssayList));
 
-              // filter experiments with status 'IMPORTADO'
+              const { response: assayList } = await this.assayListController.getOne(Number(experimentExist?.idAssayList));
+
               const experiments_importeds = assayList?.experiment.filter((experiment: any) => experiment.status === 'IMPORTADO');
 
-              // if there are only experiments in 'IMPORTED' status or have no experiments, change status assayList to 'IMPORTADO' AND change status genotype_treatment to 'IMPORTADO'
               if (experiments_importeds?.length === assayList?.experiment.length || !assayList?.experiment.length) {
                 await this.assayListController.update({
                   id: experimentExist?.idAssayList,
                   status: 'IMPORTADO',
                 });
+
                 assayList?.genotype_treatment.map(async (treatment: any) => {
                   await genotypeTreatment.update({
                     id: treatment.id,
@@ -552,7 +549,7 @@ export class ExperimentController {
                 });
               }
 
-              const {response: ambiente} = await npeController.getAll({
+              const { response: ambiente } = await npeController.getAll({
                 safraId: experimentExist?.idSafra,
                 localId: experimentExist?.idLocal,
                 focoId: experimentExist?.assay_list?.foco?.id,
@@ -561,7 +558,7 @@ export class ExperimentController {
                 typeAssayId: experimentExist?.assay_list?.type_assay?.id,
               });
 
-              const {response: experiment} = await this.getAll({
+              const { response: experiment } = await this.getAll({
                 idSafra: experimentExist?.idSafra,
                 idLocal: experimentExist?.idLocal,
                 Foco: experimentExist?.assay_list?.foco?.id,
@@ -571,7 +568,6 @@ export class ExperimentController {
                 importValidate: true,
               });
 
-              // se não houver experimentos com o mesmo ambiente, alterar status do ambiente para 1
               if (ambiente.length > 0 && experiment.length === 0) {
                 await npeController.update({
                   id: ambiente[0]?.id,
@@ -580,33 +576,24 @@ export class ExperimentController {
                   edited: 0,
                 });
               }
-
-              // simulando um erro qualquer
-              throw new Error('Erro simulado');
-
+              
               resolve({ status: 200, message: 'Experimento excluído' });
-
-            }
-            else {
+            } else {
               reject({ status: 404, message: 'Experimento não excluído' });
             }
-          } catch (error:any) {
-            handleError('Experimento controller', 'Delete', error.message, error);
-            reject(new Error('[Controller] - Delete Experimento erro: ' + error.message));
-          }
-          
-        });
-        
+          });
+        } catch (error: any) {
+          handleError('Experimento transaction', 'Delete', error.message, error);
+          reject(new Error('[transaction] - Delete Experimento erro: ' + error.message));
+        }
       });
-      
-      /*const returnTransaction:any = await transactionConfig.transactionScope.run(async () => {
-      });*/
 
       console.log('returnTransaction', returnTransaction);
       
-      return {status: 200, message: 'Experimento excluído'};
-      
+      return returnTransaction;
+
     } catch (error: any) {
+      console.log('error: ', error);
       handleError('Experimento controller', 'Delete', error.message, error);
       throw new Error('[Controller] - Delete Experimento erro: '+ error.message);
     } finally {
@@ -614,209 +601,6 @@ export class ExperimentController {
     }
   }
   
-  async delete3(data: any) {
-    const returnTransaction: any = await transactionConfig.transactionScope.run(async () => {
-      return new Promise(async (resolve, reject) => {
-        try {
-          const { response: experimentExist }: any = await this.getOne(Number(data.id));
-
-          if (!experimentExist) {
-            resolve({ status: 404, message: 'Experimento não encontrado' });
-          }
-
-          if (
-            experimentExist?.status === 'PARCIALMENTE ALOCADO' ||
-            experimentExist?.status === 'TOTALMENTE  ALOCADO'
-          ) {
-            resolve({ status: 400, message: 'Não é possível deletar.' });
-          }
-
-          const { status } = await experimentGenotipeController.deleteAllTransaction(Number(data.id));
-
-          if (status === 200) {
-            const response = await this.experimentRepository.deleteTransaction(Number(data.id));
-
-            if (response) {
-              const { ip } = await fetch('https://api.ipify.org/?format=json')
-                .then((results) => results.json())
-                .catch(() => '0.0.0.0');
-
-              await this.reporteController.create({
-                userId: data.userId,
-                module: 'EXPERIMENTO',
-                operation: 'EXCLUSÃO',
-                oldValue: response.experimentName,
-                ip: String(ip),
-              });
-            }
-
-            const { response: assayList } = await this.assayListController.getOne(
-              Number(experimentExist?.idAssayList)
-            );
-
-            const experiments_importeds = assayList?.experiment.filter(
-              (experiment: any) => experiment.status === 'IMPORTADO'
-            );
-
-            if (experiments_importeds?.length === assayList?.experiment.length || !assayList?.experiment.length) {
-              await this.assayListController.update({
-                id: experimentExist?.idAssayList,
-                status: 'IMPORTADO',
-              });
-
-              assayList?.genotype_treatment.map(async (treatment: any) => {
-                await genotypeTreatment.update({
-                  id: treatment.id,
-                  status_experiment: 'IMPORTADO',
-                });
-              });
-            }
-
-            const { response: ambiente } = await npeController.getAll({
-              safraId: experimentExist?.idSafra,
-              localId: experimentExist?.idLocal,
-              focoId: experimentExist?.assay_list?.foco?.id,
-              epoca: experimentExist?.period,
-              filterCodTecnologia: experimentExist?.assay_list?.tecnologia?.cod_tec,
-              typeAssayId: experimentExist?.assay_list?.type_assay?.id,
-            });
-
-            const { response: experiment } = await this.getAll({
-              idSafra: experimentExist?.idSafra,
-              idLocal: experimentExist?.idLocal,
-              Foco: experimentExist?.assay_list?.foco?.id,
-              Epoca: experimentExist?.period,
-              Tecnologia: experimentExist?.assay_list?.tecnologia?.cod_tec,
-              TypeAssay: experimentExist?.assay_list?.type_assay?.id,
-              importValidate: true,
-            });
-
-            if (ambiente.length > 0 && experiment.length === 0) {
-              await npeController.update({
-                id: ambiente[0]?.id,
-                userId: data.userId,
-                status: 1,
-                edited: 0,
-              });
-            }
-
-            resolve({ status: 200, message: 'Experimento excluído' });
-          } else {
-            reject({ status: 404, message: 'Experimento não excluído' });
-          }
-        } catch (error) {
-          handleError('Experimento controller', 'Delete', error.message, error);
-          reject(new Error('[Controller] - Delete Experimento erro: ' + error.message));
-        }
-      });
-    });
-  }
-
-  async delete2(data: any) {
-
-    const prisma = new PrismaClient();
-    
-    const npeController = new NpeController();
-    const genotypeTreatment = new GenotypeTreatmentController();
-
-    const transactionConfig = new TransactionConfig();
-
-    this.experimentRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
-    
-    try {
-
-      /*await prisma.$transaction(async (prisma) => {
-      });*/
-
-      const returnTransaction:any = await transactionConfig.transactionScope.run(async () => {
-
-        const { response: experimentExist }: any = await this.getOne(Number(data.id));
-
-        const experimentGenotipeController = new ExperimentGenotipeController();
-
-        if (!experimentExist)
-          return { status: 404, message: 'Experimento não encontrado' };
-
-        if (experimentExist?.status === 'PARCIALMENTE ALOCADO' || experimentExist?.status === 'TOTALMENTE  ALOCADO')
-          return { status: 400, message: 'Não é possível deletar.' };
-
-        const { status } = await experimentGenotipeController.deleteAll(data.id);
-
-        if (status === 200) {
-          
-          //const response = await this.experimentRepository.delete(Number(data.id));
-          const response = await this.experimentRepository.deleteTransaction(Number(data.id));
-          
-          if (response) {
-            const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-            await this.reporteController.create({
-              userId: data.userId, module: 'EXPERIMENTO', operation: 'EXCLUSÃO', oldValue: response.experimentName, ip: String(ip),
-            });
-          }
-          const { response: assayList } = await this.assayListController.getOne(Number(experimentExist?.idAssayList));
-
-          // filter experiments with status 'IMPORTADO'
-          const experiments_importeds = assayList?.experiment.filter((experiment: any) => experiment.status === 'IMPORTADO');
-
-          // if there are only experiments in 'IMPORTED' status or have no experiments, change status assayList to 'IMPORTADO' AND change status genotype_treatment to 'IMPORTADO'
-          if (experiments_importeds?.length === assayList?.experiment.length || !assayList?.experiment.length) {
-            await this.assayListController.update({
-              id: experimentExist?.idAssayList,
-              status: 'IMPORTADO',
-            });
-            assayList?.genotype_treatment.map(async (treatment: any) => {
-              await genotypeTreatment.update({
-                id: treatment.id,
-                status_experiment: 'IMPORTADO',
-              });
-            });
-          }
-
-          const { response: ambiente } = await npeController.getAll({
-            safraId: experimentExist?.idSafra,
-            localId: experimentExist?.idLocal,
-            focoId: experimentExist?.assay_list?.foco?.id,
-            epoca: experimentExist?.period,
-            filterCodTecnologia: experimentExist?.assay_list?.tecnologia?.cod_tec,
-            typeAssayId: experimentExist?.assay_list?.type_assay?.id,
-          });
-
-          const { response: experiment } = await this.getAll({
-            idSafra: experimentExist?.idSafra,
-            idLocal: experimentExist?.idLocal,
-            Foco: experimentExist?.assay_list?.foco?.id,
-            Epoca: experimentExist?.period,
-            Tecnologia: experimentExist?.assay_list?.tecnologia?.cod_tec,
-            TypeAssay: experimentExist?.assay_list?.type_assay?.id,
-            importValidate: true,
-          });
-
-          // se não houver experimentos com o mesmo ambiente, alterar status do ambiente para 1
-          if (ambiente.length > 0 && experiment.length === 0) {
-            await npeController.update({
-              id: ambiente[0]?.id,
-              userId: data.userId,
-              status: 1,
-              edited: 0,
-            });
-          }
-
-          if (response) {
-            return { status: 200, message: 'Experimento excluído' };
-          }
-        }
-        
-      });
-      
-      console.log('returnTransaction', returnTransaction);
-      
-      return { status: 404, message: 'Experimento não excluído' };
-    } catch (error: any) {
-      handleError('Experimento controller', 'Delete', error.message, error);
-      throw new Error('[Controller] - Delete Experimento erro: '+ error.message);
-    }
-  }
-
   async countExperimentGroupChildren(id: number) {
     const experimentGroupController = new ExperimentGroupController();
     const { response }: IReturnObject = await experimentGroupController.getOne(id);

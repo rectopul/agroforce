@@ -805,7 +805,8 @@ export class ImportExperimentController {
         id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
       });
       return {status: 200, message: 'Experimento importado com sucesso'};
-    } catch (error: any) {
+    } 
+    catch (error: any) {
       await logImportController.update({
         id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
