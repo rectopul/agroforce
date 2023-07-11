@@ -497,6 +497,7 @@ export class ImportLayoutBlockController {
                     this.aux.tipo_parcela = spreadSheet[row][column];
                   }
                 }
+                
                 if (spreadSheet[row].length === (Number(column) + 1) && this.aux !== []) {
                   if (count === 1) {
                     if (this.aux.id_layout_bd) {
@@ -552,7 +553,8 @@ export class ImportLayoutBlockController {
             id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
           });
           return {status: 200, message: 'Layout de quadra importado com sucesso'};
-        } catch (error: any) {
+        } 
+        catch (error: any) {
           await logImportController.update({
             id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
           });

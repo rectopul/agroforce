@@ -35,7 +35,17 @@ export class ExperimentGenotipeRepository extends BaseRepository {
   }
 
   async deleteAll(idExperiment: number) {
-    const result = await prisma.experiment_genotipe.deleteMany({
+    const result = this.getPrisma().experiment_genotipe.deleteMany({
+      where: {
+        idExperiment,
+      },
+    });
+    return result;
+  }
+  
+  async deleteAllDeprecated(idExperiment: number) {
+    
+    const result = await this.getPrisma().experiment_genotipe.deleteMany({
       where: {
         idExperiment,
       },

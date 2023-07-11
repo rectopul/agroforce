@@ -14,6 +14,8 @@ import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 import { prisma } from '../pages/api/db/db';
 import { NpeController } from './npe/npe.controller';
+import {PrismaClientManager} from "../shared/prisma/prismaClientManager";
+import {TransactionScope} from "../shared/prisma/transactionScope";
 
 export class ExperimentGenotipeController {
   private ExperimentGenotipeRepository = new ExperimentGenotipeRepository();
@@ -452,6 +454,10 @@ export class ExperimentGenotipeController {
       throw new Error('[Controller] - GetAll Parcelas erro');
     }
   }
+  
+  setTransactionController(clientManager: PrismaClientManager, transactionScope: TransactionScope) {
+    this.ExperimentGenotipeRepository.setTransaction(clientManager, transactionScope);
+  }
 
   async getLastNpeDisponible(options: {
     safraId: number;
@@ -699,13 +705,55 @@ export class ExperimentGenotipeController {
     }
   }
 
-  async deleteAll(idExperiment: number) {
+
+  async deleteAllTransaction(idExperiment: number) {
     try {
-      const response = await this.ExperimentGenotipeRepository.deleteAll(Number(idExperiment));
+      return this.ExperimentGenotipeRepository.deleteAllTransaction(Number(idExperiment))
+        .then((responseTransaction) => {
+          console.log('responseTransaction', responseTransaction);
+          if (responseTransaction !== undefined) {
+            return { status: 200, message: 'Parcelas excluídos' };
+          } else {
+            return { status: 400, message: 'Erro ao excluir parcelas' };
+          }
+        })
+        .catch((error: any) => {
+          handleError('Parcelas controller', 'DeleteAllTransaction', error.message);
+          throw new Error('[Controller] - DeleteAllTransaction Parcelas erro: ' + error.message);
+        });
+    } catch (error: any) {
+      handleError('Parcelas controller', 'DeleteAllTransaction', error.message);
+      throw new Error('[Controller] - DeleteAllTransaction Parcelas erro: ' + error.message);
+    }
+  }
+  
+  async deleteAllTransactionOld(idExperiment: number) {
+    try {
+
+      const responseTransaction = await this.ExperimentGenotipeRepository.deleteAllTransaction(Number(idExperiment));
+      console.log('responseTransaction', responseTransaction);
+      if (responseTransaction !== undefined) {
+        return { status: 200, message: 'Parcelas excluídos' };
+      } else {
+        return { status: 400, message: 'Erro ao excluir parcelas' };
+      }
+      
+    } catch (error: any) {
+      handleError('Parcelas controller', 'DeleteAllTransaction', error.message);
+      throw new Error('[Controller] - DeleteAllTransaction Parcelas erro: '+ error.message);
+    }
+  }
+  
+  async deleteAll(data:any) {
+    try {
+      console.log('data', data);
+      const response = await this.ExperimentGenotipeRepository.deleteAll(data);
       if (response) {
         return { status: 200, message: 'Parcelas excluídos' };
       }
+      
       return { status: 400, message: 'Erro ao excluir parcelas' };
+      
     } catch (error: any) {
       handleError('Parcelas controller', 'DeleteAll', error.message);
       throw new Error('[Controller] - DeleteAll Parcelas erro');
