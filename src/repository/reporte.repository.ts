@@ -2,8 +2,9 @@ import { prisma } from '../pages/api/db/db';
 import handleError from "../shared/utils/handleError";
 import {instanceOf} from "prop-types";
 import {Prisma} from "@prisma/client";
+import {BaseRepository} from "./base-repository";
 
-export class ReporteRepository {
+export class ReporteRepository extends BaseRepository {
   async findOne(id: number) {
     const result = await prisma.reportes.findUnique({
       where: { id },
@@ -35,7 +36,7 @@ export class ReporteRepository {
 
   async create(data: any) {
     try {
-      const reporte = await prisma.reportes.create({data});
+      const reporte = await this.getPrisma().reportes.create({data});
       return reporte;
     } catch (e:any) {
       e.data = data;

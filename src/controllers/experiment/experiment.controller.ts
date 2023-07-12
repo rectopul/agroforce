@@ -24,6 +24,8 @@ export class ExperimentController {
   reporteController = new ReporteController();
 
   async getAll(options: any) {
+
+    const prisma = new PrismaClient();
     const parameters: object | any = {};
     const equalsOrContains = options.importValidate ? 'equals' : 'contains';
     let orderBy: object | any;
@@ -336,6 +338,8 @@ export class ExperimentController {
       handleError('Experimento controller', 'GetAll', `${error.message} - ${JSON.stringify(parameters)}`);
       // throw new Error({name: 'teste', message: '[Controller] - GetAll Experimento erro: ', stack: error.message});
       throw new Error(`[Controller] - GetAll Experimento erro: \r\n${error.message}`);
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -584,7 +588,8 @@ export class ExperimentController {
           });
         } catch (error: any) {
           handleError('Experimento transaction', 'Delete', error.message, error);
-          reject(new Error('[transaction] - Delete Experimento erro: ' + error.message));
+          //reject(new Error('[transaction] - Delete Experimento erro: ' + error.message));
+          reject({status: 404, message : `[experiment][transaction] - Erro ao excluir experimento - ${data.id} - [${error.message}]`});
         }
       });
 
