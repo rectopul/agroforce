@@ -3,10 +3,11 @@ import { TransactionScope } from '../shared/prisma/transactionScope';
 import {prisma, prisma as primaDB} from '../pages/api/db/db';
 
 export class BaseRepository {
-  protected clientManager: any;
-
-  protected transactionScope: any;
-
+  
+  protected clientManager: PrismaClientManager | null = null;
+  
+  protected transactionScope: TransactionScope | null = null;
+  
   setTransaction(clientManager: PrismaClientManager, transactionScope: TransactionScope) {
     this.clientManager = clientManager;
     this.transactionScope = transactionScope;
@@ -24,8 +25,8 @@ export class BaseRepository {
     return data;
   }
 
-  async delete(id: number) {
-    return id;
+  async delete(id: number): Promise<any> {
+    return {};
   }
   
   async deleteAll(data: any) {
@@ -33,6 +34,7 @@ export class BaseRepository {
   }
 
   getPrisma() {
+    console.log('(this.clientManager)', (this.clientManager));
     return (this.clientManager) ? this.clientManager.getClient() : primaDB;
   }
 

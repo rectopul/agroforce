@@ -10,9 +10,12 @@ import { ExperimentController } from '../experiment/experiment.controller';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
 import { ReporteController } from '../reportes/reporte.controller';
+import {PrismaClientManager} from "../../shared/prisma/prismaClientManager";
+import {TransactionScope} from "../../shared/prisma/transactionScope";
+import {BaseController} from "../base.controller";
 // import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
-export class NpeController {
+export class NpeController extends BaseController {
   npeRepository = new NpeRepository();
 
   groupController = new GroupController();
@@ -22,6 +25,13 @@ export class NpeController {
   experimentGenotipe = new ExperimentGenotipeController();
 
   reporteController = new ReporteController();
+
+  setTransactionController(clientManager: PrismaClientManager, transactionScope: TransactionScope) {
+    this.setTransactioned(true);
+    this.setTransaction(clientManager, transactionScope);
+    this.npeRepository.setTransaction(clientManager, transactionScope);
+    this.reporteController.setTransactionController(clientManager, transactionScope);
+  }
 
   async getAll(options: object | any) {
     const parameters: object | any = {};
@@ -436,15 +446,35 @@ export class NpeController {
     try {
       if (data) {
         if (data.length === undefined) {
-          const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+          const {ip} = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
+
+          /*if (this.isTransaction()) {
+            await this.reporteController.createTransaction({
+              userId: data.userId, module: 'AMBIENTE', operation: 'EDIÇÃO', oldValue: data.prox_npe, ip: String(ip),
+            });
+          } else {
+            await this.reporteController.create({
+              userId: data.userId, module: 'AMBIENTE', operation: 'EDIÇÃO', oldValue: data.prox_npe, ip: String(ip),
+            });
+          }*/
+
           await this.reporteController.create({
             userId: data.userId, module: 'AMBIENTE', operation: 'EDIÇÃO', oldValue: data.prox_npe, ip: String(ip),
           });
+
           delete data.userId;
-          const npe = await this.npeRepository.update(data.id, data);
-          if (!npe) return { status: 400, message: 'Npe não encontrado' };
-          return { status: 200, message: 'Npe atualizada' };
+
+          const npe = (this.isTransaction()) ?
+            await this.npeRepository.updateTransaction(data.id, data)
+            :
+            await this.npeRepository.update(data.id, data);
+
+          if (!npe) return {status: 400, message: 'Npe não encontrado'};
+
+          return {status: 200, message: 'Npe atualizada'};
+
         }
+        
         const transactionConfig = new TransactionConfig();
         const npeRepositoryTransaction = new NpeRepository();
         npeRepositoryTransaction.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);

@@ -487,6 +487,7 @@ export class ExperimentController {
     const prisma = new PrismaClient();
 
     const npeController = new NpeController();
+    
     const genotypeTreatment = new GenotypeTreatmentController();
 
     const experimentGenotipeRepository = new ExperimentGenotipeRepository();
@@ -500,6 +501,10 @@ export class ExperimentController {
     experimentGenotipeRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
 
     experimentGenotipeController.setTransactionController(transactionConfig.clientManager, transactionConfig.transactionScope);
+
+    this.reporteController.setTransactionController(transactionConfig.clientManager, transactionConfig.transactionScope);
+
+    npeController.setTransactionController(transactionConfig.clientManager, transactionConfig.transactionScope);
 
     try {
 
@@ -526,7 +531,7 @@ export class ExperimentController {
                   .then((results) => results.json())
                   .catch(() => '0.0.0.0');
 
-                await this.reporteController.create({
+                await this.reporteController.createTransaction({
                   userId: data.userId,
                   module: 'EXPERIMENTO',
                   operation: 'EXCLUSÃO',
