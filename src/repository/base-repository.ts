@@ -1,14 +1,15 @@
 import { PrismaClientManager } from '../shared/prisma/prismaClientManager';
 import { TransactionScope } from '../shared/prisma/transactionScope';
 import {prisma, prisma as primaDB} from '../pages/api/db/db';
+import {PrismaTransactionScope} from "../shared/prisma/prismaTransactionScope";
 
 export class BaseRepository {
   
   protected clientManager: PrismaClientManager | null = null;
   
-  protected transactionScope: TransactionScope | null = null;
+  protected transactionScope: PrismaTransactionScope | null = null;
   
-  setTransaction(clientManager: PrismaClientManager, transactionScope: TransactionScope) {
+  setTransaction(clientManager: PrismaClientManager, transactionScope: PrismaTransactionScope) {
     this.clientManager = clientManager;
     this.transactionScope = transactionScope;
   }

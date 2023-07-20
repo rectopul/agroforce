@@ -9,13 +9,13 @@ import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import {ReporteRepository} from '../../repository/reporte.repository';
 import {BaseController} from "../base.controller";
 import {PrismaClientManager} from "../../shared/prisma/prismaClientManager";
-import {TransactionScope} from "../../shared/prisma/transactionScope";
+import {PrismaTransactionScope} from "../../shared/prisma/prismaTransactionScope";
 
 
 export class ReporteController extends BaseController {
   reporteRepository = new ReporteRepository();
 
-  setTransactionController(clientManager: PrismaClientManager, transactionScope: TransactionScope) {
+  setTransactionController(clientManager: PrismaClientManager, transactionScope: PrismaTransactionScope) {
     this.reporteRepository.setTransaction(clientManager, transactionScope);
   }
 
@@ -38,7 +38,7 @@ export class ReporteController extends BaseController {
                           }: any) {
 
     try {
-
+      
       const data = {
         module,
         userId,

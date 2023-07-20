@@ -16,6 +16,7 @@ import { prisma } from '../pages/api/db/db';
 import { NpeController } from './npe/npe.controller';
 import {PrismaClientManager} from "../shared/prisma/prismaClientManager";
 import {TransactionScope} from "../shared/prisma/transactionScope";
+import {PrismaTransactionScope} from "../shared/prisma/prismaTransactionScope";
 
 export class ExperimentGenotipeController {
   private ExperimentGenotipeRepository = new ExperimentGenotipeRepository();
@@ -455,7 +456,7 @@ export class ExperimentGenotipeController {
     }
   }
   
-  setTransactionController(clientManager: PrismaClientManager, transactionScope: TransactionScope) {
+  setTransactionController(clientManager: PrismaClientManager, transactionScope: PrismaTransactionScope) {
     this.ExperimentGenotipeRepository.setTransaction(clientManager, transactionScope);
   }
 

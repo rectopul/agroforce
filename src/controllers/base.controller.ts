@@ -1,13 +1,13 @@
-import { PrismaClient } from '@prisma/client';
+import {PrismaClient} from '@prisma/client';
 import {PrismaClientManager} from "../shared/prisma/prismaClientManager";
-import {TransactionScope} from "../shared/prisma/transactionScope";
+import {PrismaTransactionScope} from "../shared/prisma/prismaTransactionScope";
 
 const prisma = new PrismaClient();
 
 export abstract class BaseController {
 
-  protected clientManager: any;
-  protected transactionScope: any;
+  protected clientManager: PrismaClientManager | null = null;
+  protected transactionScope: PrismaTransactionScope | null = null;
   
   protected isTransactioned: boolean = false;
   
@@ -19,7 +19,7 @@ export abstract class BaseController {
     return this.isTransactioned;
   }
   
-  setTransaction(clientManager: PrismaClientManager, transactionScope: TransactionScope) {
+  setTransaction(clientManager: PrismaClientManager, transactionScope: PrismaTransactionScope) {
     this.clientManager = clientManager;
     this.transactionScope = transactionScope;
   }

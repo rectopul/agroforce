@@ -13,6 +13,7 @@ import { ReporteController } from '../reportes/reporte.controller';
 import {PrismaClientManager} from "../../shared/prisma/prismaClientManager";
 import {TransactionScope} from "../../shared/prisma/transactionScope";
 import {BaseController} from "../base.controller";
+import {PrismaTransactionScope} from "../../shared/prisma/prismaTransactionScope";
 // import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 
 export class NpeController extends BaseController {
@@ -26,7 +27,7 @@ export class NpeController extends BaseController {
 
   reporteController = new ReporteController();
 
-  setTransactionController(clientManager: PrismaClientManager, transactionScope: TransactionScope) {
+  setTransactionController(clientManager: PrismaClientManager, transactionScope: PrismaTransactionScope) {
     this.setTransactioned(true);
     this.setTransaction(clientManager, transactionScope);
     this.npeRepository.setTransaction(clientManager, transactionScope);
@@ -447,7 +448,9 @@ export class NpeController extends BaseController {
       if (data) {
         if (data.length === undefined) {
           const {ip} = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-
+          
+          
+          
           /*if (this.isTransaction()) {
             await this.reporteController.createTransaction({
               userId: data.userId, module: 'AMBIENTE', operation: 'EDIÇÃO', oldValue: data.prox_npe, ip: String(ip),
