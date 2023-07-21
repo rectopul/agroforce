@@ -189,6 +189,7 @@ model cultureUnity {
   name_unity_culture String
   created_by         Int
   dt_export          DateTime
+  dt_rde             Decimal?  @db.Decimal(20, 10)
   created_at         DateTime? @default(now())
   local              local     @relation(fields: [id_local], references: [id])
 
@@ -402,6 +403,7 @@ model tecnologia {
   desc                String?
   cod_tec             String
   dt_export           DateTime
+  dt_rde              Decimal?              @db.Decimal(20, 10)
   culture             culture               @relation(fields: [id_culture], references: [id])
   assay_list          assay_list[]
   genotipo            genotipo[]
@@ -427,6 +429,7 @@ model lote {
   quant_sementes      Int?
   year                Int?
   dt_export           DateTime?
+  dt_rde              Decimal?              @db.Decimal(20, 10)
   genotipo            genotipo              @relation(fields: [id_genotipo], references: [id])
   safra               safra                 @relation(fields: [id_safra], references: [id])
   culture             culture               @relation(fields: [id_culture], references: [id])
