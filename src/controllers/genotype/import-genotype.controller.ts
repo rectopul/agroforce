@@ -565,7 +565,7 @@ export class ImportGenotypeController {
                     Number(column) + 1,
                     linhaStr,
                     spreadSheet[0][column],
-                    'o campo DT precisa ser no formato data estilo',
+                    'o campo DT precisa ser no formato data numérico (ex: XXXXX,XXXXXXXXXX)',
                   );
                 }
                 

@@ -10,6 +10,12 @@ import {validateHeaders} from '../../shared/utils/validateHeaders';
 import {CulturaController} from '../cultura.controller';
 import {LogImportController} from '../log-import.controller';
 import {TecnologiaController} from './tecnologia.controller';
+import {
+  converterEpochToDate,
+  converterParaDataBanco,
+  converterParaTimestamp,
+  validarData
+} from "../../shared/utils/formatDateEpoch";
 
 export class ImportTechnologyController {
   static async validate(
@@ -132,30 +138,37 @@ export class ImportTechnologyController {
               }
             } else if (column === '4') {
               if (spreadSheet[row][column] === null) {
+                
                 responseIfError[column]
                   += responseNullFactory(
                   (Number(column) + 1),
                   linhaStr,
                   spreadSheet[0][column]
                 );
-              } else if (typeof spreadSheet[row][column] === 'number') {
+                
+              } else if (typeof spreadSheet[row][column] !== 'number') {
+                
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
                   linhaStr,
                   spreadSheet[0][column],
-                  'o campo DT precisa ser no formato data',
+                  'o campo DT precisa ser no formato data numérico (ex: XXXXX,XXXXXXXXXX)',
                 );
+                
               } else {
-                // eslint-disable-next-line no-param-reassign
-                spreadSheet[row][column] = spreadSheet[row][column].replace(/\.\d+/, '');
-                // eslint-disable-next-line no-param-reassign
-                spreadSheet[row][column] = new Date(spreadSheet[row][column]);
+                
                 const {status, response}: IReturnObject = await tecnologiaController.getAll({
                   filterCode: spreadSheet[row][0],
                   id_culture: idCulture,
                 });
+
+                const dateEpoch = spreadSheet[row][column];
+
+                const dataDB = converterParaDataBanco(dateEpoch);
+
                 const dateNow = new Date();
-                if (dateNow.getTime() < spreadSheet[row][column].getTime()) {
+
+                if (dateNow.getTime() < converterParaTimestamp(dateEpoch)) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     linhaStr,
@@ -163,22 +176,27 @@ export class ImportTechnologyController {
                     'a data e maior que a data atual',
                   );
                 }
-                if (spreadSheet[row][column].getTime() < 100000) {
+
+                if (!validarData(dataDB)) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     linhaStr,
                     spreadSheet[0][column],
-                    'o campo DT precisa ser no formato data',
+                    'o campo DT precisa ser no formato data estilo',
                   );
                 }
+                
                 if (status === 200) {
-                  let lastDtImport = response[0]?.dt_export?.getTime();
+
+                  let lastDtImport = response[0]?.dt_rde;
+
                   response.forEach((item: any) => {
-                    lastDtImport = item.dt_export.getTime() > lastDtImport
-                      ? item.dt_export.getTime()
+                    lastDtImport = item.dt_rde > lastDtImport
+                      ? item.dt_rde
                       : lastDtImport;
                   });
-                  if (lastDtImport > spreadSheet[row][column].getTime()) {
+
+                  if ((lastDtImport != null) && lastDtImport > dateEpoch) {
                     responseIfError[Number(column)] += responseGenericFactory(
                       Number(column) + 1,
                       linhaStr,
@@ -186,6 +204,21 @@ export class ImportTechnologyController {
                       'essa informação é mais antiga do que a informação do software',
                     );
                   }
+                  
+                  /*let lastDtImport = response[0]?.dt_export?.getTime();
+                  response.forEach((item: any) => {
+                      lastDtImport = item.dt_export.getTime() > lastDtImport
+                      ? item.dt_export.getTime()
+                      : lastDtImport;
+                  });*/
+                  /*if (lastDtImport > spreadSheet[row][column].getTime()) {
+                    responseIfError[Number(column)] += responseGenericFactory(
+                      Number(column) + 1,
+                      linhaStr,
+                      spreadSheet[0][column],
+                      'essa informação é mais antiga do que a informação do software',
+                    );
+                  }*/
                 }
               }
             }
@@ -201,6 +234,11 @@ export class ImportTechnologyController {
                 const {status, response}: IReturnObject = await tecnologiaController.getAll(
                   {id_culture: idCulture, cod_tec: String(spreadSheet[row][0])},
                 );
+
+                let dateEpoch = spreadSheet[row][4];
+
+                let dateExport = converterEpochToDate(dateEpoch, true);
+                
                 if (status === 200 && response[0]?.id) {
                   await tecnologiaRepository.updateTransaction(response[0]?.id, {
                     id: response[0]?.id,
@@ -209,7 +247,9 @@ export class ImportTechnologyController {
                     name: spreadSheet[row][1],
                     desc: String(spreadSheet[row][2]),
                     created_by: createdBy,
-                    dt_export: new Date(spreadSheet[row][4]),
+                    //dt_export: new Date(spreadSheet[row][4]),
+                    dt_export: dateExport,
+                    dt_rde: dateEpoch,
                   });
                 } else {
                   await tecnologiaRepository.createTransaction({
@@ -218,7 +258,9 @@ export class ImportTechnologyController {
                     name: spreadSheet[row][1],
                     desc: String(spreadSheet[row][2]),
                     created_by: createdBy,
-                    dt_export: new Date(spreadSheet[row][4]),
+                    //dt_export: new Date(spreadSheet[row][4]),
+                    dt_export: dateExport,
+                    dt_rde: dateEpoch,
                   });
                 }
               }

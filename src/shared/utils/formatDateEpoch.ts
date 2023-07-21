@@ -4,7 +4,7 @@ import Decimal from 'decimal.js';
 
 //const moment = require('moment');
 
-function calcularData(data: number, precise: boolean = false) {
+function calcularData(data: number, precise: boolean = true) {
   // Separa a parte inteira (dias) e a parte decimal (hora, minutos e segundos)
   const [dias, decimal] = data.toString().split('.');
   
@@ -20,7 +20,7 @@ function calcularData(data: number, precise: boolean = false) {
     
   } else {
     // Converte a parte decimal para segundos
-    const segundos = Math.round(parseFloat(`0.${decimal}`) * 86400);
+    const segundos = Math.round(parseFloat(`0.${decimal}`) * 86400000);
     
     // Adiciona o número de dias e segundos à data de referência (epoch)
     return moment("1900-01-01").add(numDias, 'days').add(segundos, 'seconds');
