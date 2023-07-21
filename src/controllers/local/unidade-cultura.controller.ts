@@ -81,6 +81,7 @@ export class UnidadeCulturaController {
         year: true,
         local: true,
         dt_export: true,
+        dt_rde: true,
       };
 
       console.log('86::',Date().toString());

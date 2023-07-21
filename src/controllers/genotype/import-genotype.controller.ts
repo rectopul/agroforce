@@ -28,6 +28,14 @@ import { genotipeQueue } from './genotipeQueue';
 
 import { GenotipoRepository } from '../../repository/genotipo.repository';
 import { LoteRepository } from '../../repository/lote.repository';
+import {
+  converterDateParaNumeroInicial, converterEpochToDate,
+  converterParaDataBanco,
+  converterParaTimestamp,
+  converterParaTimestampISO,
+  validarData
+} from 'src/shared/utils/formatDateEpoch';
+import moment from "moment";
 
 /* eslint-disable no-restricted-syntax */
 export class ImportGenotypeController {
@@ -518,24 +526,32 @@ export class ImportGenotypeController {
                   linhaStr,
                   spreadSheet[0][column],
                 );
-              } else if (typeof spreadSheet[row][column] === 'number') {
+              } else if (typeof spreadSheet[row][column] !== 'number') {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
                   linhaStr,
                   spreadSheet[0][column],
-                  'o campo DT precisa ser no formato data',
+                  'o campo DT precisa ser numérico separado por virgula',
                 );
               } else {
+
+                /*
                 spreadSheet[row][column] = spreadSheet[row][column].replace(/\.\d+/, '');
                 // eslint-disable-next-line no-param-reassign
-                spreadSheet[row][column] = new Date(spreadSheet[row][column]);
-                const { status, response }: IReturnObject = await loteController.getAll({
+                spreadSheet[row][column] = new Date(spreadSheet[row][column]);*/
+                
+                const { status, response: responseLoteExists }: IReturnObject = await loteController.getAll({
                   id_dados: spreadSheet[row][21],
                   id_culture: idCulture,
                 });
+                
+                const dateEpoch = spreadSheet[row][column];
+                
+                const dataDB = converterParaDataBanco(dateEpoch);
+                
                 const dateNow = new Date();
 
-                if (dateNow.getTime() < spreadSheet[row][column].getTime()) {
+                if (dateNow.getTime() < converterParaTimestamp(dateEpoch)) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     linhaStr,
@@ -543,18 +559,20 @@ export class ImportGenotypeController {
                     'a data e maior que a data atual',
                   );
                 }
-                if (spreadSheet[row][column].getTime() < 100000) {
+
+                if (!validarData(dataDB)) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     linhaStr,
                     spreadSheet[0][column],
-                    'o campo DT precisa ser no formato data',
+                    'o campo DT precisa ser no formato data numérico (ex: XXXXX,XXXXXXXXXX)',
                   );
                 }
+                
                 if (status === 200) {
-                  const lastDtImport = response[0]?.dt_export?.getTime();
-
-                  if (lastDtImport > spreadSheet[row][column].getTime()) {
+                  const lastDtImport = responseLoteExists[0]?.dt_rde;
+                  
+                  if ((lastDtImport != null) && lastDtImport > dateEpoch) {
                     responseIfError[Number(column)] += responseGenericFactory(
                       Number(column) + 1,
                       linhaStr,
@@ -873,7 +891,25 @@ export class ImportGenotypeController {
 
               if (configModule.response[0]?.fields[column] === 'DT_EXPORT') {
                 if (spreadSheet[row][column] !== null) {
-                  this.aux.dt_export = spreadSheet[row][column];
+                  let dateEpoch = spreadSheet[row][column];
+                  console.log('dateEpoch', dateEpoch);
+                  let dateExport = converterEpochToDate(dateEpoch, true);
+                  console.log('dateExport', dateExport);
+                  let numeroInicial = converterDateParaNumeroInicial(dateExport);
+                  console.log('numeroInicial', numeroInicial);
+
+                  let dateExport2 = converterEpochToDate(dateEpoch, true);
+                  console.log('dateExport2', dateExport2);
+                  
+                  // confere datas
+                  if(dateExport == dateExport2){
+                    console.log('=========>>> Está correto os valores são iguais');
+                  } else {
+                    console.log('############ Está incorreto os valores não são iguais');
+                  }
+                  
+                  this.aux.dt_export = dateExport;
+                  this.aux.dt_rde = dateEpoch;
                 }
               }
 
@@ -948,6 +984,7 @@ export class ImportGenotypeController {
                       peso: this.aux.peso ? this.aux.peso : null,
                       quant_sementes: this.aux.quant_sementes ? Number(this.aux.quant_sementes) : null,
                       dt_export: this.aux.dt_export,
+                      dt_rde: this.aux.dt_rde,
                       created_by: createdBy,
                     });
 
@@ -967,11 +1004,12 @@ export class ImportGenotypeController {
                       peso: this.aux.peso ? this.aux.peso : null,
                       quant_sementes: this.aux.quant_sementes,
                       dt_export: this.aux.dt_export,
+                      dt_rde: this.aux.dt_rde,
                       created_by: createdBy,
                     });
 
                     const genotype: any = await genotipoRepository.findOne(this.aux.id_genotipo);
-                    const genotypeUpdated:any = await genotipoRepository.updateTransaction(this.aux.id_genotipo, { numberLotes: genotype?.lote?.length });
+                    const genotypeUpdated: any = await genotipoRepository.updateTransaction(this.aux.id_genotipo, {numberLotes: genotype?.lote?.length});
                   }
                 }
                 this.aux = [];
