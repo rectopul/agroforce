@@ -23,6 +23,7 @@ import { NpeController } from 'src/controllers/npe/npe.controller';
 import { QuadraController } from 'src/controllers/block/quadra.controller';
 import moment from 'moment';
 import { ExperimentGenotipeController } from '../../controllers/experiment-genotipe.controller';
+import {converterDateParaNumeroInicial} from "../../shared/utils/formatDateEpoch";
 
 async function callExperimentGenotipeXlsxDownload(options: any) {
   const Controller = new ExperimentGenotipeController();
@@ -349,16 +350,19 @@ async function callTmgLoteXlsxDownload(options: any) {
     const newData = response.map((item: any) => {
       const newItem = item;
 
-      newItem.dt_export = new Date(newItem.dt_export);
-      newItem.dt_export = new Date(
-        newItem.dt_export.toISOString().slice(0, -1),
-      );
-
-      newItem.dt_export = moment(newItem.dt_export).format('DD-MM-YYYY hh:mm:ss');
+      // newItem.dt_export = new Date(newItem.dt_export);
+      // newItem.dt_export = new Date(
+      //   newItem.dt_export.toISOString().slice(0, -1),
+      // );
+      //newItem.dt_export = moment(newItem.dt_export).format('DD-MM-YYYY HH:mm:ss'); // antigo, agora precisa ser numerico
+      
+      const numeroOriginal = converterDateParaNumeroInicial(newItem.dt_export);
+      console.log('numeroOriginal', numeroOriginal);
+      newItem.dt_export = numeroOriginal;
 
       newItem.CULTURA = item?.genotipo.culture.name;
       newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
-      newItem.NOME_PRINCIPAL = (item?.genotipo.name_main);
+      newItem.NOME_PRINCIPAL = (item?.genotipo.name_main);  
       newItem.NOME_PUBLICO = (item?.genotipo.name_public);
       newItem.NOME_EXPERIMENTAL = (item?.genotipo.name_experiment);
       newItem.NOME_ALTERNATIVO = (item?.genotipo.name_alter);
@@ -381,8 +385,9 @@ async function callTmgLoteXlsxDownload(options: any) {
       newItem.FASE = item?.fase ? String(item?.fase) : '';
       newItem.PESO = item?.peso ? String(item?.peso) : '';
       newItem.QUANT_SEMENTES = item?.quant_sementes;
-      newItem.DT_RD = newItem.dt_export;
-      newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
+      newItem.DT_RD = String(item.dt_rde).replace('.', ',');
+      newItem.DT_GOM = moment().format('DD-MM-YYYY HH:mm:ss');
+      //newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss'); // porque a hora está sainda no formato PM e AM?
 
       delete newItem.quant_sementes;
       delete newItem.peso;
@@ -398,6 +403,7 @@ async function callTmgLoteXlsxDownload(options: any) {
       delete newItem.id_genotipo;
       delete newItem.genotipo;
       delete newItem.safra;
+      delete newItem.dt_rde;
 
       return newItem;
     });

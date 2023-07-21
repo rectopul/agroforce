@@ -36,6 +36,7 @@ export class TecnologiaController {
         desc: true,
         cod_tec: true,
         dt_export: true,
+        dt_rde: true,
         culture: true,
       };
 

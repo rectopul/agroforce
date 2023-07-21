@@ -19,6 +19,12 @@ import {LocalController} from './local.controller';
 import {UnidadeCulturaController} from './unidade-cultura.controller';
 import {LocalRepository} from '../../repository/local.repository';
 import {UnidadeCulturaRepository} from '../../repository/unidade-cultura.repository';
+import {
+  converterEpochToDate,
+  converterParaDataBanco,
+  converterParaTimestamp,
+  validarData
+} from "../../shared/utils/formatDateEpoch";
 
 export class ImportLocalController {
   static aux: any = {};
@@ -372,31 +378,43 @@ export class ImportLocalController {
                 linhaStr,
                 spreadSheet[0][column]);
             }
-          } else if (spreadSheet[0][column]?.includes('DT')) {
+          } else if (spreadSheet[0][column]?.includes('DT') || spreadSheet[0][column]?.includes('DT_EXPORT')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)] += responseNullFactory(
                 Number(column) + 1,
                 linhaStr,
                 spreadSheet[0][column],
               );
-            } else if (typeof spreadSheet[row][column] === 'number') {
+            /*} else if (typeof spreadSheet[row][column] === 'number') {
               responseIfError[Number(column)] += responseGenericFactory(
                 Number(column) + 1,
                 linhaStr,
                 spreadSheet[0][column],
                 'o campo DT precisa ser no formato data',
+              );*/
+            } 
+            else if (typeof spreadSheet[row][column] !== 'number') {
+              responseIfError[Number(column)] += responseGenericFactory(
+                Number(column) + 1,
+                linhaStr,
+                spreadSheet[0][column],
+                'o campo DT precisa ser no formato numérico (ex: XXXXX,XXXXXXXXXX)',
               );
-            } else {
-              // eslint-disable-next-line no-param-reassign
-              spreadSheet[row][column] = spreadSheet[row][column].replace(/\.\d+/, '');
-              // eslint-disable-next-line no-param-reassign
-              spreadSheet[row][column] = new Date(spreadSheet[row][column]);
-              const {status, response}: IReturnObject = await unidadeCulturaController.getAll({
+            } 
+            else {
+              
+              const {status, response: responseUnityCulture}: IReturnObject = await unidadeCulturaController.getAll({
                 filterNameUnityCulture: spreadSheet[row][2],
                 filterYear: spreadSheet[row][1],
               });
+
+              const dateEpoch = spreadSheet[row][column];
+
+              const dataDB = converterParaDataBanco(dateEpoch);
+
               const dateNow = new Date();
-              if (dateNow.getTime() < spreadSheet[row][column].getTime()) {
+
+              if (dateNow.getTime() < converterParaTimestamp(dateEpoch)) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
                   linhaStr,
@@ -404,17 +422,21 @@ export class ImportLocalController {
                   'a data e maior que a data atual',
                 );
               }
-              if (spreadSheet[row][column].getTime() < 100000) {
+
+              if (!validarData(dataDB)) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
                   linhaStr,
                   spreadSheet[0][column],
-                  'o campo DT precisa ser no formato data',
+                  'o campo DT precisa ser no formato data estilo',
                 );
               }
+              
               if (status === 200) {
-                const lastDtImport = response[0]?.dt_export?.getTime();
-                if (lastDtImport > spreadSheet[row][column].getTime()) {
+                
+                const lastDtImport = responseUnityCulture[0]?.dt_rde;
+                
+                if ((lastDtImport != null) && lastDtImport > dateEpoch) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     linhaStr,
@@ -470,8 +492,17 @@ export class ImportLocalController {
                     localCultureDTO.name_country = (spreadSheet[row][column]?.toString());
                   } else if (spreadSheet[0][column]?.includes('CNTR_LIBELLE')) {
                     localCultureDTO.label_country = (spreadSheet[row][column]?.toString());
-                  } else if (spreadSheet[0][column]?.includes('DT')) {
-                    unityCultureDTO.dt_export = spreadSheet[row][column];
+                  } else if (spreadSheet[0][column]?.includes('DT') || spreadSheet[0][column]?.includes('DT_EXPORT')) {
+                    
+                    let dateEpoch = spreadSheet[row][column];
+                    let dateExport = converterEpochToDate(dateEpoch, true);
+
+                    // this.aux.dt_export = dateExport;
+                    // this.aux.dt_rde = dateEpoch;
+
+                    unityCultureDTO.dt_export = dateExport;
+                    unityCultureDTO.dt_rde = dateEpoch;
+                    
                   }
                 }
                 localCultureDTO.created_by = Number(createdBy);
@@ -535,9 +566,9 @@ export class ImportLocalController {
           return {status: 200, message: 'Local importado com sucesso'};
         } catch (error: any) {
           await logImportController.update({
-            id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
+            id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()), invalid_data: error.message,
           });
-          handleError('Local controller', 'Save Import', error.message);
+          handleError('Local controller', 'Save Import', error.message, error.stack);
           return {status: 500, message: 'Erro ao salvar planilha de Local'};
         }
       }
