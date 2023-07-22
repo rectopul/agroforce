@@ -100,6 +100,10 @@ export class ImportAssayListController {
       spreadSheet = await this.orderByGLI(spreadSheet);
 
       spreadSheet.unshift(header);
+
+
+      const chaveComposta: any = {};
+      
       for (const row in spreadSheet) {
         //const linhaStr = String(Number(row) + 1);
         const linhaStr = spreadSheet[row][spreadSheet[row].length - 1] + 1;
@@ -245,6 +249,9 @@ export class ImportAssayListController {
             }
             // Validação GLI
             if (column === '4') {
+              
+              const cc = spreadSheet[row][4] + '_' + spreadSheet[row][10] + '_' + spreadSheet[row][11];
+              
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory(
@@ -252,7 +259,25 @@ export class ImportAssayListController {
                   linhaStr,
                   spreadSheet[0][column],
                 );
+              } else if ( chaveComposta[spreadSheet[row][1]]?.includes(cc) ) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  Number(column) + 1,
+                  linhaStr,
+                  spreadSheet[0][column],
+                  'Genótipo + NCA não pode repetir dentro de um GLI (Ensaio)',
+                );
               }
+              
+              console.log('chaveComposta', chaveComposta, typeof(chaveComposta), chaveComposta == null);
+              console.log('length', chaveComposta[spreadSheet[row][1]]);
+
+              if(typeof(chaveComposta[spreadSheet[row][1]]) == 'undefined' || chaveComposta[spreadSheet[row][1]].length === 0) {
+                chaveComposta[spreadSheet[row][1]] = [];
+              }
+
+              // chave composta = GLI + _ + GENOTIPO + _ + NCA
+              chaveComposta[spreadSheet[row][1]]?.push(cc);
+              
               const {response}: IReturnObject = await assayListController.getAll({
                 filterGli: spreadSheet[row][4],
                 id_safra: idSafra,
@@ -422,11 +447,11 @@ export class ImportAssayListController {
                   id_culture: idCulture,
                   importValidate: true,
                 });
-                const {response}: IReturnObject = await loteController.getAll({
+                const {response:responseLote}: IReturnObject = await loteController.getAll({
                   filterNcc: spreadSheet[row][column],
                   id_genotipo: genotype[0]?.id,
                 });
-                if (response?.length === 0) {
+                if (responseLote?.length === 0) {
                   responseIfError[Number(column)]
                     += responseGenericFactory(
                     (Number(column) + 1),
@@ -508,8 +533,9 @@ export class ImportAssayListController {
       //   maxWait: 0,
       //   timeout: 0,
       // });
-
+      
       await transactionConfig.transactionScope.run(async () => {
+        
         for (const row in spreadSheet) {
           if (row !== '0') {
             const {response: typeAssay}: IReturnObject = await typeAssayController.getAll({
