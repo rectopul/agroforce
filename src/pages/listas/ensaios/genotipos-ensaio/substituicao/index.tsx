@@ -2,52 +2,36 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-return-assign */
-import { removeCookies } from 'cookies-next';
-import { useFormik } from 'formik';
+import {useFormik} from 'formik';
 import MaterialTable from 'material-table';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import {GetServerSideProps, InferGetServerSidePropsType} from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
-import { useEffect, useState, useRef } from 'react';
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from 'react-beautiful-dnd';
-import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai';
-import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { IoMdArrowBack } from 'react-icons/io';
-// import { TbArrowsDownUp } from 'react-icons/tb';
-import { useRouter } from 'next/router';
+import {useEffect, useRef, useState} from 'react';
+import {BiFilterAlt, BiLeftArrow, BiRightArrow} from 'react-icons/bi';
+import {IoMdArrowBack} from 'react-icons/io';
+import {useRouter} from 'next/router';
+import {MdFirstPage, MdLastPage} from 'react-icons/md';
+import {RiArrowUpDownLine} from 'react-icons/ri';
 
-import { IoReloadSharp } from 'react-icons/io5';
-import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiArrowUpDownLine } from 'react-icons/ri';
-
-import { RequestInit } from 'next/dist/server/web/spec-extension/request';
+import {RequestInit} from 'next/dist/server/web/spec-extension/request';
 import Swal from 'sweetalert2';
 import {
   AccordionFilter,
   Button,
-  CheckBox,
   Content,
-  Input,
-  ModalConfirmation,
   FieldItemsPerPage,
+  Input,
   ManageFields,
+  ModalConfirmation,
 } from '../../../../../components';
-import {
-  loteService,
-  replaceTreatmentService,
-  userPreferencesService,
-} from '../../../../../services';
-import { UserPreferenceController } from '../../../../../controllers/user-preference.controller';
+import {replaceTreatmentService,} from '../../../../../services';
+import {UserPreferenceController} from '../../../../../controllers/user-preference.controller';
 import ITabs from '../../../../../shared/utils/dropdown';
-import { functionsUtils } from '../../../../../shared/utils/functionsUtils';
+import {functionsUtils} from '../../../../../shared/utils/functionsUtils';
 import headerTableFactoryGlobal from '../../../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../../../components/Loading';
-import { tableGlobalFunctions } from '../../../../../helpers';
+import {tableGlobalFunctions} from '../../../../../helpers';
 
 interface IFilter {
   filterYear: string;
@@ -161,36 +145,21 @@ export default function Listagem({
   const [statusAccordionFilter, setStatusAccordionFilter] = useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
-    { name: 'CamposGerenciados[]', title: 'Safra', value: 'safra' },
-    { name: 'CamposGerenciados[]', title: 'Ano Lote', value: 'year' },
-    { name: 'CamposGerenciados[]', title: 'Cod Lote', value: 'cod_lote' },
-    { name: 'CamposGerenciados[]', title: 'NCA', value: 'ncc' },
-    { name: 'CamposGerenciados[]', title: 'Fase', value: 'fase' },
-    { name: 'CamposGerenciados[]', title: 'Peso', value: 'peso' },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Qtn sementes',
-      value: 'quant_sementes',
-    },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Nome genotipo',
-      value: 'name_genotipo',
-    },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Nome principal',
-      value: 'name_main',
-    },
-    { name: 'CamposGerenciados[]', title: 'GMR_Gen', value: 'gmr' },
-    { name: 'CamposGerenciados[]', title: 'BGM_Gen', value: 'bgm' },
-    {
-      name: 'CamposGerenciados[]',
-      title: 'Tec_Gen',
-      value: 'tecnologia',
-    },
-    { name: 'CamposGerenciados[]', title: 'Substituir', value: 'action' },
+    {name: 'CamposGerenciados[]', title: 'Safra', value: 'safra'},
+    {name: 'CamposGerenciados[]', title: 'Ano Lote', value: 'year'},
+    {name: 'CamposGerenciados[]', title: 'Cod Lote', value: 'cod_lote'},
+    {name: 'CamposGerenciados[]', title: 'NCA', value: 'ncc'},
+    {name: 'CamposGerenciados[]', title: 'Fase', value: 'fase'},
+    {name: 'CamposGerenciados[]', title: 'Peso', value: 'peso'},
+    {name: 'CamposGerenciados[]', title: 'Qtn sementes', value: 'quant_sementes',},
+    {name: 'CamposGerenciados[]', title: 'Nome genotipo', value: 'name_genotipo',},
+    {name: 'CamposGerenciados[]', title: 'Nome principal', value: 'name_main',},
+    {name: 'CamposGerenciados[]', title: 'GMR_Gen', value: 'gmr'},
+    {name: 'CamposGerenciados[]', title: 'BGM_Gen', value: 'bgm'},
+    {name: 'CamposGerenciados[]', title: 'Tec_Gen', value: 'tecnologia',},
+    {name: 'CamposGerenciados[]', title: 'Substituir', value: 'action'},
   ]);
+  
   const [filter, setFilter] = useState<any>(filterApplication);
   const [orderBy, setOrderBy] = useState<string>('');
   const [orderType, setOrderType] = useState<string>('');

@@ -8,6 +8,7 @@ import { IReturnObject } from '../../interfaces/shared/Import.interface';
 import { LoteController } from '../lote.controller';
 import { GenotipoController } from '../genotype/genotipo.controller';
 import { ReporteController } from '../reportes/reporte.controller';
+import {GenotypeTreatmentController} from "./genotype-treatment.controller";
 
 export class ReplaceTreatmentController {
   loteRepository = new LoteRepository();
@@ -22,6 +23,8 @@ export class ReplaceTreatmentController {
 
   loteController = new LoteController();
 
+  genotypeTreatmentController = new GenotypeTreatmentController();
+
   async replace({
     id, checkedTreatments, value, userId,
   }: any) {
@@ -29,6 +32,8 @@ export class ReplaceTreatmentController {
       const idList: any = checkedTreatments.map(
         (row: any) => (row.id ? Number(row.id) : undefined),
       );
+      
+      
       const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
 
       const { response: lote }: IReturnObject = await this.loteController.getOne(id);
@@ -39,7 +44,40 @@ export class ReplaceTreatmentController {
 
       const { response: genraticName }: IReturnObject = await this.genotipoController.getOne(lote.id_genotipo);
       const geneticName = genraticName.name_genotipo; // Genetic value
+      
+      const {
+        response: treatments,
+      }: any = await this.genotypeTreatmentController.getAll({
+        filterIdList: idList,
+      });
+      
+      console.log(treatments);
 
+      const chaveCompostaArr: string[] = [];
+      let responseIfError= '';
+      
+      for(const treatment of treatments) {
+        console.log('🚀 ~ file: replace-treatment.controller.ts:50 ~ ReplaceTreatmentController ~ replace ~ treatment', treatment);
+        
+        const assayList = treatment.assay_list;
+        
+        const gli = assayList.gli;
+
+        const chaveComposta = gli + '_' + geneticName + '_' + ncc;
+        
+        if(chaveCompostaArr.includes(chaveComposta)) {
+          responseIfError+= `- Genótipo: ${geneticName} | NCA: ${ncc} | GLI: ${gli}<br>`;
+          responseIfError+= `Genótipo + NCA não pode repetir dentro de um GLI (Ensaio)<br>`;
+        }
+        
+        chaveCompostaArr.push(chaveComposta);
+        
+      }
+      
+      if(responseIfError) {
+        return { status: 400, response:{}, message: responseIfError };
+      }
+      
       if (checkedTreatments[0]?.genotipo) {
         let response;
         if (value == 'ensaios') {

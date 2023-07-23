@@ -102,7 +102,7 @@ export class ImportAssayListController {
       spreadSheet.unshift(header);
 
 
-      const chaveComposta: any = {};
+      const chaveCompostaArr: any = {};
       
       for (const row in spreadSheet) {
         //const linhaStr = String(Number(row) + 1);
@@ -250,7 +250,7 @@ export class ImportAssayListController {
             // Validação GLI
             if (column === '4') {
               
-              const cc = spreadSheet[row][4] + '_' + spreadSheet[row][10] + '_' + spreadSheet[row][11];
+              const chaveComposta = spreadSheet[row][4] + '_' + spreadSheet[row][10] + '_' + spreadSheet[row][11];
               
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -259,7 +259,7 @@ export class ImportAssayListController {
                   linhaStr,
                   spreadSheet[0][column],
                 );
-              } else if ( chaveComposta[spreadSheet[row][1]]?.includes(cc) ) {
+              } else if ( chaveCompostaArr[spreadSheet[row][1]]?.includes(chaveComposta) ) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
                   linhaStr,
@@ -268,15 +268,15 @@ export class ImportAssayListController {
                 );
               }
               
-              console.log('chaveComposta', chaveComposta, typeof(chaveComposta), chaveComposta == null);
-              console.log('length', chaveComposta[spreadSheet[row][1]]);
+              console.log('chaveComposta', chaveCompostaArr, typeof(chaveCompostaArr), chaveCompostaArr == null);
+              console.log('length', chaveCompostaArr[spreadSheet[row][1]]);
 
-              if(typeof(chaveComposta[spreadSheet[row][1]]) == 'undefined' || chaveComposta[spreadSheet[row][1]].length === 0) {
-                chaveComposta[spreadSheet[row][1]] = [];
+              if(typeof(chaveCompostaArr[spreadSheet[row][1]]) == 'undefined' || chaveCompostaArr[spreadSheet[row][1]].length === 0) {
+                chaveCompostaArr[spreadSheet[row][1]] = [];
               }
 
               // chave composta = GLI + _ + GENOTIPO + _ + NCA
-              chaveComposta[spreadSheet[row][1]]?.push(cc);
+              chaveCompostaArr[spreadSheet[row][1]]?.push(chaveComposta);
               
               const {response}: IReturnObject = await assayListController.getAll({
                 filterGli: spreadSheet[row][4],
