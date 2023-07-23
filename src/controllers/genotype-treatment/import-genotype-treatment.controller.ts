@@ -54,6 +54,9 @@ export class ImportGenotypeTreatmentController {
     const responseIfError: Array<string> = [];
 
     try {
+
+      const chaveCompostaArr: any = {};
+      
       for (const row in spreadSheet) {
 
         let linhaStr = String(Number(row) + 1);
@@ -193,6 +196,10 @@ export class ImportGenotypeTreatmentController {
               }
             }
             if (column === '4') { // GLI
+
+              const chaveComposta = spreadSheet[row][4] + '_' + spreadSheet[row][10] + '_' + spreadSheet[row][12];
+              const safraRow = spreadSheet[row][0];
+              
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
                   += responseNullFactory(
@@ -200,7 +207,24 @@ export class ImportGenotypeTreatmentController {
                   linhaStr,
                   spreadSheet[0][column]
                 );
+              } 
+              else if ( chaveCompostaArr[safraRow]?.includes(chaveComposta) ) {
+                responseIfError[Number(column)] += responseGenericFactory(
+                  Number(column) + 1,
+                  linhaStr,
+                  spreadSheet[0][column],
+                  'Genótipo + NCA não pode repetir dentro de um GLI (Ensaio)',
+                );
               }
+
+              if(typeof(chaveCompostaArr[safraRow]) == 'undefined' || chaveCompostaArr[safraRow].length === 0) {
+                chaveCompostaArr[safraRow] = [];
+              }
+
+              // chave composta = GLI + _ + GENOTIPO + _ + NCA
+              chaveCompostaArr[safraRow]?.push(chaveComposta);
+              console.log('chaveCompostaArr', chaveCompostaArr);
+              
             }
             if (column === '5') { // BGM
               if (spreadSheet[row][column] !== null) {

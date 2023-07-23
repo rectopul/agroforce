@@ -225,6 +225,12 @@ export class GenotypeTreatmentController {
       if (options.status) {
         parameters.status = options.status;
       }
+      
+      if(options.filterIdList){
+        //parameters.id = JSON.parse(`{"in": ${options.idList} }`);
+        //parameters.id = JSON.parse(`{"in": ${options.filterIdList} }`);
+        parameters.id = {in: options.filterIdList};
+      }
 
       const take = (options.take) ? Number(options.take) : undefined;
 
@@ -268,7 +274,7 @@ export class GenotypeTreatmentController {
       return { status: 200, response, total: response.total };
     } catch (error: any) {
       handleError('Tratamentos do genótipo controller', 'GetAll', error.message);
-      throw new Error('[Controller] - GetAll Tratamentos do genótipo erro');
+      throw new Error('[Controller] - GetAll Tratamentos do genótipo erro: '+ error.message);
     }
   }
 
