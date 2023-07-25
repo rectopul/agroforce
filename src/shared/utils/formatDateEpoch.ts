@@ -1,7 +1,5 @@
 import moment from 'moment';
 
-import Decimal from 'decimal.js';
-
 //const moment = require('moment');
 
 function calcularData(data: number, precise: boolean = true) {
@@ -75,23 +73,6 @@ export function converterDateParaNumeroInicial(date: Date): number {
   return numeroInicial;
 }
 
-// Função para converter um objeto Date para a representação numérica inicial
-export function converterDateParaNumeroInicial2(date: Date): number {
-  // Cria um objeto moment com a data fornecida
-  const minhaData = moment(date);
-
-  // Cria um objeto moment com a data de referência (1900-01-01)
-  const dataReferencia = moment("1900-01-01");
-
-  // Calcula a diferença entre as datas em milissegundos
-  const diferencaEmMilissegundos = minhaData.diff(dataReferencia);
-
-  // Converte a diferença em milissegundos para a representação numérica inicial
-  const numeroInicial = new Decimal(diferencaEmMilissegundos).div(86400000).toNumber(); // 86400000 milissegundos em um dia
-
-  // Retorna a representação numérica inicial
-  return numeroInicial;
-}
 
 // Função para converter um objeto Date para a representação numérica inicial
 export function converterDateParaNumeroInicialImpreciso(date: Date): number {
