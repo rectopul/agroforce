@@ -5,21 +5,18 @@ import moment from 'moment';
 function calcularData(data: number, precise: boolean = true) {
   // Separa a parte inteira (dias) e a parte decimal (hora, minutos e segundos)
   const [dias, decimal] = data.toString().split('.');
-  
   // Converte a parte inteira para número de dias
   const numDias = parseFloat(dias);
   
   if(precise) {
     // Converte a parte decimal para milissegundos
     const milissegundos = Math.round(parseFloat(`0.${decimal}`) * 86400000);
-    
     // Adiciona o número de dias e segundos à data de referência (epoch)
     return moment("1900-01-01").add(numDias, 'days').add(milissegundos, 'milliseconds');
-    
-  } else {
+  } 
+  else {
     // Converte a parte decimal para segundos
     const segundos = Math.round(parseFloat(`0.${decimal}`) * 86400000);
-    
     // Adiciona o número de dias e segundos à data de referência (epoch)
     return moment("1900-01-01").add(numDias, 'days').add(segundos, 'seconds');
   }
