@@ -1007,7 +1007,10 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const users = await fetch(urlParameters.toString(), requestOptions);
   const { response: allUsers, total: totalItems } = await users.json();
-
+  console.log('allUsers', allUsers);
+  console.log('totalItems', totalItems);
+  console.log('users', users);
+  
   return {
     props: {
       allUsers,
