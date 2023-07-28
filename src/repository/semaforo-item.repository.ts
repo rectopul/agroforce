@@ -7,6 +7,15 @@ export class SemaforoItemRepository {
     return await prisma.semaforoItem.create({data: data});
   }
 
+  async updateBySemaforoId(semaforoId: number, Data: Object) {
+    return await prisma.semaforoItem.updateMany({
+        where: {
+            semaforoId,
+        },
+        data: Data,
+    });
+  }
+  
   async update(id: number, Data: Object) {
     return await prisma.semaforoItem.updateMany({
       where: {

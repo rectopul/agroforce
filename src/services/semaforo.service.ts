@@ -16,6 +16,7 @@ export const semaforoService = {
   finaliza,
   finalizaItem,
   finalizaAcao,
+  testeSemaforoSorteio,
 };
 
 function getAll(parameters: any) {
@@ -67,4 +68,8 @@ function finalizaAcao(id: number, sessao: string) {
     id,
     sessao
   });
+}
+
+function testeSemaforoSorteio() {
+  return fetchWrapper.post(baseUrl + '/testeSemaforoSorteio',{});
 }

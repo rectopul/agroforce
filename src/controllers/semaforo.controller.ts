@@ -1,10 +1,39 @@
 import handleError from '../shared/utils/handleError';
 import {SemaforoRepository} from "../repository/semaforo.repository";
 import {SemaforoItemRepository} from 'src/repository/semaforo-item.repository';
+import {NpeRepository} from "../repository/npe.repository";
+import {ExperimentRepository} from "../repository/experiment.repository";
+import {ExperimentGenotipeRepository} from "../repository/experiment-genotipe.repository";
+import {NpeController} from "./npe/npe.controller";
+import {IReturnObject} from "../interfaces/shared/Import.interface";
 
 export class SemaforoController {
     semaforoRepository = new SemaforoRepository();
     semaforoItemRepository = new SemaforoItemRepository();
+    
+    async testeSemaforo() {
+        const npeRepositoy = new NpeRepository();
+        const experimentRepository = new ExperimentRepository();
+        const experimentGenotipeRepository = new ExperimentGenotipeRepository();
+        const npeController = new NpeController();
+        
+        const erro = false;
+
+        const options = {
+            filterLocal: 'TO501',
+        };
+
+        const {status: statusNPE, response: validateNpe}: IReturnObject = await npeController.getAll(options);
+
+        console.log('statusNPE', statusNPE, 'validateNpe', validateNpe);
+        
+        if(erro){
+            return {status: 400, message: 'Já tem uma sessão ativa, você não pode acessar essa ação!'};
+        }
+        
+        
+        return {status: 200, message: 'Processo em andamento!'};
+    }
 
     /**
      * funcionamento:
@@ -16,8 +45,18 @@ export class SemaforoController {
      * @param created_by chave do usuário que está usando a tela
      * @param tipo chave definindo se é front ou back, se front ele veio da page, se é back veio de um cron
      * @param automatico chave definindo se desativa automaticamente depois de 10 minutos
+     * @param oldIdSemaforo chave do semaforo que está sendo substituido
      */
-    async validaSemaforoItem(sessao: string, acao: string, referencia: string, codReferencia: string, created_by: number = 0, tipo: string = 'front', automatico: string = 's'): Promise<any> {
+    async validaSemaforoItem(
+        sessao: string, 
+        acao: string, 
+        referencia: string, 
+        codReferencia: string, 
+        created_by: number = 0, 
+        tipo: string = 'front', 
+        automatico: string = 's',
+        oldIdSemaforo: number | null = null,
+    ): Promise<any> {
 
         console.log('validaSemaforoItem', sessao, acao, referencia, codReferencia, created_by, tipo, automatico);
 
@@ -25,7 +64,7 @@ export class SemaforoController {
 
             let responseSemaforo: object | any = {};
 
-            // verifica se existe algum registro atrelado à uma ação qualquer
+            // verifica se existe algum registro atrelado a uma ação qualquer
             let responseItem: object | any = await this.semaforoItemRepository.find(referencia, codReferencia);
 
             // se não tiver, verifica se existe semaforo para a acao específica 
@@ -34,7 +73,15 @@ export class SemaforoController {
             } else {
                 // se encontrar o registro, nós pegamos o semaforo
                 // com o semaforo em mãos, nós verificamos se ele é da mesma sessão
-                responseSemaforo = [responseItem[0].semaforo];
+                if(responseItem[0].semaforoId) {
+                    
+                    const semaforo = await this.semaforoRepository.findById(responseItem[0].semaforoId);
+                    
+                    responseSemaforo = [semaforo];
+                    //responseSemaforo = await this.semaforoRepository.findById(responseItem[0].semaforoId);
+                } else {
+                    responseSemaforo = [responseItem[0].semaforo];
+                }
             }
 
             console.log('responseItem', responseItem);
@@ -42,27 +89,39 @@ export class SemaforoController {
             // se não tiver semaforo, cria um novo com a ação, seu tipo, a sessão e o usuário
             if (responseSemaforo.length <= 0) {
                 // cria o semaforo
-                let ret = await this.create({
+                const retorno = await this.create({
                     created_by,
                     sessao,
                     acao,
                     tipo,
                 });
-
-
-                if (ret && ret.status == 200) {
-                    // cria o semaforo item com o semaforo criado, onde armazena a referencia e o codReferencia do registro
-                    let retItem = await this.semaforoItemRepository.create({
-                        created_by,
-                        referencia,
-                        codReferencia,
-                        semaforoId: ret?.response?.id,
-                    });
+                
+                // se o retorno for sucesso, cria o semaforo item
+                console.log('retorno', retorno);
+                
+                if(oldIdSemaforo && retorno && retorno.status == 200 && retorno.response && retorno.response.id){
+                    //await this.semaforoRepository.update(oldIdSemaforo, {status: 'i'});
+                    console.log('oldIdSemaforo', oldIdSemaforo);
+                    // atualiza os semaforoitem com o novo id do semaforo
+                    await this.semaforoItemRepository.updateBySemaforoId(oldIdSemaforo, { semaforoId: retorno.response.id });
+                    // carrega novamente o semaforo item, para caso seja dependente da acao mesmo
+                    responseItem = await this.semaforoItemRepository.find(referencia, codReferencia);
+                    
+                } else {
+                    if (retorno && retorno.status == 200 && retorno.response && retorno.response.id) {
+                        // cria o semaforo item com o semaforo criado, onde armazena a referência e o codReferencia do registro
+                        let retItem = await this.semaforoItemRepository.create({
+                            created_by,
+                            referencia,
+                            codReferencia,
+                            semaforoId: retorno.response.id,
+                        });
+                    }
                 }
-
+                
                 // em caso de erro retorna o erro, e deveria estar encapsulado em uma transação do prisma, para que o semaforo não seja criado se seu item não for criado
-                if (!ret || ret.status != 200) {
-                    return ret || {status: 400, message: 'Erro inesperado!'};
+                if (!retorno || retorno.status != 200) {
+                    return retorno || {status: 400, message: 'Erro inesperado!'};
                 }
 
                 responseSemaforo = await this.semaforoRepository.findAcao(acao);
@@ -77,9 +136,8 @@ export class SemaforoController {
                     codReferencia,
                     semaforoId: responseSemaforo[0].id,
                 });
-
+                console.log('createdItem', createdItem);
                 responseItem = await this.semaforoItemRepository.find(referencia, codReferencia);
-
             }
 
             let semaforo = responseSemaforo[0];
@@ -90,10 +148,15 @@ export class SemaforoController {
                 if (semaforo.automatico == 's') {
                     let data = new Date();
                     data.setMinutes(data.getMinutes() - 10);
-                    console.log(semaforo.last_edit_at, data);
+                    console.log(semaforo.last_edit_at, ' <<<=== ', data);
                     if (semaforo.last_edit_at <= data) {
-                        await this.finaliza(semaforo.id)
-                        return this.validaSemaforo(sessao, acao, created_by, tipo, automatico);
+                        await this.finaliza(semaforo.id);
+                        /*
+                        usado para passar o id do semaforo para o novo item atualizando na tabela semaforoitem a coluna semaforoId
+                        ao passar novamente por validaSemaforoItem, ele vai encontrar o semaforo e não vai criar um novo
+                         */
+                        let oldIdSemaforo = semaforo.id;
+                        return this.validaSemaforoItem(sessao, acao, referencia, codReferencia, created_by, tipo, automatico, oldIdSemaforo);
                     }
                 }
 
@@ -154,7 +217,6 @@ export class SemaforoController {
 
             return {status: 400, message: 'Já tem uma sessão ativa, você não pode acessar essa ação!'};
         } else {
-            console.log('validaSemaforo', 'update', semaforo);
             await this.update({id: semaforo.id})
             return {status: 200};
         }
@@ -335,7 +397,7 @@ export class SemaforoController {
                 if (response) {
                     return {status: 200, response: response, message: 'Semaforos inseridos'};
                 }
-                return {status: 400, response: {}, message: 'houve um erro, tente novamente'};
+                return {status: 400, response: null, message: 'houve um erro, tente novamente'};
             }
         } catch (error: any) {
             handleError('Semaforo Controller', 'Create', error.message);
