@@ -20,7 +20,7 @@ export class SemaforoRepository {
       orderBy: {id: 'asc'}
     });
   }
-
+  
   async findAcao(acao: string) {
     return await prisma.semaforo.findMany({
       where: {acao, status: 'andamento'},

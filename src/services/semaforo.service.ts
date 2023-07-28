@@ -12,7 +12,9 @@ export const semaforoService = {
   getAll,
   update,
   verifica,
+  verificaItem,
   finaliza,
+  finalizaItem,
   finalizaAcao,
 };
 
@@ -34,7 +36,26 @@ function verifica(sessao: string, acao: string, user: number = 0, tipo: string =
   });
 }
 
+function verificaItem(sessao: string, acao: string, referencia:string, codReferencia:string|number, user: number = 0, tipo: string = 'front', automatico: string = 's') {
+  return fetchWrapper.get(baseUrl + '/verificaItem', {
+    sessao,
+    acao,
+    referencia,
+    codReferencia: String(codReferencia),
+    user,
+    tipo,
+    automatico,
+  });
+}
+
 function finaliza(sessao: string, acao: string) {
+  return fetchWrapper.post(baseUrl + '/verifica', {
+    sessao,
+    acao,
+  });
+}
+
+function finalizaItem(sessao: string, acao: string) {
   return fetchWrapper.post(baseUrl + '/verifica', {
     sessao,
     acao,

@@ -88,6 +88,44 @@ export function Semaforo2({ acao }) {
     });
   }
   
+  let sorteiaSemaforo = async () => {
+    const userLogado = JSON.parse(localStorage.getItem('user') as string);
+    let acao = 'sorteia';
+    let referencia = 'npe';
+    let codReferencia:string = '1';
+    
+    
+    
+    
+    await semaforoService.verificaItem(global.sessao, acao, referencia, codReferencia, userLogado.id).then((response: any) => {
+      console.log('semaforoService.sorteia',response);
+      if (response.status === 200) {
+        //setLiberado(true);
+        alert('Processo Iniciado');
+      } else {
+        //setLiberado(false);
+        if (response.message) alert(response.message);
+      }
+    });
+  }
+  
+  let finalizaSorteio = async () => {
+    const userLogado = JSON.parse(localStorage.getItem('user') as string);
+    let acao = 'sorteia';
+    
+    await semaforoService.finalizaItem(global.sessao, acao).then((response: any) => {
+      console.log('semaforoService.finaliza',response);
+      if (response.status === 200) {
+        //setLiberado(true);
+        alert('Processo Finalizado');
+      } else {
+        //setLiberado(false);
+        if (response.message) 
+          alert(response.message);
+      }
+    });
+  }
+  
   useEffect(() => {
     return () => {
       semaforoService.finaliza(global.sessao, acao)
@@ -99,6 +137,44 @@ export function Semaforo2({ acao }) {
       display: 'flex',
       flexDirection: 'row',
     }}>
+
+      <div
+        style={{
+          padding: 12,
+          border: '2px solid green',
+          backgroundColor: 'green',
+          borderRadius: 6,
+          margin: 4,
+          height: 50,
+          color: 'white',
+          cursor: 'pointer',
+        }}
+        onClick={() => {
+          sorteiaSemaforo()
+        }}
+      >
+        SORTEAR
+      </div>
+
+      <div
+          style={{
+            padding: 12,
+            border: '2px solid green',
+            backgroundColor: 'green',
+            borderRadius: 6,
+            margin: 4,
+            height: 50,
+            color: 'white',
+            cursor: 'pointer',
+          }}
+          onClick={() => {
+            finalizaSorteio()
+          }}
+      >
+        FINALIZAR SORTEIO
+      </div>
+      
+      
       {liberado ?
       <div 
         style={{
