@@ -15,7 +15,7 @@ import {validateInteger} from '../../shared/utils/numberValidate';
 import {
   responseNullFactory,
   responseGenericFactory,
-  responseDoesNotExist,
+  responseDoesNotExist, responseCompositeKeysFactory,
 } from '../../shared/utils/responseErrorFactory';
 import {AssayListController} from '../assay-list/assay-list.controller';
 import {GenotipoController} from '../genotype/genotipo.controller';
@@ -199,6 +199,15 @@ export class ImportGenotypeTreatmentController {
 
               const chaveComposta = spreadSheet[row][4] + '_' + spreadSheet[row][10] + '_' + spreadSheet[row][12];
               const safraRow = spreadSheet[row][0];
+
+              const {
+                response: treatmentsAux,
+              }: any = await genotypeTreatmentController.findByNameGenotypeAndNccLote(
+                  spreadSheet[row][4], 
+                  spreadSheet[row][10], 
+                  spreadSheet[row][12]);
+              
+              console.log('treatmentsAux', treatmentsAux);
               
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -208,12 +217,21 @@ export class ImportGenotypeTreatmentController {
                   spreadSheet[0][column]
                 );
               } 
-              else if ( chaveCompostaArr[safraRow]?.includes(chaveComposta) ) {
-                responseIfError[Number(column)] += responseGenericFactory(
+              else if ( chaveCompostaArr[safraRow]?.includes(chaveComposta) || treatmentsAux?.length > 0) {
+                let msg = '';
+                let mostraMsg = false;
+                if(mostraMsg) {
+                  if (treatmentsAux?.length > 0) {
+                    msg = '<br>Tratamento já cadastrado: <br>';
+                  }
+                  treatmentsAux?.forEach((treatment: any) => {
+                    msg += `GLI: ${treatment?.assay_list?.gli} - Genótipo: ${treatment?.genotipo?.name_genotipo} - NCA: ${treatment?.lote?.ncc} <br>`;
+                  });
+                }
+                responseIfError[Number(column)] += responseCompositeKeysFactory(
                   Number(column) + 1,
                   linhaStr,
-                  spreadSheet[0][column],
-                  'Genótipo + NCA não pode repetir dentro de um GLI (Ensaio)',
+                  'os campos Genótipo + NCA não podem repetir dentro de um GLI (Ensaio)' + msg,
                 );
               }
 
