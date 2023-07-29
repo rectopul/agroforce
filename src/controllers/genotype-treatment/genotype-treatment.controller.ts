@@ -278,6 +278,28 @@ export class GenotypeTreatmentController {
     }
   }
 
+  /**
+   * Busca tratamentos do genótipo pelo nome do gli e nome do genótipo e ncc do lote
+   * @param nameGli
+   * @param nameGenotype
+   * @param nccLote
+   * @returns
+   */
+  async findByNameGenotypeAndNccLote(nameGli: string, nameGenotype: string, nccLote: number) {
+    try {
+      
+      const response = await this.genotypeTreatmentRepository.findByNameGenotypeAndNccLote(nameGli, nameGenotype, nccLote);
+      
+      if (!response) throw new Error('Tratamentos do genótipo não encontrada');
+
+      return {status: 200, response};
+      
+    } catch (error: any) {
+      handleError('Tratamentos do genótipo controller', 'findByNameGenotypeAndNccLote', error.message);
+      throw new Error('[Controller] - findByNameGenotypeAndNccLote Tratamentos do genótipo erro: '+error.message);
+    }
+  }
+  
   async getOne(id: number) {
     try {
       const response = await this.genotypeTreatmentRepository.findById(id);
