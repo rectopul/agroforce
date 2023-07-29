@@ -32,7 +32,7 @@ const nextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
-  presets: ['next/babel'],
+  //presets: ['next/babel'],
 
   // evitar o render duplo do useEffect no modo desenvolvimento
   reactStrictMode: false,

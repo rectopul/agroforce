@@ -40,6 +40,134 @@ export class GenotypeTreatmentRepository extends BaseRepository {
     return result;
   }
 
+  /**
+   * busca tratamentos por nome do genotipo, nome do gli e ncc do lote
+   *
+   *        if (options.gli) {
+   *         parameters.assay_list = (JSON.parse(`{"gli": {"contains": "${options.gli}" } }`));
+   *       }
+   *
+   *       if (options.name_genotipo) {
+   *         parameters.genotipo = (JSON.parse(`{"name_genotipo": {"contains": "${options.name_genotipo}" } }`));
+   *       }
+   *
+   *       if (options.nca) {
+   *         parameters.lote = (JSON.parse(`{"ncc": ${Number(options.nca)} }`));
+   *       }
+   *
+   * @param nameGli - nome do gli
+   * @param nameGenotype - nome do genotipo
+   * @param nccLote - ncc do lote
+   * @returns
+   *
+   */
+  async findByNameGenotypeAndNccLote(nameGli: string, nameGenotype: string, nccLote: number) {
+
+    let select = {
+      id: true,
+      id_lote: true,
+      id_genotipo: true,
+      safra: {
+        select: {
+          id: true,
+          safraName: true,
+          culture: true,
+        },
+      },
+      genotipo: {
+        select: {
+          id: true,
+          name_genotipo: true,
+          gmr: true,
+          bgm: true,
+          // tecnologia: {select: {cod_tec: true, name: true,},},
+        },
+      },
+      treatments_number: true,
+      status: true,
+      status_experiment: true,
+      lote: {
+        select: {
+          ncc: true,
+          cod_lote: true,
+          fase: true,
+        },
+      },
+      assay_list: {
+        select: {
+          // foco: { select: { id: true, name: true } },
+          // experiment: { select: { id: true, experimentName: true } },
+          // type_assay: { select: { id: true, name: true } },
+          // tecnologia: { select: { id: true, name: true, cod_tec: true } },
+          gli: true,
+          bgm: true,
+          status: true,
+          project: true,
+          comments: true,
+        },
+      },
+      comments: true,
+    };
+    
+    const result: object | any = await this.getPrisma().genotype_treatment.findMany({
+      where: {
+        assay_list: {
+          gli: {
+            contains: nameGli,
+          }
+        },
+        genotipo: {
+          name_genotipo: {
+            contains: nameGenotype,
+          },
+        },
+        lote: {
+          ncc: nccLote,
+        },
+      },
+      select: select,
+      orderBy: {},
+    });
+
+    return result;
+
+  }
+
+  /**
+   * busca por id do tratamento, id do lote e id do genotipo
+   * @param idList
+   * @param idLote
+   * @param idGenotype
+   */
+  async findReplaceGenotype(idList: any, idLote: any, idGenotype: number) {
+
+    const result: object | any = await this.getPrisma().genotype_treatment.findMany({
+      where: {
+        id: {
+          notIn: idList,
+        },
+        id_genotipo: idGenotype,
+        id_lote: idLote, // for store both values
+      },
+      orderBy: {},
+    });
+    
+    return result;
+    /*
+    const result = await this.getPrisma().genotype_treatment.updateMany({
+      where: {
+        id: {
+          notin: idList,
+        },
+      },
+      data: {
+        id_genotipo: idGenotype,
+        id_lote: idLote, // for store both values
+      },
+    });
+    return result;*/
+  }
+  
   async replaceGenotype(idList: any, idLote: any, idGenotype: number) {
     const result = await this.getPrisma().genotype_treatment.updateMany({
       where: {
