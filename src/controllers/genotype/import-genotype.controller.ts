@@ -4,38 +4,28 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable no-await-in-loop */
 
-import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
-import {
-  ImportValidate,
-  IReturnObject,
-} from '../../interfaces/shared/Import.interface';
+import {TransactionConfig} from 'src/shared/prisma/transactionConfig';
+import {ImportValidate, IReturnObject,} from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
-import { validateDecimal, validateInteger } from '../../shared/utils/numberValidate';
+import {validateInteger} from '../../shared/utils/numberValidate';
 import {
   responseGenericFactory,
   responseNullFactory,
   responsePositiveNumericFactory,
 } from '../../shared/utils/responseErrorFactory';
-import { validateHeaders } from '../../shared/utils/validateHeaders';
-import { CulturaController } from '../cultura.controller';
-import { ImportController } from '../import.controller';
-import { LogImportController } from '../log-import.controller';
-import { LoteController } from '../lote.controller';
-import { SafraController } from '../safra.controller';
-import { TecnologiaController } from '../technology/tecnologia.controller';
-import { GenotipoController } from './genotipo.controller';
-import { genotipeQueue } from './genotipeQueue';
+import {validateHeaders} from '../../shared/utils/validateHeaders';
+import {CulturaController} from '../cultura.controller';
+import {ImportController} from '../import.controller';
+import {LogImportController} from '../log-import.controller';
+import {LoteController} from '../lote.controller';
+import {SafraController} from '../safra.controller';
+import {TecnologiaController} from '../technology/tecnologia.controller';
+import {GenotipoController} from './genotipo.controller';
+import {genotipeQueue} from './genotipeQueue';
 
-import { GenotipoRepository } from '../../repository/genotipo.repository';
-import { LoteRepository } from '../../repository/lote.repository';
-import {
-  converterDateParaNumeroInicial, converterEpochToDate,
-  converterParaDataBanco,
-  converterParaTimestamp,
-  converterParaTimestampISO,
-  validarData
-} from 'src/shared/utils/formatDateEpoch';
-import moment from "moment";
+import {GenotipoRepository} from '../../repository/genotipo.repository';
+import {LoteRepository} from '../../repository/lote.repository';
+import {convertDateToSQLDatetimeUTC, convertSerialDateToJSDate, validarData} from 'src/shared/utils/formatDateEpoch';
 
 /* eslint-disable no-restricted-syntax */
 export class ImportGenotypeController {
@@ -381,6 +371,7 @@ export class ImportGenotypeController {
                 filterSafra: String(spreadSheet[row][23]),
                 filterStatus: 1,
               });
+              
               if (Number(response[0]?.year) !== Number(spreadSheet[row][column])) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
@@ -547,11 +538,13 @@ export class ImportGenotypeController {
                 
                 const dateEpoch = spreadSheet[row][column];
                 
-                const dataDB = converterParaDataBanco(dateEpoch);
+                const dateJs = convertSerialDateToJSDate(dateEpoch);
                 
                 const dateNow = new Date();
 
-                if (dateNow.getTime() < converterParaTimestamp(dateEpoch)) {
+                const dateTimeSqlUTC = convertDateToSQLDatetimeUTC(dateEpoch);
+
+                if (dateNow.getTime() < dateJs.getTime()) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     linhaStr,
@@ -560,7 +553,7 @@ export class ImportGenotypeController {
                   );
                 }
 
-                if (!validarData(dataDB)) {
+                if (!validarData(dateTimeSqlUTC)) {
                   responseIfError[Number(column)] += responseGenericFactory(
                     Number(column) + 1,
                     linhaStr,
@@ -570,8 +563,8 @@ export class ImportGenotypeController {
                 }
                 
                 if (status === 200) {
-                  const lastDtImport = responseLoteExists[0]?.dt_rde;
-                  
+                  const lastDtImport = Number(responseLoteExists[0]?.dt_rde);
+                  // console.log('lastDtImport', lastDtImport, dateEpoch, lastDtImport > dateEpoch);
                   if ((lastDtImport != null) && lastDtImport > dateEpoch) {
                     responseIfError[Number(column)] += responseGenericFactory(
                       Number(column) + 1,
@@ -892,23 +885,9 @@ export class ImportGenotypeController {
               if (configModule.response[0]?.fields[column] === 'DT_EXPORT') {
                 if (spreadSheet[row][column] !== null) {
                   let dateEpoch = spreadSheet[row][column];
-                  console.log('dateEpoch', dateEpoch);
-                  let dateExport = converterEpochToDate(dateEpoch, true);
-                  console.log('dateExport', dateExport);
-                  let numeroInicial = converterDateParaNumeroInicial(dateExport);
-                  console.log('numeroInicial', numeroInicial);
-
-                  let dateExport2 = converterEpochToDate(dateEpoch, true);
-                  console.log('dateExport2', dateExport2);
-                  
-                  // confere datas
-                  if(dateExport == dateExport2){
-                    console.log('=========>>> Está correto os valores são iguais');
-                  } else {
-                    console.log('############ Está incorreto os valores não são iguais');
-                  }
-                  
-                  this.aux.dt_export = dateExport;
+                  // convertSerialDateToJSDate
+                  const dateJSDate = convertSerialDateToJSDate(dateEpoch);
+                  this.aux.dt_export = dateJSDate;
                   this.aux.dt_rde = dateEpoch;
                 }
               }

@@ -19,12 +19,7 @@ import {LocalController} from './local.controller';
 import {UnidadeCulturaController} from './unidade-cultura.controller';
 import {LocalRepository} from '../../repository/local.repository';
 import {UnidadeCulturaRepository} from '../../repository/unidade-cultura.repository';
-import {
-  converterEpochToDate,
-  converterParaDataBanco,
-  converterParaTimestamp,
-  validarData
-} from "../../shared/utils/formatDateEpoch";
+import {convertDateToSQLDatetimeUTC, convertSerialDateToJSDate, validarData} from "../../shared/utils/formatDateEpoch";
 
 export class ImportLocalController {
   static aux: any = {};
@@ -410,11 +405,13 @@ export class ImportLocalController {
 
               const dateEpoch = spreadSheet[row][column];
 
-              const dataDB = converterParaDataBanco(dateEpoch);
+              const dateJs = convertSerialDateToJSDate(dateEpoch);
 
               const dateNow = new Date();
 
-              if (dateNow.getTime() < converterParaTimestamp(dateEpoch)) {
+              const dateTimeSqlUTC = convertDateToSQLDatetimeUTC(dateEpoch);
+
+              if (dateNow.getTime() < dateJs.getTime()) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
                   linhaStr,
@@ -423,7 +420,7 @@ export class ImportLocalController {
                 );
               }
 
-              if (!validarData(dataDB)) {
+              if (!validarData(dateTimeSqlUTC)) {
                 responseIfError[Number(column)] += responseGenericFactory(
                   Number(column) + 1,
                   linhaStr,
@@ -434,7 +431,7 @@ export class ImportLocalController {
               
               if (status === 200) {
                 
-                const lastDtImport = responseUnityCulture[0]?.dt_rde;
+                const lastDtImport = Number(responseUnityCulture[0]?.dt_rde);
                 
                 if ((lastDtImport != null) && lastDtImport > dateEpoch) {
                   responseIfError[Number(column)] += responseGenericFactory(
@@ -493,16 +490,11 @@ export class ImportLocalController {
                   } else if (spreadSheet[0][column]?.includes('CNTR_LIBELLE')) {
                     localCultureDTO.label_country = (spreadSheet[row][column]?.toString());
                   } else if (spreadSheet[0][column]?.includes('DT') || spreadSheet[0][column]?.includes('DT_EXPORT')) {
-                    
                     let dateEpoch = spreadSheet[row][column];
-                    let dateExport = converterEpochToDate(dateEpoch, true);
-
-                    // this.aux.dt_export = dateExport;
-                    // this.aux.dt_rde = dateEpoch;
-
-                    unityCultureDTO.dt_export = dateExport;
+                    // convertSerialDateToJSDate
+                    const dateJSDate = convertSerialDateToJSDate(dateEpoch);
+                    unityCultureDTO.dt_export = dateJSDate;
                     unityCultureDTO.dt_rde = dateEpoch;
-                    
                   }
                 }
                 localCultureDTO.created_by = Number(createdBy);
