@@ -64,10 +64,12 @@ export class ReplaceTreatmentController {
         const gli = assayList.gli;
 
         const chaveComposta = gli + '_' + geneticName + '_' + ncc;
+
+        let responseExists = await this.findGenotypeTreatment([treatment.id], lote_id, geneticName_id);
         
-        if(chaveCompostaArr.includes(chaveComposta)) {
-          responseIfError+= `- Genótipo: ${geneticName} | NCA: ${ncc} | GLI: ${gli}<br>`;
+        if(chaveCompostaArr.includes(chaveComposta) || responseExists.length > 0) {
           responseIfError+= `Genótipo + NCA não pode repetir dentro de um GLI (Ensaio)<br>`;
+          responseIfError+= `- Genótipo: ${geneticName} | NCA: ${ncc} | GLI: ${gli}<br>`;
         }
         
         chaveCompostaArr.push(chaveComposta);
@@ -81,6 +83,7 @@ export class ReplaceTreatmentController {
       if (checkedTreatments[0]?.genotipo) {
         let response;
         if (value == 'ensaios') {
+          
           await this.reporteController.create({
             userId, module: 'GENOTIPOS DO ENSAIO', operation: 'SUBSTITUIÇÃO', oldValue: ncc, ip: String(ip),
           });
@@ -100,6 +103,11 @@ export class ReplaceTreatmentController {
 
       let response;
       if (value == 'ensaios') {
+        
+        let responseExists = await this.findGenotypeTreatment(idList, lote_id, geneticName_id);
+        
+        console.log('responseExists', responseExists);
+        
         await this.reporteController.create({
           userId, module: 'GENOTIPOS DO ENSAIO', operation: 'SUBSTITUIÇÃO', oldValue: geneticName, ip: String(ip),
         });
@@ -120,6 +128,16 @@ export class ReplaceTreatmentController {
     }
   }
 
+  async findGenotypeTreatment(idList:any, lote_id :any, geneticName_id :any) {
+    const response = await this.genotypeTreatmentRepository.findReplaceGenotype(
+        idList,
+        lote_id,
+        geneticName_id,
+    );
+
+    return response;
+  }
+  
   async genotypeTreatment(idList:any, lote_id :any, geneticName_id :any) {
     const response = await this.genotypeTreatmentRepository.replaceGenotype(
       idList,

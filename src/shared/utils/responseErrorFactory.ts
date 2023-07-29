@@ -38,3 +38,11 @@ export function responseGenericFactory(
 ) {
   return `<li style="text-align:left"> A ${column}º coluna da ${row}º linha está incorreta, o campo ${header} ${message}. </li> <br>`;
 }
+
+export function responseCompositeKeysFactory(
+    column: number,
+    row: string,
+    message: string,
+) {
+  return `<li style="text-align:left"> A ${column}º coluna da ${row}º linha está incorreta, ${message}. </li> <br>`;
+}

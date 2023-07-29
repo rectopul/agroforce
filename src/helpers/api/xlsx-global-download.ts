@@ -2,28 +2,27 @@
 /* eslint-disable no-param-reassign */
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
-import { CulturaController } from 'src/controllers/cultura.controller';
-import { UserController } from 'src/controllers/user.controller';
-import { DepartamentController } from 'src/controllers/departament.controller';
-import { SafraController } from 'src/controllers/safra.controller';
-import { GenotipoController } from 'src/controllers/genotype/genotipo.controller';
-import { LoteController } from 'src/controllers/lote.controller';
-import { TypeAssayController } from 'src/controllers/tipo-ensaio.controller';
-import { FocoController } from 'src/controllers/foco.controller';
-import { TecnologiaController } from 'src/controllers/technology/tecnologia.controller';
-import { DelineamentoController } from 'src/controllers/delimitation/delineamento.controller';
-import { LocalController } from 'src/controllers/local/local.controller';
-import { UnidadeCulturaController } from 'src/controllers/local/unidade-cultura.controller';
-import { LayoutQuadraController } from 'src/controllers/block-layout/layout-quadra.controller';
-import { LogImportController } from 'src/controllers/log-import.controller';
-import { AssayListController } from 'src/controllers/assay-list/assay-list.controller';
-import { GenotypeTreatmentController } from 'src/controllers/genotype-treatment/genotype-treatment.controller';
-import { ExperimentController } from 'src/controllers/experiment/experiment.controller';
-import { NpeController } from 'src/controllers/npe/npe.controller';
-import { QuadraController } from 'src/controllers/block/quadra.controller';
+import {CulturaController} from 'src/controllers/cultura.controller';
+import {UserController} from 'src/controllers/user.controller';
+import {DepartamentController} from 'src/controllers/departament.controller';
+import {SafraController} from 'src/controllers/safra.controller';
+import {GenotipoController} from 'src/controllers/genotype/genotipo.controller';
+import {LoteController} from 'src/controllers/lote.controller';
+import {TypeAssayController} from 'src/controllers/tipo-ensaio.controller';
+import {FocoController} from 'src/controllers/foco.controller';
+import {TecnologiaController} from 'src/controllers/technology/tecnologia.controller';
+import {DelineamentoController} from 'src/controllers/delimitation/delineamento.controller';
+import {LocalController} from 'src/controllers/local/local.controller';
+import {UnidadeCulturaController} from 'src/controllers/local/unidade-cultura.controller';
+import {LayoutQuadraController} from 'src/controllers/block-layout/layout-quadra.controller';
+import {LogImportController} from 'src/controllers/log-import.controller';
+import {AssayListController} from 'src/controllers/assay-list/assay-list.controller';
+import {GenotypeTreatmentController} from 'src/controllers/genotype-treatment/genotype-treatment.controller';
+import {ExperimentController} from 'src/controllers/experiment/experiment.controller';
+import {NpeController} from 'src/controllers/npe/npe.controller';
+import {QuadraController} from 'src/controllers/block/quadra.controller';
 import moment from 'moment';
-import { ExperimentGenotipeController } from '../../controllers/experiment-genotipe.controller';
-import {converterDateParaNumeroInicial} from "../../shared/utils/formatDateEpoch";
+import {ExperimentGenotipeController} from '../../controllers/experiment-genotipe.controller';
 
 async function callExperimentGenotipeXlsxDownload(options: any) {
   const Controller = new ExperimentGenotipeController();
@@ -350,16 +349,6 @@ async function callTmgLoteXlsxDownload(options: any) {
     const newData = response.map((item: any) => {
       const newItem = item;
 
-      // newItem.dt_export = new Date(newItem.dt_export);
-      // newItem.dt_export = new Date(
-      //   newItem.dt_export.toISOString().slice(0, -1),
-      // );
-      //newItem.dt_export = moment(newItem.dt_export).format('DD-MM-YYYY HH:mm:ss'); // antigo, agora precisa ser numerico
-      
-      const numeroOriginal = converterDateParaNumeroInicial(newItem.dt_export);
-      console.log('numeroOriginal', numeroOriginal);
-      newItem.dt_export = numeroOriginal;
-
       newItem.CULTURA = item?.genotipo.culture.name;
       newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
       newItem.NOME_PRINCIPAL = (item?.genotipo.name_main);  
@@ -387,8 +376,7 @@ async function callTmgLoteXlsxDownload(options: any) {
       newItem.QUANT_SEMENTES = item?.quant_sementes;
       newItem.DT_RD = String(item.dt_rde).replace('.', ',');
       newItem.DT_GOM = moment().format('DD-MM-YYYY HH:mm:ss');
-      //newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss'); // porque a hora está sainda no formato PM e AM?
-
+      
       delete newItem.quant_sementes;
       delete newItem.peso;
       delete newItem.fase;
@@ -528,25 +516,21 @@ async function callEnsaioTechnologiaXlsxDownload(options: any) {
   do {
     const { response, status } = await Controller.getAll(options);
     const newData = response.map((row: any) => {
-      row.dt_export = new Date(row.dt_export);
-      row.dt_export = new Date(
-        row.dt_export.toISOString().slice(0, -1),
-      );
+      
       row.CULTURA = row.culture.desc;
       row.NOME = row.name;
       row.DESC = row.desc;
       row.COD_TEC = row.cod_tec;
-      row.dt_export = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
-      row.DT_RD = row.dt_export;
+      row.DT_RD = Number(row.dt_rde);
       row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
-
+      
       delete row.culture;
       delete row.id;
       delete row.dt_export;
       delete row.name;
       delete row.desc;
       delete row.cod_tec;
-      delete row.DT;
+      delete row.dt_rde;
 
       return row;
     });
@@ -635,9 +619,10 @@ async function callLocalLugarCulturaXlsxDownload(options: any) {
       row.REGIÃO = row.label_region;
       row.LOCALIDADE = row.name_locality;
       row.STATUS = row.status;
-      row.DT_RD = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
+      row.DT_RD = Number(row.dt_rde);
       row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
+      delete row.id;
       delete row.name_local_culture;
       delete row.label;
       delete row.mloc;
@@ -647,8 +632,7 @@ async function callLocalLugarCulturaXlsxDownload(options: any) {
       delete row.name_locality;
       delete row.status;
       delete row.dt_export;
-      delete row.DT;
-      delete row.id;
+      delete row.dt_rde;
       delete row.cultureUnity;
 
       return row;
@@ -681,11 +665,6 @@ async function callLocalUnidadeCulturaXlsxDownload(options: any) {
     const newData = response.map((row: any) => {
       const newRow = row;
 
-      newRow.dt_export = new Date(newRow.dt_export);
-      newRow.dt_export = new Date(
-        newRow.dt_export.toISOString().slice(0, -1),
-      );
-
       newRow.NOME_DO_LUGAR_CULTURA = newRow.local?.name_local_culture;
       newRow.RÓTULO = newRow.local?.label;
       newRow.MLOC = newRow.local?.mloc;
@@ -695,20 +674,18 @@ async function callLocalUnidadeCulturaXlsxDownload(options: any) {
       newRow.LOCALIDADE = newRow.local?.name_locality;
       newRow.NOME_UNIDADE_CULTURA = newRow?.name_unity_culture;
       newRow.ANO = newRow?.year;
-      row.dt_export = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
-      row.DT_RD = row.dt_export;
-      row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
+      newRow.DT_RD = Number(row.dt_rde);
+      newRow.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete newRow.year;
       delete newRow.name_unity_culture;
-      delete newRow.DT;
       delete newRow.id_safra;
       delete newRow.id;
-      delete newRow.EXPORT;
       delete newRow.dt_export;
       delete newRow.id_unity_culture;
       delete newRow.id_local;
       delete newRow.local;
+      delete newRow.dt_rde;
       return newRow;
     });
 
