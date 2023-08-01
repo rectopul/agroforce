@@ -14,14 +14,11 @@ import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 import { prisma } from '../pages/api/db/db';
 import { NpeController } from './npe/npe.controller';
+import {SemaforoController} from "./semaforo.controller";
+
 import {PrismaClientManager} from "../shared/prisma/prismaClientManager";
 import {TransactionScope} from "../shared/prisma/transactionScope";
 import {PrismaTransactionScope} from "../shared/prisma/prismaTransactionScope";
-import {removeEspecialAndSpace} from '../shared/utils/removeEspecialAndSpace';
-import {prisma} from '../pages/api/db/db';
-import {NpeController} from './npe/npe.controller';
-import {SemaforoController} from "./semaforo.controller";
-
 
 interface ICreateParams {
   experiment_genotipo: any[];
