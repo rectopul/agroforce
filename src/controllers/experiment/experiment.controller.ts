@@ -13,6 +13,7 @@ import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpac
 import { NpeController } from '../npe/npe.controller';
 import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';
 import { ReporteController } from '../reportes/reporte.controller';
+import {SemaforoController} from "../semaforo.controller";
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -20,6 +21,8 @@ export class ExperimentController {
   assayListController = new AssayListController();
 
   reporteController = new ReporteController();
+
+  semaforoController = new SemaforoController();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -379,10 +382,16 @@ export class ExperimentController {
   }
 
   async update(data: any) {
+
+    const acao = SemaforoController.PROCESS_EDICAO;
+    const created_by = data.userId;
+    
     try {
       const experimentGenotipeController = new ExperimentGenotipeController();
       const experimentGroupController = new ExperimentGroupController();
+      
       if (data.idList) {
+        
         /**
          * limpa os experimentos
          * caso seja exclusão de experimentos de um grupo, o método relationGroup irá limpar a coluna experimentGroupId de experiments
@@ -390,13 +399,15 @@ export class ExperimentController {
          * SELECT * FROM `experiment` WHERE `experimentName` LIKE '%BA408BR02%' ORDER BY `id` ASC
          */
         const teste = await this.experimentRepository.relationGroup(data);
-
+        
         if (data.experimentGroupId) {
+          
           const { response: group } = await experimentGroupController.getOne(Number(data.experimentGroupId));
 
           const { ip } = await fetch('https://api.ipify.org/?format=json')
             .then((results) => results.json())
             .catch(() => '0.0.0.0');
+          
           await this.reporteController.create({
             userId: data.userId,
             module: 'GRUPO DE ETIQUETAGEM',

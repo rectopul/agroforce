@@ -1,15 +1,12 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {semaforoService} from "../../services";
-import {ExperimentGenotipeRepository} from "../../repository/experiment-genotipe.repository";
-import {ExperimentRepository} from "../../repository/experiment.repository";
-import {NpeRepository} from "../../repository/npe.repository";
-import {NpeController} from "../../controllers/npe/npe.controller";
 
 let semaforo_timeout: any = null;
 
 // @ts-ignore
 export function Semaforo1({ acao }) {
+  
   const [liberado, setLiberado] = useState(false);
   
   let verificaSemaforo = async () => {

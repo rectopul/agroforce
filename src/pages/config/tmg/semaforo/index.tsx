@@ -3,21 +3,17 @@ import MaterialTable from 'material-table';
 import {GetServerSideProps, InferGetServerSidePropsType} from 'next';
 import getConfig from 'next/config';
 import Head from 'next/head';
-import {useRouter} from 'next/router';
-import {SetStateAction, useEffect, useState} from 'react';
-import {DragDropContext, Draggable, Droppable, DropResult,} from 'react-beautiful-dnd';
+import {useEffect, useState} from 'react';
+import {DropResult,} from 'react-beautiful-dnd';
 import {BiLeftArrow, BiRightArrow,} from 'react-icons/bi';
 
 import {FaCheck} from 'react-icons/fa';
-import {FiUserPlus} from 'react-icons/fi';
-import {IoReloadSharp} from 'react-icons/io5';
 import {MdFirstPage, MdLastPage} from 'react-icons/md';
-import {RiFileExcel2Line} from 'react-icons/ri';
 import {RequestInit} from 'next/dist/server/web/spec-extension/request';
 import {removeCookies, setCookies} from 'cookies-next';
 import {tableGlobalFunctions} from 'src/helpers';
 import {semaforoService} from '../../../../services';
-import {AccordionFilter, Button, CheckBox, Content, Input, Semaforo1 } from '../../../../components';
+import {Button, Content, Semaforo1} from '../../../../components';
 import * as ITabs from '../../../../shared/utils/dropdown';
 import {UserPreferenceController} from '../../../../controllers/user-preference.controller';
 
