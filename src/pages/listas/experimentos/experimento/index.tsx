@@ -389,12 +389,14 @@ export default function Listagem({
     await experimentService.deleted({
       id: itemSelectedDelete?.id,
       userId: userLogado.id,
+      sessao: global.sessao,
     }).then(async ({ status, message }) => {
       if (status === 200) {
         await handlePagination(currentPage);
         setLoading(false);
       } else {
         await Swal.fire({
+          title: 'Falha ao excluir experimento',
           html: message,
           width: '800',
         });
@@ -403,6 +405,7 @@ export default function Listagem({
     }).catch((error) => {
       console.log(error);
       Swal.fire({
+        title: 'Erro fatal ao excluir experimento',
         html: (typeof error === 'string') ? error : error.message,
         width: '800',
       });

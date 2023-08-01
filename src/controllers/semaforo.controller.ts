@@ -1,11 +1,11 @@
 import handleError from '../shared/utils/handleError';
-import {SemaforoRepository} from "../repository/semaforo.repository";
-import {SemaforoItemRepository} from 'src/repository/semaforo-item.repository';
-import {NpeRepository} from "../repository/npe.repository";
-import {ExperimentRepository} from "../repository/experiment.repository";
-import {ExperimentGenotipeRepository} from "../repository/experiment-genotipe.repository";
-import {NpeController} from "./npe/npe.controller";
-import {IReturnObject} from "../interfaces/shared/Import.interface";
+import { SemaforoRepository } from "../repository/semaforo.repository";
+import { SemaforoItemRepository } from 'src/repository/semaforo-item.repository';
+import { NpeRepository } from "../repository/npe.repository";
+import { ExperimentRepository } from "../repository/experiment.repository";
+import { ExperimentGenotipeRepository } from "../repository/experiment-genotipe.repository";
+import { NpeController } from "./npe/npe.controller";
+import { IReturnObject } from "../interfaces/shared/Import.interface";
 import { UserRepository } from 'src/repository/user.repository';
 
 export class SemaforoController {
@@ -14,12 +14,16 @@ export class SemaforoController {
   userRepository = new UserRepository();
 
   userCache = new Map();
-  
+
   // constant
   static readonly PROCESS_SORTEIO = 'sorteio';
   static readonly PROCESS_VALIDACAO = 'validação';
   static readonly PROCESS_EDICAO = 'edição';
   static readonly PROCESS_EXCLUSAO = 'exclusão';
+
+  private _sessao: string = '';
+  private _acao: string = '';
+  private _created_by: number = 0;
 
   async testeSemaforo() {
     const npeRepositoy = new NpeRepository();
@@ -33,15 +37,39 @@ export class SemaforoController {
       filterLocal: 'TO501',
     };
 
-    const {status: statusNPE, response: validateNpe}: IReturnObject = await npeController.getAll(options);
+    const { status: statusNPE, response: validateNpe }: IReturnObject = await npeController.getAll(options);
 
     console.log('statusNPE', statusNPE, 'validateNpe', validateNpe);
 
     if (erro) {
-      return {status: 400, message: 'Já tem uma sessão ativa, você não pode acessar essa ação!'};
+      return { status: 400, message: 'Já tem uma sessão ativa, você não pode acessar essa ação!' };
     }
-    
-    return {status: 200, message: 'Processo em andamento!'};
+
+    return { status: 200, message: 'Processo em andamento!' };
+  }
+
+  set setCreatedBy(value: number) {
+    this._created_by = value;
+  }
+
+  set setSessao(sessao: string) {
+    this._sessao = sessao;
+  }
+
+  set setAcao(acao: string) {
+    this._acao = acao;
+  }
+
+  get createdBy(): number {
+    return this._created_by;
+  }
+
+  get sessao(): string {
+    return this._sessao;
+  }
+
+  get acao(): string {
+    return this._acao;
   }
 
   /**
@@ -66,7 +94,7 @@ export class SemaforoController {
     sessao: string,
     acao: string,
     referencia: string,
-    codReferencia: string|number,
+    codReferencia: string | number,
     created_by: number = 0,
     tipo: string = 'front',
     automatico: string = 'n',
@@ -76,6 +104,14 @@ export class SemaforoController {
     codReferencia = String(codReferencia);
 
     console.log('validaSemaforoItem', sessao, acao, referencia, codReferencia, created_by, tipo, automatico);
+
+    if (!sessao && this._sessao) {
+      sessao = this._sessao;
+    }
+
+    if (!acao && this._acao) {
+      acao = this._acao;
+    }
 
     try {
 
@@ -107,7 +143,7 @@ export class SemaforoController {
       // se não tiver semaforo, cria um novo com a ação, seu tipo, a sessão e o usuário
       if (responseSemaforo.length <= 0) {
         // cria o semaforo
-        const retorno = await this.create({
+        const retorno = await this.createSemaforo({
           created_by,
           sessao,
           acao,
@@ -122,7 +158,7 @@ export class SemaforoController {
           //await this.semaforoRepository.update(oldIdSemaforo, {status: 'i'});
           console.log('oldIdSemaforo', oldIdSemaforo);
           // atualiza os semaforoitem com o novo id do semaforo
-          await this.semaforoItemRepository.updateBySemaforoId(oldIdSemaforo, {semaforoId: retorno.response.id});
+          await this.semaforoItemRepository.updateBySemaforoId(oldIdSemaforo, { semaforoId: retorno.response.id });
           // carrega novamente o semaforo item, para caso seja dependente da acao mesmo
           responseItem = await this.semaforoItemRepository.find(referencia, codReferencia);
 
@@ -140,20 +176,22 @@ export class SemaforoController {
 
         // em caso de erro retorna o erro, e deveria estar encapsulado em uma transação do prisma, para que o semaforo não seja criado se seu item não for criado
         if (!retorno || retorno.status != 200) {
-          return retorno || {status: 400, reponse: {
-            sessao,
-            acao,
-            referencia,
-            codReferencia,
-            created_by,
-            }, message: 'Erro inesperado!'};
+          return retorno || {
+            status: 400, reponse: {
+              sessao,
+              acao,
+              referencia,
+              codReferencia,
+              created_by,
+            }, message: 'Erro inesperado!'
+          };
         }
 
         responseSemaforo = await this.semaforoRepository.findAcao(acao);
       }
 
       // se não tiver, verifica se existe semaforo para a acao específica
-      if (responseItem.length <= 0 && responseSemaforo[0].acao == acao) {
+      if (responseItem.length <= 0 && responseSemaforo[0]._acao == acao) {
         // cria o semaforo item
         let createdItem = await this.semaforoItemRepository.create({
           created_by,
@@ -167,7 +205,7 @@ export class SemaforoController {
 
       let semaforo = responseSemaforo[0];
 
-      console.log(semaforo.sessao, sessao, 'acao:', acao);
+      console.log(semaforo._sessao, sessao, 'acao:', acao);
 
       if (semaforo.sessao != sessao) {
         if (semaforo.automatico == 's') {
@@ -186,54 +224,58 @@ export class SemaforoController {
         }
 
         let bloqueadoPor = true;
-        
+
         let output = ``;
-        if(bloqueadoPor) {
-          
+        if (bloqueadoPor) {
+
           let usuario: any[] = [];
-          
+
           console.log('this.userCache', this.userCache);
           if (this.userCache.has(created_by)) {
             usuario = this.userCache.get(created_by);
           } else {
             const responseUser = await this.userRepository.findOne(created_by);
             if (!responseUser) {
-              return {status: 400, response: [], message: 'usuário não existe para a criação do semáforo.'};
+              return { status: 400, response: [], message: 'usuário não existe para a criação do semáforo.' };
             }
 
             usuario = responseUser;
-            
+
             this.userCache.set(created_by, responseUser);
           }
-          
+
           console.log('usuario', usuario);
-          
-          output+= `\nSemaforo: ${semaforo.id}\n`;
-          output+= `Sessão: ${sessao}\n`;
-          output+= `Processo: ${acao}\n`;
-          output+= `Referência: ${referencia}\n`;
-          output+= `CodReferencia: ${codReferencia}\n`;
-          output+= `Criado por: ${usuario[0].name} \n`;
+
+          output += `\nSemaforo: ${semaforo.id}\n`;
+          output += `Sessão: ${sessao}\n`;
+          output += `Processo: ${acao}\n`;
+          output += `Referência: ${referencia}\n`;
+          output += `CodReferencia: ${codReferencia}\n`;
+          output += `Criado por: ${usuario[0].name} \n`;
           // replace break lines to <br>
           output = output.replace(/\n/g, '<br>');
         }
-        
-        return {status: 400, reponse: {
+
+        return {
+          status: 400, reponse: {
             sessao,
             acao,
             referencia,
             codReferencia,
             created_by,
-          }, message: `Já tem uma sessão ativa, você não pode acessar essa ação!${output}`};
+          }, message: `Já tem uma sessão ativa, você não pode acessar essa ação!${output}`
+        };
       } else {
-        await this.update({id: semaforo.id})
-        return {status: 200, reponse: {
+        await this.update({ id: semaforo.id })
+        return {
+          status: 200, reponse: {
             sessao,
             acao,
             referencia,
             codReferencia,
             created_by,
-          }, message: 'Semaforo atualizado!'};
+          }, message: 'Semaforo atualizado!'
+        };
       }
 
     } catch (error: any) {
@@ -242,21 +284,21 @@ export class SemaforoController {
     }
   }
 
-    /**
-     * funcionamento:
-     *
-     * @param sessao chave da sessão quando o usuario abre uma tela
-     * @param acao chave definindo a página ou local específico
-     * @param created_by
-     * @param tipo chave definindo se é front ou back, se front ele veio da page, se é back veio de um cron
-     * @param automatico chave definindo se desativa automaticamente depois de 10 minutos
-     */
-    async validaSemaforo(sessao: string, acao: string, created_by: number = 0, tipo: string = 'front', automatico: string = 's'): Promise<any> {
+  /**
+   * funcionamento:
+   *
+   * @param sessao chave da sessão quando o usuario abre uma tela
+   * @param acao chave definindo a página ou local específico
+   * @param created_by
+   * @param tipo chave definindo se é front ou back, se front ele veio da page, se é back veio de um cron
+   * @param automatico chave definindo se desativa automaticamente depois de 10 minutos
+   */
+  async validaSemaforo(sessao: string, acao: string, created_by: number = 0, tipo: string = 'front', automatico: string = 's'): Promise<any> {
 
     let response: object | any = await this.semaforoRepository.findAcao(acao);
 
     if (response.length <= 0) {
-      let ret = await this.create({
+      let ret = await this.createSemaforo({
         created_by,
         sessao,
         acao,
@@ -264,7 +306,7 @@ export class SemaforoController {
       })
 
       if (!ret || ret.status != 200) {
-        return ret || {status: 400, message: 'Erro inesperado!'};
+        return ret || { status: 400, message: 'Erro inesperado!' };
       }
 
       response = await this.semaforoRepository.findAcao(acao);
@@ -272,9 +314,9 @@ export class SemaforoController {
 
     let semaforo = response[0];
 
-    console.log(semaforo.sessao, sessao, 'acao:', acao);
+    console.log(semaforo._sessao, sessao, 'acao:', acao);
 
-    if (semaforo.sessao != sessao) {
+    if (semaforo._sessao != sessao) {
       if (semaforo.automatico == 's') {
         let data = new Date();
         data.setMinutes(data.getMinutes() - 10);
@@ -285,10 +327,10 @@ export class SemaforoController {
         }
       }
 
-      return {status: 400, message: 'Já tem uma sessão ativa, você não pode acessar essa ação!'};
+      return { status: 400, message: 'Já tem uma sessão ativa, você não pode acessar essa ação!' };
     } else {
-      await this.update({id: semaforo.id})
-      return {status: 200};
+      await this.update({ id: semaforo.id })
+      return { status: 200 };
     }
   }
 
@@ -316,11 +358,11 @@ export class SemaforoController {
       await this.finaliza(response.id);
       // await this.finalizaRest(sessaoValida, 'page-semaforo-finalizaAcao');
 
-      return {status: 200};
+      return { status: 200 };
     } else {
       // await this.finalizaRest(sessaoValida, 'page-semaforo-finalizaAcao');
 
-      return {status: 400, message: 'Sessão não encontrada'};
+      return { status: 400, message: 'Sessão não encontrada' };
     }
   }
 
@@ -330,7 +372,7 @@ export class SemaforoController {
     if (response.length > 0) {
       return this.finaliza(response[0].id);
     } else {
-      return {status: 400, message: 'Sessão não encontrada'};
+      return { status: 400, message: 'Sessão não encontrada' };
     }
   }
 
@@ -340,12 +382,12 @@ export class SemaforoController {
     if (response.length > 0) {
       return this.finaliza(response[0].id);
     } else {
-      return {status: 400, message: 'Sessão não encontrada'};
+      return { status: 400, message: 'Sessão não encontrada' };
     }
   }
 
   finaliza(id: number, finaliza: boolean = true) {
-    return this.update({id, finaliza});
+    return this.update({ id, finaliza });
   }
 
   async getAll(options: any) {
@@ -372,7 +414,7 @@ export class SemaforoController {
         Object.keys(objSelect).forEach((item) => {
           select[objSelect[item]] = true;
         });
-        select = {...select};
+        select = { ...select };
       } else {
         select = {
           id: true,
@@ -424,7 +466,7 @@ export class SemaforoController {
           status: 400, response: [], total: 0, message: 'nenhum resultado encontrado',
         };
       }
-      return {status: 200, response, total: response.total};
+      return { status: 200, response, total: response.total };
     } catch (error: any) {
       handleError('Semaforo Controller', 'GetAll', error.message);
       throw new Error('[Controller] - GetAll Semaforo erro');
@@ -435,22 +477,22 @@ export class SemaforoController {
     try {
       const response = await this.semaforoRepository.findOne(id);
       if (!response) {
-        return {status: 400, response: [], message: 'user não existe'};
+        return { status: 400, response: [], message: 'user não existe' };
       }
-      return {status: 200, response};
+      return { status: 200, response };
     } catch (error: any) {
       handleError('Semaforo Controller', 'GetOne', error.message);
       throw new Error('[Controller] - GetOne Semaforo erro');
     }
   }
 
-  async create(data: object | any) {
+  async createSemaforo(data: object | any) {
     try {
       const parameters: any = {};
       if (data !== null && data !== undefined) {
 
-        if (!data.acao) return {status: 400, message: 'Informe a ação'};
-        if (!data.sessao) return {status: 400, message: 'Informe a sessão'};
+        if (!data.acao) return { status: 400, message: 'Informe a ação' };
+        if (!data.sessao) return { status: 400, message: 'Informe a sessão' };
         // if (!data.created_by) return { status: 400, message: 'Informe a sessão' };
         if (!data.tipo) data.tipo = 'front';
         if (!data.automatico) data.automatico = 'n';
@@ -465,9 +507,9 @@ export class SemaforoController {
         const response = await this.semaforoRepository.create(parameters);
 
         if (response) {
-          return {status: 200, response: response, message: 'Semaforos inseridos'};
+          return { status: 200, response: response, message: 'Semaforos inseridos' };
         }
-        return {status: 400, response: null, message: 'houve um erro, tente novamente'};
+        return { status: 400, response: null, message: 'houve um erro, tente novamente' };
       }
     } catch (error: any) {
       handleError('Semaforo Controller', 'Create', error.message);
@@ -489,11 +531,11 @@ export class SemaforoController {
         const response: object | any = await this.semaforoRepository.update(data.id, parameters);
 
         if (response.count > 0) {
-          return {status: 200, message: {message: 'Semaforo atualizada'}};
+          return { status: 200, message: { message: 'Semaforo atualizada' } };
         }
-        return {status: 400, message: {message: 'Semaforo não existe'}};
+        return { status: 400, message: { message: 'Semaforo não existe' } };
       }
-      return {status: 404, message: {message: 'Semaforo atualizada'}};
+      return { status: 404, message: { message: 'Semaforo atualizada' } };
     } catch (error: any) {
       handleError('Semaforo Controller', 'Update', error.message);
       throw new Error('[Controller] - Update Semaforo erro');

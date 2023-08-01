@@ -54,6 +54,14 @@ export class ExperimentGenotipeRepository extends BaseRepository {
     return { tagsToPrint, tagsPrinted };
   }
 
+  async findByExperimentId(idExperiment: number) {
+    const result = await prisma.experiment_genotipe.findMany({
+      where: { idExperiment: idExperiment },
+    });
+
+    return result;
+  }
+  
   async findById(id: number) {
     const result = await prisma.experiment_genotipe.findUnique({
       where: { id },
