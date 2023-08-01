@@ -10,6 +10,7 @@ import {TransactionConfig} from 'src/shared/prisma/transactionConfig';
 import {ImportValidate, IReturnObject} from '../../interfaces/shared/Import.interface';
 import handleError from '../../shared/utils/handleError';
 import {
+  responseCompositeKeysFactory,
   responseGenericFactory,
   responseNullFactory,
   responsePositiveNumericFactory
@@ -46,6 +47,7 @@ export class ImportAssayListController {
     const assayListController = new AssayListController();
     const typeAssayController = new TypeAssayController();
     const tecnologiaController = new TecnologiaController();
+    const genotypeTreatmentController = new GenotypeTreatmentController();
 
     const responseIfError: any = [];
     let validateAll: any = [];
@@ -251,6 +253,15 @@ export class ImportAssayListController {
             if (column === '4') {
               
               const chaveComposta = spreadSheet[row][4] + '_' + spreadSheet[row][10] + '_' + spreadSheet[row][11];
+
+              const {
+                response: treatmentsAux,
+              }: any = await genotypeTreatmentController.findByNameGenotypeAndNccLote(
+                  spreadSheet[row][4],
+                  spreadSheet[row][10],
+                  spreadSheet[row][11]);
+              
+              console.log('treatmentsAux', treatmentsAux);
               
               if (spreadSheet[row][column] === null) {
                 responseIfError[Number(column)]
@@ -259,12 +270,23 @@ export class ImportAssayListController {
                   linhaStr,
                   spreadSheet[0][column],
                 );
-              } else if ( chaveCompostaArr[spreadSheet[row][1]]?.includes(chaveComposta) ) {
-                responseIfError[Number(column)] += responseGenericFactory(
-                  Number(column) + 1,
-                  linhaStr,
-                  spreadSheet[0][column],
-                  'Genótipo + NCA não pode repetir dentro de um GLI (Ensaio)',
+              } else if ( chaveCompostaArr[spreadSheet[row][1]]?.includes(chaveComposta) || treatmentsAux?.length > 0) {
+
+                let msg = '';
+                let mostraMsg = false;
+                if(mostraMsg){
+                  if (treatmentsAux?.length > 0) {
+                    msg = '<br>Tratamento já cadastrado: <br>';
+                  }
+                  treatmentsAux?.forEach((treatment: any) => {
+                    msg += `GLI: ${treatment?.assay_list?.gli} - Genótipo: ${treatment?.genotipo?.name_genotipo} - NCA: ${treatment?.lote?.ncc} <br>`;
+                  });
+                }
+                
+                responseIfError[Number(column)] += responseCompositeKeysFactory(
+                    Number(column) + 1,
+                    linhaStr,
+                    'os campos Genótipo + NCA não podem repetir dentro de um GLI (Ensaio)' + msg,
                 );
               }
               

@@ -1029,11 +1029,13 @@ export default function Listagem({
           experimentObj,
           npeToUpdate,
           userId: userLogado.id,
+          sessao: global.sessao
         })
         .then((response) => {
           if (response.status === 200) {
             Swal.fire({
               title: "Sorteio salvo com sucesso.",
+              
               showDenyButton: false,
               showCancelButton: false,
               confirmButtonText: "Ok",
@@ -1043,6 +1045,7 @@ export default function Listagem({
           } else {
             Swal.fire({
               title: "Erro ao sortear",
+              width: 800,
               html: response.message,
             });
             setLoading(false);
@@ -1054,6 +1057,7 @@ export default function Listagem({
 
           Swal.fire({
             title: "Houve um problema sortear. ",
+            width: 800,
             html: error,
           });
         });
@@ -1133,8 +1137,10 @@ export default function Listagem({
         html:
           `Existem NPE usados ​​entre <b>${npeUsedFrom}</b> e <b>${temp.npef}</b><br><br>` +
           "Estes foram selecionados para : <br><div style='text-align: center'><p style='text-align:left; max-width:255px; margin:auto;'>" +
-          `<b> Foco : ${temp.nextNPE?.foco?.name}</b><br><b> Ensaio : ${temp.nextNPE?.type_assay?.name}</b><br>` +
-          `<b> Local : ${temp.nextNPE?.local?.name_local_culture}</b><br><b>Epoca : ${temp.nextNPE?.epoca}</b><br>` +
+          `<b> Foco : ${temp.nextNPE?.foco?.name}</b><br>` +
+          `<b> Ensaio : ${temp.nextNPE?.type_assay?.name}</b><br>` +
+          `<b> Local : ${temp.nextNPE?.local?.name_local_culture}</b><br>` + 
+          `<b>Epoca : ${temp.nextNPE?.epoca}</b><br>` +
           `<b>Tecnologia : ${temp.nextNPE?.tecnologia?.name}</b></p><br>` +
           `O próximo NPE disponível é <strong>${
             Number(temp.nextAvailableNPE) + 1

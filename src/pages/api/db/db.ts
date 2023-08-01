@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable vars-on-top */
 /* eslint-disable no-var */
-import {PrismaClient} from '@prisma/client';
+import {Prisma, PrismaClient} from '@prisma/client';
 
 declare global {
   var prisma: PrismaClient | undefined;
@@ -29,3 +29,10 @@ prisma.$on('query', (e: any) => {
   console.log(`Params: ${e.params}`);
   console.log(`Duration: ${e.duration}ms`);
 });
+
+/*
+// https://github.com/prisma/studio/issues/614
+// 
+BigInt.prototype.toJSON = function() {
+  return this.toString()
+}*/

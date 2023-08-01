@@ -15,6 +15,7 @@ import { GenotypeTreatmentController } from '../genotype-treatment/genotype-trea
 import { ReporteController } from '../reportes/reporte.controller';
 import {PrismaClient} from '@prisma/client';
 import {ExperimentGenotipeRepository} from "../../repository/experiment-genotipe.repository";
+import {SemaforoController} from "../semaforo.controller";
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -22,6 +23,8 @@ export class ExperimentController {
   assayListController = new AssayListController();
 
   reporteController = new ReporteController();
+
+  semaforoController = new SemaforoController();
 
   async getAll(options: any) {
 
@@ -385,6 +388,10 @@ export class ExperimentController {
   }
 
   async update(data: any) {
+
+    const acao = SemaforoController.PROCESS_EDICAO;
+    const created_by = data.userId;
+    
     try {
       const experimentGenotipeController = new ExperimentGenotipeController();
       const experimentGroupController = new ExperimentGroupController();
@@ -396,13 +403,15 @@ export class ExperimentController {
          * SELECT * FROM `experiment` WHERE `experimentName` LIKE '%BA408BR02%' ORDER BY `id` ASC
          */
         const teste = await this.experimentRepository.relationGroup(data);
-
+        
         if (data.experimentGroupId) {
+          
           const { response: group } = await experimentGroupController.getOne(Number(data.experimentGroupId));
 
           const { ip } = await fetch('https://api.ipify.org/?format=json')
             .then((results) => results.json())
             .catch(() => '0.0.0.0');
+          
           await this.reporteController.create({
             userId: data.userId,
             module: 'GRUPO DE ETIQUETAGEM',

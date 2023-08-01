@@ -678,6 +678,30 @@ model reportes {
   user user @relation(fields: [userId], references: [id])
 }
 
+model semaforo {
+  id           Int            @id @default(autoincrement())
+  created_at   DateTime       @default(now())
+  last_edit_at DateTime       @updatedAt
+  created_by   Int
+  sessao       String
+  acao         String
+  tipo         String
+  status       String
+  automatico   String
+  semaforoItem semaforoItem[]
+}
+
+model semaforoItem {
+  id            Int      @id @default(autoincrement())
+  created_at    DateTime @default(now())
+  last_edit_at  DateTime @updatedAt
+  created_by    Int
+  referencia    String
+  codReferencia String
+  semaforoId    Int
+  semaforo      semaforo @relation(fields: [semaforoId], references: [id])
+}
+
 model AllocatedExperiment {
   id             Int      @id @default(autoincrement())
   seq            Int

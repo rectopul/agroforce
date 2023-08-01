@@ -91,6 +91,11 @@ export class LocalController {
         const dts = local.cultureUnity.map((unity: any) => unity.dt_export);
         const maxDt = Math.max(...dts);
         local.dt_export = new Date(maxDt);
+
+        const dts_rde = local.cultureUnity.map((unity: any) => Number(unity.dt_rde));
+        const maxDt_rde = Math.max(...dts_rde);
+        local.dt_rde = maxDt_rde;
+        
       });
 
       if (!response || response.total <= 0) {
