@@ -12,7 +12,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       res.status(200).json(response);
       break;
     case 'POST':
-      const Result = await Controller.create(req.body);
+      const Result = await Controller.createSemaforo(req.body);
       res.status(200).json(Result);
       break;
     case 'PUT':
