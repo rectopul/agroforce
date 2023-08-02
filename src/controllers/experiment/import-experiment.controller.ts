@@ -9,7 +9,7 @@
 import {
   culture, delineamento, local, safra, assay_list, experiment,
 } from '@prisma/client';
-import handleError from '../../shared/utils/handleError';
+import handleError, { SemaforoError } from '../../shared/utils/handleError';
 import {
   responseDiffFactory,
   responseNullFactory,
@@ -17,7 +17,7 @@ import {
   responseDoesNotExist,
   responsePositiveNumericFactory,
 } from '../../shared/utils/responseErrorFactory';
-import {ImportValidate, IReturnObject} from '../../interfaces/shared/Import.interface';
+import { ImportValidate, ImportValidateWithSession, IReturnObject } from '../../interfaces/shared/Import.interface';
 import {SafraController} from '../safra.controller';
 import {LocalController} from '../local/local.controller';
 import {DelineamentoController} from '../delimitation/delineamento.controller';
@@ -28,14 +28,19 @@ import {validateInteger} from '../../shared/utils/numberValidate';
 import {CulturaController} from '../cultura.controller';
 import {validateHeaders} from '../../shared/utils/validateHeaders';
 import {experimentQueue} from './experimento-queue';
+import { SemaforoController } from '../semaforo.controller';
 
 export class ImportExperimentController {
+
+  //semaforoController: SemaforoController = new SemaforoController();
+  private static semaforoController: SemaforoController = new SemaforoController();
+  
   static async validate(
     idLog: number,
     queueProcessing: boolean,
     {
-      spreadSheet, idSafra, idCulture, created_by: createdBy,
-    }: ImportValidate,
+      spreadSheet, idSafra, idCulture, created_by: createdBy, sessao
+    }: ImportValidateWithSession,
   ): Promise<IReturnObject> {
     const safraController = new SafraController();
     const localController = new LocalController();
@@ -44,7 +49,9 @@ export class ImportExperimentController {
     const assayListController = new AssayListController();
     const experimentController = new ExperimentController();
     const delineamentoController = new DelineamentoController();
-
+    
+    const acao = SemaforoController.PROCESS_IMPORTACAO;
+    
     const experimentNameTemp: Array<string> = [];
     const responseIfError: Array<string> = [];
     const headers = [
@@ -78,7 +85,7 @@ export class ImportExperimentController {
         && !queueProcessing) {
         experimentQueue.add({
           instance: {
-            spreadSheet, idSafra, idCulture, created_by: createdBy,
+            spreadSheet, idSafra, idCulture, created_by: createdBy, sessao
           },
           logId: idLog,
         });
@@ -116,7 +123,7 @@ export class ImportExperimentController {
               Number(3 + 1),
               linhaStr,
               spreadSheet[0][4]
-            );
+            ); 
           } else {
             const {response} = await assayListController.getAll({
               gli: spreadSheet[row][4],
@@ -125,6 +132,26 @@ export class ImportExperimentController {
             });
 
             assayList = response.length > 0 ? response[0] : [];
+            
+            // enquanto estiver importando experimento, bloqueia a lista de ensaios com semaforo
+            if (assayList) {
+              /*const resSemaforoAssayList = await this.semaforoController.validaSemaforoItem(
+                sessao,
+                acao,
+                'assay_list',
+                assayList.id,
+                createdBy
+              );
+              
+              if (resSemaforoAssayList.status !== 200) {
+                throw new SemaforoError(
+                  resSemaforoAssayList.message, 
+                  resSemaforoAssayList.response, 
+                  resSemaforoAssayList.status, 
+                  resSemaforoAssayList);
+              }*/
+            }
+            
           }
 
           // ERRO: Não foi encontrado o GLI + SAFRA na lista de ensaios;
@@ -221,8 +248,7 @@ export class ImportExperimentController {
               }
             }
           }
-
-
+          
           // ENSAIO
           let columnEnsaio: string = '2';
           if (columnEnsaio === '2') {
@@ -247,8 +273,7 @@ export class ImportExperimentController {
               }
             }
           }
-
-
+          
           // FOCO
           let columnFoco: string = '3';
           if (columnFoco === '3') {
@@ -452,7 +477,7 @@ export class ImportExperimentController {
             experimentName = `${spreadSheet[row][1]}_${spreadSheet[row][4]}_${spreadSheet[row][7]}_${spreadSheet[row][9]}`;
           }
 
-          const {response: experiment} = await experimentController.getAll({
+          const { response: experiment } = await experimentController.getAll({
             filterExperimentName: experimentName,
             idSafra,
             importValidate: true,
@@ -463,6 +488,8 @@ export class ImportExperimentController {
               // Atenção responseIfError[0] onde 0 é a ordem em que a mensagem irá aparecer;
               responseIfError[0]
                 += `<li style="text-align:left"> Erro na linha ${Number(row) + 1}. Já existe um experimento cadastrado e utilizado com este nome de experimento </li> <br>`;
+            } else {
+              
             }
           }
 
@@ -625,7 +652,7 @@ export class ImportExperimentController {
 
       if (responseIfError.length === 0) {
         return this.storeRecords(idLog, {
-          spreadSheet, idSafra, idCulture, created_by: createdBy,
+          spreadSheet, idSafra, idCulture, created_by: createdBy, sessao
         });
       }
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
@@ -634,17 +661,24 @@ export class ImportExperimentController {
       });
       return {status: 400, message: responseStringError};
     } catch (error: any) {
+
+      if(SemaforoError.isSemaforoErrorAuthorizeFinalized(error)) {
+        console.log('Houve um erro no processo porém o tipo de erro é diferente de um SemaforoError, finalizando o semaforo.');
+        await this.semaforoController.finalizaRest(sessao, acao);
+      }
+      
       await logImportController.update({
         id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
+      
       handleError('Experimento controller', 'Validate Import', error.message);
-      return {status: 500, message: 'Erro ao validar planilha de experimento'};
+      return {status: 500, message: 'Erro ao validar planilha de experimento: \n'+ error.message};
     }
   }
 
   static async storeRecords(idLog: number, {
-    spreadSheet, idSafra, idCulture, created_by: createdBy,
-  }: ImportValidate) {
+    spreadSheet, idSafra, idCulture, created_by: createdBy, sessao
+  }: ImportValidateWithSession) {
     const localController = new LocalController();
     const assayListController = new AssayListController();
     const logImportController = new LogImportController();
@@ -667,6 +701,8 @@ export class ImportExperimentController {
     const otimizar = true;
 
     let linha = 1;
+    
+    const acao = SemaforoController.PROCESS_IMPORTACAO;
 
     try {
       for (const row in spreadSheet) {
@@ -753,6 +789,24 @@ export class ImportExperimentController {
             importValidate: true,
           });
           if (experiment.total > 0) {
+            
+            // antes de atualizar o experimento, verifica se ele não está bloqueado
+            const resSemaforoExperiment = await this.semaforoController.validaSemaforoItem(
+              sessao,
+              acao,
+              'experiment',
+              experiment[0].id,
+              createdBy
+            );
+
+            if (resSemaforoExperiment.status !== 200) {
+              throw new SemaforoError(
+                resSemaforoExperiment.message,
+                resSemaforoExperiment.response,
+                resSemaforoExperiment.status,
+                resSemaforoExperiment);
+            }
+            
             await experimentController.update(
               {
                 id: experiment[0]?.id,
@@ -791,6 +845,23 @@ export class ImportExperimentController {
               },
             );
             if (status === 200) {
+
+              const resSemaforoAssayList = await this.semaforoController.validaSemaforoItem(
+                sessao,
+                acao,
+                'assay_list',
+                assayList[0]?.id,
+                createdBy
+              );
+
+              if (resSemaforoAssayList.status !== 200) {
+                throw new SemaforoError(
+                  resSemaforoAssayList.message,
+                  resSemaforoAssayList.response,
+                  resSemaforoAssayList.status,
+                  resSemaforoAssayList);
+              }
+              
               await assayListController.update({
                 id: assayList[0]?.id,
                 status: 'EXP IMP.',
@@ -804,14 +875,23 @@ export class ImportExperimentController {
       await logImportController.update({
         id: idLog, status: 1, state: 'SUCESSO', updated_at: new Date(Date.now()),
       });
+
+      await this.semaforoController.finalizaRest(sessao, acao);
+      
       return {status: 200, message: 'Experimento importado com sucesso'};
     } 
     catch (error: any) {
+
+      if(SemaforoError.isSemaforoErrorAuthorizeFinalized(error)) {
+        console.log('Houve um erro no processo porém o tipo de erro é diferente de um SemaforoError, finalizando o semaforo.');
+        await this.semaforoController.finalizaRest(sessao, acao);
+      }
+      
       await logImportController.update({
         id: idLog, status: 1, state: 'FALHA', updated_at: new Date(Date.now()),
       });
       handleError('Experimento controller', 'Save Import', error.message);
-      return {status: 500, message: 'Erro ao salvar planilha de experimento'};
+      return {status: 500, message: 'Erro ao salvar planilha de experimento: \n'+ error.message};
     }
   }
 

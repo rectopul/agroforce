@@ -18,10 +18,18 @@ function getAll(parameters: any) {
 }
 
 function validate(data: any) {
+  
+  // inputar a sessao global no data
+  data.sessao = global.sessao;
+  
   return fetchWrapper.post(`${baseUrl}/validate`, data);
 }
 
 function validateProtocol(data: any) {
+
+  // inputar a sessao global no data
+  data.sessao = global.sessao;
+  
   return fetchWrapper.post(`${baseUrl}/validateProtocol`, data);
 }
 

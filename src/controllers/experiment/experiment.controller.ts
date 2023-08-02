@@ -392,6 +392,7 @@ export class ExperimentController {
   async update(data: any) {
 
     const acao = SemaforoController.PROCESS_EDICAO;
+    const sessao = data?.sessao;
     const created_by = data.userId;
 
     try {
@@ -498,7 +499,13 @@ export class ExperimentController {
   }
 
   /**
-   *
+   * deleta todas as parcelas do experimento;
+   * se ok, deleta o experimento;
+   * se ok, carrega lista de ensaio confere se todos experimentos restantes tem status IMPORTADO;
+   * se ok, atualiza o status da lista de ensaio para IMPORTADO;
+   * se ok, atualiza status os atualiza os tratamentos de genótipo para importado;
+   * carrega o ambiente que tiver a mesma safra, local, foco, epoca, tecnologia e lista de ensaio que o experimento excluido;
+   * se encontrar, atualiza status para = 1 e edited para 0;
    * @param data
    */
   async delete(data: any) {
@@ -556,7 +563,7 @@ export class ExperimentController {
               sessao, acao, 'experiment', experimentExist.id, created_by);
 
             if (resSemaforo.status !== 200) {
-              throw new SemaforoError(resSemaforo.message, resSemaforo.response);
+              throw new SemaforoError(resSemaforo.message, resSemaforo.response, resSemaforo.status, resSemaforo);
             }
 
             const {
@@ -570,9 +577,10 @@ export class ExperimentController {
               // verifica semaforo de parcelas
               const resSemaforoParcela = await this.semaforoController.validaSemaforoItem(
                 sessao, acao, 'experiment_genotipe', parcela.id, created_by);
-
+                
+              console.log('resSemaforoParcela', resSemaforoParcela);
               if (resSemaforoParcela.status !== 200) {
-                throw new SemaforoError(resSemaforoParcela.message, resSemaforoParcela.response);
+                throw new SemaforoError(resSemaforoParcela.message, resSemaforoParcela.response, resSemaforoParcela.status, resSemaforoParcela);
               }
             }
 
@@ -597,23 +605,30 @@ export class ExperimentController {
 
               const { response: assayList } = await this.assayListController.getOne(Number(experimentExist?.idAssayList));
 
-              const experiments_importeds = assayList?.experiment.filter((experiment: any) => experiment.status === 'IMPORTADO');
+              // filtra experimentos com status importado
+              const experiments_importeds = assayList?.experiment.filter((experiment: any) => {
+                return String(experiment.status) === "IMPORTADO";
+              });
+              
+              console.log('assayList?.experiment', assayList?.experiment);
 
               if (experiments_importeds?.length === assayList?.experiment.length || !assayList?.experiment.length) {
 
                 // semaforo para experimentExist?.idAssayList
                 const resSemaforoAssayList = await this.semaforoController.validaSemaforoItem(
                   sessao, acao, 'assay_list', experimentExist?.idAssayList, created_by);
-
+                
+                console.log('resSemaforoAssayList', resSemaforoAssayList);
+                
                 if (resSemaforoAssayList.status !== 200) {
-                  throw new SemaforoError(resSemaforoAssayList.message, resSemaforoAssayList.response);
+                  throw new SemaforoError(resSemaforoAssayList.message, resSemaforoAssayList.response, resSemaforoAssayList.status, resSemaforoAssayList);
                 }
 
                 await this.assayListController.update({
                   id: experimentExist?.idAssayList,
                   status: 'IMPORTADO',
                 });
-
+                
                 if (assayList?.genotype_treatment) {
                   for (const treatment of assayList.genotype_treatment) {
 
@@ -622,7 +637,7 @@ export class ExperimentController {
                       sessao, acao, 'genotype_treatment', treatment.id, created_by);
 
                     if (resSemaforoTreatment.status !== 200) {
-                      throw new SemaforoError(resSemaforoTreatment.message, resSemaforoTreatment.response);
+                      throw new SemaforoError(resSemaforoTreatment.message, resSemaforoTreatment.response, resSemaforoTreatment.status, resSemaforoTreatment);
                     }
 
                     await genotypeTreatment.update({
@@ -633,6 +648,8 @@ export class ExperimentController {
                 }
 
               }
+
+              //throw new Error("Simulação de erro de banco de dados para teste de rollback e finalização de semaforo forçada.");
 
               const { response: ambiente } = await npeController.getAll({
                 safraId: experimentExist?.idSafra,
@@ -660,7 +677,7 @@ export class ExperimentController {
                   sessao, acao, 'npe', ambiente[0]?.id, created_by);
 
                 if (resSemaforoAmbiente.status !== 200) {
-                  throw new SemaforoError(resSemaforoAmbiente.message, resSemaforoAmbiente.response);
+                  throw new SemaforoError(resSemaforoAmbiente.message, resSemaforoAmbiente.response, resSemaforoAmbiente.status, resSemaforoAmbiente);
                 }
 
                 await npeController.update({
@@ -674,11 +691,22 @@ export class ExperimentController {
               await this.semaforoController.finalizaRest(sessao, acao);
 
               return resolve({ status: 200, message: 'Experimento excluído' });
-            } else {
+            } 
+            else {
+              
+              // outros erros com status diferente de 200, finaliza o semaforo também
+              await this.semaforoController.finalizaRest(sessao, acao);
+              
               return resolve({ status: 404, message: 'Experimento não excluído' });
             }
           });
         } catch (error: any) {
+          
+          if(SemaforoError.isSemaforoErrorAuthorizeFinalized(error)) {
+            console.log('Houve um erro no processo porém o tipo de erro é diferente de um SemaforoError, finalizando o semaforo.');
+            await this.semaforoController.finalizaRest(sessao, acao);
+          }
+          
           handleError('Experimento transaction', 'Delete', error.message, error);
           //reject(new Error('[transaction] - Delete Experimento erro: ' + error.message));
           reject({
@@ -689,10 +717,21 @@ export class ExperimentController {
       });
 
       console.log('returnTransaction', returnTransaction);
+      
+      // se tudo ocorreu bem, finaliza o semaforo
+      if (returnTransaction.status === 200) {
+        await this.semaforoController.finalizaRest(sessao, acao);
+      }
 
       return returnTransaction;
 
     } catch (error: any) {
+      
+      if(SemaforoError.isSemaforoErrorAuthorizeFinalized(error)) {
+        console.log('Houve um erro no processo porém o tipo de erro é diferente de um SemaforoError, finalizando o semaforo.');
+        await this.semaforoController.finalizaRest(sessao, acao);
+      }
+      
       console.log('error: ', error);
       handleError('Experimento controller', 'Delete', error.message, error);
       throw new Error('[Controller] - Delete Experimento erro: ' + error.message);
