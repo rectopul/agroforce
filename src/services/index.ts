@@ -31,3 +31,4 @@ export * from './experiment-group.service';
 export * from './experiment-genotipe.service';
 export * from './reporte.service';
 export * from './profile/profile.service';
+export * from './semaforo.service';

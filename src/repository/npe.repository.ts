@@ -48,20 +48,15 @@ export class NpeRepository extends BaseRepository {
 
   async update(id: number, data: Object) {
     
-    try{
-      const result = await prisma.npe.update({
-        where: {
-          id,
-        },
-        data,
-      });
+    try {
+      const result = await this.getPrisma().npe.update({where: {id,}, data,});
+      //const result = await this.getPrisma().npe.update({where: {id,}, data,});
       return result;
     }catch (e:any){
       handleError('NPE Repository', 'update', e.message);
       //throw new Error('[Repository][NPE] - update erro: ' + JSON.stringify(error));
       throw e;
     }
-
     
   }
 

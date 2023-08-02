@@ -192,7 +192,7 @@ export class ExperimentRepository extends BaseRepository {
   }
 
   async delete(id: number) {
-    const result = await prisma.experiment.delete({ where: { id } });
+    const result = await this.getPrisma().experiment.delete({ where: { id } });
     return result;
   }
 }

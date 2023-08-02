@@ -1,8 +1,7 @@
 import { TransactionConfig } from 'src/shared/prisma/transactionConfig';
 import createXls from 'src/helpers/api/xlsx-global-download';
-import handleError from '../../shared/utils/handleError';
+import handleError, { SemaforoError } from '../../shared/utils/handleError';
 import { ExperimentRepository } from '../../repository/experiment.repository';
-import { ReporteRepository } from '../../repository/reporte.repository';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
 import { AssayListController } from '../assay-list/assay-list.controller';
 import { functionsUtils } from '../../shared/utils/functionsUtils';
@@ -13,6 +12,8 @@ import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpac
 import { NpeController } from '../npe/npe.controller';
 import { GenotypeTreatmentController } from '../genotype-treatment/genotype-treatment.controller';
 import { ReporteController } from '../reportes/reporte.controller';
+import { PrismaClient } from '@prisma/client';
+import { SemaforoController } from "../semaforo.controller";
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -21,7 +22,15 @@ export class ExperimentController {
 
   reporteController = new ReporteController();
 
+  semaforoController = new SemaforoController();
+
+  setSemaforoController(semaforoController: SemaforoController) {
+    this.semaforoController = semaforoController;
+  }
+
   async getAll(options: any) {
+
+    const prisma = new PrismaClient();
     const parameters: object | any = {};
     const equalsOrContains = options.importValidate ? 'equals' : 'contains';
     let orderBy: object | any;
@@ -334,6 +343,8 @@ export class ExperimentController {
       handleError('Experimento controller', 'GetAll', `${error.message} - ${JSON.stringify(parameters)}`);
       // throw new Error({name: 'teste', message: '[Controller] - GetAll Experimento erro: ', stack: error.message});
       throw new Error(`[Controller] - GetAll Experimento erro: \r\n${error.message}`);
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -379,6 +390,11 @@ export class ExperimentController {
   }
 
   async update(data: any) {
+
+    const acao = SemaforoController.PROCESS_EDICAO;
+    const sessao = data?.sessao;
+    const created_by = data.userId;
+
     try {
       const experimentGenotipeController = new ExperimentGenotipeController();
       const experimentGroupController = new ExperimentGroupController();
@@ -392,11 +408,13 @@ export class ExperimentController {
         const teste = await this.experimentRepository.relationGroup(data);
 
         if (data.experimentGroupId) {
+
           const { response: group } = await experimentGroupController.getOne(Number(data.experimentGroupId));
 
           const { ip } = await fetch('https://api.ipify.org/?format=json')
             .then((results) => results.json())
             .catch(() => '0.0.0.0');
+
           await this.reporteController.create({
             userId: data.userId,
             module: 'GRUPO DE ETIQUETAGEM',
@@ -433,7 +451,11 @@ export class ExperimentController {
         if (!data.import) {
           const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
           await this.reporteController.create({
-            userId: data.userId, module: 'EXPERIMENTO', operation: 'EDIÇÃO', oldValue: `${data.nlp}_${data.clp}_${data.comments}`, ip: String(ip),
+            userId: data.userId,
+            module: 'EXPERIMENTO',
+            operation: 'EDIÇÃO',
+            oldValue: `${data.nlp}_${data.clp}_${data.comments}`,
+            ip: String(ip),
           });
         }
         delete data.userId;
@@ -451,9 +473,12 @@ export class ExperimentController {
           return { status: 200, message: 'Experimento atualizado' };
         }
       } else {
+
         const transactionConfig = new TransactionConfig();
         const experimentRepositoryTransaction = new ExperimentRepository();
+
         experimentRepositoryTransaction.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+
         try {
           await transactionConfig.transactionScope.run(async () => {
             for (const row in data) {
@@ -473,105 +498,245 @@ export class ExperimentController {
     }
   }
 
+  /**
+   * deleta todas as parcelas do experimento;
+   * se ok, deleta o experimento;
+   * se ok, carrega lista de ensaio confere se todos experimentos restantes tem status IMPORTADO;
+   * se ok, atualiza o status da lista de ensaio para IMPORTADO;
+   * se ok, atualiza status os atualiza os tratamentos de genótipo para importado;
+   * carrega o ambiente que tiver a mesma safra, local, foco, epoca, tecnologia e lista de ensaio que o experimento excluido;
+   * se encontrar, atualiza status para = 1 e edited para 0;
+   * @param data
+   */
   async delete(data: any) {
+
+    console.clear();
+
+    const acao = SemaforoController.PROCESS_EXCLUSAO;
+    const sessao = data.sessao;
+    const created_by = data.userId;
+
+    this.semaforoController.setSessao = sessao;
+    this.semaforoController.setAcao = acao;
+    this.semaforoController.setCreatedBy = created_by;
+
+    const prisma = new PrismaClient();
+
     const npeController = new NpeController();
+
     const genotypeTreatment = new GenotypeTreatmentController();
+
+    //const experimentGenotipeRepository = new ExperimentGenotipeRepository();
+
+    const transactionConfig = new TransactionConfig();
+
+    this.experimentRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+
+    //experimentGenotipeRepository.setTransaction(transactionConfig.clientManager, transactionConfig.transactionScope);
+
+    const experimentGenotipeController = new ExperimentGenotipeController();
+
+    experimentGenotipeController.setTransactionController(transactionConfig.clientManager, transactionConfig.transactionScope);
+    experimentGenotipeController.setSemaforoController(this.semaforoController);
+
+    this.reporteController.setTransactionController(transactionConfig.clientManager, transactionConfig.transactionScope);
+
+    npeController.setTransactionController(transactionConfig.clientManager, transactionConfig.transactionScope);
+
     try {
 
-      const { response: experimentExist }: any = await this.getOne(Number(data.id));
+      const returnTransaction: any = await new Promise(async (resolve, reject) => {
+        try {
+          await transactionConfig.transactionScope.run(async () => {
 
-      /*const { response: ambiente2 } = await npeController.getAll({
-        safraId: experimentExist?.idSafra,
-        localId: experimentExist?.idLocal,
-        focoId: experimentExist?.assay_list?.foco?.id,
-        epoca: experimentExist?.period,
-        filterCodTecnologia: experimentExist?.assay_list?.tecnologia?.cod_tec,
-        typeAssayId: experimentExist?.assay_list?.type_assay?.id,
+            const { response: experimentExist }: any = await this.getOne(Number(data.id));
+
+            if (!experimentExist) {
+              return resolve({ status: 404, message: 'Experimento não encontrado' });
+            }
+
+            if (experimentExist?.status === 'PARCIALMENTE ALOCADO' || experimentExist?.status === 'TOTALMENTE  ALOCADO') {
+              return resolve({ status: 400, message: 'Não é possível deletar.' });
+            }
+
+            const resSemaforo = await this.semaforoController.validaSemaforoItem(
+              sessao, acao, 'experiment', experimentExist.id, created_by);
+
+            if (resSemaforo.status !== 200) {
+              throw new SemaforoError(resSemaforo.message, resSemaforo.response, resSemaforo.status, resSemaforo);
+            }
+
+            const {
+              status: statusParcelas,
+              response: responseParcelas
+            } = await experimentGenotipeController.findByExperimentId(Number(data.id));
+
+            console.log('statusParcelas', statusParcelas, 'responseParcelas', responseParcelas);
+
+            for (const parcela of responseParcelas) {
+              // verifica semaforo de parcelas
+              const resSemaforoParcela = await this.semaforoController.validaSemaforoItem(
+                sessao, acao, 'experiment_genotipe', parcela.id, created_by);
+                
+              console.log('resSemaforoParcela', resSemaforoParcela);
+              if (resSemaforoParcela.status !== 200) {
+                throw new SemaforoError(resSemaforoParcela.message, resSemaforoParcela.response, resSemaforoParcela.status, resSemaforoParcela);
+              }
+            }
+
+            const { status } = await experimentGenotipeController.deleteAllTransaction(Number(data.id));
+
+            if (status === 200) {
+              const response = await this.experimentRepository.deleteTransaction(Number(data.id));
+
+              if (response) {
+                const { ip } = await fetch('https://api.ipify.org/?format=json')
+                  .then((results) => results.json())
+                  .catch(() => '0.0.0.0');
+
+                await this.reporteController.createTransaction({
+                  userId: data.userId,
+                  module: 'EXPERIMENTO',
+                  operation: 'EXCLUSÃO',
+                  oldValue: response.experimentName,
+                  ip: String(ip),
+                });
+              }
+
+              const { response: assayList } = await this.assayListController.getOne(Number(experimentExist?.idAssayList));
+
+              // filtra experimentos com status importado
+              const experiments_importeds = assayList?.experiment.filter((experiment: any) => {
+                return String(experiment.status) === "IMPORTADO";
+              });
+              
+              console.log('assayList?.experiment', assayList?.experiment);
+
+              if (experiments_importeds?.length === assayList?.experiment.length || !assayList?.experiment.length) {
+
+                // semaforo para experimentExist?.idAssayList
+                const resSemaforoAssayList = await this.semaforoController.validaSemaforoItem(
+                  sessao, acao, 'assay_list', experimentExist?.idAssayList, created_by);
+                
+                console.log('resSemaforoAssayList', resSemaforoAssayList);
+                
+                if (resSemaforoAssayList.status !== 200) {
+                  throw new SemaforoError(resSemaforoAssayList.message, resSemaforoAssayList.response, resSemaforoAssayList.status, resSemaforoAssayList);
+                }
+
+                await this.assayListController.update({
+                  id: experimentExist?.idAssayList,
+                  status: 'IMPORTADO',
+                });
+                
+                if (assayList?.genotype_treatment) {
+                  for (const treatment of assayList.genotype_treatment) {
+
+                    // semaforo para treatment.id
+                    const resSemaforoTreatment = await this.semaforoController.validaSemaforoItem(
+                      sessao, acao, 'genotype_treatment', treatment.id, created_by);
+
+                    if (resSemaforoTreatment.status !== 200) {
+                      throw new SemaforoError(resSemaforoTreatment.message, resSemaforoTreatment.response, resSemaforoTreatment.status, resSemaforoTreatment);
+                    }
+
+                    await genotypeTreatment.update({
+                      id: treatment.id,
+                      status_experiment: 'IMPORTADO',
+                    });
+                  }
+                }
+
+              }
+
+              //throw new Error("Simulação de erro de banco de dados para teste de rollback e finalização de semaforo forçada.");
+
+              const { response: ambiente } = await npeController.getAll({
+                safraId: experimentExist?.idSafra,
+                localId: experimentExist?.idLocal,
+                focoId: experimentExist?.assay_list?.foco?.id,
+                epoca: experimentExist?.period,
+                filterCodTecnologia: experimentExist?.assay_list?.tecnologia?.cod_tec,
+                typeAssayId: experimentExist?.assay_list?.type_assay?.id,
+              });
+
+              const { response: experiment } = await this.getAll({
+                idSafra: experimentExist?.idSafra,
+                idLocal: experimentExist?.idLocal,
+                Foco: experimentExist?.assay_list?.foco?.id,
+                Epoca: experimentExist?.period,
+                Tecnologia: experimentExist?.assay_list?.tecnologia?.cod_tec,
+                TypeAssay: experimentExist?.assay_list?.type_assay?.id,
+                importValidate: true,
+              });
+
+              if (ambiente.length > 0 && experiment.length === 0) {
+
+                // semaforo para ambiente[0]?.id
+                const resSemaforoAmbiente = await this.semaforoController.validaSemaforoItem(
+                  sessao, acao, 'npe', ambiente[0]?.id, created_by);
+
+                if (resSemaforoAmbiente.status !== 200) {
+                  throw new SemaforoError(resSemaforoAmbiente.message, resSemaforoAmbiente.response, resSemaforoAmbiente.status, resSemaforoAmbiente);
+                }
+
+                await npeController.update({
+                  id: ambiente[0]?.id,
+                  userId: data.userId,
+                  status: 1,
+                  edited: 0,
+                });
+              }
+
+              await this.semaforoController.finalizaRest(sessao, acao);
+
+              return resolve({ status: 200, message: 'Experimento excluído' });
+            } 
+            else {
+              
+              // outros erros com status diferente de 200, finaliza o semaforo também
+              await this.semaforoController.finalizaRest(sessao, acao);
+              
+              return resolve({ status: 404, message: 'Experimento não excluído' });
+            }
+          });
+        } catch (error: any) {
+          
+          if(SemaforoError.isSemaforoErrorAuthorizeFinalized(error)) {
+            console.log('Houve um erro no processo porém o tipo de erro é diferente de um SemaforoError, finalizando o semaforo.');
+            await this.semaforoController.finalizaRest(sessao, acao);
+          }
+          
+          handleError('Experimento transaction', 'Delete', error.message, error);
+          //reject(new Error('[transaction] - Delete Experimento erro: ' + error.message));
+          reject({
+            status: 404,
+            message: `[experiment][transaction]<br/>Erro ao excluir experimento: ${data.id}<br/>${error.message}`
+          });
+        }
       });
 
-      await npeController.update({
-        id: ambiente2[0]?.id,
-        status: 1,
-        edited: 0,
-      });
+      console.log('returnTransaction', returnTransaction);
       
-      console.log('ambiente2', ambiente2);
-      
-      return { status: 404, message: 'Experimento não encontrado' };*/
-      
-      const experimentGenotipeController = new ExperimentGenotipeController();
-      
-      if (!experimentExist)
-        return { status: 404, message: 'Experimento não encontrado' };
-
-      if (experimentExist?.status === 'PARCIALMENTE ALOCADO' || experimentExist?.status === 'TOTALMENTE  ALOCADO')
-        return { status: 400, message: 'Não é possível deletar.' };
-      
-      const { status } = await experimentGenotipeController.deleteAll(data.id);
-
-      if (status === 200) {
-        const response = await this.experimentRepository.delete(Number(data.id));
-        if (response) {
-          const { ip } = await fetch('https://api.ipify.org/?format=json').then((results) => results.json()).catch(() => '0.0.0.0');
-          await this.reporteController.create({
-            userId: data.userId, module: 'EXPERIMENTO', operation: 'EXCLUSÃO', oldValue: response.experimentName, ip: String(ip),
-          });
-        }
-        const { response: assayList } = await this.assayListController.getOne(Number(experimentExist?.idAssayList));
-
-        // filter experiments with status 'IMPORTADO'
-        const experiments_importeds = assayList?.experiment.filter((experiment: any) => experiment.status === 'IMPORTADO');
-
-        // if there are only experiments in 'IMPORTED' status or have no experiments, change status assayList to 'IMPORTADO' AND change status genotype_treatment to 'IMPORTADO'
-        if (experiments_importeds?.length === assayList?.experiment.length || !assayList?.experiment.length) {
-          await this.assayListController.update({
-            id: experimentExist?.idAssayList,
-            status: 'IMPORTADO',
-          });
-          assayList?.genotype_treatment.map(async (treatment: any) => {
-            await genotypeTreatment.update({
-              id: treatment.id,
-              status_experiment: 'IMPORTADO',
-            });
-          });
-        }
-
-        const { response: ambiente } = await npeController.getAll({
-          safraId: experimentExist?.idSafra,
-          localId: experimentExist?.idLocal,
-          focoId: experimentExist?.assay_list?.foco?.id,
-          epoca: experimentExist?.period,
-          filterCodTecnologia: experimentExist?.assay_list?.tecnologia?.cod_tec,
-          typeAssayId: experimentExist?.assay_list?.type_assay?.id,
-        });
-
-        const { response: experiment } = await this.getAll({
-          idSafra: experimentExist?.idSafra,
-          idLocal: experimentExist?.idLocal,
-          Foco: experimentExist?.assay_list?.foco?.id,
-          Epoca: experimentExist?.period,
-          Tecnologia: experimentExist?.assay_list?.tecnologia?.cod_tec,
-          TypeAssay: experimentExist?.assay_list?.type_assay?.id,
-          importValidate: true,
-        });
-
-        if (ambiente.length > 0 && experiment.length === 0) {
-          await npeController.update({
-            id: ambiente[0]?.id,
-            userId: data.userId,
-            status: 1,
-            edited: 0,
-          });
-        }
-
-        if (response) {
-          return { status: 200, message: 'Experimento excluído' };
-        }
+      // se tudo ocorreu bem, finaliza o semaforo
+      if (returnTransaction.status === 200) {
+        await this.semaforoController.finalizaRest(sessao, acao);
       }
-      return { status: 404, message: 'Experimento não excluído' };
+
+      return returnTransaction;
+
     } catch (error: any) {
+      
+      if(SemaforoError.isSemaforoErrorAuthorizeFinalized(error)) {
+        console.log('Houve um erro no processo porém o tipo de erro é diferente de um SemaforoError, finalizando o semaforo.');
+        await this.semaforoController.finalizaRest(sessao, acao);
+      }
+      
+      console.log('error: ', error);
       handleError('Experimento controller', 'Delete', error.message, error);
-      throw new Error('[Controller] - Delete Experimento erro: '+ error.message);
+      throw new Error('[Controller] - Delete Experimento erro: ' + error.message);
+    } finally {
+      await prisma.$disconnect();
     }
   }
 

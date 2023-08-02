@@ -6,7 +6,7 @@ import { ExperimentGenotipeRepository } from 'src/repository/experiment-genotipe
 import * as XLSX from 'xlsx';
 import moment from 'moment';
 import { IReturnObject } from '../interfaces/shared/Import.interface';
-import handleError from '../shared/utils/handleError';
+import handleError, { SemaforoError } from '../shared/utils/handleError';
 import { ExperimentGroupController } from './experiment-group/experiment-group.controller';
 import { ExperimentController } from './experiment/experiment.controller';
 import { ReporteController } from './reportes/reporte.controller';
@@ -14,6 +14,21 @@ import handleOrderForeign from '../shared/utils/handleOrderForeign';
 import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
 import { prisma } from '../pages/api/db/db';
 import { NpeController } from './npe/npe.controller';
+import { SemaforoController } from "./semaforo.controller";
+
+import { PrismaClientManager } from "../shared/prisma/prismaClientManager";
+import { TransactionScope } from "../shared/prisma/transactionScope";
+import { PrismaTransactionScope } from "../shared/prisma/prismaTransactionScope";
+
+interface ICreateParams {
+  experiment_genotipo: any[];
+  gt: any[];
+  experimentObj: any[];
+  npeToUpdate: any[];
+  userId: number;
+  sessao: string;
+}
+
 
 export class ExperimentGenotipeController {
   private ExperimentGenotipeRepository = new ExperimentGenotipeRepository();
@@ -23,6 +38,8 @@ export class ExperimentGenotipeController {
   private experimentGroupController = new ExperimentGroupController();
 
   private reporteController = new ReporteController();
+
+  private semaforoController = new SemaforoController();
 
   async getAll(options: any) {
     const parameters: object | any = {};
@@ -453,6 +470,14 @@ export class ExperimentGenotipeController {
     }
   }
 
+  setSemaforoController(semaforoController: SemaforoController) {
+    this.semaforoController = semaforoController;
+  }
+
+  setTransactionController(clientManager: PrismaClientManager, transactionScope: PrismaTransactionScope) {
+    this.ExperimentGenotipeRepository.setTransaction(clientManager, transactionScope);
+  }
+
   async getLastNpeDisponible(options: {
     safraId: number;
     groupId: number;
@@ -467,25 +492,25 @@ export class ExperimentGenotipeController {
         count_npe_exists: number | null,
         max_NPE_1: number | null,
         maxnpe: number | null,
-      } = await prisma.$queryRaw`SELECT 
-        (EXISTS (
-            SELECT npe FROM experiment_genotipe WHERE 1=1 
-            AND npe = ${npefSearch} 
-            AND groupId = ${groupId}
-            AND ('' = ${safraId} OR gn.idSafra = ${safraId})
-        )) as count_npe_exists, 
-        (MAX(gn.npe) + 1) as max_NPE_1,
-        IF( (EXISTS (
-            SELECT npe FROM experiment_genotipe WHERE 1=1 
-            AND npe = ${npefSearch} 
-            AND groupId = ${groupId} 
-            AND ('' = ${safraId} OR gn.idSafra = ${safraId})
-        )) > 0, (MAX(gn.npe) + 1), ${npefSearch}) as maxnpe
-        FROM experiment_genotipe gn
-        WHERE 1 = 1
-        AND gn.groupId = ${groupId}
-        AND ('' = ${safraId} OR gn.idSafra = ${safraId})
-        ORDER BY npe DESC`;
+      } = await prisma.$queryRaw`SELECT (EXISTS (SELECT npe
+                                                 FROM experiment_genotipe
+                                                 WHERE 1 = 1
+                                                   AND npe = ${npefSearch}
+                                                   AND groupId = ${groupId}
+                                                   AND ('' = ${safraId} OR gn.idSafra = ${safraId}))) as count_npe_exists,
+                                        (MAX(gn.npe) + 1)                                             as max_NPE_1,
+                                        IF((EXISTS (SELECT npe
+                                                    FROM experiment_genotipe
+                                                    WHERE 1 = 1
+                                                      AND npe = ${npefSearch}
+                                                      AND groupId = ${groupId}
+                                                      AND ('' = ${safraId} OR gn.idSafra = ${safraId}))) > 0,
+                                           (MAX(gn.npe) + 1), ${npefSearch})                          as maxnpe
+                                 FROM experiment_genotipe gn
+                                 WHERE 1 = 1
+                                   AND gn.groupId = ${groupId}
+                                   AND ('' = ${safraId} OR gn.idSafra = ${safraId})
+                                 ORDER BY npe DESC`;
 
       if (!response) throw new Error('Grupo não encontrado');
 
@@ -496,15 +521,22 @@ export class ExperimentGenotipeController {
     }
   }
 
-  async create({
-    experiment_genotipo, gt, experimentObj, npeToUpdate, userId,
-  }: object | any) {
+  async create({ experiment_genotipo, gt, experimentObj, npeToUpdate, userId, sessao }: ICreateParams) {
+
     const npeController = new NpeController();
+    const acao = SemaforoController.PROCESS_SORTEIO;
+    const created_by = userId;
+
+    console.log('experiment_genotipo', experiment_genotipo);
+    console.log('gt', gt);
+    console.log('experimentObj', experimentObj);
+    console.log('npeToUpdate', npeToUpdate);
+
     try {
       const { ip } = await fetch('https://api.ipify.org/?format=json')
         .then((results) => results.json())
         .catch(() => '0.0.0.0');
-      
+
       let maxWait = 60000; // 60000 milisegundos = 60 segundos
       let timeout = 120000; // 120000 milisegundos = 120 segundos
       timeout = 600000; // 600000 milisegundos = 600 segundos = 10 minutos (capacidade 100 mil linhas) no createMany de experiment_genotipe
@@ -516,82 +548,130 @@ export class ExperimentGenotipeController {
 
       let messageLimitExceeded = `A quantidade de NPE's a gerar no sorteio foi de xxxxxx, o limite máximo é de ${limitQuantityStr} NPE's. Favor procurar o administrador.`;
 
-      if(experiment_genotipo.length > limitQuantity){
+      if (experiment_genotipo.length > limitQuantity) {
 
         messageLimitExceeded = messageLimitExceeded.replace('xxxxxx', experiment_genotipo.length.toLocaleString());
 
         return { status: 400, message: messageLimitExceeded };
 
       }
-      
+
       const response = await prisma?.$transaction(async (tx) => {
-        await gt.map(async (gen_treatment: any) => {
-          
-          console.log('gen_treatment', gen_treatment);
-          
-          await tx.genotype_treatment.update({
-            where: {
-              id: gen_treatment.id,
-            },
-            data: {
-              status_experiment: gen_treatment.status_experiment,
-            },
-          });
-        });
 
-        await experimentObj.map(async (exp: any) => {
-          
-          console.log('exp', exp);
-          
-          await tx.experiment.update({
-            where: {
-              id: exp.id,
-            },
-            data: {
-              status: exp.status,
-            },
-          });
-        });
+          //await Promise.all(experimentObj.map(async (exp: any) => {
+          // BEGIN PROMISE ALL AND MAP
+          // [...conteudo...]
+          // END PROMISE ALL AND MAP
+          //}));
 
-        await npeToUpdate.map(async (npe: any) => {
-          const { response: newNpe }: IReturnObject = await npeController.getOne(Number(npe.id));
-          const concat = `${newNpe.local.name_local_culture}_${newNpe.safra.safraName}_${newNpe.foco.name}_${newNpe.group.group}_${newNpe.type_assay.name}_${newNpe.tecnologia.cod_tec} ${newNpe.tecnologia.name}_${newNpe.epoca}_${newNpe.npei}_${newNpe.prox_npe}`;
-          
-          console.log('npe', npe);
-          
-          await this.reporteController.create({
-            userId, module: 'AMBIENTE', operation: 'SORTEIO', oldValue: concat, ip: String(ip),
-          });
-          await tx.npe.update({
-            where: {
-              id: npe.id,
-            },
-            data: {
-              npef: npe.npef,
-              prox_npe: npe.prox_npe,
-              status: npe.status,
-            },
-          });
-        });
-        
-        console.log('pre.createMany:experiment_genotipo', experiment_genotipo);
-        
-        const exp_gen = await tx.experiment_genotipe.createMany({ data: experiment_genotipo });
+          /**
+           * Validação do semáforo
+           */
+          for (const exp of experimentObj) {
 
-        return exp_gen;
-      }, 
+            console.log('exp', exp);
+
+            const resSemaforo = await this.semaforoController.validaSemaforoItem(
+              sessao, acao, 'experiment', exp.id, created_by);
+
+            if (resSemaforo.status !== 200) {
+              throw new SemaforoError(resSemaforo.message, resSemaforo.response, resSemaforo.status, resSemaforo);
+            }
+
+            await tx.experiment.update({
+              where: {
+                id: exp.id,
+              },
+              data: {
+                status: exp.status,
+              },
+            });
+
+          }
+
+
+          for (const gen_treatment of gt) {
+            const resSemaforo = await this.semaforoController.validaSemaforoItem(
+              sessao, acao, 'genotype_treatment', gen_treatment.id, created_by);
+
+            if (resSemaforo.status !== 200) {
+              throw new SemaforoError(resSemaforo.message, resSemaforo.response, resSemaforo.status, resSemaforo);
+            }
+
+            await tx.genotype_treatment.update({
+              where: {
+                id: gen_treatment.id,
+              },
+              data: {
+                status_experiment: gen_treatment.status_experiment,
+              },
+            });
+          }
+
+          for (const npe of npeToUpdate) {
+
+            const { response: newNpe }: IReturnObject = await npeController.getOne(Number(npe.id));
+
+            const concat = `${newNpe.local.name_local_culture}_${newNpe.safra.safraName}_${newNpe.foco.name}_${newNpe.group.group}_${newNpe.type_assay.name}_${newNpe.tecnologia.cod_tec} ${newNpe.tecnologia.name}_${newNpe.epoca}_${newNpe.npei}_${newNpe.prox_npe}`;
+
+            const resSemaforo = await this.semaforoController.validaSemaforoItem(
+              sessao, acao, 'npe', npe.id, created_by);
+
+            if (resSemaforo.status !== 200) {
+              throw new SemaforoError(resSemaforo.message, resSemaforo.response, resSemaforo.status, resSemaforo);
+            }
+
+            await this.reporteController.create({
+              userId, module: 'AMBIENTE', operation: 'SORTEIO', oldValue: concat, ip: String(ip),
+            });
+
+            await tx.npe.update({
+              where: {
+                id: npe.id,
+              },
+              data: {
+                npef: npe.npef,
+                prox_npe: npe.prox_npe,
+                status: npe.status,
+              },
+            });
+          }
+
+          console.log('pre.createMany:experiment_genotipo', experiment_genotipo);
+
+          const exp_gen = await tx.experiment_genotipe.createMany({ data: experiment_genotipo });
+
+          return exp_gen;
+        },
         {
-        maxWait: maxWait, // 60000 milisegundos = 60 segundos
-        timeout: timeout, // 120000 milisegundos = 120 segundos
-      });
+          maxWait: maxWait, // 60000 milisegundos = 60 segundos
+          timeout: timeout, // 120000 milisegundos = 120 segundos
+        });
 
       if (response) {
+
+        await this.semaforoController.finalizaRest(sessao, acao);
+
         return { status: 200, message: 'Tratamento experimental registrado' };
       }
       return { status: 400, message: 'Parcelas não registrado' };
     } catch (error: any) {
+      // catch final
       handleError('Parcelas do controlador', 'Create', error.message);
-      throw new Error(`[Controller] - Erro ao criar esboço de Parcelas: ${JSON.stringify(error)}`);
+      throw new Error(`[Controller] - Erro ao criar esboço de Parcelas: ${error.message}`);
+    }
+  }
+
+  async findByExperimentId(experimentId: number) {
+    try {
+      const response = await this.ExperimentGenotipeRepository.findByExperimentId(experimentId);
+
+      if (!response) throw new Error('Parcelas não encontradas');
+
+      return { status: 200, response };
+    } catch (error: any) {
+      handleError('Parcela controller', 'getOne', error.message);
+      throw new Error('[Controller] - getOne Parcela erro');
     }
   }
 
@@ -609,8 +689,8 @@ export class ExperimentGenotipeController {
   }
 
   async update({
-    idList, npe, status, userId = 0, count,
-  }: any) {
+                 idList, npe, status, userId = 0, count,
+               }: any) {
     try {
       let operation;
       let counter = 1;
@@ -699,13 +779,54 @@ export class ExperimentGenotipeController {
     }
   }
 
-  async deleteAll(idExperiment: number) {
+  async deleteAllTransaction(idExperiment: number) {
     try {
-      const response = await this.ExperimentGenotipeRepository.deleteAll(Number(idExperiment));
+      return this.ExperimentGenotipeRepository.deleteAllTransaction(Number(idExperiment))
+        .then((responseTransaction) => {
+          console.log('responseTransaction', responseTransaction);
+          if (responseTransaction !== undefined) {
+            return { status: 200, message: 'Parcelas excluídos' };
+          } else {
+            return { status: 400, message: 'Erro ao excluir parcelas' };
+          }
+        })
+        .catch((error: any) => {
+          handleError('Parcelas controller', 'DeleteAllTransaction', error.message);
+          throw new Error('[Controller] - DeleteAllTransaction Parcelas erro: ' + error.message);
+        });
+    } catch (error: any) {
+      handleError('Parcelas controller', 'DeleteAllTransaction', error.message);
+      throw new Error('[Controller] - DeleteAllTransaction Parcelas erro: ' + error.message);
+    }
+  }
+
+  async deleteAllTransactionOld(idExperiment: number) {
+    try {
+
+      const responseTransaction = await this.ExperimentGenotipeRepository.deleteAllTransaction(Number(idExperiment));
+      console.log('responseTransaction', responseTransaction);
+      if (responseTransaction !== undefined) {
+        return { status: 200, message: 'Parcelas excluídos' };
+      } else {
+        return { status: 400, message: 'Erro ao excluir parcelas' };
+      }
+
+    } catch (error: any) {
+      handleError('Parcelas controller', 'DeleteAllTransaction', error.message);
+      throw new Error('[Controller] - DeleteAllTransaction Parcelas erro: ' + error.message);
+    }
+  }
+
+  async deleteAll(data: any) {
+    try {
+      console.log('data', data);
+      const response = await this.ExperimentGenotipeRepository.deleteAll(data);
       if (response) {
         return { status: 200, message: 'Parcelas excluídos' };
       }
+
       return { status: 400, message: 'Erro ao excluir parcelas' };
+
     } catch (error: any) {
       handleError('Parcelas controller', 'DeleteAll', error.message);
       throw new Error('[Controller] - DeleteAll Parcelas erro');
@@ -749,7 +870,7 @@ export class ExperimentGenotipeController {
 
   async setStatus({ idList: idExperiment, status }: any) {
     try {
-      const experimentsGroupIds:number[] = [];
+      const experimentsGroupIds: number[] = [];
       await this.ExperimentGenotipeRepository.updateStatus(idExperiment, status);
       for (const id of idExperiment) {
         const { response }: any = await this.experimentController.getOne(Number(id));
@@ -895,7 +1016,7 @@ export class ExperimentGenotipeController {
           // logic
           res = response;
           console.log("createXls registros incluidos na planilha:", options.skip);
-          
+
           options.skip += 1000;
         });
       }
