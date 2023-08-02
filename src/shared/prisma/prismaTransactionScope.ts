@@ -28,10 +28,10 @@ export class PrismaTransactionScope implements TransactionScope {
       // exists, there is no need to create a transaction and you just execute the callback
       return await fn();
     } else {
-      await this.prisma.$executeRaw`SET TRANSACTION ISOLATION LEVEL READ COMMITTED`; 
-      await this.prisma.$executeRaw`SET wait_timeout=3600000`; 
-      await this.prisma.$executeRaw`SET interactive_timeout=3600000`; 
-     // await this.prisma.$executeRaw`SET max_statement_time=60000`; 
+      await this.prisma.$executeRaw`SET TRANSACTION ISOLATION LEVEL READ COMMITTED`;
+      await this.prisma.$executeRaw`SET wait_timeout=3600000`;
+      await this.prisma.$executeRaw`SET interactive_timeout=3600000`;
+      // await this.prisma.$executeRaw`SET max_statement_time=60000`; 
       // does not exist, create a Prisma transaction 
       await this.prisma.$transaction(async (prisma) => {
         await this.transactionContext.runPromise(async () => {
@@ -47,7 +47,7 @@ export class PrismaTransactionScope implements TransactionScope {
             throw err;
           }
         });
-      },{
+      }, {
         maxWait: (3600000 * 3), // default: 2000 === 3600000 ms == 1 hr => 1 hora * 3
         timeout: (3600000 * 3), // default: 5000 === 3600000 ms == 1 hr => 1 hora * 3
       });

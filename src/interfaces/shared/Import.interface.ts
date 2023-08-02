@@ -12,3 +12,7 @@ export interface ImportValidate {
   idCulture: number
   created_by: number
 }
+
+export interface ImportValidateWithSession extends ImportValidate {
+  sessao: string
+}
