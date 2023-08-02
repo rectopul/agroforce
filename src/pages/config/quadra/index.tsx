@@ -20,9 +20,7 @@ import {
   AiOutlineArrowUp,
   AiTwotoneStar,
 } from 'react-icons/ai';
-import {
-  BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow,
-} from 'react-icons/bi';
+import { BiEdit, BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { FaRegThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
@@ -117,22 +115,25 @@ export default function Listagem({
   const tabsDropDowns = TabsDropDowns();
   const [loading, setLoading] = useState<boolean>(false);
 
-  tabsDropDowns.map((tab) => (tab.titleTab === 'QUADRAS'
-    ? (tab.statusTab = true)
-    : (tab.statusTab = false)));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === 'QUADRAS'
+      ? (tab.statusTab = true)
+      : (tab.statusTab = false)
+  );
 
   const tableRef = useRef<any>(null);
 
   const router = useRouter();
   const [userLogado, setUserLogado] = useState<any>(
-    JSON.parse(localStorage.getItem('user') as string),
+    JSON.parse(localStorage.getItem('user') as string)
   );
   const table = 'quadra';
   const module_name = 'quadras';
   const module_id = 17;
   // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
   const identifier_preference = module_name + router.route;
-  const camposGerenciadosDefault = 'id,local_preparo,cod_quadra,linha_p,esquema,allocation,status,action';
+  const camposGerenciadosDefault =
+    'id,local_preparo,cod_quadra,linha_p,esquema,allocation,status,action';
   const preferencesDefault = {
     id: 0,
     route_usage: router.route,
@@ -140,22 +141,23 @@ export default function Listagem({
   };
 
   const [preferences, setPreferences] = useState<any>(
-    userLogado.preferences[identifier_preference] || preferencesDefault,
+    userLogado.preferences[identifier_preference] || preferencesDefault
   );
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+    preferences.table_preferences
   );
   const [quadra, setQuadra] = useState<IQuadra[]>(() => quadras);
   const [currentPage, setCurrentPage] = useState<number>(
-    Number(pageBeforeEdit),
+    Number(pageBeforeEdit)
   );
   const [filtersParams, setFiltersParams] = useState<string>(filterBeforeEdit);
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems || 0);
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [statusAccordionFilter, setStatusAccordionFilter] = useState<boolean>(false);
+  const [statusAccordionFilter, setStatusAccordionFilter] =
+    useState<boolean>(false);
   const [orderList, setOrder] = useState<number>(
-    typeOrderServer == 'desc' ? 1 : 2,
+    typeOrderServer == 'desc' ? 1 : 2
   );
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
@@ -274,7 +276,7 @@ export default function Listagem({
           setQuadra(response.response);
           setTotalItems(response.total);
           tableRef.current.dataManager.changePageSize(
-            response.total >= take ? take : response.total,
+            response.total >= take ? take : response.total
           );
         }
         setLoading(false);
@@ -329,7 +331,7 @@ export default function Listagem({
   async function handleOrder(
     column: string,
     order: string | any,
-    name: any,
+    name: any
   ): Promise<void> {
     // let typeOrder: any;
     // let parametersFilter: any;
@@ -375,9 +377,8 @@ export default function Listagem({
     // }
 
     // Gobal manage orders
-    const {
-      typeOrderG, columnG, orderByG, arrowOrder,
-    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    const { typeOrderG, columnG, orderByG, arrowOrder } =
+      await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
@@ -414,31 +415,32 @@ export default function Listagem({
       field: 'id',
       width: 0,
       sorting: false,
-      render: () => (colorStar === '#eba417' ? (
-        <div className="h-9 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('')}
-            >
-              <AiTwotoneStar size={20} color="#eba417" />
-            </button>
+      render: () =>
+        colorStar === '#eba417' ? (
+          <div className="h-9 flex">
+            <div>
+              <button
+                type="button"
+                className="w-full h-full flex items-center justify-center border-0"
+                onClick={() => setColorStar('')}
+              >
+                <AiTwotoneStar size={20} color="#eba417" />
+              </button>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="h-9 flex">
-          <div>
-            <button
-              type="button"
-              className="w-full h-full flex items-center justify-center border-0"
-              onClick={() => setColorStar('#eba417')}
-            >
-              <AiTwotoneStar size={20} />
-            </button>
+        ) : (
+          <div className="h-9 flex">
+            <div>
+              <button
+                type="button"
+                className="w-full h-full flex items-center justify-center border-0"
+                onClick={() => setColorStar('#eba417')}
+              >
+                <AiTwotoneStar size={20} />
+              </button>
+            </div>
           </div>
-        </div>
-      )),
+        ),
     };
   }
 
@@ -500,7 +502,7 @@ export default function Listagem({
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
       if (columnCampos[index] === 'comp_p') {
@@ -511,7 +513,7 @@ export default function Listagem({
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
       if (columnCampos[index] === 'linha_p') {
@@ -522,7 +524,7 @@ export default function Listagem({
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
       if (columnCampos[index] === 'esquema') {
@@ -533,7 +535,7 @@ export default function Listagem({
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
       if (columnCampos[index] === 'divisor') {
@@ -544,7 +546,7 @@ export default function Listagem({
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
       if (columnCampos[index] === 'local_plantio') {
@@ -555,7 +557,7 @@ export default function Listagem({
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
       if (columnCampos[index] === 'local_preparo') {
@@ -566,7 +568,7 @@ export default function Listagem({
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
       if (columnCampos[index] === 'allocation') {
@@ -577,7 +579,7 @@ export default function Listagem({
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
       if (columnCampos[index] === 'status') {
@@ -593,7 +595,7 @@ export default function Listagem({
                 {rowData?.status == 1 ? 'Ativo' : 'Inativo'}
               </div>
             ),
-          }),
+          })
         );
       }
       if (columnCampos[index] === 'action') {
@@ -794,7 +796,7 @@ export default function Listagem({
   function checkValue(value: any) {
     const parameter = tableGlobalFunctions.getValuesForFilter(
       value,
-      filtersParams,
+      filtersParams
     );
     return parameter;
   }
@@ -877,7 +879,7 @@ export default function Listagem({
                   onClick={() => {
                     window.open(
                       '/listas/rd?importar=alocacao_quadra',
-                      '_blank',
+                      '_blank'
                     );
                     setModalImport(false);
                   }}
@@ -1065,9 +1067,7 @@ export default function Listagem({
                     </div>
 
                     <strong className="text-blue-600">
-                      Total registrado:
-                      {' '}
-                      {itemsTotal}
+                      Total registrado: {itemsTotal}
                     </strong>
 
                     <div className="h-full flex items-center gap-2">
@@ -1149,58 +1149,59 @@ export default function Listagem({
                     </div>
                   </div>
                 ),
-                Pagination: (props) => (
-                  <div
-                    className="flex
+                Pagination: (props) =>
+                  (
+                    <div
+                      className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                    {...props}
-                  >
-                    <Button
-                      onClick={() => handlePagination(0)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdFirstPage size={18} />}
-                      disabled={currentPage < 1}
-                    />
-                    <Button
-                      onClick={() => handlePagination(currentPage - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiLeftArrow size={15} />}
-                      disabled={currentPage <= 0}
-                    />
-                    {Array(1)
-                      .fill('')
-                      .map((value, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => handlePagination(index)}
-                          value={`${currentPage + 1}`}
-                          bgColor="bg-blue-600"
-                          textColor="white"
-                          disabled
-                        />
-                      ))}
-                    <Button
-                      onClick={() => handlePagination(currentPage + 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<BiRightArrow size={15} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                    <Button
-                      onClick={() => handlePagination(pages - 1)}
-                      bgColor="bg-blue-600"
-                      textColor="white"
-                      icon={<MdLastPage size={18} />}
-                      disabled={currentPage + 1 >= pages}
-                    />
-                  </div>
+                      {...props}
+                    >
+                      <Button
+                        onClick={() => handlePagination(0)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdFirstPage size={18} />}
+                        disabled={currentPage < 1}
+                      />
+                      <Button
+                        onClick={() => handlePagination(currentPage - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiLeftArrow size={15} />}
+                        disabled={currentPage <= 0}
+                      />
+                      {Array(1)
+                        .fill('')
+                        .map((value, index) => (
+                          <Button
+                            key={index}
+                            onClick={() => handlePagination(index)}
+                            value={`${currentPage + 1}`}
+                            bgColor="bg-blue-600"
+                            textColor="white"
+                            disabled
+                          />
+                        ))}
+                      <Button
+                        onClick={() => handlePagination(currentPage + 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<BiRightArrow size={15} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                      <Button
+                        onClick={() => handlePagination(pages - 1)}
+                        bgColor="bg-blue-600"
+                        textColor="white"
+                        icon={<MdLastPage size={18} />}
+                        disabled={currentPage + 1 >= pages}
+                      />
+                    </div>
                   ) as any,
               }}
             />
@@ -1216,9 +1217,10 @@ export const getServerSideProps: GetServerSideProps = async ({
   res,
 }: any) => {
   const PreferencesControllers = new UserPreferenceController();
-  const itensPerPage = (await (
-    await PreferencesControllers.getConfigGerais()
-  )?.response[0]?.itens_per_page) ?? 15;
+  const itensPerPage =
+    (await (
+      await PreferencesControllers.getConfigGerais()
+    )?.response[0]?.itens_per_page) ?? 15;
 
   const { token } = req.cookies;
   const cultureId: number = Number(req.cookies.cultureId);
@@ -1229,7 +1231,11 @@ export const getServerSideProps: GetServerSideProps = async ({
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
-  if (lastPageServer == undefined || lastPageServer == 'No' || req.cookies.urlPage !== 'quadra') {
+  if (
+    lastPageServer == undefined ||
+    lastPageServer == 'No' ||
+    req.cookies.urlPage !== 'quadra'
+  ) {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });
