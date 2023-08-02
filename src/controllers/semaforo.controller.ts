@@ -18,8 +18,11 @@ export class SemaforoController {
   // constant
   static readonly PROCESS_SORTEIO = 'sorteio';
   static readonly PROCESS_VALIDACAO = 'validação';
+  static readonly PROCESS_IMPORTACAO = 'importação';
   static readonly PROCESS_EDICAO = 'edição';
   static readonly PROCESS_EXCLUSAO = 'exclusão';
+  
+  static readonly HTTP_STATUS_CONFLICT = 409; // INDICA QUE O SEMAFORO ESTÁ EM USO
 
   private _sessao: string = '';
   private _acao: string = '';
@@ -191,7 +194,7 @@ export class SemaforoController {
       }
 
       // se não tiver, verifica se existe semaforo para a acao específica
-      if (responseItem.length <= 0 && responseSemaforo[0]._acao == acao) {
+      if (responseItem.length <= 0 && responseSemaforo[0].acao == acao) {
         // cria o semaforo item
         let createdItem = await this.semaforoItemRepository.create({
           created_by,
@@ -205,7 +208,7 @@ export class SemaforoController {
 
       let semaforo = responseSemaforo[0];
 
-      console.log(semaforo._sessao, sessao, 'acao:', acao);
+      console.log(semaforo.sessao, sessao, 'acao:', acao);
 
       if (semaforo.sessao != sessao) {
         if (semaforo.automatico == 's') {
@@ -231,33 +234,34 @@ export class SemaforoController {
           let usuario: any[] = [];
 
           console.log('this.userCache', this.userCache);
-          if (this.userCache.has(created_by)) {
-            usuario = this.userCache.get(created_by);
+          if (this.userCache.has(semaforo.created_by)) {
+            usuario = this.userCache.get(semaforo.created_by);
           } else {
-            const responseUser = await this.userRepository.findOne(created_by);
+            const responseUser = await this.userRepository.findOne(semaforo.created_by);
             if (!responseUser) {
               return { status: 400, response: [], message: 'usuário não existe para a criação do semáforo.' };
             }
 
             usuario = responseUser;
 
-            this.userCache.set(created_by, responseUser);
+            this.userCache.set(semaforo.created_by, usuario);
           }
 
           console.log('usuario', usuario);
 
           output += `\nSemaforo: ${semaforo.id}\n`;
-          output += `Sessão: ${sessao}\n`;
-          output += `Processo: ${acao}\n`;
-          output += `Referência: ${referencia}\n`;
-          output += `CodReferencia: ${codReferencia}\n`;
+          output += `Sessão: ${semaforo.sessao}\n`;
+          output += `Processo: ${semaforo.acao}\n`;
+          output += `Referência: ${responseItem[0]?.referencia}\n`;
+          output += `CodReferencia: ${responseItem[0]?.codReferencia}\n`;
           output += `Criado por: ${usuario[0].name} \n`;
           // replace break lines to <br>
           output = output.replace(/\n/g, '<br>');
         }
 
         return {
-          status: 400, reponse: {
+          status: SemaforoController.HTTP_STATUS_CONFLICT, 
+          reponse: {
             sessao,
             acao,
             referencia,
@@ -314,9 +318,9 @@ export class SemaforoController {
 
     let semaforo = response[0];
 
-    console.log(semaforo._sessao, sessao, 'acao:', acao);
+    console.log(semaforo.sessao, sessao, 'acao:', acao);
 
-    if (semaforo._sessao != sessao) {
+    if (semaforo.sessao != sessao) {
       if (semaforo.automatico == 's') {
         let data = new Date();
         data.setMinutes(data.getMinutes() - 10);

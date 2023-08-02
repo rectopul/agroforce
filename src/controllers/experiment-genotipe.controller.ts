@@ -575,7 +575,7 @@ export class ExperimentGenotipeController {
               sessao, acao, 'experiment', exp.id, created_by);
 
             if (resSemaforo.status !== 200) {
-              throw new SemaforoError(resSemaforo.message, resSemaforo.response);
+              throw new SemaforoError(resSemaforo.message, resSemaforo.response, resSemaforo.status, resSemaforo);
             }
 
             await tx.experiment.update({
@@ -595,7 +595,7 @@ export class ExperimentGenotipeController {
               sessao, acao, 'genotype_treatment', gen_treatment.id, created_by);
 
             if (resSemaforo.status !== 200) {
-              throw new SemaforoError(resSemaforo.message, resSemaforo.response);
+              throw new SemaforoError(resSemaforo.message, resSemaforo.response, resSemaforo.status, resSemaforo);
             }
 
             await tx.genotype_treatment.update({
@@ -609,16 +609,16 @@ export class ExperimentGenotipeController {
           }
 
           for (const npe of npeToUpdate) {
-            const { response: newNpe }: IReturnObject = await npeController.getOne(Number(npe.id));
-            const concat = `${newNpe.local.name_local_culture}_${newNpe.safra.safraName}_${newNpe.foco.name}_${newNpe.group.group}_${newNpe.type_assay.name}_${newNpe.tecnologia.cod_tec} ${newNpe.tecnologia.name}_${newNpe.epoca}_${newNpe.npei}_${newNpe.prox_npe}`;
 
-            console.log('npe', npe);
+            const { response: newNpe }: IReturnObject = await npeController.getOne(Number(npe.id));
+
+            const concat = `${newNpe.local.name_local_culture}_${newNpe.safra.safraName}_${newNpe.foco.name}_${newNpe.group.group}_${newNpe.type_assay.name}_${newNpe.tecnologia.cod_tec} ${newNpe.tecnologia.name}_${newNpe.epoca}_${newNpe.npei}_${newNpe.prox_npe}`;
 
             const resSemaforo = await this.semaforoController.validaSemaforoItem(
               sessao, acao, 'npe', npe.id, created_by);
 
             if (resSemaforo.status !== 200) {
-              throw new SemaforoError(resSemaforo.message, resSemaforo.response);
+              throw new SemaforoError(resSemaforo.message, resSemaforo.response, resSemaforo.status, resSemaforo);
             }
 
             await this.reporteController.create({
@@ -638,8 +638,6 @@ export class ExperimentGenotipeController {
           }
 
           console.log('pre.createMany:experiment_genotipo', experiment_genotipo);
-
-          throw new Error('teste');
 
           const exp_gen = await tx.experiment_genotipe.createMany({ data: experiment_genotipo });
 
