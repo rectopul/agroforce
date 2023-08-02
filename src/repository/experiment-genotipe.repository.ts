@@ -37,14 +37,14 @@ export class ExperimentGenotipeRepository extends BaseRepository {
   }
 
   async deleteAll(idExperiment: number) {
-    const result = await prisma.experiment_genotipe.deleteMany({
+    const result = this.getPrisma().experiment_genotipe.deleteMany({
       where: {
         idExperiment,
       },
     });
     return result;
   }
-
+  
   async countTags(parameters: any) {
     parameters.status = 'EM ETIQUETAGEM';
     const tagsToPrint = await prisma.experiment_genotipe.count({ where: parameters });
@@ -54,6 +54,14 @@ export class ExperimentGenotipeRepository extends BaseRepository {
     return { tagsToPrint, tagsPrinted };
   }
 
+  async findByExperimentId(idExperiment: number) {
+    const result = await prisma.experiment_genotipe.findMany({
+      where: { idExperiment: idExperiment },
+    });
+
+    return result;
+  }
+  
   async findById(id: number) {
     const result = await prisma.experiment_genotipe.findUnique({
       where: { id },

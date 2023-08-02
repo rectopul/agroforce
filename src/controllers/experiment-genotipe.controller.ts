@@ -2,20 +2,23 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-loop-func */
 /* eslint-disable no-await-in-loop */
-import {ExperimentGenotipeRepository} from 'src/repository/experiment-genotipe.repository';
+import { ExperimentGenotipeRepository } from 'src/repository/experiment-genotipe.repository';
 import * as XLSX from 'xlsx';
 import moment from 'moment';
-import {IReturnObject} from '../interfaces/shared/Import.interface';
-import handleError, {SemaforoError} from '../shared/utils/handleError';
-import {ExperimentGroupController} from './experiment-group/experiment-group.controller';
-import {ExperimentController} from './experiment/experiment.controller';
-import {ReporteController} from './reportes/reporte.controller';
+import { IReturnObject } from '../interfaces/shared/Import.interface';
+import handleError, { SemaforoError } from '../shared/utils/handleError';
+import { ExperimentGroupController } from './experiment-group/experiment-group.controller';
+import { ExperimentController } from './experiment/experiment.controller';
+import { ReporteController } from './reportes/reporte.controller';
 import handleOrderForeign from '../shared/utils/handleOrderForeign';
-import {removeEspecialAndSpace} from '../shared/utils/removeEspecialAndSpace';
-import {prisma} from '../pages/api/db/db';
-import {NpeController} from './npe/npe.controller';
-import {SemaforoController} from "./semaforo.controller";
+import { removeEspecialAndSpace } from '../shared/utils/removeEspecialAndSpace';
+import { prisma } from '../pages/api/db/db';
+import { NpeController } from './npe/npe.controller';
+import { SemaforoController } from "./semaforo.controller";
 
+import { PrismaClientManager } from "../shared/prisma/prismaClientManager";
+import { TransactionScope } from "../shared/prisma/transactionScope";
+import { PrismaTransactionScope } from "../shared/prisma/prismaTransactionScope";
 
 interface ICreateParams {
   experiment_genotipo: any[];
@@ -47,7 +50,7 @@ export class ExperimentGenotipeController {
       options = await removeEspecialAndSpace(options);
       if (options.createFile) {
         const sheet = await this.createXls(options);
-        return {status: 200, response: sheet};
+        return { status: 200, response: sheet };
       }
       if (options.filterFoco) {
         parameters.foco = JSON.parse(
@@ -260,10 +263,10 @@ export class ExperimentGenotipeController {
 
       const select = {
         id: true,
-        safra: {select: {safraName: true, culture: true}},
-        foco: {select: {name: true}},
-        type_assay: {select: {name: true, envelope: true}},
-        tecnologia: {select: {name: true, cod_tec: true}},
+        safra: { select: { safraName: true, culture: true } },
+        foco: { select: { name: true } },
+        type_assay: { select: { name: true, envelope: true } },
+        tecnologia: { select: { name: true, cod_tec: true } },
         gli: true,
         status: true,
         counter: true,
@@ -273,7 +276,7 @@ export class ExperimentGenotipeController {
             status: true,
             delineamento: true,
             local: {
-              select: {name_local_culture: true},
+              select: { name_local_culture: true },
             },
             clp: true,
             nlp: true,
@@ -452,7 +455,7 @@ export class ExperimentGenotipeController {
       }
 
       if (!response || response.total <= 0) {
-        return {status: 400, response: [], total: 0};
+        return { status: 400, response: [], total: 0 };
       }
       return {
         status: 200,
@@ -467,14 +470,22 @@ export class ExperimentGenotipeController {
     }
   }
 
+  setSemaforoController(semaforoController: SemaforoController) {
+    this.semaforoController = semaforoController;
+  }
+
+  setTransactionController(clientManager: PrismaClientManager, transactionScope: PrismaTransactionScope) {
+    this.ExperimentGenotipeRepository.setTransaction(clientManager, transactionScope);
+  }
+
   async getLastNpeDisponible(options: {
     safraId: number;
     groupId: number;
     npefSearch: number;
   }) {
-    const {safraId} = options;
-    const {groupId} = options;
-    const {npefSearch} = options;
+    const { safraId } = options;
+    const { groupId } = options;
+    const { npefSearch } = options;
 
     try {
       const response: {
@@ -503,17 +514,17 @@ export class ExperimentGenotipeController {
 
       if (!response) throw new Error('Grupo não encontrado');
 
-      return {status: 200, response};
+      return { status: 200, response };
     } catch (error: any) {
       handleError('Parcelas controller', 'getLastNpeDisponible', error.message);
       throw new Error('[Controller] - getLastNpeDisponible Parcelas erro');
     }
   }
 
-  async create({experiment_genotipo, gt, experimentObj, npeToUpdate, userId, sessao}: ICreateParams) {
+  async create({ experiment_genotipo, gt, experimentObj, npeToUpdate, userId, sessao }: ICreateParams) {
 
     const npeController = new NpeController();
-    const acao = 'sorteio';
+    const acao = SemaforoController.PROCESS_SORTEIO;
     const created_by = userId;
 
     console.log('experiment_genotipo', experiment_genotipo);
@@ -522,7 +533,7 @@ export class ExperimentGenotipeController {
     console.log('npeToUpdate', npeToUpdate);
 
     try {
-      const {ip} = await fetch('https://api.ipify.org/?format=json')
+      const { ip } = await fetch('https://api.ipify.org/?format=json')
         .then((results) => results.json())
         .catch(() => '0.0.0.0');
 
@@ -541,7 +552,7 @@ export class ExperimentGenotipeController {
 
         messageLimitExceeded = messageLimitExceeded.replace('xxxxxx', experiment_genotipo.length.toLocaleString());
 
-        return {status: 400, message: messageLimitExceeded};
+        return { status: 400, message: messageLimitExceeded };
 
       }
 
@@ -564,7 +575,7 @@ export class ExperimentGenotipeController {
               sessao, acao, 'experiment', exp.id, created_by);
 
             if (resSemaforo.status !== 200) {
-              throw new SemaforoError(resSemaforo.message, resSemaforo.response);
+              throw new SemaforoError(resSemaforo.message, resSemaforo.response, resSemaforo.status, resSemaforo);
             }
 
             await tx.experiment.update({
@@ -584,7 +595,7 @@ export class ExperimentGenotipeController {
               sessao, acao, 'genotype_treatment', gen_treatment.id, created_by);
 
             if (resSemaforo.status !== 200) {
-              throw new SemaforoError(resSemaforo.message, resSemaforo.response);
+              throw new SemaforoError(resSemaforo.message, resSemaforo.response, resSemaforo.status, resSemaforo);
             }
 
             await tx.genotype_treatment.update({
@@ -598,16 +609,16 @@ export class ExperimentGenotipeController {
           }
 
           for (const npe of npeToUpdate) {
-            const {response: newNpe}: IReturnObject = await npeController.getOne(Number(npe.id));
-            const concat = `${newNpe.local.name_local_culture}_${newNpe.safra.safraName}_${newNpe.foco.name}_${newNpe.group.group}_${newNpe.type_assay.name}_${newNpe.tecnologia.cod_tec} ${newNpe.tecnologia.name}_${newNpe.epoca}_${newNpe.npei}_${newNpe.prox_npe}`;
 
-            console.log('npe', npe);
+            const { response: newNpe }: IReturnObject = await npeController.getOne(Number(npe.id));
+
+            const concat = `${newNpe.local.name_local_culture}_${newNpe.safra.safraName}_${newNpe.foco.name}_${newNpe.group.group}_${newNpe.type_assay.name}_${newNpe.tecnologia.cod_tec} ${newNpe.tecnologia.name}_${newNpe.epoca}_${newNpe.npei}_${newNpe.prox_npe}`;
 
             const resSemaforo = await this.semaforoController.validaSemaforoItem(
               sessao, acao, 'npe', npe.id, created_by);
 
             if (resSemaforo.status !== 200) {
-              throw new SemaforoError(resSemaforo.message, resSemaforo.response);
+              throw new SemaforoError(resSemaforo.message, resSemaforo.response, resSemaforo.status, resSemaforo);
             }
 
             await this.reporteController.create({
@@ -628,9 +639,7 @@ export class ExperimentGenotipeController {
 
           console.log('pre.createMany:experiment_genotipo', experiment_genotipo);
 
-          throw new Error('teste');
-
-          const exp_gen = await tx.experiment_genotipe.createMany({data: experiment_genotipo});
+          const exp_gen = await tx.experiment_genotipe.createMany({ data: experiment_genotipo });
 
           return exp_gen;
         },
@@ -640,16 +649,29 @@ export class ExperimentGenotipeController {
         });
 
       if (response) {
-        
+
         await this.semaforoController.finalizaRest(sessao, acao);
-        
-        return {status: 200, message: 'Tratamento experimental registrado'};
+
+        return { status: 200, message: 'Tratamento experimental registrado' };
       }
-      return {status: 400, message: 'Parcelas não registrado'};
+      return { status: 400, message: 'Parcelas não registrado' };
     } catch (error: any) {
       // catch final
       handleError('Parcelas do controlador', 'Create', error.message);
       throw new Error(`[Controller] - Erro ao criar esboço de Parcelas: ${error.message}`);
+    }
+  }
+
+  async findByExperimentId(experimentId: number) {
+    try {
+      const response = await this.ExperimentGenotipeRepository.findByExperimentId(experimentId);
+
+      if (!response) throw new Error('Parcelas não encontradas');
+
+      return { status: 200, response };
+    } catch (error: any) {
+      handleError('Parcela controller', 'getOne', error.message);
+      throw new Error('[Controller] - getOne Parcela erro');
     }
   }
 
@@ -659,7 +681,7 @@ export class ExperimentGenotipeController {
 
       if (!response) throw new Error('Parcela não encontrada');
 
-      return {status: 200, response};
+      return { status: 200, response };
     } catch (error: any) {
       handleError('Parcela controller', 'getOne', error.message);
       throw new Error('[Controller] - getOne Parcela erro');
@@ -679,15 +701,15 @@ export class ExperimentGenotipeController {
 
         // await idList.map(async (id: any) => {
         for (const id of idList) {
-          const {response}: any = await this.getOne(Number(id));
+          const { response }: any = await this.getOne(Number(id));
           const newCount = response.counter + 1;
           operation = 'IMPRESSO';
 
           await this.ExperimentGenotipeRepository.printed(Number(id), status, newCount);
 
-          const {idExperiment} = response;
+          const { idExperiment } = response;
 
-          const {response: resExp}: any = await this.experimentController.getOne(idExperiment);
+          const { response: resExp }: any = await this.experimentController.getOne(idExperiment);
           // await this.experimentGroupController.countEtiqueta(
           //   resExp.experimentGroupId,
           //   idExperiment,
@@ -706,15 +728,15 @@ export class ExperimentGenotipeController {
         // );
       } else if (count === 'reprint') {
         await idList.map(async (id: any) => {
-          const {response}: any = await this.getOne(id);
+          const { response }: any = await this.getOne(id);
           const newCount = response.counter + 1;
           operation = 'REIMPRESSO';
 
           await this.ExperimentGenotipeRepository.printed(id, status, newCount);
 
-          const {idExperiment} = response;
+          const { idExperiment } = response;
 
-          const {response: resExp}: any = await this.experimentController.getOne(idExperiment);
+          const { response: resExp }: any = await this.experimentController.getOne(idExperiment);
           await this.experimentGroupController.countEtiqueta(
             resExp.experimentGroupId,
             idExperiment,
@@ -731,11 +753,11 @@ export class ExperimentGenotipeController {
 
           await this.ExperimentGenotipeRepository.writeOff(id, npe, status, counter);
 
-          const {response}: any = await this.getOne(id);
+          const { response }: any = await this.getOne(id);
 
-          const {idExperiment} = response;
+          const { idExperiment } = response;
 
-          const {response: resExp}: any = await this.experimentController.getOne(idExperiment);
+          const { response: resExp }: any = await this.experimentController.getOne(idExperiment);
           await this.experimentGroupController.countEtiqueta(
             resExp.experimentGroupId,
             idExperiment,
@@ -750,31 +772,72 @@ export class ExperimentGenotipeController {
         // return { status: 200 };
       }
 
-      return {status: 200};
+      return { status: 200 };
     } catch (error: any) {
       handleError('Parcelas controller', 'Update', error.message);
       throw new Error('[Controller] - Update Parcelas erro');
     }
   }
 
-  async deleteAll(idExperiment: number) {
+  async deleteAllTransaction(idExperiment: number) {
     try {
-      const response = await this.ExperimentGenotipeRepository.deleteAll(Number(idExperiment));
-      if (response) {
-        return {status: 200, message: 'Parcelas excluídos'};
+      return this.ExperimentGenotipeRepository.deleteAllTransaction(Number(idExperiment))
+        .then((responseTransaction) => {
+          console.log('responseTransaction', responseTransaction);
+          if (responseTransaction !== undefined) {
+            return { status: 200, message: 'Parcelas excluídos' };
+          } else {
+            return { status: 400, message: 'Erro ao excluir parcelas' };
+          }
+        })
+        .catch((error: any) => {
+          handleError('Parcelas controller', 'DeleteAllTransaction', error.message);
+          throw new Error('[Controller] - DeleteAllTransaction Parcelas erro: ' + error.message);
+        });
+    } catch (error: any) {
+      handleError('Parcelas controller', 'DeleteAllTransaction', error.message);
+      throw new Error('[Controller] - DeleteAllTransaction Parcelas erro: ' + error.message);
+    }
+  }
+
+  async deleteAllTransactionOld(idExperiment: number) {
+    try {
+
+      const responseTransaction = await this.ExperimentGenotipeRepository.deleteAllTransaction(Number(idExperiment));
+      console.log('responseTransaction', responseTransaction);
+      if (responseTransaction !== undefined) {
+        return { status: 200, message: 'Parcelas excluídos' };
+      } else {
+        return { status: 400, message: 'Erro ao excluir parcelas' };
       }
-      return {status: 400, message: 'Erro ao excluir parcelas'};
+
+    } catch (error: any) {
+      handleError('Parcelas controller', 'DeleteAllTransaction', error.message);
+      throw new Error('[Controller] - DeleteAllTransaction Parcelas erro: ' + error.message);
+    }
+  }
+
+  async deleteAll(data: any) {
+    try {
+      console.log('data', data);
+      const response = await this.ExperimentGenotipeRepository.deleteAll(data);
+      if (response) {
+        return { status: 200, message: 'Parcelas excluídos' };
+      }
+
+      return { status: 400, message: 'Erro ao excluir parcelas' };
+
     } catch (error: any) {
       handleError('Parcelas controller', 'DeleteAll', error.message);
       throw new Error('[Controller] - DeleteAll Parcelas erro');
     }
   }
 
-  async relateLayout({id, blockLayoutId, status}: any) {
+  async relateLayout({ id, blockLayoutId, status }: any) {
     try {
       const parcela: any = await this.getOne(Number(id));
 
-      if (!parcela) return {status: 400, message: 'parcela não existente'};
+      if (!parcela) return { status: 400, message: 'parcela não existente' };
 
       const response: any = await this.ExperimentGenotipeRepository.update(
         id,
@@ -784,9 +847,9 @@ export class ExperimentGenotipeController {
         },
       );
       if (response) {
-        return {status: 200, response, message: 'parcela atualizada'};
+        return { status: 200, response, message: 'parcela atualizada' };
       }
-      return {status: 400, response, message: 'parcela não atualizada'};
+      return { status: 400, response, message: 'parcela não atualizada' };
     } catch (error: any) {
       handleError('Parcelas controller', 'Relacionar layout', error.message);
       throw new Error('[Controller] - Relacionar layout Parcelas erro');
@@ -796,7 +859,7 @@ export class ExperimentGenotipeController {
   async generateIdList(id: number): Promise<Array<number>> {
     try {
       const experimentGroupController = new ExperimentGroupController();
-      const {response}: any = await experimentGroupController.getOne(id);
+      const { response }: any = await experimentGroupController.getOne(id);
       const idList = response.experiment?.map((item: any) => Number(item.id));
       return idList;
     } catch (error: any) {
@@ -805,12 +868,12 @@ export class ExperimentGenotipeController {
     }
   }
 
-  async setStatus({idList: idExperiment, status}: any) {
+  async setStatus({ idList: idExperiment, status }: any) {
     try {
       const experimentsGroupIds: number[] = [];
       await this.ExperimentGenotipeRepository.updateStatus(idExperiment, status);
       for (const id of idExperiment) {
-        const {response}: any = await this.experimentController.getOne(Number(id));
+        const { response }: any = await this.experimentController.getOne(Number(id));
         // verifica se experimentGroupId já foi adicionado
         if (response?.experimentGroupId && !experimentsGroupIds.includes(response.experimentGroupId)) {
           experimentsGroupIds.push(response.experimentGroupId);
@@ -857,7 +920,7 @@ export class ExperimentGenotipeController {
         data,
       );
 
-      return {status: 200, message: 'experimento do genótipo atualizado'};
+      return { status: 200, message: 'experimento do genótipo atualizado' };
     } catch (error: any) {
       handleError(
         'Tratamento do experimento do controlador',
@@ -875,7 +938,7 @@ export class ExperimentGenotipeController {
       delete options.createFile;
       options.take = 1000;
 
-      const {response, status} = await this.getAll(options);
+      const { response, status } = await this.getAll(options);
 
       const newData = response.map((item: any) => {
         const newItem: any = {};
@@ -915,7 +978,7 @@ export class ExperimentGenotipeController {
 
       options.skip = 1000;
       while (res.length > 0) {
-        await this.getAll(options).then(({status, response}) => {
+        await this.getAll(options).then(({ status, response }) => {
           // logic
           const newData = response.map((item: any) => {
             const newItem: any = {};
@@ -949,7 +1012,7 @@ export class ExperimentGenotipeController {
             return newItem;
           });
 
-          workSheet = XLSX.utils.sheet_add_json(workSheet, newData, {origin: -1, skipHeader: true});
+          workSheet = XLSX.utils.sheet_add_json(workSheet, newData, { origin: -1, skipHeader: true });
           // logic
           res = response;
           console.log("createXls registros incluidos na planilha:", options.skip);

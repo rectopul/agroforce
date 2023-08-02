@@ -8,9 +8,9 @@ export class TransactionConfig {
 
   public prisma = new PrismaClient();
 
-  public transactionScope;
-
-  public clientManager;
+  public transactionScope: PrismaTransactionScope;
+  
+  public clientManager: PrismaClientManager;
 
   constructor() {
     this.transactionContext = cls.createNamespace('transaction');
