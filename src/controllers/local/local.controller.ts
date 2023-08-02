@@ -94,7 +94,6 @@ export class LocalController {
 
         const dts_rde = local.cultureUnity.map((unity: any) => Number(unity.dt_rde));
         const maxDt_rde = Math.max(...dts_rde);
-        console.log(dts_rde);
         local.dt_rde = maxDt_rde;
         
       });

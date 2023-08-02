@@ -6,29 +6,77 @@
 /* eslint-disable max-len */
 import handleError from '../../shared/utils/handleError';
 import handleOrderForeign from '../../shared/utils/handleOrderForeign';
-import { ReporteRepository } from '../../repository/reporte.repository';
+import {ReporteRepository} from '../../repository/reporte.repository';
+import {BaseController} from "../base.controller";
+import {PrismaClientManager} from "../../shared/prisma/prismaClientManager";
+import {PrismaTransactionScope} from "../../shared/prisma/prismaTransactionScope";
 
-export class ReporteController {
+
+export class ReporteController extends BaseController {
   reporteRepository = new ReporteRepository();
+
+  setTransactionController(clientManager: PrismaClientManager, transactionScope: PrismaTransactionScope) {
+    this.reporteRepository.setTransaction(clientManager, transactionScope);
+  }
 
   async getOne(id: number) {
     try {
       const response = await this.reporteRepository.findOne(id);
 
       if (response) {
-        return { status: 200, response };
+        return {status: 200, response};
       }
-      return { status: 404, response: [], message: 'Histórico de impressão não encontrado' };
+      return {status: 404, response: [], message: 'Histórico de impressão não encontrado'};
     } catch (error: any) {
       handleError('Histórico de impressão Controller', 'GetOne', error.message);
       throw new Error('[Controller] - GetOne Histórico de impressão erro');
     }
   }
 
+  async createTransaction({
+                            userId, operation, module, oldValue, ip,
+                          }: any) {
+
+    try {
+      
+      const data = {
+        module,
+        userId,
+        operation,
+        oldValue,
+        ip,
+      };
+
+      return this.reporteRepository.createTransaction(data)
+        .then((responseTransaction) => {
+          console.log('responseTransaction', responseTransaction);
+          if (responseTransaction !== undefined) {
+            return {status: 200, message: 'Histórico de impressão criado!'};
+          } else {
+            return {status: 400, message: 'Histórico não impressão criado!'};
+          }
+        })
+        .catch((error: any) => {
+          handleError('Histórico de impressão Controller', 'Create', error.message);
+          throw new Error('[Controller] - Create Histórico de impressão - error: ' + error.message);
+
+          handleError('Parcelas controller', 'DeleteAllTransaction', error.message);
+          throw new Error('[Controller] - DeleteAllTransaction Parcelas erro: ' + error.message);
+        });
+    } catch (error: any) {
+      handleError('Histórico de impressão controller', 'Create', error.message);
+      throw new Error('[Controller] - createTransaction Histórico erro: ' + error.message);
+    }
+    /*if (this.clientManager && this.transactionScope) {
+      return await this.transactionScope.run(async () => this.create(data));
+    }
+    throw new Error('Transação não encontrada!');*/
+  }
+
   async create({
-    userId, operation, module, oldValue, ip,
-  }: any) {
-    
+                 userId, operation, module, oldValue, ip,
+               }: any) {
+
     try {
       oldValue = String(oldValue);
       const data = {
@@ -41,7 +89,7 @@ export class ReporteController {
       await this.reporteRepository.create(data);
     } catch (error: any) {
       handleError('Histórico de impressão Controller', 'Create', error.message);
-      throw new Error('[Controller] - Create Histórico de impressão - error: '+error.message);
+      throw new Error('[Controller] - Create Histórico de impressão - error: ' + error.message);
     }
   }
 
@@ -49,13 +97,13 @@ export class ReporteController {
     try {
       const history = await this.reporteRepository.findOne(data.id);
 
-      if (!history) return { status: 404, message: 'Histórico de impressão não existente' };
+      if (!history) return {status: 404, message: 'Histórico de impressão não existente'};
 
       const response = await this.reporteRepository.update(data.id, data);
       if (response) {
-        return { status: 200, response, message: 'Histórico de impressão atualizado' };
+        return {status: 200, response, message: 'Histórico de impressão atualizado'};
       }
-      return { status: 400, message: 'Histórico de impressão não atualizado' };
+      return {status: 400, message: 'Histórico de impressão não atualizado'};
     } catch (error: any) {
       handleError('Histórico de impressão Controller', 'Update', error.message);
       throw new Error('[Controller] - Update Histórico de impressão erro');
@@ -101,11 +149,16 @@ export class ReporteController {
 
       if (options.filterStartDate || options.filterEndDate) {
         if (options.filterStartDate && options.filterEndDate) {
-          parameters.AND.push({ madeIn: { gte: new Date(`${options.filterStartDate}T00:00:00.000z`), lte: new Date(`${options.filterEndDate}T23:59:59.999z`) } });
+          parameters.AND.push({
+            madeIn: {
+              gte: new Date(`${options.filterStartDate}T00:00:00.000z`),
+              lte: new Date(`${options.filterEndDate}T23:59:59.999z`)
+            }
+          });
         } else if (options.filterStartDate) {
-          parameters.AND.push({ madeIn: { gte: new Date(`${options.filterStartDate}T00:00:00.000z`) } });
+          parameters.AND.push({madeIn: {gte: new Date(`${options.filterStartDate}T00:00:00.000z`)}});
         } else if (options.filterEndDate) {
-          parameters.AND.push({ madeIn: { lte: new Date(`${options.filterEndDate}T23:59:59.999z`) } });
+          parameters.AND.push({madeIn: {lte: new Date(`${options.filterEndDate}T23:59:59.999z`)}});
         }
       }
 
@@ -135,9 +188,9 @@ export class ReporteController {
       );
 
       if (!response || response.total <= 0) {
-        return { status: 400, response: [], total: 0 };
+        return {status: 400, response: [], total: 0};
       }
-      return { status: 200, response, total: response.total };
+      return {status: 200, response, total: response.total};
     } catch (error: any) {
       handleError('Histórico de impressão Controller', 'GetAll', error.message);
       throw new Error('[Controller] - GetAll Histórico de impressão erro');

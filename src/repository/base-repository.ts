@@ -1,15 +1,21 @@
 import { PrismaClientManager } from '../shared/prisma/prismaClientManager';
 import { TransactionScope } from '../shared/prisma/transactionScope';
-import { prisma as primaDB } from '../pages/api/db/db';
+import {prisma, prisma as primaDB} from '../pages/api/db/db';
+import {PrismaTransactionScope} from "../shared/prisma/prismaTransactionScope";
 
 export class BaseRepository {
-  protected clientManager: any;
-
-  protected transactionScope: any;
-
-  setTransaction(clientManager: PrismaClientManager, transactionScope: TransactionScope) {
+  
+  protected clientManager: PrismaClientManager | null = null;
+  
+  protected transactionScope: PrismaTransactionScope | null = null;
+  
+  setTransaction(clientManager: PrismaClientManager, transactionScope: PrismaTransactionScope) {
     this.clientManager = clientManager;
     this.transactionScope = transactionScope;
+  }
+  
+  isTransaction() {
+    return this.transactionScope && this.clientManager;
   }
 
   async create(data: object | any) {
@@ -20,7 +26,16 @@ export class BaseRepository {
     return data;
   }
 
+  async delete(id: number): Promise<any> {
+    return {};
+  }
+  
+  async deleteAll(data: any) {
+    return data;
+  }
+
   getPrisma() {
+    console.log('(this.clientManager)', (this.clientManager));
     return (this.clientManager) ? this.clientManager.getClient() : primaDB;
   }
 
@@ -37,4 +52,19 @@ export class BaseRepository {
     }
     throw new Error('Transação não encontrada!');
   }
+
+  async deleteTransaction(id: number) {
+    if (this.clientManager && this.transactionScope) {
+      return await this.transactionScope.run(async () => this.delete(id));
+    }
+    throw new Error('Transação não encontrada!');
+  }
+
+  async deleteAllTransaction(data: any) {
+    if (this.clientManager && this.transactionScope) {
+      return await this.transactionScope.run(async () => this.deleteAll(data));
+    }
+    throw new Error('Transação não encontrada!');
+  }
+  
 }

@@ -8,8 +8,13 @@ import '../shared/styles/App.css';
 import '../shared/styles/tailwind.css';
 import Modal from 'react-modal';
 import PermissionGate from '../shared/utils/PermissionUser';
+import {v4} from "uuid";
 
 Modal.setAppElement('#__next');
+
+declare global {
+  var sessao: string;
+}
 
 function App({
   Component, pageProps, permissions, user,
@@ -42,6 +47,8 @@ function App({
 
     // run auth check on route change
     router.events.on('routeChangeComplete', authCheck);
+    
+    global.sessao = v4().toString();
 
     // unsubscribe from events in useEffect return function
     return () => {
