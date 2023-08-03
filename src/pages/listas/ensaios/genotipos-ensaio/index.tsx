@@ -65,6 +65,16 @@ import headerTableFactoryGlobal from '../../../../shared/utils/headerTableFactor
 import ComponentLoading from '../../../../components/Loading';
 import { perm_can_do } from '../../../../shared/utils/perm_can_do';
 
+
+interface TableRow {
+  assay_list: {
+    gli: any;
+  };
+  tableData?: {
+    checked: boolean;
+  };
+}
+
 export default function Listagem({
   allTreatments,
   assaySelect,
@@ -240,7 +250,7 @@ export default function Listagem({
   const pages = Math.ceil(total / take);
   const [nccIsValid, setNccIsValid] = useState<boolean>(false);
   const [genotypeIsValid, setGenotypeIsValid] = useState<boolean>(false);
-  const [rowsSelected, setRowsSelected] = useState([]);
+  const [rowsSelected, setRowsSelected] = useState<TableRow[]>([]);
   const [arrowOrder, setArrowOrder] = useState<any>('');
   const [orderBy, setOrderBy] = useState<string>(orderByserver);
   const [typeOrder, setTypeOrder] = useState<string>(typeOrderServer);
@@ -1002,6 +1012,71 @@ export default function Listagem({
     }
   }
 
+  // Extrai a lógica de detecção de duplicatas para uma função separada
+  const detectDuplicates = (selectedRows: TableRow[]) => {
+    let selectedGliList: string[] = [];
+    for (let i = 0; i < selectedRows.length; i++) {
+      selectedGliList.push(selectedRows[i].assay_list.gli);
+    }
+
+    const gliSet = new Set(selectedGliList);
+    return gliSet.size < selectedGliList.length;
+  }
+  
+
+  useEffect(() => {
+    console.log('rowsSelected', rowsSelected);
+
+    // verifica registros se tem algum gli repetido na lista
+    let gliList: string[] = [];
+    for (let i = 0; i < rowsSelected.length; i++) {
+      gliList.push(rowsSelected[i].assay_list.gli);
+    }
+    
+    console.log('gliList', gliList);
+
+    // verifica se há duplicatas na gliList
+    const gliSet = new Set(gliList);
+    const hasDuplicates = gliSet.size < (gliList?.length || 0);
+    console.log(hasDuplicates); // This will log 'true' if there are duplicates, 'false' otherwise
+
+    // encontrar o índice do primeiro item duplicado
+    if (hasDuplicates) {
+      const firstDuplicateIndex = gliList.findIndex((gli, index) => {
+        return gliList.indexOf(gli) !== index;
+      });
+      
+      for (const item of rowsSelected) {
+
+        console.log('item', item);
+        // index of the item
+        const index = rowsSelected.indexOf(item);
+        console.log('index', index);
+        if (index == firstDuplicateIndex) {
+          // clone item para alterar o checked
+          const itemClone: TableRow = { ...item };
+
+          if (itemClone.tableData) {
+            // altera o checked para false
+            itemClone.tableData.checked = false;
+          }
+          
+          // troca o item na lista
+          rowsSelected[index] = itemClone;
+          
+        }
+      }
+      
+      Swal.fire({
+        html: "Não é possivel selecionar mais que um registro com mesmo GLI",
+        width: '900',
+      });
+      
+    }
+
+
+  }, [rowsSelected]);
+  
   // useEffect(() => {
   //   handlePagination();
   //   handleTotalPages();
