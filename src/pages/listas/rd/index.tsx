@@ -5,9 +5,7 @@
 import Head from 'next/head';
 import readXlsxFile from 'read-excel-file';
 import Swal from 'sweetalert2';
-import React, {
-  useState, ReactNode, useEffect, useRef,
-} from 'react';
+import React, { useState, ReactNode, useEffect, useRef } from 'react';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import getConfig from 'next/config';
 import { IoIosCloudUpload } from 'react-icons/io';
@@ -26,17 +24,16 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
+import Modal from 'react-modal';
 import Spinner from 'react-bootstrap/Spinner';
 import { BiFilterAlt, BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { IoReloadSharp } from 'react-icons/io5';
 import { MdFirstPage, MdLastPage } from 'react-icons/md';
-import { RiFileExcel2Line } from 'react-icons/ri';
+import { RiFileExcel2Line, RiCloseCircleFill } from 'react-icons/ri';
 import * as XLSX from 'xlsx';
 import { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { Form, useFormik } from 'formik';
-import {
-  Box, Tab, Tabs, Typography,
-} from '@mui/material';
+import { Box, Tab, Tabs, Typography } from '@mui/material';
 import { fetchWrapper, tableGlobalFunctions } from 'src/helpers';
 import { useRouter } from 'next/router';
 import { removeCookies, setCookies } from 'cookies-next';
@@ -103,12 +100,16 @@ export default function Import({
 
   const tabsDropDowns = TabsDropDowns('listas');
 
-  tabsDropDowns.map((tab) => (tab.titleTab === 'RD' ? (tab.statusTab = true) : (tab.statusTab = false)));
+  tabsDropDowns.map((tab) =>
+    tab.titleTab === 'RD' ? (tab.statusTab = true) : (tab.statusTab = false)
+  );
 
   const tableRef = useRef<any>(null);
 
+  const [isOpenModal, setIsOpenModal] = useState(false);
+
   const [executeUpload, setExecuteUpload] = useState<any>(
-    Number(uploadInProcess),
+    Number(uploadInProcess)
   );
 
   const disabledButton = executeUpload === 1;
@@ -194,7 +195,7 @@ export default function Import({
       }
 
       const fileExtension: any = functionsUtils.getFileExtension(
-        value?.files[0]?.name,
+        value?.files[0]?.name
       );
 
       if (fileExtension !== 'xlsx') {
@@ -231,14 +232,16 @@ export default function Import({
           } else {
             reject(response);
           }
-        }).then((res: any) => {
-          setFilePath(res.filename);
-        }).catch((err: any) => {
-          Swal.fire({
-            html: `Erro ao ler planilha: ${err.message}`,
-            width: '800',
+        })
+          .then((res: any) => {
+            setFilePath(res.filename);
+          })
+          .catch((err: any) => {
+            Swal.fire({
+              html: `Erro ao ler planilha: ${err.message}`,
+              width: '800',
+            });
           });
-        });
       }
 
       (document.getElementById(`inputFile-${moduleId}`) as any).value = null;
@@ -256,14 +259,15 @@ export default function Import({
   }
 
   const [userLogado, setUserLogado] = useState<any>(
-    JSON.parse(localStorage.getItem('user') as string),
+    JSON.parse(localStorage.getItem('user') as string)
   );
   const tables = 'log_import';
   const module_name = 'RD';
   const module_id = 25;
   // identificador da preferencia do usuario, usado em casos que o formulário tem tabela de subregistros; atualizar de experimento com parcelas;
   const identifier_preference = module_name + router.route;
-  const camposGerenciadosDefault = 'id,user_id,created_at,table,state,updated_at,action';
+  const camposGerenciadosDefault =
+    'id,user_id,created_at,table,state,updated_at,action';
   const preferencesDefault = {
     id: 0,
     route_usage: router.route,
@@ -271,11 +275,11 @@ export default function Import({
   };
 
   const [preferences, setPreferences] = useState<any>(
-    userLogado.preferences[identifier_preference] || preferencesDefault,
+    userLogado.preferences[identifier_preference] || preferencesDefault
   );
 
   const [camposGerenciados, setCamposGerenciados] = useState<any>(
-    preferences.table_preferences,
+    preferences.table_preferences
   );
 
   const [logs, setLogs] = useState<LogData[]>(allLogs);
@@ -283,11 +287,12 @@ export default function Import({
   const [itemsTotal, setTotalItems] = useState<number | any>(totalItems);
   const [filter, setFilter] = useState<any>(filterBeforeEdit);
   const [orderList, setOrder] = useState<number>(
-    typeOrderServer == 'desc' ? 1 : 2,
+    typeOrderServer == 'desc' ? 1 : 2
   );
   const [arrowOrder, setArrowOrder] = useState<ReactNode>('');
   const [statusAccordion, setStatusAccordion] = useState<boolean>(false);
-  const [statusAccordionFilter, setStatusAccordionFilter] = useState<boolean>(false);
+  const [statusAccordionFilter, setStatusAccordionFilter] =
+    useState<boolean>(false);
   const [generatesProps, setGeneratesProps] = useState<IGenerateProps[]>(() => [
     // { name: 'CamposGerenciados[]', title: 'Favorito', value: 'id' },
     { name: 'CamposGerenciados[]', title: 'Usuário', value: 'user_id' },
@@ -351,12 +356,13 @@ export default function Import({
       newPage * Number(take)
     }&take=${take}&orderBy=${orderBy}&typeOrder=${typeOrder}`;
     try {
-      await logImportService.getAll(parametersFilter)
+      await logImportService
+        .getAll(parametersFilter)
         .then(({ response, total: allTotal }) => {
           setLogs(response);
           setTotalItems(allTotal);
           tableRef.current.dataManager.changePageSize(
-            allTotal >= take ? take : allTotal,
+            allTotal >= take ? take : allTotal
           );
         });
     } catch (error) {
@@ -482,7 +488,7 @@ export default function Import({
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
       if (columnCampos[index] === 'table') {
@@ -493,7 +499,7 @@ export default function Import({
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
       if (columnCampos[index] === 'created_at') {
@@ -504,7 +510,7 @@ export default function Import({
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
       if (columnCampos[index] === 'updated_at') {
@@ -515,8 +521,9 @@ export default function Import({
             orderList,
             fieldOrder,
             handleOrder,
-            render: (rowData: any) => validateFinishDate(rowData.state, rowData.updated_at),
-          }),
+            render: (rowData: any) =>
+              validateFinishDate(rowData.state, rowData.updated_at),
+          })
         );
       }
       if (columnCampos[index] === 'state') {
@@ -527,7 +534,7 @@ export default function Import({
             orderList,
             fieldOrder,
             handleOrder,
-          }),
+          })
         );
       }
       if (columnCampos[index] === 'action') {
@@ -542,12 +549,11 @@ export default function Import({
   async function handleOrder(
     column: string,
     order: string | any,
-    name: any,
+    name: any
   ): Promise<void> {
     // Gobal manage orders
-    const {
-      typeOrderG, columnG, orderByG, arrowOrder,
-    } = await tableGlobalFunctions.handleOrderG(column, order, orderList);
+    const { typeOrderG, columnG, orderByG, arrowOrder } =
+      await tableGlobalFunctions.handleOrderG(column, order, orderList);
 
     setFieldOrder(columnG);
     setTypeOrder(typeOrderG);
@@ -682,9 +688,7 @@ export default function Import({
   }
 
   function TabPanel(props: TabPanelProps) {
-    const {
-      children, value, index, ...other
-    } = props;
+    const { children, value, index, ...other } = props;
 
     return (
       <div
@@ -714,11 +718,12 @@ export default function Import({
 
   useEffect(() => {
     if (
-      Router?.importar == 'delineamento'
-      || Router?.importar == 'ambiente'
-      || Router?.importar == 'layout_quadra'
-      || Router?.importar == 'quadra'
-      || Router?.importar == 'alocacao_quadra'
+      Router?.importar == 'delineamento' ||
+      Router?.importar == 'ambiente' ||
+      Router?.importar == 'layout_quadra' ||
+      Router?.importar == 'quadra' ||
+      Router?.importar == 'alocacao_quadra' ||
+      Router?.importar == 'etiquetas_impressas'
     ) {
       setValue(1);
     }
@@ -747,7 +752,11 @@ export default function Import({
   }
 
   function ComponentImport({
-    title, table, moduleId, disabled = false, style,
+    title,
+    table,
+    moduleId,
+    disabled = false,
+    style,
   }: any) {
     return (
       <div
@@ -799,6 +808,110 @@ export default function Import({
       <Head>
         <title>Importação planilhas</title>
       </Head>
+
+      <Modal
+        isOpen={isOpenModal}
+        shouldCloseOnOverlayClick={false}
+        shouldCloseOnEsc={false}
+        onRequestClose={() => setIsOpenModal(false)}
+        style={{ overlay: { zIndex: 1000 } }}
+        overlayClassName="fixed inset-0 flex bg-transparent justify-center items-center bg-white/75"
+        className="flex
+          flex-col
+          w-full
+          h-72
+          max-w-xl
+          bg-gray-50
+          rounded-tl-2xl
+          rounded-tr-2xl
+          rounded-br-2xl
+          rounded-bl-2xl
+          pt-2
+          pb-4
+          px-8
+          relative
+          shadow-lg
+          shadow-gray-900/50"
+      >
+        <form className="flex flex-col">
+          {/* <button
+            type="button"
+            className="flex absolute top-4 right-3 justify-end"
+            onClick={() => {
+              setIsOpenModal(false);
+            }}
+          >
+            <RiCloseCircleFill
+              size={35}
+              className="fill-red-600 hover:fill-red-800"
+            />
+          </button> */}
+
+          <div className="flex px-4 justify-between mt-2">
+            <div className="flex flex-1 flex-col">
+              <div className="border-l-8 border-l-blue-600 mt-4">
+                <h2 className="font-bold text-sm ml-2 text-gray-900">
+                  Total Registros lidos
+                </h2>
+                <span className="ml-2">20</span>
+              </div>
+            </div>
+            <div className="flex flex-1 flex-col">
+              <div className="border-l-8 border-l-blue-600 mt-4">
+                <h2 className="font-bold text-sm ml-2 text-gray-900">
+                  Total Registros com erro
+                </h2>
+                <span className="ml-2">5</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex px-4 justify-between mb-10 mt-5">
+            <div className="flex flex-1 flex-col">
+              <div className="border-l-8 border-l-blue-600 mt-4">
+                <h2 className="font-bold text-sm ml-2 text-gray-900">
+                  Total Registros ignorados
+                </h2>
+                <span className="ml-2">10</span>
+              </div>
+            </div>
+            <div className="flex flex-1 flex-col">
+              <div className="border-l-8 border-l-blue-600 mt-4">
+                <h2 className="font-bold text-sm ml-2 text-gray-900">
+                  Total Registros a atualizar
+                </h2>
+                <span className="ml-2">0</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end py-0">
+            <div className="h-10 w-full justify-end flex">
+              <div className="ml-2">
+                <button
+                  type="submit"
+                  value="Cadastrar"
+                  className="w-full h-full ml-auto mt-6 bg-green-600 text-white px-8 rounded-lg text-sm hover:bg-green-800"
+                  onClick={() => setIsOpenModal(false)}
+                >
+                  Confirmar
+                </button>
+              </div>
+              <div className="ml-2">
+                <button
+                  type="submit"
+                  value="Voltar"
+                  className="w-full h-full ml-auto mt-6 bg-red-600 text-white px-8 rounded-lg text-sm hover:bg-red-800"
+                  onClick={() => setIsOpenModal(false)}
+                >
+                  Voltar
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </Modal>
+
       <Content contentHeader={tabsDropDowns} moduloActive="listas">
         <div className="grid grid-cols-3 gap-4 h-screen overflow-y-hidden">
           <div className="bg-white rounded-lg">
@@ -828,7 +941,11 @@ export default function Import({
                     title="Cadastros RD"
                     table=""
                     moduleId={0}
-                    style={{ display: (!perm_can_do('/listas/rd', 'import')) ? 'none' : '' }}
+                    style={{
+                      display: !perm_can_do('/listas/rd', 'import')
+                        ? 'none'
+                        : '',
+                    }}
                   />
                 )}
 
@@ -838,7 +955,9 @@ export default function Import({
                     table="ASSAY_LIST"
                     moduleId={26}
                     style={{
-                      display: !perm_can_do('/listas/ensaios/ensaio', 'import') ? 'none' : '',
+                      display: !perm_can_do('/listas/ensaios/ensaio', 'import')
+                        ? 'none'
+                        : '',
                     }}
                   />
                 )}
@@ -849,7 +968,12 @@ export default function Import({
                     table="GENOTYPE_TREATMENT"
                     moduleId={27}
                     style={{
-                      display: !perm_can_do('/listas/ensaios/genotipos-ensaio', 'change') ? 'none' : '',
+                      display: !perm_can_do(
+                        '/listas/ensaios/genotipos-ensaio',
+                        'change'
+                      )
+                        ? 'none'
+                        : '',
                     }}
                   />
                 )}
@@ -860,19 +984,29 @@ export default function Import({
                     table="EXPERIMENT"
                     moduleId={22}
                     style={{
-                      display: !perm_can_do('/listas/experimentos/experimento', 'import') ? 'none' : '',
+                      display: !perm_can_do(
+                        '/listas/experimentos/experimento',
+                        'import'
+                      )
+                        ? 'none'
+                        : '',
                     }}
                   />
                 )}
 
-                {(Router?.importar == 'subs_experimento'
-                  || !Router.importar) && (
+                {(Router?.importar == 'subs_experimento' ||
+                  !Router.importar) && (
                   <ComponentImport
                     title="Importar Subs. de genótipo/nca Experimento"
                     table="PARCELS"
                     moduleId={30}
                     style={{
-                      display: !perm_can_do('/listas/experimentos/parcelas-experimento', 'change') ? 'none' : '',
+                      display: !perm_can_do(
+                        '/listas/experimentos/parcelas-experimento',
+                        'change'
+                      )
+                        ? 'none'
+                        : '',
                     }}
                   />
                 )}
@@ -887,7 +1021,9 @@ export default function Import({
                     table="DELIMITATION"
                     moduleId={7}
                     style={{
-                      display: !perm_can_do('/config/delineamento', 'import') ? 'none' : '',
+                      display: !perm_can_do('/config/delineamento', 'import')
+                        ? 'none'
+                        : '',
                     }}
                   />
                 )}
@@ -898,7 +1034,9 @@ export default function Import({
                     table="NPE"
                     moduleId={14}
                     style={{
-                      display: !perm_can_do('/operacao/ambiente', 'import') ? 'none' : '',
+                      display: !perm_can_do('/operacao/ambiente', 'import')
+                        ? 'none'
+                        : '',
                     }}
                   />
                 )}
@@ -909,7 +1047,12 @@ export default function Import({
                     table="BLOCK_LAYOUT"
                     moduleId={5}
                     style={{
-                      display: !perm_can_do('/config/quadra/layout-quadra', 'import') ? 'none' : '',
+                      display: !perm_can_do(
+                        '/config/quadra/layout-quadra',
+                        'import'
+                      )
+                        ? 'none'
+                        : '',
                     }}
                   />
                 )}
@@ -920,33 +1063,53 @@ export default function Import({
                     table="BLOCK"
                     moduleId={17}
                     style={{
-                      display: !perm_can_do('/config/quadra', 'import') ? 'none' : '',
+                      display: !perm_can_do('/config/quadra', 'import')
+                        ? 'none'
+                        : '',
                     }}
                   />
                 )}
 
-                {(Router?.importar == 'alocacao_quadra'
-                  || !Router.importar) && (
+                {(Router?.importar == 'alocacao_quadra' ||
+                  !Router.importar) && (
                   <ComponentImport
                     title="Importar Alocação de quadra"
                     table="ALLOCATION"
                     moduleId={31}
                     style={{
-                      display: !perm_can_do('config/tmg/quadra/alocacao', 'import') ? 'none' : '',
+                      display: !perm_can_do(
+                        'config/tmg/quadra/alocacao',
+                        'import'
+                      )
+                        ? 'none'
+                        : '',
                     }}
                   />
                 )}
-                {(Router?.importar == 'etiquetas_impressas'
-                  || !Router.importar) && (
-                  <ComponentImport
-                    disabled
-                    title="Importar Etiquetas Impressas"
-                    table="TAG_PRINTED" // AINDA NÃO SEI NOME CORRETO
-                    moduleId={0} // AINDA NÃO SEI CODIGO CORRETO
-                    style={{
-                      display: !perm_can_do('/operacao/etiquetagem', 'print') ? 'none' : '',
-                    }}
-                  />
+                {(Router?.importar == 'etiquetas_impressas' ||
+                  !Router.importar) && (
+                  <>
+                    <ComponentImport
+                      disabled
+                      title="Importar Etiquetas Impressas"
+                      table="TAG_PRINTED" // AINDA NÃO SEI NOME CORRETO
+                      moduleId={0} // AINDA NÃO SEI CODIGO CORRETO
+                      style={{
+                        display: !perm_can_do('/operacao/etiquetagem', 'print')
+                          ? 'none'
+                          : '',
+                      }}
+                    />
+                    {/* BOTÃO PROVISORIO SOMENTE PARA VISUALIZAR LAYOUT DA MODAL */}
+                    <Button
+                      type="button"
+                      title="Modal"
+                      value="Abrir Modal"
+                      textColor="white"
+                      bgColor={bgColor}
+                      onClick={() => setIsOpenModal(true)}
+                    />
+                  </>
                 )}
               </TabPanel>
             </Box>
@@ -1102,9 +1265,7 @@ export default function Import({
                       </div> */}
 
                       <strong className="text-blue-600">
-                        Total registrado:
-                        {' '}
-                        {itemsTotal}
+                        Total registrado: {itemsTotal}
                       </strong>
 
                       <div className="h-full flex items-center gap-2">
@@ -1153,58 +1314,59 @@ export default function Import({
                       </div>
                     </div>
                   ),
-                  Pagination: (props) => (
-                    <div
-                      className="flex
+                  Pagination: (props) =>
+                    (
+                      <div
+                        className="flex
                       h-20
                       gap-2
                       pr-2
                       py-5
                       bg-gray-50
                     "
-                      {...props}
-                    >
-                      <Button
-                        onClick={() => handlePagination(0)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdFirstPage size={18} />}
-                        disabled={currentPage < 1}
-                      />
-                      <Button
-                        onClick={() => handlePagination(currentPage - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<BiLeftArrow size={15} />}
-                        disabled={currentPage <= 0}
-                      />
-                      {Array(1)
-                        .fill('')
-                        .map((value, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => handlePagination(index)}
-                            value={`${currentPage + 1}`}
-                            bgColor="bg-blue-600"
-                            textColor="white"
-                            disabled
-                          />
-                        ))}
-                      <Button
-                        onClick={() => handlePagination(currentPage + 1)}
-                        bgColor="bg-blue-600 RR"
-                        textColor="white"
-                        icon={<BiRightArrow size={15} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                      <Button
-                        onClick={() => handlePagination(pages - 1)}
-                        bgColor="bg-blue-600"
-                        textColor="white"
-                        icon={<MdLastPage size={18} />}
-                        disabled={currentPage + 1 >= pages}
-                      />
-                    </div>
+                        {...props}
+                      >
+                        <Button
+                          onClick={() => handlePagination(0)}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          icon={<MdFirstPage size={18} />}
+                          disabled={currentPage < 1}
+                        />
+                        <Button
+                          onClick={() => handlePagination(currentPage - 1)}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          icon={<BiLeftArrow size={15} />}
+                          disabled={currentPage <= 0}
+                        />
+                        {Array(1)
+                          .fill('')
+                          .map((value, index) => (
+                            <Button
+                              key={index}
+                              onClick={() => handlePagination(index)}
+                              value={`${currentPage + 1}`}
+                              bgColor="bg-blue-600"
+                              textColor="white"
+                              disabled
+                            />
+                          ))}
+                        <Button
+                          onClick={() => handlePagination(currentPage + 1)}
+                          bgColor="bg-blue-600 RR"
+                          textColor="white"
+                          icon={<BiRightArrow size={15} />}
+                          disabled={currentPage + 1 >= pages}
+                        />
+                        <Button
+                          onClick={() => handlePagination(pages - 1)}
+                          bgColor="bg-blue-600"
+                          textColor="white"
+                          icon={<MdLastPage size={18} />}
+                          disabled={currentPage + 1 >= pages}
+                        />
+                      </div>
                     ) as any,
                 }}
               />
@@ -1217,7 +1379,10 @@ export default function Import({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  res,
+}: any) => {
   const { publicRuntimeConfig } = getConfig();
   const { token } = req.cookies;
   const idSafra = Number(req.cookies.safraId);
@@ -1230,7 +1395,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   // Last page
   const lastPageServer = req.cookies.lastPage ? req.cookies.lastPage : 'No';
 
-  if (lastPageServer == undefined || lastPageServer == 'No' || req.cookies.urlPage !== 'rd') {
+  if (
+    lastPageServer == undefined ||
+    lastPageServer == 'No' ||
+    req.cookies.urlPage !== 'rd'
+  ) {
     removeCookies('filterBeforeEdit', { req, res });
     removeCookies('pageBeforeEdit', { req, res });
     removeCookies('filterBeforeEditTypeOrder', { req, res });
@@ -1273,7 +1442,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
   const param = `skip=0&take=${itensPerPage}&idSafra=${idSafra}`;
 
   const urlParameters: any = new URL(
-    `${publicRuntimeConfig.apiUrl}/log-import`,
+    `${publicRuntimeConfig.apiUrl}/log-import`
   );
   urlParameters.search = new URLSearchParams(param).toString();
 
@@ -1285,10 +1454,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }: any) 
 
   const { response: allLogs = [], total: totalItems = 0 } = await fetch(
     urlParameters.toString(),
-    requestOptions,
+    requestOptions
   ).then((response) => response.json());
   let uploadInProcess: number = 0;
-  allLogs?.map((item: any) => (item.status === 2 ? (uploadInProcess = 1) : false));
+  allLogs?.map((item: any) =>
+    item.status === 2 ? (uploadInProcess = 1) : false
+  );
   return {
     props: {
       allLogs,
