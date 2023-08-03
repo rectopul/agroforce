@@ -50,7 +50,7 @@ export class ImportExperimentController {
     const experimentController = new ExperimentController();
     const delineamentoController = new DelineamentoController();
     
-    const acao = SemaforoController.PROCESS_IMPORTACAO;
+    const acao = SemaforoController.PROCESS_VALIDACAO;
     
     const experimentNameTemp: Array<string> = [];
     const responseIfError: Array<string> = [];
@@ -135,7 +135,7 @@ export class ImportExperimentController {
             
             // enquanto estiver importando experimento, bloqueia a lista de ensaios com semaforo
             if (assayList) {
-              /*const resSemaforoAssayList = await this.semaforoController.validaSemaforoItem(
+              const resSemaforoAssayList = await this.semaforoController.validaSemaforoItem(
                 sessao,
                 acao,
                 'assay_list',
@@ -149,7 +149,7 @@ export class ImportExperimentController {
                   resSemaforoAssayList.response, 
                   resSemaforoAssayList.status, 
                   resSemaforoAssayList);
-              }*/
+              }
             }
             
           }
@@ -439,7 +439,7 @@ export class ImportExperimentController {
 
           // EPOCA
           let columnEpoca: string = '9';
-          if (columnEpoca === '9') { // EPOCA
+          if (columnEpoca === '9') {
             // verifica se a epoca é nula
             if (spreadSheet[row][columnEpoca] === null) {
               dataIfErrorPerRow.push({column: Number(columnEpoca), row: Number(row)});
@@ -449,7 +449,8 @@ export class ImportExperimentController {
                 linhaStr,
                 spreadSheet[0][columnEpoca]
               );
-            } else if ((spreadSheet[row][columnEpoca]).toString().length > 2 || !validateInteger(spreadSheet[row][columnEpoca])) {
+            } 
+            else if ((spreadSheet[row][columnEpoca]).toString().length > 2 || !validateInteger(spreadSheet[row][columnEpoca])) {
               dataIfErrorPerRow.push({column: Number(columnEpoca), row: Number(row)});
               responseIfError[Number(columnEpoca)]
                 += responseGenericFactory(
@@ -460,8 +461,7 @@ export class ImportExperimentController {
               );
             }
           }
-
-
+          
           if (dataIfErrorPerRow.length > 0) {
             continue;
           }
@@ -484,12 +484,27 @@ export class ImportExperimentController {
           });
 
           if (experiment?.length > 0) {
+
+            const resSemaforoExperiment = await this.semaforoController.validaSemaforoItem(
+              sessao,
+              acao,
+              'experiment',
+              experiment[0].id,
+              createdBy
+            );
+
+            if (resSemaforoExperiment.status !== 200) {
+              throw new SemaforoError(
+                resSemaforoExperiment.message,
+                resSemaforoExperiment.response,
+                resSemaforoExperiment.status,
+                resSemaforoExperiment);
+            }
+            
             if (experiment[0].status?.toUpperCase() !== 'IMPORTADO') {
               // Atenção responseIfError[0] onde 0 é a ordem em que a mensagem irá aparecer;
               responseIfError[0]
                 += `<li style="text-align:left"> Erro na linha ${Number(row) + 1}. Já existe um experimento cadastrado e utilizado com este nome de experimento </li> <br>`;
-            } else {
-              
             }
           }
 
@@ -651,14 +666,24 @@ export class ImportExperimentController {
       }
 
       if (responseIfError.length === 0) {
+        
+        // finaliza Semaforo
+        await this.semaforoController.finalizaRest(sessao, acao);
+        
         return this.storeRecords(idLog, {
           spreadSheet, idSafra, idCulture, created_by: createdBy, sessao
         });
       }
+      
       const responseStringError = responseIfError.join('').replace(/undefined/g, '');
+      
       await logImportController.update({
         id: idLog, status: 1, state: 'INVALIDA', updated_at: new Date(Date.now()), invalid_data: responseStringError,
       });
+
+      // finaliza Semaforo
+      await this.semaforoController.finalizaRest(sessao, acao);
+      
       return {status: 400, message: responseStringError};
     } catch (error: any) {
 
