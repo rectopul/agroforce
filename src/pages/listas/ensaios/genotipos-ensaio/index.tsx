@@ -77,8 +77,8 @@ interface TableRow {
 
 export default function Listagem({
   allTreatments,
-  assaySelect,
-  genotypeSelect,
+  assaySelect, // não está mais carregando todas as listas de ensaio, possivelmente era pra ser usado em um select que carregava todos os registros
+  genotypeSelect, // não está mais carregando todos os genotipos, possivelmente era pra ser usado em um select que carregava todos os registros
   itensPerPage,
   filterApplication,
   idSafra,
@@ -1803,9 +1803,13 @@ export const getServerSideProps: GetServerSideProps = async ({
   removeCookies('ncaEmpty', { req, res });
   removeCookies('urlPage', { req, res });
 
-  const param = `&id_culture=${idCulture}&id_safra=${idSafra}`;
+  const param = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}`;
 
-  const urlParametersAssay: any = new URL(baseUrlAssay);
+  const paramAssay = `skip=0&take=${itensPerPage}&id_culture=${idCulture}&id_safra=${idSafra}`;
+
+  //skip=0&take=${itensPerPage}
+
+  
   const urlParametersTreatment: any = new URL(baseUrlTreatment);
   urlParametersTreatment.search = new URLSearchParams(param).toString();
   const requestOptions = {
@@ -1819,10 +1823,14 @@ export const getServerSideProps: GetServerSideProps = async ({
     requestOptions,
   ).then((response) => response.json());
 
+  const urlParametersAssay: any = new URL(baseUrlAssay);
+  urlParametersAssay.search = new URLSearchParams(paramAssay).toString();
+  
   const { response: allAssay = [] } = await fetch(
-    `${urlParametersAssay.toString()}/?id_culture=${idCulture}&id_safra=${idSafra}`,
+    urlParametersAssay.toString(),
     requestOptions,
   ).then((response) => response.json());
+  
   const assaySelect = allAssay?.map((item: any) => {
     const newItem: any = {};
     newItem.id = item.gli;

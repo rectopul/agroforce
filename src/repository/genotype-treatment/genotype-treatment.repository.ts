@@ -138,16 +138,47 @@ export class GenotypeTreatmentRepository extends BaseRepository {
    * @param idList
    * @param idLote
    * @param idGenotype
+   * @param nameGli
    */
-  async findReplaceGenotype(idList: any, idLote: any, idGenotype: number) {
+  async findReplaceGenotype(idList: any, idLote: any, idGenotype: number, nameGli?: string) {
 
+    let parameters: any = {};
+
+    parameters = {
+      ...parameters,
+      id: {
+        notIn: idList,
+      },
+      id_genotipo: idGenotype,
+      id_lote: idLote, // for store both values
+    }
+    
+    if(nameGli){
+      parameters.assay_list = {
+        gli: {
+          equals: nameGli
+        }
+      };
+    }
+    
     const result: object | any = await this.getPrisma().genotype_treatment.findMany({
-      where: {
-        id: {
-          notIn: idList,
+      where: parameters,
+      
+      // Para retornar todos os campos de relação, use includeapenas - por exemplo, { include: { posts: true } }.
+      include: {
+        assay_list: {
+          select: {
+            // foco: { select: { id: true, name: true } },
+            // experiment: { select: { id: true, experimentName: true } },
+            // type_assay: { select: { id: true, name: true } },
+            // tecnologia: { select: { id: true, name: true, cod_tec: true } },
+            gli: true,
+            bgm: true,
+            status: true,
+            project: true,
+            comments: true,
+          },
         },
-        id_genotipo: idGenotype,
-        id_lote: idLote, // for store both values
       },
       orderBy: {},
     });

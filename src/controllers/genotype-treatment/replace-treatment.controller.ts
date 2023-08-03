@@ -65,7 +65,7 @@ export class ReplaceTreatmentController {
 
         const chaveComposta = gli + '_' + geneticName + '_' + ncc;
 
-        let responseExists = await this.findGenotypeTreatment([treatment.id], lote_id, geneticName_id);
+        let responseExists = await this.findGenotypeTreatment([treatment.id], lote_id, geneticName_id, gli);
         
         if(chaveCompostaArr.includes(chaveComposta) || responseExists.length > 0) {
           responseIfError+= `Genótipo + NCA não pode repetir dentro de um GLI (Ensaio)<br>`;
@@ -128,11 +128,12 @@ export class ReplaceTreatmentController {
     }
   }
 
-  async findGenotypeTreatment(idList:any, lote_id :any, geneticName_id :any) {
+  async findGenotypeTreatment(idList:any, lote_id :any, geneticName_id :any, nameGli?: string) {
     const response = await this.genotypeTreatmentRepository.findReplaceGenotype(
-        idList,
-        lote_id,
-        geneticName_id,
+      idList,
+      lote_id,
+      geneticName_id,
+      nameGli
     );
 
     return response;
