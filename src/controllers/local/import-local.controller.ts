@@ -83,12 +83,20 @@ export class ImportLocalController {
       }
       const configModule: object | any = await importController.getAll(4);
       configModule.response[0]?.fields.push('DT');
+      
+      // Nome do local de cultura, encontra o index do campo em fields
+      const indexFieldLocalName = configModule.response[0]?.fields.indexOf('Nome da unidade de cultura');
+      
+      // ID da unidade de cultura, encontra o index do campo em fields
+      const indexFieldLocalId = configModule.response[0]?.fields.indexOf('ID da unidade de cultura');
+      
       for (const row in spreadSheet) {
 
         let linhaStr = String(Number(row) + 1);
 
         if (row !== '0') {
-          if (uniqueLocalName?.includes(spreadSheet[row][4])) {
+          
+          if (uniqueLocalName?.includes(spreadSheet[row][indexFieldLocalName])) {
             await logImportController.update({
               id: idLog,
               status: 1,
@@ -96,10 +104,22 @@ export class ImportLocalController {
               updated_at: new Date(Date.now()),
               invalid_data: `Erro na linha ${Number(row) + 1}. Nome do local de cultura duplicados na planilha`,
             });
-            uniqueLocalName[row] = spreadSheet[row][4];
-            return {status: 200, message: `Erro na linha ${linhaStr}. Nome do local de cultura duplicados na planilha`};
+            uniqueLocalName[row] = spreadSheet[row][indexFieldLocalName];
+
+            responseIfError[Number(indexFieldLocalName)]
+              += responseGenericFactory(
+              (Number(indexFieldLocalName) + 1),
+              linhaStr,
+              spreadSheet[0][indexFieldLocalName],
+              `Erro na linha ${linhaStr}. Unidades de cultura duplicados na tabela`,
+            );
+            
+            // return {status: 200, message: `Erro na linha ${linhaStr}. Nome do local de cultura duplicados na planilha`};
           }
-          if (localTemp?.includes(spreadSheet[row][2])) {
+          
+          uniqueLocalName[row] = spreadSheet[row][indexFieldLocalName];
+          
+          if (localTemp?.includes(spreadSheet[row][indexFieldLocalId])) {
             await logImportController.update({
               id: idLog,
               status: 1,
@@ -107,11 +127,21 @@ export class ImportLocalController {
               updated_at: new Date(Date.now()),
               invalid_data: `Erro na linha ${Number(row) + 1}. Unidades de cultura duplicadas na planilha`,
             });
-            localTemp[row] = spreadSheet[row][2];
-            return {status: 200, message: `Erro na linha ${linhaStr}. Unidades de cultura duplicados na tabela`};
+            localTemp[row] = spreadSheet[row][indexFieldLocalId];
+
+            responseIfError[Number(indexFieldLocalId)]
+              += responseGenericFactory(
+              (Number(indexFieldLocalId) + 1),
+              linhaStr,
+              spreadSheet[0][indexFieldLocalId],
+              `Erro na linha ${linhaStr}. Unidades de cultura duplicados na tabela`,
+            );
+            
+            //return {status: 200, message: `Erro na linha ${linhaStr}. Unidades de cultura duplicados na tabela`};
           }
-          localTemp[row] = spreadSheet[row][2];
-          uniqueLocalName[row] = spreadSheet[row][4];
+          
+          localTemp[row] = spreadSheet[row][indexFieldLocalId];
+          
           if (spreadSheet.length > 2) {
             if (spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]
               || (spreadSheet.length - 1) === Number(row)) {
@@ -152,9 +182,9 @@ export class ImportLocalController {
               validateAll.LOCALIDADE.push(spreadSheet[row][9]);
               validateAll.REGIAO.push(spreadSheet[row][11]);
               validateAll.PAIS.push(spreadSheet[row][14]);
-            }
-          }
-        }
+            } // end if spreadSheet[row][4] !== spreadSheet[Number(row) - 1][4]
+          } // end if spreadSheet.length > 2
+        } // end if row !== 0
 
         for (const column in spreadSheet[row]) {
           if (row === '0') {
@@ -169,7 +199,8 @@ export class ImportLocalController {
             //     );
             // }
 
-          } else if (spreadSheet[0][column]?.includes('ID da unidade de cultura')) {
+          } 
+          else if (spreadSheet[0][column]?.includes('ID da unidade de cultura')) {
             if (spreadSheet[row][column] === null) {
               responseIfError[Number(column)]
                 += responseNullFactory(
