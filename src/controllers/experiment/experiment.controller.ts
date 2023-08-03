@@ -14,6 +14,7 @@ import { GenotypeTreatmentController } from '../genotype-treatment/genotype-trea
 import { ReporteController } from '../reportes/reporte.controller';
 import { PrismaClient } from '@prisma/client';
 import { SemaforoController } from "../semaforo.controller";
+import { prisma } from "../../pages/api/db/db";
 
 export class ExperimentController {
   experimentRepository = new ExperimentRepository();
@@ -29,8 +30,7 @@ export class ExperimentController {
   }
 
   async getAll(options: any) {
-
-    const prisma = new PrismaClient();
+    
     const parameters: object | any = {};
     const equalsOrContains = options.importValidate ? 'equals' : 'contains';
     let orderBy: object | any;
@@ -360,6 +360,8 @@ export class ExperimentController {
     } catch (error: any) {
       handleError('Experimento controller', 'GetOne', error.message);
       throw new Error('[Controller] - GetOne Experimento erro');
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -373,6 +375,8 @@ export class ExperimentController {
     } catch (error: any) {
       handleError('Experimento controller', 'GetOne', error.message);
       throw new Error('[Controller] - GetOne Experimento erro');
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -386,6 +390,8 @@ export class ExperimentController {
     } catch (error: any) {
       handleError('Experimento controller', 'Create', error.message);
       throw new Error('[Controller] - Create Experimento erro');
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -495,6 +501,8 @@ export class ExperimentController {
     } catch (error: any) {
       handleError('Experimento controller', 'Update', error.message);
       throw new Error('[Controller] - Update Experimento erro: ' + error.message);
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
