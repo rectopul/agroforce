@@ -30,7 +30,7 @@ export class ExperimentController {
   }
 
   async getAll(options: any) {
-    
+
     const parameters: object | any = {};
     const equalsOrContains = options.importValidate ? 'equals' : 'contains';
     let orderBy: object | any;
