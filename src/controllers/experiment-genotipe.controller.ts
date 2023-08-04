@@ -52,6 +52,34 @@ export class ExperimentGenotipeController {
         const sheet = await this.createXls(options);
         return { status: 200, response: sheet };
       }
+
+      if (options.filterGroupIds) {
+        
+        // `{ "safra": {"safraName": {"contains": "${options.safraName}" } } }`,
+        
+        let groupIdsArray = [];
+        if(typeof options.filterGroupIds === 'string') {
+          groupIdsArray = options.filterGroupIds.split(',');
+        } 
+        else if(typeof options.filterGroupIds === 'object') {
+          groupIdsArray = options.filterGroupIds;
+        }
+        
+        const idList = groupIdsArray;
+        if (idList?.length > 1) {
+          parameters.experiment = {
+            is : {
+              experimentGroupId: {
+                in: idList
+              }
+            }
+          };
+          //parameters.idExperiment.in = idList;
+        } else {
+          parameters.idExperiment = Number(idList);
+        }
+      }
+      
       if (options.filterFoco) {
         parameters.foco = JSON.parse(
           `{ "name": { "${equalsOrContains}": "${options.filterFoco}" } }`,

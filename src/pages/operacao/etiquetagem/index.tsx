@@ -44,8 +44,10 @@ import {
 } from '../../../components';
 import { UserPreferenceController } from '../../../controllers/user-preference.controller';
 import {
+  epocaService,
   experimentGroupService,
   userPreferencesService,
+  experimentGenotipeService,
 } from '../../../services';
 import * as ITabs from '../../../shared/utils/dropdown';
 import { functionsUtils } from '../../../shared/utils/functionsUtils';
@@ -58,6 +60,10 @@ import { tableGlobalFunctions } from '../../../helpers';
 import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../components/Loading';
 import { perm_can_do } from '../../../shared/utils/perm_can_do';
+
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
+import handleError from "../../../shared/utils/handleError";
 
 export default function Listagem({
   allExperimentGroup,
@@ -213,6 +219,8 @@ export default function Listagem({
   const [isOpenModalConfirm, setIsOpenModalConfirm] = useState<boolean>(false);
   const [itemSelectedDelete, setItemSelectedDelete] = useState<any>(null);
 
+  const [selectedRows, setSelectedRows] = useState<any>([]);
+  
   // const pathExtra = `skip=${currentPage * Number(take)}&take=${take}`;
 
   const formik = useFormik<any>({
@@ -607,65 +615,7 @@ export default function Listagem({
     setGeneratesProps(items);
   }
 
-  const downloadExcel = async (): Promise<void> => {
-    setLoading(true);
-    await experimentGroupService.getAll(filter).then(({ status, response }) => {
-      if (status === 200) {
-        response.map((item: any) => {
-          const newItem = item;
-
-          newItem.CULTURA = item.safra.culture.name;
-          newItem.SAFRA = item.safra.safraName;
-          newItem.GRUPO_DE_ETIQUETAGEM = item.name;
-          newItem.QTDE_EXP = item.experimentAmount;
-          newItem.ETIQ_A_IMPRIMIR = item.tagsToPrint;
-          newItem.ETIQ_IMPRESSAS = item.tagsPrinted;
-          newItem.TOTAL_ETIQUETAS = item.totalTags;
-          newItem.STATUS_GRUPO_EXP = item.status;
-          newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
-
-          delete newItem.id;
-          delete newItem.safraId;
-          delete newItem.safra;
-          delete newItem.name;
-          delete newItem.experimentAmount;
-          delete newItem.tagsToPrint;
-          delete newItem.tagsPrinted;
-          delete newItem.totalTags;
-          delete newItem.status;
-          delete newItem.experiment;
-          delete newItem.created_at;
-          delete newItem.updated_at;
-          delete newItem.createdBy;
-          return newItem;
-        });
-        const workSheet = XLSX.utils.json_to_sheet(response);
-        const workBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(
-          workBook,
-          workSheet,
-          'Listagem-grupo-de-etiquetagem'
-        );
-
-        // Buffer
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'buffer',
-        });
-        // Binary
-        XLSX.write(workBook, {
-          bookType: 'xlsx', // xlsx
-          type: 'binary',
-        });
-        // Download
-        XLSX.writeFile(workBook, 'Listagem grupo de etiquetagem.xlsx');
-      } else {
-        setLoading(false);
-        Swal.fire('Nenhum dado para extrair');
-      }
-    });
-    setLoading(false);
-  };
+  
 
   // manage total pages
   async function handleTotalPages() {
@@ -771,6 +721,299 @@ export default function Listagem({
   //   handlePagination();
   //   handleTotalPages();
   // }, [currentPage]);
+
+  function handleSelectionRow(data: any) {
+    const selectedRow = data?.map((e: any) => ({
+      ...e,
+      tableData: { id: e.tableData.id, checked: false },
+    }));
+    setSelectedRows(selectedRow);
+  }
+
+  const handleRowSelection = (rowData: any) => {
+    if (selectedRows?.includes(rowData)) {
+      rowData.tableData.checked = false;
+      setSelectedRows(selectedRows.filter((item: any) => item != rowData));
+    } else {
+      rowData.tableData.checked = true;
+      setSelectedRows([...selectedRows, rowData]);
+    }
+  };
+
+  const exportGroupsExcel = async (): Promise<void> => {
+    setLoading(true);
+    
+    console.log('Grupos para excel', selectedRows);
+    
+    let filterToExport = '';
+
+    // clone filter to filterToExport
+    if (filter) {
+      filterToExport = filter;
+    }
+    
+    if (!filterToExport.includes('exportGroupsExcel')) {
+      filterToExport += `&exportGroupsExcel=1`;
+    }
+    
+    if(selectedRows.length > 0) {
+      filterToExport += `&filterGroupIds=${selectedRows.map((item: any) => item.id).join(',')}`;
+    }
+    
+    await experimentGroupService.getAll(filterToExport).then(({ status, response }) => {
+      if (status === 200) {
+
+        setLoading(false);
+        return;
+
+        try{
+          // Criação do arquivo ZIP e inserção dos arquivos Excel
+          const zip = new JSZip();
+          let nameFiles: string[] = [];
+          let nameMultipleGroups: string = '';
+
+          for (const item of response) {
+
+            let newData:any = [];
+            
+
+            for (const experiment of item.experiment) {
+
+              for (const experiment_genotipe of experiment.experiment_genotipe) {
+
+                const newItem: any = {};
+
+                /**
+                 * assay_list = Ensaio
+                 * Código reduzido da cultura
+                 * safra
+                 * foco do ensaio
+                 * tipo de ensaio
+                 * GLI do ensaio
+                 * BGM do ENSAIO
+                 * Código da tecnologia do ensaio
+                 * nome do experimento
+                 * Lugar de Cultura do experimento
+                 * Numero de tratamento do genótipo
+                 * Status do Genótipo no ensaio
+                 * Código do genótipo do Experimento
+                 * BGM do genótipo
+                 * GML do genótipo
+                 * Código da tecnologia do genótipo
+                 * Repetição da parcela do experimento
+                 * NPE da parcela do experimento
+                 * Quantidade de parcelas a alocar por NPE (Genótipo do Ensaio)
+                 * NCA do genótipo
+                 * quantidade de semente a preparar para o NPE, origem no TIPO_ENSAIO X SAFRA
+                 * [E] Em etiquetagem / [I]mpresso / [A]locado
+                 * Status da impressão ([S]im/[N]ão)
+                 * Data da Ultima atualização do registro
+                  */
+
+                // codigo reduzido da cultura -ok
+                newItem.CULTURA = experiment_genotipe.safra.culture.name;
+                // safra do ensaio - ok
+                newItem.SAFRA = experiment_genotipe.safra.safraName;
+                // foco do ensaio - ok
+                newItem.FOCO = experiment_genotipe.foco.name;
+                // tipo de ensaio - ok
+                newItem.ENSAIO = experiment_genotipe.type_assay.name;
+                // GLI do ensaio - ok
+                newItem.GLI = experiment_genotipe.gli;
+                // BGM do ENSAIO - ok
+                newItem.BGM_ENSAIO = experiment.assay_list.bgm;
+                // Código da tecnologia do ensaio - ok
+                newItem.CODIGO_DA_TECNOLOGIA = experiment.assay_list.tecnologia.cod_tec;
+                // nome do experimento - ok
+                newItem.EXPERIMENTO = experiment.experimentName;
+                // Lugar de Cultura do experimento - ok
+                newItem.LUGAR_DE_CULTURA = experiment.local.name_local_culture;
+                // Numero de tratamento do genótipo - ok
+                newItem.NT = experiment_genotipe.nt; 
+                // Status do Genótipo no ensaio - OK
+                newItem.T = experiment_genotipe.status_t; 
+                // Código do genótipo do Experimento - OK
+                newItem.CODIGO_GENOTIPO = experiment_genotipe.genotipo.name_genotipo; 
+                // BGM do genótipo - OK
+                newItem.BGM = experiment_genotipe.genotipo.bgm;
+                // GMR do genótipo
+                newItem.GMR = experiment_genotipe.genotipo.gmr; 
+                // Código da tecnologia do genótipo
+                newItem.GGEN = experiment_genotipe.genotipo.tecnologia.cod_tec; 
+                // Repetição da parcela do experimento
+                newItem.REP = experiment_genotipe.rep; 
+                // NPE da parcela do experimento
+                newItem.NPE = experiment_genotipe.npe; 
+                
+                // Quantidade de parcelas a alocar por NPE (Genótipo do Ensaio):
+                // ATENÇÃO: Preencher com 1 pois esse campo depende da alocação da quadra (QUE NÃO EXISTE NO SISTEMA);
+                newItem.NPE_REP = 1;
+                
+                // NCA do genótipo
+                newItem.NCA = experiment_genotipe.nca; 
+                
+                // Quantidade de semente a preparar para o NPE, origem no TIPO_ENSAIO X SAFRA
+                // ATENÇÃO: Quant de sementes por envelope da tabela assay_list
+                newItem.NSEM = experiment_genotipe.type_assay.envelope.find((envelope: any) => envelope.id_safra === experiment_genotipe.safra.id).seeds; 
+
+                // Status da parcela [E] Em etiquetagem / [I]mpresso / [A]locado
+                newItem.STATUS_NPE = String(experiment_genotipe.status).substring(0, 1);
+                
+                // se o status_NPE for I, então o status_impressao é S
+                if (newItem.STATUS_NPE === 'I') {
+                  newItem.STATUS_IMPRESSAO = 'S'; // precisa criar campo no banco - Status da impressão ([S]im/[N]ão)
+                } else {
+                  newItem.STATUS_IMPRESSAO = 'N'; // precisa criar campo no banco - Status da impressão ([S]im/[N]ão)
+                }
+                
+                if(newItem.STATUS_IMPRESSAO === 'S') {
+                  // DEVE PREENCHER DT_IMPRESSAO E QTDE_REIMPRESSAO
+                  // SE IMPRESSO EXTRAIR COM S, INFORMAR DATA DA ULTIMA IMPRESSAO, E QUANTIDADE DE VEZES QUE IMPRIMIU
+                  newItem.DT_IMPRESSAO = experiment_genotipe.updated_at ?? experiment_genotipe.created_at; // se STATUS_IMPRESSAO == S, Data da Última atualização do registro
+                  newItem.QTDE_REIMPRESSAO = experiment_genotipe.counter; // Se STATUS_IMPRESSAO == S - Contador de reimpressão - se imprimiu o contador é 1
+                } else {
+                  // SE EM ETIQUETAGEM OU 
+                  newItem.DT_IMPRESSAO = ''; // se STATUS_IMPRESSAO == N, DT_IMPRESSAO é igual vazio 
+                  newItem.QTDE_REIMPRESSAO = ''; // se STATUS_IMPRESSAO == N, QTDE_REIMPRESSAO é igual vazio
+                }
+                
+                // nameMultipleFiles: [CULTURA] + “_” + [SAFRA] + “_MULTIPLOS_GRUPOS_”+ [DATA/HORA DA EXPORTAÇÃO];
+                nameMultipleGroups = `${newItem.CULTURA}_${newItem.SAFRA}_MULTIPLOS_GRUPOS_${moment().format('DD_MM_YYYY__hh_mm_ss')}.zip`;
+                
+                newData.push(newItem);
+
+              } // end for experiment_genotipe 
+            } // end for experiment
+
+            const nameSheet = 'Listagem-grupo-de-etiquetagem';
+
+            /**
+             * Cada grupo de etiquetagem deve ser gerado em um arquivo MS-EXCEL distinto com a seguinte regra de nomeação do arquivo:
+             * [CULTURA] + “_” + [SAFRA]  + “_” + [GRUPO_ETIQUETAGEM] + “_”+ [DATA/HORA DA EXPORTAÇÃO];
+             * Formato da “Data/Hora”: “dd_mm_aaaa__hh_mm_ss”;
+             */
+            const nameFile = `${item.safra.culture.name}_${item.safra.safraName}_${item.name}_${moment().format('DD_MM_YYYY__hh_mm_ss')}.xlsx`;
+
+            // Create Excel data
+            let excelDataBytes = createExcelData(newData, nameSheet);
+
+            zip.file(nameFile, excelDataBytes);
+
+            nameFiles.push(nameFile);
+
+          } // end for item
+
+          // Se tiver apenas um arquivo, nomear o zip com o nome do excel
+          // Se tiver mais de um arquivo, nomear o zip com o seguinte formato: CULTURA_SAFRA_GRUPO_ETIQUETAGEM.zip
+          let zipName = nameFiles.length === 1 ? nameFiles[0] : (nameMultipleGroups ?? 'grupos-etiquetagem.zip');
+          
+          // Generate the zip file as a Blob
+          zip.generateAsync({type:"blob"}).then(function(content) {
+            // Trigger download
+            saveAs(content, zipName);
+          });
+          
+          setLoading(false);
+        } catch (error:any) {
+          console.log('Erro ao exportar excel', error);
+          handleError(router.pathname, 'Erro ao exportar excel', error.message);
+          setLoading(false);
+          Swal.fire('Erro ao exportar excel: ' + error.message);
+        }
+        
+      } else {
+        
+        setLoading(false);
+        Swal.fire('Nenhum dado para extrair');
+        
+      }
+    });
+    
+    setLoading(false);
+  };
+
+  const downloadExcel = async (): Promise<void> => {
+    setLoading(true);
+
+    await experimentGroupService.getAll(filter).then(({ status, response }) => {
+      if (status === 200) {
+        response.map((item: any) => {
+          const newItem = item;
+          
+          newItem.CULTURA = item.safra.culture.name;
+          newItem.SAFRA = item.safra.safraName;
+          newItem.GRUPO_DE_ETIQUETAGEM = item.name;
+          newItem.QTDE_EXP = item.experimentAmount;
+          newItem.ETIQ_A_IMPRIMIR = item.tagsToPrint;
+          newItem.ETIQ_IMPRESSAS = item.tagsPrinted;
+          newItem.TOTAL_ETIQUETAS = item.totalTags;
+          newItem.STATUS_GRUPO_EXP = item.status;
+          newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
+
+          delete newItem.id;
+          delete newItem.safraId;
+          delete newItem.safra;
+          delete newItem.name;
+          delete newItem.experimentAmount;
+          delete newItem.tagsToPrint;
+          delete newItem.tagsPrinted;
+          delete newItem.totalTags;
+          delete newItem.status;
+          delete newItem.experiment;
+          delete newItem.created_at;
+          delete newItem.updated_at;
+          delete newItem.createdBy;
+          return newItem;
+        });
+        const workSheet = XLSX.utils.json_to_sheet(response);
+        const workBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(
+          workBook,
+          workSheet,
+          'Listagem-grupo-de-etiquetagem'
+        );
+
+        // Buffer
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'buffer',
+        });
+        // Binary
+        XLSX.write(workBook, {
+          bookType: 'xlsx', // xlsx
+          type: 'binary',
+        });
+        // Download
+        XLSX.writeFile(workBook, 'Listagem grupo de etiquetagem.xlsx');
+      } else {
+        setLoading(false);
+        Swal.fire('Nenhum dado para extrair');
+      }
+    });
+
+    setLoading(false);
+  };
+
+  const createExcelData = (data:any, sheetName = 'Guia') => {
+    // Convert the JSON data to an Excel worksheet
+    const workSheet = XLSX.utils.json_to_sheet(data);
+
+    // Create a new workbook and add the worksheet to it
+    const workBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workBook, workSheet, sheetName);
+
+    // Write the workbook to a binary string
+    let excelData = XLSX.write(workBook, {bookType: 'xlsx', type: 'binary'});
+
+    // Convert the binary string to an array of bytes
+    let excelDataBytes = new Uint8Array(excelData.length);
+    for (let i = 0; i < excelDataBytes.length; i++) {
+      excelDataBytes[i] = excelData.charCodeAt(i);
+    }
+
+    return excelDataBytes;
+  }
+
 
   return (
     <>
@@ -1044,8 +1287,15 @@ export default function Listagem({
                 search: false,
                 filtering: false,
                 pageSize: Number(take),
+                selection: true,
+              }}
+
+              onSelectionChange={handleSelectionRow}
+              onRowClick={(evt, selectedRow: any) => {
+                handleRowSelection(selectedRow);
               }}
               onChangeRowsPerPage={() => {}}
+              
               components={{
                 Toolbar: () => (
                   <div
@@ -1097,12 +1347,17 @@ export default function Listagem({
                       </div>
                       <div className="h-12 ml-2">
                         <Button
-                          disabled
                           title="Exportar"
                           value="Exportar"
                           bgColor="bg-blue-600"
                           textColor="white"
-                          onClick={() => alert('exportar')}
+                          onClick={() => {
+                            localStorage.setItem(
+                              'selectedRows',
+                              JSON.stringify(selectedRows),
+                            );
+                            exportGroupsExcel();
+                          }}
                           //icon={<RiFileExcel2Line size={20} />}
                         />
                       </div>

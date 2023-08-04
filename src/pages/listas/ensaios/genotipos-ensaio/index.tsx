@@ -688,7 +688,7 @@ export default function Listagem({
   const columns = orderColumns(camposGerenciados);
 
   async function getValuesColumns(): Promise<void> {
-    const els: any = document.querySelectorAll("input[type='checkbox'");
+    const els: any = document.querySelectorAll("input[type='checkbox']");
     let selecionados = '';
     for (let i = 0; i < els.length; i += 1) {
       if (els[i].checked) {
@@ -1106,6 +1106,26 @@ export default function Listagem({
 
     return true;
   }
+
+  function handleSelectionRow(data: any) {
+    const selectedRow = data?.map((e: any) => ({
+      ...e,
+      tableData: { id: e.tableData.id, checked: false },
+    }));
+    console.log('handleSelectionRow', selectedRow);
+    setRowsSelected(selectedRow);
+  }
+
+  const handleRowSelection = (rowData: any) => {
+    console.log('handleRowSelection', rowData);
+    if (rowsSelected?.includes(rowData)) {
+      rowData.tableData.checked = false;
+      setRowsSelected(rowsSelected.filter((item: any) => item != rowData));
+    } else {
+      rowData.tableData.checked = true;
+      setRowsSelected([...rowsSelected, rowData]);
+    }
+  };
 
   return (
     <>
@@ -1563,8 +1583,13 @@ export default function Listagem({
                   emptyDataSourceMessage: 'Nenhum Trat. Genótipo encontrado!',
                 },
               }}
+              
+              onSelectionChange={handleSelectionRow}
+              onRowClick={(evt, selectedRow: any) => {
+                handleRowSelection(selectedRow);
+              }}
               onChangeRowsPerPage={(e: any) => {}}
-              onSelectionChange={setRowsSelected}
+              
               components={{
                 Toolbar: () => (
                   <div

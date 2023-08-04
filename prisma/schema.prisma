@@ -613,6 +613,7 @@ model history_genotype_treatment {
 model experiment_genotipe {
   id                  Int       @id @default(autoincrement())
   created_at          DateTime? @default(now())
+  updated_at          DateTime?
   idSafra             Int
   idFoco              Int
   idTypeAssay         Int

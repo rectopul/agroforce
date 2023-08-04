@@ -775,6 +775,11 @@ export default function Listagem({
       </div>
     );
   }
+  
+  // useEffect(() => {
+  //   handlePagination();
+  //   handleTotalPages();
+  // }, [currentPage]);
 
   function handleSelectionRow(data: any) {
     const selectedRow = data?.map((e: any) => ({
@@ -783,11 +788,6 @@ export default function Listagem({
     }));
     setSelectedNPE(selectedRow);
   }
-
-  // useEffect(() => {
-  //   handlePagination();
-  //   handleTotalPages();
-  // }, [currentPage]);
 
   const handleRowSelection = (rowData: any) => {
     if (selectedNPE?.includes(rowData)) {
@@ -966,9 +966,6 @@ export default function Listagem({
               style={{ background: '#f9fafb' }}
               columns={columns}
               data={npe}
-              onRowClick={(evt, selectedRow: any) => {
-                handleRowSelection(selectedRow);
-              }}
               options={{
                 showTitle: false,
                 // maxBodyHeight: window?.screen?.availHeight - 400,
@@ -989,7 +986,12 @@ export default function Listagem({
                 showSelectAllCheckbox: true,
                 showTextRowsSelected: false,
               }}
+
               onSelectionChange={handleSelectionRow}
+              onRowClick={(evt, selectedRow: any) => {
+                handleRowSelection(selectedRow);
+              }}
+              
               components={{
                 Toolbar: () => (
                   <div
