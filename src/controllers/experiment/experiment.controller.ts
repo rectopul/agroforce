@@ -344,7 +344,7 @@ export class ExperimentController {
       // throw new Error({name: 'teste', message: '[Controller] - GetAll Experimento erro: ', stack: error.message});
       throw new Error(`[Controller] - GetAll Experimento erro: \r\n${error.message}`);
     } finally {
-      await prisma.$disconnect();
+      // await prisma.$disconnect();
     }
   }
 
@@ -361,7 +361,7 @@ export class ExperimentController {
       handleError('Experimento controller', 'GetOne', error.message);
       throw new Error('[Controller] - GetOne Experimento erro');
     } finally {
-      await prisma.$disconnect();
+      // await prisma.$disconnect();
     }
   }
 
@@ -376,7 +376,7 @@ export class ExperimentController {
       handleError('Experimento controller', 'GetOne', error.message);
       throw new Error('[Controller] - GetOne Experimento erro');
     } finally {
-      await prisma.$disconnect();
+      // await prisma.$disconnect();
     }
   }
 
@@ -391,7 +391,7 @@ export class ExperimentController {
       handleError('Experimento controller', 'Create', error.message);
       throw new Error('[Controller] - Create Experimento erro');
     } finally {
-      await prisma.$disconnect();
+      // await prisma.$disconnect();
     }
   }
 
@@ -502,7 +502,7 @@ export class ExperimentController {
       handleError('Experimento controller', 'Update', error.message);
       throw new Error('[Controller] - Update Experimento erro: ' + error.message);
     } finally {
-      await prisma.$disconnect();
+      // await prisma.$disconnect();
     }
   }
 
@@ -744,7 +744,7 @@ export class ExperimentController {
       handleError('Experimento controller', 'Delete', error.message, error);
       throw new Error('[Controller] - Delete Experimento erro: ' + error.message);
     } finally {
-      await prisma.$disconnect();
+      // await prisma.$disconnect();
     }
   }
 

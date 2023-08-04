@@ -954,7 +954,7 @@ async function callExperimentosExperimentoXlsxDownload(options: any) {
       newItem.CLP = item?.clp;
       newItem.OBSERVAÇÕES = item?.comments;
       newItem.COUNT_NT = newItem.countNT;
-      newItem.NPE_QT = newItem.npeQT;
+      newItem.NPE_QT = item.npeQT;
       newItem.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete newItem.id;

@@ -7,6 +7,7 @@ import { ExperimentController } from '../experiment/experiment.controller';
 import { ExperimentGenotipeController } from '../experiment-genotipe.controller';
 import { removeEspecialAndSpace } from '../../shared/utils/removeEspecialAndSpace';
 import { ReporteController } from '../reportes/reporte.controller';
+import { functionsUtils } from "../../shared/utils/functionsUtils";
 
 export class ExperimentGroupController {
   experimentGroupRepository = new ExperimentGroupRepository();
@@ -80,6 +81,21 @@ export class ExperimentGroupController {
         parameters.id = JSON.parse(`{"not": ${Number(options.notId)} }`);
       }
 
+      if (options.filterGroupIds) {
+        
+        // verifica se options.filterGroupIds é string, se for converte para array
+        if (typeof options.filterGroupIds === 'string') {
+          options.filterGroupIds = options.filterGroupIds.split(',');
+        } else if (typeof options.filterGroupIds === 'number') {
+          options.filterGroupIds = [options.filterGroupIds];
+        } else if (typeof options.filterGroupIds === 'object') {
+          // se for object converte para array
+          options.filterGroupIds = Object.values(options.filterGroupIds);
+        }
+        
+        parameters.id = JSON.parse(`{"in": ${options.filterGroupIds} }`);
+      }
+
       if (options.filterQtdExpFrom || options.filterQtdExpTo) {
         if (options.filterQtdExpFrom && options.filterQtdExpTo) {
           parameters.experimentAmount = JSON.parse(`{"gte": ${Number(options.filterQtdExpFrom)}, "lte": ${Number(options.filterQtdExpTo)} }`);
@@ -126,24 +142,83 @@ export class ExperimentGroupController {
         parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[0]}" } }`));
         parameters.OR.push(JSON.parse(`{"status": {"equals": "${statusParams[1]}" } }`));
       }
-
-      const select = {
-        id: true,
-        name: true,
-        safra: {
-          select: {
-            safraName: true,
-            culture: true,
+      
+      let select;
+      
+      if (options.exportGroupsExcel == '1'){
+        select = {
+          id: true,
+          name: true,
+          safra: {
+            select: {
+              safraName: true,
+              culture: true,
+            },
           },
-        },
-        experimentAmount: true,
-        tagsToPrint: true,
-        tagsPrinted: true,
-        totalTags: true,
-        status: true,
-        experiment: true,
-      };
+          experimentAmount: true,
+          tagsToPrint: true,
+          tagsPrinted: true,
+          totalTags: true,
+          status: true,
+          experiment: {
+            include: {
+              assay_list: {
+                select: {
+                  gli: true,
+                  bgm: true,
+                  status: true,
+                  genotype_treatment: { include: { genotipo: true, lote: true } },
+                  tecnologia: { select: { name: true, id: true, cod_tec: true, }, },
+                  foco: { select: { name: true, id: true, }, },
+                  type_assay: { select: { name: true, id: true, }, },
+                  safra: { select: { safraName: true, culture: true, }, },
+                },
+              },
+              local: { select: { name_local_culture: true, cultureUnity: true, }, },
+              delineamento: { select: { name: true, repeticao: true, id: true, sequencia_delineamento: true, }, },
+              experiment_genotipe: { 
+                include:{
+                  safra: { select: { id: true, safraName: true, culture: true } },
+                  foco: { select: { name: true } },
+                  type_assay: { select: { name: true, envelope: true } },
+                  tecnologia: { select: { name: true, cod_tec: true } },
+                  genotipo: {
+                    select: {
+                      id: true,
+                      name_genotipo: true,
+                      gmr: true,
+                      bgm: true,
+                      lote: { select: { fase: true, }, },
+                      tecnologia: { select: { name: true, cod_tec: true, }, },
+                    },
+                  },
+                }
+              },
+            }
+          },
+          
+        };
+      } 
+      else {
+        select = {
+          id: true,
+          name: true,
+          safra: {
+            select: {
+              safraName: true,
+              culture: true,
+            },
+          },
+          experimentAmount: true,
+          tagsToPrint: true,
+          tagsPrinted: true,
+          totalTags: true,
+          status: true,
+          experiment: true,
 
+        };
+      }
+      
       const take = (options.take) ? Number(options.take) : undefined;
 
       const skip = (options.skip) ? Number(options.skip) : undefined;
@@ -160,7 +235,31 @@ export class ExperimentGroupController {
         skip,
         orderBy,
       );
+      
+      // se for exportar excel
+      if (options.exportGroupsExcel == '1'){
+        
+        response.map(async (experientGroup: any) => {
 
+          experientGroup.experiment.map(async (item: any) => {
+            const newItem = item;
+
+            newItem.countNT = functionsUtils
+              .countChildrenForSafra(item.assay_list.genotype_treatment, Number(options.idSafra));
+            newItem.npeQT = item.experiment_genotipe.length; // NPE_REP = Quantidade de parcelas a alocar por NPE (Genótipo do Ensaio)
+            newItem.seq_delineamento = item.delineamento.sequencia_delineamento.filter(
+              (x: any) => x.nt <= item.countNT && x.repeticao <= item.repetitionsNumber,
+            );
+
+            return newItem;
+          });
+
+          return experientGroup;
+        });
+        
+      }
+      
+      
       if (!response || response.total <= 0) {
         return { status: 400, response: [], total: 0 };
       }

@@ -574,7 +574,10 @@ export default function Listagem({
                         </div>
                       </div>
                       <div className="h-12 flex items-center justify-center w-full">
-                        <Button title="Exportar planilha de locais" icon={<RiFileExcel2Line size={20} />} bgColor="bg-blue-600" textColor="white" onClick={() => { downloadExcel(); }} />
+                        <Button title="Exportar planilha de locais" icon={<RiFileExcel2Line size={20}/>}
+                                bgColor="bg-blue-600" textColor="white" onClick={() => {
+                          downloadExcel();
+                        }}/>
                       </div>
                     </div>
                   </div>

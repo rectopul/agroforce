@@ -735,9 +735,7 @@ export class ImportExperimentController {
           let local = null;
           let assayList = null;
           let delineamento = null;
-
-          console.log('processando planilha de experimento: linha:', linha);
-
+          
           if (otimizar) {
             if (!locals.find((local) => local.name_local_culture === spreadSheet[row][7])) {
               const {response: localX} = await localController.getAll({

@@ -35,7 +35,6 @@ export class BaseRepository {
   }
 
   getPrisma() {
-    console.log('(this.clientManager)', (this.clientManager));
     return (this.clientManager) ? this.clientManager.getClient() : primaDB;
   }
 

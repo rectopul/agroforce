@@ -46,6 +46,7 @@ export class ExperimentGenotipeRepository extends BaseRepository {
   }
   
   async countTags(parameters: any) {
+    
     parameters.status = 'EM ETIQUETAGEM';
     const tagsToPrint = await prisma.experiment_genotipe.count({ where: parameters });
     parameters.status = 'IMPRESSO';
@@ -124,6 +125,7 @@ export class ExperimentGenotipeRepository extends BaseRepository {
       data: {
         status,
         counter,
+        updated_at: new Date(Date.now()) // Ao imprimir agora atualiza a data de impressão usando updated_at, necessário para o relatório de etiquetas impressas
       },
     });
     return result;
