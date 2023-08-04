@@ -61,9 +61,10 @@ import headerTableFactoryGlobal from '../../../shared/utils/headerTableFactory';
 import ComponentLoading from '../../../components/Loading';
 import { perm_can_do } from '../../../shared/utils/perm_can_do';
 
-import JSZip from 'jszip';
+import JSZip from "jszip";
 import { saveAs } from 'file-saver';
 import handleError from "../../../shared/utils/handleError";
+
 
 export default function Listagem({
   allExperimentGroup,
