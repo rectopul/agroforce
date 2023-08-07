@@ -26,7 +26,7 @@ export function convertSerialDateToJSDate(serial: number): Date {
   return new Date(totalMilliseconds);
 }
 
-function calcularData(data: number, precise: boolean = true) {
+export function calcularData(data: number, precise: boolean = true) {
   return moment(convertSerialDateToJSDate(data));
 }
 
@@ -74,8 +74,6 @@ export function converterParaTimestampISO(data: number) {
   // Chama a função auxiliar para calcular a data e retorna a representação ISO 8601
   return calcularData(data).toISOString();
 }
-
-
 
 export function converterEpochToDate(dataEpoch: number, precise:boolean = false): Date {
   // Chama a função auxiliar para calcular a data e formata no formato desejado

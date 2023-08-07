@@ -744,6 +744,7 @@ export default function Listagem({
   const exportGroupsExcel = async (): Promise<void> => {
     setLoading(true);
     
+    console.clear();
     console.log('Grupos para excel', selectedRows);
     
     let filterToExport = '';
@@ -764,10 +765,7 @@ export default function Listagem({
     await experimentGroupService.getAll(filterToExport).then(({ status, response }) => {
       if (status === 200) {
 
-        setLoading(false);
-        return;
-
-        try{
+        try {
           // Criação do arquivo ZIP e inserção dos arquivos Excel
           const zip = new JSZip();
           let nameFiles: string[] = [];
@@ -777,7 +775,6 @@ export default function Listagem({
 
             let newData:any = [];
             
-
             for (const experiment of item.experiment) {
 
               for (const experiment_genotipe of experiment.experiment_genotipe) {
@@ -878,9 +875,6 @@ export default function Listagem({
                   newItem.QTDE_REIMPRESSAO = ''; // se STATUS_IMPRESSAO == N, QTDE_REIMPRESSAO é igual vazio
                 }
                 
-                // nameMultipleFiles: [CULTURA] + “_” + [SAFRA] + “_MULTIPLOS_GRUPOS_”+ [DATA/HORA DA EXPORTAÇÃO];
-                nameMultipleGroups = `${newItem.CULTURA}_${newItem.SAFRA}_MULTIPLOS_GRUPOS_${moment().format('DD_MM_YYYY__hh_mm_ss')}.zip`;
-                
                 newData.push(newItem);
 
               } // end for experiment_genotipe 
@@ -895,6 +889,8 @@ export default function Listagem({
              */
             const nameFile = `${item.safra.culture.name}_${item.safra.safraName}_${item.name}_${moment().format('DD_MM_YYYY__hh_mm_ss')}.xlsx`;
 
+            nameMultipleGroups = `${item.safra.culture.name}_${item.safra.safraName}_MULTIPLOS_GRUPOS_${moment().format('DD_MM_YYYY__hh_mm_ss')}.zip`;
+            
             // Create Excel data
             let excelDataBytes = createExcelData(newData, nameSheet);
 
@@ -906,7 +902,7 @@ export default function Listagem({
 
           // Se tiver apenas um arquivo, nomear o zip com o nome do excel
           // Se tiver mais de um arquivo, nomear o zip com o seguinte formato: CULTURA_SAFRA_GRUPO_ETIQUETAGEM.zip
-          let zipName = nameFiles.length === 1 ? nameFiles[0] : (nameMultipleGroups ?? 'grupos-etiquetagem.zip');
+          let zipName = nameFiles.length === 1 ? nameFiles[0] : (nameMultipleGroups ? nameMultipleGroups : 'grupos-etiquetagem.zip');
           
           // Generate the zip file as a Blob
           zip.generateAsync({type:"blob"}).then(function(content) {
