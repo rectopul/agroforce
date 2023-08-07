@@ -23,6 +23,7 @@ import {NpeController} from 'src/controllers/npe/npe.controller';
 import {QuadraController} from 'src/controllers/block/quadra.controller';
 import moment from 'moment';
 import {ExperimentGenotipeController} from '../../controllers/experiment-genotipe.controller';
+import { calcularData, converterEpochToDate } from "../../shared/utils/formatDateEpoch";
 
 async function callExperimentGenotipeXlsxDownload(options: any) {
   const Controller = new ExperimentGenotipeController();
@@ -266,6 +267,18 @@ async function callTmgGenotipeXlsxDownload(options: any) {
   do {
     const { response } = await Controller.getAll(options);
     const newData = response.map((row: any) => {
+
+      let dtRDGOM = '';
+      let dtRD = '';
+      
+      if(row.dt_rde){
+        dtRDGOM = calcularData(row.dt_rde).format('DD-MM-YYYY HH:mm:ss');
+        dtRD = String(row.dt_rde).replace('.', ',');
+      } else {
+        dtRDGOM = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
+        dtRD = '';
+      }
+      
       row.CULTURA = row.culture.name;
       row.NOME_GENÓTIPO = row.name_genotipo;
       row.NOME_PRINCIPAL = row.name_main;
@@ -286,7 +299,8 @@ async function callTmgGenotipeXlsxDownload(options: any) {
       row.PROGENITORES_ORIGEM = row.progenitores_origem;
       row.PARENTESCO_COMPLETO = row.parentesco_completo;
       row.dt_export = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
-      row.DT_RD = row.dt_export;
+      row.DT_RD = dtRD;
+      row.DT_RD_GOM = dtRDGOM;
       row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete row.culture;
@@ -348,6 +362,17 @@ async function callTmgLoteXlsxDownload(options: any) {
     const { response } = await Controller.getAll(options);
     const newData = response.map((item: any) => {
       const newItem = item;
+      
+      let dtRDGOM = '';
+      let dtRD = '';
+
+      if(item.dt_rde){
+        dtRDGOM = calcularData(item.dt_rde).format('DD-MM-YYYY HH:mm:ss');
+        dtRD = String(item.dt_rde).replace('.', ',');
+      } else {
+        dtRDGOM = moment(item.dt_export).format('DD-MM-YYYY hh:mm:ss');
+        dtRD = '';
+      }
 
       newItem.CULTURA = item?.genotipo.culture.name;
       newItem.NOME_GENOTIPO = item?.genotipo.name_genotipo;
@@ -374,7 +399,8 @@ async function callTmgLoteXlsxDownload(options: any) {
       newItem.FASE = item?.fase ? String(item?.fase) : '';
       newItem.PESO = item?.peso ? String(item?.peso) : '';
       newItem.QUANT_SEMENTES = item?.quant_sementes;
-      newItem.DT_RD = String(item.dt_rde).replace('.', ',');
+      newItem.DT_RD = dtRD;
+      newItem.DT_RD_GOM = dtRDGOM;
       newItem.DT_GOM = moment().format('DD-MM-YYYY HH:mm:ss');
       
       delete newItem.quant_sementes;
@@ -385,7 +411,6 @@ async function callTmgLoteXlsxDownload(options: any) {
       delete newItem.year;
       delete newItem.id_s2;
       delete newItem.id_dados;
-      delete newItem.DT;
       delete newItem.dt_export;
       delete newItem.id;
       delete newItem.id_genotipo;
@@ -611,6 +636,17 @@ async function callLocalLugarCulturaXlsxDownload(options: any) {
     const newData = response.map((row: any) => {
       row.status = row.status === 0 ? 'Inativo' : 'Ativo';
 
+      let dtRDGOM = '';
+      let dtRD = '';
+
+      if(row.dt_rde){
+        dtRDGOM = calcularData(row.dt_rde).format('DD-MM-YYYY HH:mm:ss');
+        dtRD = String(row.dt_rde).replace('.', ',');
+      } else {
+        dtRDGOM = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
+        dtRD = '';
+      }
+      
       row.NOME_LUGAR_CULTURA = row.name_local_culture;
       row.RÓTULO = row.label;
       row.MLOC = row.mloc;
@@ -619,7 +655,9 @@ async function callLocalLugarCulturaXlsxDownload(options: any) {
       row.REGIÃO = row.label_region;
       row.LOCALIDADE = row.name_locality;
       row.STATUS = row.status;
-      row.DT_RD = Number(row.dt_rde);
+      //row.DT_RD = Number(row.dt_rde);
+      row.DT_RD = dtRD;
+      row.DT_RD_GOM = dtRDGOM;
       row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete row.id;
@@ -665,6 +703,17 @@ async function callLocalUnidadeCulturaXlsxDownload(options: any) {
     const newData = response.map((row: any) => {
       const newRow = row;
 
+      let dtRDGOM = '';
+      let dtRD = ''
+
+      if(row.dt_rde){
+        dtRDGOM = calcularData(row.dt_rde).format('DD-MM-YYYY HH:mm:ss');
+        dtRD = String(row.dt_rde).replace('.', ',');
+      } else {
+        dtRDGOM = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
+        dtRD = '';
+      }
+
       newRow.NOME_DO_LUGAR_CULTURA = newRow.local?.name_local_culture;
       newRow.RÓTULO = newRow.local?.label;
       newRow.MLOC = newRow.local?.mloc;
@@ -674,7 +723,9 @@ async function callLocalUnidadeCulturaXlsxDownload(options: any) {
       newRow.LOCALIDADE = newRow.local?.name_locality;
       newRow.NOME_UNIDADE_CULTURA = newRow?.name_unity_culture;
       newRow.ANO = newRow?.year;
-      newRow.DT_RD = Number(row.dt_rde);
+      //newRow.DT_RD = Number(row.dt_rde);
+      newRow.DT_RD = dtRD;
+      newRow.DT_RD_GOM = dtRDGOM;
       newRow.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
 
       delete newRow.year;

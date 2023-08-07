@@ -10,6 +10,7 @@ import { ReporteController } from '../reportes/reporte.controller';
 import { functionsUtils } from "../../shared/utils/functionsUtils";
 
 export class ExperimentGroupController {
+  
   experimentGroupRepository = new ExperimentGroupRepository();
 
   experimentController = new ExperimentController();
@@ -17,6 +18,7 @@ export class ExperimentGroupController {
   reporteController = new ReporteController();
 
   async getAll(options: any) {
+    console.clear();
     const parameters: object | any = {};
     let orderBy: object | any;
     try {
@@ -82,18 +84,24 @@ export class ExperimentGroupController {
       }
 
       if (options.filterGroupIds) {
-        
+        let filterGroupIds = options.filterGroupIds;
         // verifica se options.filterGroupIds é string, se for converte para array
         if (typeof options.filterGroupIds === 'string') {
-          options.filterGroupIds = options.filterGroupIds.split(',');
+          filterGroupIds = options.filterGroupIds.split(',');
         } else if (typeof options.filterGroupIds === 'number') {
-          options.filterGroupIds = [options.filterGroupIds];
+          filterGroupIds = [options.filterGroupIds];
         } else if (typeof options.filterGroupIds === 'object') {
-          // se for object converte para array
-          options.filterGroupIds = Object.values(options.filterGroupIds);
+          filterGroupIds = Object.values(options.filterGroupIds);
         }
         
-        parameters.id = JSON.parse(`{"in": ${options.filterGroupIds} }`);
+        if (filterGroupIds) {
+
+          // converte para number
+          filterGroupIds = filterGroupIds.map((item: any) => Number(item));
+          
+          parameters.id = JSON.parse(`{"in": ${JSON.stringify(filterGroupIds)} }`); // Erro: Unexpected number in JSON at position 10 undefined
+          //parameters.id = { "in": filterGroupIds };
+        }
       }
 
       if (options.filterQtdExpFrom || options.filterQtdExpTo) {
@@ -266,7 +274,7 @@ export class ExperimentGroupController {
       return { status: 200, response, total: response.total };
     } catch (error: any) {
       handleError('Grupo de experimento controller', 'GetAll', error.message);
-      throw new Error('[Controller] - GetAll Grupo de experimento erro');
+      throw new Error('[Controller] - GetAll Grupo de experimento erro: ' + error.message);
     }
   }
 
