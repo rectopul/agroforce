@@ -855,19 +855,25 @@ export default function Listagem({
                 newItem.NSEM = experiment_genotipe.type_assay.envelope.find((envelope: any) => envelope.id_safra === experiment_genotipe.safra.id).seeds; 
 
                 // Status da parcela [E] Em etiquetagem / [I]mpresso / [A]locado
-                newItem.STATUS_NPE = String(experiment_genotipe.status).substring(0, 1);
+                //newItem.STATUS_NPE = String(experiment_genotipe.status).substring(0, 1);
+                newItem.STATUS_NPE = experiment_genotipe.status;
                 
                 // se o status_NPE for I, então o status_impressao é S
-                if (newItem.STATUS_NPE === 'I') {
+                if (newItem.STATUS_NPE === 'IMPRESSO') {
                   newItem.STATUS_IMPRESSAO = 'S'; // precisa criar campo no banco - Status da impressão ([S]im/[N]ão)
                 } else {
                   newItem.STATUS_IMPRESSAO = 'N'; // precisa criar campo no banco - Status da impressão ([S]im/[N]ão)
                 }
-                
+
+                let dtImpressao = '';
+
                 if(newItem.STATUS_IMPRESSAO === 'S') {
+                  
+                  dtImpressao = experiment_genotipe.updated_at ?? experiment_genotipe.created_at;
+                  
                   // DEVE PREENCHER DT_IMPRESSAO E QTDE_REIMPRESSAO
                   // SE IMPRESSO EXTRAIR COM S, INFORMAR DATA DA ULTIMA IMPRESSAO, E QUANTIDADE DE VEZES QUE IMPRIMIU
-                  newItem.DT_IMPRESSAO = experiment_genotipe.updated_at ?? experiment_genotipe.created_at; // se STATUS_IMPRESSAO == S, Data da Última atualização do registro
+                  newItem.DT_IMPRESSAO = moment(dtImpressao).format('DD-MM-YYYY HH:mm:ss'); // se STATUS_IMPRESSAO == S, Data da Última atualização do registro
                   newItem.QTDE_REIMPRESSAO = experiment_genotipe.counter; // Se STATUS_IMPRESSAO == S - Contador de reimpressão - se imprimiu o contador é 1
                 } else {
                   // SE EM ETIQUETAGEM OU 
@@ -880,7 +886,7 @@ export default function Listagem({
               } // end for experiment_genotipe 
             } // end for experiment
 
-            const nameSheet = 'Listagem-grupo-de-etiquetagem';
+            const nameSheet = `GUIA-${item.name}`;
 
             /**
              * Cada grupo de etiquetagem deve ser gerado em um arquivo MS-EXCEL distinto com a seguinte regra de nomeação do arquivo:
@@ -891,11 +897,13 @@ export default function Listagem({
 
             nameMultipleGroups = `${item.safra.culture.name}_${item.safra.safraName}_MULTIPLOS_GRUPOS_${moment().format('DD_MM_YYYY__hh_mm_ss')}.zip`;
             
+            console.log('nameFile', nameFile, newData);
+            
             // Create Excel data
             let excelDataBytes = createExcelData(newData, nameSheet);
 
             zip.file(nameFile, excelDataBytes);
-
+            
             nameFiles.push(nameFile);
 
           } // end for item
@@ -903,6 +911,10 @@ export default function Listagem({
           // Se tiver apenas um arquivo, nomear o zip com o nome do excel
           // Se tiver mais de um arquivo, nomear o zip com o seguinte formato: CULTURA_SAFRA_GRUPO_ETIQUETAGEM.zip
           let zipName = nameFiles.length === 1 ? nameFiles[0] : (nameMultipleGroups ? nameMultipleGroups : 'grupos-etiquetagem.zip');
+          
+          // troca .xlsx por .zip
+          zipName = zipName.replace('.xlsx', '.zip');
+          
           
           // Generate the zip file as a Blob
           zip.generateAsync({type:"blob"}).then(function(content) {
