@@ -270,12 +270,12 @@ async function callTmgGenotipeXlsxDownload(options: any) {
 
       let dtRDGOM = '';
       let dtRD = '';
-      
-      if(row.dt_rde){
+
+      if (row.dt_rde) {
         dtRDGOM = calcularData(row.dt_rde).format('DD-MM-YYYY HH:mm:ss');
         dtRD = String(row.dt_rde).replace('.', ',');
       } else {
-        dtRDGOM = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
+        dtRDGOM = (row.dt_export)?moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss'):'';
         dtRD = '';
       }
       
@@ -324,12 +324,12 @@ async function callTmgGenotipeXlsxDownload(options: any) {
       delete row.progenitor_m_origem;
       delete row.progenitores_origem;
       delete row.parentesco_completo;
-      delete row.DT;
       delete row.id;
       delete row.id_tecnologia;
       delete row.tableData;
       delete row.lote;
       delete row.dt_export;
+      delete row.dt_rde;
 
       // row.DT = new Date();
 
@@ -370,7 +370,7 @@ async function callTmgLoteXlsxDownload(options: any) {
         dtRDGOM = calcularData(item.dt_rde).format('DD-MM-YYYY HH:mm:ss');
         dtRD = String(item.dt_rde).replace('.', ',');
       } else {
-        dtRDGOM = moment(item.dt_export).format('DD-MM-YYYY hh:mm:ss');
+        dtRDGOM = (item.dt_export)?moment(item.dt_export).format('DD-MM-YYYY hh:mm:ss'):'';
         dtRD = '';
       }
 
@@ -542,11 +542,24 @@ async function callEnsaioTechnologiaXlsxDownload(options: any) {
     const { response, status } = await Controller.getAll(options);
     const newData = response.map((row: any) => {
       
+      let dtRDGOM = '';
+      let dtRD = '';
+      
+      if (row.dt_rde) {
+        dtRDGOM = calcularData(row.dt_rde).format('DD-MM-YYYY HH:mm:ss');
+        dtRD = String(row.dt_rde).replace('.', ',');
+      } else {
+        dtRDGOM = (row.dt_export)?moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss'):'';
+        dtRD = '';
+      }
+      
       row.CULTURA = row.culture.desc;
       row.NOME = row.name;
       row.DESC = row.desc;
       row.COD_TEC = row.cod_tec;
-      row.DT_RD = Number(row.dt_rde);
+      //row.DT_RD = Number(row.dt_rde);
+      row.DT_RD = dtRD;
+      row.DT_RD_GOM = dtRDGOM;
       row.DT_GOM = moment().format('DD-MM-YYYY hh:mm:ss');
       
       delete row.culture;
@@ -643,7 +656,7 @@ async function callLocalLugarCulturaXlsxDownload(options: any) {
         dtRDGOM = calcularData(row.dt_rde).format('DD-MM-YYYY HH:mm:ss');
         dtRD = String(row.dt_rde).replace('.', ',');
       } else {
-        dtRDGOM = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
+        dtRDGOM = (row.dt_export)?moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss'):'';
         dtRD = '';
       }
       
@@ -710,7 +723,7 @@ async function callLocalUnidadeCulturaXlsxDownload(options: any) {
         dtRDGOM = calcularData(row.dt_rde).format('DD-MM-YYYY HH:mm:ss');
         dtRD = String(row.dt_rde).replace('.', ',');
       } else {
-        dtRDGOM = moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss');
+        dtRDGOM = (row.dt_export)?moment(row.dt_export).format('DD-MM-YYYY hh:mm:ss'):'';
         dtRD = '';
       }
 
