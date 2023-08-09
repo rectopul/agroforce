@@ -158,12 +158,12 @@ export class GenotipoController {
       response.map((genotipo: any) => {
         const dts = genotipo.lote.map((lote: any) => lote.dt_export);
         const maxDt = Math.max(...dts);
-        genotipo.dt_export = new Date(maxDt);
-        
+        genotipo.dt_export = (maxDt) ? new Date(maxDt) : '';
+
         // dt_rde
         const dtRde = genotipo.lote.map((lote: any) => lote.dt_rde);
         const maxDtRde = Math.max(...dtRde);
-        genotipo.dt_rde = new Date(maxDtRde);
+        genotipo.dt_rde = (maxDtRde) ? maxDtRde : '';
         
       });
 
